@@ -43,14 +43,14 @@ func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
 
 // ResetFleetManager re-registers the global fleet handler, if needed, and replace it with the test one.
 func ResetFleetManager(handler MockV2Handler) error {
-	managers, err := feature.GlobalRegistry().LookupAll(lbmanagement.Namespace)
-	if err != nil {
-		return fmt.Errorf("error finding management plugin: %w", err)
-	}
-	if managers != nil && managers[0].Name() == defaultFleetName {
-		_ = feature.GlobalRegistry().Unregister(lbmanagement.Namespace, defaultFleetName)
-	}
-	lbmanagement.Register("fleet-test", fleetClientFactory(handler), feature.Beta)
+	// Try to unregister the default fleet manager, ignoring the error if it
+	// isn't present, and replace it with a mocked equivalent.
+	_ = feature.GlobalRegistry().Unregister(lbmanagement.Namespace, defaultFleetName)
+	feature.MustRegister(feature.New(
+		lbmanagement.Namespace,
+		"fleet-test",
+		fleetClientFactory(handler),
+		feature.MakeDetails("fleet-test", "", feature.Beta)))
 	return nil
 }
 
@@ -58,7 +58,7 @@ func fleetClientFactory(srv MockV2Handler) lbmanagement.PluginFunc {
 	return func(config *conf.C) lbmanagement.FactoryFunc {
 		c := management.DefaultConfig()
 		if config.Enabled() {
-			if err := config.Unpack(&c); err != nil {
+			if err := config.Unpack(&c); err == nil {
 				return nil
 			}
 			return func(_ *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {

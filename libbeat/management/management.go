@@ -115,13 +115,6 @@ type PluginFunc func(*config.C) FactoryFunc
 // FactoryFunc for creating a config manager
 type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 
-// Register a config manager
-func Register(name string, fn PluginFunc, stability feature.Stability) {
-	f := feature.New(
-		Namespace, name, fn, feature.MakeDetails(name, "", stability))
-	feature.MustRegister(f)
-}
-
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
 func Factory(cfg *config.C) FactoryFunc {

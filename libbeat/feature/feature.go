@@ -27,8 +27,6 @@ var registry = NewRegistry()
 
 // Featurable implements the description of a feature.
 type Featurable interface {
-	bundleable
-
 	// Namespace is the kind of plugin or functionality we want to expose as a feature.
 	// Examples: Autodiscover's provider, processors, outputs.
 	Namespace() string
@@ -42,7 +40,7 @@ type Featurable interface {
 	// of the method is type checked by the 'FindFactory' of each namespace.
 	Factory() interface{}
 
-	// Description return the avaiable information for a specific feature.
+	// Description return the available information for a specific feature.
 	Description() Details
 
 	String() string
@@ -71,7 +69,7 @@ func (f *Feature) Factory() interface{} {
 	return f.factory
 }
 
-// Description return the avaiable information for a specific feature.
+// Description return the available information for a specific feature.
 func (f *Feature) Description() Details {
 	return f.description
 }
@@ -101,54 +99,25 @@ func GlobalRegistry() *Registry {
 	return registry
 }
 
-// RegisterBundle registers a bundle of features.
-func RegisterBundle(bundle *Bundle) error {
-	for _, f := range bundle.Features() {
-		err := GlobalRegistry().Register(f)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// MustRegisterBundle register a new bundle and panic on error.
-func MustRegisterBundle(bundle *Bundle) {
-	err := RegisterBundle(bundle)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// OverwriteBundle register a bundle of feature and replace any existing feature with a new
-// implementation.
-func OverwriteBundle(bundle *Bundle) error {
-	for _, f := range bundle.Features() {
-		err := GlobalRegistry().Register(f)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// MustOverwriteBundle register a bundle of feature, replace any existing feature with a new
-// implementation and panic on error.
-func MustOverwriteBundle(bundle *Bundle) {
-	err := OverwriteBundle(bundle)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// Register register a new feature on the global registry.
-func Register(feature Featurable) error {
+// register is a helper that registers a single feature in the global registry.
+func register(feature Featurable) error {
 	return GlobalRegistry().Register(feature)
 }
 
+// Register registers new features on the global registry.
+func Register(features ...Featurable) error {
+	for _, f := range features {
+		err := register(f)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // MustRegister register a new Feature on the global registry and panic on error.
-func MustRegister(feature Featurable) {
-	err := Register(feature)
+func MustRegister(features ...Featurable) {
+	err := Register(features...)
 	if err != nil {
 		panic(err)
 	}

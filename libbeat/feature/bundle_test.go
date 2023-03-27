@@ -36,21 +36,9 @@ func TestBundle(t *testing.T) {
 		assert.Equal(t, 3, len(b.Features()))
 	})
 
-	t.Run("Filters feature based on Stability", func(t *testing.T) {
-		b := NewBundle(features...)
-		new := b.Filter(Experimental)
-		assert.Equal(t, 1, len(new.Features()))
-	})
-
-	t.Run("Filters feature based on multiple different Stability", func(t *testing.T) {
-		b := NewBundle(features...)
-		new := b.Filter(Experimental, Stable)
-		assert.Equal(t, 2, len(new.Features()))
-	})
-
 	t.Run("Creates a new Bundle from specified feature", func(t *testing.T) {
 		f1 := New("libbeat.outputs", "elasticsearch", factory, Details{Stability: Stable})
-		b := MustBundle(f1)
+		b := NewBundle(f1)
 		assert.Equal(t, 1, len(b.Features()))
 	})
 
@@ -60,11 +48,7 @@ func TestBundle(t *testing.T) {
 		f3 := New("libbeat.input", "tcp", factory, Details{Stability: Beta})
 		f4 := New("libbeat.input", "udp", factory, Details{Stability: Beta})
 
-		b := MustBundle(
-			MustBundle(f1),
-			MustBundle(f2),
-			MustBundle(f3, f4),
-		)
+		b := NewBundle(f1, f2, f3, f4)
 
 		assert.Equal(t, 4, len(b.Features()))
 	})

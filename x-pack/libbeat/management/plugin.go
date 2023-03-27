@@ -11,7 +11,11 @@ import (
 )
 
 func init() {
-	lbmanagement.Register("x-pack-fleet", NewFleetManagerPluginV2, feature.Beta)
+	feature.MustRegister(feature.New(
+		lbmanagement.Namespace,
+		"x-pack-fleet",
+		NewFleetManagerPluginV2,
+		feature.MakeDetails("x-pack-fleet", "", feature.Beta)))
 }
 
 // NewFleetManagerPluginV2 registers the V2 callback

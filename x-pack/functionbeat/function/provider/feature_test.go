@@ -23,15 +23,15 @@ func TestBuilder(t *testing.T) {
 	fnFactory1 := func(_ Provider, _ *conf.C) (Function, error) { return nil, nil }
 	fnFactory2 := func(_ Provider, _ *conf.C) (Function, error) { return nil, nil }
 
-	b := MustCreate(
+	b := Builder(
 		provider,
 		providerFactory,
 		feature.MakeDetails("myprovider", "myprovider", feature.Experimental),
-	).MustAddFunction(
+	).AddFunction(
 		"f1",
 		fnFactory1,
 		feature.MakeDetails("fn1 description", "fn1", feature.Experimental),
-	).MustAddFunction("f2", fnFactory2, feature.MakeDetails(
+	).AddFunction("f2", fnFactory2, feature.MakeDetails(
 		"fn1 description",
 		"fn1",
 		feature.Experimental,

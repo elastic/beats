@@ -159,19 +159,6 @@ func (r *Registry) LookupAll(namespace string) ([]Featurable, error) {
 	return list, nil
 }
 
-// Overwrite allow to replace an existing feature with a new implementation.
-func (r *Registry) Overwrite(feature Featurable) error {
-	_, err := r.Lookup(feature.Namespace(), feature.Name())
-	if err == nil {
-		err := r.Unregister(feature.Namespace(), feature.Name())
-		if err != nil {
-			return err
-		}
-	}
-
-	return r.Register(feature)
-}
-
 // Size returns the number of registered features in the registry.
 func (r *Registry) Size() int {
 	r.RLock()
