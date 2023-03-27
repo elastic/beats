@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -28,7 +29,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 // Package packages the Beat for distribution. It generates packages based on
@@ -201,14 +201,14 @@ func saveIronbank() error {
 	ironbank := getIronbankContextName()
 	buildDir := filepath.Join("build", ironbank)
 	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
-		return fmt.Errorf("cannot find the folder with the ironbank context: %+v", err)
+		return fmt.Errorf("cannot find the folder with the ironbank context: %w", err)
 	}
 
 	distributionsDir := "build/distributions"
 	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
 		err := os.MkdirAll(distributionsDir, 0750)
 		if err != nil {
-			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+			return fmt.Errorf("cannot create folder for docker artifacts: %w", err)
 		}
 	}
 	tarGzFile := filepath.Join(distributionsDir, ironbank+".tar.gz")
@@ -216,24 +216,13 @@ func saveIronbank() error {
 	// Save the build context as tar.gz artifact
 	err := TarWithOptions(buildDir, tarGzFile, true)
 	if err != nil {
-		return fmt.Errorf("cannot compress the tar.gz file: %+v", err)
+		return fmt.Errorf("cannot compress the tar.gz file: %w", err)
 	}
 
-	return errors.Wrap(CreateSHA512File(tarGzFile), "failed to create .sha512 file")
-}
-
-// updateWithDarwinUniversal checks if darwin/amd64 and darwin/arm64, are listed
-// if so, the universal binary was built, then we need to package it as well.
-func updateWithDarwinUniversal(platforms BuildPlatformList) BuildPlatformList {
-	if IsDarwinUniversal() {
-		platforms = append(platforms,
-			BuildPlatform{
-				Name:  "darwin/universal",
-				Flags: CGOSupported | CrossBuildSupported | Default,
-			})
+	if err = CreateSHA512File(tarGzFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
 	}
-
-	return platforms
+	return nil
 }
 
 // isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
@@ -260,8 +249,11 @@ type packageBuilder struct {
 func (b packageBuilder) Build() error {
 	fmt.Printf(">> package: Building %v type=%v for platform=%v\n", b.Spec.Name, b.Type, b.Platform.Name)
 	log.Printf("Package spec: %+v", b.Spec)
-	return errors.Wrapf(b.Type.Build(b.Spec), "failed building %v type=%v for platform=%v",
-		b.Spec.Name, b.Type, b.Platform.Name)
+	if err := b.Type.Build(b.Spec); err != nil {
+		return fmt.Errorf("failed building %v type=%v for platform=%v: %w",
+			b.Spec.Name, b.Type, b.Platform.Name, err)
+	}
+	return nil
 }
 
 type testPackagesParams struct {
