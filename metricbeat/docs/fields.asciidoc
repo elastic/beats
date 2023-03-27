@@ -32624,6 +32624,21 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.force_merge.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.force_merge.rejected.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.thread_pool.get.queue.count`*::
 +
 --
