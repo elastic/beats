@@ -18,8 +18,6 @@
 package mage
 
 import (
-	"strings"
-
 	"github.com/magefile/mage/mg"
 	"go.uber.org/multierr"
 
@@ -42,7 +40,7 @@ var (
 )
 
 // GolangCrossBuild builds the Beat binary inside the golang-builder and then
-// checks the binaries GLIBC requirements for RHEL compatability.
+// checks the binaries GLIBC requirements for RHEL compatibility.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	return multierr.Combine(
@@ -65,21 +63,5 @@ func golangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild(devtools.ImageSelector(func(platform string) (string, error) {
-		image, err := devtools.CrossBuildImage(platform)
-		if err != nil {
-			return "", err
-		}
-		// Normally linux/amd64 and linux/386 binaries are build using debian7
-		// because it has an older glibc version that makes the binaries work on
-		// RHEL 6, but debian7 does not have the systemd libraries needed for
-		// the journald input.
-		//
-		// So use the debian8 image, but test the binary to ensure that the
-		// linked glibc version requirement is still compatible with RHEL6.
-		if platform == "linux/amd64" || platform == "linux/386" {
-			image = strings.ReplaceAll(image, "main-debian7", "main-debian8")
-		}
-		return image, nil
-	}))
+	return devtools.CrossBuild(devtools.ImageSelector(devtools.CrossBuildImage))
 }
