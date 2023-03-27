@@ -5,7 +5,10 @@
 package awss3
 
 import (
+	"context"
 	"io"
+	"sync/atomic"
+	"time"
 
 	"github.com/rcrowley/go-metrics"
 
@@ -15,9 +18,12 @@ import (
 )
 
 type inputMetrics struct {
-	registry           *monitoring.Registry
-	unregister         func()
-	metricReporterChan chan int64
+	registry   *monitoring.Registry
+	unregister func()
+	ctx        context.Context
+	cancel     context.CancelFunc
+
+	utilizationNanos int64
 
 	sqsMessagesReceivedTotal            *monitoring.Uint  // Number of SQS messages received (not necessarily processed fully).
 	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint  // Number of SQS visibility timeout extensions.
@@ -39,13 +45,15 @@ type inputMetrics struct {
 	s3ObjectProcessingTime  metrics.Sample   // Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
 }
 
-// Close removes the metrics from the registry.
+// Close cancels the context and removes the metrics from the registry.
 func (m *inputMetrics) Close() {
+	m.cancel()
 	m.unregister()
 }
 
-func (m *inputMetrics) initializeReporterChan() {
-	m.metricReporterChan = make(chan int64)
+func (m *inputMetrics) updateSQSProcessingTime(d time.Duration) {
+	m.sqsMessageProcessingTime.Update(d.Nanoseconds())
+	atomic.AddInt64(&m.utilizationNanos, d.Nanoseconds())
 }
 
 func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
@@ -60,12 +68,40 @@ func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 	m.sqsMessagesWaiting.Set(count)
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+func calculateUtilization(d time.Duration, maxMessagesInflight int, m *inputMetrics) float64 {
+	maxUtilization := float64(d) * float64(maxMessagesInflight)
+	utilizedRate := float64(atomic.SwapInt64(&m.utilizationNanos, 0)) / maxUtilization
+	return utilizedRate
+}
+
+func (m *inputMetrics) pollSQSUtilizationMetric(ctx context.Context, maxMessagesInflight int) {
+	t := time.NewTicker(5 * time.Second)
+	defer t.Stop()
+
+	lastTick := time.Now()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case tick := <-t.C:
+			duration := tick.Sub(lastTick)
+			utilizedRate := calculateUtilization(duration, maxMessagesInflight, m)
+			m.sqsWorkerUtilization.Set(utilizedRate)
+			// reset for the next polling duration
+			lastTick = tick
+		}
+	}
+}
+
+func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers int) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+	ctx, cancelInputCtx := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
 		registry:                            reg,
 		unregister:                          unreg,
+		ctx:                                 ctx,
+		cancel:                              cancelInputCtx,
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
@@ -89,6 +125,9 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+
+	go out.pollSQSUtilizationMetric(ctx, maxWorkers)
+
 	return out
 }
 

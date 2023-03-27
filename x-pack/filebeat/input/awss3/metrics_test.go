@@ -6,8 +6,10 @@ package awss3
 
 import (
 	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestInputMetricsClose asserts that metrics registered by this input are
@@ -17,10 +19,21 @@ import (
 func TestInputMetricsClose(t *testing.T) {
 	reg := monitoring.NewRegistry()
 
-	metrics := newInputMetrics("aws-s3-aws.cloudfront_logs-8b312b5f-9f99-492c-b035-3dff354a1f01", reg)
+	metrics := newInputMetrics("aws-s3-aws.cloudfront_logs-8b312b5f-9f99-492c-b035-3dff354a1f01", reg, defaultConfig().MaxNumberOfMessages)
 	metrics.Close()
 
 	reg.Do(monitoring.Full, func(s string, _ interface{}) {
 		t.Errorf("registry should be empty, but found %v", s)
 	})
+}
+
+func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	maxWorkers := 1
+	metrics := newInputMetrics("test", reg, maxWorkers)
+
+	metrics.utilizationNanos = time.Second.Nanoseconds()
+
+	utilization := calculateUtilization(time.Second, maxWorkers, metrics)
+	assert.Greater(t, utilization, 0.9)
 }

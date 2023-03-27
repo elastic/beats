@@ -105,9 +105,10 @@ func newSQSS3EventProcessor(
 	maxReceiveCount int,
 	pipeline beat.Pipeline,
 	s3 s3ObjectHandlerFactory,
+	maxWorkers int,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry())
+		metrics = newInputMetrics("", monitoring.NewRegistry(), maxWorkers)
 	}
 	return &sqsS3EventProcessor{
 		s3ObjectHandler:      s3,

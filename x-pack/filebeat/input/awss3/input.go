@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"sync/atomic"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -132,7 +131,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
-		go pollSqsUtilizationMetric(ctx, receiver)
 
 		if err := receiver.Receive(ctx); err != nil {
 			return err
@@ -210,9 +208,9 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	if err != nil {
 		return nil, err
 	}
-	in.metrics = newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory, in.config.MaxNumberOfMessages)
 	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
@@ -283,8 +281,8 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	in.metrics = newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
 		in.metrics,
 		s3API,
@@ -408,34 +406,6 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 			}
 
 			receiver.metrics.setSQSMessagesWaiting(int64(count))
-		}
-	}
-}
-
-func pollSqsUtilizationMetric(ctx context.Context, receiver *sqsReader) {
-	t := time.NewTicker(5 * time.Second)
-	defer t.Stop()
-
-	var utilizedNanos int64
-	go func() {
-		for elem := range receiver.metrics.metricReporterChan {
-			atomic.AddInt64(&utilizedNanos, elem)
-		}
-	}()
-
-	lastTick := time.Now()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case tick := <-t.C:
-			maxUtilization := float64(tick.Sub(lastTick)) * float64(receiver.maxMessagesInflight)
-
-			utilizedRate := float64(atomic.SwapInt64(&utilizedNanos, 0)) / maxUtilization
-			receiver.metrics.sqsWorkerUtilization.Set(utilizedRate)
-
-			// reset for the next polling duration
-			lastTick = tick
 		}
 	}
 }
