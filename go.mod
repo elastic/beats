@@ -123,7 +123,7 @@ require (
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/miekg/dns v1.1.42
 	github.com/mitchellh/gox v1.0.1
-	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
+	github.com/mitchellh/hashstructure v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/osquery/osquery-go v0.0.0-20210622151333-99b4efa62ec5
@@ -159,13 +159,8 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	golang.org/x/net v0.2.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
-<<<<<<< HEAD
-	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0
-	golang.org/x/sys v0.2.0
-=======
 	golang.org/x/sync v0.1.0
 	golang.org/x/sys v0.6.0
->>>>>>> faf4c11477 (Report FQDN on host.name enabled by a feature flag (#34456))
 	golang.org/x/text v0.4.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.1.12
@@ -198,15 +193,9 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
-<<<<<<< HEAD
-	github.com/elastic/elastic-agent-libs v0.2.16
-	github.com/elastic/elastic-agent-shipper-client v0.4.0
-	github.com/elastic/elastic-agent-system-metrics v0.4.6
-=======
 	github.com/elastic/elastic-agent-libs v0.3.3
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.4.6-0.20230308003052-ba171438211e
->>>>>>> faf4c11477 (Report FQDN on host.name enabled by a feature flag (#34456))
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
