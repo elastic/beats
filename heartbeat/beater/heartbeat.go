@@ -136,8 +136,16 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
-	bt.trace.Write("start\n")
-	defer bt.trace.Close()
+	err := bt.trace.Write("start\n")
+	if err != nil {
+		logp.L().Warn("could not start trace: %s", err)
+	}
+	defer func() {
+		err := bt.trace.Close()
+		if err != nil {
+			logp.L().Warn("could not close trace: %s", err)
+		}
+	}()
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()

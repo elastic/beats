@@ -41,17 +41,16 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 
 	started := time.Now()
 	for {
-		if time.Now().Sub(started) > wait {
+		elapsed := time.Now().Sub(started)
+		if elapsed > wait {
 			return st, fmt.Errorf("wait time for sock trace exceeded: %s", wait)
 		}
 		if _, err := os.Stat(st.path); err == nil {
 			logp.L().Info("socktracer found file for unix socket: %s, will attemp to connect")
-			fmt.Printf("WHUT %s\n", st.path)
 			break
 		} else {
 			delay := time.Millisecond * 250
 			logp.L().Info("socktracer could not find file for unix socket at: %s, will retry in %s", delay)
-			fmt.Printf("HUH\n")
 			time.Sleep(delay)
 		}
 	}

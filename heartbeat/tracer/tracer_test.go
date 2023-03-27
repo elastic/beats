@@ -19,7 +19,6 @@ package tracer
 
 import (
 	"bufio"
-	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -60,14 +59,13 @@ func TestSockTracerWaitFail(t *testing.T) {
 }
 
 func TestSockTracerWaitSuccess(t *testing.T) {
-	waitFor := 2 * time.Second
-	delay := time.Microsecond * 1500
+	waitFor := 5 * time.Second
+	delay := time.Millisecond * 1500
 
 	sockName, err := uuid.NewRandom()
 	require.NoError(t, err)
 	sockPath := filepath.Join(os.TempDir(), sockName.String())
 
-	fmt.Printf("KICKIT\n")
 	listenCh := make(chan net.Listener)
 	time.AfterFunc(delay, func() {
 		listener, err := net.Listen("unix", sockPath)
@@ -75,7 +73,7 @@ func TestSockTracerWaitSuccess(t *testing.T) {
 		listenCh <- listener
 	})
 
-	defer (<-listenCh).Close()
+	defer func() { (<-listenCh).Close() }()
 
 	started := time.Now()
 	st, err := NewSockTracer(sockPath, waitFor)
