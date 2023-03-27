@@ -60,6 +60,7 @@
   dataset_id: "dataset id"
   table_pattern: "table pattern"
   cost_type: "regular"
+- module: gcp
   metricsets:
     - carbon
   period: 24h
