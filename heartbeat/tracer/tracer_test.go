@@ -14,8 +14,6 @@ import (
 )
 
 func TestSockTracer(t *testing.T) {
-	t.Parallel()
-
 	sockName, err := uuid.NewRandom()
 	require.NoError(t, err)
 	sockPath := filepath.Join(os.TempDir(), sockName.String())
@@ -36,8 +34,6 @@ func TestSockTracer(t *testing.T) {
 }
 
 func TestSockTracerWaitFail(t *testing.T) {
-	t.Parallel()
-
 	waitFor := time.Second
 
 	started := time.Now()
