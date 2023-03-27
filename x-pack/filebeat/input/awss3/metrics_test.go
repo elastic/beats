@@ -35,5 +35,5 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 	metrics.utilizationNanos = time.Second.Nanoseconds()
 
 	utilization := calculateUtilization(time.Second, maxWorkers, metrics)
-	assert.Greater(t, utilization, 0.9)
+	assert.Greater(t, utilization, 0.95)
 }
