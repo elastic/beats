@@ -22,7 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -119,17 +118,7 @@ type chanList struct {
 	tail *batchACKState
 }
 
-func init() {
-	queue.RegisterQueueType(
-		"mem",
-		create,
-		feature.MakeDetails(
-			"Memory queue",
-			"Buffer events in memory before sending to the output.",
-			feature.Stable))
-}
-
-func create(
+func Factory(
 	ackListener queue.ACKListener, logger *logp.Logger, cfg *c.C, inQueueSize int,
 ) (queue.Queue, error) {
 	config := defaultConfig

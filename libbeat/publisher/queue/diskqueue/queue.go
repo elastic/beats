@@ -24,7 +24,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -101,19 +100,9 @@ type metricsRequestResponse struct {
 	sizeOnDisk uint64
 }
 
-func init() {
-	queue.RegisterQueueType(
-		"disk",
-		queueFactory,
-		feature.MakeDetails(
-			"Disk queue",
-			"Buffer events on disk before sending to the output.",
-			feature.Stable))
-}
-
-// queueFactory matches the queue.Factory interface, and is used to add the
-// disk queue to the registry.
-func queueFactory(
+// Factory matches the queue.Factory interface, and is used to create
+// the queue during pipeline initialization.
+func Factory(
 	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)

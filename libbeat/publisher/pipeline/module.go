@@ -27,6 +27,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -180,8 +182,12 @@ func createQueueBuilder(
 		queueType = b
 	}
 
-	queueFactory := queue.FindFactory(queueType)
-	if queueFactory == nil {
+	var queueFactory queue.Factory
+	if queueType == "mem" {
+		queueFactory = memqueue.Factory
+	} else if queueType == "disk" {
+		queueFactory = diskqueue.Factory
+	} else {
 		return nil, fmt.Errorf("'%v' is no valid queue type", queueType)
 	}
 
