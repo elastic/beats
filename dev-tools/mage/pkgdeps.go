@@ -121,7 +121,7 @@ func installDependencies(arch string, pkgs ...string) error {
 		return err
 	}
 
-	params := append([]string{"install", "-y", "--force-yes",
+	params := append([]string{"install", "-y",
 		"--no-install-recommends",
 
 		// Journalbeat is built with old versions of Debian that don't update
