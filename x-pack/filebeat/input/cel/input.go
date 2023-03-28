@@ -803,9 +803,11 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 var (
 	// mimetypes holds supported MIME type mappings.
 	mimetypes = map[string]interface{}{
-		"application/gzip":     func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
-		"application/x-ndjson": lib.NDJSON,
-		"application/zip":      lib.Zip,
+		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
+		"application/x-ndjson":     lib.NDJSON,
+		"application/zip":          lib.Zip,
+		"text/csv; header=absent":  lib.CSVNoHeader,
+		"text/csv; header=present": lib.CSVHeader,
 	}
 
 	// limitPolicies are the provided rate limit policy helpers.

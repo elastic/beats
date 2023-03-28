@@ -1,0 +1,32 @@
+{
+  "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud.account.id": "01475F-5B1080-1137E7",
+    "cloud.project.id": "elastic-bi",
+    "cloud.project.name": "elastic-containerlib-prod",
+    "cloud.provider": "gcp",
+    "event": {
+      "dataset": "gcp.carbon",
+      "duration": 115000,
+      "module": "gcp"
+    },
+    "gcp": {
+      "carbon": {
+        "project_id": "containerlib-prod-12763",
+        "project_name": "elastic-containerlib-prod",
+        "service_id": "24E6-581D-38E5",
+        "service_description": "BigQuery",
+        "footprint.scope1":          4.044,
+        "footprint.scope2.location": 1.797,
+        "footprint.scope2.market":   null,
+        "footprint.scope3":          2.337,
+        "footprint.offsets":         null
+      }
+    },
+    "metricset": {
+      "name": "carbon",
+      "period": 10000
+    },
+    "service": {
+      "type": "gcp"
+    }
+}

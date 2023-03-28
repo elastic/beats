@@ -15,30 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package queue
+package beat
 
 import (
-	"github.com/elastic/beats/v7/libbeat/feature"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-// Namespace is the feature namespace for queue definition.
-const Namespace = "libbeat.queue"
-
-// RegisterQueueType registers a new queue type.
-func RegisterQueueType(name string, factory Factory, details feature.Details) {
-	feature.MustRegister(feature.New(Namespace, name, factory, details))
-}
-
-// FindFactory retrieves a queue types constructor. Returns nil if queue type is unknown
-func FindFactory(name string) Factory {
-	f, err := feature.GlobalRegistry().Lookup(Namespace, name)
-	if err != nil {
-		return nil
+func TestFQDNAwareHostname(t *testing.T) {
+	info := Info{
+		Hostname: "foo",
+		FQDN:     "foo.bar.internal",
 	}
-	factory, ok := f.Factory().(Factory)
-	if !ok {
-		return nil
+	cases := map[string]struct {
+		useFQDN bool
+		want    string
+	}{
+		"fqdn_flag_enabled": {
+			useFQDN: true,
+			want:    "foo.bar.internal",
+		},
+		"fqdn_flag_disabled": {
+			useFQDN: false,
+			want:    "foo",
+		},
 	}
 
-	return factory
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := info.FQDNAwareHostname(tc.useFQDN)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }

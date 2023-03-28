@@ -1,0 +1,21 @@
+[[metrics-winlogbeat]]
+=== Event Processing Metrics
+
+Winlogbeat exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the event log processing activity of Winlogbeat.
+
+[float]
+==== Winlog Metrics
+
+[options="header"]
+|=======
+| Metric                   | Description
+| `provider`               | Name of the provider being read.
+| `received_events_total`  | Total number of events received.
+| `discarded_events_total` | Total number of discarded events.
+| `errors_total`           | Total number of errors.
+| `received_events_count`  | Histogram of the number of events in each non-zero batch.
+| `source_lag_time`        | Histogram of the difference between timestamped event's creation and reading.
+| `batch_read_period`      | Histogram of the elapsed time between non-zero batch reads.
+|=======
