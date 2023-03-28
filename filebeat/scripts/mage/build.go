@@ -46,5 +46,5 @@ func golangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return devtools.CrossBuild(devtools.ImageSelector(devtools.CrossBuildImage))
 }
