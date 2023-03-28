@@ -54,7 +54,7 @@ func ResetFleetManager(handler MockV2Handler) error {
 	return nil
 }
 
-func fleetClientFactory(srv MockV2Handler) lbmanagement.PluginFunc {
+func fleetClientFactory(srv MockV2Handler) func(config *conf.C) lbmanagement.FactoryFunc {
 	return func(config *conf.C) lbmanagement.FactoryFunc {
 		c := management.DefaultConfig()
 		if config.Enabled() {

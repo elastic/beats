@@ -23,7 +23,6 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -115,23 +114,35 @@ type PluginFunc func(*config.C) FactoryFunc
 // FactoryFunc for creating a config manager
 type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 
-// Factory retrieves config manager constructor. If no one is registered
-// it will create a nil manager
-func Factory(cfg *config.C) FactoryFunc {
-	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
-	if err != nil {
-		return nilFactory
-	}
+// If managerPlugin is non-nil, it will be used by Factory to create the
+// FactoryFunc for the active manager. Must hold managerPluginLock to access
+// managerPlugin.
+var managerPlugin PluginFunc
+var managerPluginLock sync.Mutex
 
-	for _, f := range factories {
-		if plugin, ok := f.Factory().(PluginFunc); ok {
-			if factory := plugin(cfg); factory != nil {
-				return factory
-			}
+// Factory returns a factory to create a manager plugin.
+// In normal operation this returns NewFleetManagerPluginV2 if linked against
+// x-pack (see x-pack/libbeat/management/plugin.go), and nilFactory otherwise.
+// Tests can call SetPlugin to make this instead return a mocked manager.
+func Factory(cfg *config.C) FactoryFunc {
+	managerPluginLock.Lock()
+	defer managerPluginLock.Unlock()
+
+	if managerPlugin != nil {
+		if managerFactory := managerPlugin(cfg); managerFactory != nil {
+			return managerFactory
 		}
 	}
-
 	return nilFactory
+}
+
+// SetPlugin sets the beats manager plugin to the given value. It is only
+// called by Agent V2 initialization (x-pack/libbeat/management/plugin.go)
+// and by tests that need a mocked manager plugin.
+func SetPlugin(plugin PluginFunc) {
+	managerPluginLock.Lock()
+	defer managerPluginLock.Unlock()
+	managerPlugin = plugin
 }
 
 // fallbackManager, fallback when no manager is present

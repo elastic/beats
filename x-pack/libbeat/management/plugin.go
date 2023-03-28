@@ -5,17 +5,17 @@
 package management
 
 import (
-	"github.com/elastic/beats/v7/libbeat/feature"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func init() {
-	feature.MustRegister(feature.New(
-		lbmanagement.Namespace,
-		"x-pack-fleet",
-		NewFleetManagerPluginV2,
-		feature.MakeDetails("x-pack-fleet", "", feature.Beta)))
+	lbmanagement.SetPlugin(NewFleetManagerPluginV2)
+	/*feature.MustRegister(feature.New(
+	lbmanagement.Namespace,
+	"x-pack-fleet",
+	NewFleetManagerPluginV2,
+	feature.MakeDetails("x-pack-fleet", "", feature.Beta)))*/
 }
 
 // NewFleetManagerPluginV2 registers the V2 callback
