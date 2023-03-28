@@ -42,8 +42,10 @@ func TestSockTracer(t *testing.T) {
 	st, err := NewSockTracer(sockPath, time.Second)
 	require.NoError(t, err)
 
-	st.Write("start")
-	st.Close()
+	err = st.Write("start")
+	require.NoError(t, err)
+	err = st.Close()
+	require.NoError(t, err)
 
 	got := <-listenRes
 	require.Equal(t, got, []string{"start"})
@@ -79,13 +81,17 @@ func TestSockTracerWaitSuccess(t *testing.T) {
 	st, err := NewSockTracer(sockPath, waitFor)
 	require.NoError(t, err)
 	defer st.Close()
-	elapsed := time.Now().Sub(started)
+	elapsed := time.Since(started)
 	require.GreaterOrEqual(t, elapsed, delay)
 }
 
 func listenTilClosed(t *testing.T, sockPath string) []string {
 	listener, err := net.Listen("unix", sockPath)
-	defer listener.Close()
+	require.NoError(t, err)
+	defer func() {
+		err := listener.Close()
+		require.NoError(t, err)
+	}()
 
 	conn, err := listener.Accept()
 	require.NoError(t, err)

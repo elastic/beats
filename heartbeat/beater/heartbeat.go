@@ -138,12 +138,12 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	err := bt.trace.Write("start\n")
 	if err != nil {
-		logp.L().Warn("could not start trace: %s", err)
+		logp.L().Errorf("could not start trace: %s", err)
 	}
 	defer func() {
 		err := bt.trace.Close()
 		if err != nil {
-			logp.L().Warn("could not close trace: %s", err)
+			logp.L().Errorf("could not close trace: %s", err)
 		}
 	}()
 
@@ -200,7 +200,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
-	bt.trace.Write("stop")
+	err = bt.trace.Write("stop")
+	if err != nil {
+		logp.L().Errorf("could not write trace stop event: %s", err)
+	}
 	logp.L().Info("Shutting down.")
 	return nil
 }
@@ -240,6 +243,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 			return nil
 		}
 		outCfg := conf.Namespace{}
+		// nolint:nilerr
 		if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
 			return nil
 		}
