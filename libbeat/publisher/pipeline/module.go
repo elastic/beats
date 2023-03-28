@@ -188,7 +188,7 @@ func createQueueFactory(
 	}
 
 	switch queueType {
-	case "mem":
+	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(config.Config())
 		if err != nil {
 			return nil, err
@@ -197,7 +197,7 @@ func createQueueFactory(
 		// initialization for the size of its API channel buffer.
 		settings.InputQueueSize = inQueueSize
 		return memQueueFactory(monitors.Logger, settings), nil
-	case "disk":
+	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(config.Config())
 		if err != nil {
 			return nil, err

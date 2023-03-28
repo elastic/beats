@@ -29,6 +29,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 
+// The string used to specify this queue in beats configurations.
+const QueueType = "disk"
+
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
 type diskQueue struct {

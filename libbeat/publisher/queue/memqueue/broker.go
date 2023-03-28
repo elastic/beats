@@ -27,6 +27,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 
+// The string used to specify this queue in beats configurations.
+const QueueType = "mem"
+
 const (
 	minInputQueueSize      = 20
 	maxInputQueueSizeRatio = 0.1
