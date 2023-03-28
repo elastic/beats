@@ -112,29 +112,12 @@ reading additional event log records.
 ==== `event_logs.name`
 
 The name of the event log to monitor. Each dictionary under `event_logs` must
-have a `name` field, except for those which use a custom XML query. You can
-get a list of available event logs by running `Get-EventLog *` in PowerShell.
-Here is a sample of the output from the command:
-
-[source,sh]
---------------------------------------------------------------------------------
-PS C:\Users\vagrant> Get-EventLog *
-
-  Max(K) Retain OverflowAction        Entries Log
-  ------ ------ --------------        ------- ---
-  20,480      0 OverwriteAsNeeded          75 Application
-  20,480      0 OverwriteAsNeeded           0 HardwareEvents
-     512      7 OverwriteOlder              0 Internet Explorer
-  20,480      0 OverwriteAsNeeded           0 Key Management Service
-  20,480      0 OverwriteAsNeeded       1,609 Security
-  20,480      0 OverwriteAsNeeded       1,184 System
-  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
---------------------------------------------------------------------------------
-
-Channel names can also be specified if running on Windows Vista or newer. A
-channel is a named stream of events that transports events from an event source
-to an event log. Most channels are tied to specific event publishers. Here is an
-example showing how to list all channels using PowerShell.
+have a `name` field, except for those which use a custom XML query.
+A channel is a named stream of events that transports events from an event
+source to an event log. Most channels are tied to specific event publishers.
+You can get a list of available event logs by using the PowerShell
+https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent[`Get-WinEvent`] cmdlet
+on Windows Vista or newer. Here is a sample of the output from the command:
 
 [source,sh]
 --------------------------------------------------------------------------------
@@ -152,6 +135,24 @@ LogName : Microsoft-Rdms-UI/Admin
 LogName : Microsoft-Rdms-UI/Operational
 LogName : Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
 ...
+--------------------------------------------------------------------------------
+
+If `Get-WinEvent` is not available, the https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog[`Get-EventLog`] cmdlet can be used in its
+place.
+
+[source,sh]
+--------------------------------------------------------------------------------
+PS C:\Users\vagrant> Get-EventLog *
+
+  Max(K) Retain OverflowAction        Entries Log
+  ------ ------ --------------        ------- ---
+  20,480      0 OverwriteAsNeeded          75 Application
+  20,480      0 OverwriteAsNeeded           0 HardwareEvents
+     512      7 OverwriteOlder              0 Internet Explorer
+  20,480      0 OverwriteAsNeeded           0 Key Management Service
+  20,480      0 OverwriteAsNeeded       1,609 Security
+  20,480      0 OverwriteAsNeeded       1,184 System
+  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
 --------------------------------------------------------------------------------
 
 You must specify the full name of the channel in the configuration file.

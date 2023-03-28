@@ -18,25 +18,9 @@
 package mage
 
 import (
-	"github.com/magefile/mage/mg"
 	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-)
-
-// declare journald dependencies for cross build target
-var (
-	journaldPlatforms = []devtools.PlatformDescription{
-		devtools.Linux386, devtools.LinuxAMD64,
-		devtools.LinuxARM64, devtools.LinuxARM5, devtools.LinuxARM6, devtools.LinuxARM7,
-		devtools.LinuxMIPS, devtools.LinuxMIPSLE, devtools.LinuxMIPS64LE,
-		devtools.LinuxPPC64LE,
-		devtools.LinuxS390x,
-	}
-
-	journaldDeps = devtools.NewPackageInstaller().
-			AddEach(journaldPlatforms, "libsystemd-dev").
-			Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
 )
 
 // GolangCrossBuild builds the Beat binary inside the golang-builder and then
@@ -55,7 +39,6 @@ func GolangCrossBuild() error {
 func golangCrossBuild() error {
 	conf := devtools.DefaultGolangCrossBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
-		mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
 		conf.ExtraFlags = append(conf.ExtraFlags, "-tags=withjournald")
 	}
 	return devtools.GolangCrossBuild(conf)
