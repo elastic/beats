@@ -11,6 +11,7 @@
         "postfix.message-id": "544D2523.30609@rhsoft.net",
         "postfix.queueid": "0F5383D",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -25,6 +26,7 @@
         "postfix.message-id": "",
         "postfix.queueid": "4104E3D",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -45,6 +47,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "voorzitter@example.com",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -64,6 +67,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "voorzitter@example.com",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -78,6 +82,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/cleanup[25469]: warning: dict_ldap_get_values[1]: DN uid=mguiraud,ou=people,dc=neotion,dc=com not found, skipping ",
         "postfix.message": "dict_ldap_get_values[1]: DN uid=mguiraud,ou=people,dc=neotion,dc=com not found, skipping ",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -97,6 +102,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "frank.test@hsdjasdd.co.uk",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -114,6 +120,7 @@
         "postfix.var.from": "from@example.com",
         "postfix.var.to": "to@example.com",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -133,6 +140,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "to@example.com",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -153,6 +161,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "recipient@example.net",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "related.ip": [
             "192.0.2.41"
         ],
@@ -172,6 +181,7 @@
         "postfix.message-id": "=?UTF-8?B?PDE5?=? =?UTF-8?B?MTIyMDExMjkxNjYxMUBDbGllbnQtMDQ1LnJ1YmluZXR0ZXJpZS5sb2NhbD4=?=",
         "postfix.queueid": "ADD961003206D",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -186,6 +196,7 @@
         "postfix.message-id": "=?utf-8?B?PDIwMjAwNjEzXzE0MzE1Ml8xMDcyZjVhZDdlZjU0M2Q0OWQ0?=? =?utf-8?B?NzQxOGVkM2YyOGFjOEBuZXdzLWFpZ2xlLmNvbQ0KPg==?=",
         "postfix.queueid": "246884008A",
         "process.name": "postfix/cleanup",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

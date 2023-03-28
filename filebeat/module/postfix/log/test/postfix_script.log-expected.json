@@ -11,6 +11,50 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: warning: symlink leaves directory: /etc/postfix/./makedefs.out",
         "postfix.message": "symlink leaves directory: /etc/postfix/./makedefs.out",
         "process.name": "postfix/postfix-script",
+        "process.pid": "25469",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 121,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: starting the Postfix mail system",
+        "process.name": "postfix/postfix-script",
+        "process.pid": "25469",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "fatal",
+        "log.offset": 212,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: fatal: mail system startup failed",
+        "postfix.message": "mail system startup failed",
+        "process.name": "postfix/postfix-script",
+        "process.pid": "25469",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "fatal",
+        "log.offset": 304,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: fatal: the Postfix mail system is not running",
+        "postfix.message": "the Postfix mail system is not running",
+        "process.name": "postfix/postfix-script",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

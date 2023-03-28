@@ -10,6 +10,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: 0F5383D: removed",
         "postfix.queueid": "0F5383D",
         "process.name": "postfix/qmgr",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -26,6 +27,7 @@
         "postfix.var.nrcpt": "1",
         "postfix.var.size": "5360",
         "process.name": "postfix/qmgr",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -40,6 +42,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/qmgr[25469]: warning: bounce_queue_lifetime is larger than maximal_queue_lifetime - adjusting bounce_queue_lifetime",
         "postfix.message": "bounce_queue_lifetime is larger than maximal_queue_lifetime - adjusting bounce_queue_lifetime",
         "process.name": "postfix/qmgr",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -55,6 +58,7 @@
         "postfix.status": "expired",
         "postfix.var.from": "",
         "process.name": "postfix/qmgr",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -70,6 +74,7 @@
         "postfix.status": "expired",
         "postfix.var.from": "uvnhbl@yahoo.com.tw",
         "process.name": "postfix/qmgr",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

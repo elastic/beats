@@ -9,6 +9,7 @@
         "log.offset": 0,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: domain lookup hits=0 miss=1 success=0%",
         "process.name": "postfix/scache",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -21,6 +22,7 @@
         "log.offset": 101,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: start interval Dec  6 21:20:35",
         "process.name": "postfix/scache",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -33,6 +35,7 @@
         "log.offset": 194,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: address lookup hits=0 miss=1 success=0%",
         "process.name": "postfix/scache",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -45,6 +48,7 @@
         "log.offset": 296,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/scache[25469]: statistics: max simultaneous domains=1 addresses=1 connection=1",
         "process.name": "postfix/scache",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

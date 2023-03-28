@@ -1,1 +1,4 @@
 Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: warning: symlink leaves directory: /etc/postfix/./makedefs.out
+Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: starting the Postfix mail system
+Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: fatal: mail system startup failed
+Mar 24 13:58:01 5mail-gw01 postfix/postfix-script[25469]: fatal: the Postfix mail system is not running

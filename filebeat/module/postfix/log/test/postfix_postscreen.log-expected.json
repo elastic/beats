@@ -11,6 +11,7 @@
         "postfix.postscreen.cache_dropped": "7",
         "postfix.postscreen.cache_retained": "242",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "service.type": "postfix"
     },
     {
@@ -25,6 +26,7 @@
         "log.offset": 144,
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: CONNECT from [61.238.241.86]:53024 to [89.105.204.244]:25",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "61.238.241.86",
             "89.105.204.244"
@@ -44,6 +46,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: DISCONNECT [216.81.72.72]:43421",
         "postfix.postscreen.access": "DISCONNECT",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "216.81.72.72"
         ],
@@ -62,6 +65,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS OLD [61.238.241.86]:53024",
         "postfix.postscreen.access": "PASS OLD",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -80,6 +84,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS OLD [2604:8d00:0:1::3]:52237",
         "postfix.postscreen.access": "PASS OLD",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "2604:8d00:0:1::3"
         ],
@@ -100,6 +105,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: PASS NEW [2607:f8b0:4003:c01::23a]:36051",
         "postfix.postscreen.access": "PASS NEW",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "2607:f8b0:4003:c01::23a"
         ],
@@ -120,6 +126,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: WHITELISTED [61.238.241.86]:53024",
         "postfix.postscreen.access": "WHITELISTED",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -138,6 +145,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: BLACKLISTED [61.238.241.86]:53024",
         "postfix.postscreen.access": "BLACKLISTED",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -156,6 +164,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: WHITELIST VETO [61.238.241.86]:53024",
         "postfix.postscreen.access": "WHITELIST VETO",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -176,6 +185,7 @@
         "postfix.postscreen.violation": "PREGREET",
         "postfix.postscreen.violation_time": "1.2",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "216.81.72.72"
         ],
@@ -195,6 +205,7 @@
         "postfix.postscreen.dnsbl_rank": "3",
         "postfix.postscreen.violation": "DNSBL",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "111.73.45.149"
         ],
@@ -214,6 +225,7 @@
         "postfix.postscreen.violation": "HANGUP",
         "postfix.postscreen.violation_time": "63",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "111.73.45.149"
         ],
@@ -233,6 +245,7 @@
         "postfix.postscreen.violation": "HANGUP",
         "postfix.postscreen.violation_time": "0",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "66.55.85.58"
         ],
@@ -252,6 +265,7 @@
         "postfix.postscreen.violation": "COMMAND TIME LIMIT",
         "postfix.smtp_stage": "CONNECT",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -271,6 +285,7 @@
         "postfix.postscreen.violation": "COMMAND TIME LIMIT",
         "postfix.smtp_stage": "HELO",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -290,6 +305,7 @@
         "postfix.postscreen.violation": "COMMAND TIME LIMIT",
         "postfix.smtp_stage": "EHLO",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -309,6 +325,7 @@
         "postfix.postscreen.violation": "COMMAND TIME LIMIT",
         "postfix.smtp_stage": "AUTH",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -328,6 +345,7 @@
         "postfix.postscreen.violation": "COMMAND TIME LIMIT",
         "postfix.smtp_stage": "MAIL",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -347,6 +365,7 @@
         "postfix.postscreen.violation": "COMMAND TIME LIMIT",
         "postfix.smtp_stage": "RCPT",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -366,6 +385,7 @@
         "postfix.postscreen.violation": "COMMAND COUNT LIMIT",
         "postfix.smtp_stage": "RCPT",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -385,6 +405,7 @@
         "postfix.postscreen.violation": "COMMAND LENGTH LIMIT",
         "postfix.smtp_stage": "RCPT",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.246.250.243"
         ],
@@ -405,6 +426,7 @@
         "postfix.postscreen.violation": "NON-SMTP COMMAND",
         "postfix.smtp_stage": "CONNECT",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "93.174.93.51"
         ],
@@ -423,6 +445,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: CONNECT from [1.2.3.4]:1337: too many connections",
         "postfix.postscreen.toobusy_data": "too many connections",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "1.2.3.4"
         ],
@@ -441,6 +464,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: NOQUEUE: reject: CONNECT from [5.6.7.8]:1337: all server ports busy",
         "postfix.postscreen.toobusy_data": "all server ports busy",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "5.6.7.8"
         ],
@@ -461,6 +485,7 @@
         "postfix.postscreen.violation": "COMMAND PIPELINING",
         "postfix.smtp_stage": ".",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "88.208.233.4"
         ],
@@ -480,6 +505,7 @@
         "postfix.postscreen.violation": "BARE NEWLINE",
         "postfix.smtp_stage": ".",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "88.208.233.4"
         ],
@@ -507,6 +533,7 @@
         "postfix.var.proto": "SMTP",
         "postfix.var.to": "tom@example.com",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "182.98.255.184"
         ],
@@ -535,6 +562,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "4ECEA00F.9040306@example.com",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "related.ip": [
             "27.157.200.233"
         ],
@@ -554,6 +582,36 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postscreen[9891]: warning: getpeername: Transport endpoint is not connected -- dropping this connection",
         "postfix.message": "getpeername: Transport endpoint is not connected -- dropping this connection",
         "process.name": "postfix/postscreen",
+        "process.pid": "9891",
         "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T19:25:35.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 3388,
+        "message": "Mar 24 19:25:35 mail postfix/postscreen[3222]: NOQUEUE: reject: RCPT from [10.10.10.10]:17308: 550 5.7.1 Service unavailable; client [10.10.10.10] blocked using zen.spamhaus.org; from=<my@address.snip>, to=<my@address.snip>, proto=ESMTP, helo=<[SNIP]>",
+        "postfix.action": "reject",
+        "postfix.queueid": "NOQUEUE",
+        "postfix.smtp_stage": "RCPT",
+        "postfix.status_code": "550",
+        "postfix.status_code_enhanced": "5.7.1",
+        "postfix.status_data": "10.10.10.10",
+        "postfix.status_message": "blocked using zen.spamhaus.org",
+        "postfix.var.from": "my@address.snip",
+        "postfix.var.helo": "[SNIP]",
+        "postfix.var.proto": "ESMTP",
+        "postfix.var.to": "my@address.snip",
+        "process.name": "postfix/postscreen",
+        "process.pid": "3222",
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "service.type": "postfix",
+        "source.ip": "10.10.10.10",
+        "source.port": "17308"
     }
 ]

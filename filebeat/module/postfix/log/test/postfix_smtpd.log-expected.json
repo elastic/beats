@@ -9,6 +9,7 @@
         "log.offset": 0,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: connect from 061238241086.static.ctinets.com[61.238.241.86]",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -26,6 +27,7 @@
         "log.offset": 109,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: disconnect from 061238241086.static.ctinets.com[61.238.241.86]",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -44,6 +46,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: 4104E3D: client=061238241086.static.ctinets.com[61.238.241.86]",
         "postfix.queueid": "4104E3D",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -72,6 +75,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "toernooicommissie@example.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -91,6 +95,7 @@
         "postfix.smtp_stage": "STARTTLS",
         "postfix.smtpd.lostconn_data": "lost connection",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -110,6 +115,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: warning: hostname exemple.com does not resolve to address 185.14.29.32",
         "postfix.message": "hostname exemple.com does not resolve to address 185.14.29.32",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -124,6 +130,7 @@
         "postfix.smtp_stage": "CONNECT",
         "postfix.smtpd.lostconn_data": "timeout",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "177.227.18.3"
         ],
@@ -152,6 +159,7 @@
         "postfix.var.proto": "SMTP",
         "postfix.var.to": "user@example.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "2001:980:cfb1:1:82f:f74e:a45c:3033"
         ],
@@ -180,6 +188,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "tom@example.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "192.36.205.58"
         ],
@@ -200,6 +209,7 @@
         "postfix.tls.cipher_size": "256/256",
         "postfix.tls.version": "TLSv1.2",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "10.163.89.202"
         ],
@@ -219,6 +229,7 @@
         "postfix.smtp_stage": "DATA",
         "postfix.smtpd.lostconn_data": "lost connection",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -238,6 +249,7 @@
         "postfix.smtp_stage": "UNKNOWN",
         "postfix.smtpd.lostconn_data": "lost connection",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "2001:456:cfb1:1:f5d7:dead:beef:cafe"
         ],
@@ -257,6 +269,7 @@
         "postfix.smtp_stage": "RSET",
         "postfix.smtpd.lostconn_data": "lost connection",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -276,6 +289,7 @@
         "postfix.smtp_stage": "END-OF-MESSAGE",
         "postfix.smtpd.lostconn_data": "timeout",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -295,6 +309,7 @@
         "postfix.improper_pipelining_data": "MAIL FROM:<>\\nRCPT TO:<tom@example.net>\\nDATA\\nSubject: pipeline test\\n\\nThis is a test\\n.\\nQUIT\\n\\r\\n",
         "postfix.smtp_stage": "EHLO",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "2001:968:9999:20:415c:cd2:da8e:d0cf"
         ],
@@ -314,6 +329,7 @@
         "postfix.smtp_stage": "DATA",
         "postfix.smtpd.lostconn_data": "lost connection",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -341,6 +357,7 @@
         "postfix.var.proto": "SMTP",
         "postfix.var.to": "aap@henk.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "2001:968:9999:20:88b:9b7d:2a54:2bd2"
         ],
@@ -368,6 +385,7 @@
         "postfix.var.proto": "SMTP",
         "postfix.var.to": "does-not-exist@example.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "2001:968:9999:20:88b:9b7d:2a54:2bd2"
         ],
@@ -387,6 +405,7 @@
         "postfix.smtpd.lostconn_data": "SSL_accept error",
         "postfix.smtpd.lostconn_reason": "lost connection",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -413,6 +432,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "user2@example2.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -432,6 +452,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "user2@example2.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -453,6 +474,7 @@
         "postfix.var.proto": "SMTP",
         "postfix.var.to": "user2@example2.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -467,6 +489,7 @@
         "postfix.smtpd.lostconn_data": "SSL_accept error",
         "postfix.smtpd.lostconn_reason": "Connection timed out",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.13.58.7"
         ],
@@ -486,6 +509,7 @@
         "postfix.smtpd.lostconn_data": "SSL_accept error",
         "postfix.smtpd.lostconn_reason": "-1",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "185.55.116.145"
         ],
@@ -505,6 +529,7 @@
         "postfix.smtpd.lostconn_data": "SSL_accept error",
         "postfix.smtpd.lostconn_reason": "0",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "207.82.80.201"
         ],
@@ -530,6 +555,7 @@
         "postfix.var.helo": "ccm231.constantcontact.com",
         "postfix.var.proto": "ESMTP",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "208.75.123.231"
         ],
@@ -556,6 +582,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "user@domain.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "85.25.255.255"
         ],
@@ -583,6 +610,7 @@
         "postfix.cmd.rcpt_accepted": "0",
         "postfix.cmd.starttls": "1",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "72.10.165.66"
         ],
@@ -592,8 +620,15 @@
     },
     {
         "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.action": [
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "postfix.log",
         "event.module": "postfix",
+        "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
@@ -602,6 +637,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: warning: ec2-3-84-57-208.compute-1.amazonaws.com[3.84.57.208]: SASL LOGIN authentication failed: UGFzc3dvcmQ6",
         "postfix.message": "SASL LOGIN authentication failed: UGFzc3dvcmQ6",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "3.84.57.208"
         ],
@@ -630,6 +666,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "user@example.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -658,6 +695,7 @@
         "postfix.var.proto": "ESMTP",
         "postfix.var.to": "recipient@example.com",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "93.184.216.34"
         ],
@@ -684,6 +722,7 @@
         "postfix.queueid": "5D88A76BDE",
         "postfix.var.sasl_method": "LOGIN",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "81.198.186.4"
         ],
@@ -714,6 +753,7 @@
         "postfix.queueid": "5D88A76BDE",
         "postfix.var.sasl_method": "PLAIN",
         "process.name": "postfix/smtpd",
+        "process.pid": "25469",
         "related.ip": [
             "81.198.186.4"
         ],
@@ -724,5 +764,188 @@
         "source.domain": "unknown",
         "source.ip": "81.198.186.4",
         "user.name": "5mail-gw01@dc"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 5854,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from mx08-0020e701.pphosted.com[91.207.212.174]: 554 5.7.1 Service unavailable; Unverified Client host [mx08-0020e701.pphosted.com] blocked using dbl.spamhaus.org; from=<prvs=122944b5d5=XXX.XXX@XXX.com> to=<XXX@XXX.de> proto=ESMTP helo=<mx07-0020e701.pphosted.com>",
+        "postfix.action": "reject",
+        "postfix.queueid": "NOQUEUE",
+        "postfix.smtp_stage": "RCPT",
+        "postfix.status_code": "554",
+        "postfix.status_code_enhanced": "5.7.1",
+        "postfix.status_data": "mx08-0020e701.pphosted.com",
+        "postfix.status_message": "blocked using dbl.spamhaus.org",
+        "postfix.var.from": "prvs=122944b5d5=XXX.XXX@XXX.com",
+        "postfix.var.helo": "mx07-0020e701.pphosted.com",
+        "postfix.var.proto": "ESMTP",
+        "postfix.var.to": "XXX@XXX.de",
+        "process.name": "postfix/smtpd",
+        "process.pid": "25469",
+        "related.ip": [
+            "91.207.212.174"
+        ],
+        "service.type": "postfix",
+        "source.domain": "mx08-0020e701.pphosted.com",
+        "source.ip": "91.207.212.174"
+    },
+    {
+        "@timestamp": "2023-03-25T22:53:46.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 6190,
+        "message": "Mar 25 22:53:46 mail postfix/smtpd[30171]: NOQUEUE: reject: RCPT from unknown[212.192.246.228]: 450 4.7.25 Client host rejected: cannot find your hostname, [212.192.246.228]; from=<spameri@tiscali.it> to=<spameri@tiscali.it> proto=ESMTP helo=<WIN-CLJ1B0GQ6JP>",
+        "postfix.action": "reject",
+        "postfix.queueid": "NOQUEUE",
+        "postfix.smtp_stage": "RCPT",
+        "postfix.status_code": "450",
+        "postfix.status_code_enhanced": "4.7.25",
+        "postfix.status_message": "Client host rejected: cannot find your hostname, [212.192.246.228]",
+        "postfix.var.from": "spameri@tiscali.it",
+        "postfix.var.helo": "WIN-CLJ1B0GQ6JP",
+        "postfix.var.proto": "ESMTP",
+        "postfix.var.to": "spameri@tiscali.it",
+        "process.name": "postfix/smtpd",
+        "process.pid": "30171",
+        "related.ip": [
+            "212.192.246.228"
+        ],
+        "service.type": "postfix",
+        "source.domain": "unknown",
+        "source.ip": "212.192.246.228"
+    },
+    {
+        "@timestamp": "2023-09-22T08:30:53.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 6450,
+        "message": "Sep 22 08:30:53 ns1 postfix/smtpd[17873]: NOQUEUE: reject: MAIL from mail-lf0-f63.google.com[209.85.215.63]: 452 4.3.1 Insufficient system storage; proto=ESMTP helo=<mail-lf0-f63.google.com>",
+        "postfix.action": "reject",
+        "postfix.queueid": "NOQUEUE",
+        "postfix.smtp_stage": "MAIL",
+        "postfix.status_code": "452",
+        "postfix.status_code_enhanced": "4.3.1",
+        "postfix.status_message": "Insufficient system storage",
+        "postfix.var.helo": "mail-lf0-f63.google.com",
+        "postfix.var.proto": "ESMTP",
+        "process.name": "postfix/smtpd",
+        "process.pid": "17873",
+        "related.ip": [
+            "209.85.215.63"
+        ],
+        "service.type": "postfix",
+        "source.domain": "mail-lf0-f63.google.com",
+        "source.ip": "209.85.215.63"
+    },
+    {
+        "@timestamp": "2023-06-03T06:25:43.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 6641,
+        "message": "Jun  3 06:25:43 server2 postfix/smtpd[29306]: too many errors after RCPT from srv-eml.info[185.222.211.11]",
+        "process.name": "postfix/smtpd",
+        "process.pid": "29306",
+        "related.ip": [
+            "185.222.211.11"
+        ],
+        "service.type": "postfix",
+        "source.domain": "srv-eml.info",
+        "source.ip": "185.222.211.11"
+    },
+    {
+        "@timestamp": "2023-03-22T19:53:27.000-02:00",
+        "event.action": [
+            "logon-failed"
+        ],
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 6748,
+        "message": "Mar 22 19:53:27 slmr02 postfix/smtpd[28901]: warning: SASL authentication failure: Password verification failed",
+        "postfix.message": "SASL authentication failure: Password verification failed",
+        "process.name": "postfix/smtpd",
+        "process.pid": "28901",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-09-22T08:30:53.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 6860,
+        "message": "Sep 22 08:30:53 ns1 postfix/smtpd[17873]: warning: not enough free space in mail queue: 16322867200 bytes < 1.5*message size limit",
+        "postfix.message": "not enough free space in mail queue: 16322867200 bytes < 1.5*message size limit",
+        "process.name": "postfix/smtpd",
+        "process.pid": "17873",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-05-15T15:16:46.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 6991,
+        "message": "May 15 15:16:46 mail postfix/smtpd[31874]: warning: 31.180.210.237: hostname host-31-180-210-237.stv.ru verification failed: Name or service not known",
+        "postfix.message": "31.180.210.237: hostname host-31-180-210-237.stv.ru verification failed: Name or service not known",
+        "process.name": "postfix/smtpd",
+        "process.pid": "31874",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-28T14:31:40.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 7142,
+        "message": "Mar 28 14:31:40 bkmr02-old postfix/smtpd[24621]: warning: hostname ubtuntu20236116.aspadmin.net does not resolve to address 66.240.236.116: Name or service not known",
+        "postfix.message": "hostname ubtuntu20236116.aspadmin.net does not resolve to address 66.240.236.116: Name or service not known",
+        "process.name": "postfix/smtpd",
+        "process.pid": "24621",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-05-16T09:37:15.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 7308,
+        "message": "May 16 09:37:15 mail postfix/smtpd[4405]: warning: 106.107.60.181.zen.spamhaus.org: RBL lookup error: Host or domain name not found. Name service error for name=106.107.60.181.zen.spamhaus.org type=A: Host not found, try again",
+        "postfix.message": "106.107.60.181.zen.spamhaus.org: RBL lookup error: Host or domain name not found. Name service error for name=106.107.60.181.zen.spamhaus.org type=A: Host not found, try again",
+        "process.name": "postfix/smtpd",
+        "process.pid": "4405",
+        "service.type": "postfix"
     }
 ]

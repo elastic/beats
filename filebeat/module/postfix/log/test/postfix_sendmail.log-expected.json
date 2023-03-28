@@ -11,6 +11,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/sendmail[25469]: fatal: root(0): message file too big",
         "postfix.message": "root(0): message file too big",
         "process.name": "postfix/sendmail",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

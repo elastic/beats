@@ -22,6 +22,7 @@
         "postfix.var.dsn": "2.0.0",
         "postfix.var.to": "admin@example.com",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "127.0.0.1"
         ],
@@ -51,6 +52,7 @@
         "postfix.var.orig_to": "bestuur@example.com",
         "postfix.var.to": "jos@example.com",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "10.74.103.11"
         ],
@@ -72,6 +74,7 @@
         "postfix.tls.cipher_size": "256/256",
         "postfix.tls.version": "TLSv1.2",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "65.55.92.136"
         ],
@@ -93,6 +96,7 @@
         "postfix.tls.cipher_size": "256/256",
         "postfix.tls.version": "TLSv1.2",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "127.0.0.1"
         ],
@@ -112,6 +116,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: connect to intern.nl[194.109.6.98]:25: Connection timed out ",
         "postfix.smtp.lostconn_data": "Connection timed out",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "194.109.6.98"
         ],
@@ -132,6 +137,7 @@
         "postfix.smtp.lostconn_data": "lost connection",
         "postfix.smtp.lostconn_reason": "receiving the initial server greeting",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "65.55.37.72"
         ],
@@ -151,6 +157,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: connect to mail2.crabruzzo.it[2.115.207.21]:25: No route to host ",
         "postfix.smtp.lostconn_data": "No route to host",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "2.115.207.21"
         ],
@@ -172,6 +179,7 @@
         "postfix.tls.cipher_size": "128/128",
         "postfix.tls.version": "TLSv1.2",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "74.125.136.26"
         ],
@@ -193,6 +201,7 @@
         "postfix.tls.cipher_size": "256/256",
         "postfix.tls.version": "TLSv1",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "2001:1578:400:111::7"
         ],
@@ -220,6 +229,7 @@
         "postfix.var.dsn": "2.0.0",
         "postfix.var.to": "admin@example.com",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -247,6 +257,7 @@
         "postfix.var.dsn": "5.7.1",
         "postfix.var.to": "redacted@gmail.com",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "2607:f8b0:400e:c04::1b"
         ],
@@ -264,6 +275,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: warning: problem talking to service private/scache: Connection timed out ",
         "postfix.message": "problem talking to service private/scache: Connection timed out ",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -281,6 +293,7 @@
         "postfix.smtp.response": "450 4.7.1 <user@example.com>: Recipient address rejected: Greylisted for 5 minutes",
         "postfix.smtp_stage": "RCPT TO",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "1.74.253.23"
         ],
@@ -301,6 +314,7 @@
         "postfix.smtp.response": "450 4.1.8 root@localhost.localdomain: Sender address rejected: Domain not found",
         "postfix.smtp_stage": "RCPT TO",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "192.0.2.1"
         ],
@@ -320,6 +334,7 @@
         "postfix.queueid": "78D6B41",
         "postfix.smtp.lostconn_reason": "receiving the initial server greeting",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "74.208.5.4"
         ],
@@ -340,6 +355,7 @@
         "postfix.smtp.response": "421-4.7.0 [1.2.3.4      15] Our system has detected an unusual rate of 421-4.7.0 unsolicited mail originating from your IP address. To protect our 421-4.7.0 users from spam, mail sent from your IP address has been temporarily 421-4.7.0 rate limited. Please visit 421-4.7.0  https://support.google.com/mail/answer/81126 to review our Bulk Email 421 4.7.0 Senders Guidelines. bv15si15610322wjb.142 - gsmtp",
         "postfix.smtp_stage": "end of DATA",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "74.125.136.26"
         ],
@@ -360,6 +376,7 @@
         "postfix.smtp.response": "451 4.3.2 Internal error reading data",
         "postfix.smtp_stage": "MAIL FROM",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "66.196.118.34"
         ],
@@ -379,6 +396,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: connect to aspmx.l.google.com[2a00:1450:400b:c02::1a]:25: Network is unreachable ",
         "postfix.smtp.lostconn_data": "Network is unreachable",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "2a00:1450:400b:c02::1a"
         ],
@@ -407,6 +425,7 @@
         "postfix.var.dsn": "4.2.0",
         "postfix.var.to": "whatever-user@lists.example.org",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "10.49.140.10"
         ],
@@ -426,6 +445,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: certificate verification failed for mail.example.com[113.169.17.115]:25: self-signed certificate. ",
         "postfix.tls.error": "self-signed certificate. ",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "113.169.17.115"
         ],
@@ -445,6 +465,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: certificate verification failed for mail.example.com[113.169.17.115]:25: untrusted issuer /C=de/L=XXX/O=XXX GmbH/CN=XX XX XXX CA/emailAddress=XX@XX ",
         "postfix.tls.error": "untrusted issuer /C=de/L=XXX/O=XXX GmbH/CN=XX XX XXX CA/emailAddress=XX@XX ",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "113.169.17.115"
         ],
@@ -466,6 +487,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: SSL_connect error to mail.example.org[112.63.65.2]:25: lost connection ",
         "postfix.smtp.lostconn_data": "lost connection",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "112.63.65.2"
         ],
@@ -487,6 +509,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: SSL_connect error to mail.example.org[112.63.65.2]:25: -1 ",
         "postfix.smtp.lostconn_data": "-1",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "112.63.65.2"
         ],
@@ -507,6 +530,7 @@
         "postfix.pix_workaround": "disable_esmtp delay_dotcrlf",
         "postfix.queueid": "B0ADE20FC7",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "93.184.216.34"
         ],
@@ -526,9 +550,64 @@
         "postfix.queueid": "D0F29603B4",
         "postfix.smtp.response": "535 5.7.8 Error: authentication failed: authentication failure ",
         "process.name": "postfix/smtp",
+        "process.pid": "25469",
         "related.ip": [
             "1.2.3.4"
         ],
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-06-16T07:34:40.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 5365,
+        "message": "Jun 16 07:34:40 willet postfix/smtp[24449]: warning: connect to private/tlsmgr: Resource temporarily unavailable",
+        "postfix.message": "connect to private/tlsmgr: Resource temporarily unavailable",
+        "process.name": "postfix/smtp",
+        "process.pid": "24449",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-06-16T07:34:40.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 5478,
+        "message": "Jun 16 07:34:40 willet postfix/smtp[24449]: warning: problem talking to server private/tlsmgr: Resource temporarily unavailable",
+        "postfix.message": "problem talking to server private/tlsmgr: Resource temporarily unavailable",
+        "process.name": "postfix/smtp",
+        "process.pid": "24449",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-09-12T07:35:43.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 5606,
+        "message": "Sep 12 07:35:43 mail postfix/smtp[11578]: BFAF01B00085: to=<user@example.com>, relay=none, delay=0.07, delays=0.06/0/0/0, dsn=5.4.4, status=bounced (Host or domain name not found. Name service error for name=example.com type=AAAA: Host found but no data record of requested type)",
+        "postfix.delay_before_qmgr": "0.06",
+        "postfix.delay_conn_setup": "0",
+        "postfix.delay_in_qmgr": "0",
+        "postfix.delay_transmission": "0",
+        "postfix.queueid": "BFAF01B00085",
+        "postfix.relay_service": "none",
+        "postfix.smtp.response": "Host or domain name not found. Name service error for name=example.com type=AAAA: Host found but no data record of requested type",
+        "postfix.status": "bounced",
+        "postfix.var.delay": "0.07",
+        "postfix.var.dsn": "5.4.4",
+        "postfix.var.to": "user@example.com",
+        "process.name": "postfix/smtp",
+        "process.pid": "11578",
         "service.type": "postfix"
     }
 ]

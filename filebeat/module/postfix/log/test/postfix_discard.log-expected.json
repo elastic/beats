@@ -19,6 +19,7 @@
         "postfix.var.dsn": "2.0.0",
         "postfix.var.to": "george.desantis@test.example.com",
         "process.name": "postfix/discard",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

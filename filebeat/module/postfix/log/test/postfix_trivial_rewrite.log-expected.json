@@ -11,6 +11,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/trivial-rewrite[25469]: warning: virtual_alias_domains lookup failure",
         "postfix.message": "virtual_alias_domains lookup failure",
         "process.name": "postfix/trivial-rewrite",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -25,6 +26,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/trivial-rewrite[25469]: warning: dict_ldap_lookup: Search error -1: Can't contact LDAP server ",
         "postfix.message": "dict_ldap_lookup: Search error -1: Can't contact LDAP server ",
         "process.name": "postfix/trivial-rewrite",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

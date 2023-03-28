@@ -11,6 +11,22 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postdrop[9891]: warning: uid=0: File too large",
         "postfix.message": "uid=0: File too large",
         "process.name": "postfix/postdrop",
+        "process.pid": "9891",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 79,
+        "message": "Mar 24 13:58:01 anymr01 postfix/postdrop[9891]: warning: mail_queue_enter: create file maildrop/142762.429191: Read-only file system",
+        "postfix.message": "mail_queue_enter: create file maildrop/142762.429191: Read-only file system",
+        "process.name": "postfix/postdrop",
+        "process.pid": "9891",
         "service.type": "postfix"
     }
 ]

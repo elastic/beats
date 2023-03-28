@@ -9,6 +9,20 @@
         "log.offset": 0,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/lmtp[25469]: 7EE668039: to=<admin@example.com>, relay=127.0.0.1[127.0.0.1]:2525, delay=3.6, delays=0.2/0.02/0.04/3.3, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 153053D)",
         "process.name": "postfix/lmtp",
+        "process.pid": "25469",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-04T11:09:38.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 210,
+        "message": "Mar  4 11:09:38 mail postfix/lmtp[22191]: warning: 54161904: defer service failure",
+        "process.name": "postfix/lmtp",
+        "process.pid": "22191",
         "service.type": "postfix"
     }
 ]

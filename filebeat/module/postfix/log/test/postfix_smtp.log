@@ -23,3 +23,6 @@ Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: SSL_connect error to mail.exampl
 Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: SSL_connect error to mail.example.org[112.63.65.2]:25: -1 
 Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: B0ADE20FC7: enabling PIX workarounds: disable_esmtp delay_dotcrlf for example.com[93.184.216.34]:25 
 Mar 24 13:58:01 5mail-gw01 postfix/smtp[25469]: D0F29603B4: SASL authentication failed; server xyz.example.com[1.2.3.4] said: 535 5.7.8 Error: authentication failed: authentication failure 
+Jun 16 07:34:40 willet postfix/smtp[24449]: warning: connect to private/tlsmgr: Resource temporarily unavailable
+Jun 16 07:34:40 willet postfix/smtp[24449]: warning: problem talking to server private/tlsmgr: Resource temporarily unavailable
+Sep 12 07:35:43 mail postfix/smtp[11578]: BFAF01B00085: to=<user@example.com>, relay=none, delay=0.07, delays=0.06/0/0/0, dsn=5.4.4, status=bounced (Host or domain name not found. Name service error for name=example.com type=AAAA: Host found but no data record of requested type)

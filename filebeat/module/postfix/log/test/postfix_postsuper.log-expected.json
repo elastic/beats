@@ -11,6 +11,7 @@
         "postfix.postsuper.action": "removed",
         "postfix.queueid": "D4F2023DB",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -25,6 +26,7 @@
         "postfix.postsuper.action": "requeued",
         "postfix.queueid": "D4F2023DB",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -39,6 +41,7 @@
         "postfix.postsuper.action": "placed on hold",
         "postfix.queueid": "D4F2023DB",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -53,6 +56,7 @@
         "postfix.postsuper.action": "released from hold",
         "postfix.queueid": "D4F2023DB",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -67,6 +71,7 @@
         "postfix.postsuper.summary_action": "Deleted",
         "postfix.postsuper.summary_count": "115",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -81,6 +86,7 @@
         "postfix.postsuper.summary_action": "Requeued",
         "postfix.postsuper.summary_count": "1",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -95,6 +101,7 @@
         "postfix.postsuper.summary_action": "Placed on hold",
         "postfix.postsuper.summary_count": "67",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -109,6 +116,7 @@
         "postfix.postsuper.summary_action": "Released from hold",
         "postfix.postsuper.summary_count": "13",
         "process.name": "postfix/postsuper",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

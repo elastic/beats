@@ -31,3 +31,12 @@ Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from 0612
 Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject_warning: RCPT from example.com[93.184.216.34]: 553 5.7.1 <sender@example.com>: Sender address rejected: not owned by user ph123; from=<sender@example.com> to=<recipient@example.com> proto=ESMTP helo=<example.com>
 Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: 5D88A76BDE: client=unknown[81.198.186.4], sasl_method=LOGIN, sasl_username=5mail-gw01@dc
 Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: 5D88A76BDE: client=unknown[81.198.186.4], sasl_method=PLAIN, sasl_username=5mail-gw01@dc
+Mar 24 13:58:01 5mail-gw01 postfix/smtpd[25469]: NOQUEUE: reject: RCPT from mx08-0020e701.pphosted.com[91.207.212.174]: 554 5.7.1 Service unavailable; Unverified Client host [mx08-0020e701.pphosted.com] blocked using dbl.spamhaus.org; from=<prvs=122944b5d5=XXX.XXX@XXX.com> to=<XXX@XXX.de> proto=ESMTP helo=<mx07-0020e701.pphosted.com>
+Mar 25 22:53:46 mail postfix/smtpd[30171]: NOQUEUE: reject: RCPT from unknown[212.192.246.228]: 450 4.7.25 Client host rejected: cannot find your hostname, [212.192.246.228]; from=<spameri@tiscali.it> to=<spameri@tiscali.it> proto=ESMTP helo=<WIN-CLJ1B0GQ6JP>
+Sep 22 08:30:53 ns1 postfix/smtpd[17873]: NOQUEUE: reject: MAIL from mail-lf0-f63.google.com[209.85.215.63]: 452 4.3.1 Insufficient system storage; proto=ESMTP helo=<mail-lf0-f63.google.com>
+Jun  3 06:25:43 server2 postfix/smtpd[29306]: too many errors after RCPT from srv-eml.info[185.222.211.11]
+Mar 22 19:53:27 slmr02 postfix/smtpd[28901]: warning: SASL authentication failure: Password verification failed
+Sep 22 08:30:53 ns1 postfix/smtpd[17873]: warning: not enough free space in mail queue: 16322867200 bytes < 1.5*message size limit
+May 15 15:16:46 mail postfix/smtpd[31874]: warning: 31.180.210.237: hostname host-31-180-210-237.stv.ru verification failed: Name or service not known
+Mar 28 14:31:40 bkmr02-old postfix/smtpd[24621]: warning: hostname ubtuntu20236116.aspadmin.net does not resolve to address 66.240.236.116: Name or service not known
+May 16 09:37:15 mail postfix/smtpd[4405]: warning: 106.107.60.181.zen.spamhaus.org: RBL lookup error: Host or domain name not found. Name service error for name=106.107.60.181.zen.spamhaus.org type=A: Host not found, try again

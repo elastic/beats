@@ -11,6 +11,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/postmap[9891]: warning: /etc/postfix/conf.d/users.db: duplicate entry: \\\"xxx@yyy.com\\\"",
         "postfix.message": "/etc/postfix/conf.d/users.db: duplicate entry: \\\"xxx@yyy.com\\\"",
         "process.name": "postfix/postmap",
+        "process.pid": "9891",
         "service.type": "postfix"
     }
 ]

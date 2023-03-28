@@ -12,6 +12,7 @@
         "postfix.var.from": "fail2ban",
         "postfix.var.uid": "0",
         "process.name": "postfix/pickup",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

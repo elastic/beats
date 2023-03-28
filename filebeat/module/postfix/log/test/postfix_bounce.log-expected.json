@@ -11,6 +11,7 @@
         "postfix.bounce.queueid": "ADD2F8052",
         "postfix.queueid": "17CCA8044",
         "process.name": "postfix/bounce",
+        "process.pid": "10884",
         "service.type": "postfix"
     },
     {
@@ -25,6 +26,7 @@
         "postfix.bounce.queueid": "1DF35917",
         "postfix.queueid": "65AFB8B5",
         "process.name": "postfix/bounce",
+        "process.pid": "10884",
         "service.type": "postfix"
     },
     {
@@ -39,6 +41,7 @@
         "postfix.bounce.queueid": "0A87A1A08",
         "postfix.queueid": "264FE1A18",
         "process.name": "postfix/bounce",
+        "process.pid": "10884",
         "service.type": "postfix"
     }
 ]

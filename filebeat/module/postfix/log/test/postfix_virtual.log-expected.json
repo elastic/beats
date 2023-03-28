@@ -20,6 +20,7 @@
         "postfix.var.dsn": "2.0.0",
         "postfix.var.to": "postmaster@example.com",
         "process.name": "postfix/virtual",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

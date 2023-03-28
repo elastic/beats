@@ -20,6 +20,7 @@
         "postfix.var.dsn": "2.0.0",
         "postfix.var.to": "tom@example.com",
         "process.name": "postfix/pipe",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -44,6 +45,7 @@
         "postfix.var.orig_to": "admin@example.com",
         "postfix.var.to": "tom@example.com",
         "process.name": "postfix/pipe",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -67,6 +69,7 @@
         "postfix.var.dsn": "5.4.6",
         "postfix.var.to": "tom@example.com",
         "process.name": "postfix/pipe",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -90,6 +93,7 @@
         "postfix.var.dsn": "5.1.1",
         "postfix.var.to": "user@example.org",
         "process.name": "postfix/pipe",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

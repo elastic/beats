@@ -21,6 +21,7 @@
         "postfix.var.orig_to": "root@localhost",
         "postfix.var.to": "user@hostname.example.com",
         "process.name": "postfix/local",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -44,6 +45,7 @@
         "postfix.var.dsn": "5.1.1",
         "postfix.var.to": "ghdsgfhdslfh@localhost",
         "process.name": "postfix/local",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -58,6 +60,7 @@
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/local[25469]: warning: dict_nis_init: NIS domain name not set - NIS lookups disabled",
         "postfix.message": "dict_nis_init: NIS domain name not set - NIS lookups disabled",
         "process.name": "postfix/local",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

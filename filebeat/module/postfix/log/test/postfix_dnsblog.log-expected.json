@@ -11,6 +11,7 @@
         "postfix.dnsbl.domain": "psbl.surriel.com",
         "postfix.dnsbl.result": "127.0.0.2",
         "process.name": "postfix/dnsblog",
+        "process.pid": "9891",
         "related.ip": [
             "61.238.241.86"
         ],
@@ -29,6 +30,7 @@
         "postfix.dnsbl.domain": "list.dnswl.org",
         "postfix.dnsbl.result": "127.0.5.1",
         "process.name": "postfix/dnsblog",
+        "process.pid": "9891",
         "related.ip": [
             "2607:f8b0:4003:c01::23a"
         ],
@@ -49,6 +51,7 @@
         "message": "Mar 24 13:58:01 anymr01 postfix/dnsblog[9891]: warning: dnsblog_query: lookup error for DNS query 198.204.82.110.list.dnswl.org: Host or domain name not found. Name service error for name=198.204.82.110.list.dnswl.org type=A: Host not found, try again",
         "postfix.message": "dnsblog_query: lookup error for DNS query 198.204.82.110.list.dnswl.org: Host or domain name not found. Name service error for name=198.204.82.110.list.dnswl.org type=A: Host not found, try again",
         "process.name": "postfix/dnsblog",
+        "process.pid": "9891",
         "service.type": "postfix"
     }
 ]

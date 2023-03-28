@@ -20,6 +20,7 @@
         "postfix.var.dsn": "4.4.2",
         "postfix.var.to": "user@yahoo.com",
         "process.name": "postfix/error",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -43,6 +44,7 @@
         "postfix.var.dsn": "5.1.1",
         "postfix.var.to": "user@yahoo.com",
         "process.name": "postfix/error",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

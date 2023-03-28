@@ -9,6 +9,7 @@
         "log.offset": 0,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/relay[25469]: 1.example.com.si[private/dovecot-lmtp]",
         "process.name": "postfix/relay",
+        "process.pid": "25469",
         "service.type": "postfix"
     }
 ]

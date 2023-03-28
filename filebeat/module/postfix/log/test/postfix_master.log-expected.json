@@ -8,7 +8,10 @@
         "input.type": "log",
         "log.offset": 0,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: daemon started -- version 2.11.0, configuration /etc/postfix",
+        "postfix.config_path": "/etc/postfix",
+        "postfix.version": "2.11.0",
         "process.name": "postfix/master",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -19,8 +22,10 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 111,
-        "message": "Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: dterminating on signal 15",
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: terminating on signal 15",
+        "postfix.termination_signal": "15",
         "process.name": "postfix/master",
+        "process.pid": "25469",
         "service.type": "postfix"
     },
     {
@@ -30,9 +35,27 @@
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
-        "log.offset": 187,
-        "message": "Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: dreload -- version 2.11.0, configuration /etc/postfix",
+        "log.offset": 186,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/master[25469]: reload -- version 2.11.0, configuration /etc/postfix",
+        "postfix.config_path": "/etc/postfix",
+        "postfix.version": "2.11.0",
         "process.name": "postfix/master",
+        "process.pid": "25469",
+        "service.type": "postfix"
+    },
+    {
+        "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "event.dataset": "postfix.log",
+        "event.module": "postfix",
+        "event.timezone": "-02:00",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "fatal",
+        "log.offset": 289,
+        "message": "Mar 24 13:58:01 5mail-gw01 postfix/master[1490]: fatal: open lock file /var/lib/postfix/master.lock: unable to set exclusive lock: Resource temporarily unavailable",
+        "postfix.message": "open lock file /var/lib/postfix/master.lock: unable to set exclusive lock: Resource temporarily unavailable",
+        "process.name": "postfix/master",
+        "process.pid": "1490",
         "service.type": "postfix"
     }
 ]
