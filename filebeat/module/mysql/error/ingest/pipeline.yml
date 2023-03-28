@@ -108,7 +108,7 @@ processors:
 - set:
     field: event.outcome
     value: failure
-    if: ctx?._tmp?.auth_failed != null
+    if: ctx._tmp?.auth_failed != null
 - remove:
     field: _tmp
     ignore_missing: true
