@@ -27,6 +27,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -95,7 +97,7 @@ func LoadWithSettings(
 
 	name := beatInfo.Name
 
-	queueBuilder, err := createQueueBuilder(config.Queue, monitors, settings.InputQueueSize)
+	queueFactory, err := createQueueFactory(config.Queue, monitors, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +107,7 @@ func LoadWithSettings(
 		return nil, err
 	}
 
-	p, err := New(beatInfo, monitors, queueBuilder, out, settings)
+	p, err := New(beatInfo, monitors, queueFactory, out, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -170,24 +172,14 @@ func loadOutput(
 	return out, nil
 }
 
-func createQueueBuilder(
+func createQueueFactory(
 	config conf.Namespace,
 	monitors Monitors,
 	inQueueSize int,
-) (func(queue.ACKListener) (queue.Queue, error), error) {
+) (queueFactory, error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
 		queueType = b
-	}
-
-	queueFactory := queue.FindFactory(queueType)
-	if queueFactory == nil {
-		return nil, fmt.Errorf("'%v' is no valid queue type", queueType)
-	}
-
-	queueConfig := config.Config()
-	if queueConfig == nil {
-		queueConfig = conf.NewConfig()
 	}
 
 	if monitors.Telemetry != nil {
@@ -195,7 +187,39 @@ func createQueueBuilder(
 		monitoring.NewString(queueReg, "name").Set(queueType)
 	}
 
+	switch queueType {
+	case memqueue.QueueType:
+		settings, err := memqueue.SettingsForUserConfig(config.Config())
+		if err != nil {
+			return nil, err
+		}
+		// The memory queue has a special override during pipeline
+		// initialization for the size of its API channel buffer.
+		settings.InputQueueSize = inQueueSize
+		return memQueueFactory(monitors.Logger, settings), nil
+	case diskqueue.QueueType:
+		settings, err := diskqueue.SettingsForUserConfig(config.Config())
+		if err != nil {
+			return nil, err
+		}
+		return diskQueueFactory(monitors.Logger, settings), nil
+	default:
+		return nil, fmt.Errorf("'%v' is not a valid queue type", queueType)
+	}
+}
+
+func memQueueFactory(logger *logp.Logger, settings memqueue.Settings) queueFactory {
 	return func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return queueFactory(ackListener, monitors.Logger, queueConfig, inQueueSize)
-	}, nil
+		factorySettings := settings
+		factorySettings.ACKListener = ackListener
+		return memqueue.NewQueue(logger, factorySettings), nil
+	}
+}
+
+func diskQueueFactory(logger *logp.Logger, settings diskqueue.Settings) queueFactory {
+	return func(ackListener queue.ACKListener) (queue.Queue, error) {
+		factorySettings := settings
+		factorySettings.WriteToDiskListener = ackListener
+		return diskqueue.NewQueue(logger, factorySettings)
+	}
 }
