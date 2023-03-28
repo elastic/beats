@@ -2,7 +2,8 @@
     {
         "@timestamp": "2023-03-12T19:26:00.000-02:00",
         "event.category": [
-            "database"
+            "database",
+            "network"
         ],
         "event.dataset": "mysql.error",
         "event.kind": "event",
