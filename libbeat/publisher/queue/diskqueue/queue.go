@@ -25,7 +25,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
@@ -98,19 +97,6 @@ type metricsRequest struct {
 // metrics response from the disk queue
 type metricsRequestResponse struct {
 	sizeOnDisk uint64
-}
-
-// Factory matches the queue.Factory interface, and is used to create
-// the queue during pipeline initialization.
-func Factory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
-) (queue.Queue, error) {
-	settings, err := SettingsForUserConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("disk queue couldn't load user config: %w", err)
-	}
-	settings.WriteToDiskListener = ackListener
-	return NewQueue(logger, settings)
 }
 
 // NewQueue returns a disk-based queue configured with the given logger
