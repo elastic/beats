@@ -602,7 +602,7 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 
 	// state.host
 	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(useFQDN), monitoring.Report)
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
