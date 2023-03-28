@@ -26,7 +26,6 @@ func newFeature(name string, factory Factory) *feature.Feature {
 func newFunctionFeature(
 	provider, name string,
 	factory FunctionFactory,
-	// details feature.Details,
 ) *feature.Feature {
 	return feature.New(getNamespace(provider), name, factory)
 }
