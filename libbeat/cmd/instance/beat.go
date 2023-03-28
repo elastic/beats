@@ -799,7 +799,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
-		logp.Warn("unable to lookup FQDN: %s, using hostname = %s", err.Error(), b.Info.Hostname)
+		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
 		b.Info.FQDN = b.Info.Hostname
 	} else {
 		b.Info.FQDN = fqdn
