@@ -243,7 +243,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 			return nil
 		}
 		outCfg := conf.Namespace{}
-		//nolint:nilerr
+		//nolint:nilerr // we are intentionally ignoring specific errors here
 		if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
 			return nil
 		}
