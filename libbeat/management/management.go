@@ -113,7 +113,7 @@ type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 var managerFactory FactoryFunc
 var managerFactoryLock sync.Mutex
 
-// Factory returns a factory to create a manager plugin. In normal operation
+// Factory returns a factory to create a manager. In normal operation
 // this returns NewV2AgentManager if linked against x-pack (see
 // x-pack/libbeat/management/managerV2.go), and nilFactory otherwise.
 // Tests can call SetFactory to have Factory instead return a mocked manager.
