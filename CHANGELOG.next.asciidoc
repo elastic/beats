@@ -238,6 +238,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
 - Improve CEL input documentation {pull}34831[34831]
 - Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
+- Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
 
 *Auditbeat*
 
