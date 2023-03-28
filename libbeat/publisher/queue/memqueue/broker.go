@@ -22,12 +22,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
+
+// The string used to specify this queue in beats configurations.
+const QueueType = "mem"
 
 const (
 	minInputQueueSize      = 20
@@ -117,37 +118,6 @@ type batchACKState struct {
 type chanList struct {
 	head *batchACKState
 	tail *batchACKState
-}
-
-func init() {
-	queue.RegisterQueueType(
-		"mem",
-		create,
-		feature.MakeDetails(
-			"Memory queue",
-			"Buffer events in memory before sending to the output.",
-			feature.Stable))
-}
-
-func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *c.C, inQueueSize int,
-) (queue.Queue, error) {
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
-	}
-
-	if logger == nil {
-		logger = logp.L()
-	}
-
-	return NewQueue(logger, Settings{
-		ACKListener:    ackListener,
-		Events:         config.Events,
-		FlushMinEvents: config.FlushMinEvents,
-		FlushTimeout:   config.FlushTimeout,
-		InputQueueSize: inQueueSize,
-	}), nil
 }
 
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
