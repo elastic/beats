@@ -68,7 +68,7 @@ func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 	m.sqsMessagesWaiting.Set(count)
 }
 
-func calculateUtilization(d time.Duration, maxMessagesInflight int, m *inputMetrics) float64 {
+func calculateUtilizationAndReset(d time.Duration, maxMessagesInflight int, m *inputMetrics) float64 {
 	maxUtilization := float64(d) * float64(maxMessagesInflight)
 	utilizedRate := float64(atomic.SwapInt64(&m.utilizationNanos, 0)) / maxUtilization
 	return utilizedRate
@@ -85,7 +85,7 @@ func (m *inputMetrics) pollSQSUtilizationMetric(ctx context.Context, maxMessages
 			return
 		case tick := <-t.C:
 			duration := tick.Sub(lastTick)
-			utilizedRate := calculateUtilization(duration, maxMessagesInflight, m)
+			utilizedRate := calculateUtilizationAndReset(duration, maxMessagesInflight, m)
 			m.sqsWorkerUtilization.Set(utilizedRate)
 			// reset for the next polling duration
 			lastTick = tick
