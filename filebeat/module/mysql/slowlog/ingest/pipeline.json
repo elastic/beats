@@ -99,7 +99,7 @@
       "append": {
         "field": "related.user",
         "value": "{{user.name}}",
-        "if": "ctx?.user?.name != null"
+        "if": "ctx.user?.name != null"
       }
     },
     {
