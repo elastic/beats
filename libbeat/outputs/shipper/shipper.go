@@ -206,9 +206,8 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 				// RPC size limit. Split the batch if possible, otherwise we
 				// need to drop it.
 				if batch.SplitRetry() {
-					// Report these events as failed since they were rejected
-					// but can be retried.
-					s.observer.Failed(len(events))
+					// Report that we split a batch
+					s.observer.Split()
 				} else {
 					batch.Drop()
 					s.observer.Dropped(len(events))

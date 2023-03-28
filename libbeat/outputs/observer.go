@@ -26,6 +26,7 @@ type Observer interface {
 	Dropped(int)      // report number of dropped events
 	Duplicate(int)    // report number of events detected as duplicates (e.g. on resends)
 	Cancelled(int)    // report number of cancelled events
+	Split()           // report a batch was split for being too large to ingest
 	WriteError(error) // report an I/O error on write
 	WriteBytes(int)   // report number of bytes being written
 	ReadError(error)  // report an I/O error on read
@@ -48,6 +49,7 @@ func (*emptyObserver) Duplicate(int)    {}
 func (*emptyObserver) Failed(int)       {}
 func (*emptyObserver) Dropped(int)      {}
 func (*emptyObserver) Cancelled(int)    {}
+func (*emptyObserver) Split()           {}
 func (*emptyObserver) WriteError(error) {}
 func (*emptyObserver) WriteBytes(int)   {}
 func (*emptyObserver) ReadError(error)  {}

@@ -191,10 +191,8 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	switch {
 	case errors.Is(err, errPayloadTooLarge):
 		if batch.SplitRetry() {
-			// If we successfully split the batch, we report the events to the
-			// observer as "failed", since this indicates a publish error that
-			// will be retried.
-			client.observer.Failed(len(events))
+			// Report that we split a batch
+			client.observer.Split()
 		} else {
 			// If the batch could not be split, there is no option left but
 			// to drop it and log the error state.

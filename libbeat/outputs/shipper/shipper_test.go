@@ -213,7 +213,7 @@ func TestPublish(t *testing.T) {
 			},
 			marshalMethod:    toShipperEvent,
 			qSize:            3,
-			observerExpected: &TestObserver{batch: 3, failed: 3},
+			observerExpected: &TestObserver{batch: 3, split: 1},
 			serverError:      status.Error(codes.ResourceExhausted, "rpc size limit exceeded"),
 		},
 		{
@@ -502,6 +502,7 @@ type TestObserver struct {
 	batch     int
 	duplicate int
 	failed    int
+	split     int
 
 	writeError error
 	readError  error
@@ -518,6 +519,7 @@ func (to *TestObserver) Duplicate(duplicate int) { to.duplicate += duplicate }
 func (to *TestObserver) Failed(failed int)       { to.failed += failed }
 func (to *TestObserver) Dropped(dropped int)     { to.dropped += dropped }
 func (to *TestObserver) Cancelled(cancelled int) { to.cancelled += cancelled }
+func (to *TestObserver) Split()                  { to.split++ }
 func (to *TestObserver) WriteError(we error)     { to.writeError = we }
 func (to *TestObserver) WriteBytes(wb int)       { to.writeBytes += wb }
 func (to *TestObserver) ReadError(re error)      { to.readError = re }
