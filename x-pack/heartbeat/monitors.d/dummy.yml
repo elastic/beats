@@ -1,0 +1,22 @@
+- id: example-monitor-mydemoproject2-default
+  name: PROJ My Example Journey
+  type: browser
+  enabled: true
+  data_stream:
+    dataset: browser
+    type: synthetics
+  __ui:
+    script_source:
+      is_generated_script: false
+      file_name: ''
+    is_zip_url_tls_enabled: false
+  origin: project
+  run_from.id: US-Midwest
+  run_from.geo.name: US-Midwest
+  schedule: '@every 10m'
+  timeout: null
+  throttling: 5d/3u/20l
+  source.project.content: >-
+    UEsDBBQACAAIAAAAIQAAAAAAAAAAAAAAAAAbAAAAam91cm5leXMvZXhhbXBsZS5qb3VybmV5LnRzjVJdb6JAFH3vr5iwL5hYxX7t2sbNFoWIC7aAouum2YwwkWmBocyoYNP/vhew391kH3TmnnvuPffcod1Gt2ydJaTgbZLjOI1Iaw+0BD/Y4AzROGWZ+MOLRIREUJ+jHsrI/ZpmRJZ+kAhzANsvaalxcSArzY91T40bsnTtXI2QVSCtlkSjOiM1kfyAUrwiTfjPcMzRYwP1vqOHA/RJv5glVLCsteZELhnACc6RtPdxuE9LzSrF/ZAE64ico45SIxHzsaAs4efo900NpRndYEHMVxlp6h5aNNgSLqQbID2CPYQ+N8gFScFdhNeJHyKcphGtG4ExDDwfyc92EMJbTEXltrVigsm149Y6iyqJ/xDCnJNMIEFFRD6V8MGDQCHBAcng2V4pVuZZJkthR6qE/iVF8pT4oiHXtXWrliC56LNEkETIjUZLMBW+BcECxqXn2ctfu/0FcXhbn1iwDZqspo7ZC7DA56+W077lLLlYYk7OTppky1ZGf3S0mI92eNZdG7dsZRXbn0b/kvpH3Y4fjyO/MM4MnVMcl/FpRObWZjEPw+Vc5Qv39H557BXL2Ds1E2dnRArv08uVEXdCf6imyzjYlT2NW6HaU101h0HfnmqZvdvHWqQ6bndgDkaA6059aoVN8wHEA1PzgDflE+BO3PwasGtT6wCmfIX7MLiz+VgbqbancRc47uSlr9359RFTGPfg7r3jeQpgRa15BXeYoawdzGie2Xe6ihWD2yVe5AvgLJ44DnDwnVXnKk9jzRyEpRfTHI7LcwdeXmqORwNTLz0p3IXYLXKz4mpdwL5xBzDneTfA23l9UxtDbJV+dae/PSnngbqkPBcw1wy4s8qPtQEtD3hjU4caz3raW62h6+/2NFbAT1bOPinycVW3n6Pq6b59g/281Ru89W+/9m88zWvQ+jtaxrpYzC16RdXl3E67/VWvd/AXUEsHCJJqKcDEAgAACgUAAFBLAQItAxQACAAIAAAAIQCSainAxAIAAAoFAAAbAAAAAAAAAAAAIACkgQAAAABqb3VybmV5cy9leGFtcGxlLmpvdXJuZXkudHNQSwUGAAAAAAEAAQBJAAAADQMAAAAA
+  params:
+    url: 'https://elastic.github.io/synthetics-demo/'
