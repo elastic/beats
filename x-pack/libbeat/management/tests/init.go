@@ -16,14 +16,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/feature"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
-
-var defaultFleetName = "x-pack-fleet"
 
 // InitBeatsForTest tinkers with a bunch of global variables so beats will start up properly in a test environment
 func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
@@ -41,31 +38,10 @@ func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
 	require.NoError(t, err)
 }
 
-// ResetFleetManager re-registers the global fleet handler, if needed, and replace it with the test one.
-func ResetFleetManager(handler MockV2Handler) error {
-	managers, err := feature.GlobalRegistry().LookupAll(lbmanagement.Namespace)
-	if err != nil {
-		return fmt.Errorf("error finding management plugin: %w", err)
-	}
-	if managers != nil && managers[0].Name() == defaultFleetName {
-		_ = feature.GlobalRegistry().Unregister(lbmanagement.Namespace, defaultFleetName)
-	}
-	lbmanagement.Register("fleet-test", fleetClientFactory(handler), feature.Beta)
-	return nil
-}
-
-func fleetClientFactory(srv MockV2Handler) lbmanagement.PluginFunc {
-	return func(config *conf.C) lbmanagement.FactoryFunc {
+func fleetClientFactory(srv MockV2Handler) lbmanagement.FactoryFunc {
+	return func(_ *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
 		c := management.DefaultConfig()
-		if config.Enabled() {
-			if err := config.Unpack(&c); err != nil {
-				return nil
-			}
-			return func(_ *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
-				return management.NewV2AgentManagerWithClient(c, registry, srv.Client, management.WithStopOnEmptyUnits)
-			}
-		}
-		return nil
+		return management.NewV2AgentManagerWithClient(c, registry, srv.Client, management.WithStopOnEmptyUnits)
 	}
 }
 
@@ -81,8 +57,7 @@ func SetupTestEnv(t *testing.T, config *proto.UnitExpectedConfig, runtime time.D
 
 	server := NewMockServer(t, runtime, config, outPath)
 	t.Logf("Resetting fleet manager...")
-	err = ResetFleetManager(server)
-	require.NoError(t, err)
+	lbmanagement.SetFactory(fleetClientFactory(server))
 
 	return outPath, server
 }

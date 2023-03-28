@@ -797,7 +797,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
+	b.Manager, err = management.Factory()(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}

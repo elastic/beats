@@ -23,7 +23,6 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,9 +52,6 @@ const (
 	// Stopped is status describing application is stopped.
 	Stopped
 )
-
-// Namespace is the feature namespace for queue definition.
-var Namespace = "libbeat.management"
 
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
@@ -109,36 +105,34 @@ type Manager interface {
 	SetPayload(map[string]interface{})
 }
 
-// PluginFunc for creating FactoryFunc if it matches a config
-type PluginFunc func(*config.C) FactoryFunc
-
 // FactoryFunc for creating a config manager
 type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 
-// Register a config manager
-func Register(name string, fn PluginFunc, stability feature.Stability) {
-	f := feature.New(
-		Namespace, name, fn, feature.MakeDetails(name, "", stability))
-	feature.MustRegister(f)
+// If managerFactory is non-nil, Factory will return it instead of the default
+// of nilFactory. managerFactoryLock must be held to access managerFactory.
+var managerFactory FactoryFunc
+var managerFactoryLock sync.Mutex
+
+// Factory returns a factory to create a manager plugin. In normal operation
+// this returns NewV2AgentManager if linked against x-pack (see
+// x-pack/libbeat/management/managerV2.go), and nilFactory otherwise.
+// Tests can call SetFactory to have Factory instead return a mocked manager.
+func Factory() FactoryFunc {
+	managerFactoryLock.Lock()
+	defer managerFactoryLock.Unlock()
+	if managerFactory != nil {
+		return managerFactory
+	}
+	return nilFactory
 }
 
-// Factory retrieves config manager constructor. If no one is registered
-// it will create a nil manager
-func Factory(cfg *config.C) FactoryFunc {
-	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
-	if err != nil {
-		return nilFactory
-	}
-
-	for _, f := range factories {
-		if plugin, ok := f.Factory().(PluginFunc); ok {
-			if factory := plugin(cfg); factory != nil {
-				return factory
-			}
-		}
-	}
-
-	return nilFactory
+// SetFactory tells Beats to create its manager with the given function. It is
+// only called by Agent V2 initialization (x-pack/libbeat/management/managerV2.go)
+// and by tests that need a mocked manager.
+func SetFactory(factory FactoryFunc) {
+	managerFactoryLock.Lock()
+	defer managerFactoryLock.Unlock()
+	managerFactory = factory
 }
 
 // fallbackManager, fallback when no manager is present
