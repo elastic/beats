@@ -30,7 +30,7 @@ func TestInputMetricsClose(t *testing.T) {
 
 func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 	reg := monitoring.NewRegistry()
-	maxWorkers := 1
+	const maxWorkers = 1
 	metrics := newInputMetrics("test", reg, maxWorkers)
 
 	metrics.utilizationNanos = time.Second.Nanoseconds()
