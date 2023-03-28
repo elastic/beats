@@ -38,6 +38,7 @@ type SockTracer struct {
 
 func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 	st.path = path
+	delay := time.Millisecond * 250
 
 	started := time.Now()
 	for {
@@ -49,7 +50,6 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 			logp.L().Info("socktracer found file for unix socket: %s, will attempt to connect")
 			break
 		} else {
-			delay := time.Millisecond * 250
 			logp.L().Info("socktracer could not find file for unix socket at: %s, will retry in %s", delay)
 			time.Sleep(delay)
 		}
