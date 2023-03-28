@@ -71,6 +71,18 @@ func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 func calculateUtilizationAndReset(d time.Duration, maxMessagesInflight int, m *inputMetrics) float64 {
 	maxUtilization := float64(d) * float64(maxMessagesInflight)
 	utilizedRate := float64(atomic.SwapInt64(&m.utilizationNanos, 0)) / maxUtilization
+
+	if utilizedRate == 0 {
+		// Falling back to inflight stats when the workers are long running
+		inflight := m.sqsMessagesInflight.Get()
+		if inflight > 0 {
+			return float64(inflight) / float64(maxMessagesInflight)
+		}
+	} else if utilizedRate > 1 {
+		// Normalizing the utilization after long running workers
+		return 1
+	}
+
 	return utilizedRate
 }
 

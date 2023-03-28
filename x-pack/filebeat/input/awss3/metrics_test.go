@@ -38,3 +38,26 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 	utilization := calculateUtilizationAndReset(time.Second, maxWorkers, metrics)
 	assert.Greater(t, utilization, 0.95)
 }
+
+func TestInputMetricsSQSWorkerUtilization_LongRunningWorkers(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	const maxWorkers = 1
+	metrics := newInputMetrics("test", reg, maxWorkers)
+
+	metrics.utilizationNanos = time.Minute.Nanoseconds()
+
+	utilization := calculateUtilizationAndReset(time.Second, maxWorkers, metrics)
+	assert.Equal(t, utilization, 1.0)
+}
+
+func TestInputMetricsSQSWorkerUtilization_InFlightWorkers(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	const maxWorkers = 1
+	metrics := newInputMetrics("test", reg, maxWorkers)
+
+	metrics.utilizationNanos = 0
+	metrics.sqsMessagesInflight.Set(maxWorkers)
+
+	utilization := calculateUtilizationAndReset(time.Second, maxWorkers, metrics)
+	assert.Equal(t, utilization, 1.0)
+}
