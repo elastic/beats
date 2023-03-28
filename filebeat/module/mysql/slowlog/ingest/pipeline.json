@@ -106,7 +106,7 @@
       "append": {
         "field": "related.ip",
         "value": "{{source.ip}}",
-        "if": "ctx?.source?.ip != null"
+        "if": "ctx.source?.ip != null"
       }
     }
   ],
