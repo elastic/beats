@@ -149,7 +149,7 @@ func (p *addHostMetadata) loadData() error {
 		if err != nil {
 			// FQDN lookup is "best effort".  We log the error, fallback to
 			// the OS-reported hostname, and move on.
-			p.logger.Infof("unable to lookup FQDN: %s", err.Error())
+			p.logger.Infof("unable to lookup FQDN: %s, using hostname = %s", err.Error(), hostname)
 		} else {
 			hostname = fqdn
 		}
