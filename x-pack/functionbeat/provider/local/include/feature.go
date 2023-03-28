@@ -10,5 +10,5 @@ import (
 )
 
 func init() {
-	feature.MustRegister(local.Bundle.Features()...)
+	feature.MustRegister(local.Features...)
 }

@@ -66,7 +66,6 @@ func testProviderLookup(t *testing.T) {
 	f := newFeature(
 		name,
 		providerFn,
-		feature.MakeDetails(name, "provider for testing", feature.Experimental),
 	)
 
 	t.Run("adding and retrieving a provider", withRegistry(func(
@@ -118,7 +117,6 @@ func testFunctionLookup(t *testing.T) {
 	f := newFeature(
 		name,
 		providerFn,
-		feature.MakeDetails(name, "provider for testing", feature.Experimental),
 	)
 
 	fnName := "myfunc"
@@ -127,11 +125,7 @@ func testFunctionLookup(t *testing.T) {
 		return myfunction, nil
 	}
 
-	fnFeature := newFunctionFeature(name, fnName, functionFn, feature.MakeDetails(
-		name,
-		"provider for testing",
-		feature.Experimental,
-	))
+	fnFeature := newFunctionFeature(name, fnName, functionFn)
 
 	t.Run("adding and retrieving a function", withRegistry(func(
 		t *testing.T,
@@ -255,18 +249,14 @@ func TestFindFunctionByName(t *testing.T) {
 		providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 			return myprovider, nil
 		}
-		f := newFeature(name, providerFn, feature.MakeDetails(name, "provider for testing", feature.Experimental))
+		f := newFeature(name, providerFn)
 
 		myfunction := &mockFunction{name}
 		functionFn := func(provider Provider, config *conf.C) (Function, error) {
 			return myfunction, nil
 		}
 
-		fnFeature := newFunctionFeature(name, fnName, functionFn, feature.MakeDetails(
-			name,
-			"provider for testing",
-			feature.Experimental,
-		))
+		fnFeature := newFunctionFeature(name, fnName, functionFn)
 
 		err := global.Register(f)
 		if !assert.NoError(t, err) {

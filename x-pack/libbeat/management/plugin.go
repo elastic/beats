@@ -10,7 +10,6 @@ import (
 )
 
 func init() {
-	lbmanagement.SetPlugin(NewFleetManagerPluginV2)
 	/*feature.MustRegister(feature.New(
 	lbmanagement.Namespace,
 	"x-pack-fleet",

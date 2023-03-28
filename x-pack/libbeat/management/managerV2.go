@@ -100,6 +100,12 @@ func WithStopOnEmptyUnits(m *BeatV2Manager) {
 // Init Functions
 // ================================
 
+// Register the agent manager, so that calls to lbmanagement.Factory will
+// return NewV2AgentManager when linked with x-pack.
+func init() {
+	lbmanagement.SetFactory(NewV2AgentManager)
+}
+
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is meant to be used by the management plugin system, which will register this as a callback.
 func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (lbmanagement.Manager, error) {

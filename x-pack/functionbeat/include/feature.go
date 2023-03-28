@@ -11,6 +11,6 @@ import (
 )
 
 func init() {
-	feature.MustRegister(aws.Bundle.Features()...)
-	feature.MustRegister(local.Bundle.Features()...)
+	feature.MustRegister(aws.Features...)
+	feature.MustRegister(local.Features...)
 }

@@ -53,9 +53,6 @@ const (
 	Stopped
 )
 
-// Namespace is the feature namespace for queue definition.
-var Namespace = "libbeat.management"
-
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
 
@@ -108,41 +105,34 @@ type Manager interface {
 	SetPayload(map[string]interface{})
 }
 
-// PluginFunc for creating FactoryFunc if it matches a config
-type PluginFunc func(*config.C) FactoryFunc
-
 // FactoryFunc for creating a config manager
 type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
 
-// If managerPlugin is non-nil, it will be used by Factory to create the
-// FactoryFunc for the active manager. Must hold managerPluginLock to access
-// managerPlugin.
-var managerPlugin PluginFunc
-var managerPluginLock sync.Mutex
+// If managerFactory is non-nil, Factory will return it instead of the default
+// of nilFactory. managerFactoryLock must be held to access managerFactory.
+var managerFactory FactoryFunc
+var managerFactoryLock sync.Mutex
 
-// Factory returns a factory to create a manager plugin.
-// In normal operation this returns NewFleetManagerPluginV2 if linked against
-// x-pack (see x-pack/libbeat/management/plugin.go), and nilFactory otherwise.
-// Tests can call SetPlugin to make this instead return a mocked manager.
-func Factory(cfg *config.C) FactoryFunc {
-	managerPluginLock.Lock()
-	defer managerPluginLock.Unlock()
-
-	if managerPlugin != nil {
-		if managerFactory := managerPlugin(cfg); managerFactory != nil {
-			return managerFactory
-		}
+// Factory returns a factory to create a manager plugin. In normal operation
+// this returns NewV2AgentManager if linked against x-pack (see
+// x-pack/libbeat/management/managerV2.go), and nilFactory otherwise.
+// Tests can call SetFactory to have Factory instead return a mocked manager.
+func Factory() FactoryFunc {
+	managerFactoryLock.Lock()
+	defer managerFactoryLock.Unlock()
+	if managerFactory != nil {
+		return managerFactory
 	}
 	return nilFactory
 }
 
-// SetPlugin sets the beats manager plugin to the given value. It is only
-// called by Agent V2 initialization (x-pack/libbeat/management/plugin.go)
-// and by tests that need a mocked manager plugin.
-func SetPlugin(plugin PluginFunc) {
-	managerPluginLock.Lock()
-	defer managerPluginLock.Unlock()
-	managerPlugin = plugin
+// SetFactory tells Beats to create its manager with the given function. It is
+// only called by Agent V2 initialization (x-pack/libbeat/management/managerV2.go)
+// and by tests that need a mocked manager.
+func SetFactory(factory FactoryFunc) {
+	managerFactoryLock.Lock()
+	defer managerFactoryLock.Unlock()
+	managerFactory = factory
 }
 
 // fallbackManager, fallback when no manager is present

@@ -17,10 +17,6 @@
 
 package feature
 
-import (
-	"fmt"
-)
-
 // Registry is the global plugin registry, this variable is meant to be temporary to move all the
 // internal factory to receive a context that include the current beat registry.
 var registry = NewRegistry()
@@ -39,19 +35,13 @@ type Featurable interface {
 	// Factory returns the function used to create an instance of the Feature, the signature
 	// of the method is type checked by the 'FindFactory' of each namespace.
 	Factory() interface{}
-
-	// Description return the available information for a specific feature.
-	Description() Details
-
-	String() string
 }
 
 // Feature contains the information for a specific feature
 type Feature struct {
-	namespace   string
-	name        string
-	factory     interface{}
-	description Details
+	namespace string
+	name      string
+	factory   interface{}
 }
 
 // Namespace return the namespace of the feature.
@@ -69,28 +59,12 @@ func (f *Feature) Factory() interface{} {
 	return f.factory
 }
 
-// Description return the available information for a specific feature.
-func (f *Feature) Description() Details {
-	return f.description
-}
-
-// Features return the current feature as a slice to be compatible with Bundle merging and filtering.
-func (f *Feature) Features() []Featurable {
-	return []Featurable{f}
-}
-
-// String return the debug information
-func (f *Feature) String() string {
-	return fmt.Sprintf("%s/%s (description: %s)", f.namespace, f.name, f.description)
-}
-
 // New returns a new Feature.
-func New(namespace, name string, factory interface{}, description Details) *Feature {
+func New(namespace, name string, factory interface{}) *Feature {
 	return &Feature{
-		namespace:   namespace,
-		name:        name,
-		factory:     factory,
-		description: description,
+		namespace: namespace,
+		name:      name,
+		factory:   factory,
 	}
 }
 

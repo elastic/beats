@@ -26,9 +26,9 @@ import (
 func TestBundle(t *testing.T) {
 	factory := func() {}
 	features := []Featurable{
-		New("libbeat.outputs", "elasticsearch", factory, Details{Stability: Stable}),
-		New("libbeat.outputs", "edge", factory, Details{Stability: Experimental}),
-		New("libbeat.input", "tcp", factory, Details{Stability: Beta}),
+		New("libbeat.outputs", "elasticsearch", factory),
+		New("libbeat.outputs", "edge", factory),
+		New("libbeat.input", "tcp", factory),
 	}
 
 	t.Run("Creates a new Bundle", func(t *testing.T) {
@@ -37,16 +37,16 @@ func TestBundle(t *testing.T) {
 	})
 
 	t.Run("Creates a new Bundle from specified feature", func(t *testing.T) {
-		f1 := New("libbeat.outputs", "elasticsearch", factory, Details{Stability: Stable})
+		f1 := New("libbeat.outputs", "elasticsearch", factory)
 		b := NewBundle(f1)
 		assert.Equal(t, 1, len(b.Features()))
 	})
 
 	t.Run("Creates a new Bundle with grouped features", func(t *testing.T) {
-		f1 := New("libbeat.outputs", "elasticsearch", factory, Details{Stability: Stable})
-		f2 := New("libbeat.outputs", "edge", factory, Details{Stability: Experimental})
-		f3 := New("libbeat.input", "tcp", factory, Details{Stability: Beta})
-		f4 := New("libbeat.input", "udp", factory, Details{Stability: Beta})
+		f1 := New("libbeat.outputs", "elasticsearch", factory)
+		f2 := New("libbeat.outputs", "edge", factory)
+		f3 := New("libbeat.input", "tcp", factory)
+		f4 := New("libbeat.input", "udp", factory)
 
 		b := NewBundle(f1, f2, f3, f4)
 

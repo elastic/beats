@@ -96,26 +96,6 @@ func (r *Registry) Register(feature Featurable) error {
 	return nil
 }
 
-// Unregister removes a feature from the registry.
-func (r *Registry) Unregister(namespace, name string) error {
-	r.Lock()
-	defer r.Unlock()
-	ns := normalize(namespace)
-
-	v, found := r.namespaces[ns]
-	if !found {
-		return fmt.Errorf("unknown namespace named '%s'", ns)
-	}
-
-	_, found = v[name]
-	if !found {
-		return fmt.Errorf("unknown feature '%s' in namespace '%s'", name, ns)
-	}
-
-	delete(r.namespaces[ns], name)
-	return nil
-}
-
 // Lookup searches for a Feature by the namespace-name pair.
 func (r *Registry) Lookup(namespace, name string) (Featurable, error) {
 	r.RLock()

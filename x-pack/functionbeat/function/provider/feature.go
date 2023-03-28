@@ -17,8 +17,8 @@ func getNamespace(provider string) string {
 
 // Feature creates a new Provider feature to be added to the global registry.
 // The namespace will be 'functionbeat.provider' in the registry.
-func newFeature(name string, factory Factory, details feature.Details) *feature.Feature {
-	return feature.New(namespace, name, factory, details)
+func newFeature(name string, factory Factory) *feature.Feature {
+	return feature.New(namespace, name, factory)
 }
 
 // FunctionFeature Feature creates a new function feature to be added to the global registry
@@ -26,9 +26,9 @@ func newFeature(name string, factory Factory, details feature.Details) *feature.
 func newFunctionFeature(
 	provider, name string,
 	factory FunctionFactory,
-	details feature.Details,
+	// details feature.Details,
 ) *feature.Feature {
-	return feature.New(getNamespace(provider), name, factory, details)
+	return feature.New(getNamespace(provider), name, factory)
 }
 
 // builder is used to have a fluent interface to build a set of function for a specific provider, it
@@ -45,14 +45,13 @@ func Builder(name string, factory Factory, details feature.Details) *builder {
 	return &builder{
 		name: name,
 		features: []feature.Featurable{
-			newFeature(name, factory, details),
+			newFeature(name, factory),
 		},
 	}
 }
 
-// Bundle transforms the provider and the functions into a bundle feature.
-func (b *builder) Bundle() *feature.Bundle {
-	return feature.NewBundle(b.features...)
+func (b *builder) Features() []feature.Featurable {
+	return b.features
 }
 
 // MustAddFunction adds a new function type to the provider and return the builder.
@@ -61,6 +60,6 @@ func (b *builder) AddFunction(
 	factory FunctionFactory,
 	details feature.Details,
 ) *builder {
-	b.features = append(b.features, newFunctionFeature(b.name, name, factory, details))
+	b.features = append(b.features, newFunctionFeature(b.name, name, factory))
 	return b
 }
