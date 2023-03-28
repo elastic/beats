@@ -1385,11 +1385,11 @@ Contents of probable licence file $GOMODCACHE/github.com/spf13/cobra@v1.3.0/LICE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-Version: v1.7.0
+Version: v1.8.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.7.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.8.2/LICENSE:
 
 MIT License
 
@@ -18988,11 +18988,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/objx
-Version: v0.1.1
+Version: v0.5.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/objx@v0.1.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/objx@v0.5.0/LICENSE:
 
 The MIT License
 

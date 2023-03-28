@@ -47,14 +47,22 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 	}
 
 	log := logp.NewLogger(logSelector)
+	passphrase := config.Passphrase
+	if passphrase == "" && config.PassphraseFile != "" {
+		p, err := os.ReadFile(config.PassphraseFile)
+		if err != nil {
+			return nil, fmt.Errorf("unable to read passphrase_file: %w", err)
+		}
+		passphrase = string(p)
+	}
 
-	certPEM, err := ReadPEMFile(log, certificate, config.Passphrase)
+	certPEM, err := ReadPEMFile(log, certificate, passphrase)
 	if err != nil {
 		log.Errorf("Failed reading certificate file %v: %+v", certificate, err)
 		return nil, fmt.Errorf("%w %v", err, certificate)
 	}
 
-	keyPEM, err := ReadPEMFile(log, key, config.Passphrase)
+	keyPEM, err := ReadPEMFile(log, key, passphrase)
 	if err != nil {
 		log.Errorf("Failed reading key file: %+v", err)
 		return nil, fmt.Errorf("%w %v", err, key)
