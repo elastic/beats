@@ -25,10 +25,10 @@ import (
 )
 
 // MapHostInfo converts the HostInfo to a MapStr based on ECS.
-func MapHostInfo(useFQDN bool, info types.HostInfo) mapstr.M {
+func MapHostInfo(info types.HostInfo, fqdn string) mapstr.M {
 	name := info.Hostname
-	if useFQDN {
-		name = info.FQDN
+	if fqdn != "" {
+		name = fqdn
 	}
 
 	data := mapstr.M{
@@ -66,7 +66,7 @@ func MapHostInfo(useFQDN bool, info types.HostInfo) mapstr.M {
 }
 
 // ReportInfo reports the HostInfo to monitoring.
-func ReportInfo(useFQDN bool) func(_ monitoring.Mode, V monitoring.Visitor) {
+func ReportInfo(fqdn string) func(_ monitoring.Mode, V monitoring.Visitor) {
 	return func(_ monitoring.Mode, V monitoring.Visitor) {
 		V.OnRegistryStart()
 		defer V.OnRegistryFinished()
@@ -78,8 +78,8 @@ func ReportInfo(useFQDN bool) func(_ monitoring.Mode, V monitoring.Visitor) {
 		info := h.Info()
 
 		hostname := info.Hostname
-		if useFQDN {
-			hostname = info.FQDN
+		if fqdn != "" {
+			hostname = fqdn
 		}
 
 		monitoring.ReportString(V, "hostname", hostname)
