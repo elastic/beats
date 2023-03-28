@@ -139,8 +139,8 @@ func (r *Registry) LookupAll(namespace string) ([]Featurable, error) {
 	return list, nil
 }
 
-// Size returns the number of registered features in the registry.
-func (r *Registry) Size() int {
+// size returns the number of registered features in the registry.
+func (r *Registry) size() int {
 	r.RLock()
 	defer r.RUnlock()
 

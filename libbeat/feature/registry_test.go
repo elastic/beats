@@ -42,7 +42,7 @@ func TestRegister(t *testing.T) {
 			return
 		}
 
-		assert.Equal(t, 1, r.Size())
+		assert.Equal(t, 1, r.size())
 	})
 
 	t.Run("namespace exists and feature doesn't exist", func(t *testing.T) {
@@ -52,7 +52,7 @@ func TestRegister(t *testing.T) {
 		err = r.Register(New("processor", "foo", f))
 		require.NoError(t, err)
 
-		assert.Equal(t, 2, r.Size())
+		assert.Equal(t, 2, r.size())
 	})
 
 	t.Run("namespace exists and feature exists and not the same factory", func(t *testing.T) {
@@ -61,7 +61,7 @@ func TestRegister(t *testing.T) {
 		require.NoError(t, err)
 		err = r.Register(New("processor", "foo", f))
 		require.Error(t, err)
-		assert.Equal(t, 1, r.Size())
+		assert.Equal(t, 1, r.size())
 	})
 
 	t.Run("when the exact feature is already registered", func(t *testing.T) {
@@ -71,7 +71,7 @@ func TestRegister(t *testing.T) {
 		require.NoError(t, err)
 		err = r.Register(feature)
 		require.NoError(t, err)
-		assert.Equal(t, 1, r.Size())
+		assert.Equal(t, 1, r.size())
 	})
 }
 
