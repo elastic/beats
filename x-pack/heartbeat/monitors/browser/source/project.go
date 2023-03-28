@@ -117,7 +117,15 @@ func setupProjectDir(workdir string) error {
 	}
 
 	// setup the project linking to the global synthetics library
-	return runSimpleCommand(exec.Command("npm", "install"), workdir)
+	return runSimpleCommand(
+		exec.Command(
+			"npm", "install",
+			"--no-audit",           // Prevent audit checks that require internet
+			"--no-update-notifier", // Prevent update checks that require internet
+			"--no-fund",            // No need for package funding messages here
+			"--package-lock=false", // no need to write package lock here
+			"--progress=false",     // no need to display progress
+		), workdir)
 }
 
 func (p *ProjectSource) Workdir() string {
