@@ -73,15 +73,10 @@ func GlobalRegistry() *Registry {
 	return registry
 }
 
-// register is a helper that registers a single feature in the global registry.
-func register(feature Featurable) error {
-	return GlobalRegistry().Register(feature)
-}
-
-// Register registers new features on the global registry.
-func Register(features ...Featurable) error {
+// register registers new features on the global registry.
+func register(features []Featurable) error {
 	for _, f := range features {
-		err := register(f)
+		err := registry.Register(f)
 		if err != nil {
 			return err
 		}
@@ -91,7 +86,7 @@ func Register(features ...Featurable) error {
 
 // MustRegister register a new Feature on the global registry and panic on error.
 func MustRegister(features ...Featurable) {
-	err := Register(features...)
+	err := register(features)
 	if err != nil {
 		panic(err)
 	}
