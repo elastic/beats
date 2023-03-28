@@ -104,7 +104,7 @@ processors:
 - append:
     field: event.action
     value: logon-failed
-    if: ctx?._tmp?.auth_failed != null
+    if: ctx._tmp?.auth_failed != null
 - set:
     field: event.outcome
     value: failure
