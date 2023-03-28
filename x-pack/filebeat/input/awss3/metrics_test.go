@@ -20,7 +20,7 @@ import (
 func TestInputMetricsClose(t *testing.T) {
 	reg := monitoring.NewRegistry()
 
-	metrics := newInputMetrics("aws-s3-aws.cloudfront_logs-8b312b5f-9f99-492c-b035-3dff354a1f01", reg, defaultConfig().MaxNumberOfMessages)
+	metrics := newInputMetrics("aws-s3-aws.cloudfront_logs-8b312b5f-9f99-492c-b035-3dff354a1f01", reg, 1)
 	metrics.Close()
 
 	reg.Do(monitoring.Full, func(s string, _ interface{}) {
@@ -30,7 +30,7 @@ func TestInputMetricsClose(t *testing.T) {
 
 func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 	reg := monitoring.NewRegistry()
-	maxWorkers := 1
+	const maxWorkers = 1
 	metrics := newInputMetrics("test", reg, maxWorkers)
 
 	metrics.utilizationNanos = time.Second.Nanoseconds()
