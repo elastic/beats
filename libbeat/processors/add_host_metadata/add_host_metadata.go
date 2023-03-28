@@ -143,7 +143,19 @@ func (p *addHostMetadata) loadData() error {
 		return err
 	}
 
-	data := host.MapHostInfo(features.FQDN(), h.Info())
+	hostname := h.Info().Hostname
+	if features.FQDN() {
+		fqdn, err := h.FQDN()
+		if err != nil {
+			// FQDN lookup is "best effort".  We log the error, fallback to
+			// the OS-reported hostname, and move on.
+			p.logger.Infof("unable to lookup FQDN: %s", err.Error())
+		} else {
+			hostname = fqdn
+		}
+	}
+
+	data := host.MapHostInfo(h.Info(), hostname)
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()

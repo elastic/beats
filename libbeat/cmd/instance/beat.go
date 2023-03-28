@@ -249,14 +249,11 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	info := h.Info()
-	fqdn := info.FQDN
-	if fqdn == "" {
-		// If FQDN is empty, it's likely we encountered some errors
-		// while trying to look it up. FQDN lookup is "best effort" so
-		// log the errors, fallback to the OS-reported hostname, and
-		// move on.
-		logp.NewLogger(name).Infof("unable to lookup FQDN: %s", info.FQDNError.String())
+	fqdn, err := h.FQDN()
+	if err != nil {
+		// FQDN lookup is "best effort".  We log the error, fallback to
+		// the OS-reported hostname, and move on.
+		logp.NewLogger(name).Infof("unable to lookup FQDN: %s", err.Error())
 		fqdn = hostname
 	}
 
