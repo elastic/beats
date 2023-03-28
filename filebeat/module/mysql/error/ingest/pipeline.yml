@@ -100,7 +100,7 @@ processors:
 - append:
     field: event.category
     value: authentication
-    if: ctx?._tmp?.auth_failed != null
+    if: ctx._tmp?.auth_failed != null
 - append:
     field: event.action
     value: logon-failed
