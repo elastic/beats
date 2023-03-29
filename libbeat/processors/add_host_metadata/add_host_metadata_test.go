@@ -19,6 +19,7 @@ package add_host_metadata
 
 import (
 	"fmt"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"net"
 	"os"
 	"runtime"
@@ -42,6 +43,10 @@ var (
 	hostID   = "9C7FAB7B"
 )
 
+func deregisterMonitoringRegistry() {
+	monitoring.Default.Remove(logName)
+}
+
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
 		Fields:    mapstr.M{},
@@ -51,6 +56,8 @@ func TestConfigDefault(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
+	defer deregisterMonitoringRegistry()
+
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -98,6 +105,8 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
+	defer deregisterMonitoringRegistry()
+
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -149,6 +158,7 @@ func TestConfigName(t *testing.T) {
 
 	p, err := New(testConfig)
 	require.NoError(t, err)
+	defer deregisterMonitoringRegistry()
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -181,6 +191,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 
 	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
+	defer deregisterMonitoringRegistry()
 
 	p, err := New(testConfig)
 	require.NoError(t, err)
@@ -207,6 +218,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 
 	p, err := New(testConfig)
 	require.NoError(t, err)
+	defer deregisterMonitoringRegistry()
 
 	newEvent, err := p.Run(event)
 
@@ -224,6 +236,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
+	defer deregisterMonitoringRegistry()
+
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -304,6 +318,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
+	defer deregisterMonitoringRegistry()
+
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -480,6 +496,7 @@ func TestExpireCacheOnFQDNReportingChange(t *testing.T) {
 
 	p, err := New(testConfig)
 	require.NoError(t, err)
+	defer deregisterMonitoringRegistry()
 
 	ahmP, ok := p.(*addHostMetadata)
 	require.True(t, ok)
@@ -561,6 +578,7 @@ func TestFQDNLookup(t *testing.T) {
 
 			p, err := New(testConfig)
 			require.NoError(t, err)
+			defer deregisterMonitoringRegistry()
 
 			addHostMetadataP, ok := p.(*addHostMetadata)
 			require.True(t, ok)

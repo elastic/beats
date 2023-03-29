@@ -19,14 +19,12 @@ package add_host_metadata
 
 import (
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -37,10 +35,6 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	"github.com/elastic/go-sysinfo"
 )
-
-// instanceID is used to assign each instance of this
-// processor a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
 
 const processorName = "add_host_metadata"
 const logName = "processor." + processorName
@@ -75,9 +69,8 @@ func New(cfg *config.C) (processors.Processor, error) {
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id     = int(instanceID.Inc())
-		logger = logp.NewLogger(logName).With("instance_id", id)
-		reg    = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+		logger = logp.NewLogger(logName)
+		reg    = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
 	)
 
 	p := &addHostMetadata{
