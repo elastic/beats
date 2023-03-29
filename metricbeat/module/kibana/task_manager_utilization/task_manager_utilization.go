@@ -31,6 +31,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(kibana.ModuleName, "task_manager_utilization", New,
 		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
 	)
 }
 
@@ -53,8 +54,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("Hello World!")
 
 	taskManagerHTTP, err := helper.NewHTTP(ms.BaseMetricSet)
 	if err != nil {
