@@ -38,8 +38,11 @@ func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
 }
 
 func fleetClientFactory(srv MockV2Handler) lbmanagement.ManagerFactory {
-	return func(_ *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+	return func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
 		c := management.DefaultConfig()
+		if err := cfg.Unpack(&c); err != nil {
+			return nil, err
+		}
 		return management.NewV2AgentManagerWithClient(c, registry, srv.Client, management.WithStopOnEmptyUnits)
 	}
 }
