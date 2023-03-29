@@ -495,17 +495,21 @@ func TestExpireCacheOnFQDNReportingChange(t *testing.T) {
 
 	// Toggle the FQDN feature flag; this should cause the cache
 	// to expire.
-	features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": true,
 	}))
+	require.NoError(t, err)
+
 	expired = ahmP.expired()
 	require.True(t, expired)
 
 	// Set the FQDN feature flag to the same value; this should NOT
 	// cause the cache to expire.
-	features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
 		"features.fqdn.enabled": true,
 	}))
+	require.NoError(t, err)
+
 	expired = ahmP.expired()
 	require.False(t, expired)
 }
