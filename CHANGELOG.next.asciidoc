@@ -242,6 +242,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
 - Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
 - Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
+- Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
 
 *Auditbeat*
 

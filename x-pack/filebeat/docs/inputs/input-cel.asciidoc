@@ -621,6 +621,10 @@ observe the activity of the input.
 | `batch_processing_time`   | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 |=======
 
+==== Developer tools
+
+A stand-alone CEL environment that implements the majority of the CEL input's Comment Expression Language functionality is available in the https://github.com/elastic/mito[Elastic Mito] repository. This tool may be used to help develop CEL programs to be used by the input. Installation is available from source by running `go install github.com/elastic/mito/cmd/mito@latest` and requires a Go toolchain.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
