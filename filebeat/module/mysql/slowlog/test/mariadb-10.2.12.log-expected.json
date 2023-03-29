@@ -25,6 +25,9 @@
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 1,
         "mysql.thread_id": "8",
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
@@ -64,6 +67,12 @@
         "mysql.slowlog.tmp_table": true,
         "mysql.slowlog.tmp_table_on_disk": false,
         "mysql.thread_id": "25844",
+        "related.ip": [
+            "192.168.0.10"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.ip": "192.168.0.10",
         "user.name": "root"
