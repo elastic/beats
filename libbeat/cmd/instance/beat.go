@@ -1040,22 +1040,28 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
 	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
+		if update == nil {
+			return nil
+		}
+
 		if b.OutputConfigReloader != nil {
 			if err := b.OutputConfigReloader.Reload(update); err != nil {
 				return err
 			}
 		}
 
-		err := b.Config.Output.Unpack(update.Config)
-		if err != nil {
-			return err
-		}
+		if update.Config != nil {
+			err := b.Config.Output.Unpack(update.Config)
+			if err != nil {
+				return err
+			}
 
-		// after the output configuration change
-		if isElasticsearchOutput(b.Config.Output.Name()) {
-			// if the output is Elasticsearch, we need to update some pre-saved flags
-			// for its global connection callbacks
-			b.allowOlderESVersions = b.isConnectionToOlderVersionAllowed()
+			// after the output configuration change
+			if isElasticsearchOutput(b.Config.Output.Name()) {
+				// if the output is Elasticsearch, we need to update some pre-saved flags
+				// for its global connection callbacks
+				b.allowOlderESVersions = b.isConnectionToOlderVersionAllowed()
+			}
 		}
 
 		return outReloader.Reload(update, b.createOutput)
