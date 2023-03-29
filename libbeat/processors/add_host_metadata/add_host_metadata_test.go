@@ -19,12 +19,13 @@ package add_host_metadata
 
 import (
 	"fmt"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"net"
 	"os"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
