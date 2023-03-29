@@ -98,7 +98,7 @@ func (e *Event) pushExtension(key, value string) {
 //
 // The CEF message consists of a header followed by a series of key-value pairs.
 //
-//    CEF:Version|Device Vendor|Device Product|Device Version|Device Event Class ID|Name|Severity|[Extension]
+//	CEF:Version|Device Vendor|Device Product|Device Version|Device Event Class ID|Name|Severity|[Extension]
 //
 // The header is a series of pipe delimited values. If a pipe (|) is used in a
 // header value, it has to be escaped with a backslash (\). If a backslash is

@@ -539,7 +539,7 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // pendingCursor returns the current published cursor state not yet ACKed.
 //
 // Note: The stateMutex must be locked when calling pendingCursor.
-//nolint: errcheck // not changing behaviour on this commit
+// nolint: errcheck // not changing behaviour on this commit
 func (r *resource) pendingCursor() interface{} {
 	if r.pendingUpdate != nil {
 		var tmp interface{}

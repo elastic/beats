@@ -163,7 +163,7 @@ func channelCloseMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-//function to fetch fields from channel close and connection close
+// function to fetch fields from channel close and connection close
 func getCloseInfo(args []byte, m *amqpMessage) bool {
 	code := binary.BigEndian.Uint16(args[0:2])
 	m.isRequest = true
@@ -411,7 +411,7 @@ func exchangeDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-//this is a method exclusive to RabbitMQ
+// this is a method exclusive to RabbitMQ
 func exchangeBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.method = "exchange.bind"
 	err := exchangeBindUnbindInfo(m, args)
@@ -421,7 +421,7 @@ func exchangeBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-//this is a method exclusive to RabbitMQ
+// this is a method exclusive to RabbitMQ
 func exchangeUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.method = "exchange.unbind"
 	err := exchangeBindUnbindInfo(m, args)
@@ -707,7 +707,7 @@ func basicAckMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-//this is a rabbitMQ specific method
+// this is a rabbitMQ specific method
 func basicNackMethod(m *amqpMessage, args []byte) (bool, bool) {
 	params := getBitParams(args[8])
 	m.method = "basic.nack"
@@ -761,14 +761,14 @@ func txRollbackMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-//simple function used when server/client responds to a sync method with no new info
+// simple function used when server/client responds to a sync method with no new info
 func okMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
 // function to get a short string. It sends back an error if slice is too short
-//for declared length. if length == 0, the function sends back an empty string and
-//advances the offset. Otherwise, it returns the string and the new offset
+// for declared length. if length == 0, the function sends back an empty string and
+// advances the offset. Otherwise, it returns the string and the new offset
 func getShortString(data []byte, start uint32, length uint32) (short string, nextOffset uint32, err bool) {
 	if length == 0 {
 		return "", start, false
@@ -779,7 +779,7 @@ func getShortString(data []byte, start uint32, length uint32) (short string, nex
 	return string(data[start : start+length]), start + length, false
 }
 
-//function to extract bit information in various AMQP methods
+// function to extract bit information in various AMQP methods
 func getBitParams(bits byte) (ret [5]bool) {
 	if bits&16 == 16 {
 		ret[4] = true

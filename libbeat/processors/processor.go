@@ -148,7 +148,7 @@ func (procs *Processors) AddProcessors(p Processors) {
 // The event us temporarily converted to beat.Event. By this 'conversion' the
 // '@timestamp' field can not be accessed by processors.
 // Note: this method will be removed, when the publisher pipeline BC-API is to
-//       be removed.
+// be removed.
 func (procs *Processors) RunBC(event common.MapStr) common.MapStr {
 	ret, err := procs.Run(&beat.Event{Fields: event})
 	if err != nil {

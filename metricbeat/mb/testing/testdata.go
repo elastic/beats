@@ -54,11 +54,14 @@ const (
 // url: "/server-status?auto="
 // suffix: plain
 // omit_documented_fields_check:
-//  - "apache.status.hostname"
+//   - "apache.status.hostname"
+//
 // remove_fields_from_comparison:
 // - "apache.status.hostname"
 // module:
-//   namespace: test
+//
+//	namespace: test
+//
 // ```
 // A test will be run for each file with the `plain` extension in the same directory
 // where a file with this configuration is placed.
