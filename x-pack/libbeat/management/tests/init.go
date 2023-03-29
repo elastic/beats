@@ -79,7 +79,8 @@ func SetupTestEnv(t *testing.T, config *proto.UnitExpectedConfig, runtime time.D
 	err := os.Mkdir(outPath, 0775)
 	require.NoError(t, err)
 
-	server := NewMockServer(t, runtime, config, outPath)
+	start := time.Now()
+	server := NewMockServer(t, func(_ string) bool { return time.Since(start) > runtime }, config, outPath)
 	t.Logf("Resetting fleet manager...")
 	err = ResetFleetManager(server)
 	require.NoError(t, err)
