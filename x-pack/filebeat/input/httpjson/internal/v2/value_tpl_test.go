@@ -228,6 +228,24 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "https://example.com/default",
 		},
 		{
+			name:  "func getRFC5988Link no space link parameters",
+			value: `[[ getRFC5988Link "next" .last_response.header.Link ]]`,
+			paramCtx: &transformContext{
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
+				lastResponse: newTestResponse(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>;title="Page 1";rel="previous"`,
+						`<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>;title="Page 3";rel="next"`,
+					}},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
 			name:        "can execute functions pipeline",
 			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },

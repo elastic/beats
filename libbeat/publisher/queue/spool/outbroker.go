@@ -217,7 +217,8 @@ func (b *outBroker) initState() {
 // The broker waits for new events and does not accept and consumer requests.
 //
 // stateWaitEvents transitions:
-//   -> stateActive: if a queue flush signal has been received
+//
+//	-> stateActive: if a queue flush signal has been received
 func (b *outBroker) stateWaitEvents() bool {
 	log := b.ctx.logger
 	log.Debug("outbroker (stateWaitEvents): waiting for new events")
@@ -243,11 +244,12 @@ func (b *outBroker) stateWaitEvents() bool {
 // Flush signals from the input are ignored.
 //
 // stateActive transitions:
-//   -> stateActive: if consumer event get request has been fulfilled (N events
-//                   copied or 0 timeout)
-//   -> stateWaitEvents: if queue is empty after read
-//   -> stateWithTimer: if only small number of events are available and flush
-//                      timeout is configured.
+//
+//	-> stateActive: if consumer event get request has been fulfilled (N events
+//	                copied or 0 timeout)
+//	-> stateWaitEvents: if queue is empty after read
+//	-> stateWithTimer: if only small number of events are available and flush
+//	                   timeout is configured.
 func (b *outBroker) stateActive() bool {
 	log := b.ctx.logger
 
@@ -322,10 +324,11 @@ func (b *outBroker) stateActive() bool {
 // will be send to the consumer.
 //
 // stateWithTimer transitions:
-//   -> stateWithTimer: if some, but not enough events have been read from the
-//                      queue
-//   -> stateActive: if the timer triggers or enough events have been returned
-//                   to the consumer
+//
+//	-> stateWithTimer: if some, but not enough events have been read from the
+//	                   queue
+//	-> stateActive: if the timer triggers or enough events have been returned
+//	                to the consumer
 func (b *outBroker) stateWithTimer() bool {
 	log := b.ctx.logger
 

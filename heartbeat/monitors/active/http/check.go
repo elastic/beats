@@ -175,7 +175,9 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 	return positiveMatch, negativeMatch, errBodyIllegalBody
 }
 
-/* checkBody accepts 2 check types:
+/*
+	checkBody accepts 2 check types:
+
 1. positive
 2. negative
 So, there are 4 kinds of scenarios:

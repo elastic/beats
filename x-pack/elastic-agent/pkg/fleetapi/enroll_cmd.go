@@ -78,13 +78,14 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 //
 // Example:
 // POST /api/fleet/agents/enroll
-// {
-// 	"type": "PERMANENT",
-//   "metadata": {
-// 	  "local": { "os": "macos"},
-// 	  "user_provided": { "region": "us-east"}
-//   }
-// }
+//
+//	{
+//		"type": "PERMANENT",
+//	  "metadata": {
+//		  "local": { "os": "macos"},
+//		  "user_provided": { "region": "us-east"}
+//	  }
+//	}
 type EnrollRequest struct {
 	EnrollAPIKey string     `json:"-"`
 	Type         EnrollType `json:"type"`
@@ -115,20 +116,21 @@ func (e *EnrollRequest) Validate() error {
 // EnrollResponse is the data received after enrolling an Agent into fleet.
 //
 // Example:
-// {
-//   "action": "created",
-//   "item": {
-//     "id": "a4937110-e53e-11e9-934f-47a8e38a522c",
-//     "active": true,
-//     "policy_id": "default",
-//     "type": "PERMANENT",
-//     "enrolled_at": "2019-10-02T18:01:22.337Z",
-//     "user_provided_metadata": {},
-//     "local_metadata": {},
-//     "actions": [],
-//     "access_api_key": "API_KEY"
-//   }
-// }
+//
+//	{
+//	  "action": "created",
+//	  "item": {
+//	    "id": "a4937110-e53e-11e9-934f-47a8e38a522c",
+//	    "active": true,
+//	    "policy_id": "default",
+//	    "type": "PERMANENT",
+//	    "enrolled_at": "2019-10-02T18:01:22.337Z",
+//	    "user_provided_metadata": {},
+//	    "local_metadata": {},
+//	    "actions": [],
+//	    "access_api_key": "API_KEY"
+//	  }
+//	}
 type EnrollResponse struct {
 	Action string             `json:"action"`
 	Item   EnrollItemResponse `json:"item"`

@@ -184,25 +184,26 @@ func mapValueHelper(t testing.TB, m common.MapStr, keys []string) interface{} {
 // The validation provided my this method should only be used on results
 // published where the response packet was "sent".
 // The following fields are validated by this method:
-//     type (must be dns)
-//     src (ip and port)
-//     dst (ip and port)
-//     query
-//     resource
-//     method
-//     dns.id
-//     dns.op_code
-//     dns.flags
-//     dns.response_code
-//     dns.question.class
-//     dns.question.type
-//     dns.question.name
-//     dns.answers_count
-//     dns.answers.data
-//     dns.authorities_count
-//     dns.authorities
-//     dns.additionals_count
-//     dns.additionals
+//
+//	type (must be dns)
+//	src (ip and port)
+//	dst (ip and port)
+//	query
+//	resource
+//	method
+//	dns.id
+//	dns.op_code
+//	dns.flags
+//	dns.response_code
+//	dns.question.class
+//	dns.question.type
+//	dns.question.name
+//	dns.answers_count
+//	dns.answers.data
+//	dns.authorities_count
+//	dns.authorities
+//	dns.additionals_count
+//	dns.additionals
 func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	t.Helper()
 

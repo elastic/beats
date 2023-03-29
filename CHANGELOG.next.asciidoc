@@ -40,6 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 - Fix panics when a processor is closed twice {pull}34647[34647]
+- Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
+- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
 
 *Heartbeat*
 
@@ -57,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 - Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
+- Improve documentation for event_logs.name configuration. {pull}34931[34931]
 
 *Functionbeat*
 

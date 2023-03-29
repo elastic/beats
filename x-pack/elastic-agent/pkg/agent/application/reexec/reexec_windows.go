@@ -25,8 +25,8 @@ import (
 // Windows does not support the ability to execute over the same PID and memory. Depending on the execution context
 // different scenarios need to occur.
 //
-// * Services.msc - A new child process is spawned that waits for the service to stop, then restarts it and the
-//   current process just exits.
+//   - Services.msc - A new child process is spawned that waits for the service to stop, then restarts it and the
+//     current process just exits.
 //
 // * Sub-process - As a sub-process a new child is spawned and the current process just exits.
 func reexec(log *logger.Logger, executable string, argOverrides ...string) error {
