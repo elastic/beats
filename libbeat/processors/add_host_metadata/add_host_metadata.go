@@ -39,9 +39,15 @@ import (
 const processorName = "add_host_metadata"
 const logName = "processor." + processorName
 
+var (
+	reg *monitoring.Registry
+)
+
 func init() {
 	processors.RegisterPlugin(processorName, New)
 	jsprocessor.RegisterPlugin("AddHostMetadata", New)
+
+	reg = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
 }
 
 type metrics struct {
@@ -67,16 +73,10 @@ func New(cfg *config.C) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	// Logging and metrics (each processor instance has a unique ID).
-	var (
-		logger = logp.NewLogger(logName)
-		reg    = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
-	)
-
 	p := &addHostMetadata{
 		config: c,
 		data:   mapstr.NewPointer(nil),
-		logger: logger,
+		logger: logp.NewLogger(logName),
 		metrics: metrics{
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
