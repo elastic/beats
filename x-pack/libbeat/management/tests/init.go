@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
@@ -38,8 +37,8 @@ func InitBeatsForTest(t *testing.T, beatRoot *cmd.BeatsRootCmd) {
 	require.NoError(t, err)
 }
 
-func fleetClientFactory(srv MockV2Handler) lbmanagement.FactoryFunc {
-	return func(_ *conf.C, registry *reload.Registry, beatUUID uuid.UUID) (lbmanagement.Manager, error) {
+func fleetClientFactory(srv MockV2Handler) lbmanagement.ManagerFactory {
+	return func(_ *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
 		c := management.DefaultConfig()
 		return management.NewV2AgentManagerWithClient(c, registry, srv.Client, management.WithStopOnEmptyUnits)
 	}
@@ -57,7 +56,7 @@ func SetupTestEnv(t *testing.T, config *proto.UnitExpectedConfig, runtime time.D
 
 	server := NewMockServer(t, runtime, config, outPath)
 	t.Logf("Resetting fleet manager...")
-	lbmanagement.SetFactory(fleetClientFactory(server))
+	lbmanagement.SetManagerFactory(fleetClientFactory(server))
 
 	return outPath, server
 }

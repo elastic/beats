@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 	gproto "google.golang.org/protobuf/proto"
@@ -100,15 +99,15 @@ func WithStopOnEmptyUnits(m *BeatV2Manager) {
 // Init Functions
 // ================================
 
-// Register the agent manager, so that calls to lbmanagement.Factory will
+// Register the agent manager, so that calls to lbmanagement.NewManager will
 // return NewV2AgentManager when linked with x-pack.
 func init() {
-	lbmanagement.SetFactory(NewV2AgentManager)
+	lbmanagement.SetManagerFactory(NewV2AgentManager)
 }
 
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
 // This is meant to be used by the management plugin system, which will register this as a callback.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (lbmanagement.Manager, error) {
+func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {

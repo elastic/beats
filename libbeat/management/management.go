@@ -20,8 +20,6 @@ package management
 import (
 	"sync"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -105,31 +103,38 @@ type Manager interface {
 	SetPayload(map[string]interface{})
 }
 
-// FactoryFunc for creating a config manager
-type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
+// ManagerFactory is the factory type for creating a config manager
+type ManagerFactory func(*config.C, *reload.Registry) (Manager, error)
 
-// If managerFactory is non-nil, Factory will return it instead of the default
-// of nilFactory. managerFactoryLock must be held to access managerFactory.
-var managerFactory FactoryFunc
+// If managerFactory is non-nil, NewManager will use it to create the
+// beats manager. managerFactoryLock must be held to access managerFactory.
+var managerFactory ManagerFactory
 var managerFactoryLock sync.Mutex
 
-// Factory returns a factory to create a manager. In normal operation
-// this returns NewV2AgentManager if linked against x-pack (see
-// x-pack/libbeat/management/managerV2.go), and nilFactory otherwise.
-// Tests can call SetFactory to have Factory instead return a mocked manager.
-func Factory() FactoryFunc {
-	managerFactoryLock.Lock()
-	defer managerFactoryLock.Unlock()
-	if managerFactory != nil {
-		return managerFactory
+// NewManager creates the beats manager based on the given configuration
+// and registry. In normal operation this returns NewV2AgentManager when
+// management is enabled and x-pack is linked (see
+// x-pack/libbeat/management/managerV2.go), and a placeholder otherwise.
+// Tests can call SetManagerFactory to instead return a mocked manager.
+func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
+	if cfg.Enabled() {
+		managerFactoryLock.Lock()
+		defer managerFactoryLock.Unlock()
+		if managerFactory != nil {
+			return managerFactory(cfg, registry)
+		}
 	}
-	return nilFactory
+	return &fallbackManager{
+		logger: logp.NewLogger("mgmt"),
+		status: Unknown,
+		msg:    "",
+	}, nil
 }
 
-// SetFactory tells Beats to create its manager with the given function. It is
+// SetManagerFactory tells Beats to create its manager with the given function. It is
 // only called by Agent V2 initialization (x-pack/libbeat/management/managerV2.go)
 // and by tests that need a mocked manager.
-func SetFactory(factory FactoryFunc) {
+func SetManagerFactory(factory ManagerFactory) {
 	managerFactoryLock.Lock()
 	defer managerFactoryLock.Unlock()
 	managerFactory = factory
@@ -143,15 +148,6 @@ type fallbackManager struct {
 	msg      string
 	stopFunc func()
 	stopOnce sync.Once
-}
-
-func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
-	log := logp.NewLogger("mgmt")
-	return &fallbackManager{
-		logger: log,
-		status: Unknown,
-		msg:    "",
-	}, nil
 }
 
 func (n *fallbackManager) UpdateStatus(status Status, msg string) {
@@ -176,7 +172,7 @@ func (n *fallbackManager) Stop() {
 	if n.stopFunc != nil {
 		// I'm not sure we really need the sync.Once here, but
 		// because different Beats can have different requirements
-		// for their stup function, it's better to make sure it will
+		// for their stop function, it's better to make sure it will
 		// only be called once.
 		n.stopOnce.Do(func() {
 			n.stopFunc()
