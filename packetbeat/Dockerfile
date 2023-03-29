@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM golang:1.18.10
-=======
 FROM golang:1.19.7
->>>>>>> 710bcfb472 ([updatecli][githubrelease] Bump version to 1.19.7 (#34802))
 
 RUN \
     apt-get update \
