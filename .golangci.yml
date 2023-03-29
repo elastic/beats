@@ -24,7 +24,7 @@ issues:
     - text: "undeclared name:"
       linters:
         - typecheck
-    - text: "imported but not used"
+    - text: "imported and not used"
       linters:
         - typecheck
     # From mage we are priting to the console to ourselves
