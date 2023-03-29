@@ -39,9 +39,9 @@ const (
 	metricsetName = "package"
 	namespace     = "system.audit.package"
 
-	bucketName              = "package.v1"
+	bucketNameV1            = "package.v1"
+	bucketNameV2            = "package.v2"
 	bucketKeyPackages       = "packages"
-	bucketKeyPackagesFb     = "packages_fb"
 	bucketKeyStateTimestamp = "state_timestamp"
 
 	eventTypeState = "state"
@@ -110,7 +110,6 @@ type MetricSet struct {
 	lastState time.Time
 
 	suppressNoPackageWarnings bool
-	arePackagesGobEncoded     bool
 }
 
 // Package represents information for a package.
@@ -206,7 +205,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketNameV2)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
@@ -219,20 +218,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		bucket:          bucket,
 	}
 
-	// Load from disk: Time when state was last sent
-	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
-		if len(blob) > 0 {
-			return ms.lastState.UnmarshalBinary(blob)
-		}
-		return nil
-	})
+	// migrate to new bucket only if required
+	err = ms.migrateBucketIfNeeded(bucket)
 	if err != nil {
 		return nil, err
 	}
-	if !ms.lastState.IsZero() {
-		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
-	} else {
-		ms.log.Debug("No state timestamp found")
+
+	// load state timestamp from new bucket
+	err = ms.loadState(bucket)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load state from bucket %s, with error %v", bucketNameV2, err)
 	}
 
 	// Load from disk: Packages
@@ -245,6 +240,92 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 
 	return ms, nil
+}
+
+// loadState, loads state timestamp from a bucket into the metricstate
+func (ms *MetricSet) loadState(bucket datastore.Bucket) error {
+	// Load from disk: Time when state was last sent
+	err := ms.bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
+		if len(blob) > 0 {
+			return ms.lastState.UnmarshalBinary(blob)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	if !ms.lastState.IsZero() {
+		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	} else {
+		ms.log.Debug("No state timestamp found")
+	}
+
+	return nil
+}
+
+// migrateBucketIfNeeded, performs the migration of data from oldBucket to a newBucket, if required
+func (ms *MetricSet) migrateBucketIfNeeded(newBucket datastore.Bucket) error {
+	var err error
+	var packages []*Package
+
+	// bucket migration process for migrating to flatbuffers
+	oldBucket, err := datastore.BucketExists(bucketNameV1)
+	if err != nil {
+		return fmt.Errorf("failed to open old persistent datastore: %w", err)
+	}
+
+	// This defer func closes the oldBucket if any error is returned from below
+	defer func() {
+		if oldBucket != nil && err != nil {
+			err := oldBucket.Close()
+			if err != nil {
+				ms.log.Debugf("failed to close old bucket %s with error %v", bucketNameV1, err)
+			}
+		}
+	}()
+
+	// if old bucket exists, migrate to new bucket and then delete old bucket
+	if oldBucket != nil {
+		// assigns old bucket to metric set for the migration process
+		ms.bucket = oldBucket
+		err = ms.loadState(oldBucket)
+		if err != nil {
+			return fmt.Errorf("failed to load state from old bucket %s, with error %v", bucketNameV1, err)
+		}
+
+		packages, err = ms.restoreOldPackagesFromDisk()
+		if err != nil {
+			return fmt.Errorf("failed to restore packages from old bucket on disk: %w", err)
+		}
+		ms.log.Debugf("Restored %d packages from old bucket on disk", len(packages))
+
+		// write state timestamp and packages to new/v2 bucket
+		// assigns new/v2 bucket to metric set for the migration process
+		ms.bucket = newBucket
+		timeBytes, err := ms.lastState.MarshalBinary()
+		if err != nil {
+			return err
+		}
+		err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
+		if err != nil {
+			return fmt.Errorf("error writing state timestamp to disk for migration to v2 bucket: %w", err)
+		}
+		//
+		if len(packages) > 0 {
+			err = ms.savePackagesToDisk(packages)
+			if err != nil {
+				return err
+			}
+		}
+		// delete old bucket
+		oldBucket.Close()
+		oldBucket = nil
+		err = datastore.DeleteBucket(bucketNameV1)
+		if err != nil {
+			return fmt.Errorf("failed to delete old bucket %s, with error %w", bucketNameV1, err)
+		}
+	}
+	return nil
 }
 
 // Close cleans up the MetricSet when it finishes.
@@ -425,15 +506,13 @@ func convertToCacheable(packages []*Package) []cache.Cacheable {
 	return c
 }
 
-// restorePackagesFromDisk loads the packages from disk.
-func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) {
-	var gobDecoder *gob.Decoder
-	var buf *bytes.Buffer
+// restoreOldPackagesFromDisk loads the packages from the old v1 bucket from disk.
+func (ms *MetricSet) restoreOldPackagesFromDisk() (packages []*Package, err error) {
+	var decoder *gob.Decoder
 	err = ms.bucket.Load(bucketKeyPackages, func(blob []byte) error {
 		if len(blob) > 0 {
-			buf = bytes.NewBuffer(blob)
-			gobDecoder = gob.NewDecoder(buf)
-			ms.arePackagesGobEncoded = true
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
 		}
 		return nil
 	})
@@ -441,11 +520,10 @@ func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) 
 		return nil, err
 	}
 
-	// if existing packages are gob encoded
-	if gobDecoder != nil {
+	if decoder != nil {
 		for {
 			pkg := new(Package)
-			err = gobDecoder.Decode(pkg)
+			err = decoder.Decode(pkg)
 			if err == nil {
 				packages = append(packages, pkg)
 			} else if err == io.EOF {
@@ -455,24 +533,29 @@ func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) 
 				return nil, fmt.Errorf("error decoding packages: %w", err)
 			}
 		}
-	} else {
-		var data []byte
-		err = ms.bucket.Load(bucketKeyPackagesFb, func(blob []byte) error {
-			if len(blob) > 0 {
-				data = blob
-			}
-			return nil
-		})
+	}
+
+	return packages, nil
+}
+
+// restorePackagesFromDisk loads the packages from disk.
+func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) {
+	var data []byte
+	err = ms.bucket.Load(bucketKeyPackages, func(blob []byte) error {
+		if len(blob) > 0 {
+			data = blob
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// if existing packages are stored as flatbuffers
+	if len(data) > 0 {
+		packages, err = decodePackagesFromContainer(data)
 		if err != nil {
 			return nil, err
-		}
-
-		// if existing packages are stored as flatbuffers
-		if len(data) > 0 {
-			packages, err = decodePackagesFromContainer(data)
-			if err != nil {
-				return nil, err
-			}
 		}
 	}
 
@@ -484,15 +567,10 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 	builder, release := fbGetBuilder()
 	defer release()
 	data := encodePackages(builder, packages)
-	if err := ms.bucket.Store(bucketKeyPackagesFb, data); err != nil {
+	if err := ms.bucket.Store(bucketKeyPackages, data); err != nil {
 		return fmt.Errorf("error writing packages as flatbuffers to disk: %w", err)
 	}
-	// remove old storage key
-	if ms.arePackagesGobEncoded {
-		if err := ms.bucket.Delete(bucketKeyPackages); err != nil {
-			return fmt.Errorf("error removing old package key from disk: %w", err)
-		}
-	}
+
 	return nil
 }
 

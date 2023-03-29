@@ -6,7 +6,9 @@ namespace schema;
 	release:string;
 	arch:string;
 	license:string;
+	// installtime stores unix epoch time in seconds
 	installtime:ulong;
+	// size stores the package size in bytes as a uint64 value internally
 	size:ulong;
 	summary:string;
 	url:string;

@@ -101,7 +101,6 @@ func poolPoison(p []*Package, t *testing.T, wg *sync.WaitGroup) {
 		builder, release := fbGetBuilder()
 		defer release()
 		data := encodePackages(builder, p)
-		t.Log("encoded length:", len(data))
 
 		out, err := decodePackagesFromContainer(data)
 		if err != nil {
