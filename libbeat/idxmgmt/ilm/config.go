@@ -44,7 +44,7 @@ type Config struct {
 	Overwrite bool `config:"overwrite"`
 }
 
-//Mode is used for enumerating the ilm mode.
+// Mode is used for enumerating the ilm mode.
 type Mode uint8
 
 const (
@@ -79,7 +79,7 @@ var DefaultPolicy = common.MapStr{
 	},
 }
 
-//Unpack creates enumeration value true, false or auto
+// Unpack creates enumeration value true, false or auto
 func (m *Mode) Unpack(in string) error {
 	in = strings.ToLower(in)
 
@@ -101,7 +101,7 @@ func (m *Mode) Unpack(in string) error {
 	return nil
 }
 
-//Validate verifies that expected config options are given and valid
+// Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
 	if cfg.RolloverAlias.IsEmpty() && cfg.Mode != ModeDisabled {
 		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")

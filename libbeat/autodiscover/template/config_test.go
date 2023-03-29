@@ -311,7 +311,7 @@ func TestNilConditionConfig(t *testing.T) {
 }
 
 // create a keystore with an existing key
-/// `PASSWORD` with the value of `secret` variable.
+// `PASSWORD` with the value of `secret` variable.
 func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 	keyStore, err := keystore.NewFileKeystore(path)
 	// Fail fast in the test suite

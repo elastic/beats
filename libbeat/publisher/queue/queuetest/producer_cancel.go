@@ -32,7 +32,7 @@ import (
 // might still have active events not yet ACKed (not tested here).
 //
 // Note: queues not requiring consumers to ACK a events in order to
-//       return ACKs to the producer are not supported by this test.
+// return ACKs to the producer are not supported by this test.
 func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 	fn := withOptLogOutput(true, func(t *testing.T) {
 		var (

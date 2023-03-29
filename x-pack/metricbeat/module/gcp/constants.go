@@ -24,7 +24,7 @@ const (
 	ServiceStorage        = "storage"
 )
 
-//Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
+// Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
 const (
 	TimeSeriesResponsePathForECSAvailabilityZone = "zone"
 	TimeSeriesResponsePathForECSAccountID        = "project_id"

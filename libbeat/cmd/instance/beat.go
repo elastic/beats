@@ -528,7 +528,7 @@ func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 	}())
 }
 
-//SetupSettings holds settings necessary for beat setup
+// SetupSettings holds settings necessary for beat setup
 type SetupSettings struct {
 	Dashboard       bool
 	MachineLearning bool

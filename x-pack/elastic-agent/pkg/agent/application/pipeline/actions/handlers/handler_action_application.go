@@ -105,11 +105,12 @@ var (
 )
 
 // appendActionResponse appends the action response property with all the action response values excluding the ones specified in excludeActionResponseFields
-// "action_response": {
-// 	   "endpoint": {
-// 		   "acked": true
-// 	   }
-//  }
+//
+//	"action_response": {
+//		   "endpoint": {
+//			   "acked": true
+//		   }
+//	 }
 func appendActionResponse(action *fleetapi.ActionApp, inputType string, res map[string]interface{}) {
 	if len(res) == 0 {
 		return

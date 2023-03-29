@@ -30,7 +30,7 @@ const (
 	transactionTimeout   = 10 * 1e9
 )
 
-//layout used when a timestamp must be parsed
+// layout used when a timestamp must be parsed
 const (
 	amqpTimeLayout = "January _2 15:04:05 2006"
 )
@@ -50,7 +50,7 @@ const (
 	frameEndOctet byte = 206
 )
 
-//Codes for MethodMap
+// Codes for MethodMap
 type codeClass uint16
 
 const (
@@ -137,7 +137,7 @@ const (
 	txRollbackOk codeMethod = 31
 )
 
-//Message properties codes for byte prop1 in getMessageProperties
+// Message properties codes for byte prop1 in getMessageProperties
 const (
 	expirationProp      byte = 1
 	replyToProp         byte = 2
@@ -159,7 +159,7 @@ const (
 	messageIDProp byte = 128
 )
 
-//table types
+// table types
 const (
 	boolean        = 't'
 	shortShortInt  = 'b'
