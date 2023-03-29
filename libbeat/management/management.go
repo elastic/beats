@@ -112,7 +112,7 @@ var managerFactory ManagerFactory
 var managerFactoryLock sync.Mutex
 
 // NewManager creates the beats manager based on the given configuration
-// and registry. In normal operation this returns NewV2AgentManager when
+// and registry. In normal operation this calls NewV2AgentManager when
 // management is enabled and x-pack is linked (see
 // x-pack/libbeat/management/managerV2.go), and a placeholder otherwise.
 // Tests can call SetManagerFactory to instead return a mocked manager.
@@ -131,9 +131,10 @@ func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
 	}, nil
 }
 
-// SetManagerFactory tells Beats to create its manager with the given function. It is
-// only called by Agent V2 initialization (x-pack/libbeat/management/managerV2.go)
-// and by tests that need a mocked manager.
+// SetManagerFactory tells NewManager to use the given factory when management
+// is enabled. It is only called by Agent V2 initialization
+// (x-pack/libbeat/management/managerV2.go) and by tests that need a mocked
+// manager.
 func SetManagerFactory(factory ManagerFactory) {
 	managerFactoryLock.Lock()
 	defer managerFactoryLock.Unlock()
