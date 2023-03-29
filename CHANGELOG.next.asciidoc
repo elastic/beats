@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix panics when a processor is closed twice {pull}34647[34647]
 - Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
 
 *Auditbeat*
 
@@ -99,7 +100,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
-- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
 
 *Heartbeat*
 
