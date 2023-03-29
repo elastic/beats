@@ -99,6 +99,11 @@ func CrossBuild() error {
 			if err != nil {
 				return "", err
 			}
+			if platform == "linux/386" {
+				// Use Debian 9 because the linux/386 build needs an older glibc
+				// to remain compatible with CentOS 7 (glibc 2.17).
+				image = strings.ReplaceAll(image, "main-debian10", "main-debian9")
+			}
 			if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
 				return image, nil
 			}
