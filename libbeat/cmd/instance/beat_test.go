@@ -26,6 +26,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -223,4 +226,80 @@ func TestSanitizeIPs(t *testing.T) {
 			require.Equal(t, tc.expectedIPs, sanitizeIPs(tc.ips))
 		})
 	}
+}
+
+func TestReloader(t *testing.T) {
+	t.Run("updates the output configuration on the beat", func(t *testing.T) {
+		b, err := NewBeat("testbeat", "testidx", "0.9", false)
+		require.NoError(t, err)
+
+		cfg := `
+elasticsearch:
+  hosts: ["https://127.0.0.1:9200"]
+  username: "elastic"
+  allow_older_versions: true
+`
+		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
+		require.NoError(t, err)
+		outCfg, err := c.Child("elasticsearch", -1)
+		require.NoError(t, err)
+
+		update := &reload.ConfigWithMeta{Config: c}
+		m := &outputReloaderMock{}
+		reloader := b.makeOutputReloader(m)
+
+		require.False(t, b.allowOlderESVersions)
+		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
+
+		err = reloader.Reload(update)
+		require.NoError(t, err)
+
+		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
+		require.True(t, b.allowOlderESVersions)
+		require.Equal(t, outCfg, b.Config.Output.Config())
+		require.Same(t, c, m.cfg.Config)
+	})
+
+	t.Run("does not update `allowOlderESVersions` if output is not Elasticsearch", func(t *testing.T) {
+		b, err := NewBeat("testbeat", "testidx", "0.9", false)
+		require.NoError(t, err)
+
+		cfg := `
+logstash:
+  hosts: ["https://127.0.0.1:9200"]
+  username: "elastic"
+  allow_older_versions: true
+`
+		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
+		require.NoError(t, err)
+		outCfg, err := c.Child("logstash", -1)
+		require.NoError(t, err)
+
+		update := &reload.ConfigWithMeta{Config: c}
+		m := &outputReloaderMock{}
+		reloader := b.makeOutputReloader(m)
+
+		require.False(t, b.allowOlderESVersions)
+		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
+
+		err = reloader.Reload(update)
+		require.NoError(t, err)
+
+		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
+		require.False(t, b.allowOlderESVersions, "the flag should not be updated")
+		require.Equal(t, outCfg, b.Config.Output.Config())
+		require.Same(t, c, m.cfg.Config)
+	})
+}
+
+type outputReloaderMock struct {
+	cfg *reload.ConfigWithMeta
+}
+
+func (r *outputReloaderMock) Reload(
+	cfg *reload.ConfigWithMeta,
+	factory func(o outputs.Observer, cfg config.Namespace) (outputs.Group, error),
+) error {
+	r.cfg = cfg
+	return nil
 }
