@@ -18,6 +18,9 @@
 package report
 
 import (
+	"os"
+	"os/user"
+	"strconv"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -46,4 +49,22 @@ func init() {
 // EphemeralID returns generated EphemeralID
 func EphemeralID() uuid.UUID {
 	return ephemeralID
+}
+
+// SetupInfoUserMetrics adds user data to the `info` registry component
+// this is performed async, as on windows user lookup can take up to a minute.
+func SetupInfoUserMetrics() {
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	go func() {
+		if u, err := user.Current(); err != nil {
+			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
+			// if the user set securityContext.runAsUser to an arbitrary value.
+			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
+			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
+		} else {
+			monitoring.NewString(infoRegistry, "username").Set(u.Username)
+			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
+			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
+		}
+	}()
 }

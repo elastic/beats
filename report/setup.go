@@ -22,10 +22,7 @@ package report
 
 import (
 	"fmt"
-	"os"
-	"os/user"
 	"runtime"
-	"strconv"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -74,24 +71,6 @@ func SetupMetrics(logger *logp.Logger, name, version string) error {
 	setupPlatformSpecificMetrics(logger, processStats)
 
 	return nil
-}
-
-// SetupInfoUserMetrics adds user data to the `info` registry component
-// this is performed async, as on windows user lookup can take up to a minute.
-func SetupInfoUserMetrics() {
-	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
-	go func() {
-		if u, err := user.Current(); err != nil {
-			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
-			// if the user set securityContext.runAsUser to an arbitrary value.
-			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
-			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
-		} else {
-			monitoring.NewString(infoRegistry, "username").Set(u.Username)
-			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
-			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
-		}
-	}()
 }
 
 // processName truncates the name if it is longer than 15 characters, so we don't fail process checks later on
