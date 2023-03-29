@@ -19,10 +19,14 @@ package add_host_metadata
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/monitoring"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -34,9 +38,20 @@ import (
 	"github.com/elastic/go-sysinfo"
 )
 
+// instanceID is used to assign each instance of this
+// processor a unique monitoring namespace.
+var instanceID = atomic.MakeUint32(0)
+
+const processorName = "add_host_metadata"
+const logName = "processor." + processorName
+
 func init() {
-	processors.RegisterPlugin("add_host_metadata", New)
+	processors.RegisterPlugin(processorName, New)
 	jsprocessor.RegisterPlugin("AddHostMetadata", New)
+}
+
+type metrics struct {
+	FQDNLookupFailed *monitoring.Int
 }
 
 type addHostMetadata struct {
@@ -48,11 +63,8 @@ type addHostMetadata struct {
 	geoData mapstr.M
 	config  Config
 	logger  *logp.Logger
+	metrics metrics
 }
-
-const (
-	processorName = "add_host_metadata"
-)
 
 // New constructs a new add_host_metadata processor.
 func New(cfg *config.C) (processors.Processor, error) {
@@ -61,10 +73,20 @@ func New(cfg *config.C) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
+	// Logging and metrics (each processor instance has a unique ID).
+	var (
+		id     = int(instanceID.Inc())
+		logger = logp.NewLogger(logName).With("instance_id", id)
+		reg    = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+	)
+
 	p := &addHostMetadata{
 		config: c,
 		data:   mapstr.NewPointer(nil),
-		logger: logp.NewLogger("add_host_metadata"),
+		logger: logger,
+		metrics: metrics{
+			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
+		},
 	}
 	if err := p.loadData(); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
@@ -147,9 +169,15 @@ func (p *addHostMetadata) loadData() error {
 	if features.FQDN() {
 		fqdn, err := h.FQDN()
 		if err != nil {
-			// FQDN lookup is "best effort".  We log the error, fallback to
+			// FQDN lookup is "best effort". If it fails, we monitor the failure, fallback to
 			// the OS-reported hostname, and move on.
-			p.logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), hostname)
+			p.metrics.FQDNLookupFailed.Inc()
+			p.logger.Debugf(
+				"unable to lookup FQDN (failed attempt counter: %d): %s, using hostname = %s as FQDN",
+				p.metrics.FQDNLookupFailed.Get(),
+				err.Error(),
+				hostname,
+			)
 		} else {
 			hostname = fqdn
 		}

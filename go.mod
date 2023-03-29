@@ -200,6 +200,7 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
+	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/google/cel-go v0.13.0
 	github.com/googleapis/gax-go/v2 v2.6.0
 	github.com/gorilla/handlers v1.5.1
