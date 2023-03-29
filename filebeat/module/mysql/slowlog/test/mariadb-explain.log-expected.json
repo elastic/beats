@@ -25,6 +25,9 @@
         "mysql.slowlog.rows_sent": 1,
         "mysql.slowlog.schema": "dbt3sf1",
         "mysql.thread_id": "2",
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
