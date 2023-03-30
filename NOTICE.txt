@@ -10814,11 +10814,11 @@ Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v1.1
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/go-cmp
-Version: v0.5.6
+Version: v0.5.8
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/go-cmp@v0.5.6/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/go-cmp@v0.5.8/LICENSE:
 
 Copyright (c) 2017 The Go Authors. All rights reserved.
 
@@ -17398,11 +17398,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.0.0-20210817164053-32db794688a5
+Version: v0.0.0-20210921155107-089bfa567519
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.0.0-20210817164053-32db794688a5/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.0.0-20210921155107-089bfa567519/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17694,11 +17694,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.1.9
+Version: v0.1.11-0.20220509190205-b87ceec0dd4d
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.9/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.11-0.20220509190205-b87ceec0dd4d/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -25936,11 +25936,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/frankban/quicktest
-Version: v1.11.3
+Version: v1.14.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/frankban/quicktest@v1.11.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/frankban/quicktest@v1.14.3/LICENSE:
 
 MIT License
 
@@ -32088,11 +32088,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/kr/pretty
-Version: v0.2.1
+Version: v0.3.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/kr/pretty@v0.2.1/License:
+Contents of probable licence file $GOMODCACHE/github.com/kr/pretty@v0.3.0/License:
 
 Copyright 2012 Keith Rarick
 
@@ -34247,6 +34247,43 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/client_golan
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/rogpeppe/go-internal
+Version: v1.8.1
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/rogpeppe/go-internal@v1.8.1/LICENSE:
+
+Copyright (c) 2018 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/samuel/go-parser
 Version: v0.0.0-20130731160455-ca8abbf65d0e
 Licence type (autodetected): BSD-3-Clause
@@ -35888,11 +35925,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.5.1
+Version: v0.6.0-dev.0.20220419223038-86c51ed26bb4
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.5.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.6.0-dev.0.20220419223038-86c51ed26bb4/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 

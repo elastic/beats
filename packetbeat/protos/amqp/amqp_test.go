@@ -275,7 +275,7 @@ func TestAmqp_ExchangeDeletion(t *testing.T) {
 	assert.Equal(t, false, m.fields["no-wait"])
 }
 
-//this method is exclusive to RabbitMQ
+// this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeBind(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -308,7 +308,7 @@ func TestAmqp_ExchangeBind(t *testing.T) {
 	}
 }
 
-//this method is exclusive to RabbitMQ
+// this method is exclusive to RabbitMQ
 func TestAmqp_ExchangeUnbindTransaction(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 
@@ -808,7 +808,7 @@ func TestAmqp_RecoverMethod(t *testing.T) {
 	assert.Equal(t, common.MapStr{"requeue": true}, trans["amqp"])
 }
 
-//this is a specific rabbitMQ method
+// this is a specific rabbitMQ method
 func TestAmqp_BasicNack(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("amqp", "amqpdetailed"))
 

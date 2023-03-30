@@ -175,14 +175,12 @@ func (es *Connection) Refresh(index string) (int, *QueryResult, error) {
 // CreateIndex creates a new index, optionally with settings and mappings passed in
 // the body.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html
-//
 func (es *Connection) CreateIndex(index string, body interface{}) (int, *QueryResult, error) {
 	return withQueryResult(es.apiCall("PUT", index, "", "", "", nil, body))
 }
 
 // IndexExists checks if an index exists.
 // Implements: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-exists.html
-//
 func (es *Connection) IndexExists(index string) (int, error) {
 	status, _, err := es.apiCall("HEAD", index, "", "", "", nil, nil)
 	return status, err

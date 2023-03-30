@@ -42,70 +42,73 @@ type Entry struct {
 // Map responseBody to common.MapStr
 //
 // A response has the following structure
-//  [
-//    {
-//        "request": {
-//            "mbean": "java.lang:type=Memory",
-//            "attribute": [
-//                "HeapMemoryUsage",
-//                "NonHeapMemoryUsage"
-//            ],
-//            "type": "read"
-//        },
-//        "value": {
-//            "HeapMemoryUsage": {
-//                "init": 1073741824,
-//                "committed": 1037959168,
-//                "max": 1037959168,
-//                "used": 227420472
-//            },
-//            "NonHeapMemoryUsage": {
-//                "init": 2555904,
-//                "committed": 53477376,
-//                "max": -1,
-//                "used": 50519768
-//            }
-//        },
-//        "timestamp": 1472298687,
-//        "status": 200
-//     }
-//  ]
+//
+//	[
+//	  {
+//	      "request": {
+//	          "mbean": "java.lang:type=Memory",
+//	          "attribute": [
+//	              "HeapMemoryUsage",
+//	              "NonHeapMemoryUsage"
+//	          ],
+//	          "type": "read"
+//	      },
+//	      "value": {
+//	          "HeapMemoryUsage": {
+//	              "init": 1073741824,
+//	              "committed": 1037959168,
+//	              "max": 1037959168,
+//	              "used": 227420472
+//	          },
+//	          "NonHeapMemoryUsage": {
+//	              "init": 2555904,
+//	              "committed": 53477376,
+//	              "max": -1,
+//	              "used": 50519768
+//	          }
+//	      },
+//	      "timestamp": 1472298687,
+//	      "status": 200
+//	   }
+//	]
 //
 // With wildcards there is an additional nesting level:
 //
-//  [
-//     {
-//        "request": {
-//           "type": "read",
-//           "attribute": "maxConnections",
-//           "mbean": "Catalina:name=*,type=ThreadPool"
-//        },
-//        "value": {
-//           "Catalina:name=\"http-bio-8080\",type=ThreadPool": {
-//              "maxConnections": 200
-//           },
-//           "Catalina:name=\"ajp-bio-8009\",type=ThreadPool": {
-//              "maxConnections": 200
-//           }
-//        },
-//        "timestamp": 1519409583
-//        "status": 200,
-//     }
-//  ]
+//	[
+//	   {
+//	      "request": {
+//	         "type": "read",
+//	         "attribute": "maxConnections",
+//	         "mbean": "Catalina:name=*,type=ThreadPool"
+//	      },
+//	      "value": {
+//	         "Catalina:name=\"http-bio-8080\",type=ThreadPool": {
+//	            "maxConnections": 200
+//	         },
+//	         "Catalina:name=\"ajp-bio-8009\",type=ThreadPool": {
+//	            "maxConnections": 200
+//	         }
+//	      },
+//	      "timestamp": 1519409583
+//	      "status": 200,
+//	   }
+//	]
 //
-// A response with single value
+// # A response with single value
 //
 // [
-//    {
-//       "request": {
-//          "mbean":"java.lang:type=Runtime",
-//          "attribute":"Uptime",
-//          "type":"read"
-//       },
-//       "value":88622,
-//       "timestamp":1551739190,
-//       "status":200
-//    }
+//
+//	{
+//	   "request": {
+//	      "mbean":"java.lang:type=Runtime",
+//	      "attribute":"Uptime",
+//	      "type":"read"
+//	   },
+//	   "value":88622,
+//	   "timestamp":1551739190,
+//	   "status":200
+//	}
+//
 // ]
 type eventKey struct {
 	mbean, event string
