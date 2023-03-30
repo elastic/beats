@@ -53,7 +53,7 @@ func (b *builder) Features() []feature.Featurable {
 	return b.features
 }
 
-// MustAddFunction adds a new function type to the provider and return the builder.
+// AddFunction adds a new function type to the provider and return the builder.
 func (b *builder) AddFunction(
 	name string,
 	factory FunctionFactory,
