@@ -329,7 +329,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
-	b.checkElasticsearchVersion()
+	err = b.registerESVersionCheckCallback()
+	if err != nil {
+		return nil, err
+	}
 
 	err = b.registerESIndexManagement()
 	if err != nil {
@@ -981,15 +984,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
-// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// registerESVersionCheckCallback registers a global callback to make sure ES instance we are connecting
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
-func (b *Beat) checkElasticsearchVersion() {
-	if b.isConnectionToOlderVersionAllowed() {
-		return
-	}
+func (b *Beat) registerESVersionCheckCallback() error {
+	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		if !isElasticsearchOutput(b.Config.Output.Name()) {
+			return errors.New("Elasticsearch output is not configured")
+		}
+		if b.isConnectionToOlderVersionAllowed() {
+			return nil
+		}
 
-	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
@@ -1000,6 +1006,8 @@ func (b *Beat) checkElasticsearchVersion() {
 		}
 		return nil
 	})
+
+	return err
 }
 
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
@@ -1035,13 +1043,28 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 }
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
-	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
+		if update == nil {
+			return nil
+		}
+
 		if b.OutputConfigReloader != nil {
-			if err := b.OutputConfigReloader.Reload(config); err != nil {
+			if err := b.OutputConfigReloader.Reload(update); err != nil {
 				return err
 			}
 		}
-		return outReloader.Reload(config, b.createOutput)
+
+		// we need to update the output configuration because
+		// some callbacks are relying on it to be up to date.
+		// e.g. the Elasticsearch version validation
+		if update.Config != nil {
+			err := b.Config.Output.Unpack(update.Config)
+			if err != nil {
+				return err
+			}
+		}
+
+		return outReloader.Reload(update, b.createOutput)
 	})
 }
 
