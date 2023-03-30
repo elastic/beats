@@ -7,23 +7,9 @@
 === Beats version 8.7.0
 https://github.com/elastic/beats/compare/v8.6.2\...v8.7.0[View commits]
 
-==== Breaking changes
-
-*Filebeat*
-
-- Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
-
-*Winlogbeat*
-
-- Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
-- Added processing for Windows Event ID's 5140 and 5145 for the Security Ingest Pipeline {pull}34352[34352]
-
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix namespacing on self-monitoring {pull}32336[32336]
-- Fix race condition when stopping runners {pull}32433[32433]
-- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
 - Fix panics when a processor is closed twice {pull}34647[34647]
 - Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
@@ -92,6 +78,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Improve CEL input documentation {pull}34831[34831]
 - Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
+- Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
 
 *Heartbeat*
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
@@ -117,6 +104,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Add metrics for log event processing. {pull}33922[33922]
 - Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
+- Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
+- Added processing for Windows Event ID's 5140 and 5145 for the Security Ingest Pipeline {pull}34352[34352]
 
 [[release-notes-8.6.1]]
 === Beats version 8.6.1
