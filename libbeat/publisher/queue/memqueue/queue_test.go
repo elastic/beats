@@ -193,7 +193,6 @@ func TestEntryIDs(t *testing.T) {
 			batch, err := q.Get(1)
 			assert.NilError(t, err, "Queue read should succeed")
 			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-			assert.Equal(t, batch.ID(0), queue.EntryID(i), "Consumed entry IDs should be ordered the same as when they were produced")
 
 			metrics, err := q.Metrics()
 			assert.NilError(t, err, "Queue metrics call should succeed")
@@ -225,7 +224,6 @@ func TestEntryIDs(t *testing.T) {
 			batch, err := q.Get(1)
 			assert.NilError(t, err, "Queue read should succeed")
 			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-			assert.Equal(t, batch.ID(0), queue.EntryID(i), "Consumed entry IDs should be ordered the same as when they were produced")
 			batches = append(batches, batch)
 		}
 

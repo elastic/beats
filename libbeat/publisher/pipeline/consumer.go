@@ -46,6 +46,10 @@ type eventConsumer struct {
 	// eventConsumer.close().
 	done chan struct{}
 
+	// queueReader is a helper routine that fetches queue batches in a
+	// separate goroutine so we don't block on the control path.
+	queueReader queueReader
+
 	// This waitgroup is released when this eventConsumer's worker
 	// goroutines return.
 	wg sync.WaitGroup
@@ -75,9 +79,10 @@ func newEventConsumer(
 	observer outputObserver,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger:   log,
-		observer: observer,
-		queue:    queue,
+		logger:      log,
+		observer:    observer,
+		queue:       queue,
+		queueReader: makeQueueReader(),
 
 		targetChan: make(chan consumerTarget),
 		retryChan:  make(chan retryRequest),
@@ -89,6 +94,17 @@ func newEventConsumer(
 		defer c.wg.Done()
 		c.run()
 	}()
+
+	// Even though we start a goroutine here, we don't include it in the
+	// waitGroup used for shutdown: if the queue itself is not closed yet,
+	// then the queueReader may be blocked in a read call to the queue,
+	// and waiting on it would deadlock. (This scenario is common; the
+	// queue is rarely closed properly on shutdown.) The queueReader itself
+	// has no independent state to clean up, and can safely shut down
+	// after the eventConsumer is already gone, so nothing is lost by
+	// letting it happen asynchronously.
+	go c.queueReader.run(c.logger)
+
 	return c
 }
 
@@ -96,12 +112,6 @@ func (c *eventConsumer) run() {
 	log := c.logger
 
 	log.Debug("start pipeline event consumer")
-
-	// Create a queueReader to run our queue fetches in the background
-	queueReader := makeQueueReader()
-	go func() {
-		queueReader.run(log)
-	}()
 
 	var (
 		// Whether there's an outstanding request to queueReader
@@ -121,9 +131,11 @@ func (c *eventConsumer) run() {
 outerLoop:
 	for {
 		// If possible, start reading the next batch in the background.
-		if queueBatch == nil && !pendingRead {
+		// We require a non-nil target channel so we don't queue up a large
+		// batch before we know the real requested size for our output.
+		if queueBatch == nil && !pendingRead && target.ch != nil {
 			pendingRead = true
-			queueReader.req <- queueReaderRequest{
+			c.queueReader.req <- queueReaderRequest{
 				queue:      c.queue,
 				retryer:    c,
 				batchSize:  target.batchSize,
@@ -165,7 +177,7 @@ outerLoop:
 
 		case target = <-c.targetChan:
 
-		case queueBatch = <-queueReader.resp:
+		case queueBatch = <-c.queueReader.resp:
 			pendingRead = false
 
 		case req := <-c.retryChan:
@@ -191,7 +203,7 @@ outerLoop:
 	}
 
 	// Close the queueReader request channel so it knows to shutdown.
-	close(queueReader.req)
+	close(c.queueReader.req)
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {

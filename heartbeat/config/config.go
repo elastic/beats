@@ -25,6 +25,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -46,6 +47,7 @@ type Config struct {
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 	Jobs           map[string]*JobLimit `config:"jobs"`
 	RunFrom        *LocationWithID      `config:"run_from"`
+	SocketTrace    *SocketTrace         `config:"socket_trace"`
 }
 
 type JobLimit struct {
@@ -83,4 +85,9 @@ func DefaultConfig() *Config {
 	return &Config{
 		Jobs: limits,
 	}
+}
+
+type SocketTrace struct {
+	Path string        `config:"path"`
+	Wait time.Duration `config:"wait"`
 }

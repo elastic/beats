@@ -253,11 +253,12 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":   c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
-			"index":  c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":  c.Dict("write", threadPoolStatsSchema, c.DictOptional),
-			"get":    c.Dict("get", threadPoolStatsSchema),
-			"search": c.Dict("search", threadPoolStatsSchema),
+			"bulk":        c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"force_merge": c.Dict("force_merge", threadPoolStatsSchema, c.DictOptional),
+			"index":       c.Dict("index", threadPoolStatsSchema, c.DictOptional),
+			"write":       c.Dict("write", threadPoolStatsSchema, c.DictOptional),
+			"get":         c.Dict("get", threadPoolStatsSchema),
+			"search":      c.Dict("search", threadPoolStatsSchema),
 		}),
 		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
 			"memory": c.Dict("memory", s.Schema{
@@ -367,11 +368,14 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 			continue
 		}
 
+		roles := node["roles"]
+
 		event.ModuleFields = mapstr.M{
 			"node": mapstr.M{
 				"id":       nodeID,
 				"mlockall": mlockall,
 				"master":   isMaster,
+				"roles":    roles,
 			},
 			"cluster": mapstr.M{
 				"name": info.ClusterName,

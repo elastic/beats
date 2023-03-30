@@ -122,7 +122,14 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 		return err
 	}
 
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, patterns)
+	var auth *lib.BasicAuth
+	if cfg.Auth.Basic.isEnabled() {
+		auth = &lib.BasicAuth{
+			Username: cfg.Auth.Basic.User,
+			Password: cfg.Auth.Basic.Password,
+		}
+	}
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns)
 	if err != nil {
 		return err
 	}
@@ -796,9 +803,11 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 var (
 	// mimetypes holds supported MIME type mappings.
 	mimetypes = map[string]interface{}{
-		"application/gzip":     func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
-		"application/x-ndjson": lib.NDJSON,
-		"application/zip":      lib.Zip,
+		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
+		"application/x-ndjson":     lib.NDJSON,
+		"application/zip":          lib.Zip,
+		"text/csv; header=absent":  lib.CSVNoHeader,
+		"text/csv; header=present": lib.CSVHeader,
 	}
 
 	// limitPolicies are the provided rate limit policy helpers.
@@ -808,12 +817,13 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, patterns map[string]*regexp.Regexp) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp) (cel.Program, error) {
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
+		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
 		lib.File(mimetypes),
@@ -825,7 +835,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		}),
 	}
 	if client != nil {
-		opts = append(opts, lib.HTTPWithContext(ctx, client, limiter))
+		opts = append(opts, lib.HTTPWithContext(ctx, client, limiter, auth))
 	}
 	if len(patterns) != 0 {
 		opts = append(opts, lib.Regexp(patterns))

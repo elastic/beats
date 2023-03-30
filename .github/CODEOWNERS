@@ -49,6 +49,7 @@ CHANGELOG*
 /heartbeat/ @elastic/uptime
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
 /libbeat/processors/community_id/ @elastic/security-external-integrations
 /libbeat/processors/decode_xml/ @elastic/security-external-integrations

@@ -34,12 +34,13 @@ func CustomizePackaging() {
 			Mode:   mode,
 			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), distFile),
 		}
-		args.Spec.Files[distFile] = packFile
 
-		// Skip packaging certs.pem for darwin
-		if args.OS == "darwin" {
-			continue
+		// If macOS bundle osquery.app, preserve the directories and files permissions
+		if distFile == distro.OsquerydDarwinApp() {
+			packFile.PreserveMode = true
 		}
+
+		args.Spec.Files[distFile] = packFile
 
 		// Certs
 		certsFile := devtools.PackageFile{

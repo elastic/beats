@@ -18,6 +18,7 @@
 package winlog
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -60,7 +61,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	//       as is common for other inputs?
 	eventLog, err := eventlog.New(cfg)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to create new event log. %v", err)
+		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 	}
 
 	sources := []cursor.Source{eventLog}
@@ -73,7 +74,7 @@ func (eventlogRunner) Test(source cursor.Source, ctx input.TestContext) error {
 	api := source.(eventlog.EventLog)
 	err := api.Open(checkpoint.EventLogState{})
 	if err != nil {
-		return fmt.Errorf("Failed to open '%v': %v", api.Name(), err)
+		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
 	}
 	return api.Close()
 }
@@ -84,14 +85,14 @@ func (eventlogRunner) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	log := ctx.Logger.With("eventlog", source.Name())
 	api := source.(eventlog.EventLog)
+	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
 	cancelCtx, cancelFn := ctxtool.WithFunc(ctx.Cancelation, func() {
 		if err := api.Close(); err != nil {
-			log.Errorf("Error while closing Windows Eventlog Access: %v", err)
+			log.Errorw("Error while closing Windows Event Log access", "error", err)
 		}
 	})
 	defer cancelFn()
@@ -104,43 +105,56 @@ runLoop:
 
 		evtCheckpoint := initCheckpoint(log, cursor)
 		openErr := api.Open(evtCheckpoint)
-		if eventlog.IsRecoverable(openErr) {
-			log.Errorf("Encountered recoverable error when opening Windows Event Log: %v", openErr)
-			timed.Wait(cancelCtx, 5*time.Second)
+
+		switch {
+		case eventlog.IsRecoverable(openErr):
+			log.Errorw("Encountered recoverable error when opening Windows Event Log", "error", openErr)
+			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
-		} else if openErr != nil {
-			return fmt.Errorf("failed to open windows event log: %v", openErr)
+		case !api.IsFile() && eventlog.IsChannelNotFound(openErr):
+			log.Errorw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+			_ = timed.Wait(cancelCtx, 5*time.Second)
+			continue
+		case openErr != nil:
+			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
-		log.Debugf("Windows Event Log '%s' opened successfully", source.Name())
+
+		log.Debug("Windows Event Log opened successfully")
 
 		// read loop
 		for cancelCtx.Err() == nil {
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
-				log.Errorf("Encountered recoverable error when reading from Windows Event Log: %v", err)
+				log.Errorw("Encountered recoverable error when reading from Windows Event Log", "error", err)
 				if closeErr := api.Close(); closeErr != nil {
-					log.Errorf("Error closing Windows Event Log handle: %v", closeErr)
+					log.Errorw("Error closing Windows Event Log handle", "error", closeErr)
 				}
 				continue runLoop
 			}
-			switch err {
-			case nil:
-				break
-			case io.EOF:
-				log.Debugf("End of Winlog event stream reached: %v", err)
-				return nil
-			default:
+			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+				log.Errorw("Encountered channel not found error when reading from Windows Event Log", "error", err)
+				if closeErr := api.Close(); closeErr != nil {
+					log.Errorw("Error closing Windows Event Log handle", "error", closeErr)
+				}
+				continue runLoop
+			}
+
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					log.Debugw("End of Winlog event stream reached", "error", err)
+					return nil
+				}
+
 				// only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					return nil
 				}
 
-				log.Errorf("Error occured while reading from Windows Event Log '%v': %v", source.Name(), err)
+				log.Errorw("Error occurred while reading from Windows Event Log", "error", err)
 				return err
 			}
-
 			if len(records) == 0 {
-				timed.Wait(cancelCtx, time.Second)
+				_ = timed.Wait(cancelCtx, time.Second)
 				continue
 			}
 

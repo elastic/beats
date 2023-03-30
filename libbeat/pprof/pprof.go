@@ -67,6 +67,12 @@ func HttpAttach(cfg *Config, mux handlerAttacher) error {
 	const path = "/debug/pprof"
 	return multierr.Combine(
 		mux.AttachHandler(path+"/", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/allocs", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/block", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/goroutine", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/heap", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/mutex", http.HandlerFunc(pprof.Index)),
+		mux.AttachHandler(path+"/threadcreate", http.HandlerFunc(pprof.Index)),
 		mux.AttachHandler(path+"/cmdline", http.HandlerFunc(pprof.Cmdline)),
 		mux.AttachHandler(path+"/profile", http.HandlerFunc(pprof.Profile)),
 		mux.AttachHandler(path+"/symbol", http.HandlerFunc(pprof.Symbol)),

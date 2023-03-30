@@ -228,7 +228,7 @@ func parseTimestampNano(ns int64) time.Time {
 	return time.Unix(0, ns).UTC()
 }
 
-var regexpLinkRel = regexp.MustCompile(`<(.*)>;.*\srel\="?([^;"]*)`)
+var regexpLinkRel = regexp.MustCompile(`<(.*)>.*;\s*rel\=("[^"]*"|[^"][^;]*[^"])`)
 
 func getMatchLink(rel string, linksSplit []string) string {
 	for _, link := range linksSplit {
@@ -241,7 +241,11 @@ func getMatchLink(rel string, linksSplit []string) string {
 			continue
 		}
 
-		if matches[2] != rel {
+		linkRel := matches[2]
+		if len(linkRel) > 1 && linkRel[0] == '"' { // We can only have a leading quote if we also have a separate trailing quote.
+			linkRel = linkRel[1 : len(linkRel)-1]
+		}
+		if linkRel != rel {
 			continue
 		}
 

@@ -28536,6 +28536,15 @@ alias to: elasticsearch.index.recovery.stop_time.ms
 
 --
 
+*`index_recovery.shards.total_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.total_time.ms
+
+--
+
 
 *`stack_stats.apm.found`*::
 +
@@ -32615,6 +32624,21 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.force_merge.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.force_merge.rejected.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.thread_pool.get.queue.count`*::
 +
 --
@@ -35329,6 +35353,102 @@ type: keyword
 +
 --
 Total billing amount.
+
+type: float
+
+--
+
+[float]
+=== carbon
+
+Google Cloud Carbon Footprint metrics
+
+
+*`gcp.carbon.project_id`*::
++
+--
+Project ID the carbon footprint report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.carbon.project_name`*::
++
+--
+Project name the carbon footprint report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.carbon.service_id`*::
++
+--
+Service ID for the carbon footprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.service_description`*::
++
+--
+Service description for the carbon footprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.region`*::
++
+--
+Region for the carbon fooprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.footprint.scope1`*::
++
+--
+Scope 1 carbon footprint.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope2.location`*::
++
+--
+Scope 2 carbon footprint using location-based methodology.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope2.market`*::
++
+--
+Scope 2 carbon footprint using market-based methodology.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope3`*::
++
+--
+Scope 3 carbon footprint.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.offsets`*::
++
+--
+Total carbon offsets.
 
 type: float
 
@@ -48093,6 +48213,13 @@ node_stats metrics.
 
 
 
+*`logstash.node.id`*::
++
+--
+type: keyword
+
+--
+
 
 *`logstash.node.state.pipeline.id`*::
 +
@@ -48105,6 +48232,64 @@ type: keyword
 +
 --
 type: keyword
+
+--
+
+*`logstash.node.state.pipeline.ephemeral_id`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.batch_size`*::
++
+--
+type: long
+
+--
+
+*`logstash.node.state.pipeline.workers`*::
++
+--
+type: long
+
+--
+
+
+*`logstash.node.state.pipeline.representation.hash`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.representation.type`*::
++
+--
+type: keyword
+
+--
+
+*`logstash.node.state.pipeline.representation.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`logstash.node.state.pipeline.representation.graph.edges`*::
++
+--
+type: object
+
+--
+
+*`logstash.node.state.pipeline.representation.graph.vertices`*::
++
+--
+type: object
 
 --
 
@@ -48161,6 +48346,13 @@ alias to: process.pid
 
 --
 
+
+*`logstash.node.stats.timestamp`*::
++
+--
+type: date
+
+--
 
 
 *`logstash.node.stats.jvm.uptime_in_millis`*::

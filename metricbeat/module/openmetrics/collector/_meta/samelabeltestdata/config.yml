@@ -2,6 +2,8 @@ type: http
 url: "/metrics"
 content_type: "application/openmetrics-text"
 suffix: plain
+path: "_meta/samelabeltestdata"
+writepath: "_meta/samelabeltestdata"
 remove_fields_from_comparison: ["openmetrics.labels.instance"]
 module:
   enable_exemplars: false
