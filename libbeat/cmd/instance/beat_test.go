@@ -249,39 +249,13 @@ elasticsearch:
 		reloader := b.makeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
+		require.False(t, b.isConnectionToOlderVersionAllowed(), "the flag should not be present in the empty configuration")
 		err = reloader.Reload(update)
 		require.NoError(t, err)
 		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
 		require.Equal(t, outCfg, b.Config.Output.Config())
 		require.Same(t, c, m.cfg.Config)
-	})
-
-	t.Run("does not update `allowOlderESVersions` if output is not Elasticsearch", func(t *testing.T) {
-		b, err := NewBeat("testbeat", "testidx", "0.9", false)
-		require.NoError(t, err)
-
-		cfg := `
-logstash:
-  hosts: ["https://127.0.0.1:9200"]
-  username: "elastic"
-  allow_older_versions: true
-`
-		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
-		require.NoError(t, err)
-		outCfg, err := c.Child("logstash", -1)
-		require.NoError(t, err)
-
-		update := &reload.ConfigWithMeta{Config: c}
-		m := &outputReloaderMock{}
-		reloader := b.makeOutputReloader(m)
-
-		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
-
-		err = reloader.Reload(update)
-		require.NoError(t, err)
-		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
-		require.Equal(t, outCfg, b.Config.Output.Config())
-		require.Same(t, c, m.cfg.Config)
+		require.True(t, b.isConnectionToOlderVersionAllowed(), "the flag should be present")
 	})
 }
 
