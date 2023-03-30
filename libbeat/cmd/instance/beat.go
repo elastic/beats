@@ -989,7 +989,10 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) registerESVersionCheckCallback() error {
 	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
-		if isElasticsearchOutput(b.Config.Output.Name()) && b.isConnectionToOlderVersionAllowed() {
+		if !isElasticsearchOutput(b.Config.Output.Name()) {
+			return errors.New("Elasticsearch output is not configured")
+		}
+		if b.isConnectionToOlderVersionAllowed() {
 			return nil
 		}
 
