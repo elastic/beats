@@ -42,12 +42,14 @@ type ProducerMock struct {
 	uuid           string
 	AcceptedCount  uint32
 	persistedIndex uint64
-	Error          error
+	ErrorCallback  func(events []*messages.Event) error
 }
 
 func (p *ProducerMock) PublishEvents(ctx context.Context, r *messages.PublishRequest) (*messages.PublishReply, error) {
-	if p.Error != nil {
-		return nil, p.Error
+	if p.ErrorCallback != nil {
+		if err := p.ErrorCallback(r.Events); err != nil {
+			return nil, err
+		}
 	}
 
 	if r.Uuid != p.uuid {

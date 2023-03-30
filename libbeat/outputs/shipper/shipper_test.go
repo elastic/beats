@@ -241,7 +241,8 @@ func TestPublish(t *testing.T) {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
-			addr, producer, stop := runServer(t, tc.qSize, tc.serverError, "localhost:0")
+			addr, producer, stop := runServer(
+				t, tc.qSize, constErrorCallback(tc.serverError), "localhost:0")
 			defer stop()
 
 			cfg, err := config.NewConfigFrom(map[string]interface{}{
@@ -432,9 +433,14 @@ func BenchmarkToShipperEvent(b *testing.B) {
 // `err` is a preset error that the server will serve to the client
 // `listenAddr` is the address for the server to listen
 // returns `actualAddr` where the listener actually is and the `stop` function to stop the server
-func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, mock *api.ProducerMock, stop func()) {
+func runServer(
+	t *testing.T,
+	qSize int,
+	errCallback func([]*messages.Event) error,
+	listenAddr string,
+) (actualAddr string, mock *api.ProducerMock, stop func()) {
 	producer := api.NewProducerMock(qSize)
-	producer.Error = err
+	producer.ErrorCallback = errCallback
 	grpcServer := grpc.NewServer()
 	pb.RegisterProducerServer(grpcServer, producer)
 
@@ -451,6 +457,12 @@ func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAdd
 	}
 
 	return actualAddr, producer, stop
+}
+
+func constErrorCallback(err error) func([]*messages.Event) error {
+	return func(_ []*messages.Event) error {
+		return err
+	}
 }
 
 func createShipperClient(t *testing.T, cfg *config.C, observer outputs.Observer) outputs.NetworkClient {
