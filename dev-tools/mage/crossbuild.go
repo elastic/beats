@@ -241,9 +241,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "linux/s390x":
 		tagSuffix = "s390x-debian10"
 	case strings.HasPrefix(platform, "linux"):
-		// Use an older version of libc to gain greater OS compatibility.
-		// Debian 8 uses glibc 2.19.
-		tagSuffix = "main-debian8"
+		tagSuffix = "main-debian10"
 	}
 
 	goVersion, err := GoVersion()

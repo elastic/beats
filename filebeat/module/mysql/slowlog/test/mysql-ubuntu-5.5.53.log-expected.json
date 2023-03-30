@@ -22,6 +22,9 @@
         "mysql.slowlog.query": "SELECT count(*) FROM mysql.user WHERE user='root' and password='';",
         "mysql.slowlog.rows_examined": 5,
         "mysql.slowlog.rows_sent": 1,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -49,6 +52,9 @@
         "mysql.slowlog.query": "select concat('select count(*) into @discard from `',\n                    TABLE_SCHEMA, '`.`', TABLE_NAME, '`')\n      from information_schema.TABLES where ENGINE='MyISAM';",
         "mysql.slowlog.rows_examined": 81,
         "mysql.slowlog.rows_sent": 31,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -76,6 +82,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`COLUMNS`;",
         "mysql.slowlog.rows_examined": 808,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -103,6 +112,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`EVENTS`;",
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -130,6 +142,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PARAMETERS`;",
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -157,6 +172,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PARTITIONS`;",
         "mysql.slowlog.rows_examined": 81,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -184,6 +202,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PLUGINS`;",
         "mysql.slowlog.rows_examined": 23,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -211,6 +232,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`PROCESSLIST`;",
         "mysql.slowlog.rows_examined": 1,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -238,6 +262,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`ROUTINES`;",
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -265,6 +292,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`TRIGGERS`;",
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -292,6 +322,9 @@
         "mysql.slowlog.query": "select count(*) into @discard from `information_schema`.`VIEWS`;",
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 0,
+        "related.user": [
+            "debian-sys-maint"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
@@ -319,6 +352,9 @@
         "mysql.slowlog.query": "select sleep(2);",
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 1,
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
@@ -347,6 +383,9 @@
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 0,
         "mysql.slowlog.schema": "mysql",
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
@@ -374,6 +413,9 @@
         "mysql.slowlog.query": "select * from user;",
         "mysql.slowlog.rows_examined": 5,
         "mysql.slowlog.rows_sent": 5,
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
