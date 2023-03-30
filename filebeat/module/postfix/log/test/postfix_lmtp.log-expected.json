@@ -1,6 +1,9 @@
 [
     {
         "@timestamp": "2023-03-24T13:58:01.000-02:00",
+        "destination.domain": "127.0.0.1",
+        "destination.ip": "127.0.0.1",
+        "destination.port": "2525",
         "event.dataset": "postfix.log",
         "event.module": "postfix",
         "event.timezone": "-02:00",
@@ -8,8 +11,21 @@
         "input.type": "log",
         "log.offset": 0,
         "message": "Mar 24 13:58:01 5mail-gw01 postfix/lmtp[25469]: 7EE668039: to=<admin@example.com>, relay=127.0.0.1[127.0.0.1]:2525, delay=3.6, delays=0.2/0.02/0.04/3.3, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 153053D)",
+        "postfix.delay_before_qmgr": "0.2",
+        "postfix.delay_conn_setup": "0.04",
+        "postfix.delay_in_qmgr": "0.02",
+        "postfix.delay_transmission": "3.3",
+        "postfix.queueid": "7EE668039",
+        "postfix.smtp.response": "250 2.0.0 Ok: queued as 153053D",
+        "postfix.status": "sent",
+        "postfix.var.delay": "3.6",
+        "postfix.var.dsn": "2.0.0",
+        "postfix.var.to": "admin@example.com",
         "process.name": "postfix/lmtp",
         "process.pid": "25469",
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "postfix"
     },
     {
@@ -19,8 +35,10 @@
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
+        "log.level": "warning",
         "log.offset": 210,
         "message": "Mar  4 11:09:38 mail postfix/lmtp[22191]: warning: 54161904: defer service failure",
+        "postfix.message": "54161904: defer service failure",
         "process.name": "postfix/lmtp",
         "process.pid": "22191",
         "service.type": "postfix"
