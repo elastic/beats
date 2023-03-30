@@ -17,11 +17,30 @@
 
 package mage
 
-import devtools "github.com/elastic/beats/v7/dev-tools/mage"
+import (
+	"strings"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+)
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	// Run all builds serially to try to address failures that might be caused
-	// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
-	return devtools.CrossBuild(devtools.Serially())
+	return devtools.CrossBuild(
+		// Run all builds serially to try to address failures that might be caused
+		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+		devtools.Serially(),
+
+		devtools.ImageSelector(func(platform string) (string, error) {
+			image, err := devtools.CrossBuildImage(platform)
+			if err != nil {
+				return "", err
+			}
+			if platform == "linux/386" {
+				// Use Debian 9 because the linux/386 build needs an older glibc
+				// to remain compatible with CentOS 7 (glibc 2.17).
+				image = strings.ReplaceAll(image, "main-debian10", "main-debian9")
+			}
+			return image, nil
+		}),
+	)
 }
