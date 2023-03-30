@@ -455,6 +455,29 @@ processors:
       target_field: okta.security_context.isp
       ignore_missing: true
       ignore_failure: true
+  - rename:
+      field: json.request.ipChain
+      target_field: okta.request.ip_chain
+      ignore_missing: true
+      ignore_failure: true
+  - foreach:
+      field: okta.request.ip_chain
+      processor:
+        rename:
+          field: _ingest._value.geographicalContext
+          target_field: _ingest._value.geographical_context
+          ignore_missing: true
+          ignore_failure: true
+      ignore_missing: true
+  - foreach:
+      field: okta.request.ip_chain
+      processor:
+        rename:
+          field: _ingest._value.geographical_context.postalCode
+          target_field: _ingest._value.geographical_context.postal_code
+          ignore_missing: true
+          ignore_failure: true
+      ignore_missing: true
   - convert:
       field: okta.client.user_agent.raw_user_agent
       target_field: user_agent.original

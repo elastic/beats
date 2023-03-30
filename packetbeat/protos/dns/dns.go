@@ -58,7 +58,7 @@ type dnsPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter // Channel where results are pushed.
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	logger *logp.Logger
 }
@@ -219,7 +219,7 @@ func init() {
 	protos.Register("dns", New)
 }
 
-func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
 	p := &dnsPlugin{logger: logp.NewLogger("dns")}
 	config := defaultConfig
 	if !testMode {
@@ -234,7 +234,7 @@ func New(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher,
 	return p, nil
 }
 
-func (dns *dnsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *dnsConfig) error {
+func (dns *dnsPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *dnsConfig) error {
 	dns.setFromConfig(config)
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,

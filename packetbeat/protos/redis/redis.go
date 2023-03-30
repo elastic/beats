@@ -56,7 +56,7 @@ type redisPlugin struct {
 	transactionTimeout time.Duration
 	queueConfig        MessageQueueConfig
 
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 	results protos.Reporter
 }
 
@@ -77,7 +77,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
@@ -94,7 +94,7 @@ func New(
 	return p, nil
 }
 
-func (redis *redisPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *redisConfig) error {
+func (redis *redisPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results

@@ -139,7 +139,9 @@ func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
 }
 
 // Trigger invokes the SYS_ACCESS syscall:
-//	  int access(const char *pathname, int mode);
+//
+//	int access(const char *pathname, int mode);
+//
 // The function call will return an error due to path being NULL, but it will
 // have invoked prepare_creds before argument validation.
 func (g *guessStructCreds) Trigger() error {

@@ -1,5 +1,6 @@
 ---
 name: Bump golang-version to latest version
+pipelineid: 'bump-golang-version'
 
 scms:
   githubConfig:

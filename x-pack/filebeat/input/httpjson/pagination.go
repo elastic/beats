@@ -138,6 +138,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 		return nil, false, err
 	}
 
+	//nolint:bodyclose // response body is closed through drainBody method
 	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq)
 	if err != nil {
 		return nil, false, err

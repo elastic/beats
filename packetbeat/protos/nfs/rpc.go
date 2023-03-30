@@ -72,7 +72,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	_ procs.ProcessesWatcher,
+	_ *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &rpc{}

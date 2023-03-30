@@ -46,7 +46,7 @@ const (
 var httpProtocol, mysqlProtocol, redisProtocol protos.Protocol
 
 func init() {
-	new := func(_ bool, _ protos.Reporter, _ procs.ProcessesWatcher, _ *conf.C) (protos.Plugin, error) {
+	new := func(_ bool, _ protos.Reporter, _ *procs.ProcessesWatcher, _ *conf.C) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 

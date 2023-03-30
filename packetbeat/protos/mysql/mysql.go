@@ -157,7 +157,7 @@ type mysqlPlugin struct {
 	prepareStatementTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
@@ -171,7 +171,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &mysqlPlugin{}
@@ -188,7 +188,7 @@ func New(
 	return p, nil
 }
 
-func (mysql *mysqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mysqlConfig) error {
+func (mysql *mysqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
 	mysql.transactions = common.NewCache(

@@ -38,7 +38,7 @@ type Decoders func(_ layers.LinkType, device string) (decoders *decoder.Decoder,
 
 // DecodersFor returns a source of Decoders using the provided configuration
 // components. The id string is expected to be the ID of the beat.
-func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
+func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
 	return func(dl layers.LinkType, device string) (*decoder.Decoder, func(), error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
