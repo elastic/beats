@@ -38,20 +38,21 @@ var experimentalWarning sync.Once
 func newProspector(config config) (loginp.Prospector, error) {
 	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
 	if err != nil {
-		return nil, fmt.Errorf("error while creating filewatcher %v", err)
+		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
 	identifier, err := newFileIdentifier(config.FileIdentity, getIdentifierSuffix(config))
 	if err != nil {
-		return nil, fmt.Errorf("error while creating file identifier: %v", err)
+		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
 
 	fileprospector := fileProspector{
-		filewatcher:       filewatcher,
-		identifier:        identifier,
-		ignoreOlder:       config.IgnoreOlder,
-		cleanRemoved:      config.CleanRemoved,
-		stateChangeCloser: config.Close.OnStateChange,
+		filewatcher:         filewatcher,
+		identifier:          identifier,
+		ignoreOlder:         config.IgnoreOlder,
+		ignoreInactiveSince: config.IgnoreInactive,
+		cleanRemoved:        config.CleanRemoved,
+		stateChangeCloser:   config.Close.OnStateChange,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil
@@ -70,7 +71,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		cfg := rotationConfig{}
 		err := externalConfig.Unpack(&cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unpack configuration of external rotation: %+v", err)
+			return nil, fmt.Errorf("failed to unpack configuration of external rotation: %w", err)
 		}
 		strategy := cfg.Strategy.Name()
 		switch strategy {
@@ -82,7 +83,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 			cpCfg := &copyTruncateConfig{}
 			err = cfg.Strategy.Config().Unpack(&cpCfg)
 			if err != nil {
-				return nil, fmt.Errorf("failed to unpack configuration of external copytruncate rotation: %+v", err)
+				return nil, fmt.Errorf("failed to unpack configuration of external copytruncate rotation: %w", err)
 			}
 			suffix, err := regexp.Compile(cpCfg.SuffixRegex)
 			if err != nil {
