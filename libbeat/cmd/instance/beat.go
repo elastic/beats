@@ -806,7 +806,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
+	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
 		return err
 	}
