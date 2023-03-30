@@ -195,3 +195,41 @@ func (b *ttlBatch) reduceTTL() bool {
 	// all events have been dropped:
 	return false
 }
+
+///////////////////////////////////////////////////////////////////////
+// Testing support helpers
+
+// NewBatchForTesting creates a ttlBatch (exposed through its publisher
+// interface). This is exposed publicly to support testing of ttlBatch
+// with other pipeline components, it should never be used to create
+// a batch in live pipeline code.
+//
+//   - events: the publisher events contained in the batch
+//   - ttl: the number of retries left until the batch is dropped. -1 means it
+//     can't be dropped.
+//   - retryCallback: the callback invoked when a batch needs to be retried.
+//     In a live pipeline, this points to the retry method on eventConsumer,
+//     the helper object that distributes pending batches to output workers.
+//   - done: the callback invoked on receiving batch.Done
+func NewBatchForTesting(
+	events []publisher.Event,
+	retryCallback func(batch publisher.Batch),
+	done func(),
+) publisher.Batch {
+	return &ttlBatch{
+		events:  events,
+		done:    done,
+		retryer: testingRetryer{retryCallback},
+	}
+}
+
+// testingRetryer is a simple wrapper of the retryer interface that is
+// used by NewBatchForTesting, to allow tests in other packages to interoperate
+// with the internal type ttlBatch.
+type testingRetryer struct {
+	retryCallback func(batch publisher.Batch)
+}
+
+func (tr testingRetryer) retry(batch *ttlBatch, _ bool) {
+	tr.retryCallback(batch)
+}

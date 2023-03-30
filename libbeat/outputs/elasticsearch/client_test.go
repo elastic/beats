@@ -23,6 +23,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -41,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/version"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -85,12 +87,26 @@ func (bm *batchMock) RetryEvents(events []publisher.Event) {
 	bm.retryEvents = events
 }
 
-func TestPublishStatusCode(t *testing.T) {
+func TestPublish(t *testing.T) {
+	makePublishTestClient := func(t *testing.T, url string) *Client {
+		client, err := NewClient(
+			ClientSettings{
+				Observer:           outputs.NewNilObserver(),
+				ConnectionSettings: eslegclient.ConnectionSettings{URL: url},
+				Index:              testIndexSelector{},
+			},
+			nil,
+		)
+		require.NoError(t, err)
+		return client
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
-	events := []publisher.Event{event}
+	event1 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
+	event2 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
+	event3 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 3}}}
 
 	t.Run("splits large batches on status code 413", func(t *testing.T) {
 		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -98,35 +114,21 @@ func TestPublishStatusCode(t *testing.T) {
 			_, _ = w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
 		}))
 		defer esMock.Close()
-
-		client, err := NewClient(
-			ClientSettings{
-				Observer: outputs.NewNilObserver(),
-				ConnectionSettings: eslegclient.ConnectionSettings{
-					URL: esMock.URL,
-				},
-				Index: testIndexSelector{},
-			},
-			nil,
-		)
-		assert.NoError(t, err)
-
-		event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
-		events := []publisher.Event{event}
+		client := makePublishTestClient(t, esMock.URL)
 
 		// Try publishing a batch that can be split
 		batch := &batchMock{
-			events:   events,
+			events:   []publisher.Event{event1},
 			canSplit: true,
 		}
-		err = client.Publish(ctx, batch)
+		err := client.Publish(ctx, batch)
 
 		assert.NoError(t, err, "Publish should split the batch without error")
 		assert.True(t, batch.didSplit, "batch should be split")
 
 		// Try publishing a batch that cannot be split
 		batch = &batchMock{
-			events:   events,
+			events:   []publisher.Event{event1},
 			canSplit: false,
 		}
 		err = client.Publish(ctx, batch)
@@ -141,28 +143,106 @@ func TestPublishStatusCode(t *testing.T) {
 			w.WriteHeader(http.StatusInternalServerError)
 		}))
 		defer esMock.Close()
-
-		client, err := NewClient(
-			ClientSettings{
-				Observer: outputs.NewNilObserver(),
-				ConnectionSettings: eslegclient.ConnectionSettings{
-					URL: esMock.URL,
-				},
-				Index: testIndexSelector{},
-			},
-			nil,
-		)
-		assert.NoError(t, err)
+		client := makePublishTestClient(t, esMock.URL)
 
 		batch := &batchMock{
-			events: events,
+			events: []publisher.Event{event1, event2},
 		}
 
-		err = client.Publish(ctx, batch)
+		err := client.Publish(ctx, batch)
 
 		assert.Error(t, err)
 		assert.False(t, batch.ack, "should not be acknowledged")
-		assert.Len(t, batch.retryEvents, len(events), "all events should be in retry")
+		assert.Len(t, batch.retryEvents, 2, "all events should be retried")
+	})
+
+	t.Run("live batches, still too big after split", func(t *testing.T) {
+		// Test a live (non-mocked) batch where both events by themselves are
+		// rejected by the server as too large after the initial split.
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusRequestEntityTooLarge)
+			_, _ = w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
+		}))
+		defer esMock.Close()
+		client := makePublishTestClient(t, esMock.URL)
+
+		// Because our tests don't use a live eventConsumer routine,
+		// everything will happen synchronously and it's safe to track
+		// test results directly without atomics/mutexes.
+		done := false
+		retryCount := 0
+		batch := pipeline.NewBatchForTesting(
+			[]publisher.Event{event1, event2, event3},
+			func(b publisher.Batch) {
+				// The retry function sends the batch back through Publish.
+				// In a live pipeline it would instead be sent to eventConsumer
+				// first and then back to Publish when an output worker was
+				// available.
+				retryCount++
+				err := client.Publish(ctx, b)
+				assert.NoError(t, err, "Publish should return without error")
+			},
+			func() { done = true },
+		)
+		err := client.Publish(ctx, batch)
+		assert.NoError(t, err, "Publish should return without error")
+
+		// For three events there should be four retries in total:
+		// {[event1], [event2, event3]}, then {[event2], [event3]}.
+		// "done" should be true because after splitting into individual
+		// events, all 3 will fail and be dropped.
+		assert.Equal(t, 4, retryCount, "3-event batch should produce 4 total retries")
+		assert.True(t, done, "batch should be marked as done")
+	})
+
+	t.Run("live batches, one event too big after split", func(t *testing.T) {
+		// Test a live (non-mocked) batch where a single event is too large
+		// for the server to ingest but the others are ok.
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			b, _ := io.ReadAll(r.Body)
+			body := string(b)
+			// Reject the batch as too large only if it contains event1
+			if strings.Contains(body, "\"field\":1") {
+				// Report batch too large
+				w.WriteHeader(http.StatusRequestEntityTooLarge)
+				_, _ = w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
+			} else {
+				// Report success with no events dropped
+				w.WriteHeader(200)
+				_, _ = io.WriteString(w, "{\"items\": []}")
+			}
+		}))
+		defer esMock.Close()
+		client := makePublishTestClient(t, esMock.URL)
+
+		// Because our tests don't use a live eventConsumer routine,
+		// everything will happen synchronously and it's safe to track
+		// test results directly without atomics/mutexes.
+		done := false
+		retryCount := 0
+		batch := pipeline.NewBatchForTesting(
+			[]publisher.Event{event1, event2, event3},
+			func(b publisher.Batch) {
+				// The retry function sends the batch back through Publish.
+				// In a live pipeline it would instead be sent to eventConsumer
+				// first and then back to Publish when an output worker was
+				// available.
+				retryCount++
+				err := client.Publish(ctx, b)
+				assert.NoError(t, err, "Publish should return without error")
+			},
+			func() { done = true },
+		)
+		err := client.Publish(ctx, batch)
+		assert.NoError(t, err, "Publish should return without error")
+
+		// There should be two retries: {[event1], [event2, event3]}.
+		// The first split batch should fail and be dropped since it contains
+		// event1, the other one should succeed.
+		// "done" should be true because both split batches are completed
+		// (one with failure, one with success).
+		assert.Equal(t, 2, retryCount, "splitting with one large event should produce two retries")
+		assert.True(t, done, "batch should be marked as done")
 	})
 }
 
