@@ -244,12 +244,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, err
 	}
 
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get host information: %w", err)
-	}
-	fqdn := h.Info().FQDN
-
 	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
@@ -268,7 +262,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Version:         v,
 			Name:            hostname,
 			Hostname:        hostname,
-			FQDN:            fqdn,
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
@@ -595,7 +588,7 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 
 	// state.host
 	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(useFQDN), monitoring.Report)
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -795,6 +788,22 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	logp.Info("Beat ID: %v", b.Info.ID)
+
+	// Try to get the host's FQDN and set it.
+	h, err := sysinfo.Host()
+	if err != nil {
+		return fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	fqdn, err := h.FQDN()
+	if err != nil {
+		// FQDN lookup is "best effort".  We log the error, fallback to
+		// the OS-reported hostname, and move on.
+		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		b.Info.FQDN = b.Info.Hostname
+	} else {
+		b.Info.FQDN = fqdn
+	}
 
 	// initialize config manager
 	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
