@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -29,35 +30,74 @@ func TestInputMetricsClose(t *testing.T) {
 }
 
 func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
-	reg := monitoring.NewRegistry()
-	const maxWorkers = 1
-	metrics := newInputMetrics("test", reg, maxWorkers)
+	const interval = 5000
 
-	metrics.utilizationNanos = time.Second.Nanoseconds()
+	t.Run("worker ends before one interval", func(t *testing.T) {
+		fakeTimeMs.Store(0)
+		defer useFakeCurrentTimeThenReset()()
 
-	utilization := calculateUtilizationAndReset(time.Second, maxWorkers, metrics)
-	assert.Greater(t, utilization, 0.95)
+		reg := monitoring.NewRegistry()
+		metrics := newInputMetrics("test", reg, 1)
+		metrics.Close()
+
+		id := metrics.beginSQSWorker()
+		fakeTimeMs.Add(2500)
+		metrics.endSQSWorker(id)
+
+		fakeTimeMs.Store(1 * interval)
+		metrics.updateSqsWorkerUtilization()
+		assert.Equal(t, 0.5, metrics.sqsWorkerUtilization.Get())
+	})
+	t.Run("worker ends mid interval", func(t *testing.T) {
+		fakeTimeMs.Store(0)
+		defer useFakeCurrentTimeThenReset()()
+
+		reg := monitoring.NewRegistry()
+		metrics := newInputMetrics("test", reg, 1)
+		metrics.Close()
+
+		fakeTimeMs.Add(4000)
+		id := metrics.beginSQSWorker()
+
+		fakeTimeMs.Store(1 * interval)
+		metrics.updateSqsWorkerUtilization()
+
+		fakeTimeMs.Add(1000)
+		metrics.endSQSWorker(id)
+
+		fakeTimeMs.Store(2 * interval)
+		metrics.updateSqsWorkerUtilization()
+		assert.Equal(t, 0.2, metrics.sqsWorkerUtilization.Get())
+	})
+	t.Run("running worker goes longer than an interval", func(t *testing.T) {
+		fakeTimeMs.Store(0)
+		defer useFakeCurrentTimeThenReset()()
+
+		reg := monitoring.NewRegistry()
+		metrics := newInputMetrics("test", reg, 1)
+		metrics.Close()
+
+		id := metrics.beginSQSWorker()
+
+		fakeTimeMs.Store(1 * interval)
+		metrics.updateSqsWorkerUtilization()
+		assert.Equal(t, 1.0, metrics.sqsWorkerUtilization.Get())
+
+		fakeTimeMs.Store(2 * interval)
+		metrics.updateSqsWorkerUtilization()
+		assert.Equal(t, 1.0, metrics.sqsWorkerUtilization.Get())
+
+		metrics.endSQSWorker(id)
+	})
 }
 
-func TestInputMetricsSQSWorkerUtilization_LongRunningWorkers(t *testing.T) {
-	reg := monitoring.NewRegistry()
-	const maxWorkers = 1
-	metrics := newInputMetrics("test", reg, maxWorkers)
+var fakeTimeMs = &atomic.Int64{}
 
-	metrics.utilizationNanos = time.Minute.Nanoseconds()
-
-	utilization := calculateUtilizationAndReset(time.Second, maxWorkers, metrics)
-	assert.Equal(t, utilization, 1.0)
-}
-
-func TestInputMetricsSQSWorkerUtilization_InFlightWorkers(t *testing.T) {
-	reg := monitoring.NewRegistry()
-	const maxWorkers = 1
-	metrics := newInputMetrics("test", reg, maxWorkers)
-
-	metrics.utilizationNanos = 0
-	metrics.sqsMessagesInflight.Set(maxWorkers)
-
-	utilization := calculateUtilizationAndReset(time.Second, maxWorkers, metrics)
-	assert.Equal(t, utilization, 1.0)
+func useFakeCurrentTimeThenReset() (reset func()) {
+	currentTime = func() time.Time {
+		return time.UnixMilli(fakeTimeMs.Load())
+	}
+	return func() {
+		currentTime = time.Now
+	}
 }

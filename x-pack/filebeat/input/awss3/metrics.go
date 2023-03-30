@@ -7,7 +7,8 @@ package awss3
 import (
 	"context"
 	"io"
-	"sync/atomic"
+	"math"
+	"sync"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -15,15 +16,25 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/go-concert/timed"
 )
+
+// currentTime returns the current time. This exists to allow unit tests
+// simulate the passage of time.
+var currentTime = time.Now
 
 type inputMetrics struct {
 	registry   *monitoring.Registry
 	unregister func()
-	ctx        context.Context
-	cancel     context.CancelFunc
+	ctx        context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
+	cancel     context.CancelFunc // cancel cancels the ctx context.
 
-	utilizationNanos int64
+	sqsMaxMessagesInflight            int                  // Maximum number of SQS workers allowed.
+	sqsWorkerUtilizationMutex         sync.Mutex           // Guards the sqs worker utilization fields.
+	sqsWorkerUtilizationLastUpdate    time.Time            // Time of the last SQS worker utilization calculation.
+	sqsWorkerUtilizationCurrentPeriod time.Duration        // Elapsed execution duration of any SQS workers that completed during the current period.
+	sqsWorkerIDCounter                uint64               // Counter used to assigned unique IDs to SQS workers.
+	sqsWorkerStartTimes               map[uint64]time.Time // Map of SQS worker ID to the time at which the worker started.
 
 	sqsMessagesReceivedTotal            *monitoring.Uint  // Number of SQS messages received (not necessarily processed fully).
 	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint  // Number of SQS visibility timeout extensions.
@@ -51,11 +62,6 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
-func (m *inputMetrics) updateSQSProcessingTime(d time.Duration) {
-	m.sqsMessageProcessingTime.Update(d.Nanoseconds())
-	atomic.AddInt64(&m.utilizationNanos, d.Nanoseconds())
-}
-
 func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 	if m.sqsMessagesWaiting == nil {
 		// if metric not initialized, and count is -1, do nothing
@@ -68,52 +74,84 @@ func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
 	m.sqsMessagesWaiting.Set(count)
 }
 
-func calculateUtilizationAndReset(d time.Duration, maxMessagesInflight int, m *inputMetrics) float64 {
-	maxUtilization := float64(d) * float64(maxMessagesInflight)
-	utilizedRate := float64(atomic.SwapInt64(&m.utilizationNanos, 0)) / maxUtilization
+// beginSQSWorker tracks the start of a new SQS worker. The returned ID
+// must be used to call endSQSWorker when the worker finishes. It also
+// increments the sqsMessagesInflight counter.
+func (m *inputMetrics) beginSQSWorker() (id uint64) {
+	m.sqsMessagesInflight.Inc()
 
-	if utilizedRate == 0 {
-		// Falling back to inflight stats when the workers are long running
-		inflight := m.sqsMessagesInflight.Get()
-		if inflight > 0 {
-			return float64(inflight) / float64(maxMessagesInflight)
-		}
-	} else if utilizedRate > 1 {
-		// Normalizing the utilization after long running workers
-		return 1
-	}
-
-	return utilizedRate
+	m.sqsWorkerUtilizationMutex.Lock()
+	defer m.sqsWorkerUtilizationMutex.Unlock()
+	m.sqsWorkerIDCounter++
+	m.sqsWorkerStartTimes[m.sqsWorkerIDCounter] = currentTime()
+	return m.sqsWorkerIDCounter
 }
 
-func (m *inputMetrics) pollSQSUtilizationMetric(ctx context.Context, maxMessagesInflight int) {
-	t := time.NewTicker(5 * time.Second)
-	defer t.Stop()
+// endSQSWorker is used to signal that the specified worker has
+// finished. This is used update the SQS worker utilization metric.
+// It also decrements the sqsMessagesInflight counter and
+// sqsMessageProcessingTime histogram.
+func (m *inputMetrics) endSQSWorker(id uint64) {
+	m.sqsMessagesInflight.Dec()
 
-	lastTick := time.Now()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case tick := <-t.C:
-			duration := tick.Sub(lastTick)
-			utilizedRate := calculateUtilizationAndReset(duration, maxMessagesInflight, m)
-			m.sqsWorkerUtilization.Set(utilizedRate)
-			// reset for the next polling duration
-			lastTick = tick
+	m.sqsWorkerUtilizationMutex.Lock()
+	defer m.sqsWorkerUtilizationMutex.Unlock()
+	now := currentTime()
+	start := m.sqsWorkerStartTimes[id]
+	delete(m.sqsWorkerStartTimes, id)
+	m.sqsMessageProcessingTime.Update(now.Sub(start).Nanoseconds())
+	if start.Before(m.sqsWorkerUtilizationLastUpdate) {
+		m.sqsWorkerUtilizationCurrentPeriod += now.Sub(m.sqsWorkerUtilizationLastUpdate)
+	} else {
+		m.sqsWorkerUtilizationCurrentPeriod += now.Sub(start)
+	}
+}
+
+// updateSqsWorkerUtilization updates the sqsWorkerUtilization metric.
+// This is invoked periodically to compute the utilization level
+// of the SQS workers. 0 indicates no workers were utilized during
+// the period. And 1 indicates that all workers fully utilized
+// during the period.
+func (m *inputMetrics) updateSqsWorkerUtilization() {
+	m.sqsWorkerUtilizationMutex.Lock()
+	defer m.sqsWorkerUtilizationMutex.Unlock()
+
+	now := currentTime()
+	lastPeriodDuration := now.Sub(m.sqsWorkerUtilizationLastUpdate)
+	maxUtilization := float64(m.sqsMaxMessagesInflight) * lastPeriodDuration.Seconds()
+
+	for _, startTime := range m.sqsWorkerStartTimes {
+		// If the worker started before the current period then only compute
+		// from elapsed time since the last update. Otherwise, it started
+		// during the current period so compute time elapsed since it started.
+		if startTime.Before(m.sqsWorkerUtilizationLastUpdate) {
+			m.sqsWorkerUtilizationCurrentPeriod += lastPeriodDuration
+		} else {
+			m.sqsWorkerUtilizationCurrentPeriod += now.Sub(startTime)
 		}
 	}
+
+	utilization := math.Round(m.sqsWorkerUtilizationCurrentPeriod.Seconds()/maxUtilization*1000) / 1000
+	if utilization > 1 {
+		utilization = 1
+	}
+	m.sqsWorkerUtilization.Set(utilization)
+	m.sqsWorkerUtilizationCurrentPeriod = 0
+	m.sqsWorkerUtilizationLastUpdate = now
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers int) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
-	ctx, cancelInputCtx := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
 		registry:                            reg,
 		unregister:                          unreg,
 		ctx:                                 ctx,
-		cancel:                              cancelInputCtx,
+		cancel:                              cancel,
+		sqsMaxMessagesInflight:              maxWorkers,
+		sqsWorkerStartTimes:                 map[uint64]time.Time{},
+		sqsWorkerUtilizationLastUpdate:      currentTime(),
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
@@ -138,7 +176,12 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
-	go out.pollSQSUtilizationMetric(ctx, maxWorkers)
+	// Periodically update the sqs worker utilization metric.
+	//nolint:errcheck // This never returns an error.
+	go timed.Periodic(ctx, 5*time.Second, func() error {
+		out.updateSqsWorkerUtilization()
+		return nil
+	})
 
 	return out
 }

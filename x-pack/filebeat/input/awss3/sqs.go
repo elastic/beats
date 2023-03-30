@@ -79,13 +79,12 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		// Process each SQS message asynchronously with a goroutine.
 		r.log.Debugf("Received %v SQS messages.", len(msgs))
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-		r.metrics.sqsMessagesInflight.Add(uint64(len(msgs)))
 		workerWg.Add(len(msgs))
 		for _, msg := range msgs {
 			go func(msg types.Message, start time.Time) {
+				id := r.metrics.beginSQSWorker()
 				defer func() {
-					r.metrics.sqsMessagesInflight.Dec()
-					r.metrics.updateSQSProcessingTime(time.Since(start))
+					r.metrics.endSQSWorker(id)
 					workerWg.Done()
 					r.workerSem.Release(1)
 				}()
