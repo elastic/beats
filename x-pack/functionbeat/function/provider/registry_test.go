@@ -198,7 +198,7 @@ func withRegistry(fn func(t *testing.T, global *feature.Registry, registry *Regi
 	}
 }
 
-func testStrInSlice(t *testing.T) {
+func TestStrInSlice(t *testing.T) {
 	haystack := []string{"bob", "aline"}
 	t.Run("when in slice return position", func(t *testing.T) {
 		assert.Equal(t, 1, strInSlice(haystack, "aline"))
