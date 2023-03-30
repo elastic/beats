@@ -15,13 +15,13 @@ func getNamespace(provider string) string {
 	return namespace + "." + provider + ".functions"
 }
 
-// Feature creates a new Provider feature to be added to the global registry.
+// newFeature creates a new Provider feature to be added to the global registry.
 // The namespace will be 'functionbeat.provider' in the registry.
 func newFeature(name string, factory Factory) *feature.Feature {
 	return feature.New(namespace, name, factory)
 }
 
-// FunctionFeature Feature creates a new function feature to be added to the global registry
+// newFunctionFeature Feature creates a new function feature to be added to the global registry
 // The namespace will be 'functionbeat.provider.local' in the registry.
 func newFunctionFeature(
 	provider, name string,
