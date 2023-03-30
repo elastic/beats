@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 
 *Heartbeat*
 
