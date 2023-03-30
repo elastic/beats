@@ -10,8 +10,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
 )
 
-// Bundle exposes the trigger supported by the AWS provider.
-var Bundle = provider.Builder(
+// Features exposes the trigger supported by the AWS provider.
+var Features = provider.Builder(
 	"aws",
 	provider.NewDefaultProvider("aws", NewCLI, NewTemplateBuilder),
 	feature.MakeDetails("AWS Lambda", "listen to events on AWS lambda", feature.Stable),
@@ -30,4 +30,4 @@ var Bundle = provider.Builder(
 ).AddFunction("cloudwatch_logs_kinesis",
 	aws.NewCloudwatchKinesis,
 	aws.CloudwatchKinesisDetails(),
-).Bundle()
+).Features()
