@@ -248,14 +248,10 @@ elasticsearch:
 		m := &outputReloaderMock{}
 		reloader := b.makeOutputReloader(m)
 
-		require.False(t, b.allowOlderESVersions)
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
-
 		err = reloader.Reload(update)
 		require.NoError(t, err)
-
 		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
-		require.True(t, b.allowOlderESVersions)
 		require.Equal(t, outCfg, b.Config.Output.Config())
 		require.Same(t, c, m.cfg.Config)
 	})
@@ -279,14 +275,11 @@ logstash:
 		m := &outputReloaderMock{}
 		reloader := b.makeOutputReloader(m)
 
-		require.False(t, b.allowOlderESVersions)
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
 
 		err = reloader.Reload(update)
 		require.NoError(t, err)
-
 		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
-		require.False(t, b.allowOlderESVersions, "the flag should not be updated")
 		require.Equal(t, outCfg, b.Config.Output.Config())
 		require.Same(t, c, m.cfg.Config)
 	})
