@@ -86,7 +86,7 @@ func (l *limiter) wait() {
 	l.wg.Wait()
 }
 
-// release puts pack a worker thread.
+// release puts back a worker thread.
 func (l *limiter) release() {
 	<-l.limit
 	l.wg.Done()
@@ -167,7 +167,7 @@ func (s *scheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterato
 }
 
 // moveToLastSeenJob, moves to the latest job position past the last seen job
-// Jobs are stored in lexicographical order always , hence the latest position can be found either on the basis of job name or timestamp
+// Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	var latestJobs []*job
 	jobsToReturn := make([]*job, 0)
