@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 
+	"go.uber.org/multierr"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
@@ -59,7 +61,10 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return devtools.GolangCrossBuild(args)
+	return multierr.Combine(
+		devtools.GolangCrossBuild(args),
+		devtools.TestLinuxForCentosGLIBC(),
+	)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
