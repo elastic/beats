@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
@@ -145,19 +146,16 @@ func TestToShipperEvent(t *testing.T) {
 func TestPublish(t *testing.T) {
 	events := []beat.Event{
 		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{"event": "first"},
-			Fields:    mapstr.M{"a": "b"},
+			Meta:   mapstr.M{"event": "first"},
+			Fields: mapstr.M{"a": "b"},
 		},
 		{
-			Timestamp: time.Now(),
-			Meta:      nil, // see failMarshal()
-			Fields:    mapstr.M{"a": "b"},
+			Meta:   nil, // see failMarshal()
+			Fields: mapstr.M{"a": "b"},
 		},
 		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{"event": "third"},
-			Fields:    mapstr.M{"e": "f"},
+			Meta:   mapstr.M{"event": "third"},
+			Fields: mapstr.M{"e": "f"},
 		},
 	}
 
@@ -374,6 +372,119 @@ func TestPublish(t *testing.T) {
 		require.Equal(t, expSignals, batch1.Signals, "batch1")
 		require.Equal(t, expSignals, batch2.Signals, "batch2")
 		require.Equal(t, expSignals, batch3.Signals, "batch3")
+		require.Equal(t, expectedObserver, observer)
+	})
+
+	t.Run("live batches where all events are too large to ingest", func(t *testing.T) {
+		// This tests recursive retry using live `ttlBatch` structs instead of mocks
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		errCallback := constErrorCallback(status.Error(codes.ResourceExhausted, "rpc size limit exceeded"))
+		addr, _, stop := runServer(t, 9, errCallback, "localhost:0")
+		defer stop()
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server": addr,
+		})
+		require.NoError(t, err)
+		observer := &TestObserver{}
+
+		client := createShipperClient(t, cfg, observer)
+
+		// Since we retry directly instead of going through a live pipeline,
+		// the Publish call is synchronous and we can track state by modifying
+		// local variables directly.
+		retryCount := 0
+		done := false
+		batch := pipeline.NewBatchForTesting(
+			[]publisher.Event{
+				{Content: events[0]}, {Content: events[1]}, {Content: events[2]},
+			},
+			func(b publisher.Batch) {
+				// Retry by sending directly back to Publish. In a live
+				// pipeline, this would be sent through eventConsumer first
+				// before calling Publish on the next free output worker.
+				retryCount++
+				err := client.Publish(ctx, b)
+				assert.NoError(t, err, "Publish shouldn't return an error")
+			},
+			func() { done = true },
+		)
+		err = client.Publish(ctx, batch)
+		assert.NoError(t, err, "Publish shouldn't return an error")
+
+		// For three events there should be four retries in total:
+		// {[event1], [event2, event3]}, then {[event2], [event3]}.
+		// "done" should be true because after splitting into individual
+		// events, all 3 will fail and be dropped.
+		assert.Equal(t, 4, retryCount, "three-event batch should produce four total retries")
+		assert.True(t, done, "batch should be done after Publish")
+
+		// "batch" adds up all events passed into publish, including repeats,
+		// so it should be 3 + 2 + 1 + 1 + 1 = 8
+		expectedObserver := &TestObserver{split: 2, dropped: 3, batch: 8}
+		require.Equal(t, expectedObserver, observer)
+	})
+
+	t.Run("live batches where only one event is too large to ingest", func(t *testing.T) {
+		// This tests retry using live `ttlBatch` structs instead of mocks,
+		// where one event is too large too ingest but the others are ok.
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		errCallback := func(batchEvents []*messages.Event) error {
+			// Treat only the first event (which contains the metadata
+			// string "first") as too large to ingest, and accept otherwise.
+			for _, e := range batchEvents {
+				if strings.Contains(e.String(), "\"first\"") {
+					return status.Error(codes.ResourceExhausted, "rpc size limit exceeded")
+				}
+			}
+			return nil
+		}
+		addr, _, stop := runServer(t, 9, errCallback, "localhost:0")
+		defer stop()
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server": addr,
+		})
+		require.NoError(t, err)
+		observer := &TestObserver{}
+
+		client := createShipperClient(t, cfg, observer)
+
+		// Since we retry directly instead of going through a live pipeline,
+		// the Publish call is synchronous and we can track state by modifying
+		// local variables directly.
+		retryCount := 0
+		done := false
+		batch := pipeline.NewBatchForTesting(
+			[]publisher.Event{
+				{Content: events[0]}, {Content: events[1]}, {Content: events[2]},
+			},
+			func(b publisher.Batch) {
+				// Retry by sending directly back to Publish. In a live
+				// pipeline, this would be sent through eventConsumer first
+				// before calling Publish on the next free output worker.
+				retryCount++
+				err := client.Publish(ctx, b)
+				assert.NoError(t, err, "Publish shouldn't return an error")
+			},
+			func() { done = true },
+		)
+		err = client.Publish(ctx, batch)
+		assert.NoError(t, err, "Publish shouldn't return an error")
+
+		// Only the first event is too large -- it will be retried by
+		// itself and the other batch will succeed, so retryCount should
+		// be 2.
+		// "done" should be false because the shipper output doesn't call done
+		// until upstream ingestion is confirmed via PersistedIndex.
+		assert.Equal(t, 2, retryCount, "three-event batch should produce four total retries")
+		assert.False(t, done, "batch should be acknowledged after Publish")
+
+		// "batch" adds up all events passed into publish, including repeats,
+		// so it should be 3 + 1 + 2 = 6
+		expectedObserver := &TestObserver{split: 1, dropped: 1, batch: 6}
 		require.Equal(t, expectedObserver, observer)
 	})
 }
