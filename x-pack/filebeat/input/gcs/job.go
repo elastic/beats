@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 	"unicode"
 
@@ -27,6 +28,8 @@ import (
 )
 
 type job struct {
+	// Mutex lock for concurrent publishes
+	mu sync.Mutex
 	// gcs bucket handle
 	bucket *storage.BucketHandle
 	// gcs object attribute struct
@@ -107,9 +110,12 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		event.SetID(objectID(j.hash, 0))
 		j.state.save(j.object.Name, j.object.Updated)
+		// locks while data is being published to avoid concurrent map read/writes
+		j.mu.Lock()
 		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		j.mu.Unlock()
 	}
 }
 
@@ -217,9 +223,12 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			// partially saves read state using offset
 			j.state.savePartial(j.object.Name, offset+relativeOffset)
 		}
+		// locks while data is being published to avoid concurrent map read/writes
+		j.mu.Lock()
 		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		j.mu.Unlock()
 	}
 	return nil
 }
