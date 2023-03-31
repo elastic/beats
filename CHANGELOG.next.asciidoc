@@ -60,6 +60,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix panics when a processor is closed twice {pull}34647[34647]
 - Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
 
 *Auditbeat*
 
@@ -99,6 +101,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 
 *Heartbeat*
 
@@ -157,6 +161,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 - Make generic SQL GA {pull}34637[34637]
+- Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
 
 
 *Osquerybeat*

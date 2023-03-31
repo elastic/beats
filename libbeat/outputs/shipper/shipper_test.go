@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/shipper/api"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
@@ -143,22 +144,18 @@ func TestToShipperEvent(t *testing.T) {
 }
 
 func TestPublish(t *testing.T) {
-	//logp.DevelopmentSetup()
 	events := []beat.Event{
 		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{"event": "first"},
-			Fields:    mapstr.M{"a": "b"},
+			Meta:   mapstr.M{"event": "first"},
+			Fields: mapstr.M{"a": "b"},
 		},
 		{
-			Timestamp: time.Now(),
-			Meta:      nil, // see failMarshal()
-			Fields:    mapstr.M{"a": "b"},
+			Meta:   nil, // see failMarshal()
+			Fields: mapstr.M{"a": "b"},
 		},
 		{
-			Timestamp: time.Now(),
-			Meta:      mapstr.M{"event": "third"},
-			Fields:    mapstr.M{"e": "f"},
+			Meta:   mapstr.M{"event": "third"},
+			Fields: mapstr.M{"e": "f"},
 		},
 	}
 
@@ -179,9 +176,7 @@ func TestPublish(t *testing.T) {
 			events:        events,
 			marshalMethod: toShipperEvent,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchACK,
-				},
+				{Tag: outest.BatchACK},
 			},
 			qSize:            3,
 			observerExpected: &TestObserver{batch: 3, acked: 3},
@@ -190,9 +185,7 @@ func TestPublish(t *testing.T) {
 			name:   "retries not accepted events",
 			events: events,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchACK,
-				},
+				{Tag: outest.BatchACK},
 			},
 			marshalMethod:    failMarshal, // emulate a dropped event
 			qSize:            3,
@@ -202,9 +195,7 @@ func TestPublish(t *testing.T) {
 			name:   "cancels the batch if server error",
 			events: events,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchCancelled,
-				},
+				{Tag: outest.BatchCancelled},
 			},
 			marshalMethod:    toShipperEvent,
 			qSize:            3,
@@ -213,16 +204,26 @@ func TestPublish(t *testing.T) {
 			expError:         "failed to publish the batch to the shipper, none of the 3 events were accepted",
 		},
 		{
-			name:   "drops the batch on resource exceeded error",
+			name:   "splits the batch on resource exceeded error",
 			events: events,
 			expSignals: []outest.BatchSignal{
-				{
-					Tag: outest.BatchDrop,
-				},
+				{Tag: outest.BatchSplitRetry},
 			},
 			marshalMethod:    toShipperEvent,
 			qSize:            3,
-			observerExpected: &TestObserver{batch: 3, dropped: 3},
+			observerExpected: &TestObserver{batch: 3, split: 1},
+			serverError:      status.Error(codes.ResourceExhausted, "rpc size limit exceeded"),
+		},
+		{
+			name:   "drops an unsplittable batch on resource exceeded error",
+			events: events[:1], // only 1 event so SplitRetry returns false
+			expSignals: []outest.BatchSignal{
+				{Tag: outest.BatchSplitRetry},
+				{Tag: outest.BatchDrop},
+			},
+			marshalMethod:    toShipperEvent,
+			qSize:            1,
+			observerExpected: &TestObserver{batch: 1, dropped: 1},
 			serverError:      status.Error(codes.ResourceExhausted, "rpc size limit exceeded"),
 		},
 	}
@@ -238,7 +239,8 @@ func TestPublish(t *testing.T) {
 			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()
 
-			addr, producer, stop := runServer(t, tc.qSize, tc.serverError, "localhost:0")
+			addr, producer, stop := runServer(
+				t, tc.qSize, constErrorCallback(tc.serverError), "localhost:0")
 			defer stop()
 
 			cfg, err := config.NewConfigFrom(map[string]interface{}{
@@ -372,6 +374,119 @@ func TestPublish(t *testing.T) {
 		require.Equal(t, expSignals, batch3.Signals, "batch3")
 		require.Equal(t, expectedObserver, observer)
 	})
+
+	t.Run("live batches where all events are too large to ingest", func(t *testing.T) {
+		// This tests recursive retry using live `ttlBatch` structs instead of mocks
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		errCallback := constErrorCallback(status.Error(codes.ResourceExhausted, "rpc size limit exceeded"))
+		addr, _, stop := runServer(t, 9, errCallback, "localhost:0")
+		defer stop()
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server": addr,
+		})
+		require.NoError(t, err)
+		observer := &TestObserver{}
+
+		client := createShipperClient(t, cfg, observer)
+
+		// Since we retry directly instead of going through a live pipeline,
+		// the Publish call is synchronous and we can track state by modifying
+		// local variables directly.
+		retryCount := 0
+		done := false
+		batch := pipeline.NewBatchForTesting(
+			[]publisher.Event{
+				{Content: events[0]}, {Content: events[1]}, {Content: events[2]},
+			},
+			func(b publisher.Batch) {
+				// Retry by sending directly back to Publish. In a live
+				// pipeline, this would be sent through eventConsumer first
+				// before calling Publish on the next free output worker.
+				retryCount++
+				err := client.Publish(ctx, b)
+				assert.NoError(t, err, "Publish shouldn't return an error")
+			},
+			func() { done = true },
+		)
+		err = client.Publish(ctx, batch)
+		assert.NoError(t, err, "Publish shouldn't return an error")
+
+		// For three events there should be four retries in total:
+		// {[event1], [event2, event3]}, then {[event2], [event3]}.
+		// "done" should be true because after splitting into individual
+		// events, all 3 will fail and be dropped.
+		assert.Equal(t, 4, retryCount, "three-event batch should produce four total retries")
+		assert.True(t, done, "batch should be done after Publish")
+
+		// "batch" adds up all events passed into publish, including repeats,
+		// so it should be 3 + 2 + 1 + 1 + 1 = 8
+		expectedObserver := &TestObserver{split: 2, dropped: 3, batch: 8}
+		require.Equal(t, expectedObserver, observer)
+	})
+
+	t.Run("live batches where only one event is too large to ingest", func(t *testing.T) {
+		// This tests retry using live `ttlBatch` structs instead of mocks,
+		// where one event is too large too ingest but the others are ok.
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		errCallback := func(batchEvents []*messages.Event) error {
+			// Treat only the first event (which contains the metadata
+			// string "first") as too large to ingest, and accept otherwise.
+			for _, e := range batchEvents {
+				if strings.Contains(e.String(), "\"first\"") {
+					return status.Error(codes.ResourceExhausted, "rpc size limit exceeded")
+				}
+			}
+			return nil
+		}
+		addr, _, stop := runServer(t, 9, errCallback, "localhost:0")
+		defer stop()
+		cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"server": addr,
+		})
+		require.NoError(t, err)
+		observer := &TestObserver{}
+
+		client := createShipperClient(t, cfg, observer)
+
+		// Since we retry directly instead of going through a live pipeline,
+		// the Publish call is synchronous and we can track state by modifying
+		// local variables directly.
+		retryCount := 0
+		done := false
+		batch := pipeline.NewBatchForTesting(
+			[]publisher.Event{
+				{Content: events[0]}, {Content: events[1]}, {Content: events[2]},
+			},
+			func(b publisher.Batch) {
+				// Retry by sending directly back to Publish. In a live
+				// pipeline, this would be sent through eventConsumer first
+				// before calling Publish on the next free output worker.
+				retryCount++
+				err := client.Publish(ctx, b)
+				assert.NoError(t, err, "Publish shouldn't return an error")
+			},
+			func() { done = true },
+		)
+		err = client.Publish(ctx, batch)
+		assert.NoError(t, err, "Publish shouldn't return an error")
+
+		// Only the first event is too large -- it will be retried by
+		// itself and the other batch will succeed, so retryCount should
+		// be 2.
+		// "done" should be false because the shipper output doesn't call done
+		// until upstream ingestion is confirmed via PersistedIndex.
+		assert.Equal(t, 2, retryCount, "three-event batch should produce four total retries")
+		assert.False(t, done, "batch should be acknowledged after Publish")
+
+		// "batch" adds up all events passed into publish, including repeats,
+		// so it should be 3 + 1 + 2 = 6
+		expectedObserver := &TestObserver{split: 1, dropped: 1, batch: 6}
+		require.Equal(t, expectedObserver, observer)
+	})
 }
 
 // BenchmarkToShipperEvent is used to detect performance regression when the conversion function is changed.
@@ -429,9 +544,14 @@ func BenchmarkToShipperEvent(b *testing.B) {
 // `err` is a preset error that the server will serve to the client
 // `listenAddr` is the address for the server to listen
 // returns `actualAddr` where the listener actually is and the `stop` function to stop the server
-func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAddr string, mock *api.ProducerMock, stop func()) {
+func runServer(
+	t *testing.T,
+	qSize int,
+	errCallback func([]*messages.Event) error,
+	listenAddr string,
+) (actualAddr string, mock *api.ProducerMock, stop func()) {
 	producer := api.NewProducerMock(qSize)
-	producer.Error = err
+	producer.ErrorCallback = errCallback
 	grpcServer := grpc.NewServer()
 	pb.RegisterProducerServer(grpcServer, producer)
 
@@ -448,6 +568,12 @@ func runServer(t *testing.T, qSize int, err error, listenAddr string) (actualAdd
 	}
 
 	return actualAddr, producer, stop
+}
+
+func constErrorCallback(err error) func([]*messages.Event) error {
+	return func(_ []*messages.Event) error {
+		return err
+	}
 }
 
 func createShipperClient(t *testing.T, cfg *config.C, observer outputs.Observer) outputs.NetworkClient {
@@ -499,6 +625,7 @@ type TestObserver struct {
 	batch     int
 	duplicate int
 	failed    int
+	split     int
 
 	writeError error
 	readError  error
@@ -515,6 +642,7 @@ func (to *TestObserver) Duplicate(duplicate int) { to.duplicate += duplicate }
 func (to *TestObserver) Failed(failed int)       { to.failed += failed }
 func (to *TestObserver) Dropped(dropped int)     { to.dropped += dropped }
 func (to *TestObserver) Cancelled(cancelled int) { to.cancelled += cancelled }
+func (to *TestObserver) Split()                  { to.split++ }
 func (to *TestObserver) WriteError(we error)     { to.writeError = we }
 func (to *TestObserver) WriteBytes(wb int)       { to.writeBytes += wb }
 func (to *TestObserver) ReadError(re error)      { to.readError = re }

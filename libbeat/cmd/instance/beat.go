@@ -244,12 +244,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, err
 	}
 
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get host information: %w", err)
-	}
-	fqdn := h.Info().FQDN
-
 	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
@@ -268,7 +262,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Version:         v,
 			Name:            hostname,
 			Hostname:        hostname,
-			FQDN:            fqdn,
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
@@ -336,7 +329,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
-	b.checkElasticsearchVersion()
+	err = b.registerESVersionCheckCallback()
+	if err != nil {
+		return nil, err
+	}
 
 	err = b.registerESIndexManagement()
 	if err != nil {
@@ -595,7 +591,7 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 
 	// state.host
 	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(useFQDN), monitoring.Report)
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -796,8 +792,24 @@ func (b *Beat) configure(settings Settings) error {
 
 	logp.Info("Beat ID: %v", b.Info.ID)
 
+	// Try to get the host's FQDN and set it.
+	h, err := sysinfo.Host()
+	if err != nil {
+		return fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	fqdn, err := h.FQDN()
+	if err != nil {
+		// FQDN lookup is "best effort".  We log the error, fallback to
+		// the OS-reported hostname, and move on.
+		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		b.Info.FQDN = b.Info.Hostname
+	} else {
+		b.Info.FQDN = fqdn
+	}
+
 	// initialize config manager
-	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
+	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
 		return err
 	}
@@ -972,15 +984,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
-// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// registerESVersionCheckCallback registers a global callback to make sure ES instance we are connecting
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
-func (b *Beat) checkElasticsearchVersion() {
-	if b.isConnectionToOlderVersionAllowed() {
-		return
-	}
+func (b *Beat) registerESVersionCheckCallback() error {
+	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		if !isElasticsearchOutput(b.Config.Output.Name()) {
+			return errors.New("Elasticsearch output is not configured")
+		}
+		if b.isConnectionToOlderVersionAllowed() {
+			return nil
+		}
 
-	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
@@ -991,6 +1006,8 @@ func (b *Beat) checkElasticsearchVersion() {
 		}
 		return nil
 	})
+
+	return err
 }
 
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
@@ -1026,13 +1043,28 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 }
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
-	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
+		if update == nil {
+			return nil
+		}
+
 		if b.OutputConfigReloader != nil {
-			if err := b.OutputConfigReloader.Reload(config); err != nil {
+			if err := b.OutputConfigReloader.Reload(update); err != nil {
 				return err
 			}
 		}
-		return outReloader.Reload(config, b.createOutput)
+
+		// we need to update the output configuration because
+		// some callbacks are relying on it to be up to date.
+		// e.g. the Elasticsearch version validation
+		if update.Config != nil {
+			err := b.Config.Output.Unpack(update.Config)
+			if err != nil {
+				return err
+			}
+		}
+
+		return outReloader.Reload(update, b.createOutput)
 	})
 }
 

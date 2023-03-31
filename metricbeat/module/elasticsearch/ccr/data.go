@@ -34,6 +34,7 @@ import (
 
 var (
 	schema = s.Schema{
+		"remote_cluster": c.Str("remote_cluster"),
 		"leader": s.Object{
 			"index":             c.Str("leader_index"),
 			"max_seq_no":        c.Int("leader_max_seq_no"),
