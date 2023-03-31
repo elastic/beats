@@ -20,7 +20,7 @@ import (
 
 // Requires the Google flatbuffer compiler and Elastic go-licenser.
 //go:generate flatc --go schema.fbs
-//go:generate go-licenser schema
+//go:generate go-licenser -license=Elastic schema
 
 var bufferPool sync.Pool
 
@@ -39,8 +39,8 @@ func fbGetBuilder() (b *flatbuffers.Builder, put func()) {
 	return b, func() { bufferPool.Put(b) }
 }
 
-// encodePackages, encodes an array of packages by creating a vector of packages and tracking offsets. It uses the
-// func fbEncodePackage to encode individual packages, and returns a []byte containing the encoded data
+// encodePackages encodes an array of packages by creating a vector of packages and tracking offsets. It uses the
+// func fbEncodePackage to encode individual packages, and returns a []byte containing the encoded data.
 func encodePackages(builder *flatbuffers.Builder, packages []*Package) []byte {
 	offsets := make([]flatbuffers.UOffsetT, len(packages))
 
@@ -74,8 +74,7 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 		return 0
 	}
 
-	var (
-		packageNameOffset,
+	var packageNameOffset,
 		packageVersionOffset,
 		packageReleaseOffset,
 		packageArchOffset,
@@ -84,7 +83,6 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 		packageURLOffset,
 		packageTypeOffset,
 		packageErrorOffset flatbuffers.UOffsetT
-	)
 
 	if p.Name != "" {
 		packageNameOffset = b.CreateString(p.Name)
@@ -149,8 +147,8 @@ func fbWritePackage(b *flatbuffers.Builder, p *Package) flatbuffers.UOffsetT {
 	return schema.PackageEnd(b)
 }
 
-// decodePackagesFromContainer, accepts a flatbuffer encoded byte slice, and decodes
-// each package from the container vector with the help of he func fbDecodePackage.
+// decodePackagesFromContainer accepts a flatbuffer encoded byte slice, and decodes
+// each package from the container vector with the help of fbDecodePackage.
 // It returns an array of package objects.
 func decodePackagesFromContainer(data []byte) ([]*Package, error) {
 	var packages []*Package
@@ -189,5 +187,4 @@ func fbDecodePackage(p *schema.Package) *Package {
 		Type:        string(p.Type()),
 		error:       err,
 	}
-
 }

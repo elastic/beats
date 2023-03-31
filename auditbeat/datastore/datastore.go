@@ -46,10 +46,10 @@ func OpenBucket(name string) (Bucket, error) {
 	return ds.OpenBucket(name)
 }
 
-// BucketExists returns a new Bucket if it already exists but does not create a new one.
-// The returned Bucket must be closed when finished to ensure all resources
-// are released.
-func BucketExists(name string) (Bucket, error) {
+// Update executes a function within the context of a read-write managed transaction.
+// If no error is returned from the function then the transaction is committed. If an
+// error is returned then the entire transaction is rolled back.
+func Update(fn func(tx *bolt.Tx) error) error {
 	initDatastoreOnce.Do(func() {
 		ds = &boltDatastore{
 			path: paths.Resolve(paths.Data, "beat.db"),
@@ -57,27 +57,14 @@ func BucketExists(name string) (Bucket, error) {
 		}
 	})
 
-	return ds.BucketExists(name)
-}
-
-// DeleteBucket deletes an existing bucket
-func DeleteBucket(name string) error {
-	initDatastoreOnce.Do(func() {
-		ds = &boltDatastore{
-			path: paths.Resolve(paths.Data, "beat.db"),
-			mode: 0o600,
-		}
-	})
-
-	return ds.DeleteBucket(name)
+	return ds.Update(fn)
 }
 
 // Datastore
 
 type Datastore interface {
 	OpenBucket(name string) (Bucket, error)
-	BucketExists(name string) (Bucket, error)
-	DeleteBucket(name string) error
+	Update(fn func(tx *bolt.Tx) error) error
 }
 
 type boltDatastore struct {
@@ -95,14 +82,8 @@ func New(path string, mode os.FileMode) Datastore {
 func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 	ds.mutex.Lock()
 	defer ds.mutex.Unlock()
-
-	// Initialize the Bolt DB.
-	if ds.db == nil {
-		var err error
-		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
-		if err != nil {
-			return nil, err
-		}
+	if err := ds.init(); err != nil {
+		return nil, err
 	}
 
 	// Ensure the name exists.
@@ -117,68 +98,29 @@ func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 	return &boltBucket{ds, bucket}, nil
 }
 
-// BucketExists, checks if a bucket exists in the given database
-// and if true returns a handle to it.
-func (ds *boltDatastore) BucketExists(bucket string) (Bucket, error) {
+// Update executes a function within the context of a read-write managed transaction.
+// If no error is returned from the function then the transaction is committed. If an
+// error is returned then the entire transaction is rolled back.
+func (ds *boltDatastore) Update(fn func(tx *bolt.Tx) error) error {
 	ds.mutex.Lock()
 	defer ds.mutex.Unlock()
-
-	// Initialize the Bolt DB.
-	if ds.db == nil {
-		var err error
-		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var bucketExists bool
-	err := ds.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(bucket))
-		if bucket != nil {
-			bucketExists = true
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if !bucketExists {
-		return nil, nil
-	}
-
-	return &boltBucket{ds, bucket}, nil
-}
-
-// DeleteBucket, deletes the given bucket
-func (ds *boltDatastore) DeleteBucket(name string) error {
-	ds.mutex.Lock()
-	defer ds.mutex.Unlock()
-
-	// Initialize the Bolt DB.
-	if ds.db == nil {
-		var err error
-		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
-		if err != nil {
-			return err
-		}
-	}
-
-	err := ds.db.Update(func(tx *bolt.Tx) error {
-		err := tx.DeleteBucket([]byte(name))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	if err != nil {
+	if err := ds.init(); err != nil {
 		return err
 	}
 
+	return ds.db.Update(fn)
+}
+
+// init initializes the backing data store if it is not already open.
+// Callers should hold the datastore mutex.
+func (ds *boltDatastore) init() error {
+	if ds.db == nil {
+		var err error
+		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

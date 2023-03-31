@@ -93,13 +93,15 @@ func TestPoolPoison(t *testing.T) {
 		go poolPoison(input[i%2], t, &wg)
 	}
 	wg.Wait()
-
 }
 
 func poolPoison(p []*Package, t *testing.T, wg *sync.WaitGroup) {
+	builder, release := fbGetBuilder()
+	defer release()
+
 	for k := 0; k < 1000; k++ {
-		builder, release := fbGetBuilder()
-		defer release()
+		builder.Reset()
+
 		data := encodePackages(builder, p)
 
 		out, err := decodePackagesFromContainer(data)

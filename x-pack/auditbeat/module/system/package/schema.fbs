@@ -1,6 +1,6 @@
 namespace schema;
 
- table Package  {
+table Package  {
 	name:string;
 	version:string;
 	release:string;
