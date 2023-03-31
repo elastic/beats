@@ -48,8 +48,20 @@ func (m *beatService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 
 	log := logp.NewLogger("service_windows")
+	combinedChan := make(chan svc.ChangeRequest)
+	go func() {
+		select {
+		case c := <-r:
+			combinedChan <- c
+		case <-m.done:
+			// exits consumption loop on termination and reports stopping
+			combinedChan <- svc.ChangeRequest{Cmd: svc.Shutdown}
+			return
+		}
+	}()
+
 loop:
-	for c := range r {
+	for c := range combinedChan {
 		switch c.Cmd {
 		case svc.Interrogate:
 			changes <- c.CurrentStatus
@@ -70,7 +82,10 @@ loop:
 			log.Errorf("Unexpected control request: $%d. Ignored.", c)
 		}
 	}
-	changes <- svc.Status{State: svc.StopPending}
+
+	trySendState(svc.StopPending, changes)
+	defer trySendState(svc.Stopped, changes)
+
 	log.Info("changed windows service state to svc.StopPending, invoking stopCallback")
 	m.stopCallback()
 
@@ -80,6 +95,13 @@ loop:
 	<-m.done
 	log.Debug("windows service state changed to svc.Stopped")
 	return ssec, errno
+}
+
+func trySendState(s svc.State, changes chan<- svc.Status) {
+	select {
+	case changes <- svc.Status{State: s}:
+	case <-time.After(500 * time.Millisecond): // should never happen, but don't make this blocking
+	}
 }
 
 func (m *beatService) stop() {
