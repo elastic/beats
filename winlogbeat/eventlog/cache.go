@@ -93,8 +93,10 @@ func newMessageFilesCache(eventLogName string, loader messageFileLoaderFunc,
 // Callers should check the MessageFiles.Err value to see if an error occurred
 // while loading the message files.
 func (hc *messageFilesCache) get(sourceName string) sys.MessageFiles {
+	debugf("messageFilesCache[%s] get: %s", hc.eventLogName, sourceName)
 	v := hc.cache.Get(sourceName)
 	if v == nil {
+		debugf("messageFilesCache[%s] miss: %s", hc.eventLogName, sourceName)
 		hc.miss()
 
 		// Handle to event message file for sourceName is not cached. Attempt
@@ -119,6 +121,7 @@ func (hc *messageFilesCache) get(sourceName string) sys.MessageFiles {
 	}
 
 	messageFiles, _ := v.(sys.MessageFiles)
+	debugf("messageFilesCache[%s] return: %+v", hc.eventLogName, messageFiles)
 	return messageFiles
 }
 

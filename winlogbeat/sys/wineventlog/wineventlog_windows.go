@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Errors
@@ -254,22 +255,29 @@ func RenderEvent(
 	return err
 }
 
+var debugf = logp.MakeDebug("wineventlog")
+
 // Message reads the event data associated with the EvtHandle and renders
 // and returns the message only.
 func Message(h EvtHandle, buf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
+	debugf("render message called for event handle: %v", h)
 	providerName, err := evtRenderProviderName(buf, h)
+	debugf("render message called for event handle: %v -> (%s, %v)", h, providerName, err)
 	if err != nil {
 		return "", err
 	}
 
 	var pub EvtHandle
 	if pubHandleProvider != nil {
+		debugf("getting message files for %s", providerName)
 		messageFiles := pubHandleProvider(providerName)
+		debugf("message files for %s: %+v", providerName, messageFiles)
 		if messageFiles.Err == nil {
 			// There is only ever a single handle when using the Windows Event
 			// Log API.
 			pub = EvtHandle(messageFiles.Handles[0].Handle)
 		}
+		debugf("publisher handle: %v", pub)
 	}
 	return getMessageStringFromHandle(&PublisherMetadata{Handle: pub}, h, nil)
 }

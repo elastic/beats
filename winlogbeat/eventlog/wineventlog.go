@@ -330,6 +330,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
 		if r.Message == "" && l.message != nil {
+			debugf("attempting to salvage message: %+v (renderinfo details: keywords == nil: %t)", r, r.Event.Keywords == nil)
 			r.Message, err = l.message(h)
 			if err != nil {
 				logp.Err("%s error salvaging message: %v", l.logPrefix, err)
