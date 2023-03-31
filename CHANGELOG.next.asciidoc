@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Filebeat*
+[Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 
 *Heartbeat*
 
