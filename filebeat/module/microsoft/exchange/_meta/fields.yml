@@ -1,0 +1,59 @@
+- name: exchange
+  type: group
+  description: >
+    Fields from the Exchange log files.
+  fields:
+    - name: client_hostname
+      type: keyword
+    - name: client_ip
+      type: ip
+    - name: connector_id
+      type: keyword
+    - name: custom_data
+      type: text
+    - name: directionality
+      type: keyword
+    - name: event_id
+      type: keyword
+    - name: internal_message_id
+      type: text
+    - name: logdate
+      type: text
+    - name: message_id
+      type: text
+    - name: message_info
+      type: text
+    - name: message_subject
+      type: text
+    - name: network_message_id
+      type: text
+    - name: original_client_ip
+      type: ip
+    - name: original_server_ip
+      type: ip
+    - name: recipient_address
+      type: keyword
+    - name: recipient_count
+      type: integer
+    - name: recipient_status
+      type: text
+    - name: reference
+      type: text
+    - name: related_recipient_address
+      type: keyword
+    - name: return_path
+      type: keyword
+    - name: sender_address
+      type: keyword
+    - name: server_hostname
+      type: keyword
+    - name: server_ip
+      type: ip
+    - name: source
+      type: keyword
+    - name: source_context
+      type: text
+    - name: tenant_id
+      type: text
+    - name: total_bytes
+      type: long

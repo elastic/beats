@@ -58,6 +58,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-lumberjack>>
 * <<exported-fields-microsoft>>
+* <<exported-fields-microsoft>>
 * <<exported-fields-misp>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
@@ -87601,6 +87602,220 @@ Structured data received in an event sent over the Lumberjack protocol.
 
 type: flattened
 
+--
+
+[[exported-fields-microsoft]]
+== microsoft fields
+
+microsoft Module
+
+
+
+[float]
+=== microsoft
+
+
+
+
+[float]
+=== exchange
+
+Fields from the Exchange log files.
+
+
+
+*`microsoft.exchange.client_hostname`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.client_ip`*::
++
+--
+type: ip
+
+--
+
+*`microsoft.exchange.connector_id`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.custom_data`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.directionality`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.event_id`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.internal_message_id`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.logdate`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.message_id`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.message_info`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.message_subject`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.network_message_id`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.original_client_ip`*::
++
+--
+type: ip
+
+--
+
+*`microsoft.exchange.original_server_ip`*::
++
+--
+type: ip
+
+--
+
+*`microsoft.exchange.recipient_address`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.recipient_count`*::
++
+--
+type: integer
+
+--
+
+*`microsoft.exchange.recipient_status`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.reference`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.related_recipient_address`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.return_path`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.sender_address`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.server_hostname`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.server_ip`*::
++
+--
+type: ip
+
+--
+
+*`microsoft.exchange.source`*::
++
+--
+type: keyword
+
+--
+
+*`microsoft.exchange.source_context`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.tenant_id`*::
++
+--
+type: text
+
+--
+
+*`microsoft.exchange.total_bytes`*::
++
+--
+type: long
+
+--
+
+*`microsoft.exchange.timestamp`*::
++
+--
 --
 
 [[exported-fields-microsoft]]

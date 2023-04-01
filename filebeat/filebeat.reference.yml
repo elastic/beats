@@ -237,6 +237,16 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------ Microsoft Module ------------------------------
+- module: microsoft
+  # All logs
+  exchange:
+    enabled: false
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
   # Logs

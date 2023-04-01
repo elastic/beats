@@ -36,6 +36,7 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/module/kafka"
 	_ "github.com/elastic/beats/v7/filebeat/module/kibana"
 	_ "github.com/elastic/beats/v7/filebeat/module/logstash"
+	_ "github.com/elastic/beats/v7/filebeat/module/microsoft"
 	_ "github.com/elastic/beats/v7/filebeat/module/mongodb"
 	_ "github.com/elastic/beats/v7/filebeat/module/mysql"
 	_ "github.com/elastic/beats/v7/filebeat/module/nats"

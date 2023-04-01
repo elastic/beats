@@ -1,0 +1,195 @@
+{
+  "description": "Pipeline for parsing microsoft exchange logs",
+  "processors": [
+  {
+    "set": {
+      "value": "{{_ingest.timestamp}}",
+      "field": "event.ingested"
+    }
+  },
+  {
+    "csv": {
+      "field": "message",
+      "target_fields": [
+        "microsoft.exchange.logdate",
+        "microsoft.exchange.client_ip",
+        "microsoft.exchange.client_hostname",
+        "microsoft.exchange.server_ip",
+        "microsoft.exchange.server_hostname",
+        "microsoft.exchange.source_context",
+        "microsoft.exchange.connector_id",
+        "microsoft.exchange.source",
+        "microsoft.exchange.event_id",
+        "microsoft.exchange.internal_message_id",
+        "microsoft.exchange.message_id",
+        "microsoft.exchange.network_message_id",
+        "microsoft.exchange.recipient_address",
+        "microsoft.exchange.recipient_status",
+        "microsoft.exchange.total_bytes",
+        "microsoft.exchange.recipient_count",
+        "microsoft.exchange.related_recipient_address",
+        "microsoft.exchange.reference",
+        "microsoft.exchange.message_subject",
+        "microsoft.exchange.sender_address",
+        "microsoft.exchange.return_path",
+        "microsoft.exchange.message_info",
+        "microsoft.exchange.directionality",
+        "microsoft.exchange.tenant_id",
+        "microsoft.exchange.original_client_ip",
+        "microsoft.exchange.original_server_ip",
+        "microsoft.exchange.custom_data"
+      ]
+    }
+  },
+  {
+    "date": {
+      "field": "microsoft.exchange.logdate",
+      "formats": [
+        "ISO8601"
+      ],
+      "if": "ctx.event.timezone == null",
+      "on_failure": [
+        {
+          "append": {
+            "field": "error.message",
+            "value": [
+              "{{ _ingest.on_failure_message }}"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "date": {
+      "field": "microsoft.exchange.logdate",
+      "formats": [
+        "ISO8601"
+      ],
+      "timezone": "{{ event.timezone }}",
+      "if": "ctx.event.timezone != null",
+      "on_failure": [
+        {
+          "append": {
+            "field": "error.message",
+            "value": [
+              "{{ _ingest.on_failure_message }}"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "append": {
+      "field": "related.ip",
+      "value": "{{microsoft.exchange.client_ip}}",
+      "allow_duplicates": false,
+      "if": "ctx?.microsoft?.exchange?.client_ip != null"
+    }
+  },
+  {
+    "append": {
+      "field": "related.ip",
+      "value": "{{microsoft.exchange.original_client_ip}}",
+      "allow_duplicates": false,
+      "if": "ctx?.microsoft?.exchange?.original_client_ip != null"
+    }
+  },
+  {
+    "append": {
+      "field": "related.ip",
+      "value": "{{microsoft.exchange.server_ip}}",
+      "allow_duplicates": false,
+      "if": "ctx?.microsoft?.exchange?.server_ip != null"
+    }
+  },
+  {
+    "append": {
+      "field": "related.ip",
+      "value": "{{microsoft.exchange.server_ip}}",
+      "allow_duplicates": false,
+      "if": "ctx?.microsoft?.exchange?.original_server_ip != null"
+    }
+  },
+  {
+    "set": {
+      "field": "source.ip",
+      "copy_from": "microsoft.exchange.client_ip",
+      "if": "ctx.microsoft?.exchange?.client_ip != null"
+    }
+  },
+  {
+    "set": {
+      "field": "destination.ip",
+      "copy_from": "microsoft.exchange.server_ip",
+      "if": "ctx.microsoft?.exchange?.server_ip != null"
+    }
+  },
+  {
+    "geoip": {
+      "target_field": "source.as",
+      "properties": [
+        "asn",
+        "organization_name"
+      ],
+      "ignore_missing": true,
+      "database_file": "GeoLite2-ASN.mmdb",
+      "field": "source.ip"
+    }
+  },
+  {
+    "rename": {
+      "target_field": "source.as.number",
+      "ignore_missing": true,
+      "field": "source.as.asn"
+    }
+  },
+  {
+    "rename": {
+      "field": "source.as.organization_name",
+      "target_field": "source.as.organization.name",
+      "ignore_missing": true
+    }
+  },
+  {
+    "geoip": {
+      "field": "destination.ip",
+      "target_field": "destination.geo",
+      "ignore_missing": true
+    }
+  },
+  {
+    "geoip": {
+      "target_field": "destination.as",
+      "properties": [
+        "asn",
+        "organization_name"
+      ],
+      "ignore_missing": true,
+      "database_file": "GeoLite2-ASN.mmdb",
+      "field": "destination.ip"
+    }
+  },
+  {
+    "rename": {
+      "target_field": "destination.as.number",
+      "ignore_missing": true,
+      "field": "destination.as.asn"
+    }
+  },
+  {
+    "rename": {
+      "field": "destination.as.organization_name",
+      "target_field": "destination.as.organization.name",
+      "ignore_missing": true
+    }
+  }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

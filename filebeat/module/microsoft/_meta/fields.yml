@@ -1,0 +1,9 @@
+- key: microsoft
+  title: "microsoft"
+  description: >
+    microsoft Module
+  fields:
+    - name: microsoft
+      type: group
+      description: >
+      fields:

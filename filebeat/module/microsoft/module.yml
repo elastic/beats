@@ -1,0 +1,3 @@
+dashboards:
+- id: Filebeat-microsoft-exchange-Dashboard
+  file: Filebeat-microsoft-exchange.json
