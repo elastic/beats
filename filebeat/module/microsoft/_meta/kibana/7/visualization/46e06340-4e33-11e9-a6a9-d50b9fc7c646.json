@@ -1,0 +1,28 @@
+{
+  "attributes": {
+    "description": "",
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[]}"
+    },
+    "savedSearchRefName": "search_0",
+    "title": "[STC] Exchange - Count messages by type",
+    "uiStateJSON": "{}",
+    "version": 1,
+    "visState": "{\"title\":\"[STC] Exchange - Count messages by type\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{\"customLabel\":\"\"},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"filters\",\"params\":{\"filters\":[{\"input\":{\"query\":\"microsoft.exchange.event_id: \\\"SEND\\\" AND microsoft.exchange.connector_id: \\\"Intra-Organization SMTP Send Connector\\\" AND microsoft.exchange.directionality: \\\"Incoming\\\"\",\"language\":\"lucene\"},\"label\":\"Messages Sent\"},{\"input\":{\"query\":\"microsoft.exchange.event_id: \\\"SEND\\\" AND microsoft.exchange.connector_id: \\\"Intra-Organization SMTP Send Connector\\\" AND microsoft.exchange.directionality: \\\"Originating\\\"\",\"language\":\"lucene\"},\"label\":\"Messages Sent (Internal)\"},{\"input\":{\"query\":\"microsoft.exchange.event_id: \\\"DELIVER\\\" AND microsoft.exchange.directionality: \\\"Incoming\\\"\",\"language\":\"lucene\"},\"label\":\"Messages Received\"},{\"input\":{\"query\":\"microsoft.exchange.event_id: \\\"DELIVER\\\" AND microsoft.exchange.directionality: \\\"Originating\\\"\",\"language\":\"lucene\"},\"label\":\"Messages Received (Internal)\"},{\"input\":{\"query\":\"\",\"language\":\"kuery\"},\"label\":\"Total\"}]},\"schema\":\"group\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":60,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"}}"
+  },
+  "coreMigrationVersion": "8.5.0",
+  "id": "46e06340-4e33-11e9-a6a9-d50b9fc7c646",
+  "migrationVersion": {
+    "visualization": "8.5.0"
+  },
+  "references": [
+    {
+      "id": "9205dc30-4e18-11e9-a6a9-d50b9fc7c646",
+      "name": "search_0",
+      "type": "search"
+    }
+  ],
+  "type": "visualization",
+  "updated_at": "2022-05-30T15:42:46.894Z",
+  "version": "WzU0NzgyMjAwLDld"
+}

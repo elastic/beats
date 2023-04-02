@@ -1,0 +1,89 @@
+{
+  "attributes": {
+    "description": "",
+    "hits": 0,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+    },
+    "optionsJSON": "{\"darkTheme\":false,\"hidePanelTitles\":false,\"useMargins\":true}",
+    "panelsJSON": "[{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":34,\"w\":14,\"h\":12,\"i\":\"1\"},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{},\"vis\":{\"legendOpen\":true}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":14,\"y\":22,\"w\":17,\"h\":12,\"i\":\"2\"},\"panelIndex\":\"2\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":22,\"w\":14,\"h\":6,\"i\":\"3\"},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":0,\"w\":48,\"h\":8,\"i\":\"4\"},\"panelIndex\":\"4\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":true},\"enhancements\":{}},\"panelRefName\":\"panel_4\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":8,\"w\":48,\"h\":8,\"i\":\"5\"},\"panelIndex\":\"5\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":true},\"enhancements\":{}},\"panelRefName\":\"panel_5\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":28,\"w\":14,\"h\":6,\"i\":\"6\"},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_6\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":31,\"y\":22,\"w\":17,\"h\":12,\"i\":\"7\"},\"panelIndex\":\"7\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_7\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":16,\"w\":48,\"h\":6,\"i\":\"8\"},\"panelIndex\":\"8\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_8\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":14,\"y\":34,\"w\":17,\"h\":12,\"i\":\"9\"},\"panelIndex\":\"9\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_9\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":31,\"y\":34,\"w\":17,\"h\":12,\"i\":\"12\"},\"panelIndex\":\"12\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_12\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":46,\"w\":24,\"h\":12,\"i\":\"7c45ad66-1a16-4923-894b-de76724e85f2\"},\"panelIndex\":\"7c45ad66-1a16-4923-894b-de76724e85f2\",\"embeddableConfig\":{\"enhancements\":{},\"vis\":{\"legendOpen\":false}},\"panelRefName\":\"panel_7c45ad66-1a16-4923-894b-de76724e85f2\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":46,\"w\":24,\"h\":12,\"i\":\"3333a2ce-952f-4404-9e93-25ec4a01ffe0\"},\"panelIndex\":\"3333a2ce-952f-4404-9e93-25ec4a01ffe0\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3333a2ce-952f-4404-9e93-25ec4a01ffe0\"},{\"version\":\"7.17.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":58,\"w\":24,\"h\":18,\"i\":\"60db93f3-694a-4e3a-92f9-0471f36a682a\"},\"panelIndex\":\"60db93f3-694a-4e3a-92f9-0471f36a682a\",\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"desc\"}}},\"table\":null,\"enhancements\":{}},\"panelRefName\":\"panel_60db93f3-694a-4e3a-92f9-0471f36a682a\"}]",
+    "timeRestore": false,
+    "title": "[STC] Exchange",
+    "version": 1
+  },
+  "coreMigrationVersion": "8.5.0",
+  "id": "a712a010-4e1b-11e9-a6a9-d50b9fc7c646",
+  "migrationVersion": {
+    "dashboard": "8.5.0"
+  },
+  "references": [
+    {
+      "id": "d9a14fc0-4e18-11e9-a6a9-d50b9fc7c646",
+      "name": "1:panel_1",
+      "type": "visualization"
+    },
+    {
+      "id": "03b2cff0-4e19-11e9-a6a9-d50b9fc7c646",
+      "name": "2:panel_2",
+      "type": "visualization"
+    },
+    {
+      "id": "89255700-4e1b-11e9-a6a9-d50b9fc7c646",
+      "name": "3:panel_3",
+      "type": "visualization"
+    },
+    {
+      "id": "ee75a910-4e1c-11e9-a6a9-d50b9fc7c646",
+      "name": "4:panel_4",
+      "type": "visualization"
+    },
+    {
+      "id": "37b12c80-4e27-11e9-a6a9-d50b9fc7c646",
+      "name": "5:panel_5",
+      "type": "visualization"
+    },
+    {
+      "id": "389e1d30-4e2a-11e9-a6a9-d50b9fc7c646",
+      "name": "6:panel_6",
+      "type": "visualization"
+    },
+    {
+      "id": "dfb5e910-4e28-11e9-a6a9-d50b9fc7c646",
+      "name": "7:panel_7",
+      "type": "visualization"
+    },
+    {
+      "id": "46e06340-4e33-11e9-a6a9-d50b9fc7c646",
+      "name": "8:panel_8",
+      "type": "visualization"
+    },
+    {
+      "id": "d54a5fd0-4e67-11e9-a6a9-d50b9fc7c646",
+      "name": "9:panel_9",
+      "type": "visualization"
+    },
+    {
+      "id": "abae36b0-4e67-11e9-a6a9-d50b9fc7c646",
+      "name": "12:panel_12",
+      "type": "visualization"
+    },
+    {
+      "id": "dbef47b0-df8c-11ec-b014-417efccd38dd",
+      "name": "7c45ad66-1a16-4923-894b-de76724e85f2:panel_7c45ad66-1a16-4923-894b-de76724e85f2",
+      "type": "visualization"
+    },
+    {
+      "id": "cd3893b0-e02d-11ec-b014-417efccd38dd",
+      "name": "3333a2ce-952f-4404-9e93-25ec4a01ffe0:panel_3333a2ce-952f-4404-9e93-25ec4a01ffe0",
+      "type": "visualization"
+    },
+    {
+      "id": "fc435a80-e02f-11ec-b014-417efccd38dd",
+      "name": "60db93f3-694a-4e3a-92f9-0471f36a682a:panel_60db93f3-694a-4e3a-92f9-0471f36a682a",
+      "type": "visualization"
+    }
+  ],
+  "type": "dashboard",
+  "updated_at": "2022-05-30T15:51:45.866Z",
+  "version": "WzU0NzgyMjAyLDld"
+}

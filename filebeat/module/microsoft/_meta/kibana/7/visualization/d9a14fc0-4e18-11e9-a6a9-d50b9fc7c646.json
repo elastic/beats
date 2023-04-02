@@ -1,0 +1,28 @@
+{
+  "attributes": {
+    "description": "",
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+    },
+    "savedSearchRefName": "search_0",
+    "title": "[STC] Exchange - Hosts",
+    "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+    "version": 1,
+    "visState": "{\"title\":\"[STC] Exchange - Hosts\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"host.name\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":true,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"segment\"}],\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100},\"palette\":{\"type\":\"palette\",\"name\":\"kibana_palette\"},\"distinctColors\":true,\"nestedLegend\":false,\"truncateLegend\":true,\"maxLegendLines\":1,\"legendDisplay\":\"show\",\"legendSize\":\"auto\"}}"
+  },
+  "coreMigrationVersion": "8.5.0",
+  "id": "d9a14fc0-4e18-11e9-a6a9-d50b9fc7c646",
+  "migrationVersion": {
+    "visualization": "8.5.0"
+  },
+  "references": [
+    {
+      "id": "9205dc30-4e18-11e9-a6a9-d50b9fc7c646",
+      "name": "search_0",
+      "type": "search"
+    }
+  ],
+  "type": "visualization",
+  "updated_at": "2022-05-30T15:36:49.682Z",
+  "version": "WzU0NzgyMTk4LDld"
+}

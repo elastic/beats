@@ -87813,11 +87813,6 @@ type: long
 
 --
 
-*`microsoft.exchange.timestamp`*::
-+
---
---
-
 [[exported-fields-microsoft]]
 == Microsoft fields
 

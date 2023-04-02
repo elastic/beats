@@ -1,0 +1,28 @@
+{
+  "attributes": {
+    "description": "",
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[{\"meta\":{\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"microsoft.exchange.event_id\",\"value\":\"SEND\",\"params\":{\"query\":\"SEND\",\"type\":\"phrase\"},\"indexRefName\":\"search_0\"},\"query\":{\"match\":{\"microsoft.exchange.event_id\":{\"query\":\"SEND\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}]}"
+    },
+    "savedSearchRefName": "search_0",
+    "title": "[STC] Exchange - Outbound Message Volume",
+    "uiStateJSON": "{}",
+    "version": 1,
+    "visState": "{\"title\":\"[STC] Exchange - Outbound Message Volume\",\"type\":\"metric\",\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":40,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"microsoft.exchange.total_bytes\"}}]}"
+  },
+  "coreMigrationVersion": "8.5.0",
+  "id": "389e1d30-4e2a-11e9-a6a9-d50b9fc7c646",
+  "migrationVersion": {
+    "visualization": "8.5.0"
+  },
+  "references": [
+    {
+      "id": "9205dc30-4e18-11e9-a6a9-d50b9fc7c646",
+      "name": "search_0",
+      "type": "search"
+    }
+  ],
+  "type": "visualization",
+  "updated_at": "2020-03-13T21:46:56.027Z",
+  "version": "WzU0Nzk2Nzk4LDld"
+}

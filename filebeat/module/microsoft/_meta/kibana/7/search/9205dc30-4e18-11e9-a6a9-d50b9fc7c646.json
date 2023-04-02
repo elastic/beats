@@ -1,0 +1,35 @@
+{
+  "attributes": {
+    "columns": [],
+    "description": "",
+    "grid": {},
+    "hideChart": false,
+    "hits": 0,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"event.module: \\\"microsoft\\\" and event.dataset: \\\"microsoft.exchange\\\"\",\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    },
+    "sort": [
+      [
+        "@timestamp",
+        "desc"
+      ]
+    ],
+    "title": "[STC] Exchange",
+    "version": 1
+  },
+  "coreMigrationVersion": "8.5.0",
+  "id": "9205dc30-4e18-11e9-a6a9-d50b9fc7c646",
+  "migrationVersion": {
+    "search": "8.0.0"
+  },
+  "references": [
+    {
+      "id": "filebeat-*",
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern"
+    }
+  ],
+  "type": "search",
+  "updated_at": "2022-05-30T15:30:02.504Z",
+  "version": "WzU0NzgyMTkyLDld"
+}

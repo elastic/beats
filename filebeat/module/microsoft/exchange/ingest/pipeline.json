@@ -81,6 +81,20 @@
     }
   },
   {
+    "split": {
+      "field": "microsoft.exchange.recipient_address",
+      "separator": ";",
+      "ignore_missing": true
+    }
+  },
+  {
+    "split": {
+      "field": "microsoft.exchange.recipient_status",
+      "separator": ";",
+      "ignore_missing": true
+    }
+  },
+  {
     "append": {
       "field": "related.ip",
       "value": "{{microsoft.exchange.client_ip}}",

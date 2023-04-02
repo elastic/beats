@@ -16,7 +16,9 @@
         "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
@@ -43,7 +45,9 @@
         "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
@@ -75,9 +79,13 @@
         "microsoft.exchange.message_info": "2023-03-28T21:32:48.383Z;LSRV=server2.test2.com:TOTAL-HUB=0.322|SMR=0.125(SMRDE=0.002|SMRC=0.122(SMRCL=0.054|X-SMRCR=0.122))|CAT=0.089(CATOS=0.034(CATSM=0.034(CATSM-Malware Agent=0.033))|CATRESL=0.005(CATRESLP2R=0.001)|CATORES=0.047(CATRS=0.046(CATRS-Transport Rule Agent=0.001(X-ETREX=0.001)|CATRS-Index Routing Agent=0.045))|CATORT=0.001(CATRT=0.001))|SMSC=0.017|SMS=0.089(SMSMBXD=0.085)",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
-        "microsoft.exchange.recipient_status": "250 2.1.5 Recipient OK",
+        "microsoft.exchange.recipient_status": [
+            "250 2.1.5 Recipient OK"
+        ],
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
         "microsoft.exchange.server_hostname": "hostname1.test2.com",
@@ -114,9 +122,13 @@
         "microsoft.exchange.message_info": "2023-03-28T21:32:48.383Z;LSRV=server2.test2.com:TOTAL-HUB=0.322|SMR=0.125(SMRDE=0.002|SMRC=0.122(SMRCL=0.054|X-SMRCR=0.122))|CAT=0.089(CATOS=0.034(CATSM=0.034(CATSM-Malware Agent=0.033))|CATRESL=0.005(CATRESLP2R=0.001)|CATORES=0.047(CATRS=0.046(CATRS-Transport Rule Agent=0.001(X-ETREX=0.001)|CATRS-Index Routing Agent=0.045))|CATORT=0.001(CATRT=0.001))|SMSC=0.017|SMS=0.089(SMSMBXD=0.085)",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
-        "microsoft.exchange.recipient_status": "250 2.1.5 Recipient OK",
+        "microsoft.exchange.recipient_status": [
+            "250 2.1.5 Recipient OK"
+        ],
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
         "microsoft.exchange.server_hostname": "hostname1.test2.com",
@@ -155,7 +167,9 @@
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
         "microsoft.exchange.original_client_ip": "172.20.15.25",
         "microsoft.exchange.original_server_ip": "172.20.16.42",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
@@ -189,7 +203,9 @@
         "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
@@ -217,7 +233,9 @@
         "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
@@ -249,9 +267,13 @@
         "microsoft.exchange.message_info": "2023-03-28T16:29:48.975Z;SRV=server1.test.com:TOTAL-HUB=0.334|SMR=0.146(SMRDE=0.013(SMRED=0.009(SMRED-ESET Filtering Agent=0.009))|SMRC=0.132(SMRCL=0.082 |X-SMRCR=0.131))|CAT=0.166(CATMS=0.001|CATOS=0.037(CATSM=0.036(CATSM-Malware Agent=0.035 ))|CATRESL=0.010|CATORES=0.001(CATRS=0.001(CATRS-ABP Routing Agent=0.001))|CATORES=0.054 (CATRS=0.054(CATRS-Index Routing Agent=0.053))|CATBIF=0.002)|QDI=0.020;SRV=server1.test.com:TOTAL-EDGE=18175.166|SMR=0.124(SMRDI=0.011(SMRED=0.008(SMRED-ESET Filtering Agent=0.007))|SMRC=0.112(SMRCL=0.111))|CAT=0.001|QDE=18169.740|SMS=5.100",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "96988589-8595-419e-f7f4-08db2fa9a656",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
-        "microsoft.exchange.recipient_status": "250 2.1.5 <mail1@test.com>... Recipient ok",
+        "microsoft.exchange.recipient_status": [
+            "250 2.1.5 <mail1@test.com>... Recipient ok"
+        ],
         "microsoft.exchange.return_path": "<>",
         "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
         "microsoft.exchange.server_hostname": "mx.test.com",
@@ -283,7 +305,9 @@
         "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "96988589-8595-419e-f7f4-08db2fa9a656",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.reference": "27414776251023",
         "microsoft.exchange.return_path": "<>",
@@ -311,7 +335,9 @@
         "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "96988589-8595-419e-f7f4-08db2fa9a656",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.related_recipient_address": "mail1@test.com",
         "microsoft.exchange.return_path": "<>",
@@ -339,7 +365,9 @@
         "microsoft.exchange.message_info": "<mail1@test.com>:<400 4.4.7 Message delayed>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "96988589-8595-419e-f7f4-08db2fa9a656",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.reference": "<393932194.209800.1680006242883@test3.com>",
         "microsoft.exchange.return_path": "<>",
@@ -367,7 +395,9 @@
         "microsoft.exchange.message_id": "<29634534.206435.1680000849959@test3.com>",
         "microsoft.exchange.message_subject": "SUBJECT-XXX",
         "microsoft.exchange.network_message_id": "066694bd-bf3b-497b-a1d3-08db2f7ac5dc",
-        "microsoft.exchange.recipient_address": "mail1@test.com",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
         "microsoft.exchange.recipient_count": "1",
         "microsoft.exchange.related_recipient_address": "mail1@test.com",
         "microsoft.exchange.return_path": "test@test.com",
