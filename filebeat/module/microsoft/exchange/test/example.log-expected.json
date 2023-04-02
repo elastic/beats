@@ -489,5 +489,51 @@
         "microsoft.exchange.total_bytes": "27289",
         "microsoft.exchange.transport_traffic_type": "Email",
         "service.type": "microsoft"
+    },
+    {
+        "@timestamp": "2023-04-02T16:54:02.142-02:00",
+        "destination.ip": "10.225.101.11",
+        "event.dataset": "microsoft.exchange",
+        "event.module": "microsoft",
+        "event.timezone": "-02:00",
+        "fileset.name": "exchange",
+        "input.type": "log",
+        "log.offset": 13167,
+        "message": "2023-04-02T18:54:02.142Z,10.225.105.11,5mail-exch01,10.225.101.11,1mail-exch01.test.com,,Intra-Organization SMTP Send Connector,SMTP,FAIL,27938762260930,<JIRA.482743.1680382959000.295531.1680461640168@anysvc.bz>,bf9f43ac-45e3-4653-d544-08db33ab9f76,usrmailjiratech@test.com,\"'[{LED=554 5.2.2 mailbox full; STOREDRV.Deliver.Exception:QuotaExceededException.MapiExceptionShutoffQuotaExceeded; Failed to process message due to a permanent exception with message The process failed to get the correct properties. 16.55847:C7040000, 17.43559:00000000A0010000000000000000000000000000, 20.52176:010FCB891700103100000000, 20.50032:010FCB898717000000000000, 0.35180:010FCB89, 255.23226:58010000, 255.27962:02000000, 255.27962:06000000, 255.17082:DD040000, 0.24929:15000000, 4.21921:DD040000, 255.27962:FA000000, 255.1494:00000000, 5.29818:0000000039386665316535642D636666632D346337362D393762632D633131383532323736666262002E3235, 1.29920:03000000, 7.29828:2D9802400100000039366138, 7.29832:000000400100000065302D39, 4.45884:DD040000, 4.29880:DD040000, 4.59420:DD040000, 0.49544:E744A896, 8.45434:5D1EFE98FCCF764C97BCC11852276FBBF42C0000, 5.10786:0000000031352E30312E323530372E3032333A316D61696C2D6578636830313A39366138343465372D303261392D343665302D396436352D6566613538323936306636650000000000000000, 255.1750:00000000, 255.27962:A1000000, 255.17082:B9040000, 0.27745:00000000, 4.21921:B9040000, 255.27962:07000000, 0.26881:00000000, 255.21817:B9040000, 0.20385:00000000, 4.28577:DD040000, 0.32001:00000000, 4.29953:DD040000, 0.32768:00000000, 4.33024:DD040000 [Stage: CreateMessage]};{MSG=};{FQDN=1mail-exch01.test.com};{IP=10.225.101.11};{LRT=02.04.2023 18:54:01}]'\",23557,1,,<ac681870-286e-4b33-9adb-068a6fb667ae@5mail-exch01.test.com>,SUBJECT-XXX,jira@officesvc.bz,jira@officesvc.bz,2023-04-02T18:54:01.053Z;LSRV=5mail-exch01.test.com:TOTAL-HUB=0.521|SMR=0.248(SMRDE=0.009(SMRED=0.006(SMRED-ESET Filtering Agent=0.006))|SMRC=0.238(SMRCL=0.102|X-SMRCR=0.239))|CAT=0.052(CATMS=0.001|CATOS=0.034(CATSM=0.033(CATSM-Malware Agent=0.033))|CATRESL=0.003|CATORES=0.012(CATRS=0.012(CATRS-Transport Rule Agent=0.001(X-ETREX=0.001)|CATRS-Index Routing Agent=0.009)))|SMSC=0.157|SMS=0.057(SMSMBXD=0.034),Incoming,,,,S:E2ELatency=1.088;S:ToEntity=Unknown;S:FromEntity=Internet;S:MsgRecipCount=1;S:IncludeInSla=True;S:Microsoft.Exchange.Transport.MailRecipient.RequiredTlsAuthLevel=Opportunistic;S:IsSmtpResponseFromExternalServer=False;S:DeliveryPriority=Normal;S:AccountForest=test.com,Email,5822c8e7-ce02-46cb-39b3-08db33aba018,15.01.2507.023",
+        "microsoft.exchange.client_hostname": "5mail-exch01",
+        "microsoft.exchange.client_ip": "10.225.105.11",
+        "microsoft.exchange.connector_id": "Intra-Organization SMTP Send Connector",
+        "microsoft.exchange.custom_data": "S:E2ELatency=1.088;S:ToEntity=Unknown;S:FromEntity=Internet;S:MsgRecipCount=1;S:IncludeInSla=True;S:Microsoft.Exchange.Transport.MailRecipient.RequiredTlsAuthLevel=Opportunistic;S:IsSmtpResponseFromExternalServer=False;S:DeliveryPriority=Normal;S:AccountForest=test.com",
+        "microsoft.exchange.directionality": "Incoming",
+        "microsoft.exchange.event_id": "FAIL",
+        "microsoft.exchange.internal_message_id": "27938762260930",
+        "microsoft.exchange.led_code": "554",
+        "microsoft.exchange.led_message": "LED=554 5.2.2 mailbox full",
+        "microsoft.exchange.log_id": "5822c8e7-ce02-46cb-39b3-08db33aba018",
+        "microsoft.exchange.logdate": "2023-04-02T18:54:02.142Z",
+        "microsoft.exchange.message_id": "<JIRA.482743.1680382959000.295531.1680461640168@anysvc.bz>",
+        "microsoft.exchange.message_info": "2023-04-02T18:54:01.053Z;LSRV=5mail-exch01.test.com:TOTAL-HUB=0.521|SMR=0.248(SMRDE=0.009(SMRED=0.006(SMRED-ESET Filtering Agent=0.006))|SMRC=0.238(SMRCL=0.102|X-SMRCR=0.239))|CAT=0.052(CATMS=0.001|CATOS=0.034(CATSM=0.033(CATSM-Malware Agent=0.033))|CATRESL=0.003|CATORES=0.012(CATRS=0.012(CATRS-Transport Rule Agent=0.001(X-ETREX=0.001)|CATRS-Index Routing Agent=0.009)))|SMSC=0.157|SMS=0.057(SMSMBXD=0.034)",
+        "microsoft.exchange.message_subject": "SUBJECT-XXX",
+        "microsoft.exchange.network_message_id": "bf9f43ac-45e3-4653-d544-08db33ab9f76",
+        "microsoft.exchange.recipient_address": [
+            "usrmailjiratech@test.com"
+        ],
+        "microsoft.exchange.recipient_count": "1",
+        "microsoft.exchange.recipient_status": "'[{LED=554 5.2.2 mailbox full; STOREDRV.Deliver.Exception:QuotaExceededException.MapiExceptionShutoffQuotaExceeded; Failed to process message due to a permanent exception with message The process failed to get the correct properties. 16.55847:C7040000, 17.43559:00000000A0010000000000000000000000000000, 20.52176:010FCB891700103100000000, 20.50032:010FCB898717000000000000, 0.35180:010FCB89, 255.23226:58010000, 255.27962:02000000, 255.27962:06000000, 255.17082:DD040000, 0.24929:15000000, 4.21921:DD040000, 255.27962:FA000000, 255.1494:00000000, 5.29818:0000000039386665316535642D636666632D346337362D393762632D633131383532323736666262002E3235, 1.29920:03000000, 7.29828:2D9802400100000039366138, 7.29832:000000400100000065302D39, 4.45884:DD040000, 4.29880:DD040000, 4.59420:DD040000, 0.49544:E744A896, 8.45434:5D1EFE98FCCF764C97BCC11852276FBBF42C0000, 5.10786:0000000031352E30312E323530372E3032333A316D61696C2D6578636830313A39366138343465372D303261392D343665302D396436352D6566613538323936306636650000000000000000, 255.1750:00000000, 255.27962:A1000000, 255.17082:B9040000, 0.27745:00000000, 4.21921:B9040000, 255.27962:07000000, 0.26881:00000000, 255.21817:B9040000, 0.20385:00000000, 4.28577:DD040000, 0.32001:00000000, 4.29953:DD040000, 0.32768:00000000, 4.33024:DD040000 [Stage: CreateMessage]};{MSG=};{FQDN=1mail-exch01.test.com};{IP=10.225.101.11};{LRT=02.04.2023 18:54:01}]'",
+        "microsoft.exchange.reference": "<ac681870-286e-4b33-9adb-068a6fb667ae@5mail-exch01.test.com>",
+        "microsoft.exchange.return_path": "jira@officesvc.bz",
+        "microsoft.exchange.schema_version": "15.01.2507.023",
+        "microsoft.exchange.sender_address": "jira@officesvc.bz",
+        "microsoft.exchange.server_hostname": "1mail-exch01.test.com",
+        "microsoft.exchange.server_ip": "10.225.101.11",
+        "microsoft.exchange.source": "SMTP",
+        "microsoft.exchange.total_bytes": "23557",
+        "microsoft.exchange.transport_traffic_type": "Email",
+        "related.ip": [
+            "10.225.101.11",
+            "10.225.105.11"
+        ],
+        "service.type": "microsoft",
+        "source.ip": "10.225.105.11"
     }
 ]

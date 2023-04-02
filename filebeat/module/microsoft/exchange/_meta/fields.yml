@@ -17,6 +17,10 @@
       type: keyword
     - name: internal_message_id
       type: text
+    - name: led_code
+      type: integer
+    - name: led_message
+      type: text
     - name: log_id
       type: text
     - name: logdate

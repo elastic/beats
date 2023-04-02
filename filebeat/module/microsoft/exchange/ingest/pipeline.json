@@ -84,6 +84,28 @@
     }
   },
   {
+    "grok": {
+      "field": "microsoft.exchange.recipient_status",
+      "patterns": [
+        "^'\\[{%{LEDPATTERN:microsoft.exchange.led_message};"
+      ],
+      "pattern_definitions": {
+        "LEDPATTERN": "LED=%{INT} %{DATA}"
+      },
+      "ignore_missing": true,
+      "ignore_failure": true
+    }
+  },
+  {
+    "grok": {
+      "field": "microsoft.exchange.led_message",
+      "patterns": [
+        "^LED=%{INT:microsoft.exchange.led_code}"
+      ],
+      "ignore_missing": true
+    }
+  },
+  {
     "split": {
       "field": "microsoft.exchange.recipient_address",
       "separator": ";",
@@ -94,6 +116,7 @@
     "split": {
       "field": "microsoft.exchange.recipient_status",
       "separator": ";",
+      "if": "['SEND', 'SENDEXTERNAL'].contains(ctx.microsoft.exchange.event_id)",
       "ignore_missing": true
     }
   },

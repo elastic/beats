@@ -87673,6 +87673,20 @@ type: text
 
 --
 
+*`microsoft.exchange.led_code`*::
++
+--
+type: integer
+
+--
+
+*`microsoft.exchange.led_message`*::
++
+--
+type: text
+
+--
+
 *`microsoft.exchange.log_id`*::
 +
 --
