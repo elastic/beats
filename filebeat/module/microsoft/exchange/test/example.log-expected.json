@@ -386,7 +386,7 @@
         "fileset.name": "exchange",
         "input.type": "log",
         "log.offset": 12720,
-        "message": "2023-03-28T10:54:18.804Z,,,,server1,/o=STC/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Recipients/cn=usere339c092,,ROUTING,RESOLVE,27389006448778,<29634534.206435.1680000849959@test3.com>,066694bd-bf3b-497b-a1d3-08db2f7ac5dc,mail1@test.com,,27289,1,mail1@test.com,,SUBJECT-XXX,test@test.com,test@test.com,,Incoming,,,,S:DeliveryPriority=Normal;S:AccountForest=test.com,Email,a785cbe6-132d-48f6-9a37-08db2f7ac7d2,15.01.2507.023",
+        "message": "2023-03-28T10:54:18.804Z,,,,server1,/o=TEST/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Recipients/cn=usere339c092,,ROUTING,RESOLVE,27389006448778,<29634534.206435.1680000849959@test3.com>,066694bd-bf3b-497b-a1d3-08db2f7ac5dc,mail1@test.com,,27289,1,mail1@test.com,,SUBJECT-XXX,test@test.com,test@test.com,,Incoming,,,,S:DeliveryPriority=Normal;S:AccountForest=test.com,Email,a785cbe6-132d-48f6-9a37-08db2f7ac7d2,15.01.2507.023",
         "microsoft.exchange.custom_data": "S:DeliveryPriority=Normal;S:AccountForest=test.com",
         "microsoft.exchange.directionality": "Incoming",
         "microsoft.exchange.event_id": "RESOLVE",
@@ -404,7 +404,7 @@
         "microsoft.exchange.sender_address": "test@test.com",
         "microsoft.exchange.server_hostname": "server1",
         "microsoft.exchange.source": "ROUTING",
-        "microsoft.exchange.source_context": "/o=STC/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Recipients/cn=usere339c092",
+        "microsoft.exchange.source_context": "/o=TEST/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Recipients/cn=usere339c092",
         "microsoft.exchange.total_bytes": "27289",
         "service.type": "microsoft"
     }

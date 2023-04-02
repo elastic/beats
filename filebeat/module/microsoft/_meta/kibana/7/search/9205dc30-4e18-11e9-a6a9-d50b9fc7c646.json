@@ -14,7 +14,7 @@
         "desc"
       ]
     ],
-    "title": "[STC] Exchange",
+    "title": "[Filebeat Microsoft] Exchange",
     "version": 1
   },
   "coreMigrationVersion": "8.5.0",

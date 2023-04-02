@@ -5,10 +5,10 @@
       "searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[{\"meta\":{\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"microsoft.exchange.event_id\",\"params\":{\"query\":\"DELIVER\"},\"indexRefName\":\"search_0\"},\"$state\":{\"store\":\"appState\"},\"query\":{\"match_phrase\":{\"microsoft.exchange.event_id\":{\"query\":\"DELIVER\"}}}}]}"
     },
     "savedSearchRefName": "search_0",
-    "title": "[STC] Exchange - Inbound Message Volume",
+    "title": "[Filebeat Microsoft] Exchange - Inbound Message Volume",
     "uiStateJSON": "{}",
     "version": 1,
-    "visState": "{\"title\":\"[STC] Exchange - Inbound Message Volume\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"params\":{\"field\":\"microsoft.exchange.total_bytes\"},\"schema\":\"metric\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":40,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"}}"
+    "visState": "{\"title\":\"[Filebeat Microsoft] Exchange - Inbound Message Volume\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"params\":{\"field\":\"microsoft.exchange.total_bytes\"},\"schema\":\"metric\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":40,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"}}"
   },
   "coreMigrationVersion": "8.5.0",
   "id": "89255700-4e1b-11e9-a6a9-d50b9fc7c646",
