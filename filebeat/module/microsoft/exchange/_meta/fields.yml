@@ -17,6 +17,8 @@
       type: keyword
     - name: internal_message_id
       type: text
+    - name: log_id
+      type: text
     - name: logdate
       type: text
     - name: message_id
@@ -43,6 +45,8 @@
       type: keyword
     - name: return_path
       type: keyword
+    - name: schema_version
+      type: text
     - name: sender_address
       type: keyword
     - name: server_hostname
@@ -57,3 +61,5 @@
       type: text
     - name: total_bytes
       type: long
+    - name: transport_traffic_type
+      type: text

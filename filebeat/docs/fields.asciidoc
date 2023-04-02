@@ -87673,6 +87673,13 @@ type: text
 
 --
 
+*`microsoft.exchange.log_id`*::
++
+--
+type: text
+
+--
+
 *`microsoft.exchange.logdate`*::
 +
 --
@@ -87764,6 +87771,13 @@ type: keyword
 
 --
 
+*`microsoft.exchange.schema_version`*::
++
+--
+type: text
+
+--
+
 *`microsoft.exchange.sender_address`*::
 +
 --
@@ -87810,6 +87824,13 @@ type: text
 +
 --
 type: long
+
+--
+
+*`microsoft.exchange.transport_traffic_type`*::
++
+--
+type: text
 
 --
 

@@ -37,7 +37,10 @@
         "microsoft.exchange.tenant_id",
         "microsoft.exchange.original_client_ip",
         "microsoft.exchange.original_server_ip",
-        "microsoft.exchange.custom_data"
+        "microsoft.exchange.custom_data",
+        "microsoft.exchange.transport_traffic_type",
+        "microsoft.exchange.log_id",
+        "microsoft.exchange.schema_version"
       ]
     }
   },
