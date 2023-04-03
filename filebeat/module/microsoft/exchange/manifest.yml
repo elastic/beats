@@ -3,11 +3,9 @@ module_version: 1.0
 var:
   - name: paths
     default:
-      - /example/test.log*
-    os.darwin:
-      - /usr/local/example/test.log*
+      - C:/Program Files/Microsoft/Exchange Server/V*/TransportRoles/Logs/MessageTracking/*.LOG
     os.windows:
-      - c:/programdata/example/logs/test.log*
+      - C:/Program Files/Microsoft/Exchange Server/V*/TransportRoles/Logs/MessageTracking/*.LOG
 
 ingest_pipeline: ingest/pipeline.json
 input: config/exchange.yml

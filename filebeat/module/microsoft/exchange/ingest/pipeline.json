@@ -147,9 +147,23 @@
   {
     "append": {
       "field": "related.ip",
-      "value": "{{microsoft.exchange.server_ip}}",
+      "value": "{{microsoft.exchange.original_server_ip}}",
       "allow_duplicates": false,
       "if": "ctx?.microsoft?.exchange?.original_server_ip != null"
+    }
+  },
+  {
+    "set": {
+      "field": "source.address",
+      "copy_from": "microsoft.exchange.client_hostname",
+      "if": "ctx.microsoft?.exchange?.client_hostname != null"
+    }
+  },
+  {
+    "set": {
+      "field": "destination.address",
+      "copy_from": "microsoft.exchange.server_hostname",
+      "if": "ctx.microsoft?.exchange?.server_hostname != null"
     }
   },
   {
@@ -164,6 +178,20 @@
       "field": "destination.ip",
       "copy_from": "microsoft.exchange.server_ip",
       "if": "ctx.microsoft?.exchange?.server_ip != null"
+    }
+  },
+  {
+    "set": {
+      "field": "client.ip",
+      "copy_from": "microsoft.exchange.original_client_ip",
+      "if": "ctx.microsoft?.exchange?.original_client_ip != null"
+    }
+  },
+  {
+    "set": {
+      "field": "source.ip",
+      "copy_from": "microsoft.exchange.client_ip",
+      "if": "ctx.microsoft?.exchange?.client_ip != null"
     }
   },
   {
@@ -222,6 +250,72 @@
     "rename": {
       "field": "destination.as.organization_name",
       "target_field": "destination.as.organization.name",
+      "ignore_missing": true
+    }
+  },
+  {
+    "geoip": {
+      "field": "client.ip",
+      "target_field": "client.geo",
+      "ignore_missing": true
+    }
+  },
+  {
+    "geoip": {
+      "target_field": "client.as",
+      "properties": [
+        "asn",
+        "organization_name"
+      ],
+      "ignore_missing": true,
+      "database_file": "GeoLite2-ASN.mmdb",
+      "field": "client.ip"
+    }
+  },
+  {
+    "rename": {
+      "target_field": "client.as.number",
+      "ignore_missing": true,
+      "field": "client.as.asn"
+    }
+  },
+  {
+    "rename": {
+      "field": "client.as.organization_name",
+      "target_field": "client.as.organization.name",
+      "ignore_missing": true
+    }
+  },
+  {
+    "geoip": {
+      "field": "server.ip",
+      "target_field": "server.geo",
+      "ignore_missing": true
+    }
+  },
+  {
+    "geoip": {
+      "target_field": "server.as",
+      "properties": [
+        "asn",
+        "organization_name"
+      ],
+      "ignore_missing": true,
+      "database_file": "GeoLite2-ASN.mmdb",
+      "field": "server.ip"
+    }
+  },
+  {
+    "rename": {
+      "target_field": "server.as.number",
+      "ignore_missing": true,
+      "field": "server.as.asn"
+    }
+  },
+  {
+    "rename": {
+      "field": "server.as.organization_name",
+      "target_field": "server.as.organization.name",
       "ignore_missing": true
     }
   }

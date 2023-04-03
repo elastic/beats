@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2023-03-28T19:33:57.324-02:00",
+        "destination.address": "hostname1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -33,6 +34,7 @@
     },
     {
         "@timestamp": "2023-03-30T14:56:57.422-02:00",
+        "destination.address": "172.20.15.25",
         "destination.ip": "172.20.15.25",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
@@ -75,10 +77,12 @@
             "172.20.16.41"
         ],
         "service.type": "microsoft",
+        "source.address": "server2",
         "source.ip": "172.20.16.41"
     },
     {
         "@timestamp": "2023-03-28T19:33:57.324-02:00",
+        "destination.address": "hostname1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -111,6 +115,7 @@
     },
     {
         "@timestamp": "2023-03-28T19:32:48.715-02:00",
+        "destination.address": "hostname1.test2.com",
         "destination.ip": "172.20.16.42",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
@@ -153,10 +158,12 @@
             "172.20.16.42"
         ],
         "service.type": "microsoft",
+        "source.address": "server2",
         "source.ip": "172.20.16.41"
     },
     {
         "@timestamp": "2023-03-28T19:32:48.715-02:00",
+        "destination.address": "hostname1.test2.com",
         "destination.ip": "172.20.16.42",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
@@ -199,10 +206,53 @@
             "172.20.16.42"
         ],
         "service.type": "microsoft",
+        "source.address": "server2",
         "source.ip": "172.20.16.41"
     },
     {
+        "@timestamp": "2023-03-28T19:32:48.606-02:00",
+        "client.ip": "172.20.15.25",
+        "event.dataset": "microsoft.exchange",
+        "event.module": "microsoft",
+        "event.timezone": "-02:00",
+        "fileset.name": "exchange",
+        "input.type": "log",
+        "log.offset": 4816,
+        "message": "2023-03-28T21:32:48.606Z,,server2,,,CatContentConversion,,AGENT,AGENTINFO,86998857548161,<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>,0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d,mail1@test.com,,21468,1,,,SUBJECT-XXX,MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com,<>,,Incoming,,172.20.15.25,172.20.16.42,\"S:AMA=SUM|v=0|action=|error=|atch=2;S:AMA=EV|engine=M|v=0|sig=1.385.1389.0|name=|file=;S:TRA=ETRP|ruleId=b72937a8-e41c-4b68-b14b-b2444a6a9c66|st=2020-12-16T21:18:47.0000000Z|ExecW=0|ExecC=0|Conditions=ISUP,M.F,0;S:TRA=ETRP|ruleId=579a6804-d13f-45e0-956f-8fd5fc514286|st=2021-05-12T08:50:00.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=d465cf6d-8adc-416d-8c9c-6283392c3a53|st=2020-12-17T17:56:44.0000000Z|ExecW=0|ExecC=0|Conditions=ISUP,M.F,0;S:TRA=ETRP|ruleId=150e9a5b-f645-491f-bbd8-3748cacd08bb|st=2020-12-21T11:25:29.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=fce9a3dd-f74c-4a54-b1df-0fa27ab2b884|st=2020-12-21T11:43:56.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=e7cbf089-4e93-4621-857f-f9131e30df8b|st=2021-01-12T13:06:56.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=ce148684-a4c2-4b0c-a492-b215e51e4f3e|st=2021-01-28T07:30:00.0000000Z|ExecW=0|ExecC=0|Conditions=IIP,F.E,0;S:TRA=ETRP|ruleId=3d1000bd-7f74-4dc8-96a1-a98df3ca7199|st=2021-03-29T17:36:33.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=2b7fc674-4606-43e1-b994-9bf2c0415654|st=2022-02-10T13:19:01.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=cf11c536-96e5-4bbb-9b7f-6607845744e3|st=2021-12-28T15:01:33.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=cb2b1bed-bb33-4e7f-9df7-58f234ecd9cf|st=2022-04-01T10:45:01.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=7d2840b2-fac0-4f02-b57e-44927736aa05|st=2022-03-17T07:41:16.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=138877ed-7549-400f-933e-3f45c627f61b|st=2022-07-12T08:42:19.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=93f629f2-fe13-464b-86c1-3054582de7bf|st=2022-03-17T07:50:14.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=7f95e898-a647-4e39-83c8-9afc5706e747|st=2022-03-17T07:57:20.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=5715fceb-b305-4be0-a954-a9a7d00f06d4|st=2022-03-17T08:05:39.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=9d7fd735-44e7-4b35-9983-90195de8826e|st=2022-03-22T09:52:20.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=aef01ee9-44e6-45ea-991a-04f3ef667cad|st=2022-07-04T14:40:01.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=d6d45142-eaaf-47ab-b806-e823c73b566a|st=2022-08-26T14:30:51.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=d3b561ea-65f6-44b0-a665-efb40a31bd04|st=2022-09-03T05:29:28.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRI|MsgType=Dsn|Ex=|IsKnown=|FipsStatus=NoFips|AttchUns=|ceErr=|Synth=False-Na-;S:CompCost=|AMA=0;S:DeliveryPriority=Low;S:PrioritizationReason=AMS:651982/1048576|ARC:60/50;S:OriginalFromAddress=<>;S:AccountForest=test2.com\",Email,19447831-9693-41d0-98bd-08db2fd3fa3e,15.02.0986.041",
+        "microsoft.exchange.client_hostname": "server2",
+        "microsoft.exchange.custom_data": "S:AMA=SUM|v=0|action=|error=|atch=2;S:AMA=EV|engine=M|v=0|sig=1.385.1389.0|name=|file=;S:TRA=ETRP|ruleId=b72937a8-e41c-4b68-b14b-b2444a6a9c66|st=2020-12-16T21:18:47.0000000Z|ExecW=0|ExecC=0|Conditions=ISUP,M.F,0;S:TRA=ETRP|ruleId=579a6804-d13f-45e0-956f-8fd5fc514286|st=2021-05-12T08:50:00.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=d465cf6d-8adc-416d-8c9c-6283392c3a53|st=2020-12-17T17:56:44.0000000Z|ExecW=0|ExecC=0|Conditions=ISUP,M.F,0;S:TRA=ETRP|ruleId=150e9a5b-f645-491f-bbd8-3748cacd08bb|st=2020-12-21T11:25:29.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=fce9a3dd-f74c-4a54-b1df-0fa27ab2b884|st=2020-12-21T11:43:56.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=e7cbf089-4e93-4621-857f-f9131e30df8b|st=2021-01-12T13:06:56.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=ce148684-a4c2-4b0c-a492-b215e51e4f3e|st=2021-01-28T07:30:00.0000000Z|ExecW=0|ExecC=0|Conditions=IIP,F.E,0;S:TRA=ETRP|ruleId=3d1000bd-7f74-4dc8-96a1-a98df3ca7199|st=2021-03-29T17:36:33.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=2b7fc674-4606-43e1-b994-9bf2c0415654|st=2022-02-10T13:19:01.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=cf11c536-96e5-4bbb-9b7f-6607845744e3|st=2021-12-28T15:01:33.0000000Z|ExecW=0|ExecC=0|Conditions=IP,F,0;S:TRA=ETRP|ruleId=cb2b1bed-bb33-4e7f-9df7-58f234ecd9cf|st=2022-04-01T10:45:01.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=7d2840b2-fac0-4f02-b57e-44927736aa05|st=2022-03-17T07:41:16.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=138877ed-7549-400f-933e-3f45c627f61b|st=2022-07-12T08:42:19.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=93f629f2-fe13-464b-86c1-3054582de7bf|st=2022-03-17T07:50:14.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=7f95e898-a647-4e39-83c8-9afc5706e747|st=2022-03-17T07:57:20.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=5715fceb-b305-4be0-a954-a9a7d00f06d4|st=2022-03-17T08:05:39.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=9d7fd735-44e7-4b35-9983-90195de8826e|st=2022-03-22T09:52:20.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=aef01ee9-44e6-45ea-991a-04f3ef667cad|st=2022-07-04T14:40:01.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=d6d45142-eaaf-47ab-b806-e823c73b566a|st=2022-08-26T14:30:51.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRP|ruleId=d3b561ea-65f6-44b0-a665-efb40a31bd04|st=2022-09-03T05:29:28.0000000Z|ExecW=0|ExecC=0;S:TRA=ETRI|MsgType=Dsn|Ex=|IsKnown=|FipsStatus=NoFips|AttchUns=|ceErr=|Synth=False-Na-;S:CompCost=|AMA=0;S:DeliveryPriority=Low;S:PrioritizationReason=AMS:651982/1048576|ARC:60/50;S:OriginalFromAddress=<>;S:AccountForest=test2.com",
+        "microsoft.exchange.directionality": "Incoming",
+        "microsoft.exchange.event_id": "AGENTINFO",
+        "microsoft.exchange.internal_message_id": "86998857548161",
+        "microsoft.exchange.log_id": "19447831-9693-41d0-98bd-08db2fd3fa3e",
+        "microsoft.exchange.logdate": "2023-03-28T21:32:48.606Z",
+        "microsoft.exchange.message_id": "<fa68b3ae-35cd-4e76-9291-6ee5bcb4175c@server1.test.com>",
+        "microsoft.exchange.message_subject": "SUBJECT-XXX",
+        "microsoft.exchange.network_message_id": "0661c4ca-f09e-40f0-0a6f-08db2fd3fa1d",
+        "microsoft.exchange.original_client_ip": "172.20.15.25",
+        "microsoft.exchange.original_server_ip": "172.20.16.42",
+        "microsoft.exchange.recipient_address": [
+            "mail1@test.com"
+        ],
+        "microsoft.exchange.recipient_count": "1",
+        "microsoft.exchange.return_path": "<>",
+        "microsoft.exchange.schema_version": "15.02.0986.041",
+        "microsoft.exchange.sender_address": "MicrosoftExchange329e71ec88ae4615bbc36ab6ce41109e@test.com",
+        "microsoft.exchange.source": "AGENT",
+        "microsoft.exchange.source_context": "CatContentConversion",
+        "microsoft.exchange.total_bytes": "21468",
+        "microsoft.exchange.transport_traffic_type": "Email",
+        "related.ip": [
+            "172.20.15.25",
+            "172.20.16.42"
+        ],
+        "service.type": "microsoft",
+        "source.address": "server2"
+    },
+    {
         "@timestamp": "2023-03-28T19:32:48.517-02:00",
+        "client.ip": "172.20.15.25",
+        "destination.address": "server2",
         "destination.ip": "172.20.16.41",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
@@ -245,10 +295,12 @@
             "172.20.16.42"
         ],
         "service.type": "microsoft",
+        "source.address": "hostname1.test2.com",
         "source.ip": "172.20.16.42"
     },
     {
         "@timestamp": "2023-03-28T19:32:48.516-02:00",
+        "destination.address": "server2",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -281,6 +333,7 @@
     },
     {
         "@timestamp": "2023-03-28T19:32:48.516-02:00",
+        "destination.address": "hostname1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -310,10 +363,12 @@
         "microsoft.exchange.source_context": "c05c9bdc-c963-433c-883d-be04bfb84118",
         "microsoft.exchange.total_bytes": "21029",
         "microsoft.exchange.transport_traffic_type": "Email",
-        "service.type": "microsoft"
+        "service.type": "microsoft",
+        "source.address": "server1"
     },
     {
         "@timestamp": "2023-03-28T19:32:48.347-02:00",
+        "destination.address": "mx.test.com",
         "destination.ip": "10.10.10.10",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
@@ -356,10 +411,12 @@
             "10.225.105.21"
         ],
         "service.type": "microsoft",
+        "source.address": "server1",
         "source.ip": "10.225.105.21"
     },
     {
         "@timestamp": "2023-03-28T14:29:53.158-02:00",
+        "destination.address": "server1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -393,6 +450,7 @@
     },
     {
         "@timestamp": "2023-03-28T14:29:53.042-02:00",
+        "destination.address": "server1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -425,6 +483,7 @@
     },
     {
         "@timestamp": "2023-03-28T14:29:48.975-02:00",
+        "destination.address": "server1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -459,6 +518,7 @@
     },
     {
         "@timestamp": "2023-03-28T08:54:18.804-02:00",
+        "destination.address": "server1",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
         "event.timezone": "-02:00",
@@ -492,6 +552,7 @@
     },
     {
         "@timestamp": "2023-04-02T16:54:02.142-02:00",
+        "destination.address": "1mail-exch01.test.com",
         "destination.ip": "10.225.101.11",
         "event.dataset": "microsoft.exchange",
         "event.module": "microsoft",
@@ -534,6 +595,7 @@
             "10.225.105.11"
         ],
         "service.type": "microsoft",
+        "source.address": "5mail-exch01",
         "source.ip": "10.225.105.11"
     }
 ]
