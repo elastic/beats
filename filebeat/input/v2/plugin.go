@@ -62,18 +62,6 @@ type Plugin struct {
 	Manager InputManager
 }
 
-// Details returns a generic feature description that is compatible with the
-// feature package.
-func (p Plugin) Details() feature.Details {
-	return feature.Details{
-		Name:       p.Name,
-		Stability:  p.Stability,
-		Deprecated: p.Deprecated,
-		Info:       p.Info,
-		Doc:        p.Doc,
-	}
-}
-
 func (p Plugin) validate() error {
 	if p.Name == "" {
 		return fmt.Errorf("input plugin without name found")
