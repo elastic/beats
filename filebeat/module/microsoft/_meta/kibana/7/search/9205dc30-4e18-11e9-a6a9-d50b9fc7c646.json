@@ -6,7 +6,16 @@
     "hideChart": false,
     "hits": 0,
     "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"event.module: \\\"microsoft\\\" and event.dataset: \\\"microsoft.exchange\\\"\",\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+      "searchSourceJSON": {
+        "highlightAll": true,
+        "version": true,
+        "query": {
+          "query": "event.module: \"microsoft\" and event.dataset: \"microsoft.exchange\"",
+          "language": "lucene"
+        },
+        "filter": [],
+        "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
+      }
     },
     "sort": [
       [

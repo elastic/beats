@@ -2,13 +2,73 @@
   "attributes": {
     "description": "",
     "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"
+      "searchSourceJSON": {
+        "query": {
+          "query": "",
+          "language": "lucene"
+        },
+        "filter": []
+      }
     },
     "savedSearchRefName": "search_0",
     "title": "[Filebeat Microsoft] Exchange - Top 10 Senders",
-    "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+    "uiStateJSON": {
+      "vis": {
+        "legendOpen": true
+      }
+    },
     "version": 1,
-    "visState": "{\"title\":\"[Filebeat Microsoft] Exchange - Top 10 Senders\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"microsoft.exchange.sender_address\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"segment\"}],\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100},\"palette\":{\"type\":\"palette\",\"name\":\"kibana_palette\"},\"distinctColors\":true,\"nestedLegend\":false,\"truncateLegend\":true,\"maxLegendLines\":1,\"legendDisplay\":\"show\",\"legendSize\":\"auto\"}}"
+    "visState": {
+      "title": "[Filebeat Microsoft] Exchange - Top 10 Senders",
+      "type": "pie",
+      "aggs": [
+        {
+          "id": "1",
+          "enabled": true,
+          "type": "count",
+          "params": {},
+          "schema": "metric"
+        },
+        {
+          "id": "2",
+          "enabled": true,
+          "type": "terms",
+          "params": {
+            "field": "microsoft.exchange.sender_address",
+            "orderBy": "1",
+            "order": "desc",
+            "size": 10,
+            "otherBucket": false,
+            "otherBucketLabel": "Other",
+            "missingBucket": false,
+            "missingBucketLabel": "Missing"
+          },
+          "schema": "segment"
+        }
+      ],
+      "params": {
+        "type": "pie",
+        "addTooltip": true,
+        "legendPosition": "right",
+        "isDonut": true,
+        "labels": {
+          "show": false,
+          "values": true,
+          "last_level": true,
+          "truncate": 100
+        },
+        "palette": {
+          "type": "palette",
+          "name": "kibana_palette"
+        },
+        "distinctColors": true,
+        "nestedLegend": false,
+        "truncateLegend": true,
+        "maxLegendLines": 1,
+        "legendDisplay": "show",
+        "legendSize": "auto"
+      }
+    }
   },
   "coreMigrationVersion": "8.5.0",
   "id": "03b2cff0-4e19-11e9-a6a9-d50b9fc7c646",

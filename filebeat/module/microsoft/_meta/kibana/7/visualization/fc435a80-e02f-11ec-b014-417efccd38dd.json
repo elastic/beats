@@ -2,13 +2,98 @@
   "attributes": {
     "description": "",
     "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"
+      "searchSourceJSON": {
+        "query": {
+          "query": "",
+          "language": "kuery"
+        },
+        "filter": []
+      }
     },
     "savedSearchRefName": "search_0",
     "title": "[Filebeat Microsoft] Exchange - Data Table",
     "uiStateJSON": "{}",
     "version": 1,
-    "visState": "{\"title\":\"[Filebeat Microsoft] Exchange - Data Table\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"microsoft.exchange.event_id\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":true,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"bucket\"},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"microsoft.exchange.directionality\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"bucket\"},{\"id\":\"4\",\"enabled\":true,\"type\":\"sum\",\"params\":{\"field\":\"microsoft.exchange.total_bytes\"},\"schema\":\"metric\"},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"microsoft.exchange.source\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":20,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"showTotal\":true,\"showToolbar\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\",\"autoFitRowToContent\":false}}"
+    "visState": {
+      "title": "[Filebeat Microsoft] Exchange - Data Table",
+      "type": "table",
+      "aggs": [
+        {
+          "id": "1",
+          "enabled": true,
+          "type": "count",
+          "params": {},
+          "schema": "metric"
+        },
+        {
+          "id": "2",
+          "enabled": true,
+          "type": "terms",
+          "params": {
+            "field": "microsoft.exchange.event_id",
+            "orderBy": "1",
+            "order": "desc",
+            "size": 10,
+            "otherBucket": true,
+            "otherBucketLabel": "Other",
+            "missingBucket": false,
+            "missingBucketLabel": "Missing"
+          },
+          "schema": "bucket"
+        },
+        {
+          "id": "3",
+          "enabled": true,
+          "type": "terms",
+          "params": {
+            "field": "microsoft.exchange.directionality",
+            "orderBy": "1",
+            "order": "desc",
+            "size": 5,
+            "otherBucket": false,
+            "otherBucketLabel": "Other",
+            "missingBucket": false,
+            "missingBucketLabel": "Missing"
+          },
+          "schema": "bucket"
+        },
+        {
+          "id": "4",
+          "enabled": true,
+          "type": "sum",
+          "params": {
+            "field": "microsoft.exchange.total_bytes"
+          },
+          "schema": "metric"
+        },
+        {
+          "id": "5",
+          "enabled": true,
+          "type": "terms",
+          "params": {
+            "field": "microsoft.exchange.source",
+            "orderBy": "1",
+            "order": "desc",
+            "size": 5,
+            "otherBucket": false,
+            "otherBucketLabel": "Other",
+            "missingBucket": false,
+            "missingBucketLabel": "Missing"
+          },
+          "schema": "bucket"
+        }
+      ],
+      "params": {
+        "perPage": 20,
+        "showPartialRows": false,
+        "showMetricsAtAllLevels": false,
+        "showTotal": true,
+        "showToolbar": false,
+        "totalFunc": "sum",
+        "percentageCol": "",
+        "autoFitRowToContent": false
+      }
+    }
   },
   "coreMigrationVersion": "8.5.0",
   "id": "fc435a80-e02f-11ec-b014-417efccd38dd",
@@ -26,3 +111,4 @@
   "updated_at": "2022-05-30T15:48:44.203Z",
   "version": "WzU0NzgyMjAxLDld"
 }
+
