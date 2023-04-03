@@ -20,10 +20,7 @@ package management
 import (
 	"sync"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,9 +50,6 @@ const (
 	// Stopped is status describing application is stopped.
 	Stopped
 )
-
-// Namespace is the feature namespace for queue definition.
-var Namespace = "libbeat.management"
 
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
@@ -109,36 +103,43 @@ type Manager interface {
 	SetPayload(map[string]interface{})
 }
 
-// PluginFunc for creating FactoryFunc if it matches a config
-type PluginFunc func(*config.C) FactoryFunc
+// ManagerFactory is the factory type for creating a config manager
+type ManagerFactory func(*config.C, *reload.Registry) (Manager, error)
 
-// FactoryFunc for creating a config manager
-type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
+// If managerFactory is non-nil, NewManager will use it to create the
+// beats manager. managerFactoryLock must be held to access managerFactory.
+var managerFactory ManagerFactory
+var managerFactoryLock sync.Mutex
 
-// Register a config manager
-func Register(name string, fn PluginFunc, stability feature.Stability) {
-	f := feature.New(
-		Namespace, name, fn, feature.MakeDetails(name, "", stability))
-	feature.MustRegister(f)
-}
-
-// Factory retrieves config manager constructor. If no one is registered
-// it will create a nil manager
-func Factory(cfg *config.C) FactoryFunc {
-	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
-	if err != nil {
-		return nilFactory
-	}
-
-	for _, f := range factories {
-		if plugin, ok := f.Factory().(PluginFunc); ok {
-			if factory := plugin(cfg); factory != nil {
-				return factory
-			}
+// NewManager creates the beats manager based on the given configuration
+// and registry. If management and x-pack are enabled this calls
+// NewV2AgentManager (see x-pack/libbeat/management/managerV2.go), otherwise
+// it returns a placeholder.
+// Tests can call SetManagerFactory to instead use a mocked manager,
+// see x-pack/libbeat/management/tests/init.go.
+func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
+	if cfg.Enabled() {
+		managerFactoryLock.Lock()
+		defer managerFactoryLock.Unlock()
+		if managerFactory != nil {
+			return managerFactory(cfg, registry)
 		}
 	}
+	return &fallbackManager{
+		logger: logp.NewLogger("mgmt"),
+		status: Unknown,
+		msg:    "",
+	}, nil
+}
 
-	return nilFactory
+// SetManagerFactory tells NewManager to use the given factory when management
+// is enabled. It is only called by Agent V2 initialization
+// (x-pack/libbeat/management/managerV2.go) and by tests that need a mocked
+// manager.
+func SetManagerFactory(factory ManagerFactory) {
+	managerFactoryLock.Lock()
+	defer managerFactoryLock.Unlock()
+	managerFactory = factory
 }
 
 // fallbackManager, fallback when no manager is present
@@ -149,15 +150,6 @@ type fallbackManager struct {
 	msg      string
 	stopFunc func()
 	stopOnce sync.Once
-}
-
-func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
-	log := logp.NewLogger("mgmt")
-	return &fallbackManager{
-		logger: log,
-		status: Unknown,
-		msg:    "",
-	}, nil
 }
 
 func (n *fallbackManager) UpdateStatus(status Status, msg string) {
@@ -182,7 +174,7 @@ func (n *fallbackManager) Stop() {
 	if n.stopFunc != nil {
 		// I'm not sure we really need the sync.Once here, but
 		// because different Beats can have different requirements
-		// for their stup function, it's better to make sure it will
+		// for their stop function, it's better to make sure it will
 		// only be called once.
 		n.stopOnce.Do(func() {
 			n.stopFunc()

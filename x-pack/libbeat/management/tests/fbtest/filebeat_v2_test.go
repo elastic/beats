@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	fbroot "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+
 	// initialize the plugin system before libbeat does, so we can overwrite it properly
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
@@ -71,21 +72,36 @@ func TestFilebeat(t *testing.T) {
 	}
 
 	expectedFBStreams.Streams = fbStreams
-	outPath, server := tests.SetupTestEnv(t, expectedFBStreams, time.Second*6)
-	defer server.Srv.Stop()
+
+	outPath, server := tests.SetupTestEnv(t, expectedFBStreams, time.Second*30)
 
 	defer func() {
 		err := os.RemoveAll(outPath)
 		require.NoError(t, err)
 	}()
 
-	t.Logf("Running beats...")
-	err := filebeatCmd.Execute()
-	require.NoError(t, err)
+	go func() {
+		t.Logf("Running beats...")
+		err := filebeatCmd.Execute()
+		require.NoError(t, err)
+	}()
+
+	// Wait until we've read from all log sources
+	t.Logf("waiting for events...")
+	for {
+		time.Sleep(time.Second)
+		//t.Logf("checking for stop condition in %s", outputFilesPath)
+		events := tests.ReadLogLines(t, outPath)
+		if events >= 90 {
+			t.Logf("stopping filebeat after %d events", events)
+			server.Client.Stop()
+			server.Srv.Stop()
+			break
+		}
+	}
 
 	t.Logf("Reading events...")
 	events := tests.ReadEvents(t, outPath)
-	t.Logf("Got %d events", len(events))
 	// Look for processors
 	expectedMetaValuesSyslog := map[string]interface{}{
 		// Processors created by
@@ -96,7 +112,7 @@ func TestFilebeat(t *testing.T) {
 		"data_stream.namespace": "default",
 		"data_stream.type":      "logs",
 	}
-	tests.ValuesExist(t, expectedMetaValuesSyslog, events, tests.ONCE)
+	tests.ValuesExist(t, expectedMetaValuesSyslog, events, tests.ONCE, "expectedMetaValuesSyslog")
 
 	expectedMetaValuesAuth := map[string]interface{}{
 		// Processors created by
@@ -105,11 +121,11 @@ func TestFilebeat(t *testing.T) {
 		"agent.id":            "test-agent",
 		"data_stream.dataset": "system.auth",
 	}
-	tests.ValuesExist(t, expectedMetaValuesAuth, events, tests.ONCE)
+	tests.ValuesExist(t, expectedMetaValuesAuth, events, tests.ONCE, "expectedMetaValuesAuth")
 
 	expectedLogValues := map[string]interface{}{
 		"log.file.path": nil,
 		"message":       nil,
 	}
-	tests.ValuesExist(t, expectedLogValues, events, tests.ONCE)
+	tests.ValuesExist(t, expectedLogValues, events, tests.ONCE, "expectedLogValues")
 }
