@@ -38,6 +38,9 @@
         "mysql.slowlog.tmp_table_sizes": 4026528,
         "mysql.slowlog.tmp_tables": 1,
         "mysql.thread_id": "37",
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
