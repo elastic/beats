@@ -1,6 +1,6 @@
 {
   "attributes": {
-    "description": "",
+    "description": "Overview dashboard for the FIlebeat Exchange module",
     "hits": 0,
     "kibanaSavedObjectMeta": {
       "searchSourceJSON": {

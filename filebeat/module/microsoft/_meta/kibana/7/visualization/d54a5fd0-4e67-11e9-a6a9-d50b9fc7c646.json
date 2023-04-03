@@ -11,11 +11,11 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Top 10 Recipients",
+    "title": "Exchange - Top 10 Recipients [Filebeat Microsoft]",
     "uiStateJSON": "{}",
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Top 10 Recipients",
+      "title": "Exchange - Top 10 Recipients [Filebeat Microsoft]",
       "type": "pie",
       "aggs": [
         {

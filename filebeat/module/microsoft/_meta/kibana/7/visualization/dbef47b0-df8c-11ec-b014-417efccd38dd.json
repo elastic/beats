@@ -11,11 +11,11 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Event ID",
+    "title": "Exchange - Event ID [Filebeat Microsoft]",
     "uiStateJSON": "{}",
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Event ID",
+      "title": "Exchange - Event ID [Filebeat Microsoft]",
       "type": "pie",
       "aggs": [
         {

@@ -11,11 +11,11 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Send/Deliver",
+    "title": "Exchange - Send/Deliver [Filebeat Microsoft]",
     "uiStateJSON": "{}",
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Send/Deliver",
+      "title": "Exchange - Send/Deliver [Filebeat Microsoft]",
       "type": "histogram",
       "params": {
         "type": "histogram",

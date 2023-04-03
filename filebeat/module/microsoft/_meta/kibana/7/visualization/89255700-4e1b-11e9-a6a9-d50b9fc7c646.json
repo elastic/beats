@@ -35,11 +35,11 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Inbound Message Volume",
+    "title": "Exchange - Inbound Message Volume [Filebeat Microsoft]",
     "uiStateJSON": "{}",
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Inbound Message Volume",
+      "title": "Exchange - Inbound Message Volume [Filebeat Microsoft]",
       "type": "metric",
       "aggs": [
         {

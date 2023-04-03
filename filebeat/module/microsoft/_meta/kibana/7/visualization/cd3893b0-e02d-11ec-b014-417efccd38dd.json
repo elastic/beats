@@ -11,7 +11,7 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Direction",
+    "title": "Exchange - Direction [Filebeat Microsoft]",
     "uiStateJSON": {
       "vis": {
         "legendOpen": false
@@ -19,7 +19,7 @@
     },
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Direction",
+      "title": "Exchange - Direction [Filebeat Microsoft]",
       "type": "pie",
       "aggs": [
         {

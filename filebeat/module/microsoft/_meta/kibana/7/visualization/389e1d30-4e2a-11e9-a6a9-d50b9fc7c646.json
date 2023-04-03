@@ -38,11 +38,11 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Outbound Message Volume",
+    "title": "Exchange - Outbound Message Volume [Filebeat Microsoft]",
     "uiStateJSON": "{}",
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Outbound Message Volume",
+      "title": "Exchange - Outbound Message Volume [Filebeat Microsoft]",
       "type": "metric",
       "params": {
         "addLegend": false,

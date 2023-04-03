@@ -11,7 +11,7 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Hosts",
+    "title": "Exchange - Hosts [Filebeat Microsoft]",
     "uiStateJSON": {
       "vis": {
         "legendOpen": true
@@ -19,7 +19,7 @@
     },
     "version": 1,
     "visState": {
-      "title": "[Filebeat Microsoft] Exchange - Hosts",
+      "title": "Exchange - Hosts [Filebeat Microsoft]",
       "type": "pie",
       "aggs": [
         {

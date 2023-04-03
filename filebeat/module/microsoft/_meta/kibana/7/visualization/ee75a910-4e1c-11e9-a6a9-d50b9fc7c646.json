@@ -11,10 +11,11 @@
       }
     },
     "savedSearchRefName": "search_0",
-    "title": "[Filebeat Microsoft] Exchange - Time Histogram",
+    "title": "Exchange - Time Histogram [Filebeat Microsoft]",
     "uiStateJSON": "{}",
     "version": 1,
     "visState": {
+      "title": "Exchange - Time Histogram [Filebeat Microsoft]",
       "aggs": [
         {
           "enabled": true,
@@ -115,7 +116,6 @@
         "detailedTooltip": true,
         "legendSize": "auto"
       },
-      "title": "[Filebeat Microsoft] Exchange - Time Histogram",
       "type": "histogram"
     }
   },
