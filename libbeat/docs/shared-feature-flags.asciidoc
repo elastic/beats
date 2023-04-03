@@ -7,8 +7,8 @@
 
 The Feature Flags section of the +{beatname_lc}.yml+ config file contains
 settings in {beatname_uc} that are disabled by default. These may include 
-experimental features, changes to behaviors within {beatname_uc} or its 
-components, or settings that could cause a breaking change. For example a
+experimental features, changes to behaviors within {beatname_uc}, or 
+settings that could cause a breaking change. For example a
 setting that changes information included in events might be inconsistent with
 the naming pattern expected in your configured {beatname_uc} output.
 
