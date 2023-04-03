@@ -1,6 +1,6 @@
 - name: gke
   description: '`gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE'
-  release: beta
+  release: ga
   type: group
   fields:
   - name: container.cpu.core_usage_time.sec
