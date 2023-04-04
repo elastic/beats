@@ -129,7 +129,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer receiver.metrics.Close()
 
-		// Poll sqs waiting metric periodically in the background.
+		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
 
 		if err := receiver.Receive(ctx); err != nil {
@@ -208,9 +208,9 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	if err != nil {
 		return nil, err
 	}
-	in.metrics = newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory, in.config.MaxNumberOfMessages)
 	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
@@ -281,8 +281,8 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	in.metrics = newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
 		in.metrics,
 		s3API,
