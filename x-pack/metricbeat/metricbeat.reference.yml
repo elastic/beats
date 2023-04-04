@@ -611,6 +611,15 @@ metricbeat.modules:
   table_pattern: "table pattern"
   cost_type: "regular"
 
+- module: gcp
+  metricsets:
+    - carbon
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"
+
 #-------------------------------- Golang Module --------------------------------
 - module: golang
   #metricsets:
@@ -1836,6 +1845,13 @@ output.elasticsearch:
 
   # Number of workers per Elasticsearch host.
   #worker: 1
+
+  # If set to true and multiple hosts are configured, the output plugin load
+  # balances published events onto all Elasticsearch hosts. If set to false,
+  # the output plugin sends all events to only one host (determined at random)
+  # and will switch to another host if the currently selected one becomes
+  # unreachable. The default value is true.
+  #loadbalance: true
 
   # Optional data stream or index name. The default is "metricbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
@@ -3104,4 +3120,11 @@ logging.files:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
+
+# =============================== Feature Flags ================================
+
+# Enable and configure feature flags.
+#features:
+#  fqdn:
+#    enabled: true
 

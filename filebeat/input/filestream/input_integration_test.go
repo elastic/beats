@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package filestream
 
@@ -38,7 +37,6 @@ import (
 
 // test_close_renamed from test_harvester.py
 func TestFilestreamCloseRenamed(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/26727")
 	if runtime.GOOS == "windows" {
 		t.Skip("renaming files while Filebeat is running is not supported on Windows")
 	}
@@ -59,7 +57,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	})
 
 	testlines := []byte("first log line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -72,7 +70,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.mustRenameFile(testlogName, testlogNameRotated)
 
 	newerTestlines := []byte("new first log line\nnew second log line\n")
-	env.mustWriteLinesToFile(testlogName, newerTestlines)
+	env.mustWriteToFile(testlogName, newerTestlines)
 
 	env.waitUntilEventCount(3)
 
@@ -84,8 +82,6 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 }
 
 func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/26608")
-
 	if runtime.GOOS == "windows" {
 		t.Skip("renaming files while Filebeat is running is not supported on Windows")
 	}
@@ -100,7 +96,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	})
 
 	testline := []byte("log line\n")
-	env.mustWriteLinesToFile(testlogName, testline)
+	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -116,7 +112,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env.waitUntilMetaInRegistry(testlogNameRenamed, "fake-ID", fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
 	env.requireOffsetInRegistry(testlogNameRenamed, "fake-ID", len(testline))
 
-	env.mustAppendLinesToFile(testlogNameRenamed, testline)
+	env.mustAppendToFile(testlogNameRenamed, testline)
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogNameRenamed, "fake-ID", len(testline)*2)
@@ -139,7 +135,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	})
 
 	testlines := []byte("first log line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -179,7 +175,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 
 	testlines := []byte("first log line\n")
 	expectedOffset := len(testlines)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -189,7 +185,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, "fake-ID", expectedOffset)
 
 	// the second log line will not be picked up as scan_interval is set to one day.
-	env.mustWriteLinesToFile(testlogName, []byte("first line\nsecond log line\n"))
+	env.mustWriteToFile(testlogName, []byte("first line\nsecond log line\n"))
 
 	// only one event is read
 	env.waitUntilEventCount(1)
@@ -215,13 +211,13 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first log line\nnext is an empty line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	moreTestlines := []byte("\nafter an empty line\n")
-	env.mustAppendLinesToFile(testlogName, moreTestlines)
+	env.mustAppendToFile(testlogName, moreTestlines)
 
 	env.waitUntilEventCount(3)
 	env.requireEventsReceived([]string{
@@ -253,7 +249,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	testlines := []byte("\n\n\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -280,7 +276,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 2016-04-05T00:00:02.052Z,,,,,"MDB:61914740-3f1b-4ddb-94e0-557196870cfa, Mailbox:279f077c-216f-4323-a9ee-48e50ffd3cad, Event:269492708, MessageClass:IPM.Note.StorageQuotaWarning.Warning, CreationTime:2016-04-05T00:00:01.022Z, ClientType:System",,STOREDRIVER,NOTIFYMAPI,,,,,,,,,,,,,,,,,S:ItemEntryId=00-00-00-00-37-DB-F9-F9-B5-F2-42-4F-86-62-E6-5D-FC-0C-A1-41-07-00-0E-D6-03-16-80-DC-8C-44-9D-30-07-23-ED-71-B7-F7-00-00-1F-D4-B5-0E-00-00-2E-EF-F2-59-0E-E8-2D-46-BC-31-02-85-0D-67-98-43-00-00-37-4A-A3-B3-00-00
 2016-04-05T00:00:02.145Z,,,,,"MDB:61914740-3f1b-4ddb-94e0-557196870cfa, Mailbox:49cb09c6-5b76-415d-a085-da0ad9079682, Event:269492711, MessageClass:IPM.Note.StorageQuotaWarning.Warning, CreationTime:2016-04-05T00:00:01.038Z, ClientType:System",,STOREDRIVER,NOTIFYMAPI,,,,,,,,,,,,,,,,,S:ItemEntryId=00-00-00-00-97-8F-07-43-51-44-61-4A-AD-BD-29-D4-97-4E-20-A0-07-00-0E-D6-03-16-80-DC-8C-44-9D-30-07-23-ED-71-B7-F7-00-8E-8F-BD-EB-57-00-00-3D-FB-CE-26-A4-8D-46-4C-A4-35-0F-A7-9B-FA-D7-B9-00-00-37-44-2F-CA-00-00
 `)...)
-	env.mustWriteLinesToFile(testlogName, lines)
+	env.mustWriteToFile(testlogName, lines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -320,7 +316,7 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			writer.Write(line)
 			writer.Close()
 
-			env.mustWriteLinesToFile(testlogName, buf.Bytes())
+			env.mustWriteToFile(testlogName, buf.Bytes())
 
 			ctx, cancelInput := context.WithCancel(context.Background())
 			env.startInput(ctx, inp)
@@ -349,7 +345,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	})
 
 	testlines := []byte("first line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -358,7 +354,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	env.mustWriteLinesToFile(testlogName, []byte("first line\nsecond log line\n"))
+	env.mustWriteToFile(testlogName, []byte("first line\nsecond log line\n"))
 
 	env.waitUntilEventCount(1)
 
@@ -382,7 +378,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -412,7 +408,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -444,7 +440,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -478,7 +474,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -513,7 +509,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -527,7 +523,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env.waitUntilHarvesterIsDone()
 
 	newTestlines := []byte("rotated first line\nrotated second line\nrotated third line\n")
-	env.mustWriteLinesToFile(testlogName, newTestlines)
+	env.mustWriteToFile(testlogName, newTestlines)
 
 	env.waitUntilEventCount(6)
 
@@ -555,7 +551,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -564,7 +560,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	time.Sleep(5 * time.Millisecond)
 
 	truncatedTestLines := []byte("truncated first line\n")
-	env.mustWriteLinesToFile(testlogName, truncatedTestLines)
+	env.mustWriteToFile(testlogName, truncatedTestLines)
 	env.waitUntilEventCount(4)
 
 	cancelInput()
@@ -589,7 +585,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -600,7 +596,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	time.Sleep(5 * time.Millisecond)
 
 	truncatedTestLines := []byte("truncated first line\n")
-	env.mustWriteLinesToFile(testlogName, truncatedTestLines)
+	env.mustWriteToFile(testlogName, truncatedTestLines)
 	env.waitUntilEventCount(4)
 
 	cancelInput()
@@ -626,7 +622,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	})
 
 	lines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, lines)
+	env.mustWriteToFile(testlogName, lines)
 
 	env.mustSymlink(testlogName, symlinkName)
 
@@ -643,7 +639,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
 
 	moreLines := []byte("forth line\nfifth line\n")
-	env.mustWriteLinesToFile(testlogName, moreLines)
+	env.mustWriteToFile(testlogName, moreLines)
 
 	env.waitUntilEventCount(5)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(moreLines))
@@ -669,7 +665,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -677,7 +673,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	env.mustTruncateFile(testlogName, 0)
 
 	truncatedTestLines := []byte("truncated first line\n")
-	env.mustWriteLinesToFile(testlogName, truncatedTestLines)
+	env.mustWriteToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
 
@@ -700,7 +696,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -714,7 +710,6 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 }
 
 func TestFilestreamTruncateBlockedOutput(t *testing.T) {
-	t.Skip("Flaky test https://github.com/elastic/beats/issues/27085")
 	env := newInputTestingEnvironment(t)
 	env.pipeline = &mockPipelineConnector{blocking: true}
 
@@ -727,7 +722,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	})
 
 	testlines := []byte("first line\nsecond line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -743,7 +738,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	// extra lines are appended after first line is processed
 	// so it can interfere with the truncation of the file
-	env.mustAppendLinesToFile(testlogName, []byte("third line\n"))
+	env.mustAppendToFile(testlogName, []byte("third line\n"))
 
 	env.mustTruncateFile(testlogName, 0)
 
@@ -755,7 +750,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.pipeline.invertBlocking()
 
 	truncatedTestLines := []byte("truncated line\n")
-	env.mustWriteLinesToFile(testlogName, truncatedTestLines)
+	env.mustWriteToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
 	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines))
@@ -779,7 +774,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	})
 
 	testlines := []byte("first line\n")
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	env.mustSymlink(testlogName, symlinkName)
 
@@ -814,7 +809,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 
 	commonLine := "first line in file "
 	for i, path := range []string{firstTestlogName, secondTestlogName} {
-		env.mustWriteLinesToFile(path, []byte(commonLine+strconv.Itoa(i)+"\n"))
+		env.mustWriteToFile(path, []byte(commonLine+strconv.Itoa(i)+"\n"))
 	}
 
 	env.mustSymlink(firstTestlogName, symlinkName)
@@ -832,7 +827,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.mustSymlink(secondTestlogName, symlinkName)
 
 	moreLines := "second line in file 2\nthird line in file 2\n"
-	env.mustAppendLinesToFile(secondTestlogName, []byte(moreLines))
+	env.mustAppendToFile(secondTestlogName, []byte(moreLines))
 
 	env.waitUntilEventCount(4)
 	env.requireOffsetInRegistry(firstTestlogName, "fake-ID", expectedOffset)
@@ -862,7 +857,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	})
 
 	line := []byte("first line\n")
-	env.mustWriteLinesToFile(testlogName, line)
+	env.mustWriteToFile(testlogName, line)
 
 	env.mustSymlink(testlogName, symlinkName)
 
@@ -876,7 +871,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 
-	env.mustAppendLinesToFile(testlogName, line)
+	env.mustAppendToFile(testlogName, line)
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", 2*len(line))
@@ -904,7 +899,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	})
 
 	lines := []byte("first line\nsecond line\nthird line\n")
-	env.mustWriteLinesToFile(testlogName, lines)
+	env.mustWriteToFile(testlogName, lines)
 
 	env.mustSymlink(testlogName, symlinkName)
 
@@ -924,7 +919,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	moreLines := []byte("forth line\nfifth line\n")
-	env.mustWriteLinesToFile(testlogName, moreLines)
+	env.mustWriteToFile(testlogName, moreLines)
 
 	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines))
 
@@ -1013,7 +1008,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 
-	env.mustWriteLinesToFile(testlogName, []byte("Line 1\n"))
+	env.mustWriteToFile(testlogName, []byte("Line 1\n"))
 	env.waitUntilEventCount(1)
 
 	env.mustRenameFile(testlogName, testlogName+".1")
@@ -1021,7 +1016,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	env.waitUntilHarvesterIsDone()
 	time.Sleep(2 * time.Second)
 
-	env.mustWriteLinesToFile(testlogName, []byte("Line 2\n"))
+	env.mustWriteToFile(testlogName, []byte("Line 2\n"))
 
 	// allow for events to be send multiple times due to log rotation
 	env.waitUntilAtLeastEventCount(2)

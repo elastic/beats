@@ -59,7 +59,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix panics when a processor is closed twice {pull}34647[34647]
-- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}[]
+- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
 
 *Auditbeat*
 
@@ -96,11 +98,19 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
 - Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
 - Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
+- Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
+- Fix errors and panics due to re-used processors {pull}34761[34761]
+- Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix integration hashing to prevent reloading all when updated. {pull}34697[34697]
+- Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
 - Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
@@ -109,6 +119,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
 with the ecs field name `container`. {pull}34403[34403]
 automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Fix broken mapping for state.ends field. {pull}34891[34891]
+- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
 
 *Heartbeat*
 
@@ -123,6 +135,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
 - Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
+- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
+- Drop empty API response events for Microsoft module. {issue}34786[34786] {pull}34893[34893]
 
 *Auditbeat*
 
@@ -147,6 +161,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
 - Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
+- Make generic SQL GA {pull}34637[34637]
+- Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
 
 
 *Osquerybeat*
@@ -160,6 +176,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
+- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
+- Improve documentation for event_logs.name configuration. {pull}34931[34931]
 
 *Functionbeat*
 
@@ -174,7 +192,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Affecting all Beats*
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
-
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 
 *Auditbeat*
 
@@ -222,6 +240,17 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
 - Fixed GCS log format issues. {pull}34659[34659]
 - Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
+- Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
+- Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
+- Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
+- Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
+- Added metric `sqs_worker_utilization` for aws-s3 input. {pull}34793[34793]
+- Improve CEL input documentation {pull}34831[34831]
+- Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
+- Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
+- Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
+- Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
+- Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 
 *Auditbeat*
 
@@ -248,6 +277,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
 - Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
 - Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
+- Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 
 *Packetbeat*
 
@@ -258,6 +288,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
 - Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 - Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
+- Add metrics documentation for TCP and UDP protocols. {issue}34887[34887] {pull}34889[34889]
 
 *Packetbeat*
 
@@ -268,6 +299,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Add metrics for log event processing. {pull}33922[33922]
+- Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
 
 *Elastic Log Driver*
 

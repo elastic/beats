@@ -73,10 +73,13 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		if requestedType != "" {
-			if typ, ok := m["input"].(string); ok && !strings.EqualFold(typ, requestedType) {
-				continue
-			}
+		// Require all entries to have an 'input' and 'id' to be accessed through this API.
+		if id, ok := m["id"].(string); !ok || id == "" {
+			continue
+		}
+
+		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+			continue
 		}
 
 		filtered = append(filtered, m)

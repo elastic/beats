@@ -23,7 +23,7 @@ func SetSqlValueWithParentKey(logger *logp.Logger, output map[string]mapstr.M, p
 	SetSqlValue(logger, ms, targetFieldName, v)
 }
 
-//SetSqlValue avoid setting an invalid empty value value on Metricbeat event
+// SetSqlValue avoid setting an invalid empty value value on Metricbeat event
 func SetSqlValue(logger *logp.Logger, output mapstr.M, targetFieldName string, v SqlValue) {
 	if v.isValid() {
 		if _, err := output.Put(targetFieldName, v.Value()); err != nil {

@@ -32,8 +32,9 @@ func appendUnpadded(bs []byte, i int) []byte {
 // 'digits' bytes.
 //
 // for example:
-//   appendPadded(..., 10, 5) -> 00010
-//   appendPadded(..., 12345, 5) -> 12345
+//
+//	appendPadded(..., 10, 5) -> 00010
+//	appendPadded(..., 12345, 5) -> 12345
 func appendPadded(bs []byte, val, digits int) []byte {
 	if val < 0 {
 		bs = append(bs, '-')
@@ -86,11 +87,12 @@ func appendPadded(bs []byte, val, digits int) []byte {
 // be printed.
 //
 // for example:
-//    appendFractPadded(..., 0, 9, 3) -> "000"
-//    appendFractPadded(..., 123000, 9, 3) -> "000123"
-//    appendFractPadded(..., 120000, 9, 3) -> "000120"
-//    appendFractPadded(..., 120000010, 9, 3) -> "000120010"
-//    appendFractPadded(..., 123456789, 6, 3) -> "123456"
+//
+//	appendFractPadded(..., 0, 9, 3) -> "000"
+//	appendFractPadded(..., 123000, 9, 3) -> "000123"
+//	appendFractPadded(..., 120000, 9, 3) -> "000120"
+//	appendFractPadded(..., 120000010, 9, 3) -> "000120010"
+//	appendFractPadded(..., 123456789, 6, 3) -> "123456"
 func appendFractPadded(bs []byte, val, digits, fractSz int) []byte {
 	if fractSz == 0 || digits <= fractSz {
 		return appendPadded(bs, val, digits)

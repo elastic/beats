@@ -19,7 +19,10 @@ package memqueue
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
@@ -38,6 +41,21 @@ func (c *config) Validate() error {
 	if c.FlushMinEvents > c.Events {
 		return errors.New("flush.min_events must be less events")
 	}
-
 	return nil
+}
+
+// SettingsForUserConfig unpacks a ucfg config from a Beats queue
+// configuration and returns the equivalent memqueue.Settings object.
+func SettingsForUserConfig(cfg *c.C) (Settings, error) {
+	config := defaultConfig
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
+		}
+	}
+	return Settings{
+		Events:         config.Events,
+		FlushMinEvents: config.FlushMinEvents,
+		FlushTimeout:   config.FlushTimeout,
+	}, nil
 }
