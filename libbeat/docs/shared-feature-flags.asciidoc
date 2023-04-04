@@ -31,8 +31,8 @@ You can specify the following options in the `features` section of the +{beatnam
 ==== `fqdn`
 
 Contains configuration for the FQDN reporting feature. When this feature is
-enabled, {beatname_uc} reports the fully-qualified domain name for the host
-on which it's running.
+enabled, the fully-qualified domain name for the host is reported in the
+`host.name` field in events produced by {beatname_uc}.
 
 For FQDN reporting to work as expected, the hostname of the current host must either:
 
