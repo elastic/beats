@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
 - Fix `httpjson` input storing all the responses in memory for one iteration of chain call. {issue}34310[34310] {pull}34325[34325]
 
 *Heartbeat*
@@ -244,11 +245,13 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
+- Added metric `sqs_worker_utilization` for aws-s3 input. {pull}34793[34793]
 - Improve CEL input documentation {pull}34831[34831]
 - Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
 - Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
 - Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
 - Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
+- Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 
 *Auditbeat*
 

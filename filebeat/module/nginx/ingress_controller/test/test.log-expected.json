@@ -1763,5 +1763,69 @@
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14.6",
         "user_agent.version": "13.0.5"
+    },
+    {
+        "@timestamp": "2020-02-07T12:02:42.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "192.168.64.14 - - [07/Feb/2020:12:02:42 +0000] \"GET /test/test.mp4 HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 348 0.001 [default-web2-8080] [] 172.17.0.6:8080, 172.17.0.7:8080 - 0.100, - 200, - 835136ae24486dbb4156dcbe21f5d402",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "835136ae24486dbb4156dcbe21f5d402",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 61,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 7742,
+        "nginx.ingress_controller.http.request.id": "835136ae24486dbb4156dcbe21f5d402",
+        "nginx.ingress_controller.http.request.length": 348,
+        "nginx.ingress_controller.http.request.time": 0.001,
+        "nginx.ingress_controller.remote_ip_list": [
+            "192.168.64.14"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.7",
+        "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
+        "nginx.ingress_controller.upstream.response.status_code": 200,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "-",
+            "200"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.1,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "-",
+            "0.100"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "172.17.0.6:8080",
+            "172.17.0.7:8080"
+        ],
+        "related.ip": [
+            "172.17.0.7",
+            "192.168.64.14"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.64.14",
+        "source.ip": "192.168.64.14",
+        "url.extension": "mp4",
+        "url.original": "/test/test.mp4",
+        "url.path": "/test/test.mp4",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
+        "user_agent.os.full": "Mac OS X 10.14",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.14",
+        "user_agent.version": "72.0."
     }
 ]
