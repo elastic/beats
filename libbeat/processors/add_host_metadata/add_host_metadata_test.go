@@ -31,7 +31,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/features"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
@@ -593,5 +592,3 @@ func fqdnFeatureFlagConfig(fqdnEnabled bool) *conf.C {
 		"features.fqdn.enabled": fqdnEnabled,
 	})
 }
->>>>>>> 895505cffe (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
->>>>>>> 877f803e23 (Log any FQDN lookup errors and fallback to OS-reported hostname (#34946))
