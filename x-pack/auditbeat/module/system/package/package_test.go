@@ -10,33 +10,27 @@ package pkg
 import (
 	"bytes"
 	"encoding/gob"
-	"errors"
-	"flag"
-	"io/ioutil"
+	"io"
+	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var flagUpdateGob = flag.Bool("update-gob", false, "update persisted gob testdata")
-
 func TestData(t *testing.T) {
-	if runtime.GOOS == "darwin" {
-		t.Skip("FIXME: https://github.com/elastic/beats/issues/18855")
-	}
-
 	defer abtest.SetupDataDir(t)()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	defer f.(*MetricSet).bucket.DeleteBucket()
+	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -52,7 +46,7 @@ func TestData(t *testing.T) {
 }
 
 func TestDpkg(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	defer abtest.SetupDataDir(t)()
 
@@ -75,7 +69,7 @@ func TestDpkg(t *testing.T) {
 	}
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	defer f.(*MetricSet).bucket.DeleteBucket()
+	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -111,7 +105,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"python2.7-minimal": 0,
 	}
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	defer abtest.SetupDataDir(t)()
 
@@ -134,7 +128,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 	}
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	defer f.(*MetricSet).bucket.DeleteBucket()
+	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -170,8 +164,8 @@ func getConfig() map[string]interface{} {
 	}
 }
 
-func TestPackageGobEncodeDecode(t *testing.T) {
-	pkg := Package{
+func TestPackageV1GobDecode(t *testing.T) {
+	pkg := packageV1{
 		Name:        "foo",
 		Version:     "1.2.3",
 		Release:     "1",
@@ -184,37 +178,17 @@ func TestPackageGobEncodeDecode(t *testing.T) {
 		Type:        "rpm",
 	}
 
-	buf := new(bytes.Buffer)
-	if err := gob.NewEncoder(buf).Encode(pkg); err != nil {
-		t.Fatal(err)
-	}
-
 	const gobTestFile = "testdata/package.v1.gob"
-	if *flagUpdateGob {
-		// NOTE: If you are updating this file then you may have introduced a
-		// a breaking change.
-		if err := ioutil.WriteFile(gobTestFile, buf.Bytes(), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	t.Run("decode", func(t *testing.T) {
-		var pkgDecoded Package
-		if err := gob.NewDecoder(buf).Decode(&pkgDecoded); err != nil {
-			t.Fatal(err)
-		}
-		assert.Equal(t, pkg, pkgDecoded)
-	})
 
 	// Validate that we get the same result when decoding an earlier saved version.
 	// This detects breakages to the struct or to the encoding/decoding pkgs.
 	t.Run("decode_from_file", func(t *testing.T) {
-		contents, err := ioutil.ReadFile(gobTestFile)
+		contents, err := os.ReadFile(gobTestFile)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		var pkgDecoded Package
+		var pkgDecoded packageV1
 		if err := gob.NewDecoder(bytes.NewReader(contents)).Decode(&pkgDecoded); err != nil {
 			t.Fatal(err)
 		}
@@ -222,15 +196,71 @@ func TestPackageGobEncodeDecode(t *testing.T) {
 	})
 }
 
-// Regression test for https://github.com/elastic/beats/issues/18536 to verify
-// that error isn't made public.
-func TestPackageWithErrorGobEncode(t *testing.T) {
-	pkg := Package{
-		error: errors.New("test"),
+func TestPackageDatabaseMigration(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "beat.db")
+	if err := copyFile("testdata/package.v1.db", dbPath); err != nil {
+		t.Fatal(err)
 	}
 
-	buf := new(bytes.Buffer)
-	if err := gob.NewEncoder(buf).Encode(pkg); err != nil {
+	ds := datastore.New(dbPath, 0o600)
+	if err := ds.Update(migrateDatastoreSchema); err != nil {
+		t.Fatal(err)
+	}
+
+	bucket, err := ds.OpenBucket(bucketNameV2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bucket.Close()
+
+	ts, err := loadStateTimestamp(bucket)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.EqualValues(t, 1680274980069542000, ts.UnixNano())
+
+	pkgs, err := loadPackages(bucket)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(t, pkgs, 149)
+
+	for _, pkg := range pkgs {
+		if pkg.Name == "yq" {
+			assert.Equal(t, &Package{
+				Name:        "yq",
+				Version:     "4.30.8",
+				InstallTime: time.Date(2023, time.January, 17, 20, 15, 42, 0, time.UTC),
+				Summary:     "Process YAML, JSON, XML, CSV and properties documents from the CLI",
+				URL:         "https://github.com/mikefarah/yq",
+				Type:        "brew",
+			}, pkg)
+		}
+	}
+}
+
+func copyFile(old, new string) error {
+	o, err := os.Open(old)
+	if err != nil {
+		return err
+	}
+	defer o.Close()
+	n, err := os.Create(new)
+	if err != nil {
+		return err
+	}
+	defer n.Close()
+	_, err = io.Copy(n, o)
+	return err
+}
+
+// deleteBucket deletes the bucket from the datastore. This is workaround
+// for the lack of proper test isolation. Tests may be sharing the same
+// global datastore that is stored in the path.data directory and this
+// prevents test side effects. The tests should be refactored to support
+// true isolation with different data stores in different temp dirs.
+func deleteBucket(t *testing.T, metricSet mb.ReportingMetricSetV2) {
+	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil {
 		t.Fatal(err)
 	}
 }
