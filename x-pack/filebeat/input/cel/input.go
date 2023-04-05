@@ -1032,10 +1032,7 @@ func cloneMap(dst, src mapstr.M) {
 // walkMap walks to all ends of the provided path in m and applies fn to the
 // final element of each walk. Nested arrays are not handled.
 func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
-	var rest string
-	var key string
-	var more bool
-	key, rest, more = strings.Cut(path, ".")
+	key, rest, more := strings.Cut(path, ".")
 	v, ok := m[key]
 	if !ok {
 		return
