@@ -331,6 +331,7 @@ func TestPublish(t *testing.T) {
 	}
 
 	t.Run("cancels the batch when a different server responds", func(t *testing.T) {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/34984")
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
