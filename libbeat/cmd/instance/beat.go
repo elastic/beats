@@ -80,7 +80,9 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -211,12 +213,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 		return nil, err
 	}
 
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get host information: %w", err)
-	}
-	fqdn := h.Info().FQDN
-
 	fields, err := asset.GetFields(name)
 	if err != nil {
 		return nil, err
@@ -235,7 +231,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Version:         v,
 			Name:            hostname,
 			Hostname:        hostname,
-			FQDN:            fqdn,
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
