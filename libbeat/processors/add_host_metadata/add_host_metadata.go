@@ -22,9 +22,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -57,30 +56,40 @@ const (
 
 // New constructs a new add_host_metadata processor.
 func New(cfg *config.C) (processors.Processor, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	p := &addHostMetadata{
-		config: config,
+		config: c,
 		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_host_metadata"),
 	}
-	p.loadData()
+	if err := p.loadData(); err != nil {
+		return nil, fmt.Errorf("failed to load data: %w", err)
+	}
 
-	if config.Geo != nil {
-		geoFields, err := util.GeoConfigToMap(*config.Geo)
+	if c.Geo != nil {
+		geoFields, err := util.GeoConfigToMap(*c.Geo)
 		if err != nil {
 			return nil, err
 		}
 		p.geoData = mapstr.M{"host": mapstr.M{"geo": geoFields}}
 	}
 
+	err := features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, processorName)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"could not register callback for FQDN reporting onChange from %s processor: %w",
+			processorName, err,
+		)
+	}
+
 	return p, nil
 }
 
-// Run enriches the given event with the host meta data
+// Run enriches the given event with the host metadata
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// check replace_host_fields field
 	if !p.config.ReplaceFields && skipAddingHostMetadata(event) {
@@ -99,6 +108,15 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	return event, nil
 }
+
+// Ideally we'd be able to implement the Closer interface here and
+// deregister the callback.  But processors that can be used with the
+// `script` processor are not allowed to implement the Closer
+// interface (@see https://github.com/elastic/beats/pull/16349).
+//func (p *addHostMetadata) Close() error {
+//	features.RemoveFQDNOnChangeCallback(processorName)
+//	return nil
+//}
 
 func (p *addHostMetadata) expired() bool {
 	if p.config.CacheTTL <= 0 {
@@ -125,7 +143,7 @@ func (p *addHostMetadata) loadData() error {
 		return err
 	}
 
-	data := host.MapHostInfo(h.Info())
+	data := host.MapHostInfo(features.FQDN(), h.Info())
 	if p.config.NetInfoEnabled {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
@@ -134,16 +152,23 @@ func (p *addHostMetadata) loadData() error {
 		}
 
 		if len(ipList) > 0 {
-			data.Put("host.ip", ipList)
+			if _, err := data.Put("host.ip", ipList); err != nil {
+				return fmt.Errorf("could not set host.ip: %w", err)
+			}
 		}
 		if len(hwList) > 0 {
-			data.Put("host.mac", hwList)
+			if _, err := data.Put("host.mac", hwList); err != nil {
+				return fmt.Errorf("could not set host.mac: %w", err)
+			}
 		}
 	}
 
 	if p.config.Name != "" {
-		data.Put("host.name", p.config.Name)
+		if _, err := data.Put("host.name", p.config.Name); err != nil {
+			return fmt.Errorf("could not set host.name: %w", err)
+		}
 	}
+
 	p.data.Set(data)
 	return nil
 }
@@ -151,6 +176,30 @@ func (p *addHostMetadata) loadData() error {
 func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
+}
+
+func (p *addHostMetadata) handleFQDNReportingChange(new, old bool) {
+	if new == old {
+		// Nothing to do
+		return
+	}
+
+	// Whether we should report the FQDN or not has changed.  Expire cache
+	// so we start report the desired hostname value immediately.
+	p.expireCache()
+}
+
+func (p *addHostMetadata) expireCache() {
+	if p.config.CacheTTL <= 0 {
+		return
+	}
+
+	p.lastUpdate.Lock()
+	defer p.lastUpdate.Unlock()
+
+	// Update cache's last updated timestamp to be zero,
+	// effectively expiring the cache immediately.
+	p.lastUpdate.Time = time.Time{}
 }
 
 func skipAddingHostMetadata(event *beat.Event) bool {

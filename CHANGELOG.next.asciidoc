@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 
 *Auditbeat*
 
