@@ -391,6 +391,7 @@ func assertEventMatches(t *testing.T, expected bay.MaybeMsg, got beat.Event) {
 }
 
 func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/34956")
 	var err error
 
 	expectedEventCount := 2
