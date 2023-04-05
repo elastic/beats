@@ -6,12 +6,14 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
@@ -47,12 +49,16 @@ func init() {
 	management.ConfigTransform.SetTransform(metricbeatCfg)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
+	if err != nil { // these are hard-coded, shouldn't fail
+		panic(fmt.Errorf("error creating global processors: %w", err))
+	}
 	settings := instance.Settings{
 		RunFlags:        runFlags,
 		Name:            Name,
 		HasDashboards:   true,
 		ElasticLicensed: true,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:      processing.MakeDefaultSupport(true, globalProcs, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))

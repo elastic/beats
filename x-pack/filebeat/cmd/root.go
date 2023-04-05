@@ -5,8 +5,12 @@
 package cmd
 
 import (
+	"fmt"
+
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register the includes.
@@ -21,6 +25,11 @@ const Name = fbcmd.Name
 func Filebeat() *cmd.BeatsRootCmd {
 	management.ConfigTransform.SetTransform(filebeatCfg)
 	settings := fbcmd.FilebeatSettings()
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
+	if err != nil { // these are hard-coded, shouldn't fail
+		panic(fmt.Errorf("error creating global processors: %w", err))
+	}
+	settings.Processing = processing.MakeDefaultSupport(true, globalProcs)
 	settings.ElasticLicensed = true
 	command := fbcmd.Filebeat(inputs.Init, settings)
 	return command

@@ -15,8 +15,7 @@ import (
 )
 
 func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	procs := defaultProcessors()
-	modules, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo, procs...)
+	modules, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}

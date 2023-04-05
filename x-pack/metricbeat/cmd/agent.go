@@ -16,8 +16,7 @@ import (
 )
 
 func metricbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	procs := defaultProcessors()
-	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo, procs...)
+	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}

@@ -149,7 +149,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
-	processing, err := processing.MakeDefaultSupport(true)(beat, log, conf.NewConfig())
+	processing, err := processing.MakeDefaultSupport(true, nil)(beat, log, conf.NewConfig())
 	if err != nil {
 		return nil, err
 	}
