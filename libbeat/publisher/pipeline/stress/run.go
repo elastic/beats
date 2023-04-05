@@ -56,7 +56,7 @@ func RunTests(
 ) error {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return fmt.Errorf("unpacking config failed: %v", err)
+		return fmt.Errorf("unpacking config failed: %w", err)
 	}
 
 	log := logp.L()
@@ -81,7 +81,7 @@ func RunTests(
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("loading pipeline failed: %+v", err)
+		return fmt.Errorf("loading pipeline failed: %w", err)
 	}
 	defer func() {
 		log.Info("Stop pipeline")

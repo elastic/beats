@@ -282,7 +282,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			clusterUUID = getClusterUUID()
 		}
 		if clusterUUID != "" {
-			meta.Put("cluster_uuid", clusterUUID)
+			_, _ = meta.Put("cluster_uuid", clusterUUID)
 		}
 
 		r.client.Publish(beat.Event{
