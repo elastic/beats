@@ -64,3 +64,17 @@ func init() {
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
 }
+
+func defaultProcessors() []mapstr.M {
+	// processors:
+	//   - add_host_metadata: ~
+	//   - add_cloud_metadata: ~
+	//   - add_docker_metadata: ~
+	//   - add_kubernetes_metadata: ~
+	return []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
+	}
+}
