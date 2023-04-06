@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35037[35037]
 
 *Heartbeat*
 

@@ -110,6 +110,10 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
+	if cfg.Resource.Tracer != nil {
+		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", env.ID)
+	}
+
 	client, err := newClient(ctx, cfg, log)
 	if err != nil {
 		return err
