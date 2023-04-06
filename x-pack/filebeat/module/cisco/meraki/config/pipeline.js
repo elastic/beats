@@ -322,7 +322,7 @@ var select9 = linear_select([
 	part23,
 ]);
 
-var part24 = match("MESSAGE#3:urls/1", "nwparser.p0", "%{sport}:%{saddr->} dst=%{daddr}:%{dport->} mac=%{macaddr->} %{p0}");
+var part24 = match("MESSAGE#3:urls/1", "nwparser.p0", "%{saddr}:%{sport->} dst=%{daddr}:%{dport->} mac=%{macaddr->} %{p0}");
 
 var part25 = match("MESSAGE#3:urls/2_0", "nwparser.p0", "agent='%{user_agent}' request: %{p0}");
 
