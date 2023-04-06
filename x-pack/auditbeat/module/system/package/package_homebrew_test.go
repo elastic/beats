@@ -43,7 +43,7 @@ func TestHomebrew(t *testing.T) {
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
 		f := mbtest.NewReportingMetricSetV2(t, getConfig())
-		defer f.(*MetricSet).bucket.DeleteBucket()
+		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
 		if len(errs) > 0 {
@@ -97,7 +97,7 @@ func TestHomebrewNotExist(t *testing.T) {
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
 		f := mbtest.NewReportingMetricSetV2(t, getConfig())
-		defer f.(*MetricSet).bucket.DeleteBucket()
+		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
 		if len(errs) > 0 {
