@@ -31,7 +31,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	// Get DBInstance IDs per region
 	dbDetailsMap, err := getDBInstancesPerRegion(svc)
 	if err != nil {
-		logp.Error(fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err))
+		logp.L().Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err)
 		return events, nil
 	}
 

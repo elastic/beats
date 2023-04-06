@@ -30,7 +30,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	// Get queueUrls for each region
 	queueURLs, err := getQueueUrls(svc)
 	if err != nil {
-		logp.Error(fmt.Errorf("getQueueUrls failed, skipping region %s: %w", regionName, err))
+		logp.L().Errorf("getQueueUrls failed, skipping region %s: %w", regionName, err)
 		return events, nil
 	}
 
