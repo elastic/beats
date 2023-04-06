@@ -260,7 +260,7 @@ type CertificateConfig struct {
 	Certificate    string `config:"certificate" yaml:"certificate,omitempty"`
 	Key            string `config:"key" yaml:"key,omitempty"`
 	Passphrase     string `config:"key_passphrase" yaml:"key_passphrase,omitempty"`
-	PassphraseFile string `config:"key_passphrase_file" yaml:"key_passphrase_file,omitempty"`
+	PassphrasePath string `config:"key_passphrase_path" yaml:"key_passphrase_path,omitempty"`
 }
 
 // Validate validates the CertificateConfig

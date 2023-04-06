@@ -48,8 +48,8 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 
 	log := logp.NewLogger(logSelector)
 	passphrase := config.Passphrase
-	if passphrase == "" && config.PassphraseFile != "" {
-		p, err := os.ReadFile(config.PassphraseFile)
+	if passphrase == "" && config.PassphrasePath != "" {
+		p, err := os.ReadFile(config.PassphrasePath)
 		if err != nil {
 			return nil, fmt.Errorf("unable to read passphrase_file: %w", err)
 		}

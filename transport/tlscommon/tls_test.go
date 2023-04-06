@@ -102,7 +102,7 @@ func TestLoadWithEmptyValues(t *testing.T) {
     certificate:
     key:
     key_passphrase:
-    key_passphrase_file:
+    key_passphrase_path:
     certificate_authorities:
     cipher_suites:
     curve_types:
@@ -677,7 +677,7 @@ func TestKeyPassphrase(t *testing.T) {
     enabled: true
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
-    key_passphrase_file: %s
+    key_passphrase_path: %s
     `, fileName)))
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
@@ -689,7 +689,7 @@ func TestKeyPassphrase(t *testing.T) {
     enabled: true
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
-    key_passphrase_file: %s
+    key_passphrase_path: %s
     `, fileName)))
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will generate an internal "no passphrase available" error that is logged and the no PEM blocks error is returned instead
 	})
