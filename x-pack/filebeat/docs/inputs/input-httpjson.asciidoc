@@ -619,6 +619,9 @@ It is possible to log httpjson requests and responses to a local file-system for
 This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
 tune log rotation behavior.
 
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
+For Example, `http-request-trace-*.ndjson`.
+
 Enabling this option compromises security and should only be used for debugging.
 
 [float]
