@@ -8669,11 +8669,11 @@ third-party archives.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/docker/docker
-Version: v20.10.22+incompatible
+Version: v20.10.24+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/docker/docker@v20.10.22+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/docker/docker@v20.10.24+incompatible/LICENSE:
 
 
                                  Apache License
@@ -10079,11 +10079,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-client/v7
-Version: v7.0.3-0.20230315204017-166fd1fd746f
+Version: v7.1.0
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.0.3-0.20230315204017-166fd1fd746f/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.1.0/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -10626,11 +10626,11 @@ these terms.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.5.1-0.20230328163318-a87a0b315c42
+Version: v0.6.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.5.1-0.20230328163318-a87a0b315c42/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.6.0/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -12566,11 +12566,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sysinfo
-Version: v1.9.1-0.20230328042007-6dcfe88b8359
+Version: v1.10.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.9.1-0.20230328042007-6dcfe88b8359/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.10.0/LICENSE.txt:
 
 
                                  Apache License
@@ -22376,11 +22376,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.2.0
+Version: v0.7.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.7.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -22524,11 +22524,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
-Version: v0.4.0
+Version: v0.7.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.7.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -46052,11 +46052,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.2.0
+Version: v0.5.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.5.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
