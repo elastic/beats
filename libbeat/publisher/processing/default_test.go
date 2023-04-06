@@ -41,7 +41,6 @@ import (
 )
 
 func TestGenerateProcessorList(t *testing.T) {
-	_ = logp.DevelopmentSetup()
 	inputCfg := []mapstr.M{
 		{"add_host_metadata": nil},
 		{"add_cloud_metadata": nil},

@@ -258,6 +258,15 @@ func newBuilder(
 	return b, nil
 }
 
+// Processors returns a string description of the processor config
+func (b *builder) Processors() []string {
+	procList := []string{}
+	for _, proc := range b.processors.list {
+		procList = append(procList, proc.String())
+	}
+	return procList
+}
+
 // Create combines the builder configuration with the client settings
 // in order to build the event processing pipeline.
 //
