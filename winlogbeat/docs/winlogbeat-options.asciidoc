@@ -251,7 +251,11 @@ logs.
 `WARN EventLog[Application] Open() error. No events will be read from this
 source. The specified query is invalid.`
 
-If you have more than 22 event IDs, you can workaround this Windows limitation
+In some cases, the limit may be lower than 22 conditions. For instance, using a
+mixture of ranges and single event IDs, along with an additional parameter such
+as `ignore older`, results in a limit of 21 conditions.
+
+If you have more than 22 conditions, you can workaround this Windows limitation
 by using a drop_event[drop-event] processor to do the filtering after
 {beatname_uc} has received the events from Windows. The filter shown below is
 equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22

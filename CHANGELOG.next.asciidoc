@@ -102,6 +102,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 
+- Add metrics for log event processing. {pull}33922[33922]
+- Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
 
 *Elastic Log Driver*
 
