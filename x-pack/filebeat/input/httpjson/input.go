@@ -112,6 +112,10 @@ func run(
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
+	if config.Request.Tracer != nil {
+		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", ctx.ID)
+	}
+
 	httpClient, err := newHTTPClient(stdCtx, config, log)
 	if err != nil {
 		return err
