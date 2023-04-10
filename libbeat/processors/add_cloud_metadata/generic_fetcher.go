@@ -19,6 +19,7 @@ package add_cloud_metadata
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
@@ -48,8 +49,7 @@ func (g *genericFetcher) fetchMetadata(ctx context.Context, client http.Client) 
 	if res.err != nil {
 		return res
 	}
-	// Apply schema.
-	res.metadata = g.conv(res.metadata)
+	fmt.Printf("res: %s", res)
 	res.metadata.Put("cloud.provider", g.provider)
 
 	return res
