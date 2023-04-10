@@ -66,9 +66,8 @@ func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
 
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
-
 	if allowedContentTypes[*j.blob.Properties.ContentType] {
-		if *j.blob.Properties.ContentType == gzType || *j.blob.Properties.ContentEncoding == encodingGzip {
+		if *j.blob.Properties.ContentType == gzType || (j.blob.Properties.ContentEncoding != nil && *j.blob.Properties.ContentEncoding == encodingGzip) {
 			j.isCompressed = true
 		}
 		err := j.processAndPublishData(ctx, id)
@@ -81,9 +80,6 @@ func (j *job) do(ctx context.Context, id string) {
 		err := fmt.Errorf("job with jobId %s encountered an error: content-type %s not supported", id, *j.blob.Properties.ContentType)
 		fields = mapstr.M{
 			"message": err.Error(),
-			"event": mapstr.M{
-				"kind": "publish_error",
-			},
 		}
 		event := beat.Event{
 			Timestamp: time.Now(),
@@ -228,9 +224,6 @@ func (j *job) createEvent(message string, offset int64) beat.Event {
 			},
 			"cloud": mapstr.M{
 				"provider": "azure",
-			},
-			"event": mapstr.M{
-				"kind": "publish_data",
 			},
 		},
 	}

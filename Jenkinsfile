@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'ubuntu-18 && immutable' }
+  agent { label 'ubuntu-22 && immutable' }
   environment {
     AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
     AWS_REGION = "${params.awsRegion}"
@@ -24,8 +24,8 @@ pipeline {
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "1.0.2"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
-    KIND_VERSION = 'v0.14.0'
-    K8S_VERSION = 'v1.25.0'
+    KIND_VERSION = 'v0.17.0'
+    K8S_VERSION = 'v1.26.0'
   }
   options {
     timeout(time: 6, unit: 'HOURS')

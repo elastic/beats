@@ -1,0 +1,367 @@
+[
+  {
+    "@timestamp": "2023-01-17T22:18:03.557Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "credential-manager-credentials-were-read",
+      "category": [
+        "iam"
+      ],
+      "code": "5379",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
+    "winlog": {
+      "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "10428",
+        "CountOfCredentialsReturned": "1",
+        "ProcessCreationTime": "2023-01-17T22:17:36.2114738Z",
+        "ReadOperation": "%%8099",
+        "ReturnCode": "3221226021",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x278a6ed9",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetName": "MicrosoftOffice16_Data:ADAL:d2462c77-a0fd-467e-857f-2b0d3cc6f451@@@8.000000",
+        "Type": "1"
+      },
+      "event_id": "5379",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x278a6ed9"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 924,
+        "thread": {
+          "id": 12672
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "7959006",
+      "time_created": "2023-01-17T22:18:03.5577972Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:18:03.553Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "credential-manager-credentials-were-read",
+      "category": [
+        "iam"
+      ],
+      "code": "5379",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
+    "winlog": {
+      "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "10428",
+        "CountOfCredentialsReturned": "1",
+        "ProcessCreationTime": "2023-01-17T22:17:36.2114738Z",
+        "ReadOperation": "%%8099",
+        "ReturnCode": "0",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x278a6ed9",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetName": "MicrosoftOffice16_Data:ADAL:d2462c77-a0fd-467e-857f-2b0d3cc6f451@@@7.000000",
+        "Type": "1"
+      },
+      "event_id": "5379",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x278a6ed9"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 924,
+        "thread": {
+          "id": 12672
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "7959005",
+      "time_created": "2023-01-17T22:18:03.5530981Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:18:03.548Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "credential-manager-credentials-were-read",
+      "category": [
+        "iam"
+      ],
+      "code": "5379",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
+    "winlog": {
+      "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "10428",
+        "CountOfCredentialsReturned": "1",
+        "ProcessCreationTime": "2023-01-17T22:17:36.2114738Z",
+        "ReadOperation": "%%8099",
+        "ReturnCode": "0",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x278a6ed9",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetName": "MicrosoftOffice16_Data:ADAL:d2462c77-a0fd-467e-857f-2b0d3cc6f451@@@6.000000",
+        "Type": "1"
+      },
+      "event_id": "5379",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x278a6ed9"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 924,
+        "thread": {
+          "id": 12672
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "7959004",
+      "time_created": "2023-01-17T22:18:03.5480672Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:18:03.543Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "credential-manager-credentials-were-read",
+      "category": [
+        "iam"
+      ],
+      "code": "5379",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
+    "winlog": {
+      "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "10428",
+        "CountOfCredentialsReturned": "1",
+        "ProcessCreationTime": "2023-01-17T22:17:36.2114738Z",
+        "ReadOperation": "%%8099",
+        "ReturnCode": "0",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x278a6ed9",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetName": "MicrosoftOffice16_Data:ADAL:d2462c77-a0fd-467e-857f-2b0d3cc6f451@@@5.000000",
+        "Type": "1"
+      },
+      "event_id": "5379",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x278a6ed9"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 924,
+        "thread": {
+          "id": 12672
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "7959003",
+      "time_created": "2023-01-17T22:18:03.5437073Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:18:03.539Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "credential-manager-credentials-were-read",
+      "category": [
+        "iam"
+      ],
+      "code": "5379",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1"
+    },
+    "winlog": {
+      "activity_id": "{1cd3afa7-265d-0001-54b0-d31c5d26d901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "10428",
+        "CountOfCredentialsReturned": "1",
+        "ProcessCreationTime": "2023-01-17T22:17:36.2114738Z",
+        "ReadOperation": "%%8099",
+        "ReturnCode": "0",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x278a6ed9",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetName": "MicrosoftOffice16_Data:ADAL:d2462c77-a0fd-467e-857f-2b0d3cc6f451@@@4.000000",
+        "Type": "1"
+      },
+      "event_id": "5379",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x278a6ed9"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 924,
+        "thread": {
+          "id": 12672
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "7959002",
+      "time_created": "2023-01-17T22:18:03.5397904Z"
+    }
+  }
+]

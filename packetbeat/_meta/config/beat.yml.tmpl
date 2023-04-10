@@ -42,6 +42,8 @@ packetbeat.interfaces.poll_default_route: 1m
 packetbeat.interfaces.internal_networks:
   - private
 
+{{- template "windows_npcap.yml.tmpl" .}}
+
 {{header "Flows"}}
 
 # Set `enabled: false` or comment out all options to disable flows reporting.

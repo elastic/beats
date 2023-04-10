@@ -15,6 +15,7 @@ const (
 )
 
 // Metricsets / GCP services names
+// NOTE: if you are adding a service make sure to update tests in metrics/metrics_requester_test.go.
 const (
 	ServiceCloudFunctions = "cloudfunctions"
 	ServiceCompute        = "compute"
@@ -78,6 +79,7 @@ const (
 	LabelMetadata = "metadata"
 )
 
+// NOTE: if you are adding labels make sure to update tests in metrics/metrics_requester_test.go.
 const (
 	DefaultResourceLabel  = "resource.label.zone"
 	ComputeResourceLabel  = "resource.labels.zone"

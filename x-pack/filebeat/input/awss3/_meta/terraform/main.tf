@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.52"
+      version = "4.46.0"
     }
   }
 }
@@ -102,8 +102,8 @@ resource "aws_s3_bucket_notification" "bucket_notification-sns" {
   bucket = aws_s3_bucket.filebeat-integtest-sns.id
 
   topic {
-    topic_arn     = aws_sns_topic.filebeat-integtest-sns.arn
-    events        = ["s3:ObjectCreated:*"]
+    topic_arn = aws_sns_topic.filebeat-integtest-sns.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 
   depends_on = [
@@ -113,7 +113,7 @@ resource "aws_s3_bucket_notification" "bucket_notification-sns" {
 }
 
 resource "aws_sqs_queue" "filebeat-integtest-sns" {
-  name   = "filebeat-s3-integtest-sns-${random_string.random.result}"
+  name = "filebeat-s3-integtest-sns-${random_string.random.result}"
 
   policy = <<POLICY
 {

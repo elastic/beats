@@ -174,20 +174,16 @@ processors:
       field:
         - azure.signinlogs.properties.location
       ignore_missing: true
-  - foreach:
-      field: azure.signinlogs.properties.authentication_processing_details
-      ignore_missing: true
-      processor:
-        set:
-          field: '_tmp.{{{_ingest._value.key}}}'
-          copy_from: _ingest._value.value
-  - set:
-      if: ctx?._tmp != null
-      field: azure.signinlogs.properties.authentication_processing_details
-      copy_from: _tmp
-  - remove:
-      field: _tmp
-      ignore_missing: true
+  - script:
+      description: "Turns the authentication_processing_details array elements into key/value pairs. For example, the array element ``{key: 'key1', value: 'value1'}`` becomes ``{key1: 'value1'}``."
+      lang: painless
+      source: |
+        def tmp = [:];
+        for (item in ctx.azure.signinlogs.properties.authentication_processing_details) {
+            tmp[item.key] = item.value;
+        }
+        ctx.azure.signinlogs.properties.authentication_processing_details = tmp;
+      if: ctx.azure?.signinlogs?.properties?.authentication_processing_details != null && ctx.azure.signinlogs.properties.authentication_processing_details instanceof List
   - set:
       field: event.kind
       value: event

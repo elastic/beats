@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	dto "github.com/prometheus/client_model/go"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 )
 
 // PromEvent stores a set of one or more metrics with the same labels
@@ -51,18 +51,19 @@ func (p *promEventGenerator) Stop()  {}
 
 // GeneratePromEvents DefaultPromEventsGenerator stores all Prometheus metrics using
 // only double field type in Elasticsearch.
-func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEvent {
+func (p *promEventGenerator) GeneratePromEvents(mf *p.MetricFamily) []PromEvent {
 	var events []PromEvent
 
 	name := *mf.Name
+	_ = name // skip noisy linter
 	metrics := mf.Metric
 	for _, metric := range metrics {
 		labels := mapstr.M{}
 
 		if len(metric.Label) != 0 {
 			for _, label := range metric.Label {
-				if label.GetName() != "" && label.GetValue() != "" {
-					labels[label.GetName()] = label.GetValue()
+				if label.Name != "" && label.Value != "" {
+					labels[label.Name] = label.Value
 				}
 			}
 		}
@@ -160,7 +161,7 @@ func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEven
 			}
 		}
 
-		untyped := metric.GetUntyped()
+		untyped := metric.GetUnknown()
 		if untyped != nil {
 			if !math.IsNaN(untyped.GetValue()) && !math.IsInf(untyped.GetValue(), 0) {
 				events = append(events, PromEvent{

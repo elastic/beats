@@ -24,8 +24,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -51,12 +49,14 @@ type arrayData struct {
 // InstantVectorResponse is for "vector" type from Prometheus Query API Request
 // instantVectorResult format:
 // [
-//  {
-//    "metric": { "<label_name>": "<label_value>", ... },
-//    "value": [ <unix_time>, "<sample_value>" ]
-//  },
-//  ...
-//]
+//
+//	{
+//	  "metric": { "<label_name>": "<label_value>", ... },
+//	  "value": [ <unix_time>, "<sample_value>" ]
+//	},
+//	...
+//
+// ]
 type InstantVectorResponse struct {
 	Status string            `json:"status"`
 	Data   instantVectorData `json:"data"`
@@ -72,12 +72,14 @@ type instantVectorResult struct {
 // RangeVectorResponse is for "vector" type from Prometheus Query API Request
 // rangeVectorResult format:
 // [
-//  {
-//    "metric": { "<label_name>": "<label_value>", ... },
-//    "values": [ [ <unix_time>, "<sample_value>" ], ... ]
-//  },
-//  ...
-//]
+//
+//	{
+//	  "metric": { "<label_name>": "<label_value>", ... },
+//	  "values": [ [ <unix_time>, "<sample_value>" ], ... ]
+//	},
+//	...
+//
+// ]
 type RangeVectorResponse struct {
 	Status string          `json:"status"`
 	Data   rangeVectorData `json:"data"`
@@ -119,7 +121,7 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 		events = append(events, evnts...)
 	default:
 		msg := fmt.Sprintf("Unknown resultType '%v'", resultType)
-		return events, errors.New(msg)
+		return events, fmt.Errorf(msg)
 	}
 	return events, nil
 }
@@ -153,7 +155,7 @@ func getEventsFromMatrix(body []byte, queryName string) ([]mb.Event, error) {
 					},
 				})
 			} else {
-				return []mb.Event{}, errors.New("Could not parse results")
+				return []mb.Event{}, fmt.Errorf("Could not parse results")
 			}
 		}
 	}
@@ -188,7 +190,7 @@ func getEventsFromVector(body []byte, queryName string) ([]mb.Event, error) {
 				},
 			})
 		} else {
-			return []mb.Event{}, errors.New("Could not parse results")
+			return []mb.Event{}, fmt.Errorf("Could not parse results")
 		}
 	}
 	return events, nil
@@ -222,7 +224,7 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			value, ok := convertedArray.Data.Results[1].(string)
 			if !ok {
 				msg := fmt.Sprintf("Could not parse value of result: %v", convertedArray.Data.Results)
-				return mb.Event{}, errors.New(msg)
+				return mb.Event{}, fmt.Errorf(msg)
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
@@ -237,18 +239,18 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 			}, nil
 		}
 	}
-	return mb.Event{}, errors.New("Could not parse results")
+	return mb.Event{}, fmt.Errorf("could not parse results")
 }
 
 func getTimestampFromVector(vector []interface{}) (float64, error) {
 	// Example input: [ <unix_time>, "<sample_value>" ]
 	if len(vector) != 2 {
-		return 0, errors.New("Could not parse results")
+		return 0, fmt.Errorf("could not parse results")
 	}
 	timestamp, ok := vector[0].(float64)
 	if !ok {
 		msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
-		return 0, errors.New(msg)
+		return 0, fmt.Errorf(msg)
 	}
 	return timestamp, nil
 }
@@ -256,17 +258,17 @@ func getTimestampFromVector(vector []interface{}) (float64, error) {
 func getValueFromVector(vector []interface{}) (float64, error) {
 	// Example input: [ <unix_time>, "<sample_value>" ]
 	if len(vector) != 2 {
-		return 0, errors.New("Could not parse results")
+		return 0, fmt.Errorf("could not parse results")
 	}
 	value, ok := vector[1].(string)
 	if !ok {
 		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
-		return 0, errors.New(msg)
+		return 0, fmt.Errorf(msg)
 	}
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
-		return 0, errors.New(msg)
+		return 0, fmt.Errorf(msg)
 	}
 	return val, nil
 }
@@ -274,10 +276,10 @@ func getValueFromVector(vector []interface{}) (float64, error) {
 func getResultType(body []byte) (string, error) {
 	response := Response{}
 	if err := json.Unmarshal(body, &response); err != nil {
-		return "", errors.Wrap(err, "Failed to parse api response")
+		return "", fmt.Errorf("failed to parse api response: %w", err)
 	}
 	if response.Status == "error" {
-		return "", errors.Errorf("Failed to query")
+		return "", fmt.Errorf("failed to query")
 	}
 	return response.Data.ResultType, nil
 }
@@ -285,10 +287,10 @@ func getResultType(body []byte) (string, error) {
 func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 	arrayBody := ArrayResponse{}
 	if err := json.Unmarshal(body, &arrayBody); err != nil {
-		return arrayBody, errors.Wrap(err, "Failed to parse api response")
+		return arrayBody, fmt.Errorf("failed to parse api response: %w", err)
 	}
 	if arrayBody.Status == "error" {
-		return arrayBody, errors.Errorf("Failed to query")
+		return arrayBody, fmt.Errorf("failed to query")
 	}
 	return arrayBody, nil
 }
@@ -296,10 +298,10 @@ func convertJSONToArrayResponse(body []byte) (ArrayResponse, error) {
 func convertJSONToRangeVectorResponse(body []byte) (RangeVectorResponse, error) {
 	mapBody := RangeVectorResponse{}
 	if err := json.Unmarshal(body, &mapBody); err != nil {
-		return RangeVectorResponse{}, errors.Wrap(err, "Failed to parse api response")
+		return RangeVectorResponse{}, fmt.Errorf("failed to parse api response: %w", err)
 	}
 	if mapBody.Status == "error" {
-		return mapBody, errors.Errorf("Failed to query")
+		return mapBody, fmt.Errorf("failed to query")
 	}
 	return mapBody, nil
 }
@@ -307,10 +309,10 @@ func convertJSONToRangeVectorResponse(body []byte) (RangeVectorResponse, error) 
 func convertJSONToInstantVectorResponse(body []byte) (InstantVectorResponse, error) {
 	mapBody := InstantVectorResponse{}
 	if err := json.Unmarshal(body, &mapBody); err != nil {
-		return InstantVectorResponse{}, errors.Wrap(err, "Failed to parse api response")
+		return InstantVectorResponse{}, fmt.Errorf("failed to parse api response: %w", err)
 	}
 	if mapBody.Status == "error" {
-		return mapBody, errors.Errorf("Failed to query")
+		return mapBody, fmt.Errorf("failed to query")
 	}
 	return mapBody, nil
 }

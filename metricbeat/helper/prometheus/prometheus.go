@@ -21,13 +21,9 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
-
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
-	"github.com/prometheus/common/expfmt"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -40,11 +36,11 @@ const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
 	// GetFamilies requests metric families from prometheus endpoint and returns them
-	GetFamilies() ([]*dto.MetricFamily, error)
+	GetFamilies() ([]*MetricFamily, error)
 
 	GetProcessedMetrics(mapping *MetricsMapping) ([]mapstr.M, error)
 
-	ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error)
+	ProcessMetrics(families []*MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error)
 
 	ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error
 }
@@ -71,7 +67,7 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
-func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
+func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 	var reader io.Reader
 
 	resp, err := p.FetchResponse()
@@ -92,35 +88,26 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 	}
 
 	if resp.StatusCode > 399 {
-		bodyBytes, err := ioutil.ReadAll(reader)
+		bodyBytes, err := io.ReadAll(reader)
 		if err == nil {
 			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
 		}
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
 
-	format := expfmt.ResponseFormat(resp.Header)
-	if format == "" {
-		return nil, fmt.Errorf("Invalid format for response of response")
+	contentType := GetContentType(resp.Header)
+	if contentType == "" {
+		return nil, fmt.Errorf("invalid format for response: %v", resp.Header)
 	}
 
-	decoder := expfmt.NewDecoder(reader, format)
-	if decoder == nil {
-		return nil, fmt.Errorf("Unable to create decoder to decode response")
+	appendTime := time.Now().Round(0)
+	b, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
-
-	families := []*dto.MetricFamily{}
-	for {
-		mf := &dto.MetricFamily{}
-		err = decoder.Decode(mf)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return nil, errors.Wrap(err, "decoding of metric family failed")
-		} else {
-			families = append(families, mf)
-		}
+	families, err := ParseMetricFamilies(b, contentType, appendTime)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse families: %w", err)
 	}
 
 	return families, nil
@@ -141,7 +128,7 @@ type MetricsMapping struct {
 	ExtraFields map[string]string
 }
 
-func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
+func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
 
 	eventsMap := map[string]mapstr.M{}
 	infoMetrics := []*infoMetricData{}
@@ -183,15 +170,15 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
-						keyLabels.Put(l.GetField(), v)
+						_, _ = keyLabels.Put(l.GetField(), v)
 					} else {
-						labels.Put(l.GetField(), v)
+						_, _ = labels.Put(l.GetField(), v)
 					}
 				} else if storeAllLabels {
 					// if label for this metric is not found at the label mappings but
 					// it is configured to store any labels found, make it so
 					// TODO dedot
-					labels.Put(labelsLocation+"."+k, v)
+					_, _ = labels.Put(labelsLocation+"."+k, v)
 				}
 			}
 
@@ -201,7 +188,7 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 			// not considering these extra fields to be keylabels as that case
 			// have not appeared yet
 			for k, v := range extraFields {
-				labels.Put(k, v)
+				_, _ = labels.Put(k, v)
 			}
 
 			// Keep a info document if it's an infoMetric
@@ -217,7 +204,7 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 			if field != "" {
 				event := getEvent(eventsMap, keyLabels)
 				update := mapstr.M{}
-				update.Put(field, value)
+				_, _ = update.Put(field, value)
 				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
 				event.DeepUpdate(update)
 
@@ -275,7 +262,7 @@ type infoMetricData struct {
 func (p *prometheus) ReportProcessedMetrics(mapping *MetricsMapping, r mb.ReporterV2) error {
 	events, err := p.GetProcessedMetrics(mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting processed metrics")
+		return fmt.Errorf("error getting processed metrics: %w", err)
 	}
 	for _, event := range events {
 		r.Event(mb.Event{
@@ -297,11 +284,11 @@ func getEvent(m map[string]mapstr.M, labels mapstr.M) mapstr.M {
 	return res
 }
 
-func getLabels(metric *dto.Metric) mapstr.M {
+func getLabels(metric *OpenMetric) mapstr.M {
 	labels := mapstr.M{}
 	for _, label := range metric.GetLabel() {
-		if label.GetName() != "" && label.GetValue() != "" {
-			labels.Put(label.GetName(), label.GetValue())
+		if label.Name != "" && label.Value != "" {
+			_, _ = labels.Put(label.Name, label.Value)
 		}
 	}
 	return labels
@@ -315,7 +302,7 @@ func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
 		for _, pattern := range *patterns {
 			r, err := regexp.Compile(pattern)
 			if err != nil {
-				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+				return nil, fmt.Errorf("failed compiling pattern '%s': %w", pattern, err)
 			}
 			compiledPatterns = append(compiledPatterns, r)
 		}

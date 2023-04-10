@@ -28,9 +28,10 @@ even though it can get expensive with dealing with a very large number of files.
     describing said error.
 
 [id="supported-types-gcs"]
-NOTE: Currently only `JSON` is supported with respect to object/file formats. As for authentication types, we currently have support for 
-`json credential keys` and `credential files`. If a download for a file/object fails or gets interrupted, the download is retried for 2 times. 
-  This is currently not user configurable.
+NOTE: Currently only `JSON` and `NDJSON` are supported object/file formats. Objects/files may be also be gzip compressed. 
+"JSON credential keys" and "credential files" are supported authentication types.
+If an array is present as the root object for an object/file, it is automatically split into individual objects and processed. 
+If a download for a file/object fails or gets interrupted, the download is retried for 2 times. This is currently not user configurable.
 
 
 [id="basic-config-gcs"]
@@ -90,6 +91,7 @@ calls to the bucket list api if it exceeds the given value. Each iteration consi
     "_id": "gcs-test-new-data_3.json-worker-1"
   },
   "log": {
+    "offset": 200,
     "file": {
       "path": "gs://gcs-test-new/data_3.json"
     }

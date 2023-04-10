@@ -275,6 +275,7 @@ metricbeat.modules:
     #- index
     #- index_recovery
     #- index_summary
+    #- ingest_pipeline
     #- shard
     #- ml_job
   period: 10s
@@ -284,6 +285,7 @@ metricbeat.modules:
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   #index_recovery.active_only: true
+  #ingest_pipeline.processor_sample_rate: 0.25
   #xpack.enabled: false
   #scope: node
 
@@ -1289,6 +1291,13 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
+  # If set to true and multiple hosts are configured, the output plugin load
+  # balances published events onto all Elasticsearch hosts. If set to false,
+  # the output plugin sends all events to only one host (determined at random)
+  # and will switch to another host if the currently selected one becomes
+  # unreachable. The default value is true.
+  #loadbalance: true
+
   # Optional data stream or index name. The default is "metricbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "metricbeat-%{[agent.version]}"
@@ -1397,6 +1406,15 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+
+  # Enables restarting metricbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -1536,6 +1554,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting metricbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1741,6 +1767,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting metricbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -2531,4 +2565,11 @@ logging.files:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
+
+# =============================== Feature Flags ================================
+
+# Enable and configure feature flags.
+#features:
+#  fqdn:
+#    enabled: true
 

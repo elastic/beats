@@ -113,7 +113,7 @@ func (input *azurebsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
 	currentSource := src.(*Source)
 
-	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
+	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 
 	var cp *Checkpoint

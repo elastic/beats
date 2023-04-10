@@ -19,6 +19,9 @@ package udp
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -54,7 +57,7 @@ func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
 	udp := &UDP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(id, device),
+		metrics:   newInputMetrics(id, device, portMap),
 	}
 	logp.Debug("udp", "Port map: %v", portMap)
 
@@ -148,14 +151,15 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the UDP processor. If id or
 // device is empty a nil inputMetric is returned.
-func newInputMetrics(id, device string) *inputMetrics {
+func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *inputMetrics {
 	if id == "" || device == "" {
 		// An empty id signals to not record metrics,
 		// while an empty device means we are reading
 		// from a pcap file and no metrics are needed.
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry("udp", id+"::"+device, nil)
+	devID := fmt.Sprintf("%s-udp%s::%s", id, portList(ports), device)
+	reg, unreg := inputmon.NewInputRegistry("udp", devID, nil)
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
@@ -172,6 +176,24 @@ func newInputMetrics(id, device string) *inputMetrics {
 	out.device.Set(device)
 
 	return out
+}
+
+// portList returns a dash-separated list of port numbers sorted ascending. A leading
+// dash is prepended to the list if it is not empty.
+func portList(m map[uint16]protos.Protocol) string {
+	if len(m) == 0 {
+		return ""
+	}
+	ports := make([]int, 0, len(m))
+	for p := range m {
+		ports = append(ports, int(p))
+	}
+	sort.Ints(ports)
+	s := make([]string, len(ports)+1)
+	for i, p := range ports {
+		s[i+1] = strconv.FormatInt(int64(p), 10)
+	}
+	return strings.Join(s, "-")
 }
 
 // log logs metric for the given packet.

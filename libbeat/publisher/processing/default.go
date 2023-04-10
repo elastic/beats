@@ -23,10 +23,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -142,10 +144,12 @@ var WithHost modifier = builtinModifier(func(info beat.Info) mapstr.M {
 // pipeline.
 func WithAgentMeta() modifier {
 	return builtinModifier(func(info beat.Info) mapstr.M {
+		hostname := info.FQDNAwareHostname(features.FQDN())
+
 		metadata := mapstr.M{
 			"ephemeral_id": info.EphemeralID.String(),
 			"id":           info.ID.String(),
-			"name":         info.Hostname,
+			"name":         hostname,
 			"type":         info.Beat,
 			"version":      info.Version,
 		}
@@ -356,7 +360,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 10: debug print final event (P)
-	if b.log.IsDebug() {
+	if b.log.IsDebug() || publisher.UnderAgent() {
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 

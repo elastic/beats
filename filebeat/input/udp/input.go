@@ -36,7 +36,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
-	"github.com/elastic/beats/v7/libbeat/beat" // TODO: Replace with sync/atomic when go1.19 is supported.
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -129,7 +129,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 		publisher.Publish(evt)
 
-		// This must be called after forwarder.Send to measure
+		// This must be called after publisher.Publish to measure
 		// the processing time metric.
 		metrics.log(data, evt.Timestamp)
 	})

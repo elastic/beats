@@ -22,8 +22,8 @@ processors:
     - "%{AUDIT_TYPE} %{AUDIT_KEY_VALUES:auditd.log.kv}"
 - kv:
     field: auditd.log.kv
-    field_split: "\\s+"
-    value_split: "="
+    field_split: '\s(?![\w\"]+?(\s+|$))'
+    value_split: '(?<!\\)='
     target_field: auditd.log
 - kv:
     field: auditd.log.sub_kv

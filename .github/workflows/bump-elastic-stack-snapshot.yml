@@ -1,0 +1,38 @@
+---
+name: bump-elastic-stack-snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    steps:
+      - id: generator
+        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
+
+  bump-elastic-stack:
+    runs-on: ubuntu-latest
+    needs: [filter]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
+        with:
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
+          pipeline: ./.ci/bump-elastic-stack-snapshot.yml
+        env:
+          BRANCH: ${{ matrix.branch }}

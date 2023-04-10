@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -34,6 +35,7 @@ import (
 
 type replaceString struct {
 	config replaceStringConfig
+	log    *logp.Logger
 }
 
 type replaceStringConfig struct {
@@ -69,6 +71,7 @@ func NewReplaceString(c *conf.C) (processors.Processor, error) {
 
 	f := &replaceString{
 		config: config,
+		log:    logp.NewLogger("replace"),
 	}
 	return f, nil
 }
@@ -84,7 +87,9 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %s", err)
-			logp.Debug("replace", errMsg.Error())
+			if publisher.LogWithTrace() {
+				f.log.Debug(errMsg.Error())
+			}
 			if f.config.FailOnError {
 				event = backup
 				event.PutValue("error.message", errMsg.Error())

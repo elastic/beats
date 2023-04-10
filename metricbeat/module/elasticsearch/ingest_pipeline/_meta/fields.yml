@@ -1,0 +1,45 @@
+- name: ingest_pipeline
+  type: group
+  release: beta
+  description: Runtime metrics on ingest pipeline execution
+  fields:
+    - name: name
+      type: wildcard
+      description: Name / id of the ingest pipeline
+    - name: total
+      type: group
+      description: Metrics on the total ingest pipeline execution, including all processors.
+      fields:
+        - name: count
+          type: long
+          description: Number of documents processed by this pipeline
+        - name: failed
+          type: long
+          description: Number of documented failed to process by this pipeline
+        - name: time.total.ms
+          type: long
+          description: Total time spent processing documents through this pipeline, inclusive of other pipelines called
+        - name: time.self.ms
+          type: long
+          description: Time spent processing documents through this pipeline, exclusive of other pipelines called
+    - name: processor
+      type: group
+      fields:
+        - name: type
+          type: keyword
+          description: The type of ingest processor
+        - name: type_tag
+          type: keyword
+          description: The type and the tag for this processor in the format "<type>:<tag>"
+        - name: order_index
+          type: long
+          description: The order this processor appears in the pipeline definition
+        - name: count
+          type: long
+          description: Number of documents processed by this processor
+        - name: failed
+          type: long
+          description: Number of documented failed to process by this processor
+        - name: time.total.ms
+          type: long
+          description: Total time spent processing documents through this processor

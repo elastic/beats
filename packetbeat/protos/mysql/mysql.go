@@ -157,7 +157,7 @@ type mysqlPlugin struct {
 	prepareStatementTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handleMysql func(mysql *mysqlPlugin, m *mysqlMessage, tcp *common.TCPTuple,
@@ -171,7 +171,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &mysqlPlugin{}
@@ -188,7 +188,7 @@ func New(
 	return p, nil
 }
 
-func (mysql *mysqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mysqlConfig) error {
+func (mysql *mysqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *mysqlConfig) error {
 	mysql.setFromConfig(config)
 
 	mysql.transactions = common.NewCache(
@@ -553,8 +553,6 @@ func (mysql *mysqlPlugin) ConnectionTimeout() time.Duration {
 func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMysql exception")
-
 	priv := mysqlPrivateData{}
 	if private != nil {
 		var ok bool
@@ -613,8 +611,6 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(mysql) exception")
-
 	if private == nil {
 		return private, false
 	}

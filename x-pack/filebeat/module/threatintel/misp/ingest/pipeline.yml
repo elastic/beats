@@ -249,6 +249,8 @@ processors:
         - "%{IP:threat.indicator.ip}\\|%{NUMBER:threat.indicator.port}"
       ignore_missing: true
       if: "['ip-src|port', 'ip-dst|port'].contains(ctx.misp?.attribute?.type)"
+      # MISP may send a CIDR such as 1.2.3.0/22, which is not a valid Elasticsearch IP data type
+      ignore_failure: true
 
   ## Email indicator operations
   # Currently this ignores email-message, except setting the type it will leave the rest of the fields under misp.

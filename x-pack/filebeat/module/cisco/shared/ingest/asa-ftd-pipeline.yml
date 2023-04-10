@@ -18,7 +18,10 @@ processors:
         SYSPRIORITY: "<%{NONNEGINT:log.syslog.priority:int}>"
         # Beginning with version 6.3, Firepower Threat Defense provides the option to enable timestamp as per RFC 5424.
         FTD_DATE: "(?:%{TIMESTAMP_ISO8601}|%{ASA_DATE})"
-        ASA_DATE: "(?:%{DAY} )?%{MONTH}  *%{MONTHDAY}(?: %{YEAR})? %{TIME}(?: %{TZ})?"
+        ASA_DATE: "(?:%{DAY} )?%{MONTH}  *%{MONTHDAY}(?: %{YEAR})? %{TIME}(?: %{TZ:_temp_.tz})?"
+        TZ: "(?:[APMCE][SD]T|UTC)"
+        TIMESTAMP_ISO8601: "%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE:_temp_.tz}?"
+        ISO8601_TIMEZONE: "(?:Z|[+-]%{HOUR}(?::?%{MINUTE}))"
         PROCESS: "(?:[^%\\s:\\[]+)"
         SYSLOG_END: "(?:(:|\\s)\\s+)"
         # exactly match the syntax for firepower management logs
@@ -78,13 +81,35 @@ processors:
   - drop:
       if: "ctx.event.severity > {< .log_level >}"
 
+  # Time zone can come from three sources, choose in order: log, config, locale, default to UTC.
+  - set:
+      field: _temp_.tz
+      value: UTC
+      if: ctx._temp_?.tz == 'Z'
+  - set:
+      field: _temp_.tz
+      copy_from: _temp_.timezone_offset
+      override: false
+      if: ctx._temp_?.timezone_offset != null && ctx._temp_?.timezone_offset != 'local'
+  - set:
+      field: _temp_.tz
+      copy_from: event.timezone
+      override: false
+      if: ctx.event?.timezone != null
+  - set:
+      field: _temp_.tz
+      value: UTC
+      override: false
+  - set:
+      field: event.timezone
+      copy_from: _temp_.tz
   #
   # Parse the date included in FTD logs
   #
   - date:
-      if: "ctx.event?.timezone == null && ctx._temp_?.raw_date != null"
+      if: ctx._temp_?.raw_date != null
+      timezone: "{{{ event.timezone }}}"
       field: "_temp_.raw_date"
-      target_field: "@timestamp"
       formats:
         - "ISO8601"
         - "MMM  d HH:mm:ss"
@@ -104,48 +129,35 @@ processors:
         - "EEE MMM  d yyyy HH:mm:ss z"
         - "EEE MMM dd yyyy HH:mm:ss z"
       on_failure:
-        [
-          {
-            "append":
-              {
-                "field": "error.message",
-                "value": "{{ _ingest.on_failure_message }}",
-              },
-          },
-        ]
-  - date:
-      if: "ctx.event?.timezone != null && ctx._temp_?.raw_date != null"
-      timezone: "{{ event.timezone }}"
-      field: "_temp_.raw_date"
-      target_field: "@timestamp"
-      formats:
-        - "ISO8601"
-        - "MMM  d HH:mm:ss"
-        - "MMM dd HH:mm:ss"
-        - "EEE MMM  d HH:mm:ss"
-        - "EEE MMM dd HH:mm:ss"
-        - "MMM  d HH:mm:ss z"
-        - "MMM dd HH:mm:ss z"
-        - "EEE MMM  d HH:mm:ss z"
-        - "EEE MMM dd HH:mm:ss z"
-        - "MMM  d yyyy HH:mm:ss"
-        - "MMM dd yyyy HH:mm:ss"
-        - "EEE MMM  d yyyy HH:mm:ss"
-        - "EEE MMM dd yyyy HH:mm:ss"
-        - "MMM  d yyyy HH:mm:ss z"
-        - "MMM dd yyyy HH:mm:ss z"
-        - "EEE MMM  d yyyy HH:mm:ss z"
-        - "EEE MMM dd yyyy HH:mm:ss z"
-      on_failure:
-        [
-          {
-            "append":
-              {
-                "field": "error.message",
-                "value": "{{ _ingest.on_failure_message }}",
-              },
-          },
-        ]
+        # Try to re-parse as UTC to catch when TZ is invalid or unknown.
+        - remove:
+            field: event.timezone
+            ignore_missing: true
+        - date:
+            if: ctx._temp_?.raw_date != null
+            field: "_temp_.raw_date"
+            formats:
+              - "ISO8601"
+              - "MMM  d HH:mm:ss"
+              - "MMM dd HH:mm:ss"
+              - "EEE MMM  d HH:mm:ss"
+              - "EEE MMM dd HH:mm:ss"
+              - "MMM  d HH:mm:ss z"
+              - "MMM dd HH:mm:ss z"
+              - "EEE MMM  d HH:mm:ss z"
+              - "EEE MMM dd HH:mm:ss z"
+              - "MMM  d yyyy HH:mm:ss"
+              - "MMM dd yyyy HH:mm:ss"
+              - "EEE MMM  d yyyy HH:mm:ss"
+              - "EEE MMM dd yyyy HH:mm:ss"
+              - "MMM  d yyyy HH:mm:ss z"
+              - "MMM dd yyyy HH:mm:ss z"
+              - "EEE MMM  d yyyy HH:mm:ss z"
+              - "EEE MMM dd yyyy HH:mm:ss z"
+            on_failure:
+              - append:
+                  field: error.message
+                  value: "{{{ _ingest.on_failure_message }}}"
   #
   # Set log.level
   #

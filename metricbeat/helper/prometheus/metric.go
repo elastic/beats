@@ -26,8 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	dto "github.com/prometheus/client_model/go"
 )
 
 // MetricMap defines the mapping from Prometheus metric to a Metricbeat field
@@ -39,7 +37,7 @@ type MetricMap interface {
 	GetField() string
 
 	// GetValue returns the resulting value
-	GetValue(m *dto.Metric) interface{}
+	GetValue(m *OpenMetric) interface{}
 
 	// GetConfiguration returns the configuration for the metric
 	GetConfiguration() Configuration
@@ -205,7 +203,7 @@ func (m *commonMetric) GetConfiguration() Configuration {
 }
 
 // GetValue returns the resulting value
-func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
+func (m *commonMetric) GetValue(metric *OpenMetric) interface{} {
 	counter := metric.GetCounter()
 	if counter != nil {
 		if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
@@ -278,7 +276,7 @@ type keywordMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *keywordMetric) GetValue(metric *dto.Metric) interface{} {
+func (m *keywordMetric) GetValue(metric *OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
 		return m.keyword
 	}
@@ -290,7 +288,7 @@ type booleanMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *booleanMetric) GetValue(metric *dto.Metric) interface{} {
+func (m *booleanMetric) GetValue(metric *OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil {
 		return gauge.GetValue() == 1
 	}
@@ -303,17 +301,17 @@ type labelMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *labelMetric) GetValue(metric *dto.Metric) interface{} {
+func (m *labelMetric) GetValue(metric *OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
 		return getLabel(metric, m.label)
 	}
 	return nil
 }
 
-func getLabel(metric *dto.Metric, name string) string {
+func getLabel(metric *OpenMetric, name string) string {
 	for _, label := range metric.GetLabel() {
-		if label.GetName() == name {
-			return label.GetValue()
+		if label.Name == name {
+			return label.Value
 		}
 	}
 	return ""
@@ -324,7 +322,7 @@ type infoMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *infoMetric) GetValue(metric *dto.Metric) interface{} {
+func (m *infoMetric) GetValue(metric *OpenMetric) interface{} {
 	return ""
 }
 

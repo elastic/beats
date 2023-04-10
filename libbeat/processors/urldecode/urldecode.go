@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -83,7 +84,9 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 		err := p.decodeField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("failed to decode fields in urldecode processor: %v", err)
-			p.log.Debug(errMsg.Error())
+			if publisher.LogWithTrace() {
+				p.log.Debug(errMsg.Error())
+			}
 			if p.config.FailOnError {
 				event = backup
 				event.PutValue("error.message", errMsg.Error())

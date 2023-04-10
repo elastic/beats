@@ -1,0 +1,13 @@
+{{if and (eq .BeatLicense "Elastic License") (eq .GOOS "windows")}}
+
+{{header "Windows Npcap installation settings"}}
+
+# Windows Npcap installation options. These options specify how the Npcap packet
+# capture library for Windows should be obtained and installed.
+#
+#packetbeat.npcap:
+#  # If a specific local version of Npcap is required, installation by packetbeat
+#  # can be blocked by setting never_install to true. No action is taken if this
+#  # option is set to true.
+#  never_install: false
+{{- end -}}

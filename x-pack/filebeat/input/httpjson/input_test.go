@@ -159,6 +159,66 @@ func TestInput(t *testing.T) {
 			expected: nil,
 		},
 		{
+			name:        "Test split on null field with ignore_empty_value keeping parent",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target":             "body.response.empty",
+					"ignore_empty_value": true,
+					"keep_parent":        true,
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":{"empty":null}}`),
+			expected: []string{`{"response":{"empty":null}}`},
+		},
+		{
+			name:        "Test split on empty array with ignore_empty_value keeping parent",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target":             "body.response.empty",
+					"ignore_empty_value": true,
+					"keep_parent":        true,
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":{"empty":[]}}`),
+			expected: []string{`{"response":{"empty":[]}}`},
+		},
+		{
+			name:        "Test split on null field at root with ignore_empty_value keeping parent",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target":             "body.response",
+					"ignore_empty_value": true,
+					"keep_parent":        true,
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":null,"other":"data"}`),
+			expected: []string{`{"other":"data","response":null}`},
+		},
+		{
+			name:        "Test split on empty array at root with ignore_empty_value keeping parent",
+			setupServer: newTestServer(httptest.NewServer),
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.split": map[string]interface{}{
+					"target":             "body.response",
+					"ignore_empty_value": true,
+					"keep_parent":        true,
+				},
+			},
+			handler:  defaultHandler(http.MethodGet, "", `{"response":[],"other":"data"}`),
+			expected: []string{`{"other":"data","response":[]}`},
+		},
+		{
 			name:        "Test nested split",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
@@ -670,8 +730,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -748,8 +809,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -784,8 +846,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{

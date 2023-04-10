@@ -54,10 +54,22 @@ func installNpcap(b *beat.Beat) error {
 		return nil
 	}
 
+	log := logp.NewLogger("npcap_install")
+
+	var cfg struct {
+		NeverInstall bool `config:"npcap.never_install"`
+	}
+	err := b.BeatConfig.Unpack(&cfg)
+	if err != nil {
+		return fmt.Errorf("failed to unpack npcap config: %w", err)
+	}
+	if cfg.NeverInstall {
+		log.Warn("npcap installation/upgrade disabled by user")
+		return nil
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
-
-	log := logp.NewLogger("npcap_install")
 
 	if npcap.Installer == nil {
 		return nil

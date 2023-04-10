@@ -1241,13 +1241,13 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(events))
+	assert.Equal(t, 1, len(events))
 
-	metricValue, err := events[label1+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	metricValue, err := events["i-1-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
 
-	dimension, err := events[label2+"-0"].RootFields.GetValue("aws.dimensions.InstanceId")
+	dimension, err := events["i-1-0"].RootFields.GetValue("aws.dimensions.InstanceId")
 	assert.NoError(t, err)
 	assert.Equal(t, instanceID1, dimension)
 }
@@ -1283,12 +1283,12 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
-	expectedID := regionName + accountID
-	metricValue, err := events[expectedID+label3+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	expectedID := regionName + accountID + namespace
+	metricValue, err := events[expectedID+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
 
-	dimension, err := events[expectedID+label4+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	dimension, err := events[expectedID+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value2, dimension)
 }
@@ -1319,19 +1319,19 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 	assert.NoError(t, err)
 
 	expectedID := regionName + accountID
-	metricValue, err := events[expectedID+label3+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	metricValue, err := events[expectedID+namespace+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
-	metricValue1, err := events[expectedID+label3+"-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	metricValue1, err := events[expectedID+namespace+"-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
-	metricValue2, err := events[expectedID+label4+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	metricValue2, err := events[expectedID+namespace+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
-	metricValue3, err := events[expectedID+label4+"-1"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	metricValue3, err := events[expectedID+namespace+"-1"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
 	assert.Equal(t, value1, metricValue1)
 	assert.Equal(t, value2, metricValue2)
 	assert.Equal(t, value2, metricValue3)
-	assert.Equal(t, 4, len(events))
+	assert.Equal(t, 2, len(events))
 }
 
 func TestCreateEventsWithTagsFilter(t *testing.T) {
@@ -1360,7 +1360,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(events))
+	assert.Equal(t, 1, len(events))
 
 	// Specify a tag filter that does not match the tag for i-1
 	resourceTypeTagFilters["ec2:instance"] = []aws.Tag{
@@ -1522,8 +1522,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
 	events, err := m.createEvents(cloudwatchMock, resGroupTaggingClientMock, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
-	assert.Equal(t, timestamp, events[regionName+accountID+label3+"-0"].Timestamp)
-	assert.Equal(t, timestamp, events[regionName+accountID+label4+"-0"].Timestamp)
+	assert.Equal(t, timestamp, events[regionName+accountID+namespace+"-0"].Timestamp)
 }
 
 func TestGetStartTimeEndTime(t *testing.T) {

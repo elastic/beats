@@ -66,9 +66,9 @@ func getMDDevice(path string) (MDDevice, error) {
 	return newMD(path)
 }
 
-//check if a block device directory looks like an MD device
-//I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
-//Right now, we're doing this by looking for an `md` directory in the device dir.
+// check if a block device directory looks like an MD device
+// I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
+// Right now, we're doing this by looking for an `md` directory in the device dir.
 func isMD(path string) bool {
 	_, err := os.Stat(filepath.Join(path, "md"))
 	if err != nil {

@@ -25,9 +25,16 @@ func (s *Source) Name() string {
 }
 
 const (
-	contentTypeJSON string = "application/json"
+	jsonType     = "application/json"
+	octetType    = "application/octet-stream"
+	ndJsonType   = "application/x-ndjson"
+	gzType       = "application/x-gzip"
+	encodingGzip = "gzip"
 )
 
 var allowedContentTypes = map[string]bool{
-	contentTypeJSON: true,
+	jsonType:   true,
+	octetType:  true,
+	ndJsonType: true,
+	gzType:     true,
 }

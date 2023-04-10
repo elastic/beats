@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/elastic/go-sysinfo"
+	sysinfo "github.com/elastic/go-sysinfo"
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
@@ -44,7 +44,7 @@ func init() {
 	}
 
 	if localUserName := os.Getenv("BEAT_SETUID_AS"); isContainer && localUserName != "" && syscall.Geteuid() == 0 {
-		err := changeUser(localUserName)
+		err := setNodeProcAttr(localUserName)
 		if err != nil {
 			panic(err)
 		}
@@ -57,7 +57,8 @@ func init() {
 	_ = setCapabilities()
 }
 
-func changeUser(localUserName string) error {
+func setNodeProcAttr(localUserName string) error {
+
 	localUser, err := user.Lookup(localUserName)
 	if err != nil {
 		return fmt.Errorf("could not lookup '%s': %w", localUser, err)
@@ -70,50 +71,33 @@ func changeUser(localUserName string) error {
 	if err != nil {
 		return fmt.Errorf("could not parse GID '%s' as int: %w", localUser.Uid, err)
 	}
+
 	// We include the root group because the docker image contains many directories (data,logs)
 	// that are owned by root:root with 0775 perms. The heartbeat user is in both groups
 	// in the container, but we need to repeat that here.
-	err = syscall.Setgroups([]int{localUserGID, 0})
-	if err != nil {
-		return fmt.Errorf("could not set groups: %w", err)
+	NodeChildProcCred = &syscall.Credential{
+		Uid:         uint32(localUserUID),
+		Gid:         uint32(localUserGID),
+		Groups:      []uint32{0},
+		NoSetGroups: false,
 	}
 
-	// Set the main group as localUserUid so new files created are owned by the user's group
-	err = syscall.Setgid(localUserGID)
-	if err != nil {
-		return fmt.Errorf("could not set gid to %d: %w", localUserGID, err)
-	}
-
-	// Note this is not the regular SetUID! Look at the 'cap' package docs for it, it preserves
-	// capabilities post-SetUID, which we use to lock things down immediately
-	err = cap.SetUID(localUserUID)
-	if err != nil {
-		return fmt.Errorf("could not setuid to %d: %w", localUserUID, err)
-	}
-
-	// This may not be necessary, but is good hygiene, we do some shelling out to node/npm etc.
-	// and $HOME should reflect the user's preferences
 	return os.Setenv("HOME", localUser.HomeDir)
 }
 
 func setCapabilities() error {
-	// Start with an empty capability set
-	newcaps := cap.NewSet()
-	// Both permitted and effective are required! Permitted makes the permmission
-	// possible to get, effective makes it 'active'
-	err := newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW)
+	newcaps := cap.GetProc()
+
+	// Raise all permitted caps to effective
+	err := newcaps.Fill(cap.Effective, cap.Permitted)
 	if err != nil {
-		return fmt.Errorf("error setting permitted setcap: %w", err)
-	}
-	err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW)
-	if err != nil {
-		return fmt.Errorf("error setting effective setcap: %w", err)
+		return fmt.Errorf("error raising effective cap set: %w", err)
 	}
 
-	// We do not want these capabilities to be inherited by subprocesses
-	err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW)
+	// Drop all inheritable caps to stop propagation to child proc
+	err = newcaps.ClearFlag(cap.Inheritable)
 	if err != nil {
-		return fmt.Errorf("error setting inheritable setcap: %w", err)
+		return fmt.Errorf("error clearing inheritable cap set: %w", err)
 	}
 
 	// Apply the new capabilities to the current process (incl. all threads)

@@ -11,12 +11,12 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-filebeat"
     tags: true                 ## for all the tags
-platform: "immutable && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-22" ## default label for all the stages
 stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "arm"
+          - "ubuntu-2204-aarch64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/filebeat for arm"
@@ -140,7 +140,7 @@ stages:
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.
-          - "arm"
+          - "ubuntu-2204-aarch64"
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being

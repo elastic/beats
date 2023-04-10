@@ -18,9 +18,9 @@
 package query
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -39,11 +39,11 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 	//  },
 	//  ...
 	//]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_instant_vector.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_instant_vector.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -65,7 +65,7 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 2 {
@@ -88,11 +88,11 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 	//  },
 	//  ...
 	//]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_range_vector.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_range_vector.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -117,7 +117,7 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 6 {
@@ -134,11 +134,11 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 
 	// test with response format like:
 	//[ <unix_time>, "<scalar_value>" ]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_scalar.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_scalar.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -160,7 +160,7 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 1 {
@@ -177,11 +177,11 @@ func TestQueryFetchEventContentString(t *testing.T) {
 
 	// test with response format like:
 	//[ <unix_time>, "<scalar_value>" ]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_string.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_string.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -203,7 +203,7 @@ func TestQueryFetchEventContentString(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 1 {

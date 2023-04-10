@@ -8,5 +8,5 @@ services:
       args:
         ORACLE_VERSION: ${ORACLE_VERSION:-12.2.0.1}
     ports:
-      - 1521
-      - 5500
+      - 1521:1521
+      - 5500:5500

@@ -112,9 +112,16 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 			if s.child != nil {
 				return s.child.split(ctx, root, ch)
 			}
+			if s.keepParent {
+				ch <- maybeMsg{msg: root}
+			}
 			return nil
 		}
 		if s.isRoot {
+			if s.keepParent {
+				ch <- maybeMsg{msg: root}
+				return errEmptyField
+			}
 			return errEmptyRootField
 		}
 		ch <- maybeMsg{msg: root}
@@ -132,6 +139,9 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 			if s.ignoreEmptyValue {
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
+				}
+				if s.keepParent {
+					ch <- maybeMsg{msg: root}
 				}
 				return nil
 			}
@@ -161,6 +171,9 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 			if s.ignoreEmptyValue {
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
+				}
+				if s.keepParent {
+					ch <- maybeMsg{msg: root}
 				}
 				return nil
 			}

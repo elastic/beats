@@ -23,6 +23,8 @@ package state_statefulset
 import (
 	"testing"
 
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -30,25 +32,23 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
+var files = []string{
+	"../_meta/test/ksm.v2.4.2.plain",
+	"../_meta/test/ksm.v2.5.0.plain",
+	"../_meta/test/ksm.v2.6.0.plain",
+	"../_meta/test/ksm.v2.7.0.plain",
+}
+
+const name = "state_statefulset"
+
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "state_statefulset",
-		ptest.TestCases{
-			{
-				MetricsFile:  "../_meta/test/ksm.v1.3.0",
-				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
-			},
-			{
-				MetricsFile:  "../_meta/test/ksm.v1.8.0",
-				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
-			},
-			{
-				MetricsFile:  "./_meta/test/ksm.unit.v2.0.0",
-				ExpectedFile: "./_meta/test/ksm.unit.v2.0.0.expected",
-			},
-		},
-	)
+	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
 }
 
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "kubernetes", "state_statefulset")
+	mbtest.TestDataFiles(t, "kubernetes", name)
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestStateMetricsFamily(t, files, mapping)
 }

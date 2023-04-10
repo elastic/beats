@@ -21,20 +21,15 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
-
-// Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *config.C, int) (Queue, error)
 
 // ACKListener listens to special events to be send by queue implementations.
 type ACKListener interface {
 	OnACK(eventCount int) // number of consecutively published events acked by producers
 }
 
-//Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
+// Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
 	//EventCount is the total events currently in the queue
 	EventCount opt.Uint
@@ -141,6 +136,11 @@ type Producer interface {
 type Batch interface {
 	Count() int
 	Entry(i int) interface{}
-	ID(i int) EntryID
+	// Release the internal references to the contained events.
+	// Count() and Entry() cannot be used after this call.
+	// This is only guaranteed to release references when using the
+	// proxy queue, where it is used to avoid keeping multiple copies
+	// of events that have already been queued by the shipper.
+	FreeEntries()
 	Done()
 }

@@ -157,11 +157,14 @@ func TestConfigureModule(t *testing.T) {
 	require.NoError(t, err)
 	err = mockRegistry.AddMetricSet(moduleName, "baz", mockMetricSetFactory)
 	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "thud", mockMetricSetFactory)
+	require.NoError(t, err)
 
 	tests := map[string]struct {
-		initConfig             metricSetConfig
-		xpackEnabledMetricsets []string
-		newConfig              metricSetConfig
+		initConfig              metricSetConfig
+		xpackEnabledMetricsets  []string
+		optionalXpackMetricsets []string
+		newConfig               metricSetConfig
 	}{
 		"no_xpack_enabled": {
 			metricSetConfig{
@@ -169,6 +172,7 @@ func TestConfigureModule(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			},
 			[]string{"baz", "qux", "foo"},
+			[]string{},
 			metricSetConfig{
 				Module:     moduleName,
 				MetricSets: []string{"foo", "bar"},
@@ -181,10 +185,25 @@ func TestConfigureModule(t *testing.T) {
 				MetricSets:   []string{"foo", "bar"},
 			},
 			[]string{"baz", "qux", "foo"},
+			[]string{},
 			metricSetConfig{
 				Module:       moduleName,
 				XPackEnabled: true,
 				MetricSets:   []string{"baz", "qux", "foo"},
+			},
+		},
+		"xpack_enabled_with_optional": {
+			metricSetConfig{
+				Module:       moduleName,
+				XPackEnabled: true,
+				MetricSets:   []string{"foo", "bar", "thud"},
+			},
+			[]string{"baz", "qux", "foo"},
+			[]string{"bar"},
+			metricSetConfig{
+				Module:       moduleName,
+				XPackEnabled: true,
+				MetricSets:   []string{"baz", "qux", "foo", "bar"}, // include optional, exclude others
 			},
 		},
 	}
@@ -200,7 +219,7 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newM, err := NewModule(bm, test.xpackEnabledMetricsets, logp.L())
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, test.optionalXpackMetricsets, logp.L())
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

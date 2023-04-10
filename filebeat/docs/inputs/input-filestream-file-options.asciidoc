@@ -218,6 +218,24 @@ To remove the state of previously harvested files from the registry file, use
 the `clean_inactive` configuration option.
 
 [float]
+[id="{beatname_lc}-input-{type}-take-over"]
+===== `take_over`
+
+If `take_over` is set to `true`, this `filestream` will take over all files
+from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+
+IMPORTANT: `take_over: true` requires the `filestream` to have a unique ID.
+
+This `take over` mode was created to enable smooth migration from deprecated `log`
+inputs to the new `filestream` inputs.
+
+See <<migrate-to-filestream>> for more details about the migration process.
+
+WARNING: The `take over` mode is still in beta, however, it's manually reversible
+due to backups created in the <<configuration-global-options,`registry.path/filebeat` directory>>
+and should be generally safe to use.
+
+[float]
 [id="{beatname_lc}-input-{type}-close-options"]
 ===== `close.*`
 
@@ -537,4 +555,3 @@ rotation.external.strategy.copytruncate:
   suffix_regex: \-\d{6}$
   dateformat: -20060102
 ---
-

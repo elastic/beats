@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	recursiveGlobDepth = 8
+	RecursiveGlobDepth = 8
 	scannerName        = "scanner"
 	watcherDebugKey    = "file_watcher"
 )
@@ -282,7 +282,7 @@ func (s *fileScanner) resolveRecursiveGlobs(c fileScannerConfig) error {
 	s.log.Debug("recursive glob enabled")
 	var paths []string
 	for _, path := range s.paths {
-		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
+		patterns, err := file.GlobPatterns(path, RecursiveGlobDepth)
 		if err != nil {
 			return err
 		}

@@ -23,7 +23,7 @@ import (
 
 	"github.com/prometheus/prometheus/pkg/textparse"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
@@ -71,10 +71,11 @@ func (p *openmetricEventGenerator) Stop()  {}
 
 // Default openmetricEventsGenerator stores all OpenMetrics metrics using
 // only double field type in Elasticsearch.
-func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFamily) []OpenMetricEvent {
+func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily) []OpenMetricEvent {
 	var events []OpenMetricEvent
 
 	name := *mf.Name
+	_ = name // skip noisy linter
 	metrics := mf.Metric
 	help := ""
 	unit := ""
@@ -88,6 +89,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 	for _, metric := range metrics {
 		labels := mapstr.M{}
 		mn := metric.GetName()
+		_ = mn // skip noisy linter
 
 		if len(metric.Label) != 0 {
 			for _, label := range metric.Label {
@@ -101,11 +103,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 		if metric.Exemplar != nil {
 			exemplars = mapstr.M{*mn: metric.Exemplar.Value}
 			if metric.Exemplar.HasTs {
-				exemplars.Put("timestamp", metric.Exemplar.Ts)
+				_, _ = exemplars.Put("timestamp", metric.Exemplar.Ts)
 			}
 			for _, label := range metric.Exemplar.Labels {
 				if label.Name != "" && label.Value != "" {
-					exemplars.Put("labels."+label.Name, label.Value)
+					_, _ = exemplars.Put("labels."+label.Name, label.Value)
 				}
 			}
 		}
@@ -215,6 +217,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 			if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
 				var sum = "_sum"
 				var count = "_count"
+				_, _ = sum, count // skip noisy linter
 				var typ = textparse.MetricTypeHistogram
 				if histogram.IsGaugeHistogram {
 					sum = "_gsum"
@@ -244,11 +247,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 				if bucket.Exemplar != nil {
 					exemplars = mapstr.M{name: bucket.Exemplar.Value}
 					if bucket.Exemplar.HasTs {
-						exemplars.Put("timestamp", bucket.Exemplar.Ts)
+						_, _ = exemplars.Put("timestamp", bucket.Exemplar.Ts)
 					}
 					for _, label := range bucket.Exemplar.Labels {
 						if label.Name != "" && label.Value != "" {
-							exemplars.Put("labels."+label.Name, label.Value)
+							_, _ = exemplars.Put("labels."+label.Name, label.Value)
 						}
 					}
 				}

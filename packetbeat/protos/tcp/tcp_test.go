@@ -46,7 +46,7 @@ const (
 var httpProtocol, mysqlProtocol, redisProtocol protos.Protocol
 
 func init() {
-	new := func(_ bool, _ protos.Reporter, _ procs.ProcessesWatcher, _ *conf.C) (protos.Plugin, error) {
+	new := func(_ bool, _ protos.Reporter, _ *procs.ProcessesWatcher, _ *conf.C) (protos.Plugin, error) {
 		return &TestProtocol{}, nil
 	}
 
@@ -294,44 +294,45 @@ func TestTCSeqPayload(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
-		t.Logf("Test (%v): %v", i, test.name)
-
-		gap := 0
-		var state []byte
-		tcp, err := NewTCP(protocols{
-			tcp: map[protos.Protocol]protos.TCPPlugin{
-				httpProtocol: &TestProtocol{
-					Ports: []int{ServerPort},
-					gap:   makeCountGaps(nil, &gap),
-					parse: makeCollectPayload(&state, true),
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			gap := 0
+			var state []byte
+			tcp, err := NewTCP(protocols{
+				tcp: map[protos.Protocol]protos.TCPPlugin{
+					httpProtocol: &TestProtocol{
+						Ports: []int{ServerPort},
+						gap:   makeCountGaps(nil, &gap),
+						parse: makeCollectPayload(&state, true),
+					},
 				},
-			},
-		}, "", "")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		addr := common.NewIPPortTuple(4,
-			net.ParseIP(ServerIP), ServerPort,
-			net.ParseIP(ClientIP), uint16(rand.Intn(65535)))
-
-		for _, segment := range test.segments {
-			hdr := &layers.TCP{Seq: segment.seq}
-			pkt := &protos.Packet{
-				Ts:      time.Now(),
-				Tuple:   addr,
-				Payload: segment.payload,
+			}, "test", "test")
+			if err != nil {
+				t.Fatal(err)
 			}
-			tcp.Process(nil, hdr, pkt)
-		}
+			defer tcp.metrics.close()
 
-		assert.Equal(t, test.expectedGaps, gap)
-		if len(test.expectedState) != len(state) {
-			assert.Equal(t, len(test.expectedState), len(state))
-			continue
-		}
-		assert.Equal(t, test.expectedState, state)
+			addr := common.NewIPPortTuple(4,
+				net.ParseIP(ServerIP), ServerPort,
+				net.ParseIP(ClientIP), uint16(rand.Intn(65535)))
+
+			for _, segment := range test.segments {
+				hdr := &layers.TCP{Seq: segment.seq}
+				pkt := &protos.Packet{
+					Ts:      time.Now(),
+					Tuple:   addr,
+					Payload: segment.payload,
+				}
+				tcp.Process(nil, hdr, pkt)
+			}
+
+			assert.Equal(t, test.expectedGaps, gap)
+			if len(test.expectedState) != len(state) {
+				assert.Equal(t, len(test.expectedState), len(state))
+				return
+			}
+			assert.Equal(t, test.expectedState, state)
+		})
 	}
 }
 

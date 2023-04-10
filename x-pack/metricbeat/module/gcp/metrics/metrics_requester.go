@@ -116,7 +116,7 @@ func (r *metricsRequester) buildRegionsFilter(regions []string, label string) st
 			filter.WriteString(" ")
 		}
 
-		filter.WriteString(fmt.Sprintf("%s = starts_with(\"%s\")", label, strings.TrimSuffix(region, "*")))
+		filter.WriteString(fmt.Sprintf("%s = starts_with(\"%s\")", label, trimWildcard(region)))
 		filter.WriteString(" ")
 
 		regionsCount++
@@ -131,119 +131,79 @@ func (r *metricsRequester) buildRegionsFilter(regions []string, label string) st
 	}
 }
 
+// getServiceLabelFor return the appropriate label to use for filtering metrics of a given service.
+func getServiceLabelFor(serviceName string) string {
+	switch serviceName {
+	case gcp.ServiceCompute:
+		return gcp.ComputeResourceLabel
+	case gcp.ServiceGKE:
+		return gcp.GKEResourceLabel
+	case gcp.ServiceDataproc:
+		return gcp.DataprocResourceLabel
+	case gcp.ServiceStorage:
+		return gcp.StorageResourceLabel
+	case gcp.ServiceCloudSQL:
+		return gcp.CloudSQLResourceLabel
+	case gcp.ServiceRedis:
+		return gcp.RedisResourceLabel
+	default:
+		return gcp.DefaultResourceLabel
+	}
+}
+
+func (r *metricsRequester) buildLocationFilter(serviceLabel, filter string) string {
+	if r.config.Region != "" && r.config.Zone != "" {
+		r.logger.Warnf("when region %s and zone %s config parameter "+
+			"both are provided, only use region", r.config.Regions, r.config.Zone)
+	}
+
+	if r.config.Region != "" && len(r.config.Regions) != 0 {
+		r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
+	}
+
+	switch {
+	case r.config.Region != "":
+		filter = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", filter, serviceLabel, trimWildcard(r.config.Region))
+	case r.config.Zone != "":
+		filter = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", filter, serviceLabel, trimWildcard(r.config.Zone))
+	case len(r.config.Regions) != 0:
+		regionsFilter := r.buildRegionsFilter(r.config.Regions, serviceLabel)
+		filter = fmt.Sprintf("%s AND %s", filter, regionsFilter)
+	}
+
+	return filter
+}
+
+// trimWildcard remove wildcard value `*` from the end of the string.
+func trimWildcard(value string) string {
+	return strings.TrimSuffix(value, "*")
+}
+
+// isAGlobalService return true if the given service is considered global from GCP and does not
+// uses the regional or zonal metrics filtering.
+func isAGlobalService(serviceName string) bool {
+	switch serviceName {
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
+		return true
+	default:
+		return false
+	}
+}
+
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
 func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	f := fmt.Sprintf(`metric.type="%s"`, m)
-	if r.config.Zone == "" && r.config.Region == "" && len(r.config.Regions) == 0 {
-		return f
+
+	locationsConfigsAvailable := r.config.Region != "" || r.config.Zone != "" || len(r.config.Regions) > 0
+	// NOTE: some GCP services are global, not regional or zonal. To these services we don't need
+	// to apply any additional filters.
+	if locationsConfigsAvailable && !isAGlobalService(serviceName) {
+		serviceLabel := getServiceLabelFor(serviceName)
+		f = r.buildLocationFilter(serviceLabel, f)
 	}
 
-	switch serviceName {
-	case gcp.ServiceCompute:
-		if r.config.Region != "" && r.config.Zone != "" {
-			r.logger.Warnf("when region %s and zone %s config parameter "+
-				"both are provided, only use region", r.config.Regions, r.config.Zone)
-		}
-
-		if r.config.Region != "" && len(r.config.Regions) != 0 {
-			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
-		}
-
-		switch {
-		case r.config.Region != "":
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabel, strings.TrimSuffix(r.config.Region, "*"))
-		case r.config.Zone != "":
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.ComputeResourceLabel, strings.TrimSuffix(r.config.Zone, "*"))
-		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.ComputeResourceLabel)
-			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
-		}
-	case gcp.ServiceGKE:
-		if r.config.Region != "" && r.config.Zone != "" {
-			r.logger.Warnf("when region %s and zone %s config parameter "+
-				"both are provided, only use region", r.config.Region, r.config.Zone)
-		}
-
-		switch {
-		case r.config.Region != "":
-			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
-		case r.config.Zone != "":
-			zone := strings.TrimSuffix(r.config.Zone, "*")
-			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
-		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.GKEResourceLabel)
-			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
-		}
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
-		return f
-	case gcp.ServiceDataproc:
-		if r.config.Region != "" && len(r.config.Regions) != 0 {
-			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
-		}
-
-		switch {
-		case r.config.Region != "":
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.DataprocResourceLabel, strings.TrimSuffix(r.config.Region, "*"))
-		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.DataprocResourceLabel)
-			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
-		}
-	case gcp.ServiceStorage:
-		if r.config.Region != "" && len(r.config.Regions) != 0 {
-			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
-		}
-
-		switch {
-		case r.config.Region != "":
-			f = fmt.Sprintf(`%s AND resource.labels.location = "%s"`, f, r.config.Region)
-		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.StorageResourceLabel)
-			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
-		}
-	case gcp.ServiceCloudSQL:
-		if r.config.Region != "" && len(r.config.Regions) != 0 {
-			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
-		}
-
-		switch {
-		case r.config.Region != "":
-			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.CloudSQLResourceLabel, region)
-		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.CloudSQLResourceLabel)
-			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
-		}
-	case gcp.ServiceRedis:
-		if r.config.Region != "" && len(r.config.Regions) != 0 {
-			r.logger.Warnf("when region %s and regions config parameters are both provided, use region", r.config.Region)
-		}
-
-		switch {
-		case r.config.Region != "":
-			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf("%s AND %s = starts_with(\"%s\")", f, gcp.RedisResourceLabel, region)
-		case len(r.config.Regions) != 0:
-			regionsFilter := r.buildRegionsFilter(r.config.Regions, gcp.RedisResourceLabel)
-			f = fmt.Sprintf("%s AND %s", f, regionsFilter)
-		}
-	default:
-		if r.config.Region != "" && r.config.Zone != "" {
-			r.logger.Warnf("when region %s and zone %s config parameter "+
-				"both are provided, only use region", r.config.Region, r.config.Zone)
-		}
-
-		switch {
-		case r.config.Region != "":
-			region := strings.TrimSuffix(r.config.Region, "*")
-			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, region)
-		case r.config.Zone != "":
-			zone := strings.TrimSuffix(r.config.Zone, "*")
-			f = fmt.Sprintf(`%s AND resource.labels.zone = starts_with("%s")`, f, zone)
-		}
-	}
-
+	// NOTE: make sure to log the applied filter, as it helpful when debugging
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
 
 	return f

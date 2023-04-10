@@ -27,6 +27,8 @@ type config struct {
 	ParseJSON     *bool          `config:"parse_json,omitempty"`
 	BucketTimeOut *time.Duration `config:"bucket_timeout,omitempty"`
 	Buckets       []bucket       `config:"buckets" validate:"required"`
+	// This field is only used for system test purposes, to override the HTTP endpoint.
+	AlternativeHost string `config:"alternative_host,omitempty"`
 }
 
 // bucket contains the config for each specific object storage bucket in the root account

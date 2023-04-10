@@ -252,6 +252,10 @@ By default it is `true`.
 if the `annotations.dedot` config is set to be `true` in the provider config, then `.` in annotations will be replaced
 with `_`. By default it is `true`.
 
+NOTE: Starting from 8.6 release `kubernetes.labels.*` used in config templating are not dedoted regardless of `labels.dedot` value.
+This config parameter only affects the fields added in the final Elasticsearch document. For example, for a pod with label `app.kubernetes.io/name=ingress-nginx`
+the matching condition should be `condition: ${kubernetes.labels.app.kubernetes.io/name} == "ingress-nginx"`. If `labels.dedot` is set to `true`(default value)
+the label will be stored in Elasticsearch as `kubernetes.labels.app_kubernetes_io/name`. The same applies for kubernetes annotations.
 
 For example:
 
