@@ -32,7 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-//TODO: adjust tests and delete consts:
+// TODO: adjust tests and delete consts:
 const (
 	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
 	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
@@ -75,18 +75,20 @@ func fetchRawProviderMetadata(
 	// LoadDefaultConfig loads the Ec2 role credentials
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
-		logger.Warnf("error when loading AWS default configuration: %s.", err)
+		logger.Debugf("error loading AWS default configuration: %s.", err)
+		return
 	}
 
 	awsClient := imds.NewFromConfig(awsConfig)
 
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
-		logger.Warnf("error when fetching EC2 Identity Document: %s.", err)
+		logger.Warnf("error fetching EC2 Identity Document: %s.", err)
 	}
 
 	// Region must be set to be able to get EC2 Tags
-	awsConfig.Region = instanceIdentity.Region
+	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
+	awsConfig.Region = awsRegion
 
 	svc := ec2.NewFromConfig(awsConfig)
 	input := &ec2.DescribeTagsInput{
@@ -108,13 +110,13 @@ func fetchRawProviderMetadata(
 
 	tagsResult, err := svc.DescribeTags(context.TODO(), input)
 	if err != nil {
-		logger.Warnf("error when fetching EC2 Tags: %s.", err)
+		logger.Warnf("error fetching EC2 Tags: %s.", err)
 	}
 
 	result.metadata.Put("cloud.orchestrator.cluster.name", tagsResult.Tags[0].Value)
 	result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
 	result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
-	result.metadata.Put("cloud.region", instanceIdentity.InstanceIdentityDocument.Region)
+	result.metadata.Put("cloud.region", awsRegion)
 	result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
 	result.metadata.Put("cloud.account.id", instanceIdentity.InstanceIdentityDocument.AccountID)
 	result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
