@@ -6,7 +6,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-structform v0.0.9
-	github.com/elastic/go-sysinfo v1.10.0
+	github.com/elastic/go-sysinfo v1.10.1
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.2
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -16,7 +16,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.21.12
 	github.com/stretchr/testify v1.7.0
 	go.elastic.co/go-licence-detector v0.5.0
-	golang.org/x/sys v0.6.0
+	golang.org/x/sys v0.7.0
 )
 
 require (
