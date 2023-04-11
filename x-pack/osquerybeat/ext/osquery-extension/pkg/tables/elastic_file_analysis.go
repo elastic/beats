@@ -5,9 +5,11 @@
 package tables
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
@@ -15,6 +17,19 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/osquery/osquery-go/plugin/table"
 )
+
+func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string, err error) {
+	cmd := exec.CommandContext(ctx, name, arg...)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+	if err != nil {
+		return stderr.String(), err
+	}
+
+	return stderr.String(), nil
+}
 
 func FileAnalysisColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
@@ -71,10 +86,15 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 
 		// Execute macOS commands
 		fileType, _ := command.Execute(ctx, "file", *path)
-		codeSign, _ := command.Execute(ctx, "codesign", "-dvvv", *path)
 		dependencies, _ := command.Execute(ctx, "otool", "-L", *path)
 		symbols, _ := command.Execute(ctx, "nm", *path)
 		stringsOutput, _ := command.Execute(ctx, "strings", "-a", *path)
+
+		// Execute macOS codesign command and capture stderr for output
+		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
+		if err != nil {
+			fmt.Println("Error running codesign command:", err)
+		}
 
 		// Convert outputs to strings
 		fileTypeStr := strings.TrimSpace(string(fileType))
