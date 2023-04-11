@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
 
 *Elastic Log Driver*
 
