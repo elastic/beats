@@ -176,6 +176,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Winlogbeat*
 
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
 
 *Elastic Log Driver*
 
