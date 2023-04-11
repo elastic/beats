@@ -112,6 +112,11 @@ func (p *Input) Stop() {
 	p.outlet.Close()
 }
 
+// Reload runs the input
+func (p *Input) Reload() {
+	return
+}
+
 // Wait waits for the input to be completed. Not implemented.
 func (p *Input) Wait() {}
 
