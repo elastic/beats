@@ -35,8 +35,8 @@ func FileAnalysisColumns() []table.ColumnDefinition {
 	return []table.ColumnDefinition{
 		table.TextColumn("path"),
 		table.TextColumn("mode"),
-		table.TextColumn("uid"),
-		table.TextColumn("gid"),
+		table.BigIntColumn("uid"),
+		table.BigIntColumn("gid"),
 		table.TextColumn("size"),
 		table.TextColumn("mtime"),
 		table.TextColumn("file_type"),
