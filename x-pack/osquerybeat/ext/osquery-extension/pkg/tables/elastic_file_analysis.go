@@ -43,16 +43,19 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 
 		var path *string
 		for _, constraint := range pathConstraint.Constraints {
-			path = &constraint.Expression
+			constraintCopy := constraint
+			path = &constraintCopy.Expression
 			break
 		}
+
 		if path == nil {
 			return results, nil
 		}
 
+		// Validate and sanitize the input path
 		stat, err := os.Stat(*path)
-		if err != nil {
-			return results, nil
+		if err != nil || !stat.Mode().IsRegular() {
+			return results, fmt.Errorf("invalid path: %s", *path)
 		}
 
 		sys, ok := stat.Sys().(*syscall.Stat_t)
