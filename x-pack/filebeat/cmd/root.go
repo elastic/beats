@@ -31,7 +31,7 @@ func Filebeat() *cmd.BeatsRootCmd {
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
 	}
-	settings.Processing = processing.MakeDefaultSupport(true, globalProcs)
+	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 	command := fbcmd.Filebeat(inputs.Init, settings)
 	return command
