@@ -79,9 +79,9 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		}
 
 		mode := fmt.Sprintf("%o", stat.Mode().Perm())
-		uid := strconv.Itoa(int(sys.Uid))
-		gid := strconv.Itoa(int(sys.Gid))
-		size := strconv.Itoa(int(stat.Size()))
+		uid := strconv.FormatUint(uint64(sys.Uid), 10)
+		gid := strconv.FormatUint(uint64(sys.Gid), 10)
+		size := strconv.FormatUint(uint64(stat.Size()), 10)
 		mtime := strconv.FormatInt(stat.ModTime().Unix(), 10)
 
 		// Execute macOS commands
