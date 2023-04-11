@@ -116,7 +116,7 @@ func MakeDefaultSupport(
 		var rawProcessors processors.PluginConfig
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
 		if fleetmode.Enabled() && !beatCfg.HasField("processors") {
-			log.Debugf("In fleet with processors specified, defaulting to global processors")
+			log.Debugf("In fleet mode with no processors specified, defaulting to global processors")
 			rawProcessors = fleetDefaultProcessors
 
 		} else {
