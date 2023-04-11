@@ -8,14 +8,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/osquery/osquery-go/plugin/table"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 )
 
 func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string, err error) {
@@ -93,15 +95,15 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Execute macOS codesign command and capture stderr for output
 		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
 		if err != nil {
-			fmt.Println("Error running codesign command:", err)
+			log.Println("Error running codesign command:", err)
 		}
 
 		// Convert outputs to strings
-		fileTypeStr := strings.TrimSpace(string(fileType))
-		codeSignStr := strings.TrimSpace(string(codeSign))
-		dependenciesStr := strings.TrimSpace(string(dependencies))
-		symbolsStr := strings.TrimSpace(string(symbols))
-		stringsStr := strings.TrimSpace(string(stringsOutput))
+		fileTypeStr := strings.TrimSpace(fileType)
+		codeSignStr := strings.TrimSpace(codeSign)
+		dependenciesStr := strings.TrimSpace(dependencies)
+		symbolsStr := strings.TrimSpace(symbols)
+		stringsStr := strings.TrimSpace(stringsOutput)
 
 		results = append(results, map[string]string{
 			"path":         *path,
