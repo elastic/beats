@@ -249,6 +249,10 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 	}
 
 	it, err := job.Read(ctx)
+	if err != nil {
+		return events, fmt.Errorf("reading from bigquery job failed: %w", err)
+	}
+
 	for {
 		var row []bigquery.Value
 		err := it.Next(&row)
