@@ -8,11 +8,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/osquery/osquery-go/plugin/table"
 )
 
@@ -67,11 +67,11 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		mtime := strconv.FormatInt(stat.ModTime().Unix(), 10)
 
 		// Execute macOS commands
-		fileType, _ := exec.Command("file", *path).Output()
-		codeSign, _ := exec.Command("codesign", "-dvvv", *path).Output()
-		dependencies, _ := exec.Command("otool", "-L", *path).Output()
-		symbols, _ := exec.Command("nm", *path).Output()
-		stringsOutput, _ := exec.Command("strings", "-a", *path).Output()
+		fileType, _ := command.Execute(ctx, "file", *path)
+		codeSign, _ := command.Execute(ctx, "codesign", "-dvvv", *path)
+		dependencies, _ := command.Execute(ctx, "otool", "-L", *path)
+		symbols, _ := command.Execute(ctx, "nm", *path)
+		stringsOutput, _ := command.Execute(ctx, "strings", "-a", *path)
 
 		// Convert outputs to strings
 		fileTypeStr := strings.TrimSpace(string(fileType))
