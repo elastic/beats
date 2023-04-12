@@ -200,15 +200,16 @@ func startHarvester(
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
 			if !errors.Is(err, ErrHarvesterLimitReached) {
-				return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
+				return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 			}
 
-			t := time.Tick(100 * time.Millisecond)
+			t := time.NewTicker(100 * time.Millisecond)
+			defer t.Stop()
 			for err != nil {
 				select {
 				case <-canceler.Done():
 					return canceler.Err()
-				case <-t:
+				case <-t.C:
 					harvesterCtx, cancelHarvester, err = hg.readers.newContext(srcID, canceler)
 				}
 			}
@@ -239,7 +240,7 @@ func startHarvester(
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
 		err = hg.harvester.Run(ctx, src, cursor, publisher)
-		if err != nil && err != context.Canceled {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)
 			return fmt.Errorf("error while running harvester: %w", err)
 		}
@@ -254,20 +255,21 @@ func startHarvester(
 	}
 }
 
-// Continue start a new Harvester with the state information from a different Source.
+// Continue starts a new Harvester with the state information from a different Source.
 func (hg *defaultHarvesterGroup) Continue(ctx inputv2.Context, previous, next Source) {
 	ctx.Logger.Debugf("Continue harvester for file prev=%s, next=%s", previous.Name(), next.Name())
 	prevID := hg.identifier.ID(previous)
 	nextID := hg.identifier.ID(next)
 
-	_ = hg.tg.Go(func(canceler context.Context) error {
+	err := hg.tg.Go(func(canceler context.Context) error {
 		previousResource, err := lock(ctx, hg.store, prevID)
 		if err != nil {
 			return fmt.Errorf("error while locking previous resource: %w", err)
 		}
+
 		// mark previous state out of date
 		// so when reading starts again the offset is set to zero
-		_ = hg.store.remove(prevID)
+		_ = hg.store.remove(prevID) // ignoring error as it can only be "not found"
 
 		nextResource, err := lock(ctx, hg.store, nextID)
 		if err != nil {
@@ -282,6 +284,11 @@ func (hg *defaultHarvesterGroup) Continue(ctx inputv2.Context, previous, next So
 		hg.Start(ctx, next)
 		return nil
 	})
+	if err != nil {
+		ctx.Logger.Warnf(
+			"input %s tried to Continue harvester with task group already closed",
+			ctx.ID)
+	}
 }
 
 // Stop stops the running Harvester for a given Source.
