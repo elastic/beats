@@ -8,9 +8,13 @@ import (
 	"strings"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	"google.golang.org/genproto/googleapis/monitoring/v3"
+=======
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+>>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -36,7 +40,11 @@ type KeyValuePoint struct {
 }
 
 // extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
+<<<<<<< HEAD
 func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
+=======
+func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringpb.TimeSeries, aligner string) (points []KeyValuePoint) {
+>>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -59,7 +67,7 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 	return points, nil
 }
 
-func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time, err error) {
+func (e *incomingFieldExtractor) getTimestamp(p *monitoringpb.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
 		if ts, err = ptypes.Timestamp(p.Interval.EndTime); err != nil {
@@ -227,19 +235,29 @@ func remap(l *logp.Logger, s string) string {
 	return s
 }
 
-func getValueFromPoint(p *monitoring.Point) (out interface{}) {
+func getValueFromPoint(p *monitoringpb.Point) (out interface{}) {
 	switch v := p.Value.Value.(type) {
-	case *monitoring.TypedValue_DoubleValue:
+	case *monitoringpb.TypedValue_DoubleValue:
 		out = v.DoubleValue
-	case *monitoring.TypedValue_BoolValue:
+	case *monitoringpb.TypedValue_BoolValue:
 		out = v.BoolValue
-	case *monitoring.TypedValue_Int64Value:
+	case *monitoringpb.TypedValue_Int64Value:
 		out = v.Int64Value
-	case *monitoring.TypedValue_StringValue:
+	case *monitoringpb.TypedValue_StringValue:
 		out = v.StringValue
+<<<<<<< HEAD
 	case *monitoring.TypedValue_DistributionValue:
 		//TODO Distribution values aren't simple values. Take a look at this
 		out = v.DistributionValue
+=======
+	case *monitoringpb.TypedValue_DistributionValue:
+		// Distribution values aren't simple values. Take a look at this
+		histogram := gcp.DistributionHistogramToES(v.DistributionValue)
+
+		out = mapstr.M{
+			"histogram": histogram,
+		}
+>>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 	}
 
 	return out

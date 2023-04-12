@@ -13,10 +13,14 @@ import (
 
 	"github.com/golang/protobuf/ptypes/duration"
 
+<<<<<<< HEAD
 	monitoring "cloud.google.com/go/monitoring/apiv3"
+=======
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+>>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
