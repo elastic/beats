@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -43,10 +43,10 @@ type Harvester interface {
 	// Name returns the type of the Harvester
 	Name() string
 	// Test checks if the Harvester can be started with the given configuration.
-	Test(Source, input.TestContext) error
+	Test(Source, inputv2.TestContext) error
 	// Run is the event loop which reads from the source
 	// and forwards it to the publisher.
-	Run(input.Context, Source, Cursor, Publisher) error
+	Run(inputv2.Context, Source, Cursor, Publisher) error
 }
 
 type readerGroup struct {
@@ -72,7 +72,7 @@ func newReaderGroupWithLimit(limit uint64) *readerGroup {
 // function is nil in that case and must not be called.
 //
 // The context will be automatically cancelled once the ID is removed from the group. Calling `cancel` is optional.
-func (r *readerGroup) newContext(id string, cancelation input.Canceler) (context.Context, context.CancelFunc, error) {
+func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (context.Context, context.CancelFunc, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -115,11 +115,11 @@ func (r *readerGroup) hasID(id string) bool {
 // Harvesters started by the Prospector.
 type HarvesterGroup interface {
 	// Start starts a Harvester and adds it to the readers list.
-	Start(input.Context, Source)
+	Start(inputv2.Context, Source)
 	// Restart starts a Harvester if it might be already running.
-	Restart(input.Context, Source)
+	Restart(inputv2.Context, Source)
 	// Continue starts a new Harvester with the state information of the previous.
-	Continue(ctx input.Context, previous, next Source)
+	Continue(ctx inputv2.Context, previous, next Source)
 	// Stop cancels the reader of a given Source.
 	Stop(Source)
 	// StopGroup cancels all running Harvesters.
@@ -137,28 +137,50 @@ type defaultHarvesterGroup struct {
 	tg           unison.TaskGroup
 }
 
-func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
-	sourceName := hg.identifier.ID(s)
+// Start starts the Harvester for a Source if no Harvester is running for the
+// Source.
+// If the harvester fails to start due to ErrHarvesterLimitReached, it'll retry
+// until it succeeds or an error other than ErrHarvesterLimitReached happens.
+func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
+	sourceName := hg.identifier.ID(src)
 
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Starting harvester for file")
 
-	_ = hg.tg.Go(startHarvester(ctx, hg, s, false))
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, false)); err != nil {
+		ctx.Logger.Warnf(
+			"tried to start harvester with task group already closed",
+			ctx.ID)
+	}
 }
 
-// Restart starts the Harvester for a Source if a Harvester is already running it waits for it
-// to shut down for a specified timeout. It does not block.
-func (hg *defaultHarvesterGroup) Restart(ctx input.Context, s Source) {
-	sourceName := hg.identifier.ID(s)
+// Restart starts the Harvester for a Source if a Harvester is already running
+// it waits for it to shut down for a specified timeout. It does not block.
+// If the harvester fails to start due to ErrHarvesterLimitReached, it'll retry
+// until it succeeds or an error other than ErrHarvesterLimitReached happens.
+func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
+	sourceName := hg.identifier.ID(src)
 
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	_ = hg.tg.Go(startHarvester(ctx, hg, s, true))
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true)); err != nil {
+		ctx.Logger.Warnf(
+			"input %s tried to restart harvester with task group already closed",
+			ctx.ID)
+	}
 }
 
-func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, restart bool) func(context.Context) error {
-	srcID := hg.identifier.ID(s)
+// Start starts the harvester. if restart is true, it'll first remove the
+// associated reader.
+// If the harvester fails to start due to ErrHarvesterLimitReached, it'll retry
+// until it succeeds or an error other than ErrHarvesterLimitReached happens.
+func startHarvester(
+	ctx inputv2.Context,
+	hg *defaultHarvesterGroup,
+	src Source,
+	restart bool) func(context.Context) error {
+	srcID := hg.identifier.ID(src)
 
 	return func(canceler context.Context) error {
 		defer func() {
@@ -177,8 +199,21 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
-			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
+			if !errors.Is(err, ErrHarvesterLimitReached) {
+				return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
+			}
+
+			t := time.Tick(100 * time.Millisecond)
+			for err != nil {
+				select {
+				case <-canceler.Done():
+					return canceler.Err()
+				case <-t:
+					harvesterCtx, cancelHarvester, err = hg.readers.newContext(srcID, canceler)
+				}
+			}
 		}
+
 		ctx.Cancelation = harvesterCtx
 		defer cancelHarvester()
 
@@ -203,8 +238,8 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
-		err = hg.harvester.Run(ctx, s, cursor, publisher)
-		if err != nil && !errors.Is(err, context.Canceled) {
+		err = hg.harvester.Run(ctx, src, cursor, publisher)
+		if err != nil && err != context.Canceled {
 			hg.readers.remove(srcID)
 			return fmt.Errorf("error while running harvester: %w", err)
 		}
@@ -220,7 +255,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 }
 
 // Continue start a new Harvester with the state information from a different Source.
-func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Source) {
+func (hg *defaultHarvesterGroup) Continue(ctx inputv2.Context, previous, next Source) {
 	ctx.Logger.Debugf("Continue harvester for file prev=%s, next=%s", previous.Name(), next.Name())
 	prevID := hg.identifier.ID(previous)
 	nextID := hg.identifier.ID(next)
@@ -264,7 +299,7 @@ func (hg *defaultHarvesterGroup) StopGroup() error {
 
 // Lock locks a key for exclusive access and returns an resource that can be used to modify
 // the cursor state and unlock the key.
-func lock(ctx input.Context, store *store, key string) (*resource, error) {
+func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
@@ -279,7 +314,7 @@ func lock(ctx input.Context, store *store, key string) (*resource, error) {
 	return resource, nil
 }
 
-func lockResource(log *logp.Logger, resource *resource, canceler input.Canceler) error {
+func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Canceler) error {
 	if !resource.lock.TryLock() {
 		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
 		err := resource.lock.LockContext(canceler)
