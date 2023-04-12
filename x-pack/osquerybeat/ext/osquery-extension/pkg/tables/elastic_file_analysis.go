@@ -98,28 +98,28 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Execute macOS commands
 		fileType, err := command.Execute(ctx, "file", *path)
 		if err != nil {
-			log.Printf("error running 'file' command: %v", err)
+			log.Printf("Error running 'file' command: %v", err)
 		}
 
 		dependencies, err := command.Execute(ctx, "otool", "-L", *path)
 		if err != nil {
-			log.Printf("error running 'otool' command: %v", err)
+			log.Printf("Error running 'otool' command: %v", err)
 		}
 
 		symbols, err := command.Execute(ctx, "nm", *path)
 		if err != nil {
-			log.Printf("error running 'nm' command: %v", err)
+			log.Printf("Error running 'nm' command: %v", err)
 		}
 
 		stringsOutput, err := command.Execute(ctx, "strings", "-a", *path)
 		if err != nil {
-			log.Printf("error running 'strings' command: %v", err)
+			log.Printf("Error running 'strings' command: %v", err)
 		}
 
 		// Execute macOS codesign command and capture stderr for output
 		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
 		if err != nil {
-			log.Println("Error running codesign command:", err)
+			log.Println("Error running 'codesign' command:", err)
 		}
 
 		// Convert outputs to strings
