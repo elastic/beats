@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -136,13 +135,13 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		clients = append(clients, client)
 	}
 
-	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
+	/*queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
 		return memqueue.NewQueue(log,
 			memqueue.Settings{
 				ACKListener: ackListener,
 				Events:      20,
 			}), nil
-	}
+	}*/
 
 	monitoring := monitoring.Default.GetRegistry("monitoring")
 
@@ -160,7 +159,12 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 			Metrics: monitoring,
 			Logger:  log,
 		},
-		queueFactory,
+		pipeline.QueueConfig{
+			Type: memqueue.QueueType,
+			UserConfig: conf.MustNewConfigFrom(
+				map[string]interface{}{"events": 20},
+			),
+		},
 		outputs.Group{
 			Clients:   []outputs.Client{outClient},
 			BatchSize: windowSize,

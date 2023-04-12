@@ -24,10 +24,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 
-// ACKListener listens to special events to be send by queue implementations.
+// ACKCallback listens to special events to be send by queue implementations.
+/*type ACKCallback func(eventCount int)
+
 type ACKListener interface {
 	OnACK(eventCount int) // number of consecutively published events acked by producers
-}
+}*/
 
 // Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {

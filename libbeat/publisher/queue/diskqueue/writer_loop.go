@@ -235,8 +235,8 @@ outerLoop:
 	_ = wl.outputFile.Sync()
 
 	// If the queue has an ACK listener, notify it the frames were written.
-	if wl.settings.WriteToDiskListener != nil {
-		wl.settings.WriteToDiskListener.OnACK(totalACKCount)
+	if wl.settings.WriteToDiskCallback != nil {
+		wl.settings.WriteToDiskCallback(totalACKCount)
 	}
 
 	// Notify any producers with ACK listeners that their frames were written.

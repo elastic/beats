@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -58,8 +59,7 @@ type Pipeline struct {
 
 	monitors Monitors
 
-	queue  queue.Queue
-	output *outputController
+	outputController *outputController
 
 	observer observer
 
@@ -111,7 +111,12 @@ type OutputReloader interface {
 	) error
 }
 
-type queueFactory func(queue.ACKListener) (queue.Queue, error)
+type queueFactory func(ackCallback func(eventCount int)) (queue.Queue, error)
+
+type QueueConfig struct {
+	Type       string
+	UserConfig *conf.C
+}
 
 // New create a new Pipeline instance from a queue instance and a set of outputs.
 // The new pipeline will take ownership of queue and outputs. On Close, the
@@ -119,12 +124,10 @@ type queueFactory func(queue.ACKListener) (queue.Queue, error)
 func New(
 	beat beat.Info,
 	monitors Monitors,
-	queueFactory queueFactory,
+	queueConfig QueueConfig,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
-	var err error
-
 	if monitors.Logger == nil {
 		monitors.Logger = logp.NewLogger("publish")
 	}
@@ -142,33 +145,34 @@ func New(
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 
-	p.queue, err = queueFactory(p)
+	/*p.queue, err = queueFactory(p)
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
-	maxEvents := p.queue.BufferConfig().MaxEvents
+	/*maxEvents := p.queue.BufferConfig().MaxEvents
 	if maxEvents <= 0 {
 		// Maximum number of events until acker starts blocking.
 		// Only active if pipeline can drop events.
 		maxEvents = 64000
 	}
-	p.observer.queueMaxEvents(maxEvents)
+	p.observer.queueMaxEvents(maxEvents)*/
+	ackCallback := func(eventCount int) {
+		p.observer.queueACKed(eventCount)
+		if p.waitOnClose {
+			p.waitCloseGroup.Add(-eventCount)
+		}
+	}
 
-	p.output = newOutputController(beat, monitors, p.observer, p.queue)
-	p.output.Set(out)
+	output, err := newOutputController(
+		beat, monitors, p.observer, queueConfig, ackCallback, settings.InputQueueSize)
+	if err != nil {
+		return nil, err
+	}
+	p.outputController = output
+	p.outputController.Set(out)
 
 	return p, nil
-}
-
-// OnACK implements the queue.ACKListener interface, so the queue can notify the
-// Pipeline when events are acknowledged.
-func (p *Pipeline) OnACK(n int) {
-	p.observer.queueACKed(n)
-
-	if p.waitOnClose {
-		p.waitCloseGroup.Add(-n)
-	}
 }
 
 // Close stops the pipeline, outputs and queue.
@@ -200,12 +204,12 @@ func (p *Pipeline) Close() error {
 
 	// Closing the queue stops ACKs from propagating, so we close the output first
 	// to give it a chance to wait for any outstanding events to be acknowledged.
-	p.output.Close()
+	p.outputController.Close()
 	// shutdown queue
-	err := p.queue.Close()
-	if err != nil {
-		log.Error("pipeline queue shutdown error: ", err)
-	}
+	// err := p.queue.Close()
+	// if err != nil {
+	// 	log.Error("pipeline queue shutdown error: ", err)
+	// }
 
 	p.observer.cleanup()
 	if p.sigNewClient != nil {
@@ -250,26 +254,26 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
-		pipeline:     p,
-		closeRef:     cfg.CloseRef,
-		done:         make(chan struct{}),
-		isOpen:       atomic.MakeBool(true),
-		eventer:      cfg.Events,
-		processors:   processors,
-		eventFlags:   eventFlags,
-		canDrop:      canDrop,
-		reportEvents: reportEvents,
+		pipeline:       p,
+		closeRef:       cfg.CloseRef,
+		done:           make(chan struct{}),
+		isOpen:         atomic.MakeBool(true),
+		clientListener: cfg.ClientListener,
+		processors:     processors,
+		eventFlags:     eventFlags,
+		canDrop:        canDrop,
+		reportEvents:   reportEvents,
 	}
 
 	ackHandler := cfg.ACKHandler
 
 	producerCfg := queue.ProducerConfig{}
 
-	if reportEvents || cfg.Events != nil {
+	if reportEvents || cfg.ClientListener != nil {
 		producerCfg.OnDrop = func(event interface{}) {
 			publisherEvent, _ := event.(publisher.Event)
-			if cfg.Events != nil {
-				cfg.Events.DroppedOnPublish(publisherEvent.Content)
+			if cfg.ClientListener != nil {
+				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
 			}
 			if reportEvents {
 				p.waitCloseGroup.Add(-1)
@@ -298,7 +302,8 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	client.acker = ackHandler
 	client.waiter = waiter
-	client.producer = p.queue.Producer(producerCfg)
+	client.producer = p.outputController.queueProducer(producerCfg)
+	// p.queue.Producer(producerCfg)
 
 	p.observer.clientConnected()
 
@@ -397,5 +402,15 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
-	return p.output
+	return p.outputController
+}
+
+// OnACK implements the queue.ACKListener interface, so the queue can notify the
+// Pipeline when events are acknowledged.
+func (p *Pipeline) OnACK(n int) {
+	p.observer.queueACKed(n)
+
+	if p.waitOnClose {
+		p.waitCloseGroup.Add(-n)
+	}
 }

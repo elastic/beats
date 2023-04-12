@@ -18,13 +18,18 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // outputController manages the pipelines output capabilities, like:
@@ -36,7 +41,9 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	workQueue chan publisher.Batch
+	queue queue.Queue
+
+	workerChan chan publisher.Batch
 
 	consumer *eventConsumer
 	workers  []outputWorker
@@ -52,20 +59,32 @@ func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	observer outputObserver,
-	queue queue.Queue,
-) *outputController {
-	return &outputController{
-		beat:      beat,
-		monitors:  monitors,
-		observer:  observer,
-		workQueue: make(chan publisher.Batch),
-		consumer:  newEventConsumer(monitors.Logger, queue, observer),
+	queueConfig QueueConfig,
+	ackCallback func(eventCount int),
+	inQueueSize int,
+) (*outputController, error) {
+
+	controller := &outputController{
+		beat:       beat,
+		monitors:   monitors,
+		observer:   observer,
+		workerChan: make(chan publisher.Batch),
+		consumer:   newEventConsumer(monitors.Logger, observer),
 	}
+
+	queueFactory, err := createQueueFactory(queueConfig, monitors, inQueueSize)
+	if err != nil {
+		return nil, err
+	}
+	queue, err := queueFactory(ackCallback)
+	controller.queue = queue
+
+	return controller, nil
 }
 
 func (c *outputController) Close() error {
 	c.consumer.close()
-	close(c.workQueue)
+	close(c.workerChan)
 
 	for _, out := range c.workers {
 		out.Close()
@@ -88,10 +107,10 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
 		logger := logp.NewLogger("publisher_pipeline_output")
-		c.workers[i] = makeClientWorker(c.observer, c.workQueue, client, logger, c.monitors.Tracer)
+		c.workers[i] = makeClientWorker(c.observer, c.workerChan, client, logger, c.monitors.Tracer)
 	}
 
-	targetChan := c.workQueue
+	targetChan := c.workerChan
 	if len(clients) == 0 {
 		// If there are no output clients, we are probably still waiting
 		// for our output config from Agent via BeatV2Manager.reloadOutput.
@@ -135,4 +154,55 @@ func (c *outputController) Reload(
 	c.Set(output)
 
 	return nil
+}
+
+func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
+	return nil
+}
+
+func createQueueFactory(
+	config QueueConfig,
+	monitors Monitors,
+	inQueueSize int,
+) (queueFactory, error) {
+	if monitors.Telemetry != nil {
+		queueReg := monitors.Telemetry.NewRegistry("queue")
+		monitoring.NewString(queueReg, "name").Set(config.Type)
+	}
+
+	switch config.Type {
+	case memqueue.QueueType:
+		settings, err := memqueue.SettingsForUserConfig(config.UserConfig)
+		if err != nil {
+			return nil, err
+		}
+		// The memory queue has a special override during pipeline
+		// initialization for the size of its API channel buffer.
+		settings.InputQueueSize = inQueueSize
+		return memQueueFactory(monitors.Logger, settings), nil
+	case diskqueue.QueueType:
+		settings, err := diskqueue.SettingsForUserConfig(config.UserConfig)
+		if err != nil {
+			return nil, err
+		}
+		return diskQueueFactory(monitors.Logger, settings), nil
+	default:
+		return nil, fmt.Errorf("'%v' is not a valid queue type", config.Type)
+	}
+}
+
+func memQueueFactory(logger *logp.Logger, settings memqueue.Settings) queueFactory {
+	return func(ackCallback func(eventCount int)) (queue.Queue, error) {
+		factorySettings := settings
+		factorySettings.ACKCallback = ackCallback
+		return memqueue.NewQueue(logger, factorySettings), nil
+	}
+}
+
+func diskQueueFactory(logger *logp.Logger, settings diskqueue.Settings) queueFactory {
+	return func(ackCallback func(eventCount int)) (queue.Queue, error) {
+		factorySettings := settings
+		factorySettings.WriteToDiskCallback = ackCallback
+		return diskqueue.NewQueue(logger, factorySettings)
+	}
 }

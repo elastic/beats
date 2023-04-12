@@ -57,8 +57,8 @@ type ClientConfig struct {
 	// Configure ACK callback.
 	ACKHandler ACKer
 
-	// Events configures callbacks for common client callbacks
-	Events ClientEventer
+	// ClientListener configures callbacks for common client callbacks
+	ClientListener ClientListener
 }
 
 // ACKer can be registered with a Client when connecting to the pipeline.
@@ -130,8 +130,8 @@ type ProcessingConfig struct {
 	Private interface{}
 }
 
-// ClientEventer provides access to internal client events.
-type ClientEventer interface {
+// ClientListener provides access to internal client events.
+type ClientListener interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 

@@ -56,11 +56,11 @@ func TestOutputReload(t *testing.T) {
 				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
 				numOutputReloads := 350 + (q % 150)     // 350 to 499
 
-				queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
+				queueFactory := func(ackCallback func(eventCount int)) (queue.Queue, error) {
 					return memqueue.NewQueue(
 						logp.L(),
 						memqueue.Settings{
-							ACKListener: ackListener,
+							ACKCallback: ackCallback,
 							Events:      int(numEventsToPublish),
 						}), nil
 				}
