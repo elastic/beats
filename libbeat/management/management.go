@@ -109,6 +109,9 @@ type Manager interface {
 
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]interface{})
+
+	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
 }
 
 // PluginFunc for creating FactoryFunc if it matches a config
@@ -190,4 +193,19 @@ func (n *nilManager) RegisterAction(action client.Action) {}
 
 func (n *nilManager) UnregisterAction(action client.Action) {}
 
+<<<<<<< HEAD
 func (n *nilManager) SetPayload(map[string]interface{}) {}
+=======
+// Enabled returns false because management is disabled.
+// the nilManager is still used for shutdown on some cases,
+// but that does not mean the Beat is being managed externally,
+// hence it will always return false.
+func (n *fallbackManager) Enabled() bool                         { return false }
+func (n *fallbackManager) Start() error                          { return nil }
+func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
+func (n *fallbackManager) RegisterAction(action client.Action)   {}
+func (n *fallbackManager) UnregisterAction(action client.Action) {}
+func (n *fallbackManager) SetPayload(map[string]interface{})     {}
+func (n *fallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+}
+>>>>>>> ea1293fdb0 (Fix performance issues with processors scaling under agent (#35031))
