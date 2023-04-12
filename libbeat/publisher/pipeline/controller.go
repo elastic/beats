@@ -124,6 +124,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
+			queue:      c.queue,
 			ch:         targetChan,
 			batchSize:  outGrp.BatchSize,
 			timeToLive: outGrp.Retry + 1,
@@ -157,7 +158,7 @@ func (c *outputController) Reload(
 }
 
 func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
-	return nil
+	return c.queue.Producer(config)
 }
 
 func createQueueFactory(

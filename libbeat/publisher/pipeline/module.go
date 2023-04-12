@@ -93,11 +93,6 @@ func LoadWithSettings(
 
 	name := beatInfo.Name
 
-	/*queueFactory, err := createQueueFactory(config.Queue, monitors, settings.InputQueueSize)
-	if err != nil {
-		return nil, err
-	}*/
-
 	out, err := loadOutput(monitors, makeOutput)
 	if err != nil {
 		return nil, err
