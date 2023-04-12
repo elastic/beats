@@ -98,22 +98,22 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Execute macOS commands
 		fileType, err := command.Execute(ctx, "file", *path)
 		if err != nil {
-			log.Printf("error running 'file' command: %v\n", err)
+			log.Printf("error running 'file' command: %v", err)
 		}
 
 		dependencies, err := command.Execute(ctx, "otool", "-L", *path)
 		if err != nil {
-			log.Printf("error running 'otool' command: %v\n", err)
+			log.Printf("error running 'otool' command: %v", err)
 		}
 
 		symbols, err := command.Execute(ctx, "nm", *path)
 		if err != nil {
-			log.Printf("error running 'nm' command: %v\n", err)
+			log.Printf("error running 'nm' command: %v", err)
 		}
 
 		stringsOutput, err := command.Execute(ctx, "strings", "-a", *path)
 		if err != nil {
-			log.Printf("error running 'strings' command: %v\n", err)
+			log.Printf("error running 'strings' command: %v", err)
 		}
 
 		// Execute macOS codesign command and capture stderr for output
