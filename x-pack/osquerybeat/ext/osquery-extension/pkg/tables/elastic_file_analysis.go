@@ -74,8 +74,8 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Validate and sanitize the input path
 		stat, err := os.Stat(*path)
 		if err != nil {
-			log.Printf("Error stating path '%s': %v", *path, err)
-			return results, fmt.Errorf("invalid path: %s", *path)
+			log.Printf("Error stating file path '%s': %v", *path, err)
+			return results, fmt.Errorf("error accessing file path %s: %w", *path, err)
 		}
 
 		if !stat.Mode().IsRegular() {
