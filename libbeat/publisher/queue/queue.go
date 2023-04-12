@@ -90,11 +90,10 @@ type ProducerConfig struct {
 	// by the producer instance and being ACKed by the queue.
 	ACK func(count int)
 
-	// OnDrop provided to the queue, to report events being silently dropped by
-	// the queue. For example an async producer close and publish event,
-	// with close happening early might result in the event being dropped. The callback
-	// gives a queue user a chance to keep track of total number of events
-	// being buffered by the queue.
+	// OnDrop is called to report events being silently dropped by
+	// the queue. Currently this can only happen when a Publish call is sent
+	// to the memory queue's request channel but the producer is cancelled
+	// before it reaches the queue buffer.
 	OnDrop func(interface{})
 
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects

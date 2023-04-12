@@ -77,6 +77,8 @@ func newOutputController(
 		return nil, err
 	}
 	controller.queue = queue
+	maxEvents := queue.BufferConfig().MaxEvents
+	observer.queueMaxEvents(maxEvents)
 
 	return controller, nil
 }

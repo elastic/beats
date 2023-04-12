@@ -142,13 +142,6 @@ func New(
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 
-	/*maxEvents := p.queue.BufferConfig().MaxEvents
-	if maxEvents <= 0 {
-		// Maximum number of events until acker starts blocking.
-		// Only active if pipeline can drop events.
-		maxEvents = 64000
-	}
-	p.observer.queueMaxEvents(maxEvents)*/
 	ackCallback := func(eventCount int) {
 		p.observer.queueACKed(eventCount)
 		if p.waitOnClose {
