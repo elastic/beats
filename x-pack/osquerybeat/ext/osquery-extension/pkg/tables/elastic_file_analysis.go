@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -73,14 +74,19 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 			return results, fmt.Errorf("invalid path: %s", *path)
 		}
 
-		sys, ok := stat.Sys().(*syscall.Stat_t)
-		if !ok {
-			return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
+		var uid, gid string = "0", "0"
+
+		if runtime.GOOS == "darwin" {
+			sys, ok := stat.Sys().(*syscall.Stat_t)
+			if !ok {
+				return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
+			}
+			uid = strconv.FormatUint(uint64(sys.Uid), 10)
+			gid = strconv.FormatUint(uint64(sys.Gid), 10)
 		}
 
 		mode := fmt.Sprintf("%o", stat.Mode().Perm())
-		uid := strconv.FormatUint(uint64(sys.Uid), 10)
-		gid := strconv.FormatUint(uint64(sys.Gid), 10)
+
 		size := strconv.FormatUint(uint64(stat.Size()), 10)
 		mtime := strconv.FormatInt(stat.ModTime().Unix(), 10)
 
