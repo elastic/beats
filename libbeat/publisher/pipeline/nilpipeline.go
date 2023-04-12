@@ -24,8 +24,8 @@ import (
 type nilPipeline struct{}
 
 type nilClient struct {
-	eventListener beat.ClientListener
-	acker         beat.ACKer
+	clientListener beat.ClientListener
+	acker          beat.ACKer
 }
 
 var _nilPipeline = (*nilPipeline)(nil)
@@ -42,8 +42,8 @@ func (p *nilPipeline) Connect() (beat.Client, error) {
 
 func (p *nilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return &nilClient{
-		eventListener: cfg.ClientListener,
-		acker:         cfg.ACKHandler,
+		clientListener: cfg.ClientListener,
+		acker:          cfg.ACKHandler,
 	}, nil
 }
 
@@ -66,9 +66,9 @@ func (c *nilClient) PublishAll(events []beat.Event) {
 }
 
 func (c *nilClient) Close() error {
-	if c.eventListener != nil {
-		c.eventListener.Closing()
-		c.eventListener.Closed()
+	if c.clientListener != nil {
+		c.clientListener.Closing()
+		c.clientListener.Closed()
 	}
 	return nil
 }

@@ -135,14 +135,6 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		clients = append(clients, client)
 	}
 
-	/*queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return memqueue.NewQueue(log,
-			memqueue.Settings{
-				ACKListener: ackListener,
-				Events:      20,
-			}), nil
-	}*/
-
 	monitoring := monitoring.Default.GetRegistry("monitoring")
 
 	outClient := outputs.NewFailoverClient(clients)

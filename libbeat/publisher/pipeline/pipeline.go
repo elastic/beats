@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -107,11 +106,9 @@ const (
 type OutputReloader interface {
 	Reload(
 		cfg *reload.ConfigWithMeta,
-		factory func(outputs.Observer, config.Namespace) (outputs.Group, error),
+		factory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
 	) error
 }
-
-type queueFactory func(ackCallback func(eventCount int)) (queue.Queue, error)
 
 type QueueConfig struct {
 	Type       string
@@ -144,11 +141,6 @@ func New(
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
-
-	/*p.queue, err = queueFactory(p)
-	if err != nil {
-		return nil, err
-	}*/
 
 	/*maxEvents := p.queue.BufferConfig().MaxEvents
 	if maxEvents <= 0 {
@@ -201,7 +193,6 @@ func (p *Pipeline) Close() error {
 	}
 
 	// Note: active clients are not closed / disconnected.
-
 	p.outputController.Close()
 
 	p.observer.cleanup()
@@ -296,7 +287,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	client.acker = ackHandler
 	client.waiter = waiter
 	client.producer = p.outputController.queueProducer(producerCfg)
-	// p.queue.Producer(producerCfg)
 
 	p.observer.clientConnected()
 
