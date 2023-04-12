@@ -199,13 +199,16 @@ func startHarvester(
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
-			if !errors.Is(err, ErrHarvesterLimitReached) {
-				return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
-			}
-
-			t := time.NewTicker(100 * time.Millisecond)
+			backoff := 100 * time.Millisecond
+			t := time.NewTicker(backoff)
 			defer t.Stop()
 			for err != nil {
+				if !errors.Is(err, ErrHarvesterLimitReached) {
+					return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
+				}
+				ctx.Logger.Debugf("harvester limit reached, will retry to start %s in %s",
+					srcID, backoff)
+
 				select {
 				case <-canceler.Done():
 					return canceler.Err()
