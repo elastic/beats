@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
 
 *Heartbeat*
 
@@ -253,7 +254,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 
 *Auditbeat*
-
+   - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
 
 *Filebeat*
 
@@ -300,6 +301,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Add metrics for log event processing. {pull}33922[33922]
 - Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
 
 *Elastic Log Driver*
 

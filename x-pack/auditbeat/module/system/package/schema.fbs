@@ -1,0 +1,22 @@
+namespace schema;
+
+table Package  {
+	name:string;
+	version:string;
+	release:string;
+	arch:string;
+	license:string;
+	// installtime stores unix epoch time in seconds
+	installtime:ulong;
+	// size stores the package size in bytes as a uint64 value internally
+	size:ulong;
+	summary:string;
+	url:string;
+	type:string;
+	error:string;
+}
+
+table PackageContainer {
+	packages: [Package];
+}
+root_type PackageContainer;
