@@ -28,9 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
@@ -56,13 +55,11 @@ func TestOutputReload(t *testing.T) {
 				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
 				numOutputReloads := 350 + (q % 150)     // 350 to 499
 
-				queueFactory := func(ackCallback func(eventCount int)) (queue.Queue, error) {
-					return memqueue.NewQueue(
-						logp.L(),
-						memqueue.Settings{
-							ACKCallback: ackCallback,
-							Events:      int(numEventsToPublish),
-						}), nil
+				queueConfig := QueueConfig{
+					Type: memqueue.QueueType,
+					UserConfig: conf.MustNewConfigFrom(
+						map[string]interface{}{"events": numEventsToPublish},
+					),
 				}
 
 				var publishedCount atomic.Uint
@@ -74,7 +71,7 @@ func TestOutputReload(t *testing.T) {
 				pipeline, err := New(
 					beat.Info{},
 					Monitors{},
-					queueFactory,
+					queueConfig,
 					outputs.Group{},
 					Settings{},
 				)
@@ -99,7 +96,7 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					pipeline.output.Set(out)
+					pipeline.outputController.Set(out)
 				}
 
 				wg.Wait()

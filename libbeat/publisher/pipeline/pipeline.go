@@ -202,14 +202,7 @@ func (p *Pipeline) Close() error {
 
 	// Note: active clients are not closed / disconnected.
 
-	// Closing the queue stops ACKs from propagating, so we close the output first
-	// to give it a chance to wait for any outstanding events to be acknowledged.
 	p.outputController.Close()
-	// shutdown queue
-	// err := p.queue.Close()
-	// if err != nil {
-	// 	log.Error("pipeline queue shutdown error: ", err)
-	// }
 
 	p.observer.cleanup()
 	if p.sigNewClient != nil {
@@ -403,14 +396,4 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
 	return p.outputController
-}
-
-// OnACK implements the queue.ACKListener interface, so the queue can notify the
-// Pipeline when events are acknowledged.
-func (p *Pipeline) OnACK(n int) {
-	p.observer.queueACKed(n)
-
-	if p.waitOnClose {
-		p.waitCloseGroup.Add(-n)
-	}
 }

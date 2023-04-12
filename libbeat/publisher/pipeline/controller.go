@@ -72,11 +72,10 @@ func newOutputController(
 		consumer:   newEventConsumer(monitors.Logger, observer),
 	}
 
-	queueFactory, err := createQueueFactory(queueConfig, monitors, inQueueSize)
+	queue, err := createQueue(queueConfig, ackCallback, inQueueSize, monitors)
 	if err != nil {
 		return nil, err
 	}
-	queue, err := queueFactory(ackCallback)
 	controller.queue = queue
 
 	return controller, nil
@@ -89,6 +88,12 @@ func (c *outputController) Close() error {
 	for _, out := range c.workers {
 		out.Close()
 	}
+
+	// Closing the queue stops ACKs from propagating, so we close everything
+	// else first to give it a chance to wait for any outstanding events to be
+	// acknowledged.
+	c.queue.Close()
+
 	return nil
 }
 
@@ -161,11 +166,12 @@ func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Prod
 	return c.queue.Producer(config)
 }
 
-func createQueueFactory(
+func createQueue(
 	config QueueConfig,
-	monitors Monitors,
+	ackCallback func(eventCount int),
 	inQueueSize int,
-) (queueFactory, error) {
+	monitors Monitors,
+) (queue.Queue, error) {
 	if monitors.Telemetry != nil {
 		queueReg := monitors.Telemetry.NewRegistry("queue")
 		monitoring.NewString(queueReg, "name").Set(config.Type)
@@ -180,30 +186,16 @@ func createQueueFactory(
 		// The memory queue has a special override during pipeline
 		// initialization for the size of its API channel buffer.
 		settings.InputQueueSize = inQueueSize
-		return memQueueFactory(monitors.Logger, settings), nil
+		settings.ACKCallback = ackCallback
+		return memqueue.NewQueue(monitors.Logger, settings), nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(config.UserConfig)
 		if err != nil {
 			return nil, err
 		}
-		return diskQueueFactory(monitors.Logger, settings), nil
+		settings.WriteToDiskCallback = ackCallback
+		return diskqueue.NewQueue(monitors.Logger, settings)
 	default:
 		return nil, fmt.Errorf("'%v' is not a valid queue type", config.Type)
-	}
-}
-
-func memQueueFactory(logger *logp.Logger, settings memqueue.Settings) queueFactory {
-	return func(ackCallback func(eventCount int)) (queue.Queue, error) {
-		factorySettings := settings
-		factorySettings.ACKCallback = ackCallback
-		return memqueue.NewQueue(logger, factorySettings), nil
-	}
-}
-
-func diskQueueFactory(logger *logp.Logger, settings diskqueue.Settings) queueFactory {
-	return func(ackCallback func(eventCount int)) (queue.Queue, error) {
-		factorySettings := settings
-		factorySettings.WriteToDiskCallback = ackCallback
-		return diskqueue.NewQueue(logger, factorySettings)
 	}
 }
