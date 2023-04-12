@@ -2,23 +2,23 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build darwin
+// +build darwin
+
 package tables
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
-	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
 
-	"github.com/osquery/osquery-go/plugin/table"
-
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
+	"github.com/osquery/osquery-go/plugin/table"
 )
 
 func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string, err error) {
@@ -76,19 +76,14 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 			return results, fmt.Errorf("invalid path: %s", *path)
 		}
 
-		var uid, gid string = "0", "0"
-
-		if runtime.GOOS == "darwin" {
-			sys, ok := stat.Sys().(*syscall.Stat_t)
-			if !ok {
-				return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
-			}
-			uid = strconv.FormatUint(uint64(sys.Uid), 10)
-			gid = strconv.FormatUint(uint64(sys.Gid), 10)
+		sys, ok := stat.Sys().(*syscall.Stat_t)
+		if !ok {
+			return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
 		}
 
 		mode := fmt.Sprintf("%o", stat.Mode().Perm())
-
+		uid := strconv.FormatUint(uint64(sys.Uid), 10)
+		gid := strconv.FormatUint(uint64(sys.Gid), 10)
 		size := strconv.FormatUint(uint64(stat.Size()), 10)
 		mtime := strconv.FormatInt(stat.ModTime().Unix(), 10)
 
@@ -101,15 +96,15 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		// Execute macOS codesign command and capture stderr for output
 		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
 		if err != nil {
-			log.Println("Error running codesign command:", err)
+			fmt.Println("Error running codesign command:", err)
 		}
 
 		// Convert outputs to strings
-		fileTypeStr := strings.TrimSpace(fileType)
-		codeSignStr := strings.TrimSpace(codeSign)
-		dependenciesStr := strings.TrimSpace(dependencies)
-		symbolsStr := strings.TrimSpace(symbols)
-		stringsStr := strings.TrimSpace(stringsOutput)
+		fileTypeStr := strings.TrimSpace(string(fileType))
+		codeSignStr := strings.TrimSpace(string(codeSign))
+		dependenciesStr := strings.TrimSpace(string(dependencies))
+		symbolsStr := strings.TrimSpace(string(symbols))
+		stringsStr := strings.TrimSpace(string(stringsOutput))
 
 		results = append(results, map[string]string{
 			"path":         *path,
