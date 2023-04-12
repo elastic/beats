@@ -246,7 +246,7 @@ func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger)
 	for {
 		select {
 		case <-t.C:
-			rx, err := procNetTCP(addr)
+			rx, err := procNetTCP("/proc/net/tcp", addr)
 			if err != nil {
 				log.Warnf("failed to get tcp stats from /proc: %v", err)
 				continue
@@ -263,18 +263,18 @@ func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger)
 // socket on the provided address formatted in hex, xxxxxxxx:xxxx.
 // This function is only useful on linux due to its dependence on the /proc
 // filesystem, but is kept in this file for simplicity.
-func procNetTCP(addr []string) (rx int64, err error) {
-	b, err := os.ReadFile("/proc/net/tcp")
+func procNetTCP(path string, addr []string) (rx int64, err error) {
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return 0, err
 	}
 	lines := bytes.Split(b, []byte("\n"))
 	if len(lines) < 2 {
-		return 0, fmt.Errorf("/proc/net/tcp entry not found for %s (no line)", addr)
+		return 0, fmt.Errorf("%s entry not found for %s (no line)", path, addr)
 	}
 	for _, l := range lines[1:] {
 		f := bytes.Fields(l)
-		if contains(f[1], addr) {
+		if len(f) > 4 && contains(f[1], addr) {
 			_, r, ok := bytes.Cut(f[4], []byte(":"))
 			if !ok {
 				return 0, errors.New("no rx_queue field " + string(f[4]))
@@ -286,7 +286,7 @@ func procNetTCP(addr []string) (rx int64, err error) {
 			return rx, nil
 		}
 	}
-	return 0, fmt.Errorf("/proc/net/tcp entry not found for %s", addr)
+	return 0, fmt.Errorf("%s entry not found for %s", path, addr)
 }
 
 func contains(b []byte, addr []string) bool {
