@@ -21,6 +21,13 @@ output.logstash:
 The `loadbalance` option is available for Redis, Logstash, and Elasticsearch
 outputs. The Kafka output handles load balancing internally.
 
+Beat’s loadbalance: true causes it to send data if-and-only-if it can send to all hosts in the list.
+
+When loadbalance: false, Filebeat will pick a host at random from the list and send data, failing over to other entries. It also accepts a ttl, which will cause it to voluntarily reestablish a connection to a new host after a time even if it is healthy.
+As long as the first chosen endpoint is available, then it continues to communicate with that one. It only switches to another endpoint in case of failure.
+
+When loadbalance: true is set, Filebeat will connect to all hosts in the list and evenly distribute the events to them. This has the side effect of blocking publishing to all hosts if any one of them is down or exerting back-pressure.
+
 The load balancer also supports multiple workers per host. The default is
 `worker: 1`. If you increase the number of workers, additional network
 connections will be used.  The total number of workers participating
