@@ -847,7 +847,24 @@ func (b *Beat) configure(settings Settings) error {
 	}
 	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
 
+	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
+		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+
 	return err
+}
+
+// agentDiagnosticHook is the callback function sent to the agent manager RegisterDiagnosticHook function
+// right now, this only returns information on the global processors; however, in the future, we might find it useful
+// to expand this to other components of the beat state.
+// To anyone refactoring: be careful to make sure the callback is registered after the global processors are initialized
+func (b *Beat) agentDiagnosticHook() []byte {
+	list := b.processing.Processors()
+
+	var debugBytes []byte
+	for _, proc := range list {
+		debugBytes = append(debugBytes, []byte(proc+"\n")...)
+	}
+	return debugBytes
 }
 
 func (b *Beat) loadMeta(metaPath string) error {

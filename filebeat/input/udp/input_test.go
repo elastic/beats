@@ -15,31 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package processors
+package udp
 
 import (
-	"fmt"
+	"testing"
 
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
 )
 
-// PluginConfig represents the list of processors.
-type PluginConfig []*config.C
-
-// MandatoryExportedFields are fields that should be always exported
-var MandatoryExportedFields = []string{"type"}
-
-// NewPluginConfigFromList creates a PluginConfig from a list of raw processor config objects
-func NewPluginConfigFromList(raw []mapstr.M) (PluginConfig, error) {
-	processors := make([]*config.C, len(raw))
-	for i := 0; i < len(raw); i++ {
-		cfg, err := config.NewConfigFrom(raw[i])
+func TestProcNetUDP(t *testing.T) {
+	t.Run("with_match", func(t *testing.T) {
+		rx, drops, err := procNetUDP("testdata/proc_net_udp.txt", []string{"2508640A:1BBE"})
 		if err != nil {
-			return nil, fmt.Errorf("error creating processor config: %w", err)
+			t.Fatal(err)
 		}
-		processors[i] = cfg
-	}
+		assert.EqualValues(t, 1, rx)
+		assert.EqualValues(t, 2, drops)
+	})
 
-	return processors, nil
+	t.Run("without_match", func(t *testing.T) {
+		_, _, err := procNetUDP("testdata/proc_net_udp.txt", []string{"FOO:BAR", "BAR:BAZ"})
+		if assert.Error(t, err) {
+			assert.Contains(t, err.Error(), "entry not found")
+		}
+	})
 }
