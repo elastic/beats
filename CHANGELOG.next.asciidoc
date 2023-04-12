@@ -106,7 +106,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
 - Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
-- Fix panic in UDP input on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
 
 *Heartbeat*
 
