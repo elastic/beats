@@ -109,6 +109,9 @@ type Manager interface {
 
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]interface{})
+
+	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
 }
 
 // PluginFunc for creating FactoryFunc if it matches a config
@@ -191,3 +194,5 @@ func (n *nilManager) RegisterAction(action client.Action) {}
 func (n *nilManager) UnregisterAction(action client.Action) {}
 
 func (n *nilManager) SetPayload(map[string]interface{}) {}
+func (n *nilManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+}
