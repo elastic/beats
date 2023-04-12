@@ -264,7 +264,7 @@ func procNetUDP(path string, addr []string) (rx, drops int64, err error) {
 	}
 	lines := bytes.Split(b, []byte("\n"))
 	if len(lines) < 2 {
-		return 0, 0, fmt.Errorf("/proc/net/udp entry not found for %s (no line)", addr)
+		return 0, 0, fmt.Errorf("%s entry not found for %s (no line)", path, addr)
 	}
 	for _, l := range lines[1:] {
 		f := bytes.Fields(l)
@@ -284,7 +284,7 @@ func procNetUDP(path string, addr []string) (rx, drops int64, err error) {
 			return rx, drops, nil
 		}
 	}
-	return 0, 0, fmt.Errorf("/proc/net/udp entry not found for %s", addr)
+	return 0, 0, fmt.Errorf("%s entry not found for %s", path, addr)
 }
 
 func contains(b []byte, addr []string) bool {
