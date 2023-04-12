@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -28,7 +29,7 @@ func ExecuteStderr(ctx context.Context, name string, arg ...string) (out string,
 
 	err = cmd.Run()
 	if err != nil {
-		return stderr.String(), err
+		return "", err
 	}
 
 	return stderr.String(), nil
@@ -40,8 +41,8 @@ func FileAnalysisColumns() []table.ColumnDefinition {
 		table.TextColumn("mode"),
 		table.BigIntColumn("uid"),
 		table.BigIntColumn("gid"),
-		table.TextColumn("size"),
-		table.TextColumn("mtime"),
+		table.BigIntColumn("size"),
+		table.BigIntColumn("mtime"),
 		table.TextColumn("file_type"),
 		table.TextColumn("code_sign"),
 		table.TextColumn("dependencies"),
@@ -72,12 +73,19 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 
 		// Validate and sanitize the input path
 		stat, err := os.Stat(*path)
-		if err != nil || !stat.Mode().IsRegular() {
+		if err != nil {
+			log.Printf("Error stating path '%s': %v", *path, err)
+			return results, fmt.Errorf("invalid path: %s", *path)
+		}
+
+		if !stat.Mode().IsRegular() {
+			log.Printf("Path is not a regular file: %s", *path)
 			return results, fmt.Errorf("invalid path: %s", *path)
 		}
 
 		sys, ok := stat.Sys().(*syscall.Stat_t)
 		if !ok {
+			log.Printf("Unable to convert stat.Sys() to *syscall.Stat_t for path: %s", *path)
 			return results, fmt.Errorf("unable to convert stat.Sys() to *syscall.Stat_t")
 		}
 
@@ -88,23 +96,38 @@ func GetFileAnalysisGenerateFunc() table.GenerateFunc {
 		mtime := strconv.FormatInt(stat.ModTime().Unix(), 10)
 
 		// Execute macOS commands
-		fileType, _ := command.Execute(ctx, "file", *path)
-		dependencies, _ := command.Execute(ctx, "otool", "-L", *path)
-		symbols, _ := command.Execute(ctx, "nm", *path)
-		stringsOutput, _ := command.Execute(ctx, "strings", "-a", *path)
+		fileType, err := command.Execute(ctx, "file", *path)
+		if err != nil {
+			log.Printf("error running 'file' command: %v\n", err)
+		}
+
+		dependencies, err := command.Execute(ctx, "otool", "-L", *path)
+		if err != nil {
+			log.Printf("error running 'otool' command: %v\n", err)
+		}
+
+		symbols, err := command.Execute(ctx, "nm", *path)
+		if err != nil {
+			log.Printf("error running 'nm' command: %v\n", err)
+		}
+
+		stringsOutput, err := command.Execute(ctx, "strings", "-a", *path)
+		if err != nil {
+			log.Printf("error running 'strings' command: %v\n", err)
+		}
 
 		// Execute macOS codesign command and capture stderr for output
 		codeSign, err := ExecuteStderr(ctx, "codesign", "-dvvv", *path)
 		if err != nil {
-			fmt.Println("Error running codesign command:", err)
+			log.Println("Error running codesign command:", err)
 		}
 
 		// Convert outputs to strings
-		fileTypeStr := strings.TrimSpace(string(fileType))
-		codeSignStr := strings.TrimSpace(string(codeSign))
-		dependenciesStr := strings.TrimSpace(string(dependencies))
-		symbolsStr := strings.TrimSpace(string(symbols))
-		stringsStr := strings.TrimSpace(string(stringsOutput))
+		fileTypeStr := strings.TrimSpace(fileType)
+		codeSignStr := strings.TrimSpace(codeSign)
+		dependenciesStr := strings.TrimSpace(dependencies)
+		symbolsStr := strings.TrimSpace(symbols)
+		stringsStr := strings.TrimSpace(stringsOutput)
 
 		results = append(results, map[string]string{
 			"path":         *path,
