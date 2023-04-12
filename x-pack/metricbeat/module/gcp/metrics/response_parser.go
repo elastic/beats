@@ -9,10 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/genproto/googleapis/monitoring/v3"
+
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"google.golang.org/genproto/googleapis/monitoring/v3"
 )
 
 func newIncomingFieldExtractor(l *logp.Logger, mc metricsConfig) *incomingFieldExtractor {
