@@ -110,18 +110,13 @@ type OutputReloader interface {
 	) error
 }
 
-type QueueConfig struct {
-	Type       string
-	UserConfig *conf.C
-}
-
 // New create a new Pipeline instance from a queue instance and a set of outputs.
 // The new pipeline will take ownership of queue and outputs. On Close, the
 // queue and outputs will be closed.
 func New(
 	beat beat.Info,
 	monitors Monitors,
-	queueConfig QueueConfig,
+	userQueueConfig conf.Namespace,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
@@ -149,8 +144,19 @@ func New(
 		}
 	}
 
-	output, err := newOutputController(
-		beat, monitors, p.observer, queueConfig, ackCallback, settings.InputQueueSize)
+	queueType := defaultQueueType
+	if b := userQueueConfig.Name(); b != "" {
+		queueType = b
+	}
+	queueConfig := queueConfig{
+		logger:      monitors.Logger,
+		queueType:   queueType,
+		userConfig:  userQueueConfig.Config(),
+		ackCallback: ackCallback,
+		inQueueSize: settings.InputQueueSize,
+	}
+
+	output, err := newOutputController(beat, monitors, p.observer, queueConfig)
 	if err != nil {
 		return nil, err
 	}

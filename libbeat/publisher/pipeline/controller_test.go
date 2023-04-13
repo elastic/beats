@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"testing/quick"
@@ -28,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -52,15 +52,13 @@ func TestOutputReload(t *testing.T) {
 			//defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
-				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
-				numOutputReloads := 350 + (q % 150)     // 350 to 499
+				numEventsToPublish := 15000 + (q % 5000) // 15000 to 19999
+				numOutputReloads := 350 + (q % 150)      // 350 to 499
 
-				queueConfig := QueueConfig{
-					Type: memqueue.QueueType,
-					UserConfig: conf.MustNewConfigFrom(
-						map[string]interface{}{"events": numEventsToPublish},
-					),
-				}
+				queueConfig := conf.Namespace{}
+				conf, _ := conf.NewConfigFrom(
+					fmt.Sprintf("mem.events: %v", numEventsToPublish))
+				_ = queueConfig.Unpack(conf)
 
 				var publishedCount atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {

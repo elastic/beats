@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -145,18 +144,20 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		return nil, err
 	}
 
+	queueConfig := conf.Namespace{}
+	conf, err := conf.NewConfigFrom("mem.events: 20")
+	if err != nil {
+		return nil, err
+	}
+	queueConfig.Unpack(conf)
+
 	pipeline, err := pipeline.New(
 		beat,
 		pipeline.Monitors{
 			Metrics: monitoring,
 			Logger:  log,
 		},
-		pipeline.QueueConfig{
-			Type: memqueue.QueueType,
-			UserConfig: conf.MustNewConfigFrom(
-				map[string]interface{}{"events": 20},
-			),
-		},
+		queueConfig,
 		outputs.Group{
 			Clients:   []outputs.Client{outClient},
 			BatchSize: windowSize,

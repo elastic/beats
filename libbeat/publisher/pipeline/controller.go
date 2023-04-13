@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -41,7 +41,8 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queue queue.Queue
+	queueConfig queueConfig
+	queue       queue.Queue
 
 	workerChan chan publisher.Batch
 
@@ -55,30 +56,34 @@ type outputWorker interface {
 	Close() error
 }
 
+type queueConfig struct {
+	logger      *logp.Logger
+	queueType   string
+	userConfig  *conf.C
+	ackCallback func(eventCount int)
+	inQueueSize int
+}
+
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	observer outputObserver,
-	queueConfig QueueConfig,
-	ackCallback func(eventCount int),
-	inQueueSize int,
+	queueConfig queueConfig,
 ) (*outputController, error) {
 
 	controller := &outputController{
-		beat:       beat,
-		monitors:   monitors,
-		observer:   observer,
-		workerChan: make(chan publisher.Batch),
-		consumer:   newEventConsumer(monitors.Logger, observer),
+		beat:        beat,
+		monitors:    monitors,
+		observer:    observer,
+		queueConfig: queueConfig,
+		workerChan:  make(chan publisher.Batch),
+		consumer:    newEventConsumer(monitors.Logger, observer),
 	}
 
-	queue, err := createQueue(queueConfig, ackCallback, inQueueSize, monitors)
+	err := controller.createQueue()
 	if err != nil {
 		return nil, err
 	}
-	controller.queue = queue
-	maxEvents := queue.BufferConfig().MaxEvents
-	observer.queueMaxEvents(maxEvents)
 
 	return controller, nil
 }
@@ -114,7 +119,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
 		logger := logp.NewLogger("publisher_pipeline_output")
-		c.workers[i] = makeClientWorker(c.observer, c.workerChan, client, logger, c.monitors.Tracer)
+		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
 	}
 
 	targetChan := c.workerChan
@@ -141,9 +146,9 @@ func (c *outputController) Set(outGrp outputs.Group) {
 // Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
-	outFactory func(outputs.Observer, config.Namespace) (outputs.Group, error),
+	outFactory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
 ) error {
-	outCfg := config.Namespace{}
+	outCfg := conf.Namespace{}
 	if cfg != nil {
 		if err := cfg.Config.Unpack(&outCfg); err != nil {
 			return err
@@ -168,36 +173,41 @@ func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Prod
 	return c.queue.Producer(config)
 }
 
-func createQueue(
-	config QueueConfig,
-	ackCallback func(eventCount int),
-	inQueueSize int,
-	monitors Monitors,
-) (queue.Queue, error) {
-	if monitors.Telemetry != nil {
-		queueReg := monitors.Telemetry.NewRegistry("queue")
-		monitoring.NewString(queueReg, "name").Set(config.Type)
-	}
+func (c *outputController) createQueue() error {
+	config := c.queueConfig
 
-	switch config.Type {
+	switch config.queueType {
 	case memqueue.QueueType:
-		settings, err := memqueue.SettingsForUserConfig(config.UserConfig)
+		settings, err := memqueue.SettingsForUserConfig(config.userConfig)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		// The memory queue has a special override during pipeline
 		// initialization for the size of its API channel buffer.
-		settings.InputQueueSize = inQueueSize
-		settings.ACKCallback = ackCallback
-		return memqueue.NewQueue(monitors.Logger, settings), nil
+		settings.InputQueueSize = config.inQueueSize
+		settings.ACKCallback = config.ackCallback
+		c.queue = memqueue.NewQueue(config.logger, settings)
 	case diskqueue.QueueType:
-		settings, err := diskqueue.SettingsForUserConfig(config.UserConfig)
+		settings, err := diskqueue.SettingsForUserConfig(config.userConfig)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		settings.WriteToDiskCallback = ackCallback
-		return diskqueue.NewQueue(monitors.Logger, settings)
+		settings.WriteToDiskCallback = config.ackCallback
+		queue, err := diskqueue.NewQueue(config.logger, settings)
+		if err != nil {
+			return err
+		}
+		c.queue = queue
 	default:
-		return nil, fmt.Errorf("'%v' is not a valid queue type", config.Type)
+		return fmt.Errorf("'%v' is not a valid queue type", config.queueType)
 	}
+
+	if c.monitors.Telemetry != nil {
+		queueReg := c.monitors.Telemetry.NewRegistry("queue")
+		monitoring.NewString(queueReg, "name").Set(config.queueType)
+	}
+	maxEvents := c.queue.BufferConfig().MaxEvents
+	c.observer.queueMaxEvents(maxEvents)
+
+	return nil
 }

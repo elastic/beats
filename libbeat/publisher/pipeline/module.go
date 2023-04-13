@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -98,25 +97,13 @@ func LoadWithSettings(
 		return nil, err
 	}
 
-	queueConfig := queueConfigFromNamespace(config.Queue)
-	p, err := New(beatInfo, monitors, queueConfig, out, settings)
+	p, err := New(beatInfo, monitors, config.Queue, out, settings)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Infof("Beat name: %s", name)
 	return p, err
-}
-
-func queueConfigFromNamespace(namespace conf.Namespace) QueueConfig {
-	queueType := defaultQueueType
-	if b := namespace.Name(); b != "" {
-		queueType = b
-	}
-	return QueueConfig{
-		Type:       queueType,
-		UserConfig: namespace.Config(),
-	}
 }
 
 func loadOutput(

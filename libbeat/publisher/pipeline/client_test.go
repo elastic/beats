@@ -42,7 +42,7 @@ func TestClient(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			QueueConfig{Type: memqueue.QueueType},
+			conf.Namespace{},
 			outputs.Group{},
 			settings,
 		)
@@ -130,7 +130,7 @@ func TestClientWaitClose(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			QueueConfig{Type: memqueue.QueueType},
+			conf.Namespace{},
 			outputs.Group{},
 			settings,
 		)
