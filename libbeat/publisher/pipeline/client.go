@@ -35,7 +35,6 @@ type client struct {
 	processors beat.Processor
 	producer   queue.Producer
 	mutex      sync.Mutex
-	acker      beat.ACKer
 	waiter     *clientCloseWaiter
 
 	eventFlags   publisher.EventFlags
@@ -48,6 +47,7 @@ type client struct {
 	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
 	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
 
+	eventListener  beat.EventListener
 	clientListener beat.ClientListener
 }
 
@@ -107,7 +107,7 @@ func (c *client) publish(e beat.Event) {
 		e = *event
 	}
 
-	c.acker.AddEvent(e, publish)
+	c.eventListener.AddEvent(e, publish)
 	if !publish {
 		c.onFilteredOut(e)
 		return
@@ -148,7 +148,7 @@ func (c *client) Close() error {
 		c.waiter.signalClose()
 		c.waiter.wait()
 
-		c.acker.Close()
+		c.eventListener.ClientClosed()
 		log.Debug("client: done closing acker")
 
 		log.Debug("client: close queue producer")
@@ -255,10 +255,10 @@ func (w *clientCloseWaiter) ACKEvents(n int) {
 	}
 }
 
-// The Close signal from the pipeline is ignored. Instead the client
+// The client's close signal is ignored. Instead the client
 // explicitly uses `signalClose` and `wait` before it continues with the
 // closing sequence.
-func (w *clientCloseWaiter) Close() {}
+func (w *clientCloseWaiter) ClientClosed() {}
 
 func (w *clientCloseWaiter) signalClose() {
 	if w == nil {

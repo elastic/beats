@@ -277,12 +277,12 @@ func newStubOutlet(onEvent eventHandler) *stubOutleter {
 }
 
 func ackEvent(ev beat.Event, cfg beat.ClientConfig) bool {
-	if cfg.ACKHandler == nil {
+	if cfg.EventListener == nil {
 		return false
 	}
 
-	cfg.ACKHandler.AddEvent(ev, true)
-	cfg.ACKHandler.ACKEvents(1)
+	cfg.EventListener.AddEvent(ev, true)
+	cfg.EventListener.ACKEvents(1)
 	return true
 }
 

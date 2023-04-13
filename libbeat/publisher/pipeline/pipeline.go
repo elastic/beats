@@ -248,7 +248,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		reportEvents:   reportEvents,
 	}
 
-	ackHandler := cfg.ACKHandler
+	ackHandler := cfg.EventListener
 
 	producerCfg := queue.ProducerConfig{}
 
@@ -283,7 +283,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		ackHandler = acker.Nil()
 	}
 
-	client.acker = ackHandler
+	client.eventListener = ackHandler
 	client.waiter = waiter
 	client.producer = p.outputController.queueProducer(producerCfg)
 

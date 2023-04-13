@@ -25,7 +25,7 @@ type nilPipeline struct{}
 
 type nilClient struct {
 	clientListener beat.ClientListener
-	acker          beat.ACKer
+	acker          beat.EventListener
 }
 
 var _nilPipeline = (*nilPipeline)(nil)
@@ -43,7 +43,7 @@ func (p *nilPipeline) Connect() (beat.Client, error) {
 func (p *nilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return &nilClient{
 		clientListener: cfg.ClientListener,
-		acker:          cfg.ACKHandler,
+		acker:          cfg.EventListener,
 	}, nil
 }
 

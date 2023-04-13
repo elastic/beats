@@ -69,7 +69,7 @@ func generate(
 
 	logger := logp.NewLogger("publisher_pipeline_stress_generate")
 	if config.ACK {
-		settings.ACKHandler = acker.Counting(func(n int) {
+		settings.EventListener = acker.Counting(func(n int) {
 			logger.Infof("Pipeline client (%v) ACKS; %v", id, n)
 		})
 	}

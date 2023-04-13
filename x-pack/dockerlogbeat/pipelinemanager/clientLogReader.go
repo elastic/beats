@@ -51,7 +51,7 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		WaitClose: 0,
 	}
 	clientLogger := logp.NewLogger("clientLogReader")
-	settings.ACKHandler = acker.Counting(func(n int) {
+	settings.EventListener = acker.Counting(func(n int) {
 		clientLogger.Debugf("Pipeline client ACKS; %v", n)
 	})
 	settings.PublishMode = beat.DefaultGuarantees

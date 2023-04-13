@@ -57,7 +57,7 @@ func NewTxTracker(ctx context.Context) *TxTracker {
 
 // NewTxACKHandler creates a new beat.ACKer. As events are ACK-ed and if the event
 // contains a TxTracker, Ack will be called on the TxTracker.
-func NewTxACKHandler() beat.ACKer {
+func NewTxACKHandler() beat.EventListener {
 	return acker.ConnectionOnly(acker.EventPrivateReporter(func(acked int, privates []interface{}) {
 		for _, private := range privates {
 			if t, ok := private.(*TxTracker); ok {

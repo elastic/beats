@@ -435,13 +435,13 @@ func TestManager_InputsRun(t *testing.T) {
 		defer cancel()
 
 		// setup publishing pipeline and capture ACKer, so we can simulate progress in the Output
-		var acker beat.ACKer
+		var acker beat.EventListener
 		var wgACKer sync.WaitGroup
 		wgACKer.Add(1)
 		pipeline := &pubtest.FakeConnector{
 			ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
 				defer wgACKer.Done()
-				acker = cfg.ACKHandler
+				acker = cfg.EventListener
 				return &pubtest.FakeClient{
 					PublishFunc: func(event beat.Event) {
 						acker.AddEvent(event, true)

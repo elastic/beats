@@ -111,7 +111,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	log := ctx.Logger.Named("kafka input").With("hosts", input.config.Hosts)
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		ACKHandler: acker.ConnectionOnly(
+		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, events []interface{}) {
 				for _, event := range events {
 					if meta, ok := event.(eventMeta); ok {
