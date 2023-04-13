@@ -42,7 +42,7 @@ func validateClientConfig(c *beat.ClientConfig) error {
 	withDrop := false
 
 	switch m := c.PublishMode; m {
-	case beat.DefaultGuarantees, beat.GuaranteedSend, beat.OutputChooses:
+	case beat.DefaultGuarantees, beat.GuaranteedSend:
 	case beat.DropIfFull:
 		withDrop = true
 	default:
