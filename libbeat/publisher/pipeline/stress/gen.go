@@ -129,7 +129,7 @@ func generate(
 				if last == current {
 					// collect all active go-routines stack-traces:
 					var buf bytes.Buffer
-					pprof.Lookup("goroutine").WriteTo(&buf, 2)
+					_ = pprof.Lookup("goroutine").WriteTo(&buf, 2)
 
 					err := fmt.Errorf("no progress in generator %v (last=%v, current=%v):\n%s", id, last, current, buf.Bytes())
 					errors(err)
