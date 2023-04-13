@@ -9,7 +9,12 @@ class Test(XPackTest):
 
     COMPOSE_SERVICES = ['oracle']
 
+<<<<<<< HEAD
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+=======
+    # @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/34993")
+>>>>>>> f245b445c1 (Disable flaky test (x-pack.metricbeat.module.sql.query.test_sql_oracle.Test) (#35083))
     def test_query(self):
         """
         sql oracle custom query test
