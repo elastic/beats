@@ -170,6 +170,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Osquerybeat*
 
+- Adds the `elastic_file_analysis` table to the Osquery extension for macOS builds. {pull}35056[35056]
 
 *Packetbeat*
 
