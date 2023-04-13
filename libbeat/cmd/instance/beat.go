@@ -852,7 +852,7 @@ func (b *Beat) configure(settings Settings) error {
 // to expand this to other components of the beat state.
 // To anyone refactoring: be careful to make sure the callback is registered after the global processors are initialized
 func (b *Beat) agentDiagnosticHook() []byte {
-	list := b.processing.Processors()
+	list := b.processors.Processors()
 
 	var debugBytes []byte
 	for _, proc := range list {
