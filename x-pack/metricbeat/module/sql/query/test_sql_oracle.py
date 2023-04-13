@@ -9,8 +9,8 @@ class Test(XPackTest):
 
     COMPOSE_SERVICES = ['oracle']
 
+    # @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/34993")
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_query(self):
         """
         sql oracle custom query test
