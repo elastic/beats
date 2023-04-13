@@ -149,7 +149,10 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 	if err != nil {
 		return nil, err
 	}
-	queueConfig.Unpack(conf)
+	err = queueConfig.Unpack(conf)
+	if err != nil {
+		return nil, err
+	}
 
 	pipeline, err := pipeline.New(
 		beat,

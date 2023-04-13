@@ -59,7 +59,7 @@ func (countACKer) ClientClosed()                 {}
 //	event: X  X  D  D  X  D  D  X  D  X   X   X
 //
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
-// - the drop sequence for events 2 and 3 is inbetween the number of forwarded and ACKed events
+// - the drop sequence for events 2 and 3 is in between the number of forwarded and ACKed events
 // - events 5-6 have been dropped as well, but event 7 is not ACKed yet
 //
 // If there is no event currently tracked by this ACKer and the next event is dropped by the processors,
@@ -221,7 +221,7 @@ func (a *trackingACKer) ClientClosed() {}
 //	event: X  X  D  D  X  D  D  X  D  X   X   X
 //
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
-// - the drop sequence for events 2 and 3 is inbetween the number of forwarded and ACKed events
+// - the drop sequence for events 2 and 3 is in between the number of forwarded and ACKed events
 // - events 5-6 have been dropped as well, but event 7 is not ACKed yet
 func EventPrivateReporter(fn func(acked int, data []interface{})) beat.EventListener {
 	a := &eventDataACKer{fn: fn}
