@@ -174,7 +174,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
-
+- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
 
 *Winlogbeat*
 
