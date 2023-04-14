@@ -351,6 +351,7 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		"amazonaws.com":          "aws",
 		"c2s.sgov.gov":           "aws",
 		"c2s.ic.gov":             "aws",
+		"sc2s.sgov.gov":          "aws",
 		"amazonaws.com.cn":       "aws",
 		"backblazeb2.com":        "backblaze",
 		"cloudflarestorage.com":  "cloudflare",

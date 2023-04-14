@@ -403,7 +403,7 @@ Name of the 3rd party S3 bucket provider like backblaze or GCP.
 The following endpoints/providers will be detected automatically:
 |===
 |Domain |Provider
-|amazonaws.com, amazonaws.com.cn, c2s.sgov.gov, c2s.ic.gov |aws
+|amazonaws.com, amazonaws.com.cn, c2s.sgov.gov, sc2s.sgov.gov, c2s.ic.gov |aws
 |backblazeb2.com |backblaze
 |wasabisys.com |wasabi
 |digitaloceanspaces.com |digitalocean
