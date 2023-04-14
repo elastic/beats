@@ -87,7 +87,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-
+- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
 
 *Winlogbeat*
 
