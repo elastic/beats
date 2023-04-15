@@ -48,8 +48,9 @@ type ModuleConfig struct {
 
 	Database string `config:"database"`
 
-	Username string `config:"username"`
-	Password string `config:"password"`
+	Username         string `config:"username"`
+	Password         string `config:"password"`
+	MaxCollectionNum int    `config:"max_collection_num"`
 
 	Credentials struct {
 		AuthMechanism           string            `config:"auth_mechanism"`
@@ -79,6 +80,9 @@ func NewMetricset(base mb.BaseMetricSet) (*Metricset, error) {
 	config := ModuleConfig{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, fmt.Errorf("could not read config: %w", err)
+	}
+	if config.MaxCollectionNum <= 0 {
+		config.MaxCollectionNum = 1000
 	}
 
 	return &Metricset{Config: config, BaseMetricSet: base}, nil

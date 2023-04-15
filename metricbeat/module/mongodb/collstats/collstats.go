@@ -128,6 +128,8 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("ListDatabaseNames failed: %s", err)
 	}
+	collectedCollectionNum := 0
+OutLoop:
 	for _, databaseName := range databaseNames {
 		database := client.Database(databaseName)
 		collectionNames, err := database.ListCollectionNames(context.Background(), bson.D{})
@@ -156,6 +158,10 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			reporter.Event(mb.Event{
 				MetricSetFields: event,
 			})
+			collectedCollectionNum += 1
+			if collectedCollectionNum >= m.Config.MaxCollectionNum {
+				break OutLoop
+			}
 		}
 	}
 
