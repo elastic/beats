@@ -252,10 +252,8 @@ var reMapping = map[string]string{
 }
 
 func remap(l *logp.Logger, s string) string {
-	var newS string
-
 	if v, found := reMapping[s]; found {
-		l.Debugf("remapping %s to %s", s, newS)
+		l.Debugf("remapping %s to %s", s, v)
 		return v
 	}
 
