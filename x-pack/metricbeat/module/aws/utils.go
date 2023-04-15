@@ -7,6 +7,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	"math"
 	"strings"
 	"time"
@@ -191,4 +192,23 @@ func FindWholeIdentifierFromARN(resourceARN string) (string, error) {
 		return "", err
 	}
 	return arnParsed.Resource, nil
+}
+
+// GetAutoScalingGroupTags function queries tags with autoscaling API
+func GetAutoScalingGroupTags(svcAutoscalingAPIClient autoscaling.DescribeTagsAPIClient) (map[string][]resourcegroupstaggingapitypes.Tag, error) {
+	autoscalingGroupTags := make(map[string][]resourcegroupstaggingapitypes.Tag)
+	paginator := autoscaling.NewDescribeTagsPaginator(svcAutoscalingAPIClient, &autoscaling.DescribeTagsInput{})
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return nil, err
+		}
+		if len(page.Tags) == 0 {
+			return nil, nil
+		}
+		for _, tag := range page.Tags {
+			autoscalingGroupTags[*tag.ResourceId] = append(autoscalingGroupTags[*tag.ResourceId], resourcegroupstaggingapitypes.Tag{Key: tag.Key, Value: tag.Value})
+		}
+	}
+	return autoscalingGroupTags, nil
 }

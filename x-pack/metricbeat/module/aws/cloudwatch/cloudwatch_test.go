@@ -14,11 +14,14 @@ import (
 	"testing"
 	"time"
 
+	autoscalingtypes "github.com/aws/aws-sdk-go-v2/service/autoscaling/types"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
+
 	"github.com/aws/smithy-go/middleware"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/stretchr/testify/assert"
@@ -165,6 +168,20 @@ var (
 		ResourceType: resourceTypeEC2,
 		Statistic:    []string{"Average"},
 	}
+
+	autoscalingGroupName1              = "asg-1"
+	autoscalingGroupNamespace          = "AWS/AutoScaling"
+	autoscalingGroupMetricDimName      = "AutoScalingGroupName"
+	autoscalingGroupMetricName1        = "GroupMaxSize"
+	autoscalingGroupMetricName2        = "GroupTotalCapacity"
+	autoscalingGroupMetricStatisticAvg = "Average"
+	autoscalingGroupMetricLabel1       = autoscalingGroupMetricName1 + "|" + autoscalingGroupNamespace + "|" + autoscalingGroupMetricStatisticAvg + "|" + autoscalingGroupMetricDimName + "|" + autoscalingGroupName1
+	autoscalingGroupMetricLabel2       = autoscalingGroupMetricName2 + "|" + autoscalingGroupNamespace + "|" + autoscalingGroupMetricStatisticAvg + "|" + autoscalingGroupMetricDimName + "|" + autoscalingGroupName1
+	resourceTypeAutoscalingGroup       = "autoscaling"
+	autoscalingGroupTagKey1            = "autoscaling-group-tag-key-1"
+	autoscalingGroupTagValue1          = "autoscaling-group-tag-value-1"
+	autoscalingGroupTagKey2            = "autoscaling-group-tag-key-2"
+	autoscalingGroupTagValue2          = "autoscaling-group-tag-value-2"
 )
 
 func TestConstructLabel(t *testing.T) {
@@ -1201,6 +1218,33 @@ func (m *MockCloudWatchClientWithDataGranularity) GetMetricData(context.Context,
 	}, nil
 }
 
+// MockCloudWatchClientWithAutoscalingMetrics struct is used for unit tests.
+type MockCloudWatchClientWithAutoscalingMetrics struct{}
+
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient.
+func (m *MockCloudWatchClientWithAutoscalingMetrics) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:         awssdk.String("id-1"),
+				Label:      &autoscalingGroupMetricLabel1,
+				Values:     []float64{value1},
+				Timestamps: []time.Time{timestamp},
+			},
+			{
+				Id:         awssdk.String("id-2"),
+				Label:      &autoscalingGroupMetricLabel2,
+				Values:     []float64{value2},
+				Timestamps: []time.Time{timestamp},
+			},
+		},
+		NextToken:      &emptyString,
+		ResultMetadata: middleware.Metadata{},
+	}, nil
+}
+
 // MockResourceGroupsTaggingClient is used for unit tests.
 type MockResourceGroupsTaggingClient struct{}
 
@@ -1223,6 +1267,31 @@ func (m *MockResourceGroupsTaggingClient) GetResources(context.Context, *resourc
 	}, nil
 }
 
+type MockAutoScalingClient struct{}
+
+func (m *MockAutoScalingClient) DescribeTags(context.Context, *autoscaling.DescribeTagsInput, ...func(*autoscaling.Options)) (*autoscaling.DescribeTagsOutput, error) {
+	return &autoscaling.DescribeTagsOutput{
+		NextToken: awssdk.String(""),
+		Tags: []autoscalingtypes.TagDescription{
+			{
+				Key:               &autoscalingGroupTagKey1,
+				Value:             &autoscalingGroupTagValue1,
+				PropagateAtLaunch: awssdk.Bool(true),
+				ResourceId:        &autoscalingGroupName1,
+				ResourceType:      &resourceTypeAutoscalingGroup,
+			},
+			{
+				Key:               &autoscalingGroupTagKey2,
+				Value:             &autoscalingGroupTagValue2,
+				PropagateAtLaunch: awssdk.Bool(true),
+				ResourceId:        &autoscalingGroupName1,
+				ResourceType:      &resourceTypeAutoscalingGroup,
+			},
+		},
+		ResultMetadata: middleware.Metadata{},
+	}, nil
+}
+
 func TestCreateEventsWithIdentifier(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
@@ -1231,6 +1300,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClient{}
+	mockAutoScalingSvc := &MockAutoScalingClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{{
 		listMetric1,
 		[]string{"Average"},
@@ -1239,7 +1309,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockAutoScalingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 
@@ -1260,6 +1330,8 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClientWithoutDim{}
+	mockAutoScalingSvc := &MockAutoScalingClient{}
+
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
 			cloudwatchtypes.Metric{
@@ -1280,7 +1352,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockAutoScalingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
 	expectedID := regionName + accountID + namespace
@@ -1293,6 +1365,53 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	assert.Equal(t, value2, dimension)
 }
 
+func TestCreateEventsWithAutoscalingTags(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{
+		{
+			Namespace:  autoscalingGroupNamespace,
+			MetricName: []string{autoscalingGroupMetricName1, autoscalingGroupMetricName2},
+			Dimensions: []Dimension{{
+				Name:  autoscalingGroupMetricDimName,
+				Value: autoscalingGroupName1,
+			}},
+			Statistic:    []string{autoscalingGroupMetricStatisticAvg},
+			ResourceType: resourceTypeAutoscalingGroup,
+		},
+	}
+	m.MetricSet = &aws.MetricSet{Period: 300, AccountID: accountID}
+	m.logger = logp.NewLogger("test")
+
+	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockCloudwatchSvc := &MockCloudWatchClientWithAutoscalingMetrics{}
+	mockAutoScalingSvc := &MockAutoScalingClient{}
+
+	listMetricDetailTotal, _ := m.readCloudwatchConfig()
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockAutoScalingSvc, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+
+	event := events[autoscalingGroupName1+"-0"]
+	// check metric value
+	metricValue1, err := event.RootFields.GetValue("aws.autoscaling.metrics." + autoscalingGroupMetricName1 + ".avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value1, metricValue1)
+
+	metricValue2, err := event.RootFields.GetValue("aws.autoscaling.metrics." + autoscalingGroupMetricName2 + ".avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value2, metricValue2)
+
+	// check tags
+	tagValue1, err := event.RootFields.GetValue("aws.tags." + autoscalingGroupTagKey1)
+	assert.NoError(t, err)
+	assert.Equal(t, tagValue1, autoscalingGroupTagValue1)
+
+	tagValue2, err := event.RootFields.GetValue("aws.tags." + autoscalingGroupTagKey2)
+	assert.NoError(t, err)
+	assert.Equal(t, tagValue2, autoscalingGroupTagValue2)
+}
+
 func TestCreateEventsWithDataGranularity(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
@@ -1301,6 +1420,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClientWithDataGranularity{}
+	mockAutoScalingSvc := &MockAutoScalingClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
 			listMetric1,
@@ -1315,7 +1435,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockAutoScalingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
 	expectedID := regionName + accountID
@@ -1342,6 +1462,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClient{}
+	mockAutoScalingSvc := &MockAutoScalingClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
 			listMetric1,
@@ -1358,7 +1479,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
 
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockAutoScalingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 
@@ -1370,7 +1491,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 		},
 	}
 
-	events, err = m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err = m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockAutoScalingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(events))
 }
@@ -1520,7 +1641,8 @@ func TestCreateEventsTimestamp(t *testing.T) {
 
 	cloudwatchMock := &MockCloudWatchClientWithoutDim{}
 	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
-	events, err := m.createEvents(cloudwatchMock, resGroupTaggingClientMock, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	mockAutoScalingSvc := &MockAutoScalingClient{}
+	events, err := m.createEvents(cloudwatchMock, resGroupTaggingClientMock, mockAutoScalingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, timestamp, events[regionName+accountID+namespace+"-0"].Timestamp)
 }
