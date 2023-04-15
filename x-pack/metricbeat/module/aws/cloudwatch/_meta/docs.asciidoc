@@ -10,6 +10,7 @@ ec2:DescribeRegions
 cloudwatch:GetMetricData
 cloudwatch:ListMetrics
 tag:getResources
+autoscaling:DescribeTags
 sts:GetCallerIdentity
 iam:ListAccountAliases
 ----
