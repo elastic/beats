@@ -166,7 +166,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 - Make generic SQL GA {pull}34637[34637]
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-
+- Keep resource labels and metric labels from timeSeries response for gce instance {pull}35090[35090]
 
 *Osquerybeat*
 

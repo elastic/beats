@@ -78,37 +78,21 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	}
 
 	if s.timeSeries.Metric != nil {
-		metrics := make(map[string]interface{})
-		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
-		// the ones I want
 		for k, v := range s.timeSeries.Metric.Labels {
-			if k == TimeSeriesResponsePathForECSInstanceName {
+			//Do not write metrics labels if it's content is empty
+			if v == "" {
 				continue
 			}
-
-			metrics[k] = v
-		}
-
-		//Do not write metrics labels if it's content is empty
-		for k, v := range metrics {
 			_, _ = m.Put(LabelMetrics+"."+k, v)
 		}
 	}
 
 	if s.timeSeries.Resource != nil {
-		resources := make(map[string]interface{})
-		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
-		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
-			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
+			//Do not write resources labels if it's content is empty
+			if v == "" {
 				continue
 			}
-
-			resources[k] = v
-		}
-
-		//Do not write resources labels if it's content is empty
-		for k, v := range resources {
 			_, _ = m.Put(LabelResource+"."+k, v)
 		}
 	}
