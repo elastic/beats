@@ -43,14 +43,13 @@ type Harvester struct {
 
 // log contains all data related to one slowlog entry
 //
-// 	The data is in the following format:
-// 	1) (integer) 13
-// 	2) (integer) 1309448128
-// 	3) (integer) 30
-// 	4) 1) "slowlog"
-// 	   2) "get"
-// 	   3) "100"
-//
+//	The data is in the following format:
+//	1) (integer) 13
+//	2) (integer) 1309448128
+//	3) (integer) 30
+//	4) 1) "slowlog"
+//	   2) "get"
+//	   3) "100"
 type log struct {
 	id        int64
 	timestamp int64
@@ -151,14 +150,15 @@ func (h *Harvester) Run() error {
 		data.Event = beat.Event{
 			Timestamp: time.Unix(log.timestamp, 0).UTC(),
 			Fields: common.MapStr{
-				"message": strings.Join(args, " "),
-				"redis": common.MapStr{
-					"slowlog": subEvent,
-				},
-				"event": common.MapStr{
-					"created": time.Now(),
-				},
-			},
+				"data": common.MapStr{
+					"message": strings.Join(args, " "),
+					"redis": common.MapStr{
+						"slowlog": subEvent,
+					},
+					"event": common.MapStr{
+						"created": time.Now(),
+					},
+				}},
 		}
 
 		h.forwarder.Send(data)
