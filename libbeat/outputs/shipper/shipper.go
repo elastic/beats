@@ -106,7 +106,12 @@ func makeShipper(
 
 	swb := outputs.WithBackoff(s, config.Backoff.Init, config.Backoff.Max)
 
-	return outputs.Success(config.BulkMaxSize, config.MaxRetries, swb)
+	return outputs.Group{
+		Clients:    []outputs.Client{swb},
+		BatchSize:  config.BulkMaxSize,
+		Retry:      config.MaxRetries,
+		ProxyQueue: true,
+	}, nil
 }
 
 // Connect establishes connection to the shipper server and implements `outputs.Connectable`.

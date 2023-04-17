@@ -48,11 +48,14 @@ type IndexSelector interface {
 }
 
 // Group configures and combines multiple clients into load-balanced group of clients
-// being managed by the publisher pipeline.
+// being managed by the publisher pipeline. If ProxyQueue is set then this output
+// group will use the proxy queue, which allows queueing to happen upstream in the
+// shipper.
 type Group struct {
-	Clients   []Client
-	BatchSize int
-	Retry     int
+	Clients    []Client
+	BatchSize  int
+	Retry      int
+	ProxyQueue bool
 }
 
 // RegisterType registers a new output type.
