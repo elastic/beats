@@ -165,6 +165,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
+- ECS field region and zone should be nested in cloud field by M.Put method for GCP module. {pull}[]
 
 *Osquerybeat*
 
