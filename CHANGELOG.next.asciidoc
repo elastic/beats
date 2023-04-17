@@ -341,6 +341,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 - Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
+- Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
 
 *Osquerybeat*
 

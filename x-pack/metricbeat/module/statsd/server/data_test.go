@@ -875,6 +875,14 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
+			input: "counter1:11.12|c",
+			expected: []statsdMetric{{
+				name:       "counter1",
+				metricType: "c",
+				value:      "11.12",
+			}},
+		},
+		{
 			input: "counter2:15|c|@0.1",
 			expected: []statsdMetric{{
 				name:       "counter2",
