@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -118,6 +119,8 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
+	c.updateQueue(outGrp)
+
 	// Set consumer to empty target to pause it while we reload
 	c.consumer.setTarget(consumerTarget{})
 
@@ -186,10 +189,27 @@ func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Prod
 	return c.queue.Producer(config)
 }
 
-func (c *outputController) createQueue() error {
+func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
+	if len(outGrp.Clients) == 0 {
+		// If the output group is empty, there's nothing to do
+		return
+	}
+	c.queueLock.Lock()
+	defer c.queueLock.Unlock()
+
 	config := c.queueConfig
+	if c.queue != nil {
+		// Some day we might support hot-swapping of output configurations,
+		// but for now we can only accept a nonempty output group once, and
+		// after that we log it as an error.
+		config.logger.Errorf("outputController received new output configuration when queue is already active")
+		return
+	}
 
 	switch config.queueType {
+	case proxyqueue.QueueType:
+		c.queue = proxyqueue.NewQueue(config.logger, proxyqueue.Settings{})
+
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(config.userConfig)
 		if err != nil {

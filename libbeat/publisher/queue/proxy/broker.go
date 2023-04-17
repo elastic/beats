@@ -82,6 +82,8 @@ type blockedRequests struct {
 	last  *blockedRequest
 }
 
+const QueueType = "proxy"
+
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
