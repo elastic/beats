@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -41,13 +42,25 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queueConfig queueConfig
-	queue       queue.Queue
+	// The queue is not created until the outputController is assigned a
+	// nonempty outputs.Group, in case the output group requests a proxy
+	// queue. At that time, any prior calls to outputController.queueProducer
+	// from incoming pipeline connections will be unblocked, and future
+	// requests will be handled synchronously.
+	queueLock       sync.Mutex
+	queueConfig     queueConfig
+	queue           queue.Queue
+	pendingRequests []producerRequest
 
 	workerChan chan publisher.Batch
 
 	consumer *eventConsumer
 	workers  []outputWorker
+}
+
+type producerRequest struct {
+	config       queue.ProducerConfig
+	responseChan chan queue.Producer
 }
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
