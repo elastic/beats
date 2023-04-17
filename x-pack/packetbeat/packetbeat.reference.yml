@@ -69,7 +69,7 @@ packetbeat.flows:
   # timed out.
   timeout: 30s
 
-  # Configure reporting period. If set to -1, only killed flows will be reported
+  # Configure reporting period. If set to -1s, only killed flows will be reported
   period: 10s
 
   # Set to true to publish fields with null values in events.
