@@ -25,16 +25,44 @@ import (
 
 func TestProcNetUDP(t *testing.T) {
 	t.Run("with_match", func(t *testing.T) {
-		rx, drops, err := procNetUDP("testdata/proc_net_udp.txt", []string{"2508640A:1BBE"})
+		addr := []string{"2508640A:1BBE"}
+		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+		rx, drops, err := procNetUDP("testdata/proc_net_udp.txt", addr, hasUnspecified, addrIsUnspecified)
 		if err != nil {
 			t.Fatal(err)
 		}
+		assert.Nil(t, bad)
 		assert.EqualValues(t, 1, rx)
 		assert.EqualValues(t, 2, drops)
 	})
 
+	t.Run("unspecified", func(t *testing.T) {
+		addr := []string{"00000000:1BBE"}
+		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+		rx, drops, err := procNetUDP("testdata/proc_net_udp.txt", addr, hasUnspecified, addrIsUnspecified)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Nil(t, bad)
+		assert.EqualValues(t, 2, rx)
+		assert.EqualValues(t, 4, drops)
+	})
+
 	t.Run("without_match", func(t *testing.T) {
-		_, _, err := procNetUDP("testdata/proc_net_udp.txt", []string{"FOO:BAR", "BAR:BAZ"})
+		addr := []string{"deadbeef:f00d", "ba1dface:1135"}
+		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+		_, _, err := procNetUDP("testdata/proc_net_udp.txt", addr, hasUnspecified, addrIsUnspecified)
+		assert.Nil(t, bad)
+		if assert.Error(t, err) {
+			assert.Contains(t, err.Error(), "entry not found")
+		}
+	})
+
+	t.Run("bad_addrs", func(t *testing.T) {
+		addr := []string{"FOO:BAR", "BAR:BAZ"}
+		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+		_, _, err := procNetUDP("testdata/proc_net_udp.txt", addr, hasUnspecified, addrIsUnspecified)
+		assert.EqualValues(t, addr, bad)
 		if assert.Error(t, err) {
 			assert.Contains(t, err.Error(), "entry not found")
 		}

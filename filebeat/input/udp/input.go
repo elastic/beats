@@ -20,6 +20,7 @@ package udp
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net"
@@ -235,11 +236,15 @@ func (m *inputMetrics) log(data []byte, timestamp time.Time) {
 
 // poll periodically gets UDP buffer and packet drops stats from the OS.
 func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger) {
+	hasUnspecified, addrIsUnspecified, badAddr := containsUnspecifiedAddr(addr)
+	if badAddr != nil {
+		log.Warnf("failed to parse addrs for metric collection %q", badAddr)
+	}
 	t := time.NewTicker(each)
 	for {
 		select {
 		case <-t.C:
-			rx, drops, err := procNetUDP("/proc/net/udp", addr)
+			rx, drops, err := procNetUDP("/proc/net/udp", addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				log.Warnf("failed to get udp stats from /proc: %v", err)
 				continue
@@ -253,11 +258,33 @@ func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger)
 	}
 }
 
+func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []string) {
+	which = make([]bool, len(addr))
+	for i, a := range addr {
+		prefix, _, ok := strings.Cut(a, ":")
+		if !ok {
+			continue
+		}
+		ip, err := hex.DecodeString(prefix)
+		if err != nil {
+			bad = append(bad, a)
+		}
+		if net.IP(ip).IsUnspecified() {
+			yes = true
+			which[i] = true
+		}
+	}
+	return yes, which, bad
+}
+
 // procNetUDP returns the rx_queue and drops field of the UDP socket table
 // for the socket on the provided address formatted in hex, xxxxxxxx:xxxx.
 // This function is only useful on linux due to its dependence on the /proc
-// filesystem, but is kept in this file for simplicity.
-func procNetUDP(path string, addr []string) (rx, drops int64, err error) {
+// filesystem, but is kept in this file for simplicity. If hasUnspecified
+// is true, all addresses listed in the file in path are considered, and the
+// sum of rx_queue and drops matching the addr ports is returned where the
+// corresponding addrIsUnspecified is true.
+func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecified []bool) (rx, drops int64, err error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return 0, 0, err
@@ -266,30 +293,49 @@ func procNetUDP(path string, addr []string) (rx, drops int64, err error) {
 	if len(lines) < 2 {
 		return 0, 0, fmt.Errorf("%s entry not found for %s (no line)", path, addr)
 	}
+	var found bool
 	for _, l := range lines[1:] {
 		f := bytes.Fields(l)
-		if len(f) > 12 && contains(f[1], addr) {
+		if len(f) > 12 && contains(f[1], addr, addrIsUnspecified) {
 			_, r, ok := bytes.Cut(f[4], []byte(":"))
 			if !ok {
 				return 0, 0, errors.New("no rx_queue field " + string(f[4]))
 			}
-			rx, err = strconv.ParseInt(string(r), 16, 64)
+			found = true
+
+			v, err := strconv.ParseInt(string(r), 16, 64)
 			if err != nil {
 				return 0, 0, fmt.Errorf("failed to parse rx_queue: %w", err)
 			}
-			drops, err = strconv.ParseInt(string(f[12]), 16, 64)
+			rx += v
+
+			v, err = strconv.ParseInt(string(f[12]), 16, 64)
 			if err != nil {
 				return 0, 0, fmt.Errorf("failed to parse drops: %w", err)
+			}
+			drops += v
+
+			if hasUnspecified {
+				continue
 			}
 			return rx, drops, nil
 		}
 	}
+	if found {
+		return rx, drops, nil
+	}
 	return 0, 0, fmt.Errorf("%s entry not found for %s", path, addr)
 }
 
-func contains(b []byte, addr []string) bool {
-	for _, a := range addr {
-		if strings.EqualFold(string(b), a) {
+func contains(b []byte, addr []string, addrIsUnspecified []bool) bool {
+	for i, a := range addr {
+		if addrIsUnspecified[i] {
+			_, ap, pok := strings.Cut(a, ":")
+			_, bp, bok := bytes.Cut(b, []byte(":"))
+			if pok && bok && strings.EqualFold(string(bp), ap) {
+				return true
+			}
+		} else if strings.EqualFold(string(b), a) {
 			return true
 		}
 	}
