@@ -88,30 +88,34 @@ func TestReaderGroup(t *testing.T) {
 	})
 
 	t.Run("assert new harvester cannot be added if limit is reached", func(t *testing.T) {
-		rg := newReaderGroupWithLimit(1)
-		require.Equal(t, 0, len(rg.table))
-		ctx, cf, err := rg.newContext("test-id", context.Background())
-		requireGroupSuccess(t, ctx, cf, err)
-		ctx, cf, err = rg.newContext("test-id", context.Background())
-		requireGroupError(t, ctx, cf, err)
+		t.Fatal("TODO: move this test to defaultHarvesterGroup")
+		// rg := newReaderGroupWithLimit(1)
+		// require.Equal(t, 0, len(rg.table))
+		// ctx, cf, err := rg.newContext("test-id", context.Background())
+		// requireGroupSuccess(t, ctx, cf, err)
+		// ctx, cf, err = rg.newContext("test-id", context.Background())
+		// requireGroupError(t, ctx, cf, err)
 	})
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/26727")
 	source := &testSource{"/path/to/test"}
 
-	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-		require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
-	}
+	requireSourceAddedToBookkeeper :=
+		func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
+			require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
+		}
 
-	requireSourceRemovedFromBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-		require.False(t, hg.readers.hasID(hg.identifier.ID(s)))
-	}
+	requireSourceRemovedFromBookkeeper :=
+		func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
+			require.False(t, hg.readers.hasID(hg.identifier.ID(s)))
+		}
 
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
-		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
+		mockHarvester := &mockHarvester{
+			onRun: correctOnRun,
+			wg:    &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
 		gorountineChecker := resources.NewGoroutinesChecker()

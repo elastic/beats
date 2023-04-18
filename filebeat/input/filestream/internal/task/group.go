@@ -30,6 +30,9 @@ type Goer interface {
 }
 
 func NewGroup(limit uint64, maxErrors uint64) *Group {
+	if maxErrors < 1 {
+		maxErrors = 1
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 
 	g := Group{
@@ -61,9 +64,9 @@ func (p *Group) Go(fn func(context.Context) error) error {
 	p.wg.Add(1)
 	go func() {
 		defer p.wg.Done()
-		defer p.sem.Release(1)
 
 		if p.limit != 0 {
+			defer p.sem.Release(1)
 			err := p.sem.Acquire(p.ctx, 1)
 			if err != nil {
 				p.addErr(err)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -43,7 +44,7 @@ func TestGroup_Go(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Eventually(t,
-			func() bool { return uint64(want) == runningCount.Load() },
+			func() bool { return want == runningCount.Load() },
 			time.Second, 100*time.Millisecond)
 	})
 
@@ -141,6 +142,36 @@ func TestGroup_Go(t *testing.T) {
 
 		err = p.Go(func(_ context.Context) error { return nil })
 		assert.ErrorIs(t, err, context.Canceled)
+	})
+
+	t.Run("without limit, all goroutines run", func(t *testing.T) {
+		// 100 <= limit <= 100000
+		limit := rand.Int63n(100000-100) + 100
+		t.Logf("running %d goroutines", limit)
+		p := NewGroup(uint64(limit), uint64(limit))
+
+		done := make(chan struct{})
+		var runningCounter atomic.Int64
+		var i int64
+		for i = 0; i < limit; i++ {
+			err := p.Go(func(context.Context) error {
+				runningCounter.Add(1)
+				defer runningCounter.Add(-1)
+
+				<-done
+				return nil
+			})
+			require.NoError(t, err)
+		}
+
+		assert.Eventually(t,
+			func() bool { return limit == runningCounter.Load() },
+			100*time.Millisecond,
+			time.Millisecond)
+
+		close(done)
+		err := p.Stop()
+		require.NoError(t, err)
 	})
 }
 

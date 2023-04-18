@@ -56,12 +56,17 @@ type readerGroup struct {
 }
 
 func newReaderGroup() *readerGroup {
-	return newReaderGroupWithLimit(0)
+	return &readerGroup{
+		table: make(map[string]context.CancelFunc),
+	}
 }
 
+// newReaderGroupWithLimit is deprecated in favour of controlling the number of
+// harvesters on defaultHarvesterGroup directly through the taskgroup used to
+// spawn new harvester goroutines.
+// Deprecated
 func newReaderGroupWithLimit(limit uint64) *readerGroup {
 	return &readerGroup{
-		limit: limit,
 		table: make(map[string]context.CancelFunc),
 	}
 }
@@ -75,10 +80,6 @@ func newReaderGroupWithLimit(limit uint64) *readerGroup {
 func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (context.Context, context.CancelFunc, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
-	if r.limit > 0 && r.limit <= uint64(len(r.table)) {
-		return nil, nil, ErrHarvesterLimitReached
-	}
 
 	if _, ok := r.table[id]; ok {
 		return nil, nil, ErrHarvesterAlreadyRunning
@@ -199,23 +200,8 @@ func startHarvester(
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
-			backoff := 100 * time.Millisecond
-			t := time.NewTicker(backoff)
-			defer t.Stop()
-			for err != nil {
-				if !errors.Is(err, ErrHarvesterLimitReached) {
-					return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
-				}
-				ctx.Logger.Debugf("harvester limit reached, will retry to start %s in %s",
-					srcID, backoff)
-
-				select {
-				case <-canceler.Done():
-					return canceler.Err()
-				case <-t.C:
-					harvesterCtx, cancelHarvester, err = hg.readers.newContext(srcID, canceler)
-				}
-			}
+			ctx.Logger.Errorf("error while adding new reader to the bookkeeper %v", err)
+			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
 
 		ctx.Cancelation = harvesterCtx
