@@ -76,14 +76,6 @@ type outputWorker interface {
 	Close() error
 }
 
-type queueConfig struct {
-	logger      *logp.Logger
-	queueType   string
-	userConfig  *conf.C
-	ackCallback func(eventCount int)
-	inQueueSize int
-}
-
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
