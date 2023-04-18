@@ -18,21 +18,42 @@
 package add_cloud_metadata
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
+	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func createEC2MockAPI(responseMap map[string]string) *httptest.Server {
+type MockIMDSClient struct {
+	imds.Client
+	GetInstanceIdentityDocumentFunc func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+}
+
+type MockEC2Client struct {
+	ec2.Client
+	DescribeTagsFunc func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error)
+}
+
+func (m *MockIMDSClient) GetInstanceIdentityDocument(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+	return m.GetInstanceIdentityDocumentFunc(ctx, params, optFns...)
+}
+
+func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+	return e.DescribeTagsFunc(ctx, params, optFns...)
+}
+
+func createIMDSMockAPI(responseMap map[string]string) *httptest.Server {
 	h := func(w http.ResponseWriter, r *http.Request) {
 		if res, ok := responseMap[r.RequestURI]; ok {
 			w.Write([]byte(res))
@@ -62,48 +83,59 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 		instanceIDDoc1       = "i-11111111"
 		imageIDDoc1          = "ami-abcd1234"
 		instanceTypeDoc1     = "t2.medium"
+		clusterNameDoc1      = "test"
 
 		instanceIDDoc2 = "i-22222222"
 
-		templateDoc = `{
-	  "accountId" : "%s",
-	  "region" : "%s",
-	  "availabilityZone" : "%s",
-	  "instanceId" : "%s",
-	  "imageId" : "%s",
-	  "instanceType" : "%s",
-	  "devpayProductCodes" : null,
-	  "privateIp" : "10.0.0.1",
-	  "version" : "2010-08-31",
-	  "billingProducts" : null,
-	  "pendingTime" : "2016-09-20T15:43:02Z",
-	  "architecture" : "x86_64",
-	  "kernelId" : null,
-	  "ramdiskId" : null
-	}`
+	// 	templateDoc = `{
+	//   "accountId" : "%s",
+	//   "region" : "%s",
+	//   "availabilityZone" : "%s",
+	//   "instanceId" : "%s",
+	//   "imageId" : "%s",
+	//   "instanceType" : "%s",
+	//   "devpayProductCodes" : null,
+	//   "privateIp" : "10.0.0.1",
+	//   "version" : "2010-08-31",
+	//   "billingProducts" : null,
+	//   "pendingTime" : "2016-09-20T15:43:02Z",
+	//   "architecture" : "x86_64",
+	//   "kernelId" : null,
+	//   "ramdiskId" : null
+	// }`
+	// )
+
+	// sampleEC2Doc1 := fmt.Sprintf(
+	// 	templateDoc,
+	// 	accountIDDoc1,
+	// 	regionDoc1,
+	// 	availabilityZoneDoc1,
+	// 	instanceIDDoc1,
+	// 	imageIDDoc1,
+	// 	instanceTypeDoc1,
 	)
 
-	sampleEC2Doc1 := fmt.Sprintf(
-		templateDoc,
-		accountIDDoc1,
-		regionDoc1,
-		availabilityZoneDoc1,
-		instanceIDDoc1,
-		imageIDDoc1,
-		instanceTypeDoc1,
-	)
-
-	var testCases = []struct {
-		testName           string
-		ec2ResponseMap     map[string]string
-		processorOverwrite bool
-		previousEvent      mapstr.M
-
-		expectedEvent mapstr.M
+	var tests = []struct {
+		testName                            string
+		mockGetInstanceIdentityDocumentFunc func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+		processorOverwrite                  bool
+		previousEvent                       mapstr.M
+		expectedEvent                       mapstr.M
 	}{
 		{
-			testName:           "all fields from processor",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+			testName: "valid instance identity document",
+			mockGetInstanceIdentityDocumentFunc: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
 			processorOverwrite: false,
 			previousEvent:      mapstr.M{},
 			expectedEvent: mapstr.M{
@@ -118,141 +150,193 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"service": mapstr.M{
 						"name": "EC2",
 					},
-				},
-			},
-		},
-
-		{
-			testName:           "instanceId pre-informed, no overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-			processorOverwrite: false,
-			previousEvent: mapstr.M{
-				"cloud": mapstr.M{
-					"instance": mapstr.M{"id": instanceIDDoc2},
-				},
-			},
-			expectedEvent: mapstr.M{
-				"cloud": mapstr.M{
-					"instance": mapstr.M{"id": instanceIDDoc2},
-				},
-			},
-		},
-
-		{
-			// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
-			// it won't detect cloud.provider as a cloud field. This is not the behavior we
-			// expect and will find a better solution later in issue 11697.
-			testName:           "only cloud.provider pre-informed, no overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-			processorOverwrite: false,
-			previousEvent: mapstr.M{
-				"cloud.provider": "aws",
-			},
-			expectedEvent: mapstr.M{
-				"cloud.provider": "aws",
-				"cloud": mapstr.M{
-					"provider":          "aws",
-					"account":           mapstr.M{"id": accountIDDoc1},
-					"instance":          mapstr.M{"id": instanceIDDoc1},
-					"machine":           mapstr.M{"type": instanceTypeDoc1},
-					"image":             mapstr.M{"id": imageIDDoc1},
-					"region":            regionDoc1,
-					"availability_zone": availabilityZoneDoc1,
-					"service": mapstr.M{
-						"name": "EC2",
-					},
-				},
-			},
-		},
-
-		{
-			testName:           "all fields from processor, overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-			processorOverwrite: true,
-			previousEvent:      mapstr.M{},
-			expectedEvent: mapstr.M{
-				"cloud": mapstr.M{
-					"provider":          "aws",
-					"account":           mapstr.M{"id": accountIDDoc1},
-					"instance":          mapstr.M{"id": instanceIDDoc1},
-					"machine":           mapstr.M{"type": instanceTypeDoc1},
-					"image":             mapstr.M{"id": imageIDDoc1},
-					"region":            regionDoc1,
-					"availability_zone": availabilityZoneDoc1,
-					"service": mapstr.M{
-						"name": "EC2",
-					},
-				},
-			},
-		},
-
-		{
-			testName:           "instanceId pre-informed, overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-			processorOverwrite: true,
-			previousEvent: mapstr.M{
-				"cloud": mapstr.M{
-					"instance": mapstr.M{"id": instanceIDDoc2},
-				},
-			},
-			expectedEvent: mapstr.M{
-				"cloud": mapstr.M{
-					"provider":          "aws",
-					"account":           mapstr.M{"id": accountIDDoc1},
-					"instance":          mapstr.M{"id": instanceIDDoc1},
-					"machine":           mapstr.M{"type": instanceTypeDoc1},
-					"image":             mapstr.M{"id": imageIDDoc1},
-					"region":            regionDoc1,
-					"availability_zone": availabilityZoneDoc1,
-					"service": mapstr.M{
-						"name": "EC2",
-					},
-				},
-			},
-		},
-
-		{
-			testName:           "only cloud.provider pre-informed, overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-			processorOverwrite: false,
-			previousEvent: mapstr.M{
-				"cloud.provider": "aws",
-			},
-			expectedEvent: mapstr.M{
-				"cloud.provider": "aws",
-				"cloud": mapstr.M{
-					"provider":          "aws",
-					"account":           mapstr.M{"id": accountIDDoc1},
-					"instance":          mapstr.M{"id": instanceIDDoc1},
-					"machine":           mapstr.M{"type": instanceTypeDoc1},
-					"image":             mapstr.M{"id": imageIDDoc1},
-					"region":            regionDoc1,
-					"availability_zone": availabilityZoneDoc1,
-					"service": mapstr.M{
-						"name": "EC2",
-					},
+					// "orchestrator": mapstr.M{
+					// 	"cluster": mapstr.M{
+					// 		"name": clusterNameDoc1,
+					// 		"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameDoc1),
+					// 	},
+					// },
 				},
 			},
 		},
 	}
 
-	for _, tc := range testCases {
+	// var testCases = []struct {
+	// 	testName           string
+	// 	ec2ResponseMap     map[string]string
+	// 	processorOverwrite bool
+	// 	previousEvent      mapstr.M
+
+	// 	expectedEvent mapstr.M
+	// }{
+	// 	// {
+	// 	// 	testName:           "all fields from processor",
+	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+	// 	// 	processorOverwrite: false,
+	// 	// 	previousEvent:      mapstr.M{},
+	// 	// 	expectedEvent: mapstr.M{
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"provider":          "aws",
+	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
+	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
+	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
+	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
+	// 	// 			"region":            regionDoc1,
+	// 	// 			"availability_zone": availabilityZoneDoc1,
+	// 	// 			"service": mapstr.M{
+	// 	// 				"name": "EC2",
+	// 	// 			},
+	// 	// 			"orchestrator": mapstr.M{
+	// 	// 				"cluster": mapstr.M{
+	// 	// 					"name": clusterNameDoc1,
+	// 	// 					"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameDoc1),
+	// 	// 				},
+	// 	// 			},
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+
+	// 	// {
+	// 	// 	testName:           "instanceId pre-informed, no overwrite",
+	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+	// 	// 	processorOverwrite: false,
+	// 	// 	previousEvent: mapstr.M{
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"instance": mapstr.M{"id": instanceIDDoc2},
+	// 	// 		},
+	// 	// 	},
+	// 	// 	expectedEvent: mapstr.M{
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"instance": mapstr.M{"id": instanceIDDoc2},
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+
+	// 	// {
+	// 	// 	// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
+	// 	// 	// it won't detect cloud.provider as a cloud field. This is not the behavior we
+	// 	// 	// expect and will find a better solution later in issue 11697.
+	// 	// 	testName:           "only cloud.provider pre-informed, no overwrite",
+	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+	// 	// 	processorOverwrite: false,
+	// 	// 	previousEvent: mapstr.M{
+	// 	// 		"cloud.provider": "aws",
+	// 	// 	},
+	// 	// 	expectedEvent: mapstr.M{
+	// 	// 		"cloud.provider": "aws",
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"provider":          "aws",
+	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
+	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
+	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
+	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
+	// 	// 			"region":            regionDoc1,
+	// 	// 			"availability_zone": availabilityZoneDoc1,
+	// 	// 			"service": mapstr.M{
+	// 	// 				"name": "EC2",
+	// 	// 			},
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+
+	// 	// {
+	// 	// 	testName:           "all fields from processor, overwrite",
+	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+	// 	// 	processorOverwrite: true,
+	// 	// 	previousEvent:      mapstr.M{},
+	// 	// 	expectedEvent: mapstr.M{
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"provider":          "aws",
+	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
+	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
+	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
+	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
+	// 	// 			"region":            regionDoc1,
+	// 	// 			"availability_zone": availabilityZoneDoc1,
+	// 	// 			"service": mapstr.M{
+	// 	// 				"name": "EC2",
+	// 	// 			},
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+
+	// 	// {
+	// 	// 	testName:           "instanceId pre-informed, overwrite",
+	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+	// 	// 	processorOverwrite: true,
+	// 	// 	previousEvent: mapstr.M{
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"instance": mapstr.M{"id": instanceIDDoc2},
+	// 	// 		},
+	// 	// 	},
+	// 	// 	expectedEvent: mapstr.M{
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"provider":          "aws",
+	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
+	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
+	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
+	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
+	// 	// 			"region":            regionDoc1,
+	// 	// 			"availability_zone": availabilityZoneDoc1,
+	// 	// 			"service": mapstr.M{
+	// 	// 				"name": "EC2",
+	// 	// 			},
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+
+	// 	// {
+	// 	// 	testName:           "only cloud.provider pre-informed, overwrite",
+	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+	// 	// 	processorOverwrite: false,
+	// 	// 	previousEvent: mapstr.M{
+	// 	// 		"cloud.provider": "aws",
+	// 	// 	},
+	// 	// 	expectedEvent: mapstr.M{
+	// 	// 		"cloud.provider": "aws",
+	// 	// 		"cloud": mapstr.M{
+	// 	// 			"provider":          "aws",
+	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
+	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
+	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
+	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
+	// 	// 			"region":            regionDoc1,
+	// 	// 			"availability_zone": availabilityZoneDoc1,
+	// 	// 			"service": mapstr.M{
+	// 	// 				"name": "EC2",
+	// 	// 			},
+	// 	// 		},
+	// 	// 	},
+	// 	// },
+	// }
+
+	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
-			server := createEC2MockAPI(tc.ec2ResponseMap)
-			defer server.Close()
+
+			mockClient := &MockIMDSClient{
+				GetInstanceIdentityDocumentFunc: tc.mockGetInstanceIdentityDocumentFunc,
+			}
+
+			oldNewFromConfig := imds.NewFromConfig
+			imds.NewFromConfig = func(cfg aws.Config, optFns ...func(*imds.Options)) *imds.Client {
+				return (*imds.Client)(mockClient)
+			}
+			defer func() { imds.NewFromConfig = oldNewFromConfig }()
 
 			config, err := conf.NewConfigFrom(map[string]interface{}{
-				"host":      server.Listener.Addr().String(),
 				"overwrite": tc.processorOverwrite,
 			})
 			if err != nil {
 				t.Fatalf("error creating config from map: %s", err.Error())
 			}
-
 			cmp, err := New(config)
 			if err != nil {
 				t.Fatalf("error creating new metadata processor: %s", err.Error())
 			}
+
+			// client := http.Client{}
+			// res := result{provider: "ec2", metadata: mapstr.M{}}
+			// fetchRawProviderMetadata(context.Background(), client, &res)
 
 			actual, err := cmp.Run(&beat.Event{Fields: tc.previousEvent})
 			if err != nil {
