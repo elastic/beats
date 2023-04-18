@@ -81,7 +81,6 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKCallback    func(eventCount int)
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
@@ -122,6 +121,7 @@ type chanList struct {
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
+	ackCallback func(eventCount int),
 	settings Settings,
 ) *broker {
 	var (
@@ -159,7 +159,7 @@ func NewQueue(
 		// internal broker and ACK handler channels
 		scheduledACKs: make(chan chanList),
 
-		ackCallback: settings.ACKCallback,
+		ackCallback: ackCallback,
 		metricChan:  make(chan metricsRequest),
 	}
 

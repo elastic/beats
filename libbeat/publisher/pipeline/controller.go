@@ -18,7 +18,7 @@
 package pipeline
 
 import (
-	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -41,13 +42,32 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queueConfig queueConfig
-	queue       queue.Queue
+	// If eventWaitGroup is non-nil, it will be decremented as the queue
+	// reports upstream acknowledgment of published events.
+	eventWaitGroup *sync.WaitGroup
+
+	// The queue is not created until the outputController is assigned a
+	// nonempty outputs.Group, in case the output group requests a proxy
+	// queue. At that time, any prior calls to outputController.queueProducer
+	// from incoming pipeline connections will be unblocked, and future
+	// requests will be handled synchronously.
+	queue           queue.Queue
+	queueLock       sync.Mutex
+	pendingRequests []producerRequest
+
+	// queueSettings must be one of memqueue.Settings, diskqueue.Settings, or
+	// proxyqueue.Settings.
+	queueSettings interface{}
 
 	workerChan chan publisher.Batch
 
 	consumer *eventConsumer
 	workers  []outputWorker
+}
+
+type producerRequest struct {
+	config       queue.ProducerConfig
+	responseChan chan queue.Producer
 }
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
@@ -68,21 +88,17 @@ func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	observer outputObserver,
-	queueConfig queueConfig,
+	eventWaitGroup *sync.WaitGroup,
+	queueSettings interface{},
 ) (*outputController, error) {
-
 	controller := &outputController{
-		beat:        beat,
-		monitors:    monitors,
-		observer:    observer,
-		queueConfig: queueConfig,
-		workerChan:  make(chan publisher.Batch),
-		consumer:    newEventConsumer(monitors.Logger, observer),
-	}
-
-	err := controller.createQueue()
-	if err != nil {
-		return nil, err
+		beat:           beat,
+		monitors:       monitors,
+		observer:       observer,
+		eventWaitGroup: eventWaitGroup,
+		queueSettings:  queueSettings,
+		workerChan:     make(chan publisher.Batch),
+		consumer:       newEventConsumer(monitors.Logger, observer),
 	}
 
 	return controller, nil
@@ -105,6 +121,8 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
+	c.createQueueIfNeeded(outGrp)
+
 	// Set consumer to empty target to pause it while we reload
 	c.consumer.setTarget(consumerTarget{})
 
@@ -169,45 +187,99 @@ func (c *outputController) Reload(
 	return nil
 }
 
+// queueProducer creates a queue producer with the given config, blocking
+// until the queue is created if it does not yet exist.
 func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
-	return c.queue.Producer(config)
+	c.queueLock.Lock()
+	if c.queue != nil {
+		defer c.queueLock.Unlock()
+		return c.queue.Producer(config)
+	}
+	// If there's no queue yet, create a producer request, release the
+	// queue lock, and wait to receive our producer.
+	request := producerRequest{
+		config:       config,
+		responseChan: make(chan queue.Producer),
+	}
+	c.pendingRequests = append(c.pendingRequests, request)
+	c.queueLock.Unlock()
+	return <-request.responseChan
 }
 
-func (c *outputController) createQueue() error {
-	config := c.queueConfig
+// onACK receives event acknowledgment notifications from the queue and
+// forwards them to the metrics observer and the pipeline's global event
+// wait group if one is set.
+func (c *outputController) onACK(eventCount int) {
+	c.observer.queueACKed(eventCount)
+	if c.eventWaitGroup != nil {
+		c.eventWaitGroup.Add(-eventCount)
+	}
+}
 
-	switch config.queueType {
-	case memqueue.QueueType:
-		settings, err := memqueue.SettingsForUserConfig(config.userConfig)
+func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
+	logger := c.monitors.Logger
+	if len(outGrp.Clients) == 0 {
+		// If the output group is empty, there's nothing to do
+		return
+	}
+	c.queueLock.Lock()
+	defer c.queueLock.Unlock()
+
+	if c.queue != nil {
+		// Some day we might support hot-swapping of output configurations,
+		// but for now we can only accept a nonempty output group once, and
+		// after that we log it as an error.
+		logger.Errorf("outputController received new output configuration when queue is already active")
+		return
+	}
+
+	// Queue settings from the output take precedence, otherwise fall back
+	// on what we were given during initialization.
+	settings := outGrp.QueueSettings
+	if settings == nil {
+		settings = c.queueSettings
+	}
+
+	var queueType string
+	switch s := settings.(type) {
+	case proxyqueue.Settings:
+		queueType = proxyqueue.QueueType
+		c.queue = proxyqueue.NewQueue(logger, c.onACK, s)
+
+	case memqueue.Settings:
+		queueType = memqueue.QueueType
+		c.queue = memqueue.NewQueue(logger, c.onACK, s)
+
+	case diskqueue.Settings:
+		queueType = diskqueue.QueueType
+		queue, err := diskqueue.NewQueue(logger, c.onACK, s)
 		if err != nil {
-			return err
-		}
-		// The memory queue has a special override during pipeline
-		// initialization for the size of its API channel buffer.
-		settings.InputQueueSize = config.inQueueSize
-		settings.ACKCallback = config.ackCallback
-		c.queue = memqueue.NewQueue(config.logger, settings)
-	case diskqueue.QueueType:
-		settings, err := diskqueue.SettingsForUserConfig(config.userConfig)
-		if err != nil {
-			return err
-		}
-		settings.WriteToDiskCallback = config.ackCallback
-		queue, err := diskqueue.NewQueue(config.logger, settings)
-		if err != nil {
-			return err
+			logger.Errorf("couldn't initialize disk queue: %v", err)
 		}
 		c.queue = queue
 	default:
-		return fmt.Errorf("'%v' is not a valid queue type", config.queueType)
+		logger.Errorf("outputController received unrecognized queue settings")
+	}
+	// If we have no valid settings or the disk queue failed, fall back on the
+	// memory queue since that is guaranteed to succeed.
+	if c.queue == nil {
+		queueType = memqueue.QueueType
+		logger.Errorf("falling back to default memory queue, check your queue configuration")
+		s, _ := memqueue.SettingsForUserConfig(nil)
+		c.queue = memqueue.NewQueue(logger, c.onACK, s)
 	}
 
 	if c.monitors.Telemetry != nil {
 		queueReg := c.monitors.Telemetry.NewRegistry("queue")
-		monitoring.NewString(queueReg, "name").Set(config.queueType)
+		monitoring.NewString(queueReg, "name").Set(queueType)
 	}
 	maxEvents := c.queue.BufferConfig().MaxEvents
 	c.observer.queueMaxEvents(maxEvents)
 
-	return nil
+	// Now that we've created a queue, go through and unblock any callers
+	// that are waiting for a producer.
+	for _, req := range c.pendingRequests {
+		req.responseChan <- c.queue.Producer(req.config)
+	}
+	c.pendingRequests = nil
 }

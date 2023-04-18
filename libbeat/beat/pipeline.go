@@ -78,6 +78,8 @@ type EventListener interface {
 	// ACK Events from the output and pipeline queue are forwarded to ACKEvents.
 	// The number of reported events only matches the known number of events downstream.
 	// ACKers might need to keep track of dropped events by themselves.
+	// TODO: This method is never called by any live pipeline, it should
+	// be deleted.
 	ACKEvents(n int)
 
 	// ClientClosed informs the ACKer that the Client used to publish to the pipeline has been closed.

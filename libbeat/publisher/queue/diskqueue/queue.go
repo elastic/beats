@@ -104,7 +104,11 @@ type metricsRequestResponse struct {
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
-func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
+func NewQueue(
+	logger *logp.Logger,
+	writeToDiskCallback func(eventCount int),
+	settings Settings,
+) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
@@ -209,7 +213,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
 		readerLoop:  newReaderLoop(settings),
-		writerLoop:  newWriterLoop(logger, settings),
+		writerLoop:  newWriterLoop(logger, writeToDiskCallback, settings),
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),

@@ -59,8 +59,7 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKCallback func(eventCount int)
-	BatchSize   int
+	BatchSize int
 }
 
 type queueEntry struct {
@@ -82,11 +81,14 @@ type blockedRequests struct {
 	last  *blockedRequest
 }
 
+const QueueType = "proxy"
+
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
+	ackCallback func(eventCount int),
 	settings Settings,
 ) *broker {
 	if logger == nil {
@@ -102,7 +104,7 @@ func NewQueue(
 		pushChan: make(chan *pushRequest),
 		getChan:  make(chan getRequest),
 
-		ackCallback: settings.ACKCallback,
+		ackCallback: ackCallback,
 	}
 
 	b.wg.Add(1)
