@@ -19,6 +19,7 @@ package add_cloud_metadata
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -30,15 +31,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-)
-
-// TODO: adjust tests and delete consts:
-const (
-	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
-	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
-	ec2InstanceIMDSv2TokenTTLHeader   = "X-aws-ec2-metadata-token-ttl-seconds"
-	ec2InstanceIMDSv2TokenTTLValue    = "21600"
-	ec2InstanceIMDSv2TokenURI         = "/latest/api/token"
 )
 
 // AWS EC2 Metadata Service
@@ -67,12 +59,8 @@ func fetchRawProviderMetadata(
 	result *result,
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
-	// config := defaultConfig()
-	// if err := c.Unpack(&config); err != nil {
-	// 	logger.Warnf("error when load config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-	// }
 
-	// LoadDefaultConfig loads the Ec2 role credentials
+	// LoadDefaultConfig loads the EC2 role credentials
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
 		logger.Debugf("error loading AWS default configuration: %s.", err)
@@ -86,23 +74,48 @@ func fetchRawProviderMetadata(
 		logger.Warnf("error fetching EC2 Identity Document: %s.", err)
 	}
 
-	// Region must be set to be able to get EC2 Tags
+	// AWS Region must be set to be able to get EC2 Tags
 	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
 	awsConfig.Region = awsRegion
 
+	clusterName, err := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
+	if err != nil {
+		logger.Debugf("error fetching cluster name metadata: %s.", err)
+	}
+
+	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
+
+	// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
+	// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
+	if *clusterName != "" {
+		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", awsRegion, accountID, *clusterName)
+
+		result.metadata.Put("cloud.orchestrator.cluster.name", clusterName)
+		result.metadata.Put("cloud.orchestrator.cluster.id", clusterARN)
+	}
+
+	result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
+	result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
+	result.metadata.Put("cloud.region", awsRegion)
+	result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
+	result.metadata.Put("cloud.account.id", accountID)
+	result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+}
+
+func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (*string, error) {
 	svc := ec2.NewFromConfig(awsConfig)
 	input := &ec2.DescribeTagsInput{
 		Filters: []types.Filter{
 			{
 				Name: awssdk.String("resource-id"),
 				Values: []string{
-					*awssdk.String(instanceIdentity.InstanceIdentityDocument.InstanceID),
+					instanceID,
 				},
 			},
 			{
 				Name: awssdk.String("key"),
 				Values: []string{
-					*awssdk.String("eks:cluster-name"),
+					"eks:cluster-name",
 				},
 			},
 		},
@@ -110,15 +123,7 @@ func fetchRawProviderMetadata(
 
 	tagsResult, err := svc.DescribeTags(context.TODO(), input)
 	if err != nil {
-		logger.Warnf("error fetching EC2 Tags: %s.", err)
+		return nil, fmt.Errorf("error fetching EC2 Tags: %s", err)
 	}
-
-	result.metadata.Put("cloud.orchestrator.cluster.name", tagsResult.Tags[0].Value)
-	result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
-	result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
-	result.metadata.Put("cloud.region", awsRegion)
-	result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
-	result.metadata.Put("cloud.account.id", instanceIdentity.InstanceIdentityDocument.AccountID)
-	result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
-
+	return tagsResult.Tags[0].Value, nil
 }
