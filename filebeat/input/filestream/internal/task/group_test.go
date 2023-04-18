@@ -1,4 +1,4 @@
-package workerpool
+package task
 
 import (
 	"context"
@@ -13,15 +13,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewPool(t *testing.T) {
-	p := NewPool(10, 10)
-	require.NotNil(t, p, "NewPool returned a nil Poll, it cannot be nil")
+func TestNewGroup(t *testing.T) {
+	p := NewGroup(10, 10)
+	require.NotNil(t, p, "NewGroup returned a nil group, it cannot be nil")
 
 	assert.Equal(t, 10, p.limit)
 	assert.Equal(t, 10, p.errsSize)
 }
 
-func TestPool_Go(t *testing.T) {
+func TestGroup_Go(t *testing.T) {
 	t.Run("don't run more than limit goroutines", func(t *testing.T) {
 		done := make(chan struct{})
 		defer close(done)
@@ -32,8 +32,8 @@ func TestPool_Go(t *testing.T) {
 			return nil
 		}
 
-		want := 2
-		p := NewPool(want, want)
+		want := uint64(2)
+		p := NewGroup(want, want)
 
 		err := p.Go(blocked)
 		require.NoError(t, err)
@@ -50,8 +50,8 @@ func TestPool_Go(t *testing.T) {
 	t.Run("workloads wait for available worker", func(t *testing.T) {
 		runningCount := atomic.Int64{}
 
-		limit := 2
-		p := NewPool(limit, limit+1)
+		limit := uint64(2)
+		p := NewGroup(limit, limit+1)
 
 		done1 := make(chan struct{})
 		f1 := func(_ context.Context) error {
@@ -134,8 +134,8 @@ func TestPool_Go(t *testing.T) {
 		assert.Contains(t, err.Error(), "f3")
 	})
 
-	t.Run("return error if Pool is closed", func(t *testing.T) {
-		p := NewPool(1, 1)
+	t.Run("return error if the group is closed", func(t *testing.T) {
+		p := NewGroup(1, 1)
 		err := p.Stop()
 		require.NoError(t, err)
 
@@ -146,7 +146,7 @@ func TestPool_Go(t *testing.T) {
 
 func TestAddErr(t *testing.T) {
 	t.Run("keep most recent errors", func(t *testing.T) {
-		p := NewPool(2, 2)
+		p := NewGroup(2, 2)
 
 		p.addErr(errors.New("1"))
 		p.addErr(errors.New("2"))
@@ -159,7 +159,7 @@ func TestAddErr(t *testing.T) {
 	})
 
 	t.Run("do not add nil errors", func(t *testing.T) {
-		p := NewPool(2, 2)
+		p := NewGroup(2, 2)
 
 		p.addErr(nil)
 		p.addErr(nil)
@@ -190,8 +190,8 @@ func TestPoll_Stop(t *testing.T) {
 			}
 		}
 
-		want := 2
-		p := NewPool(want, want)
+		want := uint64(2)
+		p := NewGroup(want, want)
 
 		wg.Add(2)
 		err := p.Go(blocked(1))
@@ -213,8 +213,8 @@ func TestPoll_Stop(t *testing.T) {
 	t.Run("some workloads return an error", func(t *testing.T) {
 		wantErr := errors.New("a error")
 
-		want := 2
-		p := NewPool(want, want)
+		want := uint64(2)
+		p := NewGroup(want, want)
 
 		err := p.Go(func(_ context.Context) error { return nil })
 		require.NoError(t, err)
@@ -246,8 +246,8 @@ func TestPoll_Stop(t *testing.T) {
 			}
 		}
 
-		want := 2
-		p := NewPool(want, want)
+		want := uint64(2)
+		p := NewGroup(want, want)
 
 		wg.Add(2)
 		err := p.Go(bloked(1))
