@@ -257,6 +257,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
 - Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
+- Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]

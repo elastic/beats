@@ -56,6 +56,17 @@ Only applicable to v9 and IPFIX protocols. A value of zero disables expiration.
 
 [float]
 [[queue_size]]
+==== `share_templates`
+
+This option allows v9 and ipfix templates to be shared within a session without
+reference to the origin of the template.
+
+Note that setting this to true is not recommended as it can result in the wrong
+template being applied under certain conditions, but it may be required for some
+systems.
+
+[float]
+[[queue_size]]
 ==== `queue_size`
 
 The maximum number of packets that can be queued for processing.
