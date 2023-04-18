@@ -46076,6 +46076,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.status.network_unavailable`*::
++
+--
+Node NetworkUnavailable status (true, false or unknown)
+
+
+type: keyword
+
+--
+
 
 *`kubernetes.node.cpu.allocatable.cores`*::
 +

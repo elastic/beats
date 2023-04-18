@@ -46,11 +46,12 @@ var mapping = &p.MetricsMapping{
 
 		"kube_node_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
 			"condition", map[string]string{
-				"Ready":          "ready",
-				"MemoryPressure": "memory_pressure",
-				"DiskPressure":   "disk_pressure",
-				"OutOfDisk":      "out_of_disk",
-				"PIDPressure":    "pid_pressure",
+				"Ready":              "ready",
+				"MemoryPressure":     "memory_pressure",
+				"DiskPressure":       "disk_pressure",
+				"OutOfDisk":          "out_of_disk",
+				"PIDPressure":        "pid_pressure",
+				"NetworkUnavailable": "network_unavailable",
 			},
 		)),
 	},

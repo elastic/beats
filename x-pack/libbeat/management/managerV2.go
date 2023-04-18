@@ -165,6 +165,11 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // Beats central management interface implementation
 // ================================
 
+// RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
+func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
+	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, hook)
+}
+
 // UpdateStatus updates the manager with the current status for the beat.
 func (cm *BeatV2Manager) UpdateStatus(status lbmanagement.Status, msg string) {
 	cm.mx.Lock()

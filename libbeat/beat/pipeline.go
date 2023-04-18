@@ -54,24 +54,24 @@ type ClientConfig struct {
 	// is configured
 	WaitClose time.Duration
 
-	// Configure ACK callback.
-	ACKHandler ACKer
+	// Callbacks for when events are added / acknowledged
+	EventListener EventListener
 
-	// Events configures callbacks for common client callbacks
-	Events ClientEventer
+	// ClientListener configures callbacks for monitoring pipeline clients
+	ClientListener ClientListener
 }
 
-// ACKer can be registered with a Client when connecting to the pipeline.
-// The ACKer will be informed when events are added or dropped by the processors,
+// EventListener can be registered with a Client when connecting to the pipeline.
+// The EventListener will be informed when events are added or dropped by the processors,
 // and when an event has been ACKed by the outputs.
 //
 // Due to event publishing and ACKing are asynchronous operations, the
-// operations on ACKer are normally executed in different go routines. ACKers
+// operations on EventListener are normally executed in different go routines. ACKers
 // are required to be multi-threading safe.
-type ACKer interface {
-	// AddEvent informs the ACKer that a new event has been sent to the client.
+type EventListener interface {
+	// AddEvent informs the listener that a new event has been sent to the client.
 	// AddEvent is called after the processors have handled the event. If the
-	// event has been dropped by the processor `published` will be set to true.
+	// event has been dropped by the processor `published` will be set to false.
 	// This allows the ACKer to do some bookkeeping for dropped events.
 	AddEvent(event Event, published bool)
 
@@ -80,12 +80,12 @@ type ACKer interface {
 	// ACKers might need to keep track of dropped events by themselves.
 	ACKEvents(n int)
 
-	// Close informs the ACKer that the Client used to publish to the pipeline has been closed.
-	// No new events should be published anymore. The ACKEvents method still will be actively called
+	// ClientClosed informs the ACKer that the Client used to publish to the pipeline has been closed.
+	// No new events should be published anymore. The ACKEvents method still will be called as long
 	// as long as there are pending events for the client in the pipeline. The Close signal can be used
 	// to suppress any ACK event propagation if required.
 	// Close might be called from another go-routine than AddEvent and ACKEvents.
-	Close()
+	ClientClosed()
 }
 
 // CloseRef allows users to close the client asynchronously.
@@ -130,8 +130,8 @@ type ProcessingConfig struct {
 	Private interface{}
 }
 
-// ClientEventer provides access to internal client events.
-type ClientEventer interface {
+// ClientListener provides access to internal client events.
+type ClientListener interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 
@@ -160,13 +160,6 @@ type PublishMode uint8
 const (
 	// DefaultGuarantees are up to the pipeline configuration itself.
 	DefaultGuarantees PublishMode = iota
-
-	// OutputChooses mode fully depends on the output and its configuration.
-	// Events might be dropped based on the users output configuration.
-	// In this mode no events are dropped within the pipeline. Events are only removed
-	// after the output has ACKed the events to the pipeline, even if the output
-	// did drop the events.
-	OutputChooses
 
 	// GuaranteedSend ensures events are retried until acknowledged by the output.
 	// Normally guaranteed sending should be used with some client ACK-handling

@@ -64,14 +64,11 @@ type broker struct {
 	// chanList of all outstanding ACK channels.
 	scheduledACKs chan chanList
 
-	// A listener that should be notified when ACKs are processed.
-	// ackLoop calls this listener's OnACK function when it advances
-	// the consumer ACK position.
-	// Right now this listener always points at the Pipeline associated with
-	// this queue. Pipeline.OnACK then forwards the notification to
-	// Pipeline.observer.queueACKed(), which updates the beats registry
-	// if needed.
-	ackListener queue.ACKListener
+	// A callback that should be invoked when ACKs are processed.
+	// ackLoop calls this function when it advances the consumer ACK position.
+	// Right now this forwards the notification to queueACKed() in
+	// the pipeline observer, which updates the beats registry if needed.
+	ackCallback func(eventCount int)
 
 	// This channel is used to request/return metrics where such metrics require insight into
 	// the actual eventloop itself. This seems like it might be overkill, but it seems that
@@ -84,7 +81,7 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener    queue.ACKListener
+	ACKCallback    func(eventCount int)
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
@@ -162,7 +159,7 @@ func NewQueue(
 		// internal broker and ACK handler channels
 		scheduledACKs: make(chan chanList),
 
-		ackListener: settings.ACKListener,
+		ackCallback: settings.ACKCallback,
 		metricChan:  make(chan metricsRequest),
 	}
 

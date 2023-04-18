@@ -1,6 +1,6 @@
 - name: compute
   description: Google Cloud Compute metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: firewall.dropped.bytes
