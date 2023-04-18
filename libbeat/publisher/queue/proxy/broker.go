@@ -42,13 +42,12 @@ type broker struct {
 	// Consumers send requests to getChan to read entries from the queue.
 	getChan chan getRequest
 
-	// A listener that should be notified when ACKs are processed.
-	// Right now this listener always points at the Pipeline associated with
-	// this queue, and Pipeline.OnACK forwards the notification to
-	// Pipeline.observer.queueACKed(), which updates the beats registry
-	// if needed. This pointer is included in batches created by the proxy
-	// queue, so they can call it when they receive a Done call.
-	ackListener queue.ACKListener
+	// A callback that should be invoked when ACKs are processed.
+	// This is used to forward notifications back to the pipeline observer,
+	// which updates the beats registry if needed. This callback is included
+	// in batches created by the proxy queue, so they can invoke it when they
+	// receive a Done call.
+	ackCallback func(eventCount int)
 
 	// Internal state for the broker's run loop.
 	queuedEntries      []queueEntry
@@ -60,7 +59,7 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener queue.ACKListener
+	ACKCallback func(eventCount int)
 	BatchSize   int
 }
 
@@ -103,7 +102,7 @@ func NewQueue(
 		pushChan: make(chan *pushRequest),
 		getChan:  make(chan getRequest),
 
-		ackListener: settings.ACKListener,
+		ackCallback: settings.ACKCallback,
 	}
 
 	b.wg.Add(1)
@@ -184,8 +183,8 @@ func (b *broker) run() {
 			}
 			// Notify the pipeline's metrics reporter
 			//nolint:typecheck // this nil check is ok
-			if b.ackListener != nil {
-				b.ackListener.OnACK(ackedBatch.originalEntryCount)
+			if b.ackCallback != nil {
+				b.ackCallback(ackedBatch.originalEntryCount)
 			}
 		}
 	}

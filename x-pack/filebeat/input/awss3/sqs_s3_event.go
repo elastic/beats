@@ -309,7 +309,7 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 
 	// Create a pipeline client scoped to this goroutine.
 	client, err := p.pipeline.ConnectWith(beat.ClientConfig{
-		ACKHandler: awscommon.NewEventACKHandler(),
+		EventListener: awscommon.NewEventACKHandler(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.

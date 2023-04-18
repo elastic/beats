@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/mapping"
@@ -77,14 +78,14 @@ type builtinModifier func(beat.Info) mapstr.M
 // MakeDefaultBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
 // to each event.
 func MakeDefaultBeatSupport(normalize bool) SupportFactory {
-	return MakeDefaultSupport(normalize, WithECS, WithHost, WithAgentMeta())
+	return MakeDefaultSupport(normalize, nil, WithECS, WithHost, WithAgentMeta())
 }
 
 // MakeDefaultObserverSupport creates a new SupportFactory based on NewDefaultSupport.
 // MakeDefaultObserverSupport automatically adds the `ecs.version` and `observer.X` fields
 // to each event.
 func MakeDefaultObserverSupport(normalize bool) SupportFactory {
-	return MakeDefaultSupport(normalize, WithECS, WithObserverMeta())
+	return MakeDefaultSupport(normalize, nil, WithECS, WithObserverMeta())
 }
 
 // MakeDefaultSupport creates a new SupportFactory for use with the publisher pipeline.
@@ -94,8 +95,11 @@ func MakeDefaultObserverSupport(normalize bool) SupportFactory {
 // and `processor` settings to the event processing pipeline to be generated.
 // Use WithFields, WithBeatMeta, and other to declare the builtin fields to be added
 // to each event. Builtin fields can be modified using global `processors`, and `fields` only.
+// the fleetDefaultProcessors argument will set the given global-level processors if the beat is currently running under fleet,
+// and no other global-level processors are set.
 func MakeDefaultSupport(
 	normalize bool,
+	fleetDefaultProcessors processors.PluginConfig,
 	modifiers ...modifier,
 ) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
@@ -107,8 +111,19 @@ func MakeDefaultSupport(
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
 		}
+		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
+		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
+		var rawProcessors processors.PluginConfig
+		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
+		if fleetmode.Enabled() && !beatCfg.HasField("processors") {
+			log.Debugf("In fleet mode with no processors specified, defaulting to global processors")
+			rawProcessors = fleetDefaultProcessors
 
-		processors, err := processors.New(cfg.Processors)
+		} else {
+			rawProcessors = cfg.Processors
+		}
+
+		processors, err := processors.New(rawProcessors)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing processors: %w", err)
 		}
@@ -125,7 +140,7 @@ func WithFields(fields mapstr.M) modifier {
 }
 
 // WithECS modifier adds `ecs.version` builtin fields to a processing pipeline.
-var WithECS modifier = WithFields(mapstr.M{
+var WithECS = WithFields(mapstr.M{
 	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
@@ -241,6 +256,15 @@ func newBuilder(
 	}
 
 	return b, nil
+}
+
+// Processors returns a string description of the processor config
+func (b *builder) Processors() []string {
+	procList := []string{}
+	for _, proc := range b.processors.list {
+		procList = append(procList, proc.String())
+	}
+	return procList
 }
 
 // Create combines the builder configuration with the client settings

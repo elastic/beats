@@ -15,19 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package diskqueue
+package tcp
 
 import (
-	"encoding/binary"
-	"hash/crc32"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// Computes the checksum that should be written / read in a frame footer
-// based on the raw content of that frame (excluding header / footer).
-func computeChecksum(data []byte) uint32 {
-	hash := crc32.NewIEEE()
-	frameLength := uint32(len(data) + frameMetadataSize)
-	_ = binary.Write(hash, binary.LittleEndian, &frameLength)
-	hash.Write(data)
-	return hash.Sum32()
+func TestProcNetTCP(t *testing.T) {
+	t.Run("with_match", func(t *testing.T) {
+		rx, err := procNetTCP("testdata/proc_net_tcp.txt", []string{"0100007F:17AC"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.EqualValues(t, 1, rx)
+	})
+
+	t.Run("without_match", func(t *testing.T) {
+		_, err := procNetTCP("testdata/proc_net_tcp.txt", []string{"FOO:BAR", "BAR:BAZ"})
+		if assert.Error(t, err) {
+			assert.Contains(t, err.Error(), "entry not found")
+		}
+	})
 }
