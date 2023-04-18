@@ -84,8 +84,8 @@ func (c *Config) WithCustomFields(dicts ...fields.FieldDict) *Config {
 }
 
 // WithSharedTemplates allows to toggle the sharing of templates within
-// a v9 neflow session. If it is not enabled, the source address must match
-// the address of the source of the template.
+// a v9 neflow or ipfix session. If it is not enabled, the source address
+// must match the address of the source of the template.
 func (c *Config) WithSharedTemplates(enabled bool) *Config {
 	c.sharedTemplates = enabled
 	return c
