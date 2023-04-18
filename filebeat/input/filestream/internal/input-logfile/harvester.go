@@ -25,11 +25,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
 )
 
 var (
@@ -134,7 +134,7 @@ type defaultHarvesterGroup struct {
 	store        *store
 	ackCH        *updateChan
 	identifier   *sourceIdentifier
-	tg           unison.TaskGroup
+	tg           *task.Group
 }
 
 // Start starts the Harvester for a Source if no Harvester is running for the
