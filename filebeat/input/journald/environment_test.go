@@ -153,7 +153,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
-	ackHandler beat.ACKer
+	ackHandler beat.EventListener
 	closed     bool
 	mtx        sync.Mutex
 	canceler   context.CancelFunc
@@ -268,15 +268,15 @@ func (pc *mockPipelineConnector) cancelClient(i int) {
 	pc.clients[i].canceler()
 }
 
-func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.ACKer {
+func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
-		return config.ACKHandler
+		return config.EventListener
 	}
 
-	return acker.Combine(blockingACKer(starter), config.ACKHandler)
+	return acker.Combine(blockingACKer(starter), config.EventListener)
 }
 
-func blockingACKer(starter context.Context) beat.ACKer {
+func blockingACKer(starter context.Context) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		for starter.Err() == nil {
 		}

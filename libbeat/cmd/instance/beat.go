@@ -96,7 +96,7 @@ type Beat struct {
 	IdxSupporter idxmgmt.Supporter
 
 	keystore   keystore.Keystore
-	processing processing.Supporter
+	processors processing.Supporter
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 
@@ -376,16 +376,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		WaitClose:      0,
-		WaitCloseMode:  pipeline.NoWaitOnClose,
-		Processors:     b.processing,
+		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
-	if settings.InputQueueSize > 0 {
-		publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
-	} else {
-		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
-	}
+	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
@@ -412,7 +406,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	defer func() {
-		if err := b.processing.Close(); err != nil {
+		if err := b.processors.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
 		}
 	}()
@@ -845,7 +839,7 @@ func (b *Beat) configure(settings Settings) error {
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
-	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	b.processors, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
@@ -858,7 +852,7 @@ func (b *Beat) configure(settings Settings) error {
 // to expand this to other components of the beat state.
 // To anyone refactoring: be careful to make sure the callback is registered after the global processors are initialized
 func (b *Beat) agentDiagnosticHook() []byte {
-	list := b.processing.Processors()
+	list := b.processors.Processors()
 
 	var debugBytes []byte
 	for _, proc := range list {
