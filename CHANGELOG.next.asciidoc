@@ -78,6 +78,8 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
+
 
 *Auditbeat*
 
