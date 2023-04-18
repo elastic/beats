@@ -66,7 +66,7 @@ func newReaderGroupWithLimit(limit uint64) *readerGroup {
 	}
 }
 
-// newContext createas a new context, cancel function and associates it with the given id within
+// newContext creates a new context, cancel function and associates it with the given id within
 // the reader group. Using the cancel function does not remvoe the association.
 // An error is returned if the id is already associated with a context. The cancel
 // function is nil in that case and must not be called.
@@ -76,7 +76,7 @@ func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (conte
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if 0 < r.limit && r.limit <= uint64(len(r.table)) {
+	if r.limit > 0 && r.limit <= uint64(len(r.table)) {
 		return nil, nil, ErrHarvesterLimitReached
 	}
 
