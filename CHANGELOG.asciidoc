@@ -3,6 +3,171 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.7.1]]
+=== Beats version 8.7.1
+https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
+
+*Auditbeat*
+
+
+*Filebeat*
+[Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35037[35037]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+
+*Heartbeat*
+
+- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-8.7.0]]
 === Beats version 8.7.0
 https://github.com/elastic/beats/compare/v8.6.2\...v8.7.0[View commits]
