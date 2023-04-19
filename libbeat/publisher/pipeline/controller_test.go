@@ -204,14 +204,11 @@ func TestInvalidQueueSettingsRevertsToDefault(t *testing.T) {
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	controller := outputController{
-		queueSettings: "This is not a queue settings object",
+		queueSettings: memqueue.Settings{Events: 1},
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},
 		observer: nilObserver,
-		monitors: Monitors{
-			Logger: logp.NewLogger("tests"),
-		},
 	}
 	// Send producer requests from different goroutines. They should all
 	// block, because there is no queue, but they should become unblocked
