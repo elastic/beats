@@ -18,14 +18,13 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"testing"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // This is the maximum waiting time for goroutine shutdown.
