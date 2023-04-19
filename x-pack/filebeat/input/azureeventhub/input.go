@@ -163,35 +163,15 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 	return true
 }
 
-// sanitizeMessage will replace out of place newlines and single quotes
-func sanitizeMessage(jsonStr string) []byte {
-	var result strings.Builder
-	inDoubleQuotes := false
-
-	for _, r := range jsonStr {
-		if r == '"' {
-			inDoubleQuotes = !inDoubleQuotes
-		}
-		if r == '\n' && !inDoubleQuotes {
-			continue
-		}
-		if r == '\'' && !inDoubleQuotes {
-			result.WriteRune('"')
-		} else {
-			result.WriteRune(r)
-		}
-	}
-
-	return []byte(result.String())
-}
-
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
 	// clean up the message for known issues producing a malformed JSON
-	if a.config.SanitizeMessage {
-		bMessage = sanitizeMessage(string(bMessage))
+	if a.config.SanitizeOptions != nil {
+		for _, opt := range a.config.SanitizeOptions {
+			bMessage = sanitize(string(bMessage), opt)
+		}
 	}
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)

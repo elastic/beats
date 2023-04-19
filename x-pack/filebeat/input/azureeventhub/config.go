@@ -27,7 +27,10 @@ type azureInputConfig struct {
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// option to cleanup the input for known issues which might produce a malformed JSON
-	SanitizeMessage bool `config:"sanitize_message"`
+	// SanitizeNewLineMessage bool `config:"sanitize_message"`
+	// SanitizeSingleQuotesMessage bool `config:"sanitize_message"`
+	SanitizeOptions []string `config:"sanitize_options"`
+	// NEW_LINE, SINGLE_QUOTE
 }
 
 const ephContainerName = "filebeat"

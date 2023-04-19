@@ -180,29 +180,3 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	o.cond.Broadcast()
 	return o.done
 }
-
-func TestSanitizeMessage(t *testing.T) {
-	msg := "{\"records\":[{'test':\"this is some message\", \n \"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is '2nd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is '2nd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is '3rd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"time\": \"2023-04-11T13:35:20Z\", \"resourceId\": \"/SUBSCRIPTIONS/REDACTED/RESOURCEGROUPS/ELASTIC-FUNCTION-TEST/PROVIDERS/MICROSOFT.WEB/SITES/REDACTED\", \"category\": \"FunctionAppLogs\", \"operationName\": \"Microsoft.Web/sites/functions/log\", \"level\": \"Informational\", \"location\": \"West Europe\", \"properties\": {'appName':'REDACTED','roleInstance':'REDACTED','message':'Elastic Test Function Trigger. ---- West Europe West Europe West Europe West Europe West Europe ','category':'Function.HttpTriggerJava.User','hostVersion':'4.16.5.5','functionInvocationId':'REDACTED','functionName':'HttpTriggerJava','hostInstanceId':'REDACTED','level':'Information','levelId':2,'processId':62}}]}"
-	msgs := []string{
-		"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-		"{\"test\":\"this is '2nd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-		"{\"test\":\"this is '2nd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-		"{\"test\":\"this is '3rd' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-		"{\"category\":\"FunctionAppLogs\",\"level\":\"Informational\",\"location\":\"West Europe\",\"operationName\":\"Microsoft.Web/sites/functions/log\",\"properties\":{\"appName\":\"REDACTED\",\"category\":\"Function.HttpTriggerJava.User\",\"functionInvocationId\":\"REDACTED\",\"functionName\":\"HttpTriggerJava\",\"hostInstanceId\":\"REDACTED\",\"hostVersion\":\"4.16.5.5\",\"level\":\"Information\",\"levelId\":2,\"message\":\"Elastic Test Function Trigger. ---- West Europe West Europe West Europe West Europe West Europe \",\"processId\":62,\"roleInstance\":\"REDACTED\"},\"resourceId\":\"/SUBSCRIPTIONS/REDACTED/RESOURCEGROUPS/ELASTIC-FUNCTION-TEST/PROVIDERS/MICROSOFT.WEB/SITES/REDACTED\",\"time\":\"2023-04-11T13:35:20Z\"}",
-	}
-
-	input := azureInput{log: logp.NewLogger(fmt.Sprintf("%s test for input", inputName))}
-	input.config.SanitizeMessage = true
-	messages := input.parseMultipleMessages([]byte(msg))
-
-	assert.NotNil(t, messages)
-	assert.Equal(t, len(messages), 5)
-
-	for _, ms := range messages {
-		assert.Contains(t, msgs, ms)
-	}
-}
