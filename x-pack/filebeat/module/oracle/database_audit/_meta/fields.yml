@@ -8,6 +8,31 @@
       description: >
         System privilege used to execute the action.
 
+    - name: logoff_pread
+      type: integer
+      description: >
+        Physical reads for the session.
+
+    - name: logoff_lread
+      type: integer
+      description: >
+        Logical reads for the session.
+
+    - name: logoff_lwrite
+      type: integer
+      description: >
+        Logical writes for the session.
+
+    - name: logoff_dead
+      type: integer
+      description: >
+        Deadlocks detected during the session.
+
+    - name: sessioncpu
+      type: integer
+      description: >
+        Amount of CPU time used by each Oracle session.
+
     - name: returncode
       type: integer
       description: >
