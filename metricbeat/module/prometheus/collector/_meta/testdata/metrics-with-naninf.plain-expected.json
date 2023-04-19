@@ -43,6 +43,7 @@
                 "go_gc_duration_seconds_count": 13118,
                 "go_gc_duration_seconds_sum": 3.451780079,
                 "http_request_duration_seconds_count": 3,
+<<<<<<< HEAD
                 "http_request_duration_seconds_sum": 6
             }
         },
@@ -69,6 +70,10 @@
             },
             "metrics": {
                 "kafka_consumer_records_lag_records": 5
+=======
+                "http_request_duration_seconds_sum": 6,
+                "up": 1
+>>>>>>> 3255e53aa4 ([Prometheus] Add up metric to the document with the same set of labels (#35117))
             }
         },
         "service": {
