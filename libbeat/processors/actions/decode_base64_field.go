@@ -58,7 +58,7 @@ func init() {
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
-func NewDecodeBase64Field(c *cfg.C) (processors.Processor, error) {
+func NewDecodeBase64Field(c *cfg.C) (beat.Processor, error) {
 	config := base64Config{
 		IgnoreMissing: false,
 		FailOnError:   true,

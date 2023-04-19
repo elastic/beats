@@ -90,7 +90,7 @@ func (f *extractArrayProcessor) Unpack(from *conf.C) error {
 }
 
 // New builds a new extract_array processor.
-func New(c *conf.C) (processors.Processor, error) {
+func New(c *conf.C) (beat.Processor, error) {
 	p := &extractArrayProcessor{}
 	err := c.Unpack(p)
 	if err != nil {

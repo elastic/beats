@@ -131,7 +131,7 @@ type ModulesSource interface {
 	HasMetricSet(module, name string) bool
 	MetricSetRegistration(r *Register, module, name string) (MetricSetRegistration, error)
 	ModulesInfo(r *Register) string
-	ProcessorsForMetricSet(r *Register, module, name string) (*processors.Processors, error)
+	ProcessorsForMetricSet(r *Register, module, name string) (*processors.ProcessorList, error)
 }
 
 // NewRegister creates and returns a new Register.
@@ -380,7 +380,7 @@ func (r *Register) MetricSets(module string) []string {
 }
 
 // ProcessorsForMetricSet returns a list of processors defined in manifest of the registered metricset.
-func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.Processors, error) {
+func (r *Register) ProcessorsForMetricSet(module, name string) (*processors.ProcessorList, error) {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 

@@ -131,12 +131,12 @@ type InterfaceConfig struct {
 }
 
 type Flows struct {
-	Enabled       *bool                   `config:"enabled"`
-	Timeout       string                  `config:"timeout"`
-	Period        string                  `config:"period"`
-	EventMetadata mapstr.EventMetadata    `config:",inline"`
-	Processors    processors.PluginConfig `config:"processors"`
-	KeepNull      bool                    `config:"keep_null"`
+	Enabled       *bool                 `config:"enabled"`
+	Timeout       string                `config:"timeout"`
+	Period        string                `config:"period"`
+	EventMetadata mapstr.EventMetadata  `config:",inline"`
+	Processors    processors.UserConfig `config:"processors"`
+	KeepNull      bool                  `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
 	Index string `config:"index"`
 }

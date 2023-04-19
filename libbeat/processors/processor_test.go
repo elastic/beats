@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Processors {
+func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.ProcessorList {
 	list, err := MakeProcessors(t, yml)
 	if err != nil {
 		t.Fatal(err)
@@ -41,10 +41,10 @@ func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Proce
 	return list
 }
 
-func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Processors, error) {
+func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.ProcessorList, error) {
 	t.Helper()
 
-	var config processors.PluginConfig
+	var config processors.UserConfig
 	for _, processor := range yml {
 		processorCfg, err := conf.NewConfigFrom(processor)
 		if err != nil {

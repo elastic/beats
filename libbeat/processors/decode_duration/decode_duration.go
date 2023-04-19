@@ -82,7 +82,7 @@ func (u decodeDuration) String() string {
 	return "decode_duration"
 }
 
-func NewDecodeDuration(c *config.C) (processors.Processor, error) {
+func NewDecodeDuration(c *config.C) (beat.Processor, error) {
 	fc := decodeDurationConfig{}
 	err := c.Unpack(&fc)
 	if err != nil {

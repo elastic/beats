@@ -88,10 +88,10 @@ func (p *TransactionPublisher) CreateReporter(
 ) (func(beat.Event), error) {
 	// load and register the module it's fields, tags and processors settings
 	meta := struct {
-		Index      string                  `config:"index"`
-		Event      mapstr.EventMetadata    `config:",inline"`
-		Processors processors.PluginConfig `config:"processors"`
-		KeepNull   bool                    `config:"keep_null"`
+		Index      string                `config:"index"`
+		Event      mapstr.EventMetadata  `config:",inline"`
+		Processors processors.UserConfig `config:"processors"`
+		KeepNull   bool                  `config:"keep_null"`
 	}{}
 	if err := config.Unpack(&meta); err != nil {
 		return nil, err

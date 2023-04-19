@@ -48,7 +48,7 @@ func init() {
 }
 
 // CreateAddFields constructs an add_fields processor from config.
-func CreateAddFields(c *conf.C) (processors.Processor, error) {
+func CreateAddFields(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Fields mapstr.M `config:"fields" validate:"required"`
 		Target *string  `config:"target"`
@@ -68,7 +68,7 @@ func CreateAddFields(c *conf.C) (processors.Processor, error) {
 // NewAddFields creates a new processor adding the given fields to events.
 // Set `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
-func NewAddFields(fields mapstr.M, shared bool, overwrite bool) processors.Processor {
+func NewAddFields(fields mapstr.M, shared bool, overwrite bool) beat.Processor {
 	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
 
@@ -103,7 +103,7 @@ func optTarget(opt *string, def string) string {
 	return *opt
 }
 
-func makeFieldsProcessor(target string, fields mapstr.M, shared bool) processors.Processor {
+func makeFieldsProcessor(target string, fields mapstr.M, shared bool) beat.Processor {
 	if target != "" {
 		fields = mapstr.M{
 			target: fields,

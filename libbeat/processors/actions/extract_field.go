@@ -44,7 +44,7 @@ func init() {
 }
 */
 
-func NewExtractField(c *conf.C) (processors.Processor, error) {
+func NewExtractField(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Field     string `config:"field"`
 		Separator string `config:"separator"`

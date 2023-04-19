@@ -40,7 +40,7 @@ func init() {
 			checks.AllowedFields("tags", "target", "when")))
 }
 
-func createAddTags(c *conf.C) (processors.Processor, error) {
+func createAddTags(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Tags   []string `config:"tags" validate:"required"`
 		Target string   `config:"target"`
@@ -57,7 +57,7 @@ func createAddTags(c *conf.C) (processors.Processor, error) {
 // NewAddTags creates a new processor for adding tags to a field.
 // If the target field already contains tags, then the new tags will be
 // appended to the existing list of tags.
-func NewAddTags(target string, tags []string) processors.Processor {
+func NewAddTags(target string, tags []string) beat.Processor {
 	if target == "" {
 		target = mapstr.TagsKey
 	}

@@ -61,7 +61,7 @@ type addDockerMetadata struct {
 	log             *logp.Logger
 	watcher         docker.Watcher
 	fields          []string
-	sourceProcessor processors.Processor
+	sourceProcessor beat.Processor
 
 	pidFields       []string         // Field names that contain PIDs.
 	cgroups         *common.Cache    // Cache of PID (int) to cgropus (map[string]string).
@@ -73,11 +73,11 @@ type addDockerMetadata struct {
 const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
-func New(cfg *conf.C) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
@@ -98,7 +98,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	}
 
 	// Use extract_field processor to get container ID from source file path.
-	var sourceProcessor processors.Processor
+	var sourceProcessor beat.Processor
 	if config.MatchSource {
 		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",

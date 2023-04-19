@@ -47,7 +47,7 @@ type eventLogger struct {
 type eventLoggerConfig struct {
 	mapstr.EventMetadata `config:",inline"` // Fields and tags to add to events.
 
-	Processors processors.PluginConfig  `config:"processors"`
+	Processors processors.UserConfig    `config:"processors"`
 	Index      fmtstr.EventFormatString `config:"index"`
 
 	// KeepNull determines whether published events will keep null values or omit them.
@@ -205,7 +205,7 @@ runLoop:
 // processorsForConfig assembles the Processors for an eventLogger.
 func processorsForConfig(
 	beatInfo beat.Info, config eventLoggerConfig,
-) (*processors.Processors, error) {
+) (*processors.ProcessorList, error) {
 	procs := processors.NewList(nil)
 
 	// Processor order is important! The index processor, if present, must be

@@ -54,7 +54,7 @@ type networkDirectionProcessor struct {
 }
 
 // NewAddNetworkDirection constructs a new network direction processor.
-func NewAddNetworkDirection(cfg *conf.C) (processors.Processor, error) {
+func NewAddNetworkDirection(cfg *conf.C) (beat.Processor, error) {
 	networkDirection := &networkDirectionProcessor{}
 	if err := cfg.Unpack(networkDirection); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the add_network_direction configuration")

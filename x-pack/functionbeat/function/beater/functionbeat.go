@@ -144,7 +144,7 @@ func isOutputSupported(name string) bool {
 }
 
 type fnExtraConfig struct {
-	Processors processors.PluginConfig `config:"processors"`
+	Processors processors.UserConfig `config:"processors"`
 
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`

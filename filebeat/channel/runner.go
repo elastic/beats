@@ -40,9 +40,9 @@ type onCreateWrapper func(cfgfile.RunnerFactory, beat.PipelineConnector, *conf.C
 // for the publisher pipeline.
 type commonInputConfig struct {
 	// event processing
-	mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to events.
-	Processors           processors.PluginConfig `config:"processors"`
-	KeepNull             bool                    `config:"keep_null"`
+	mapstr.EventMetadata `config:",inline"`    // Fields and tags to add to events.
+	Processors           processors.UserConfig `config:"processors"`
+	KeepNull             bool                  `config:"keep_null"`
 
 	PublisherPipeline struct {
 		DisableHost bool `config:"disable_host"` // Disable addition of host.name.
@@ -134,7 +134,7 @@ func newCommonConfigEditor(
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		var indexProcessor processors.Processor
+		var indexProcessor beat.Processor
 		if !config.Index.IsEmpty() {
 			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
 			timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)

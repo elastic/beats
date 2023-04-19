@@ -67,7 +67,7 @@ func init() {
 }
 
 // NewDecodeCSVField construct a new decode_csv_field processor.
-func NewDecodeCSVField(c *config.C) (processors.Processor, error) {
+func NewDecodeCSVField(c *config.C) (beat.Processor, error) {
 	config := defaultCSVConfig
 
 	err := c.Unpack(&config)

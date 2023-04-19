@@ -57,7 +57,7 @@ func init() {
 }
 
 // NewRenameFields returns a new rename processor.
-func NewRenameFields(c *conf.C) (processors.Processor, error) {
+func NewRenameFields(c *conf.C) (beat.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

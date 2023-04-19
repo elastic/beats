@@ -58,7 +58,7 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *c.C) (processors.Processor, error) {
+func new(cfg *c.C) (beat.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "could not unpack processor configuration")

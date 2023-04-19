@@ -53,7 +53,7 @@ func init() {
 }
 
 // NewCopyFields returns a new copy_fields processor.
-func NewCopyFields(c *conf.C) (processors.Processor, error) {
+func NewCopyFields(c *conf.C) (beat.Processor, error) {
 	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

@@ -30,8 +30,8 @@ import (
 // Config object for loading a pipeline instance via Load.
 type Config struct {
 	// Event processing configurations
-	mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
-	Processors           processors.PluginConfig `config:"processors"`
+	mapstr.EventMetadata `config:",inline"`    // Fields and tags to add to each event.
+	Processors           processors.UserConfig `config:"processors"`
 
 	// Event queue
 	Queue config.Namespace `config:"queue"`

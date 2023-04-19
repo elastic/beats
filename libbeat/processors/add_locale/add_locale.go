@@ -58,7 +58,7 @@ func init() {
 }
 
 // New constructs a new add_locale processor.
-func New(c *config.C) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{

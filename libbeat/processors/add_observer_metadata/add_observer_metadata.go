@@ -55,7 +55,7 @@ const (
 )
 
 // New creates a new instance of the add_observer_metadata processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)

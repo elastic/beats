@@ -58,7 +58,7 @@ type processor struct {
 //
 // Other IP-borne protocols:
 // IP src / IP dst / IP proto
-func New(cfg *cfg.C) (processors.Processor, error) {
+func New(cfg *cfg.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")

@@ -60,7 +60,7 @@ type initData struct {
 }
 
 // New constructs a new add_cloud_metadata processor.
-func New(c *cfg.C) (processors.Processor, error) {
+func New(c *cfg.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
 		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")

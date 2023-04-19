@@ -52,7 +52,7 @@ type processor struct {
 }
 
 // New constructs a new DNS processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, errors.Wrap(err, "fail to unpack the dns configuration")

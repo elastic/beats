@@ -24,14 +24,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// PluginConfig represents the list of processors.
-type PluginConfig []*config.C
+// UserConfig represents the list of processors given in beat configuration.
+type UserConfig []*config.C
 
 // MandatoryExportedFields are fields that should be always exported
 var MandatoryExportedFields = []string{"type"}
 
 // NewPluginConfigFromList creates a PluginConfig from a list of raw processor config objects
-func NewPluginConfigFromList(raw []mapstr.M) (PluginConfig, error) {
+func NewPluginConfigFromList(raw []mapstr.M) (UserConfig, error) {
 	processors := make([]*config.C, len(raw))
 	for i := 0; i < len(raw); i++ {
 		cfg, err := config.NewConfigFrom(raw[i])

@@ -59,7 +59,7 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *conf.C) (processors.Processor, error) {
+func NewReplaceString(c *conf.C) (beat.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

@@ -81,7 +81,7 @@ func newGroup(title string, log *logp.Logger) *group {
 	}
 }
 
-func (p *group) add(processor processors.Processor) {
+func (p *group) add(processor beat.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
 	}

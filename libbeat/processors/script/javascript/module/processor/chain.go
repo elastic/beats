@@ -21,6 +21,7 @@ import (
 	"github.com/dop251/goja"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -130,7 +131,7 @@ func (p *jsProcessor) run(event javascript.Event) error {
 
 // nativeProcessor is a normal Beat processor.
 type nativeProcessor struct {
-	processors.Processor
+	beat.Processor
 }
 
 func newNativeProcessor(constructor processors.Constructor, call gojaCall) (processor, error) {

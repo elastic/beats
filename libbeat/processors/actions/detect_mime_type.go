@@ -42,7 +42,7 @@ type mimeTypeProcessor struct {
 }
 
 // NewDetectMimeType constructs a new mime processor.
-func NewDetectMimeType(cfg *conf.C) (processors.Processor, error) {
+func NewDetectMimeType(cfg *conf.C) (beat.Processor, error) {
 	mimeType := &mimeTypeProcessor{}
 	if err := cfg.Unpack(mimeType); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the detect_mime_type configuration")

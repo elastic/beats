@@ -50,7 +50,7 @@ var withECSVersion = processing.WithFields(mapstr.M{
 var RootCmd *cmd.BeatsRootCmd
 
 // PacketbeatSettings contains the default settings for packetbeat
-func PacketbeatSettings(globals processors.PluginConfig) instance.Settings {
+func PacketbeatSettings(globals processors.UserConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))

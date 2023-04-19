@@ -22,6 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -35,7 +36,7 @@ func init() {
 }
 
 // New constructs a new script processor.
-func New(c *config.C) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	var config = struct {
 		Lang string `config:"lang" validate:"required"`
 	}{}

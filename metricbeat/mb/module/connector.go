@@ -32,14 +32,14 @@ import (
 // to the publisher pipeline.
 type Connector struct {
 	pipeline   beat.PipelineConnector
-	processors *processors.Processors
+	processors *processors.ProcessorList
 	eventMeta  mapstr.EventMetadata
 	timeSeries bool
 	keepNull   bool
 }
 
 type connectorConfig struct {
-	Processors processors.PluginConfig `config:"processors"`
+	Processors processors.UserConfig `config:"processors"`
 	// ES output index pattern
 	Index fmtstr.EventFormatString `config:"index"`
 
@@ -50,7 +50,7 @@ type connectorConfig struct {
 }
 
 type metricSetRegister interface {
-	ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error)
+	ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.ProcessorList, error)
 }
 
 func NewConnector(
@@ -110,7 +110,7 @@ func (c *Connector) Connect() (beat.Client, error) {
 // processorsForConfig assembles the Processors for a Connector.
 func processorsForConfig(
 	beatInfo beat.Info, config connectorConfig,
-) (*processors.Processors, error) {
+) (*processors.ProcessorList, error) {
 	procs := processors.NewList(nil)
 
 	// Processor order is important! The index processor, if present, must be

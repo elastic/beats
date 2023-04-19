@@ -32,7 +32,7 @@ import (
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg *config.C) (Processor, error) {
+	return func(cfg *config.C) (beat.Processor, error) {
 		rule, err := ruleFactory(cfg)
 		if err != nil {
 			return nil, err
@@ -59,14 +59,14 @@ func NewConditionList(configs []conditions.Config) ([]conditions.Condition, erro
 // WhenProcessor is a tuple of condition plus a Processor.
 type WhenProcessor struct {
 	condition conditions.Condition
-	p         Processor
+	p         beat.Processor
 }
 
 // NewConditionRule returns a processor that will execute the provided processor if the condition is true.
 func NewConditionRule(
 	c conditions.Config,
-	p Processor,
-) (Processor, error) {
+	p beat.Processor,
+) (beat.Processor, error) {
 	cond, err := conditions.NewCondition(&c)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize condition")
@@ -92,8 +92,8 @@ func (r *WhenProcessor) String() string {
 
 func addCondition(
 	cfg *config.C,
-	p Processor,
-) (Processor, error) {
+	p beat.Processor,
+) (beat.Processor, error) {
 	if !cfg.HasField("when") {
 		return p, nil
 	}
@@ -120,8 +120,8 @@ type ifThenElseConfig struct {
 // true and another set of processors (else) if the condition is false.
 type IfThenElseProcessor struct {
 	cond conditions.Condition
-	then *Processors
-	els  *Processors
+	then *ProcessorList
+	els  *ProcessorList
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
@@ -136,7 +136,7 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 		return nil, err
 	}
 
-	newProcessors := func(c *config.C) (*Processors, error) {
+	newProcessors := func(c *config.C) (*ProcessorList, error) {
 		if c == nil {
 			return nil, nil
 		}
@@ -144,14 +144,14 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 			return New([]*config.C{c})
 		}
 
-		var pc PluginConfig
+		var pc UserConfig
 		if err := c.Unpack(&pc); err != nil {
 			return nil, err
 		}
 		return New(pc)
 	}
 
-	var ifProcessors, elseProcessors *Processors
+	var ifProcessors, elseProcessors *ProcessorList
 	if ifProcessors, err = newProcessors(c.Then); err != nil {
 		return nil, err
 	}

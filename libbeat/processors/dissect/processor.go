@@ -41,7 +41,7 @@ func init() {
 }
 
 // NewProcessor constructs a new dissect processor.
-func NewProcessor(c *cfg.C) (processors.Processor, error) {
+func NewProcessor(c *cfg.C) (beat.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {

@@ -53,7 +53,7 @@ func init() {
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
-func NewDecompressGzipFields(c *conf.C) (processors.Processor, error) {
+func NewDecompressGzipFields(c *conf.C) (beat.Processor, error) {
 	config := decompressGzipFieldConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,

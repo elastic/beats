@@ -41,7 +41,7 @@ func init() {
 			checks.AllowedFields("fields", "when")))
 }
 
-func newIncludeFields(c *conf.C) (processors.Processor, error) {
+func newIncludeFields(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}

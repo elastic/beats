@@ -146,7 +146,7 @@ func functionConfigFromString(s string) (fnExtraConfig, error) {
 }
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
-func makeProcessors(procs ...processors.Processor) *processors.Processors {
+func makeProcessors(procs ...beat.Processor) *processors.ProcessorList {
 	procList := processors.NewList(nil)
 	procList.List = procs
 	return procList

@@ -63,7 +63,7 @@ func init() {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *config.C) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {
@@ -73,7 +73,7 @@ func New(c *config.C) (processors.Processor, error) {
 	return newDecodeXML(config)
 }
 
-func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
+func newDecodeXML(config decodeXMLConfig) (beat.Processor, error) {
 	// Default target to overwriting field.
 	if config.Target == nil {
 		config.Target = &config.Field

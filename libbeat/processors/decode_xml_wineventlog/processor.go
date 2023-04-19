@@ -68,7 +68,7 @@ type decoder interface {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *conf.C) (processors.Processor, error) {
+func New(c *conf.C) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {
@@ -78,7 +78,7 @@ func New(c *conf.C) (processors.Processor, error) {
 	return newProcessor(config)
 }
 
-func newProcessor(config config) (processors.Processor, error) {
+func newProcessor(config config) (beat.Processor, error) {
 	cfgwarn.Experimental("The " + procName + " processor is experimental.")
 
 	return &processor{
