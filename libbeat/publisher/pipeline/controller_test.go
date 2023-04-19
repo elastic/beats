@@ -76,13 +76,16 @@ func TestOutputReload(t *testing.T) {
 				require.NoError(t, err)
 				defer pipeline.Close()
 
-				pipelineClient, err := pipeline.Connect()
-				require.NoError(t, err)
-				defer pipelineClient.Close()
-
 				var wg sync.WaitGroup
 				wg.Add(1)
 				go func() {
+					// Our initial pipeline has no outputs set, so we need
+					// to create the client in a goroutine since any
+					// Connect calls will block until the pipeline has an
+					// output.
+					pipelineClient, err := pipeline.Connect()
+					require.NoError(t, err)
+					defer pipelineClient.Close()
 					for i := uint(0); i < numEventsToPublish; i++ {
 						pipelineClient.Publish(beat.Event{})
 					}
