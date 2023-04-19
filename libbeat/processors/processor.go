@@ -134,7 +134,7 @@ func (procs *ProcessorList) AddProcessors(p ProcessorList) {
 	// backwards compatibility.
 	// We are unhappy about this and have plans to fix this inconsistency at a
 	// higher level, but for now we need to respect the existing semantics.
-	procs.List = append(procs.List, p.All()...)
+	procs.List = append(procs.List, p.List...)
 }
 
 func (procs *ProcessorList) All() []beat.Processor {
