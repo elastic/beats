@@ -135,7 +135,7 @@ type ClientListener interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 
-	Published()             // event has been successfully forwarded to the publisher pipeline
+	Published()             // event has successfully entered the queue
 	FilteredOut(Event)      // event has been filtered out/dropped by processors
 	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
