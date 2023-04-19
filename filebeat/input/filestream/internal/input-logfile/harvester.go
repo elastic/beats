@@ -123,7 +123,7 @@ type HarvesterGroup interface {
 	Continue(ctx inputv2.Context, previous, next Source)
 	// Stop cancels the reader of a given Source.
 	Stop(Source)
-	// StopGroup cancels all running Harvesters.
+	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
 }
 
