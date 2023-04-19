@@ -18,8 +18,8 @@ func TestNewGroup(t *testing.T) {
 	p := NewGroup(10, 10)
 	require.NotNil(t, p, "NewGroup returned a nil group, it cannot be nil")
 
-	assert.Equal(t, 10, p.limit)
-	assert.Equal(t, 10, p.errsSize)
+	assert.Equal(t, uint64(10), p.limit)
+	assert.Equal(t, uint64(10), p.errsSize)
 }
 
 func TestGroup_Go(t *testing.T) {
