@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processors"
@@ -142,23 +141,6 @@ func (procs *Processors) AddProcessors(p Processors) {
 	// We are unhappy about this and have plans to fix this inconsistency at a
 	// higher level, but for now we need to respect the existing semantics.
 	procs.List = append(procs.List, p.List...)
-}
-
-// RunBC (run backwards-compatible) applies the processors, by providing the
-// old interface based on mapstr.M.
-// The event us temporarily converted to beat.Event. By this 'conversion' the
-// '@timestamp' field can not be accessed by processors.
-// Note: this method will be removed, when the publisher pipeline BC-API is to
-// be removed.
-func (procs *Processors) RunBC(event mapstr.M) mapstr.M {
-	ret, err := procs.Run(&beat.Event{Fields: event})
-	if err != nil {
-		procs.log.Debugw("Error in processor pipeline", "error", err)
-	}
-	if ret == nil {
-		return nil
-	}
-	return ret.Fields
 }
 
 func (procs *Processors) All() []beat.Processor {
