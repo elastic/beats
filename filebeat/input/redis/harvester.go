@@ -158,7 +158,8 @@ func (h *Harvester) Run() error {
 					"event": common.MapStr{
 						"created": time.Now(),
 					},
-				}},
+				}.String(),
+			},
 		}
 
 		h.forwarder.Send(data)
