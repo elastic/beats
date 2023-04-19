@@ -18,15 +18,14 @@
 package processors
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const logName = "processors"
@@ -78,14 +77,14 @@ func New(config PluginConfig) (*Processors, error) {
 		if procConfig.HasField("if") {
 			p, err := NewIfElseThenProcessor(procConfig)
 			if err != nil {
-				return nil, errors.Wrap(err, "failed to make if/then/else processor")
+				return nil, fmt.Errorf("failed to make if/then/else processor: %w", err)
 			}
 			procs.AddProcessor(p)
 			continue
 		}
 
 		if len(procConfig.GetFields()) != 1 {
-			return nil, errors.Errorf("each processor must have exactly one "+
+			return nil, fmt.Errorf("each processor must have exactly one "+
 				"action, but found %d actions (%v)",
 				len(procConfig.GetFields()),
 				strings.Join(procConfig.GetFields(), ","))
@@ -104,7 +103,7 @@ func New(config PluginConfig) (*Processors, error) {
 				validActions = append(validActions, k)
 
 			}
-			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
+			return nil, fmt.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
 		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
@@ -144,23 +143,6 @@ func (procs *Processors) AddProcessors(p Processors) {
 	procs.List = append(procs.List, p.List...)
 }
 
-// RunBC (run backwards-compatible) applies the processors, by providing the
-// old interface based on mapstr.M.
-// The event us temporarily converted to beat.Event. By this 'conversion' the
-// '@timestamp' field can not be accessed by processors.
-// Note: this method will be removed, when the publisher pipeline BC-API is to
-// be removed.
-func (procs *Processors) RunBC(event mapstr.M) mapstr.M {
-	ret, err := procs.Run(&beat.Event{Fields: event})
-	if err != nil {
-		procs.log.Debugw("Error in processor pipeline", "error", err)
-	}
-	if ret == nil {
-		return nil
-	}
-	return ret.Fields
-}
-
 func (procs *Processors) All() []beat.Processor {
 	if procs == nil || len(procs.List) == 0 {
 		return nil
@@ -192,7 +174,7 @@ func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	for _, p := range procs.List {
 		event, err = p.Run(event)
 		if err != nil {
-			return event, errors.Wrapf(err, "failed applying processor %v", p)
+			return event, fmt.Errorf("failed applying processor %v: %w", p, err)
 		}
 		if event == nil {
 			// Drop.
