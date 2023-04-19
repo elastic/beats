@@ -18,6 +18,7 @@
 package v2
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -77,23 +78,12 @@ func (l *Loader) Init(group unison.Group, mode Mode) error {
 // matching plugin. If a plugin is found, the plugin it's InputManager is used to create
 // the input.
 // Returns a LoadError if the input name can not be read from the config or if
-// the type does not exist. Error values for Ccnfiguration errors do depend on
+// the type does not exist. Error values for Configuration errors do depend on
 // the InputManager.
 func (l *Loader) Configure(cfg *conf.C) (Input, error) {
-	name, err := cfg.String(l.typeField, -1)
+	name, p, input, err := l.loadFromCfg(cfg)
 	if err != nil {
-		if l.defaultType == "" {
-			return nil, &LoadError{
-				Reason:  ErrNoInputConfigured,
-				Message: fmt.Sprintf("%v setting is missing", l.typeField),
-			}
-		}
-		name = l.defaultType
-	}
-
-	p, exists := l.registry[name]
-	if !exists {
-		return nil, &LoadError{Name: name, Reason: ErrUnknownInput}
+		return input, err
 	}
 
 	log := l.log.With("input", name, "stability", p.Stability, "deprecated", p.Deprecated)
@@ -108,6 +98,39 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 	}
 
 	return p.Manager.Create(cfg)
+}
+
+func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
+	name, err := cfg.String(l.typeField, -1)
+	if err != nil {
+		if l.defaultType == "" {
+			return "", Plugin{}, nil, &LoadError{
+				Reason:  ErrNoInputConfigured,
+				Message: fmt.Sprintf("%v setting is missing", l.typeField),
+			}
+		}
+		name = l.defaultType
+	}
+
+	p, exists := l.registry[name]
+	if !exists {
+		return "", Plugin{}, nil, &LoadError{Name: name, Reason: ErrUnknownInput}
+	}
+	return name, p, nil, nil
+}
+
+func (l *Loader) Delete(cfg *conf.C) error {
+	_, p, _, err := l.loadFromCfg(cfg)
+	if err != nil {
+		return err
+	}
+
+	pp, ok := p.Manager.(Deleter)
+	if !ok {
+		return errors.New("%T does not implement %T, input won't be deleted")
+	}
+
+	return pp.Delete(cfg)
 }
 
 // validatePlugins checks if there are multiple plugins with the same name in

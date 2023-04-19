@@ -45,6 +45,10 @@ type InputManager interface {
 	Create(*conf.C) (Input, error)
 }
 
+type Deleter interface {
+	Delete(cfg *conf.C) error
+}
+
 // Mode tells the InputManager in which mode it is initialized.
 type Mode uint8
 
@@ -65,7 +69,7 @@ type Input interface {
 	// and filebeat.
 	Name() string
 
-	// Test checks the configuaration and runs additional checks if the Input can
+	// Test checks the configuration and runs additional checks if the Input can
 	// actually collect data for the given configuration (e.g. check if host/port or files are
 	// accessible).
 	Test(TestContext) error

@@ -74,7 +74,8 @@ func (f *factory) CheckConfig(cfg *conf.C) error {
 	if err != nil {
 		return err
 	}
-	return nil
+
+	return f.loader.Delete(cfg)
 }
 
 func (f *factory) Create(
