@@ -140,8 +140,8 @@ type defaultHarvesterGroup struct {
 
 // Start starts the Harvester for a Source if no Harvester is running for the
 // Source.
-// If the harvester fails to start due to ErrHarvesterLimitReached, it'll retry
-// until it succeeds or an error other than ErrHarvesterLimitReached happens.
+// If the harvester limit has been reached, the harvester will wait until it can
+// be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 
@@ -157,8 +157,8 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 
 // Restart starts the Harvester for a Source if a Harvester is already running
 // it waits for it to shut down for a specified timeout. It does not block.
-// If the harvester fails to start due to ErrHarvesterLimitReached, it'll retry
-// until it succeeds or an error other than ErrHarvesterLimitReached happens.
+// If the harvester limit has been reached, the harvester will wait until it can
+// be started. Start does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 
@@ -172,10 +172,10 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	}
 }
 
-// Start starts the harvester. if restart is true, it'll first remove the
+// startHarvester start starts the harvester. if restart is true, it'll first remove the
 // associated reader.
-// If the harvester fails to start due to ErrHarvesterLimitReached, it'll retry
-// until it succeeds or an error other than ErrHarvesterLimitReached happens.
+// startHarvester does NOT check if the harvester limit has been reached. Its caller
+// is responsible for doing so.
 func startHarvester(
 	ctx inputv2.Context,
 	hg *defaultHarvesterGroup,
@@ -200,6 +200,8 @@ func startHarvester(
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
+			// The returned may or not be collected by the caller, thus logging
+			// it here is important.
 			ctx.Logger.Errorf("error while adding new reader to the bookkeeper %v", err)
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
