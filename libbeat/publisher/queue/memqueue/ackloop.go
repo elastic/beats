@@ -65,8 +65,8 @@ func (l *ackLoop) handleBatchSig() int {
 	}
 
 	if count > 0 {
-		if listener := l.broker.ackListener; listener != nil {
-			listener.OnACK(count)
+		if callback := l.broker.ackCallback; callback != nil {
+			callback(count)
 		}
 
 		// report acks to waiting clients

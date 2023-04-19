@@ -18,13 +18,18 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // outputController manages the pipelines output capabilities, like:
@@ -36,7 +41,10 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	workQueue chan publisher.Batch
+	queueConfig queueConfig
+	queue       queue.Queue
+
+	workerChan chan publisher.Batch
 
 	consumer *eventConsumer
 	workers  []outputWorker
@@ -48,28 +56,51 @@ type outputWorker interface {
 	Close() error
 }
 
+type queueConfig struct {
+	logger      *logp.Logger
+	queueType   string
+	userConfig  *conf.C
+	ackCallback func(eventCount int)
+	inQueueSize int
+}
+
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	observer outputObserver,
-	queue queue.Queue,
-) *outputController {
-	return &outputController{
-		beat:      beat,
-		monitors:  monitors,
-		observer:  observer,
-		workQueue: make(chan publisher.Batch),
-		consumer:  newEventConsumer(monitors.Logger, queue, observer),
+	queueConfig queueConfig,
+) (*outputController, error) {
+
+	controller := &outputController{
+		beat:        beat,
+		monitors:    monitors,
+		observer:    observer,
+		queueConfig: queueConfig,
+		workerChan:  make(chan publisher.Batch),
+		consumer:    newEventConsumer(monitors.Logger, observer),
 	}
+
+	err := controller.createQueue()
+	if err != nil {
+		return nil, err
+	}
+
+	return controller, nil
 }
 
 func (c *outputController) Close() error {
 	c.consumer.close()
-	close(c.workQueue)
+	close(c.workerChan)
 
 	for _, out := range c.workers {
 		out.Close()
 	}
+
+	// Closing the queue stops ACKs from propagating, so we close everything
+	// else first to give it a chance to wait for any outstanding events to be
+	// acknowledged.
+	c.queue.Close()
+
 	return nil
 }
 
@@ -88,10 +119,10 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
 		logger := logp.NewLogger("publisher_pipeline_output")
-		c.workers[i] = makeClientWorker(c.observer, c.workQueue, client, logger, c.monitors.Tracer)
+		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
 	}
 
-	targetChan := c.workQueue
+	targetChan := c.workerChan
 	if len(clients) == 0 {
 		// If there are no output clients, we are probably still waiting
 		// for our output config from Agent via BeatV2Manager.reloadOutput.
@@ -105,6 +136,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
+			queue:      c.queue,
 			ch:         targetChan,
 			batchSize:  outGrp.BatchSize,
 			timeToLive: outGrp.Retry + 1,
@@ -114,9 +146,9 @@ func (c *outputController) Set(outGrp outputs.Group) {
 // Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
-	outFactory func(outputs.Observer, config.Namespace) (outputs.Group, error),
+	outFactory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
 ) error {
-	outCfg := config.Namespace{}
+	outCfg := conf.Namespace{}
 	if cfg != nil {
 		if err := cfg.Config.Unpack(&outCfg); err != nil {
 			return err
@@ -133,6 +165,49 @@ func (c *outputController) Reload(
 	}
 
 	c.Set(output)
+
+	return nil
+}
+
+func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
+	return c.queue.Producer(config)
+}
+
+func (c *outputController) createQueue() error {
+	config := c.queueConfig
+
+	switch config.queueType {
+	case memqueue.QueueType:
+		settings, err := memqueue.SettingsForUserConfig(config.userConfig)
+		if err != nil {
+			return err
+		}
+		// The memory queue has a special override during pipeline
+		// initialization for the size of its API channel buffer.
+		settings.InputQueueSize = config.inQueueSize
+		settings.ACKCallback = config.ackCallback
+		c.queue = memqueue.NewQueue(config.logger, settings)
+	case diskqueue.QueueType:
+		settings, err := diskqueue.SettingsForUserConfig(config.userConfig)
+		if err != nil {
+			return err
+		}
+		settings.WriteToDiskCallback = config.ackCallback
+		queue, err := diskqueue.NewQueue(config.logger, settings)
+		if err != nil {
+			return err
+		}
+		c.queue = queue
+	default:
+		return fmt.Errorf("'%v' is not a valid queue type", config.queueType)
+	}
+
+	if c.monitors.Telemetry != nil {
+		queueReg := c.monitors.Telemetry.NewRegistry("queue")
+		monitoring.NewString(queueReg, "name").Set(config.queueType)
+	}
+	maxEvents := c.queue.BufferConfig().MaxEvents
+	c.observer.queueMaxEvents(maxEvents)
 
 	return nil
 }

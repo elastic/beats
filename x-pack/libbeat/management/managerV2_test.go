@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/features"
 )
 
 func TestManagerV2(t *testing.T) {
@@ -35,6 +36,7 @@ func TestManagerV2(t *testing.T) {
 	configsSet := false
 	configsCleared := false
 	logLevelSet := false
+	fqdnEnabled := false
 	allStopped := false
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
 		if currentIdx == 1 {
@@ -67,9 +69,12 @@ func TestManagerV2(t *testing.T) {
 			logLevelSet = true
 			t.Logf("debug log level set")
 		}
+
+		fqdnEnabled = features.FQDN()
+		t.Logf("FQDN feature flag set to %v", fqdnEnabled)
 	}
 
-	srv := mockSrvWithUnits([][]*proto.UnitExpected{
+	srv := mockSrv([][]*proto.UnitExpected{
 		{
 			{
 				Id:             "output-unit",
@@ -180,7 +185,17 @@ func TestManagerV2(t *testing.T) {
 			},
 		},
 		{},
-	}, onObserved, 500*time.Millisecond)
+	},
+		[]uint64{1, 2, 2, 2},
+		[]*proto.Features{
+			nil,
+			{Fqdn: &proto.FQDNFeature{Enabled: true}},
+			nil,
+			nil,
+		},
+		onObserved,
+		500*time.Millisecond,
+	)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -202,11 +217,17 @@ func TestManagerV2(t *testing.T) {
 	defer m.Stop()
 
 	require.Eventually(t, func() bool {
-		return configsSet && configsCleared && logLevelSet && allStopped
+		return configsSet && configsCleared && logLevelSet && fqdnEnabled && allStopped
 	}, 15*time.Second, 300*time.Millisecond)
 }
 
-func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*proto.CheckinObserved, int), delay time.Duration) *mock.StubServerV2 {
+func mockSrv(
+	units [][]*proto.UnitExpected,
+	featuresIdxs []uint64,
+	features []*proto.Features,
+	observedCallback func(*proto.CheckinObserved, int),
+	delay time.Duration,
+) *mock.StubServerV2 {
 	i := 0
 	agentInfo := &proto.CheckinAgentInfo{
 		Id:       "elastic-agent-id",
@@ -218,27 +239,31 @@ func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*prot
 			if observedCallback != nil {
 				observedCallback(observed, i)
 			}
-			matches := doesStateMatch(observed, units[i])
+			matches := doesStateMatch(observed, units[i], featuresIdxs[i])
 			if !matches {
-				// send same set of units
+				// send same set of units and features
 				return &proto.CheckinExpected{
-					AgentInfo: agentInfo,
-					Units:     units[i],
+					AgentInfo:   agentInfo,
+					Units:       units[i],
+					Features:    features[i],
+					FeaturesIdx: featuresIdxs[i],
 				}
 			}
 			// delay sending next expected based on delay
 			if delay > 0 {
 				<-time.After(delay)
 			}
-			// send next set of units
+			// send next set of units and features
 			i += 1
 			if i >= len(units) {
 				// stay on last index
 				i = len(units) - 1
 			}
 			return &proto.CheckinExpected{
-				AgentInfo: agentInfo,
-				Units:     units[i],
+				AgentInfo:   agentInfo,
+				Units:       units[i],
+				Features:    features[i],
+				FeaturesIdx: featuresIdxs[i],
 			}
 		},
 		ActionImpl: func(response *proto.ActionResponse) error {
@@ -249,12 +274,16 @@ func mockSrvWithUnits(units [][]*proto.UnitExpected, observedCallback func(*prot
 	}
 }
 
-func doesStateMatch(observed *proto.CheckinObserved, expected []*proto.UnitExpected) bool {
-	if len(observed.Units) != len(expected) {
+func doesStateMatch(
+	observed *proto.CheckinObserved,
+	expectedUnits []*proto.UnitExpected,
+	expectedFeaturesIdx uint64,
+) bool {
+	if len(observed.Units) != len(expectedUnits) {
 		return false
 	}
 	expectedMap := make(map[unitKey]*proto.UnitExpected)
-	for _, exp := range expected {
+	for _, exp := range expectedUnits {
 		expectedMap[unitKey{client.UnitType(exp.Type), exp.Id}] = exp
 	}
 	for _, unit := range observed.Units {
@@ -266,6 +295,11 @@ func doesStateMatch(observed *proto.CheckinObserved, expected []*proto.UnitExpec
 			return false
 		}
 	}
+
+	if observed.FeaturesIdx != expectedFeaturesIdx {
+		return false
+	}
+
 	return true
 }
 

@@ -24,12 +24,13 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
+
+// The string used to specify this queue in beats configurations.
+const QueueType = "disk"
 
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
@@ -99,29 +100,6 @@ type metricsRequest struct {
 // metrics response from the disk queue
 type metricsRequestResponse struct {
 	sizeOnDisk uint64
-}
-
-func init() {
-	queue.RegisterQueueType(
-		"disk",
-		queueFactory,
-		feature.MakeDetails(
-			"Disk queue",
-			"Buffer events on disk before sending to the output.",
-			feature.Stable))
-}
-
-// queueFactory matches the queue.Factory interface, and is used to add the
-// disk queue to the registry.
-func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
-) (queue.Queue, error) {
-	settings, err := SettingsForUserConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("disk queue couldn't load user config: %w", err)
-	}
-	settings.WriteToDiskListener = ackListener
-	return NewQueue(logger, settings)
 }
 
 // NewQueue returns a disk-based queue configured with the given logger

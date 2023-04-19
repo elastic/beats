@@ -52,6 +52,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -81,9 +82,9 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Beat provides the runnable and configurable instance of a beat.
@@ -95,7 +96,7 @@ type Beat struct {
 	IdxSupporter idxmgmt.Supporter
 
 	keystore   keystore.Keystore
-	processing processing.Supporter
+	processors processing.Supporter
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 
@@ -113,7 +114,8 @@ type beatConfig struct {
 	MaxProcs  int    `config:"max_procs"`
 	GCPercent int    `config:"gc_percent"`
 
-	Seccomp *config.C `config:"seccomp"`
+	Seccomp  *config.C `config:"seccomp"`
+	Features *config.C `config:"features"`
 
 	// beat internal components configurations
 	HTTP            *config.C              `config:"http"`
@@ -327,7 +329,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
-	b.checkElasticsearchVersion()
+	err = b.registerESVersionCheckCallback()
+	if err != nil {
+		return nil, err
+	}
 
 	err = b.registerESIndexManagement()
 	if err != nil {
@@ -371,16 +376,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
-		WaitClose:      0,
-		WaitCloseMode:  pipeline.NoWaitOnClose,
-		Processors:     b.processing,
+		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
-	if settings.InputQueueSize > 0 {
-		publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
-	} else {
-		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
-	}
+	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
@@ -407,7 +406,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
 	defer func() {
-		if err := b.processing.Close(); err != nil {
+		if err := b.processors.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
 		}
 	}()
@@ -543,7 +542,6 @@ func (b *Beat) registerMetrics() {
 	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
 	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
 	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(infoRegistry, "hostname").Set(b.Info.Hostname)
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
 	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
@@ -576,9 +574,18 @@ func (b *Beat) registerMetrics() {
 	// state.beat
 	beatRegistry := stateRegistry.NewRegistry("beat")
 	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+}
+
+func (b *Beat) RegisterHostname(useFQDN bool) {
+	hostname := b.Info.FQDNAwareHostname(useFQDN)
+
+	// info.hostname
+	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
+	monitoring.NewString(infoRegistry, "hostname").Set(hostname)
 
 	// state.host
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
+	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -605,9 +612,9 @@ type SetupSettings struct {
 	Dashboard       bool
 	Pipeline        bool
 	IndexManagement bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	Template bool
-	//Deprecated: use IndexManagementKey instead
+	// Deprecated: use IndexManagementKey instead
 	ILMPolicy         bool
 	EnableAllFilesets bool
 }
@@ -749,6 +756,11 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
+		return fmt.Errorf("could not parse features: %w", err)
+	}
+	b.RegisterHostname(features.FQDN())
+
 	b.Beat.Config = &b.Config.BeatConfig
 
 	if name := b.Config.Name; name != "" {
@@ -774,8 +786,24 @@ func (b *Beat) configure(settings Settings) error {
 
 	logp.Info("Beat ID: %v", b.Info.ID)
 
+	// Try to get the host's FQDN and set it.
+	h, err := sysinfo.Host()
+	if err != nil {
+		return fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	fqdn, err := h.FQDN()
+	if err != nil {
+		// FQDN lookup is "best effort".  We log the error, fallback to
+		// the OS-reported hostname, and move on.
+		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		b.Info.FQDN = b.Info.Hostname
+	} else {
+		b.Info.FQDN = fqdn
+	}
+
 	// initialize config manager
-	b.Manager, err = management.Factory(b.Config.Management)(b.Config.Management, reload.RegisterV2, b.Beat.Info.ID)
+	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
 		return err
 	}
@@ -811,9 +839,26 @@ func (b *Beat) configure(settings Settings) error {
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
-	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	b.processors, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+
+	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
+		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
 
 	return err
+}
+
+// agentDiagnosticHook is the callback function sent to the agent manager RegisterDiagnosticHook function
+// right now, this only returns information on the global processors; however, in the future, we might find it useful
+// to expand this to other components of the beat state.
+// To anyone refactoring: be careful to make sure the callback is registered after the global processors are initialized
+func (b *Beat) agentDiagnosticHook() []byte {
+	list := b.processors.Processors()
+
+	var debugBytes []byte
+	for _, proc := range list {
+		debugBytes = append(debugBytes, []byte(proc+"\n")...)
+	}
+	return debugBytes
 }
 
 func (b *Beat) loadMeta(metaPath string) error {
@@ -950,15 +995,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
-// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// registerESVersionCheckCallback registers a global callback to make sure ES instance we are connecting
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
-func (b *Beat) checkElasticsearchVersion() {
-	if b.isConnectionToOlderVersionAllowed() {
-		return
-	}
+func (b *Beat) registerESVersionCheckCallback() error {
+	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		if !isElasticsearchOutput(b.Config.Output.Name()) {
+			return errors.New("Elasticsearch output is not configured")
+		}
+		if b.isConnectionToOlderVersionAllowed() {
+			return nil
+		}
 
-	_, _ = elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
@@ -969,6 +1017,8 @@ func (b *Beat) checkElasticsearchVersion() {
 		}
 		return nil
 	})
+
+	return err
 }
 
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
@@ -1004,13 +1054,28 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 }
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
-	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
+		if update == nil {
+			return nil
+		}
+
 		if b.OutputConfigReloader != nil {
-			if err := b.OutputConfigReloader.Reload(config); err != nil {
+			if err := b.OutputConfigReloader.Reload(update); err != nil {
 				return err
 			}
 		}
-		return outReloader.Reload(config, b.createOutput)
+
+		// we need to update the output configuration because
+		// some callbacks are relying on it to be up to date.
+		// e.g. the Elasticsearch version validation
+		if update.Config != nil {
+			err := b.Config.Output.Unpack(update.Config)
+			if err != nil {
+				return err
+			}
+		}
+
+		return outReloader.Reload(update, b.createOutput)
 	})
 }
 

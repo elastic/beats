@@ -176,7 +176,7 @@ As noted above the `cel` input provides function, macro and global variables to 
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-Parse_Query[Parse Query]
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-Format_Query[Format Query]
 
-* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#File[File] — the file extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#NDJSON["application/x-ndjson"] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#Zip["application/zip"].
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#File[File] — the file extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#NDJSON["application/x-ndjson"], https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#Zip["application/zip"], https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#CSVNoHeader["text/csv; header=absent"], and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#CSVHeader["text/csv; header=present"].
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-Encode_JSON[Encode JSON]
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-Decode_JSON[Decode JSON]
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-Decode_JSON_Stream[Decode JSON Stream]
@@ -184,7 +184,7 @@ As noted above the `cel` input provides function, macro and global variables to 
 * https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#Limit[Limit] — the rate limit extension is initialized with https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#OktaRateLimit[Okta (as "okta")] and the https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#DraftRateLimit[Draft Rate Limit (as "draft")] policies.
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-Rate_Limit[Rate Limit]
 
-* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#MIME[MIME] — the MIME extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#NDJSON["application/x-ndjson"] and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#Zip["application/zip"].
+* https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#MIME[MIME] — the MIME extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#NDJSON["application/x-ndjson"], https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#Zip["application/zip"], https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#CSVNoHeader["text/csv; header=absent"], and https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#CSVHeader["text/csv; header=present"].
 ** https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#hdr-MIME[MIME]
 
 * https://pkg.go.dev/github.com/elastic/mito@v0.0.0-20230302005114-1dda06e81678/lib#Regexp[Regexp] — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
@@ -271,7 +271,7 @@ Duration between repeated requests. It may make additional pagination requests i
 
 [[program-cel]]
 [float]
-=== `program`
+==== `program`
 
 The CEL program that is executed each polling period. This field is required.
 
@@ -308,7 +308,7 @@ filebeat.inputs:
 
 [[regexp-cel]]
 [float]
-=== `regexp`
+==== `regexp`
 
 A set of named regular expressions that may be used during a CEL program's execution using the `regexp` extension library. The syntax used for the regular expressions is https://github.com/google/re2/wiki/Syntax[RE2].
 
@@ -561,6 +561,9 @@ It is possible to log HTTP requests and responses in a CEL program to a local fi
 This option is enabled by setting the `resource.tracer.filename` value. Additional options are available to
 tune log rotation behavior.
 
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
+For Example, `http-request-trace-*.ndjson`.
+
 Enabling this option compromises security and should only be used for debugging.
 
 [float]
@@ -600,6 +603,30 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 ==== `redact.delete`
 
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                    | Description
+| `resource`                | URL or path of the input resource.
+| `cel_executions`          | Number times the CEL program has been executed.
+| `batches_received_total`  | Number of event arrays received.
+| `events_received_total`   | Number of events received.
+| `batches_published_total` | Number of event arrays published.
+| `events_published_total`  | Number of events published.
+| `cel_processing_time`     | Histogram of the elapsed successful CEL program processing times in nanoseconds.
+| `batch_processing_time`   | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+|=======
+
+==== Developer tools
+
+A stand-alone CEL environment that implements the majority of the CEL input's Comment Expression Language functionality is available in the https://github.com/elastic/mito[Elastic Mito] repository. This tool may be used to help develop CEL programs to be used by the input. Installation is available from source by running `go install github.com/elastic/mito/cmd/mito@latest` and requires a Go toolchain.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

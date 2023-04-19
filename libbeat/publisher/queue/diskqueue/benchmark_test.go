@@ -78,7 +78,7 @@ func makeMessagesEvent() *messages.Event {
 		Timestamp: timestamppb.New(eventTime),
 		Fields: &messages.Struct{
 			Data: map[string]*messages.Value{
-				"message": &messages.Value{
+				"message": {
 					Kind: &messages.Value_StringValue{
 						StringValue: msgs[rand.Intn(len(msgs))],
 					},
