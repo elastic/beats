@@ -24,6 +24,8 @@ import (
 	"runtime/pprof"
 	"testing"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // This is the maximum waiting time for goroutine shutdown.
@@ -61,12 +63,12 @@ func (c *GoroutinesChecker) Check(t testing.TB) {
 
 func dumpGoroutines() {
 	profile := pprof.Lookup("goroutine")
-	profile.WriteTo(os.Stdout, 2)
+	_ = profile.WriteTo(os.Stdout, 2)
 }
 
 func (c *GoroutinesChecker) check() error {
 	after, err := c.WaitUntilOriginalCount()
-	if err == ErrTimeout {
+	if errors.Is(err, ErrTimeout) {
 		return fmt.Errorf("possible goroutines leak, before: %d, after: %d", c.before, after)
 	}
 	return err
