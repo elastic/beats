@@ -42,8 +42,8 @@ type GoroutinesChecker struct {
 }
 
 // NewGoroutinesChecker creates a new GoroutinesChecker
-func NewGoroutinesChecker() GoroutinesChecker {
-	return GoroutinesChecker{
+func NewGoroutinesChecker() *GoroutinesChecker {
+	return &GoroutinesChecker{
 		before:              runtime.NumGoroutine(),
 		FinalizationTimeout: defaultFinalizationTimeout,
 	}
