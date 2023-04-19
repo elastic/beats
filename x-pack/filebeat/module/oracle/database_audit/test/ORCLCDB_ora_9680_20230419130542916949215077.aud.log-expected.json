@@ -1,0 +1,44 @@
+[
+    {
+        "@timestamp": "2023-04-18T11:38:18.000Z",
+        "event.action": [
+            "database_audit",
+            "logged-in"
+        ],
+        "event.category": [
+            "authentication",
+            "database"
+        ],
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "+03:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 573,
+        "oracle.database_audit.action": "100",
+        "oracle.database_audit.comment_text": "Authenticated by: DATABASE; Client address: (ADDRESS=(PROTOCOL=tcp)(HOST=10.232.109.62)(PORT=58864))",
+        "oracle.database_audit.database.id": "1956306463",
+        "oracle.database_audit.entryid": "1",
+        "oracle.database_audit.length": 357,
+        "oracle.database_audit.os_userid": "zabbix",
+        "oracle.database_audit.priv_used": "5",
+        "oracle.database_audit.returncode": "0",
+        "oracle.database_audit.session_id": "4294967295",
+        "oracle.database_audit.statement": "1",
+        "oracle.database_audit.terminal": "pts/0",
+        "oracle.database_audit.userid": "ZABBIX",
+        "process.pid": "9680",
+        "server.address": "9mmtdmz-gdzp02",
+        "server.domain": "9mmtdmz-gdzp02",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    }
+]

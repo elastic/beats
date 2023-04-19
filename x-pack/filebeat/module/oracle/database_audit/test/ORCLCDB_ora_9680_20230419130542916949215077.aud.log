@@ -1,0 +1,18 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_m005_24958_20201007115707242540239811.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 1
+Oracle process number: 50
+Unix process pid: 24958, image: oracle@testlab.local (M005)
+
+Tue Apr 18 14:38:18 2023 +03:00
+LENGTH: "357"
+SESSIONID:[10] "4294967295" ENTRYID:[1] "1" STATEMENT:[1] "1" USERID:[6] "ZABBIX" USERHOST:[14] "9mmtdmz-gdzp02" TERMINAL:[5] "pts/0" ACTION:[3] "100" RETURNCODE:[1] "0" COMMENT$TEXT:[100] "Authenticated by: DATABASE; Client address: (ADDRESS=(PROTOCOL=tcp)(HOST=10.232.109.62)(PORT=58864))" OS$USERID:[6] "zabbix" DBID:[10] "1956306463" PRIV$USED:[1] "5"

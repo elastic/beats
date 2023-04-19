@@ -22,6 +22,13 @@ processors:
       field: message
       patterns:
         - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH : '%{GREEDYDATA:LENGTH}'\\\n(?m)%{GREEDYDATA:audit}"
+        - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH: \"%{GREEDYDATA:LENGTH}\"\\\n(?m)%{GREEDYDATA:auth}"
+  - gsub:
+      field: "auth"
+      pattern: "\"\s"
+      replacement: "\"|"
+      ignore_missing: true
+      if: ctx?.auth != null
   - kv:
       field: audit
       field_split: "\\\n(?=[a-zA-Z])"
@@ -29,6 +36,7 @@ processors:
       trim_value: " '"
       trim_key: " "
       prefix: oracle.database_audit.
+      if: ctx?.audit != null
   - grok:
       field: log.file.path
       patterns:
@@ -37,21 +45,26 @@ processors:
   - script:
       source: "ctx.oracle.database_audit = ctx.oracle.database_audit.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), Map.Entry::getValue));"
       lang: painless
+      if: ctx?.oracle?.database_audit != null
   # Replace all field names that has spaces in them with _
   - script:
       lang: painless
       source: "ctx.oracle.database_audit = ctx?.oracle?.database_audit.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().replace(' ', '_'), e -> e.getValue()));"
+      if: ctx?.oracle?.database_audit != null
   - gsub:
       field: "oracle.database_audit.action"
       pattern: "\\n"
       replacement: ""
+      if: ctx?.oracle?.database_audit != null
   - gsub:
       field: "oracle.database_audit.action"
       pattern: "\\s{2,}"
       replacement: " "
+      if: ctx?.oracle?.database_audit != null
   - trim:
       field: "oracle.database_audit.action_number"
       ignore_missing: true
+      if: ctx?.oracle?.database_audit != null
   # Removes all null values from ctx.*
   - script:
       lang: painless
@@ -118,6 +131,7 @@ processors:
       field: oracle.database_audit.length
       type: long
       ignore_missing: true
+      if: ctx?.oracle?.database_audit != null
   - grok:
       field: client.address
       patterns:
@@ -165,6 +179,7 @@ processors:
         - tmp_timestamp
         - audit
         - message
+        - auth
       ignore_missing: true
 on_failure:
   - set:
