@@ -60,30 +60,6 @@
             "period": 10000
         },
         "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:42061",
-                "job": "prometheus"
-            },
-            "up": {
-                "value": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
             "go_gc_duration_seconds_count": {
                 "counter": 13118,
                 "rate": 0
@@ -109,6 +85,9 @@
                         7
                     ]
                 }
+            },
+            "up": {
+                "value": 1
             },
             "labels": {
                 "instance": "127.0.0.1:42061",
