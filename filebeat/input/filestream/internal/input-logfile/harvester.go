@@ -124,7 +124,7 @@ type HarvesterGroup interface {
 	// Stop cancels the reader of a given Source.
 	Stop(Source)
 	// StopGroup cancels all running Harvesters.
-	StopGroup() error
+	StopHarvesters() error
 }
 
 type defaultHarvesterGroup struct {
@@ -290,12 +290,12 @@ func (hg *defaultHarvesterGroup) Stop(s Source) {
 	})
 }
 
-// StopGroup stops all running Harvesters.
-func (hg *defaultHarvesterGroup) StopGroup() error {
+// StopHarvesters stops all running Harvesters.
+func (hg *defaultHarvesterGroup) StopHarvesters() error {
 	return hg.tg.Stop()
 }
 
-// Lock locks a key for exclusive access and returns an resource that can be used to modify
+// Lock locks a key for exclusive access and returns a resource that can be used to modify
 // the cursor state and unlock the key.
 func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 	resource := store.Get(key)

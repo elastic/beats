@@ -290,7 +290,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 }
 
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
-	err := hg.StopGroup()
+	err := hg.StopHarvesters()
 	if err != nil {
 		log.Errorf("Error while stopping harvester group: %v", err)
 	}
