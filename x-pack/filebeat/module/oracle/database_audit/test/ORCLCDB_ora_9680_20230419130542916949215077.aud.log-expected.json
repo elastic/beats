@@ -33,6 +33,9 @@
         "oracle.database_audit.terminal": "pts/1",
         "oracle.database_audit.userid": "SYSTEM",
         "process.pid": "9680",
+        "related.hosts": [
+            "testhost"
+        ],
         "server.address": "testhost",
         "server.domain": "testhost",
         "service.type": "oracle",

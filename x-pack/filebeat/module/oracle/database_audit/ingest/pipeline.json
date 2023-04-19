@@ -352,6 +352,95 @@
         ],
         "ignore_missing": true
       }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "target_field": "source.as",
+        "properties": [
+          "asn",
+          "organization_name"
+        ],
+        "ignore_missing": true,
+        "database_file": "GeoLite2-ASN.mmdb",
+        "field": "source.ip"
+      }
+    },
+    {
+      "rename": {
+        "target_field": "source.as.number",
+        "ignore_missing": true,
+        "field": "source.as.asn"
+      }
+    },
+    {
+      "rename": {
+        "field": "source.as.organization_name",
+        "target_field": "source.as.organization.name",
+        "ignore_missing": true
+      }
+    },
+    {
+      "append": {
+        "value": "{{source.ip}}",
+        "if": "ctx?.source?.ip != null",
+	"allow_duplicates": false,
+        "field": "related.ip"
+      }
+    },
+    {
+      "append": {
+        "value": "{{client.ip}}",
+        "if": "ctx?.client?.ip != null",
+	"allow_duplicates": false,
+        "field": "related.ip"
+      }
+    },
+    {
+      "append": {
+        "value": "{{server.ip}}",
+        "if": "ctx?.server?.ip != null",
+	"allow_duplicates": false,
+        "field": "related.ip"
+      }
+    },
+    {
+      "append": {
+        "field": "related.user",
+        "value": "{{client.user.name}}",
+	"allow_duplicates": false,
+        "if": "ctx?.client?.user?.name != null && ctx?.client?.user?.name != '/'"
+      }
+    },
+    {
+      "append": {
+        "field": "related.user",
+        "value": "{{server.user.name}}",
+	"allow_duplicates": false,
+        "if": "ctx?.server?.user?.name != null && ctx?.server?.user?.name != '/'"
+      }
+    },
+    {
+      "append": {
+        "value": "{{server.domain}}",
+        "if": "ctx?.server?.domain != null",
+	"allow_duplicates": false,
+        "field": "related.hosts"
+      }
+    },
+    {
+      "append": {
+        "value": "{{client.domain}}",
+        "if": "ctx?.client?.domain != null",
+	"allow_duplicates": false,
+        "field": "related.hosts"
+      }
     }
   ],
   "on_failure": [
