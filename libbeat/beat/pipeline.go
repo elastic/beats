@@ -89,7 +89,7 @@ type EventListener interface {
 }
 
 // CloseRef allows users to close the client asynchronously.
-// A CloseReg implements a subset of function required for context.Context.
+// A CloseRef implements a subset of function required for context.Context.
 type CloseRef interface {
 	Done() <-chan struct{}
 	Err() error
