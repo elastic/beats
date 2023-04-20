@@ -25,6 +25,8 @@ import (
 )
 
 func TestInput(t *testing.T) {
+	tempDirectory := t.TempDir()
+	fileLocation := tempDirectory + "/http-request-trace-*.ndjson"
 	testCases := []struct {
 		name        string
 		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -294,7 +296,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test filename truncation",
+			name: "Test tracer file sanitization",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
@@ -326,7 +328,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": "../../logs/httpjson/http-request-trace-*.ndjson",
+				"request.tracer.filename": fileLocation,
 				"verifyfilepath":          true,
 			},
 			handler: dateCursorHandler(),
@@ -1236,7 +1238,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			if tc.baseConfig["verifyfilepath"] != nil {
-				if _, err := os.Stat("../../logs/httpjson/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"); err == nil {
+				if _, err := os.Stat(tempDirectory + "/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
