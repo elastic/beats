@@ -114,7 +114,7 @@ func run(
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if config.Request.Tracer != nil {
-		id := sanitizeFilePaths(ctx)
+		id := sanitizeFileName(ctx.ID)
 		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
 	}
 
@@ -161,14 +161,12 @@ func run(
 	return nil
 }
 
-/*
-The Request.Tracer.Filename may have ":" when a httpjson input has cursor config
-The MacOs Finder will treat this as path-separator and causes to show up strange filepaths.
-This function will sanitize characters like ":" and "/" to replace them with "_" just to be
-safe on all operating systems.
-*/
-func sanitizeFilePaths(ctx v2.Context) string {
-	id := strings.ReplaceAll(ctx.ID, ":", string(filepath.Separator))
+// The Request.Tracer.Filename may have ":" when a httpjson input has cursor config
+// The MacOs Finder will treat this as path-separator and causes to show up strange filepaths.
+// This function will sanitize characters like ":" and "/" to replace them with "_" just to be
+// safe on all operating systems.
+func sanitizeFileName(name string) string {
+	id := strings.ReplaceAll(name, ":", string(filepath.Separator))
 	id = filepath.Clean(id)
 	id = strings.ReplaceAll(id, string(filepath.Separator), "_")
 
