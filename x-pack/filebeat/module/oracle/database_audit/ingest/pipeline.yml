@@ -25,7 +25,7 @@ processors:
         - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH: \"%{GREEDYDATA:LENGTH}\"\\\n(?m)%{GREEDYDATA:auth}"
   - gsub:
       field: "auth"
-      pattern: "\"\s"
+      pattern: "\"\\s"
       replacement: "\"|"
       ignore_missing: true
       if: ctx?.auth != null
