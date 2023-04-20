@@ -9,13 +9,9 @@ import (
 	"strings"
 	"time"
 
-<<<<<<< HEAD
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
-=======
-	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
->>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )

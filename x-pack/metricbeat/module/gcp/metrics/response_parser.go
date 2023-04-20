@@ -8,13 +8,9 @@ import (
 	"strings"
 	"time"
 
-<<<<<<< HEAD
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
-	"google.golang.org/genproto/googleapis/monitoring/v3"
-=======
-	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
->>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -40,11 +36,7 @@ type KeyValuePoint struct {
 }
 
 // extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
-<<<<<<< HEAD
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
-=======
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringpb.TimeSeries, aligner string) (points []KeyValuePoint) {
->>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
+func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringpb.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -245,19 +237,9 @@ func getValueFromPoint(p *monitoringpb.Point) (out interface{}) {
 		out = v.Int64Value
 	case *monitoringpb.TypedValue_StringValue:
 		out = v.StringValue
-<<<<<<< HEAD
-	case *monitoring.TypedValue_DistributionValue:
+	case *monitoringpb.TypedValue_DistributionValue:
 		//TODO Distribution values aren't simple values. Take a look at this
 		out = v.DistributionValue
-=======
-	case *monitoringpb.TypedValue_DistributionValue:
-		// Distribution values aren't simple values. Take a look at this
-		histogram := gcp.DistributionHistogramToES(v.DistributionValue)
-
-		out = mapstr.M{
-			"histogram": histogram,
-		}
->>>>>>> a1d968e11f ([GCP] Migrate away from go-genproto in GCP module (#35060))
 	}
 
 	return out
