@@ -33,7 +33,7 @@ import (
 
 var inputTests = []struct {
 	name          string
-	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
+	server        func(testing.TB, http.HandlerFunc, map[string]interface{})
 	handler       http.HandlerFunc
 	config        map[string]interface{}
 	persistCursor map[string]interface{}
@@ -383,7 +383,7 @@ var inputTests = []struct {
 	// Decoder tests.
 	{
 		name: "decode_xml",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				const text = `<?xml version="1.0" encoding="UTF-8"?>
 <order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
@@ -886,7 +886,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "tracer_filename_sanitization",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)
 			config["resource.url"] = server.URL
 			t.Cleanup(server.Close)
@@ -1039,7 +1039,7 @@ var inputTests = []struct {
 	// Authenticated access tests.
 	{
 		name: "OAuth2",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
 			config["resource.url"] = s.URL
 			config["auth.oauth2.token_url"] = s.URL + "/token"
@@ -1100,7 +1100,7 @@ var inputTests = []struct {
 	},
 	{
 		name: "three_step_GET_request",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		server: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/":
@@ -1237,7 +1237,11 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{}.run(v2Ctx, src, test.persistCursor, &client)
+			i, err := newInput(v2Ctx, src)
+			if err != nil {
+				t.Fatalf("unexpected error making input: %v", err)
+			}
+			err = i.run(test.persistCursor, &client)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
@@ -1277,6 +1281,71 @@ func TestInput(t *testing.T) {
 				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
 					t.Errorf("expected log file not found: %v", err)
 				}
+			}
+		})
+	}
+}
+
+func BenchmarkInput(b *testing.B) {
+	skipOnWindows := map[string]string{
+		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
+	}
+	for _, test := range inputTests {
+		b.Run(test.name, func(b *testing.B) {
+			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
+				b.Skip(reason)
+			}
+			if test.server != nil {
+				test.server(b, test.handler, test.config)
+			}
+
+			cfg := conf.MustNewConfigFrom(test.config)
+
+			conf := defaultConfig()
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				b.Fatalf("unexpected error unpacking config: %v", err)
+			}
+
+			src := &source{conf}
+			err = input{}.Test(src, v2.TestContext{})
+			if err != nil {
+				b.Fatalf("unexpected error running test: %v", err)
+			}
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				func() {
+					// Program compilation is run once for an input, so don't benchmark.
+					b.StopTimer()
+					ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+					defer cancel()
+
+					var client publisher
+					client.done = func() {
+						if len(client.published) >= len(test.want) {
+							cancel()
+						}
+					}
+					v2Ctx := v2.Context{
+						Logger:      logp.NewLogger("cel_test"),
+						ID:          "test_id:" + test.name,
+						Cancelation: ctx,
+					}
+					i, err := newInput(v2Ctx, src)
+					if err != nil {
+						b.Errorf("unexpected error making input: %v", err)
+					}
+					b.StartTimer()
+
+					err = i.run(test.persistCursor, &client)
+					if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+						b.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
+					}
+					if test.wantErr != nil {
+						return
+					}
+				}()
 			}
 		})
 	}
@@ -1324,16 +1393,16 @@ func missingFileError(path string) string {
 	return fmt.Sprint(err)
 }
 
-func newTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+func newTestServer(serve func(http.Handler) *httptest.Server) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := serve(h)
 		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }
 
-func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+func newChainTestServer(serve func(http.Handler) *httptest.Server) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/":

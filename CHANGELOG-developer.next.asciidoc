@@ -160,6 +160,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add Okta API package for entity analytics. {pull}35478[35478]
 - Add benchmarking to HTTPJSON input testing. {pull}35138[35138]
 - Allow non-AWS endpoints for testing Filebeat awss3 input. {issue}35496[35496] {pull}35520[35520]
+- Add benchmarks to CEL Filebeat input package. {pull}35139[35139]
 
 ==== Deprecated
 

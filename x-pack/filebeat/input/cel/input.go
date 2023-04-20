@@ -76,7 +76,17 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-type input struct{}
+type input struct {
+	cfg config
+
+	env v2.Context
+	ctx context.Context
+
+	prg     cel.Program
+	limiter *rate.Limiter
+
+	log *logp.Logger
+}
 
 func (input) Name() string { return inputName }
 
@@ -98,7 +108,11 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			return err
 		}
 	}
-	return input{}.run(env, src.(*source), cursor, pub)
+	i, err := newInput(env, src.(*source))
+	if err != nil {
+		return err
+	}
+	return i.run(cursor, pub)
 }
 
 // sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
@@ -110,7 +124,8 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+// newInput construct a newInput based on the provided context and CEL source.
+func newInput(env v2.Context, src *source) (*input, error) {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
@@ -126,14 +141,14 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 
 	client, err := newClient(ctx, cfg, log)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	limiter := newRateLimiterFromConfig(cfg.Resource)
 
 	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var auth *lib.BasicAuth
@@ -145,20 +160,36 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	}
 	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	return &input{
+		cfg:     cfg,
+		env:     env,
+		ctx:     ctx,
+		prg:     prg,
+		limiter: limiter,
+		log:     log,
+	}, err
+}
+
+// run runs the program held by the input using the provided cursor and
+// publishing events to pub.
+func (i *input) run(cursor map[string]interface{}, pub inputcursor.Publisher) error {
+	metrics := newInputMetrics(i.env.ID)
+	defer metrics.Close()
+
 	var state map[string]interface{}
-	if cfg.State == nil {
+	if i.cfg.State == nil {
 		state = make(map[string]interface{})
 	} else {
-		state = cfg.State
+		state = i.cfg.State
 	}
 	if cursor != nil {
 		state["cursor"] = cursor
 	}
 	goodCursor := cursor
-	goodURL := cfg.Resource.URL.String()
+	goodURL := i.cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metrics.resource.Set(goodURL)
 	// On entry, state is expected to be in the shape:
@@ -194,10 +225,11 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
-	err = periodically(ctx, cfg.Interval, func() error {
-		log.Info("process repeated request")
+	var err error
+	err = periodically(i.ctx, i.cfg.Interval, func() error {
+		i.log.Info("process repeated request")
 		var (
-			budget    = *cfg.MaxExecutions
+			budget    = *i.cfg.MaxExecutions
 			waitUntil time.Time
 		)
 		for {
@@ -209,27 +241,27 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 				// the retry after for a 429 and rate limit headers if we have
 				// a zero rate quota. See handleResponse below.
 				select {
-				case <-ctx.Done():
-					return ctx.Err()
+				case <-i.ctx.Done():
+					return i.ctx.Err()
 				case <-time.After(wait):
 				}
-			} else if err = ctx.Err(); err != nil {
+			} else if err = i.ctx.Err(); err != nil {
 				// Otherwise exit if we have been cancelled.
 				return err
 			}
 
 			// Process a set of event requests.
-			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
+			i.log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, mask: i.cfg.Redact.Fields, delete: i.cfg.Redact.Delete})
 			metrics.executions.Add(1)
 			start := time.Now()
-			state, err = evalWith(ctx, prg, state)
-			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
+			state, err = evalWith(i.ctx, i.prg, state)
+			i.log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, mask: i.cfg.Redact.Fields, delete: i.cfg.Redact.Delete})
 			if err != nil {
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					return err
 				}
-				log.Errorw("failed evaluation", "error", err)
+				i.log.Errorw("failed evaluation", "error", err)
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 
@@ -317,7 +349,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			// the lost events and potentially re-requesting e3.
 
 			var ok bool
-			ok, waitUntil, err = handleResponse(log, state, limiter)
+			ok, waitUntil, err = handleResponse(i.log, state, i.limiter)
 			if err != nil {
 				return err
 			}
@@ -328,12 +360,12 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			_, ok = state["url"]
 			if !ok && goodURL != "" {
 				state["url"] = goodURL
-				log.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
+				i.log.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
 			}
 
 			e, ok := state["events"]
 			if !ok {
-				log.Error("unexpected missing events array from evaluation")
+				i.log.Error("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
@@ -346,7 +378,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 				if e == nil {
 					return nil
 				}
-				log.Errorw("single event object returned by evaluation", "event", e)
+				i.log.Errorw("single event object returned by evaluation", "event", e)
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
@@ -371,7 +403,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 				cursors, ok = c.([]interface{})
 				if ok {
 					if len(cursors) != len(events) {
-						log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
+						i.log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
 						// But try to continue.
 						if len(cursors) < len(events) {
 							cursors = nil
@@ -388,7 +420,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 
 			start = time.Now()
 			var hadPublicationError bool
-			for i, e := range events {
+			for j, e := range events {
 				event, ok := e.(map[string]interface{})
 				if !ok {
 					return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
@@ -398,7 +430,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 					if singleCursor {
 						// Only set the cursor for publication at the last event
 						// when a single cursor object has been provided.
-						if i == len(events)-1 {
+						if j == len(events)-1 {
 							goodCursor = cursor
 							cursor, ok = cursors[0].(map[string]interface{})
 							if !ok {
@@ -408,9 +440,9 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 						}
 					} else {
 						goodCursor = cursor
-						cursor, ok = cursors[i].(map[string]interface{})
+						cursor, ok = cursors[j].(map[string]interface{})
 						if !ok {
-							return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+							return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[j])
 						}
 						pubCursor = cursor
 					}
@@ -421,19 +453,19 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 				}, pubCursor)
 				if err != nil {
 					hadPublicationError = true
-					log.Errorw("error publishing event", "error", err)
+					i.log.Errorw("error publishing event", "error", err)
 					cursors = nil // We are lost, so retry with this event's cursor,
 					continue      // but continue with the events that we have without
 					// advancing the cursor. This allows us to potentially publish the
 					// events we have now, with a fallback to the last guaranteed
 					// correctly published cursor.
 				}
-				if i == 0 {
+				if j == 0 {
 					metrics.batchesPublished.Add(1)
 				}
 				metrics.eventsPublished.Add(1)
 
-				err = ctx.Err()
+				err = i.ctx.Err()
 				if err != nil {
 					return err
 				}
@@ -456,14 +488,14 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			// Check we have a remaining execution budget.
 			budget--
 			if budget <= 0 {
-				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
+				i.log.Warnw("exceeding maximum number of CEL executions", "limit", *i.cfg.MaxExecutions)
 				return nil
 			}
 		}
 	})
 	switch {
 	case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-		log.Infof("input stopped because context was cancelled with: %v", err)
+		i.log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
 	return err
