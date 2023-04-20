@@ -160,7 +160,7 @@ type lightModuleConfig struct {
 }
 
 // ProcessorsForMetricSet returns processors defined for the light metricset.
-func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.ProcessorList, error) {
+func (s *LightModulesSource) ProcessorsForMetricSet(r *Register, moduleName string, metricSetName string) (*processors.Processors, error) {
 	module, err := s.loadModule(r, moduleName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "reading processors for metricset '%s' in module '%s'", metricSetName, moduleName)

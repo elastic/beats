@@ -91,7 +91,7 @@ func (p *Publisher) Close() {
 	}
 }
 
-func (p *Publisher) processorsForInputsConfig(inputs []config.InputConfig) (procs *processors.ProcessorList, err error) {
+func (p *Publisher) processorsForInputsConfig(inputs []config.InputConfig) (procs *processors.Processors, err error) {
 	procs = processors.NewList(nil)
 
 	// Use only first input processor

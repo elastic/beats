@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 )
 
-func processorsForFunction(beatInfo beat.Info, config fnExtraConfig) (*processors.ProcessorList, error) {
+func processorsForFunction(beatInfo beat.Info, config fnExtraConfig) (*processors.Processors, error) {
 	procs := processors.NewList(nil)
 
 	// Processor ordering is important:

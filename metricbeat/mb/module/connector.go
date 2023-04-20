@@ -32,7 +32,7 @@ import (
 // to the publisher pipeline.
 type Connector struct {
 	pipeline   beat.PipelineConnector
-	processors *processors.ProcessorList
+	processors *processors.Processors
 	eventMeta  mapstr.EventMetadata
 	timeSeries bool
 	keepNull   bool
@@ -50,7 +50,7 @@ type connectorConfig struct {
 }
 
 type metricSetRegister interface {
-	ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.ProcessorList, error)
+	ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error)
 }
 
 func NewConnector(
@@ -110,7 +110,7 @@ func (c *Connector) Connect() (beat.Client, error) {
 // processorsForConfig assembles the Processors for a Connector.
 func processorsForConfig(
 	beatInfo beat.Info, config connectorConfig,
-) (*processors.ProcessorList, error) {
+) (*processors.Processors, error) {
 	procs := processors.NewList(nil)
 
 	// Processor order is important! The index processor, if present, must be

@@ -205,7 +205,7 @@ runLoop:
 // processorsForConfig assembles the Processors for an eventLogger.
 func processorsForConfig(
 	beatInfo beat.Info, config eventLoggerConfig,
-) (*processors.ProcessorList, error) {
+) (*processors.Processors, error) {
 	procs := processors.NewList(nil)
 
 	// Processor order is important! The index processor, if present, must be

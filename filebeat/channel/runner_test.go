@@ -185,7 +185,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	require.NoError(t, err)
 
 	lst := clientCfg.Processing.Processor
-	assert.Equal(t, 2, len(lst.(*processors.ProcessorList).List))
+	assert.Equal(t, 2, len(lst.(*processors.Processors).List))
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
@@ -208,7 +208,7 @@ func (p *setRawIndex) String() string {
 }
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
-func makeProcessors(procs ...beat.Processor) *processors.ProcessorList {
+func makeProcessors(procs ...beat.Processor) *processors.Processors {
 	procList := processors.NewList(nil)
 	procList.List = procs
 	return procList

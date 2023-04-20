@@ -99,12 +99,12 @@ type fakeMetricSetRegister struct {
 	success bool
 }
 
-func (fmsr *fakeMetricSetRegister) ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.ProcessorList, error) {
+func (fmsr *fakeMetricSetRegister) ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error) {
 	if !fmsr.success {
 		return nil, errors.New("failure")
 	}
 
-	procs := new(processors.ProcessorList)
+	procs := new(processors.Processors)
 	procs.List = []beat.Processor{nil, nil}
 	return procs, nil
 }
@@ -124,7 +124,7 @@ func TestUseMetricSetProcessors_ReadingProcessorsSucceeded(t *testing.T) {
 	}
 
 	connector := Connector{
-		processors: &processors.ProcessorList{
+		processors: &processors.Processors{
 			List: []beat.Processor{},
 		},
 	}
