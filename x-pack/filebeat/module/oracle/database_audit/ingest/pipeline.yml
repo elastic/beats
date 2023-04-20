@@ -21,8 +21,8 @@ processors:
   - grok:
       field: message
       patterns:
-          - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH : '%{GREEDYDATA:LENGTH}'\\\n(?m)%{GREEDYDATA:audit}"
-          - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH: \"%{GREEDYDATA:LENGTH}\"\\\n(?m)%{GREEDYDATA:auth}"
+        - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH : '%{GREEDYDATA:LENGTH}'\\\n(?m)%{GREEDYDATA:audit}"
+        - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH: \"%{GREEDYDATA:LENGTH}\"\\\n(?m)%{GREEDYDATA:auth}"
   - gsub:
       field: auth
       pattern: "\"\\s"
