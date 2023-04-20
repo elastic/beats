@@ -42193,6 +42193,33 @@ alias to: kibana.stats.process.event_loop_delay.ms
 
 --
 
+*`kibana_stats.process.event_loop_utilization.active`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_utilization.active
+
+--
+
+*`kibana_stats.process.event_loop_utilization.idle`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_utilization.idle
+
+--
+
+*`kibana_stats.process.event_loop_utilization.utilization`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_utilization.utilization
+
+--
+
 *`kibana_stats.requests.total`*::
 +
 --
@@ -42704,6 +42731,43 @@ type: long
 +
 --
 Event loop delay in milliseconds
+
+
+type: scaled_float
+
+--
+
+[float]
+=== event_loop_utilization
+
+The ratio of time the event loop is not idling in the event provider to the total time the event loop is running.
+
+
+
+*`kibana.stats.process.event_loop_utilization.active`*::
++
+--
+Duration of time event loop has been active since last measurement.
+
+
+type: scaled_float
+
+--
+
+*`kibana.stats.process.event_loop_utilization.idle`*::
++
+--
+Duration of time event loop has been idle since last measurement.
+
+
+type: scaled_float
+
+--
+
+*`kibana.stats.process.event_loop_utilization.utilization`*::
++
+--
+Computed utilization value representing ratio of active to idle time since last measurement.
 
 
 type: scaled_float

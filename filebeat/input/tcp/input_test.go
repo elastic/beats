@@ -24,45 +24,93 @@ import (
 )
 
 func TestProcNetTCP(t *testing.T) {
-	t.Run("with_match", func(t *testing.T) {
-		addr := []string{"0100007F:17AC"}
-		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-		rx, err := procNetTCP("testdata/proc_net_tcp.txt", addr, hasUnspecified, addrIsUnspecified)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Nil(t, bad)
-		assert.EqualValues(t, 1, rx)
+	t.Run("IPv4", func(t *testing.T) {
+		path := "testdata/proc_net_tcp.txt"
+		t.Run("with_match", func(t *testing.T) {
+			addr := []string{"0100007F:17AC"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Nil(t, bad)
+			assert.EqualValues(t, 1, rx)
+		})
+
+		t.Run("unspecified", func(t *testing.T) {
+			addr := []string{"00000000:17AC"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Nil(t, bad)
+			assert.EqualValues(t, 2, rx)
+		})
+
+		t.Run("without_match", func(t *testing.T) {
+			addr := []string{"deadbeef:f00d", "ba1dface:1135"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			assert.Nil(t, bad)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), "entry not found")
+			}
+		})
+
+		t.Run("bad_addrs", func(t *testing.T) {
+			addr := []string{"FOO:BAR", "BAR:BAZ"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			assert.EqualValues(t, addr, bad)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), "entry not found")
+			}
+		})
 	})
 
-	t.Run("unspecified", func(t *testing.T) {
-		addr := []string{"00000000:17AC"}
-		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-		rx, err := procNetTCP("testdata/proc_net_tcp.txt", addr, hasUnspecified, addrIsUnspecified)
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.Nil(t, bad)
-		assert.EqualValues(t, 2, rx)
-	})
+	t.Run("IPv6", func(t *testing.T) {
+		path := "testdata/proc_net_tcp6.txt"
+		t.Run("with_match", func(t *testing.T) {
+			addr := []string{"0000000000000000000000000100007f:17AC"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Nil(t, bad)
+			assert.EqualValues(t, 1, rx)
+		})
 
-	t.Run("without_match", func(t *testing.T) {
-		addr := []string{"deadbeef:f00d", "ba1dface:1135"}
-		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-		_, err := procNetTCP("testdata/proc_net_tcp.txt", addr, hasUnspecified, addrIsUnspecified)
-		assert.Nil(t, bad)
-		if assert.Error(t, err) {
-			assert.Contains(t, err.Error(), "entry not found")
-		}
-	})
+		t.Run("unspecified", func(t *testing.T) {
+			addr := []string{"00000000000000000000000000000000:17AC"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Nil(t, bad)
+			assert.EqualValues(t, 2, rx)
+		})
 
-	t.Run("bad_addrs", func(t *testing.T) {
-		addr := []string{"FOO:BAR", "BAR:BAZ"}
-		hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-		_, err := procNetTCP("testdata/proc_net_tcp.txt", addr, hasUnspecified, addrIsUnspecified)
-		assert.EqualValues(t, addr, bad)
-		if assert.Error(t, err) {
-			assert.Contains(t, err.Error(), "entry not found")
-		}
+		t.Run("without_match", func(t *testing.T) {
+			addr := []string{"deadbeefdeadbeefdeadbeefdeadbeef:f00d", "ba1dfaceba1dfaceba1dfaceba1dface:1135"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			assert.Nil(t, bad)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), "entry not found")
+			}
+		})
+
+		t.Run("bad_addrs", func(t *testing.T) {
+			addr := []string{"FOO:BAR", "BAR:BAZ"}
+			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
+			assert.EqualValues(t, addr, bad)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), "entry not found")
+			}
+		})
 	})
 }
