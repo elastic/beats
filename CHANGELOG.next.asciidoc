@@ -287,6 +287,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
 - Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
+- Add event loop utilization metric to Kibana module {pull}35020[35020]
 
 *Packetbeat*
 
