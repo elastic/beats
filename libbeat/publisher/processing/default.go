@@ -196,7 +196,7 @@ func WithObserverMeta() modifier {
 func newBuilder(
 	info beat.Info,
 	log *logp.Logger,
-	processors *processors.ProcessorList,
+	processors *processors.Processors,
 	eventMeta mapstr.EventMetadata,
 	modifiers []modifier,
 	skipNormalize bool,

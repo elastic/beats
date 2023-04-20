@@ -40,7 +40,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			ps := make([]*processors.ProcessorList, len(test.cfg))
+			ps := make([]*processors.Processors, len(test.cfg))
 			for i := range test.cfg {
 				config, err := conf.NewConfigWithYAML([]byte(test.cfg[i]), "test")
 				if err != nil {

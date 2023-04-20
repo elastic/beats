@@ -30,8 +30,8 @@ import (
 
 const logName = "processors"
 
-// ProcessorList is
-type ProcessorList struct {
+// Processors is
+type Processors struct {
 	List []beat.Processor
 	log  *logp.Logger
 }
@@ -55,15 +55,15 @@ func Close(p beat.Processor) error {
 
 // NewList creates a new empty processor list.
 // Additional processors can be added to the List field.
-func NewList(log *logp.Logger) *ProcessorList {
+func NewList(log *logp.Logger) *Processors {
 	if log == nil {
 		log = logp.NewLogger(logName)
 	}
-	return &ProcessorList{log: log}
+	return &Processors{log: log}
 }
 
 // New creates a list of processors from a list of free user configurations.
-func New(config UserConfig) (*ProcessorList, error) {
+func New(config UserConfig) (*Processors, error) {
 	procs := NewList(nil)
 
 	for _, procConfig := range config {
@@ -117,12 +117,12 @@ func New(config UserConfig) (*ProcessorList, error) {
 }
 
 // AddProcessor adds a single Processor to Processors
-func (procs *ProcessorList) AddProcessor(p beat.Processor) {
+func (procs *Processors) AddProcessor(p beat.Processor) {
 	procs.List = append(procs.List, p)
 }
 
 // AddProcessors adds more Processors to Processors
-func (procs *ProcessorList) AddProcessors(p ProcessorList) {
+func (procs *Processors) AddProcessors(p Processors) {
 	// Subtlety: it is important here that we append the individual elements of
 	// p, rather than p itself, even though
 	// p implements the beat.Processor interface. This is
@@ -137,7 +137,7 @@ func (procs *ProcessorList) AddProcessors(p ProcessorList) {
 	procs.List = append(procs.List, p.List...)
 }
 
-func (procs *ProcessorList) All() []beat.Processor {
+func (procs *Processors) All() []beat.Processor {
 	if procs == nil || len(procs.List) == 0 {
 		return nil
 	}
@@ -149,7 +149,7 @@ func (procs *ProcessorList) All() []beat.Processor {
 	return ret
 }
 
-func (procs *ProcessorList) Close() error {
+func (procs *Processors) Close() error {
 	var errs multierror.Errors
 	for _, p := range procs.List {
 		err := Close(p)
@@ -163,7 +163,7 @@ func (procs *ProcessorList) Close() error {
 // Run executes the all processors serially and returns the event and possibly
 // an error. If the event has been dropped (canceled) by a processor in the
 // list then a nil event is returned.
-func (procs *ProcessorList) Run(event *beat.Event) (*beat.Event, error) {
+func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	var err error
 	for _, p := range procs.List {
 		event, err = p.Run(event)
@@ -178,7 +178,7 @@ func (procs *ProcessorList) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (procs ProcessorList) String() string {
+func (procs Processors) String() string {
 	var s []string
 	for _, p := range procs.List {
 		s = append(s, p.String())

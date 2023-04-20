@@ -120,8 +120,8 @@ type ifThenElseConfig struct {
 // true and another set of processors (else) if the condition is false.
 type IfThenElseProcessor struct {
 	cond conditions.Condition
-	then *ProcessorList
-	els  *ProcessorList
+	then *Processors
+	els  *Processors
 }
 
 // NewIfElseThenProcessor construct a new IfThenElseProcessor.
@@ -136,7 +136,7 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 		return nil, err
 	}
 
-	newProcessors := func(c *config.C) (*ProcessorList, error) {
+	newProcessors := func(c *config.C) (*Processors, error) {
 		if c == nil {
 			return nil, nil
 		}
@@ -151,7 +151,7 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 		return New(pc)
 	}
 
-	var ifProcessors, elseProcessors *ProcessorList
+	var ifProcessors, elseProcessors *Processors
 	if ifProcessors, err = newProcessors(c.Then); err != nil {
 		return nil, err
 	}
