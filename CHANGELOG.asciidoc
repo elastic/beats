@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
 
 *Affecting all Beats*
 
-- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix Beats started by agent not respecting the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
 - Beats started by agent now configure one global instance of each default add_x_metadata processor instead of creating one processor per input. Fixes a significant performance degradation for the aws-s3 input. {issue}35000[35000] {pull}35031[35031]
 
 *Filebeat*
