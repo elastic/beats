@@ -10,5 +10,5 @@ var:
     default: file
 
 ingest_pipeline:
-  - ingest/pipeline.json
+  - ingest/pipeline.yml
 input: config/config.yml
