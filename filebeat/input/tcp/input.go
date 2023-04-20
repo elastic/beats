@@ -167,7 +167,7 @@ type inputMetrics struct {
 	device         *monitoring.String // name of the device being monitored
 	packets        *monitoring.Uint   // number of packets processed
 	bytes          *monitoring.Uint   // number of bytes processed
-	rxQueue        *monitoring.Uint   // value of the rx_queue field from /proc/net/tcp{,6} (only on linux systems)
+	rxQueue        *monitoring.Uint   // value of the rx_queue field from /proc/net/tcp (only on linux systems)
 	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
 	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 }
@@ -196,9 +196,9 @@ func newInputMetrics(id, device string, poll time.Duration, log *logp.Logger) *i
 	out.device.Set(device)
 
 	if poll > 0 && runtime.GOOS == "linux" {
-		host, port, err := net.SplitHostPort(device)
-		if err != nil {
-			log.Warnf("failed to get address for %s: could not split host and port:", err)
+		host, port, ok := strings.Cut(device, ":")
+		if !ok {
+			log.Warnf("failed to get address for %s: no port separator", device)
 			return out
 		}
 		ip, err := net.LookupIP(host)
@@ -213,19 +213,15 @@ func newInputMetrics(id, device string, poll time.Duration, log *logp.Logger) *i
 		}
 		ph := strconv.FormatInt(p, 16)
 		addr := make([]string, 0, len(ip))
-		addr6 := make([]string, 0, len(ip))
 		for _, p := range ip {
-			switch len(p) {
-			case net.IPv4len:
-				addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To4()), ph))
-			case net.IPv6len:
-				addr6 = append(addr6, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To16()), ph))
-			default:
-				log.Warnf("unexpected addr length %d for %s", len(p), p)
+			p4 := p.To4()
+			if len(p4) != net.IPv4len {
+				continue
 			}
+			addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p4), ph))
 		}
 		out.done = make(chan struct{})
-		go out.poll(addr, addr6, poll, log)
+		go out.poll(addr, poll, log)
 	}
 
 	return out
@@ -246,14 +242,10 @@ func (m *inputMetrics) log(data []byte, timestamp time.Time) {
 }
 
 // poll periodically gets TCP buffer stats from the OS.
-func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
+func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger) {
 	hasUnspecified, addrIsUnspecified, badAddr := containsUnspecifiedAddr(addr)
 	if badAddr != nil {
-		log.Warnf("failed to parse IPv4 addrs for metric collection %q", badAddr)
-	}
-	hasUnspecified6, addrIsUnspecified6, badAddr := containsUnspecifiedAddr(addr)
-	if badAddr != nil {
-		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
+		log.Warnf("failed to parse addrs for metric collection %q", badAddr)
 	}
 	t := time.NewTicker(each)
 	for {
@@ -264,12 +256,7 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 				log.Warnf("failed to get tcp stats from /proc: %v", err)
 				continue
 			}
-			rx6, err := procNetTCP("/proc/net/tcp6", addr6, hasUnspecified6, addrIsUnspecified6)
-			if err != nil {
-				log.Warnf("failed to get tcp6 stats from /proc: %v", err)
-				continue
-			}
-			m.rxQueue.Set(uint64(rx + rx6))
+			m.rxQueue.Set(uint64(rx))
 		case <-m.done:
 			t.Stop()
 			return
@@ -297,17 +284,13 @@ func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []strin
 }
 
 // procNetTCP returns the rx_queue field of the TCP socket table for the
-// socket on the provided address formatted in hex, xxxxxxxx:xxxx or the IPv6
-// equivalent.
+// socket on the provided address formatted in hex, xxxxxxxx:xxxx.
 // This function is only useful on linux due to its dependence on the /proc
 // filesystem, but is kept in this file for simplicity. If hasUnspecified
 // is true, all addresses listed in the file in path are considered, and the
 // sum of rx_queue matching the addr ports is returned where the corresponding
 // addrIsUnspecified is true.
 func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecified []bool) (rx int64, err error) {
-	if len(addr) == 0 {
-		return 0, nil
-	}
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return 0, err
@@ -319,11 +302,10 @@ func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 	var found bool
 	for _, l := range lines[1:] {
 		f := bytes.Fields(l)
-		const queuesField = 4
-		if len(f) > queuesField && contains(f[1], addr, addrIsUnspecified) {
+		if len(f) > 4 && contains(f[1], addr, addrIsUnspecified) {
 			_, r, ok := bytes.Cut(f[4], []byte(":"))
 			if !ok {
-				return 0, errors.New("no rx_queue field " + string(f[queuesField]))
+				return 0, errors.New("no rx_queue field " + string(f[4]))
 			}
 			found = true
 
