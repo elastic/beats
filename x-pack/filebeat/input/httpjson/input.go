@@ -166,11 +166,9 @@ func run(
 // This function will sanitize characters like ":" and "/" to replace them with "_" just to be
 // safe on all operating systems.
 func sanitizeFileName(name string) string {
-	id := strings.ReplaceAll(name, ":", string(filepath.Separator))
-	id = filepath.Clean(id)
-	id = strings.ReplaceAll(id, string(filepath.Separator), "_")
-
-	return id
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
