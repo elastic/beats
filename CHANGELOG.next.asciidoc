@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
 - Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
 - Sanitize filenames for request tracer in httpjson and cel inputs. {pull}35143[35143]
+- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
 
 *Heartbeat*
 
