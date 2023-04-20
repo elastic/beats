@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -23,6 +23,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
 
 
@@ -30,6 +33,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Functionbeat*
+
+
+*Elastic Logging Plugin*
 
 
 ==== Bugfixes
@@ -84,12 +90,34 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
-- Add GCP CloudSQL region filter {pull}32943[32943]
-- Fix logstash cgroup mappings {pull}33131[33131]
-- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
 
 
 *Osquerybeat*
@@ -104,59 +132,12 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Functionbeat*
 
 
-
 *Elastic Logging Plugin*
-
-
-==== Added
-
-*Affecting all Beats*
-
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-- add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
-- httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
-- Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
-- Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
-- Added separation of transform context object inside httpjson. Introduced new clause `.parent_last_response.*` {pull}33499[33499]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-- Add per-thread metrics to system_summary {pull}33614[33614]
-- Add GCP CloudSQL metadata {pull}33066[33066]
-
-*Packetbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
 
 
 ==== Deprecated
 
-*Affecting all Beats*
+*Auditbeat*
 
 
 *Filebeat*
@@ -168,12 +149,20 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
+
 
 *Winlogbeat*
 
 
 *Functionbeat*
+
+
+*Elastic Logging Plugin*
+
 
 ==== Known Issue
 
