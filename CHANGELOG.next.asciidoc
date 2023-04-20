@@ -109,6 +109,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
 - Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
 - Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
+- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
 
 *Heartbeat*
 
@@ -258,6 +259,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
+- Add support for collecting IPv6 metrics. {pull}35123[35123]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
