@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -113,7 +114,8 @@ func run(
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if config.Request.Tracer != nil {
-		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", ctx.ID)
+		id := sanitizeFilePaths(ctx)
+		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
 	}
 
 	httpClient, err := newHTTPClient(stdCtx, config, log)
@@ -157,6 +159,20 @@ func run(
 	log.Infof("Input stopped because context was cancelled with: %v", err)
 
 	return nil
+}
+
+/*
+The Request.Tracer.Filename may have ":" when a httpjson input has cursor config
+The MacOs Finder will treat this as path-separator and causes to show up strange filepaths.
+This function will sanitize characters like ":" and "/" to replace them with "_" just to be
+safe on all operating systems.
+*/
+func sanitizeFilePaths(ctx v2.Context) string {
+	id := strings.ReplaceAll(ctx.ID, ":", string(filepath.Separator))
+	id = filepath.Clean(id)
+	id = strings.ReplaceAll(id, string(filepath.Separator), "_")
+
+	return id
 }
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
