@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -284,6 +285,49 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
+			},
+			handler: dateCursorHandler(),
+			expected: []string{
+				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+			},
+		},
+		{
+			name: "Test filename truncation",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				// mock timeNow func to return a fixed value
+				timeNow = func() time.Time {
+					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+					return t
+				}
+
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+				t.Cleanup(func() { timeNow = time.Now })
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":  "url.params.$filter",
+							"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+							"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"timestamp": map[string]interface{}{
+						"value": `[[index .last_response.body "@timestamp"]]`,
+					},
+				},
+				"request.tracer.filename": "../../logs/httpjson/http-request-trace-*.ndjson",
+				"verifyfilepath":          true,
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -1191,6 +1235,13 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
+			if tc.baseConfig["verifyfilepath"] != nil {
+				if _, err := os.Stat("../../logs/httpjson/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"); err == nil {
+					assert.NoError(t, g.Wait())
+				} else {
+					t.Errorf("Expected log filename not found")
+				}
+			}
 			assert.NoError(t, g.Wait())
 		})
 	}
@@ -1257,7 +1308,7 @@ func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
+		ID:          "httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi",
 		Cancelation: ctx,
 	}, cancel
 }
