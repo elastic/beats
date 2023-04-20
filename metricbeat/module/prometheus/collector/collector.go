@@ -162,20 +162,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// Calculate labels hash after adding all relevant labels
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
-<<<<<<< HEAD
 				eventList[labelsHash] = common.MapStr{}
-
-				// Add default instance label if not already there
-				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
-					promEvent.Labels.Put(upMetricInstanceLabel, m.Host())
-				}
-				// Add default job label if not already there
-				if exists, _ := promEvent.Labels.HasKey("job"); !exists {
-					promEvent.Labels.Put("job", m.Module().Name())
-				}
-=======
-				eventList[labelsHash] = mapstr.M{}
->>>>>>> 3255e53aa4 ([Prometheus] Add up metric to the document with the same set of labels (#35117))
 				// Add labels
 				if len(promEvent.Labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.Labels

@@ -11,111 +11,7 @@
         },
         "prometheus": {
             "labels": {
-<<<<<<< HEAD
                 "instance": "127.0.0.1:55924",
-=======
-                "instance": "127.0.0.1:42999",
-                "job": "prometheus",
-                "server_version": "3.3.10"
-            },
-            "metrics": {
-                "etcd_server_version": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:42999",
-                "job": "prometheus",
-                "server_go_version": "go1.10.4"
-            },
-            "metrics": {
-                "etcd_server_go_version": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "action": "getRecursive",
-                "instance": "127.0.0.1:42999",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "etcd_debugging_store_reads_total": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "action": "create",
-                "instance": "127.0.0.1:42999",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "etcd_debugging_store_writes_total": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:42999",
->>>>>>> 3255e53aa4 ([Prometheus] Add up metric to the document with the same set of labels (#35117))
                 "job": "prometheus",
                 "version": "go1.10.4"
             },
@@ -178,30 +74,7 @@
             "type": "prometheus"
         }
     },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:55924",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "up": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
+
     {
         "event": {
             "dataset": "prometheus.collector",
