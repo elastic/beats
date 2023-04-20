@@ -36,30 +36,6 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:55928",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "up": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
                 "dialer_name": "alertmanager",
                 "instance": "127.0.0.1:55928",
                 "job": "prometheus"
@@ -176,7 +152,8 @@
                 "process_start_time_seconds": 1553430305.4,
                 "process_virtual_memory_bytes": 150646784,
                 "process_virtual_memory_max_bytes": -1,
-                "prometheus_api_remote_read_queries": 0
+                "prometheus_api_remote_read_queries": 0,
+                "up": 1
             }
         },
         "service": {
