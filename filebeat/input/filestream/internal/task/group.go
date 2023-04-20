@@ -39,7 +39,7 @@ func NewGroup(limit uint64, maxErrors uint64) *Group {
 		limit:     limit,
 		wg:        &sync.WaitGroup{},
 		errsSize:  maxErrors,
-		errs:      make([]error, maxErrors, maxErrors),
+		errs:      make([]error, maxErrors),
 		errsMu:    &sync.Mutex{},
 		ctx:       ctx,
 		cancelCtx: cancel,

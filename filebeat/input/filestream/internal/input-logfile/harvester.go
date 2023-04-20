@@ -51,21 +51,10 @@ type Harvester interface {
 
 type readerGroup struct {
 	mu    sync.Mutex
-	limit uint64
 	table map[string]context.CancelFunc
 }
 
 func newReaderGroup() *readerGroup {
-	return &readerGroup{
-		table: make(map[string]context.CancelFunc),
-	}
-}
-
-// newReaderGroupWithLimit is deprecated in favour of controlling the number of
-// harvesters on defaultHarvesterGroup directly through the taskgroup used to
-// spawn new harvester goroutines.
-// Deprecated
-func newReaderGroupWithLimit(limit uint64) *readerGroup {
 	return &readerGroup{
 		table: make(map[string]context.CancelFunc),
 	}

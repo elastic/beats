@@ -214,10 +214,8 @@ func TestPoll_Stop(t *testing.T) {
 				runningCount.Add(1)
 				defer wg.Done()
 
-				select {
-				case <-done:
-					return fmt.Errorf("[%d]: %w", i, wantErr)
-				}
+				<-done
+				return fmt.Errorf("[%d]: %w", i, wantErr)
 			}
 		}
 
@@ -270,10 +268,8 @@ func TestPoll_Stop(t *testing.T) {
 				runningCount.Add(1)
 				defer wg.Done()
 
-				select {
-				case <-done:
-					return nil
-				}
+				<-done
+				return nil
 			}
 		}
 
