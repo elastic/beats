@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
 - [GCS Input] Added missing locks for safe concurrency {pull}34914[34914]
 - Add input instance id to request trace filename for httpjson and cel inputs {pull}35037[35037]
 - Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
 
 *Heartbeat*
 
