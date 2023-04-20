@@ -12,6 +12,7 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -145,101 +146,105 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
+	// TODO: should use goroutine for concurrent query
+	for _, regionName := range m.MetricSet.RegionsList {
+		err := m.fetchInRegion(report, regionName, startTime, endTime, config, listMetricDetailTotal, namespaceDetailTotal)
+		if err != nil {
+			m.logger.Errorf("Error in region %s: %w", regionName, err)
+		}
+	}
+
+	return nil
+}
+
+func (m *MetricSet) fetchInRegion(report mb.ReporterV2, regionName string, startTime, endTime time.Time, config aws.Config, listMetricDetailTotal listMetricWithDetail, namespaceDetailTotal map[string][]namespaceDetail) error {
+	m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
+
+	beatsConfig := m.MetricSet.AwsConfig.Copy()
+	beatsConfig.Region = regionName
+
+	svcCloudwatch := m.createCloudWatchClient(beatsConfig, config)
+	svcAutoscalingAPI := m.createAutoscalingGroupAPIClient(beatsConfig, config)
+	svcResourceGroupAPI := m.createResourceGroupTaggingAPIClient(beatsConfig, config)
+
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
-		for _, regionName := range m.MetricSet.RegionsList {
-			//m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-			beatsConfig := m.MetricSet.AwsConfig.Copy()
-			beatsConfig.Region = regionName
-
-			svcCloudwatch, svcResourceAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
-			if err != nil {
-				m.Logger().Warn("skipping metrics list from region '%s'", regionName)
-			}
-
-			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
-			if err != nil {
-				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
-			}
-
-			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
-
-			for _, event := range eventsWithIdentifier {
-				report.Event(event)
-			}
+		eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceGroupAPI, svcAutoscalingAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, regionName, startTime, endTime)
+		if err != nil {
+			return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
+		}
+		m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
+		for _, event := range eventsWithIdentifier {
+			report.Event(event)
 		}
 	}
 
 	// Create events based on namespaceDetailTotal from configuration
-	for _, regionName := range m.MetricSet.RegionsList {
-		m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-		beatsConfig := m.MetricSet.AwsConfig.Copy()
-		beatsConfig.Region = regionName
+	// retrieve all the details for all the metrics available in the current region
+	listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, svcCloudwatch)
+	if err != nil {
+		m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
+	}
 
-		svcCloudwatch, svcResourceAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
+	if len(listMetricsOutput) == 0 {
+		return nil
+	}
+
+	for namespace, namespaceDetails := range namespaceDetailTotal {
+		m.logger.Debugf("Collected metrics from namespace %s", namespace)
+		// filter listMetricsOutput by detailed configuration per each namespace
+		filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
+		// get resource type filters and tags filters for each namespace
+		resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
+
+		eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceGroupAPI, svcAutoscalingAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 		if err != nil {
-			m.Logger().Warn("skipping metrics list from region '%s'", regionName, err)
-			continue
+			return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 		}
 
-		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, svcCloudwatch)
+		m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
+
+		events, err := addMetadata(namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
 		if err != nil {
-			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
+			// TODO What to do if add metadata fails? I guess to continue, probably we have an 90% of reliable data
+			m.Logger().Warn("could not add metadata to events: %w", err)
 		}
 
-		if len(listMetricsOutput) == 0 {
-			continue
-		}
-
-		for namespace, namespaceDetails := range namespaceDetailTotal {
-			m.logger.Debugf("Collected metrics from namespace %s", namespace)
-
-			// filter listMetricsOutput by detailed configuration per each namespace
-			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
-
-			// get resource type filters and tags filters for each namespace
-			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
-
-			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
-			if err != nil {
-				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
-			}
-
-			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
-
-			events, err := addMetadata(namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
-			if err != nil {
-				// TODO What to do if add metadata fails? I guess to continue, probably we have an 90% of reliable data
-				m.Logger().Warn("could not add metadata to events: %w", err)
-			}
-
-			for _, event := range events {
-				report.Event(event)
-			}
+		for _, event := range events {
+			report.Event(event)
 		}
 	}
+
 	return nil
 }
 
-// createAwsRequiredClients will return the two necessary client instances to do Metric requests to the AWS API
-func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionName string, config aws.Config) (*cloudwatch.Client, *resourcegroupstaggingapi.Client, error) {
-	m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
-
+// createCloudWatchClient will return the two necessary client instances to do Metric requests to the AWS API
+func (m *MetricSet) createCloudWatchClient(beatsConfig awssdk.Config, config aws.Config) *cloudwatch.Client {
 	svcCloudwatchClient := cloudwatch.NewFromConfig(beatsConfig, func(o *cloudwatch.Options) {
 		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
-
 	})
+	return svcCloudwatchClient
+}
 
+func (m *MetricSet) createResourceGroupTaggingAPIClient(beatsConfig awssdk.Config, config aws.Config) *resourcegroupstaggingapi.Client {
 	svcResourceAPIClient := resourcegroupstaggingapi.NewFromConfig(beatsConfig, func(o *resourcegroupstaggingapi.Options) {
 		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
+	return svcResourceAPIClient
+}
 
-	return svcCloudwatchClient, svcResourceAPIClient, nil
+func (m *MetricSet) createAutoscalingGroupAPIClient(beatsConfig awssdk.Config, config aws.Config) *autoscaling.Client {
+	svcAutoscalingAPIClient := autoscaling.NewFromConfig(beatsConfig, func(o *autoscaling.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
+
+	return svcAutoscalingAPIClient
 }
 
 // filterListMetricsOutput compares config details with listMetricsOutput and filter out the ones don't match
@@ -450,7 +455,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	return event
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient, svcResourceAPI resourcegroupstaggingapi.GetResourcesAPIClient, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, error) {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient, svcResourceAPI resourcegroupstaggingapi.GetResourcesAPIClient, svcAutoscalingAPI autoscaling.DescribeTagsAPIClient, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, error) {
 	// Initialize events for each identifier.
 	events := make(map[string]mb.Event)
 
@@ -500,7 +505,13 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 	for resourceType, tagsFilter := range resourceTypeTagFilters {
 		m.logger.Debugf("resourceType = %s", resourceType)
 		m.logger.Debugf("tagsFilter = %s", tagsFilter)
-		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
+		var resourceTagMap map[string][]resourcegroupstaggingapitypes.Tag
+		var err error
+		if resourceType == "autoscaling" || strings.HasPrefix(resourceType, "autoscaling:") {
+			resourceTagMap, err = aws.GetAutoScalingGroupTags(svcAutoscalingAPI)
+		} else {
+			resourceTagMap, err = aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
+		}
 		if err != nil {
 			// If GetResourcesTags failed, continue report event just without tags.
 			m.logger.Info(fmt.Errorf("getResourcesTags failed, skipping region %s: %w", regionName, err))
