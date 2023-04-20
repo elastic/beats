@@ -156,8 +156,8 @@ type inputMetrics struct {
 	packets        *monitoring.Uint   // number of packets processed
 	bytes          *monitoring.Uint   // number of bytes processed
 	bufferLen      *monitoring.Uint   // configured read buffer length
-	rxQueue        *monitoring.Uint   // value of the rx_queue field from /proc/net/udp (only on linux systems)
-	drops          *monitoring.Uint   // number of udp drops noted in /proc/net/udp
+	rxQueue        *monitoring.Uint   // value of the rx_queue field from /proc/net/udp{,6} (only on linux systems)
+	drops          *monitoring.Uint   // number of udp drops noted in /proc/net/udp{,6}
 	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
 	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 }
@@ -189,9 +189,9 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 	out.bufferLen.Set(buflen)
 
 	if poll > 0 && runtime.GOOS == "linux" {
-		host, port, ok := strings.Cut(device, ":")
-		if !ok {
-			log.Warnf("failed to get address for %s: no port separator", device)
+		host, port, err := net.SplitHostPort(device)
+		if err != nil {
+			log.Warnf("failed to get address for %s: could not split host and port:", err)
 			return out
 		}
 		ip, err := net.LookupIP(host)
@@ -206,15 +206,19 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 		}
 		ph := strconv.FormatInt(p, 16)
 		addr := make([]string, 0, len(ip))
+		addr6 := make([]string, 0, len(ip))
 		for _, p := range ip {
-			p4 := p.To4()
-			if len(p4) != net.IPv4len {
-				continue
+			switch len(p) {
+			case net.IPv4len:
+				addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To4()), ph))
+			case net.IPv6len:
+				addr6 = append(addr6, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To16()), ph))
+			default:
+				log.Warnf("unexpected addr length %d for %s", len(p), p)
 			}
-			addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p4), ph))
 		}
 		out.done = make(chan struct{})
-		go out.poll(addr, poll, log)
+		go out.poll(addr, addr6, poll, log)
 	}
 
 	return out
@@ -235,10 +239,14 @@ func (m *inputMetrics) log(data []byte, timestamp time.Time) {
 }
 
 // poll periodically gets UDP buffer and packet drops stats from the OS.
-func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger) {
+func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
 	hasUnspecified, addrIsUnspecified, badAddr := containsUnspecifiedAddr(addr)
 	if badAddr != nil {
-		log.Warnf("failed to parse addrs for metric collection %q", badAddr)
+		log.Warnf("failed to parse IPv4 addrs for metric collection %q", badAddr)
+	}
+	hasUnspecified6, addrIsUnspecified6, badAddr := containsUnspecifiedAddr(addr6)
+	if badAddr != nil {
+		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
 	}
 	t := time.NewTicker(each)
 	for {
@@ -249,8 +257,13 @@ func (m *inputMetrics) poll(addr []string, each time.Duration, log *logp.Logger)
 				log.Warnf("failed to get udp stats from /proc: %v", err)
 				continue
 			}
-			m.rxQueue.Set(uint64(rx))
-			m.drops.Set(uint64(drops))
+			rx6, drops6, err := procNetUDP("/proc/net/udp6", addr, hasUnspecified6, addrIsUnspecified6)
+			if err != nil {
+				log.Warnf("failed to get udp6 stats from /proc: %v", err)
+				continue
+			}
+			m.rxQueue.Set(uint64(rx + rx6))
+			m.drops.Set(uint64(drops + drops6))
 		case <-m.done:
 			t.Stop()
 			return
@@ -278,13 +291,17 @@ func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []strin
 }
 
 // procNetUDP returns the rx_queue and drops field of the UDP socket table
-// for the socket on the provided address formatted in hex, xxxxxxxx:xxxx.
+// for the socket on the provided address formatted in hex, xxxxxxxx:xxxx or
+// the IPv6 equivalent.
 // This function is only useful on linux due to its dependence on the /proc
 // filesystem, but is kept in this file for simplicity. If hasUnspecified
 // is true, all addresses listed in the file in path are considered, and the
 // sum of rx_queue and drops matching the addr ports is returned where the
 // corresponding addrIsUnspecified is true.
 func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecified []bool) (rx, drops int64, err error) {
+	if len(addr) == 0 {
+		return 0, 0, nil
+	}
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return 0, 0, err
@@ -296,20 +313,27 @@ func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 	var found bool
 	for _, l := range lines[1:] {
 		f := bytes.Fields(l)
-		if len(f) > 12 && contains(f[1], addr, addrIsUnspecified) {
-			_, r, ok := bytes.Cut(f[4], []byte(":"))
+		const (
+			queuesField = 4
+			dropsField  = 12
+		)
+		if len(f) > dropsField && contains(f[1], addr, addrIsUnspecified) {
+			_, r, ok := bytes.Cut(f[queuesField], []byte(":"))
 			if !ok {
-				return 0, 0, errors.New("no rx_queue field " + string(f[4]))
+				return 0, 0, errors.New("no rx_queue field " + string(f[queuesField]))
 			}
 			found = true
 
-			v, err := strconv.ParseInt(string(r), 16, 64)
+			// queue lengths and drops are decimal, e.g.:
+			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv4/udp.c#L3110
+			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv6/datagram.c#L1048
+			v, err := strconv.ParseInt(string(r), 10, 64)
 			if err != nil {
 				return 0, 0, fmt.Errorf("failed to parse rx_queue: %w", err)
 			}
 			rx += v
 
-			v, err = strconv.ParseInt(string(f[12]), 16, 64)
+			v, err = strconv.ParseInt(string(f[dropsField]), 10, 64)
 			if err != nil {
 				return 0, 0, fmt.Errorf("failed to parse drops: %w", err)
 			}
