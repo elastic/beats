@@ -12,13 +12,12 @@ import (
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -50,7 +49,7 @@ type MetricSet struct {
 	MetricsConfig []metricsConfig `config:"metrics" validate:"nonzero,required"`
 }
 
-//metricsConfig holds a configuration specific for metrics metricset.
+// metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
 	ServiceName string `config:"service"  validate:"required"`
 	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
@@ -114,8 +113,6 @@ type config struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", MetricsetName)
-
 	m := &MetricSet{BaseMetricSet: base}
 
 	if err := base.Module().UnpackConfig(&m.config); err != nil {

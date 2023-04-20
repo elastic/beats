@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"testing/quick"
@@ -28,12 +29,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -52,17 +52,13 @@ func TestOutputReload(t *testing.T) {
 			//defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
-				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
-				numOutputReloads := 350 + (q % 150)     // 350 to 499
+				numEventsToPublish := 15000 + (q % 5000) // 15000 to 19999
+				numOutputReloads := 350 + (q % 150)      // 350 to 499
 
-				queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
-					return memqueue.NewQueue(
-						logp.L(),
-						memqueue.Settings{
-							ACKListener: ackListener,
-							Events:      int(numEventsToPublish),
-						}), nil
-				}
+				queueConfig := conf.Namespace{}
+				conf, _ := conf.NewConfigFrom(
+					fmt.Sprintf("mem.events: %v", numEventsToPublish))
+				_ = queueConfig.Unpack(conf)
 
 				var publishedCount atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {
@@ -73,7 +69,7 @@ func TestOutputReload(t *testing.T) {
 				pipeline, err := New(
 					beat.Info{},
 					Monitors{},
-					queueFactory,
+					queueConfig,
 					outputs.Group{},
 					Settings{},
 				)
@@ -98,14 +94,14 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					pipeline.output.Set(out)
+					pipeline.outputController.Set(out)
 				}
 
 				wg.Wait()
 
 				timeout := 20 * time.Second
 				return waitUntilTrue(timeout, func() bool {
-					return uint(numEventsToPublish) == publishedCount.Load()
+					return numEventsToPublish == publishedCount.Load()
 				})
 			}, &quick.Config{MaxCount: 25})
 
@@ -114,4 +110,25 @@ func TestOutputReload(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
+	// Just fill out enough to confirm what's sent to the event consumer,
+	// we don't want to start up real helper routines.
+	controller := outputController{
+		consumer: &eventConsumer{
+			targetChan: make(chan consumerTarget, 2),
+		},
+	}
+	controller.Set(outputs.Group{})
+
+	// Two messages should be sent to eventConsumer's targetChan:
+	// one to clear the old target while the state is updating,
+	// and one with the new metadata after the state update is
+	// complete. Since we're setting an empty output group, both
+	// of these calls should have a nil target channel.
+	target := <-controller.consumer.targetChan
+	assert.Nil(t, target.ch, "consumerTarget should receive a nil channel to block batch assembly")
+	target = <-controller.consumer.targetChan
+	assert.Nil(t, target.ch, "consumerTarget should receive a nil channel to block batch assembly")
 }

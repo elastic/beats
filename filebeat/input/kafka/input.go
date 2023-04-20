@@ -20,6 +20,7 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -30,7 +31,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
-	"github.com/pkg/errors"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -66,7 +66,7 @@ func configure(cfg *conf.C) (input.Input, error) {
 
 	saramaConfig, err := newSaramaConfig(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing Sarama config")
+		return nil, fmt.Errorf("initializing Sarama config: %w", err)
 	}
 	return NewInput(config, saramaConfig)
 }
@@ -111,7 +111,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	log := ctx.Logger.Named("kafka input").With("hosts", input.config.Hosts)
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		ACKHandler: acker.ConnectionOnly(
+		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, events []interface{}) {
 				for _, event := range events {
 					if meta, ok := event.(eventMeta); ok {
@@ -165,7 +165,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		input.runConsumerGroup(log, client, goContext, consumerGroup)
 	}
 
-	if ctx.Cancelation.Err() == context.Canceled {
+	if errors.Is(ctx.Cancelation.Err(), context.Canceled) {
 		return nil
 	} else {
 		return ctx.Cancelation.Err()
@@ -254,6 +254,7 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
+	//nolint:nakedret // omitting the return gives a build error
 	return
 }
 
@@ -311,7 +312,7 @@ func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 	parser := h.parsers.Create(reader)
 	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return nil
 		}
 		if err != nil {

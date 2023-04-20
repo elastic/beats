@@ -35,7 +35,6 @@ type client struct {
 	processors beat.Processor
 	producer   queue.Producer
 	mutex      sync.Mutex
-	acker      beat.ACKer
 	waiter     *clientCloseWaiter
 
 	eventFlags   publisher.EventFlags
@@ -48,7 +47,8 @@ type client struct {
 	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
 	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
 
-	eventer beat.ClientEventer
+	eventListener  beat.EventListener
+	clientListener beat.ClientListener
 }
 
 type clientCloseWaiter struct {
@@ -107,7 +107,7 @@ func (c *client) publish(e beat.Event) {
 		e = *event
 	}
 
-	c.acker.AddEvent(e, publish)
+	c.eventListener.AddEvent(e, publish)
 	if !publish {
 		c.onFilteredOut(e)
 		return
@@ -117,10 +117,6 @@ func (c *client) publish(e beat.Event) {
 	pubEvent := publisher.Event{
 		Content: e,
 		Flags:   c.eventFlags,
-	}
-
-	if c.reportEvents {
-		c.pipeline.waitCloseGroup.Add(1)
 	}
 
 	var published bool
@@ -134,9 +130,6 @@ func (c *client) publish(e beat.Event) {
 		c.onPublished()
 	} else {
 		c.onDroppedOnPublish(e)
-		if c.reportEvents {
-			c.pipeline.waitCloseGroup.Add(-1)
-		}
 	}
 }
 
@@ -155,12 +148,13 @@ func (c *client) Close() error {
 		c.waiter.signalClose()
 		c.waiter.wait()
 
-		c.acker.Close()
+		c.eventListener.ClientClosed()
 		log.Debug("client: done closing acker")
 
-		log.Debug("client: unlink from queue")
-		c.unlink()
-		log.Debug("client: done unlink")
+		log.Debug("client: close queue producer")
+		cancelledEventCount := c.producer.Cancel()
+		c.onClosed(cancelledEventCount)
+		log.Debug("client: done producer close")
 
 		if c.processors != nil {
 			log.Debug("client: closing processors")
@@ -174,38 +168,30 @@ func (c *client) Close() error {
 	return nil
 }
 
-// unlink is the final step of closing a client. It cancels the connect of the
-// client as producer to the queue.
-func (c *client) unlink() {
-	log := c.logger()
-
-	n := c.producer.Cancel() // close connection to queue
-	log.Debugf("client: cancelled %v events", n)
-
-	if c.reportEvents {
-		log.Debugf("client: remove client events")
-		if n > 0 {
-			c.pipeline.waitCloseGroup.Add(-n)
-		}
-	}
-
-	c.onClosed()
-}
-
 func (c *client) logger() *logp.Logger {
 	return c.pipeline.monitors.Logger
 }
 
 func (c *client) onClosing() {
-	if c.eventer != nil {
-		c.eventer.Closing()
+	if c.clientListener != nil {
+		c.clientListener.Closing()
 	}
 }
 
-func (c *client) onClosed() {
+func (c *client) onClosed(cancelledEventCount int) {
+	log := c.logger()
+	log.Debugf("client: cancelled %v events", cancelledEventCount)
+
+	if c.reportEvents {
+		log.Debugf("client: remove client events")
+		if cancelledEventCount > 0 {
+			c.pipeline.waitCloseGroup.Add(-cancelledEventCount)
+		}
+	}
+
 	c.pipeline.observer.clientClosed()
-	if c.eventer != nil {
-		c.eventer.Closed()
+	if c.clientListener != nil {
+		c.clientListener.Closed()
 	}
 }
 
@@ -214,9 +200,12 @@ func (c *client) onNewEvent() {
 }
 
 func (c *client) onPublished() {
+	if c.reportEvents {
+		c.pipeline.waitCloseGroup.Add(1)
+	}
 	c.pipeline.observer.publishedEvent()
-	if c.eventer != nil {
-		c.eventer.Published()
+	if c.clientListener != nil {
+		c.clientListener.Published()
 	}
 }
 
@@ -225,8 +214,8 @@ func (c *client) onFilteredOut(e beat.Event) {
 
 	log.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
 	c.pipeline.observer.filteredEvent()
-	if c.eventer != nil {
-		c.eventer.FilteredOut(e)
+	if c.clientListener != nil {
+		c.clientListener.FilteredOut(e)
 	}
 }
 
@@ -235,8 +224,8 @@ func (c *client) onDroppedOnPublish(e beat.Event) {
 
 	log.Debugf("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
 	c.pipeline.observer.failedPublishEvent()
-	if c.eventer != nil {
-		c.eventer.DroppedOnPublish(e)
+	if c.clientListener != nil {
+		c.clientListener.DroppedOnPublish(e)
 	}
 }
 
@@ -266,10 +255,10 @@ func (w *clientCloseWaiter) ACKEvents(n int) {
 	}
 }
 
-// The Close signal from the pipeline is ignored. Instead the client
+// The client's close signal is ignored. Instead the client
 // explicitly uses `signalClose` and `wait` before it continues with the
 // closing sequence.
-func (w *clientCloseWaiter) Close() {}
+func (w *clientCloseWaiter) ClientClosed() {}
 
 func (w *clientCloseWaiter) signalClose() {
 	if w == nil {

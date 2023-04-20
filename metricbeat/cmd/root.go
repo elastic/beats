@@ -58,7 +58,7 @@ func MetricbeatSettings() instance.Settings {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 }
 

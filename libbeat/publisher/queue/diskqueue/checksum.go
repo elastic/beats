@@ -27,7 +27,7 @@ import (
 func computeChecksum(data []byte) uint32 {
 	hash := crc32.NewIEEE()
 	frameLength := uint32(len(data) + frameMetadataSize)
-	binary.Write(hash, binary.LittleEndian, &frameLength)
+	_ = binary.Write(hash, binary.LittleEndian, &frameLength)
 	hash.Write(data)
 	return hash.Sum32()
 }

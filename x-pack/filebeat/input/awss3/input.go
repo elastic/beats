@@ -6,13 +6,16 @@ package awss3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/smithy-go"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -24,7 +27,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-const inputName = "aws-s3"
+const (
+	inputName                = "aws-s3"
+	sqsAccessDeniedErrorCode = "AccessDeniedException"
+)
 
 func Plugin(store beater.StateStore) v2.Plugin {
 	return v2.Plugin{
@@ -123,6 +129,9 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer receiver.metrics.Close()
 
+		// Poll metrics periodically in the background
+		go pollSqsWaitingMetric(ctx, receiver)
+
 		if err := receiver.Receive(ctx); err != nil {
 			return err
 		}
@@ -131,8 +140,8 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
 		// Create client for publishing events and receive notification of their ACKs.
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:   inputContext.Cancelation,
-			ACKHandler: awscommon.NewEventACKHandler(),
+			CloseRef:      inputContext.Cancelation,
+			EventListener: awscommon.NewEventACKHandler(),
 			Processing: beat.ProcessingConfig{
 				// This input only produces events with basic types so normalization
 				// is not required.
@@ -199,9 +208,9 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 	if err != nil {
 		return nil, err
 	}
-	in.metrics = newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory, in.config.MaxNumberOfMessages)
 	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
@@ -272,8 +281,8 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
-	in.metrics = newInputMetrics(ctx.ID, nil)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
 		in.metrics,
 		s3API,
@@ -374,6 +383,31 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		}
 	}
 	return "unknown"
+}
+
+func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			count, err := receiver.GetApproximateMessageCount(ctx)
+
+			var apiError smithy.APIError
+			if errors.As(err, &apiError) {
+				switch apiError.ErrorCode() {
+				case sqsAccessDeniedErrorCode:
+					// stop polling if auth error is encountered
+					receiver.metrics.setSQSMessagesWaiting(int64(count))
+					return
+				}
+			}
+
+			receiver.metrics.setSQSMessagesWaiting(int64(count))
+		}
+	}
 }
 
 // boolPtr returns a pointer to b.

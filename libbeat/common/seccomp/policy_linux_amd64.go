@@ -49,6 +49,7 @@ func init() {
 					"epoll_ctl",
 					"epoll_pwait",
 					"epoll_wait",
+					"execve",
 					"exit",
 					"exit_group",
 					"fchdir",

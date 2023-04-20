@@ -27,6 +27,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
+	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -39,25 +40,32 @@ func TestLogRun(t *testing.T) {
 	})))
 
 	durationUs := int64(5000 * time.Microsecond)
-	durationMs := time.Duration(durationUs * int64(time.Microsecond)).Milliseconds()
 	steps := 1337
 
 	fields := mapstr.M{
 		"monitor.id":          "b0",
 		"monitor.duration.us": durationUs,
 		"monitor.type":        "browser",
+		"monitor.status":      "down",
 	}
 
 	event := beat.Event{Fields: fields}
+	eventext.SetMeta(&event, META_STEP_COUNT, steps)
 
-	LogRun(&event, &steps)
+	LogRun(&event)
 
 	observedEntries := observed.All()
 	require.Len(t, observedEntries, 1)
 	assert.Equal(t, "Monitor finished", observedEntries[0].Message)
 
-	expectedMonitor := NewMonitorRunInfo("b0", "browser", durationMs)
-	expectedMonitor.Steps = &steps
+	expectedMonitor := MonitorRunInfo{
+		MonitorID: "b0",
+		Type:      "browser",
+		Duration:  durationUs,
+		Status:    "down",
+		Steps:     &steps,
+	}
+
 	assert.ElementsMatch(t, []zap.Field{
 		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
 		logp.Any("monitor", &expectedMonitor),

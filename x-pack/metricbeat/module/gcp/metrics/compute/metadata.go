@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"strings"
 
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	compute "google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"

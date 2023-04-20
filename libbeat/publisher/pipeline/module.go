@@ -19,15 +19,12 @@ package pipeline
 
 import (
 	"flag"
-	"fmt"
 
 	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -95,17 +92,12 @@ func LoadWithSettings(
 
 	name := beatInfo.Name
 
-	queueBuilder, err := createQueueBuilder(config.Queue, monitors, settings.InputQueueSize)
-	if err != nil {
-		return nil, err
-	}
-
 	out, err := loadOutput(monitors, makeOutput)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := New(beatInfo, monitors, queueBuilder, out, settings)
+	p, err := New(beatInfo, monitors, config.Queue, out, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -168,34 +160,4 @@ func loadOutput(
 	}
 
 	return out, nil
-}
-
-func createQueueBuilder(
-	config conf.Namespace,
-	monitors Monitors,
-	inQueueSize int,
-) (func(queue.ACKListener) (queue.Queue, error), error) {
-	queueType := defaultQueueType
-	if b := config.Name(); b != "" {
-		queueType = b
-	}
-
-	queueFactory := queue.FindFactory(queueType)
-	if queueFactory == nil {
-		return nil, fmt.Errorf("'%v' is no valid queue type", queueType)
-	}
-
-	queueConfig := config.Config()
-	if queueConfig == nil {
-		queueConfig = conf.NewConfig()
-	}
-
-	if monitors.Telemetry != nil {
-		queueReg := monitors.Telemetry.NewRegistry("queue")
-		monitoring.NewString(queueReg, "name").Set(queueType)
-	}
-
-	return func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return queueFactory(ackListener, monitors.Logger, queueConfig, inQueueSize)
-	}, nil
 }
