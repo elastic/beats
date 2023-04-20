@@ -45,7 +45,7 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 			MaxDepth: 1,
 		},
 	})
-	_, err := processors.New(processors.UserConfig([]*conf.C{cfg}))
+	_, err := processors.New(processors.PluginConfig([]*conf.C{cfg}))
 	assert.NoError(t, err)
 
 	// Unknown fields should not be allowed.
@@ -55,7 +55,7 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 			"extraneous": "field",
 		},
 	})
-	_, err = processors.New(processors.UserConfig([]*conf.C{cfg}))
+	_, err = processors.New(processors.PluginConfig([]*conf.C{cfg}))
 	assert.Error(t, err)
 	assert.EqualError(t, err, "unexpected extraneous option in decode_json_fields")
 }

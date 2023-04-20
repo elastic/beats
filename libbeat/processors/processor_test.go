@@ -44,7 +44,7 @@ func GetProcessors(t testing.TB, yml []map[string]interface{}) *processors.Proce
 func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Processors, error) {
 	t.Helper()
 
-	var config processors.UserConfig
+	var config processors.PluginConfig
 	for _, processor := range yml {
 		processorCfg, err := conf.NewConfigFrom(processor)
 		if err != nil {

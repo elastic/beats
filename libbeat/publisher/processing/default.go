@@ -99,21 +99,21 @@ func MakeDefaultObserverSupport(normalize bool) SupportFactory {
 // and no other global-level processors are set.
 func MakeDefaultSupport(
 	normalize bool,
-	fleetDefaultProcessors processors.UserConfig,
+	fleetDefaultProcessors processors.PluginConfig,
 	modifiers ...modifier,
 ) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *config.C) (Supporter, error) {
 		cfg := struct {
-			mapstr.EventMetadata `config:",inline"`    // Fields and tags to add to each event.
-			Processors           processors.UserConfig `config:"processors"`
-			TimeSeries           bool                  `config:"timeseries.enabled"`
+			mapstr.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
+			Processors           processors.PluginConfig `config:"processors"`
+			TimeSeries           bool                    `config:"timeseries.enabled"`
 		}{}
 		if err := beatCfg.Unpack(&cfg); err != nil {
 			return nil, err
 		}
 		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
 		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
-		var rawProcessors processors.UserConfig
+		var rawProcessors processors.PluginConfig
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
 		if fleetmode.Enabled() && !beatCfg.HasField("processors") {
 			log.Debugf("In fleet mode with no processors specified, defaulting to global processors")

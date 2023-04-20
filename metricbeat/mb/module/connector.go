@@ -39,7 +39,7 @@ type Connector struct {
 }
 
 type connectorConfig struct {
-	Processors processors.UserConfig `config:"processors"`
+	Processors processors.PluginConfig `config:"processors"`
 	// ES output index pattern
 	Index fmtstr.EventFormatString `config:"index"`
 

@@ -34,7 +34,7 @@ type LightMetricSet struct {
 		MetricSet string      `config:"metricset" validate:"required"`
 		Defaults  interface{} `config:"defaults"`
 	} `config:"input" validate:"required"`
-	Processors processors.UserConfig `config:"processors"`
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 // Registration obtains a metric set registration for this light metric set, this registration

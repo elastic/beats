@@ -144,7 +144,7 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 			return New([]*config.C{c})
 		}
 
-		var pc UserConfig
+		var pc PluginConfig
 		if err := c.Unpack(&pc); err != nil {
 			return nil, err
 		}

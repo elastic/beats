@@ -54,7 +54,7 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // AuditbeatSettings contains the default settings for auditbeat
-func AuditbeatSettings(globals processors.UserConfig) instance.Settings {
+func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	return instance.Settings{
 		RunFlags:      runFlags,

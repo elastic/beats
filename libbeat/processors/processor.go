@@ -63,7 +63,7 @@ func NewList(log *logp.Logger) *Processors {
 }
 
 // New creates a list of processors from a list of free user configurations.
-func New(config UserConfig) (*Processors, error) {
+func New(config PluginConfig) (*Processors, error) {
 	procs := NewList(nil)
 
 	for _, procConfig := range config {

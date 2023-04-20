@@ -45,10 +45,10 @@ type DatastreamConfig struct {
 }
 
 type InputConfig struct {
-	Name       string                `config:"name"`
-	Type       string                `config:"type"`
-	Datastream DatastreamConfig      `config:"data_stream"` // Datastream configuration
-	Processors processors.UserConfig `config:"processors"`
+	Name       string                  `config:"name"`
+	Type       string                  `config:"type"`
+	Datastream DatastreamConfig        `config:"data_stream"` // Datastream configuration
+	Processors processors.PluginConfig `config:"processors"`
 
 	// Full Osquery configuration
 	Osquery *OsqueryConfig `config:"osquery"`

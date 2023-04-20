@@ -60,8 +60,8 @@ type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, e
 
 type publishSettings struct {
 	// Fields and tags to add to monitor.
-	EventMetadata mapstr.EventMetadata  `config:",inline"`
-	Processors    processors.UserConfig `config:"processors"`
+	EventMetadata mapstr.EventMetadata    `config:",inline"`
+	Processors    processors.PluginConfig `config:"processors"`
 
 	PublisherPipeline struct {
 		DisableHost bool `config:"disable_host"` // Disable addition of host.name.

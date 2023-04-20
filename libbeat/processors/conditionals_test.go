@@ -139,7 +139,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 				t.Fatal(err)
 			}
 
-			var pluginConfig UserConfig
+			var pluginConfig PluginConfig
 			if err = c.Unpack(&pluginConfig); err != nil {
 				t.Fatal(err)
 			}
