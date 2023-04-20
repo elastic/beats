@@ -18,7 +18,6 @@
 package v2
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -126,11 +125,11 @@ func (l *Loader) Delete(cfg *conf.C) error {
 	}
 
 	pp, ok := p.Manager.(Deleter)
-	if !ok {
-		return errors.New("%T does not implement %T, input won't be deleted")
+	if ok {
+		return pp.Delete(cfg)
 	}
 
-	return pp.Delete(cfg)
+	return nil
 }
 
 // validatePlugins checks if there are multiple plugins with the same name in

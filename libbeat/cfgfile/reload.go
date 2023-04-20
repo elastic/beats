@@ -75,7 +75,7 @@ type RunnerFactory interface {
 	// Create creates a new Runner based on the given configuration.
 	Create(p beat.PipelineConnector, config *config.C) (Runner, error)
 
-	// CheckConfig tests if a confiugation can be used to create an input. If it
+	// CheckConfig tests if a configuration can be used to create an input. If it
 	// is not possible to create an input using the configuration, an error must
 	// be returned.
 	CheckConfig(config *config.C) error

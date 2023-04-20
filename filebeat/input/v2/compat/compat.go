@@ -72,10 +72,16 @@ func RunnerFactory(
 func (f *factory) CheckConfig(cfg *conf.C) error {
 	_, err := f.loader.Configure(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("runner factory could not check config: %w", err)
 	}
 
-	return f.loader.Delete(cfg)
+	if err = f.loader.Delete(cfg); err != nil {
+		return fmt.Errorf(
+			"runner factory failed to delet input after checking config: %w",
+			err)
+	}
+
+	return nil
 }
 
 func (f *factory) Create(
