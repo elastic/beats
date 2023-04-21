@@ -25,8 +25,9 @@ import (
 )
 
 func TestInput(t *testing.T) {
-	tempDirectory := t.TempDir()
-	fileLocation := tempDirectory + "/http-request-trace-*.ndjson"
+	dir := os.TempDir() + "/http-request-trace-*.ndjson"
+	defer os.RemoveAll(dir)
+
 	testCases := []struct {
 		name         string
 		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -329,7 +330,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": fileLocation,
+				"request.tracer.filename": dir,
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -337,7 +338,7 @@ func TestInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
-			expectedfile: "/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson",
+			expectedfile: os.TempDir() + "/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson",
 		},
 		{
 			name: "Test pagination",
@@ -1239,7 +1240,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			if len(tc.expectedfile) > 0 {
-				if _, err := os.Stat(tempDirectory + tc.expectedfile); err == nil {
+				if _, err := os.Stat(tc.expectedfile); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
@@ -1248,7 +1249,6 @@ func TestInput(t *testing.T) {
 			assert.NoError(t, g.Wait())
 		})
 	}
-	t.Cleanup(func() { os.RemoveAll(t.TempDir()) })
 }
 
 func newTestServer(
