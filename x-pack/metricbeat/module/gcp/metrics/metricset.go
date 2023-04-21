@@ -224,7 +224,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 		}
 
 		for _, singleEvent := range groupedEvents {
-			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
+			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
 		}
 
 		if sdc.ServiceName == "compute" {
@@ -334,11 +334,11 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 	hostRootFields := groupedEvents[0].ECS
 	// add host.id and host.name
 	if hostID, err := groupedEvents[0].ECS.GetValue("cloud.instance.id"); err == nil {
-		hostRootFields.Put("host.id", hostID)
+		_, _ = hostRootFields.Put("host.id", hostID)
 	}
 
 	if hostName, err := groupedEvents[0].ECS.GetValue("cloud.instance.name"); err == nil {
-		hostRootFields.Put("host.name", hostName)
+		_, _ = hostRootFields.Put("host.name", hostName)
 	}
 
 	hostFieldTable := map[string]string{
@@ -353,7 +353,7 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 
 	for _, singleEvent := range groupedEvents {
 		if hostMetricName, ok := hostFieldTable[singleEvent.Key]; ok {
-			hostRootFields.Put(hostMetricName, singleEvent.Value)
+			_, _ = hostRootFields.Put(hostMetricName, singleEvent.Value)
 		}
 	}
 	return hostRootFields

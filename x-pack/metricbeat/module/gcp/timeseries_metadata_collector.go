@@ -92,7 +92,7 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 		//Do not write metrics labels if it's content is empty
 		for k, v := range metrics {
-			m.Put(LabelMetrics+"."+k, v)
+			_, _ = m.Put(LabelMetrics+"."+k, v)
 		}
 	}
 
@@ -110,13 +110,13 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 		//Do not write resources labels if it's content is empty
 		for k, v := range resources {
-			m.Put(LabelResource+"."+k, v)
+			_, _ = m.Put(LabelResource+"."+k, v)
 		}
 	}
 
 	if s.timeSeries.Metadata != nil {
-		m.Put(LabelSystem, s.timeSeries.Metadata.SystemLabels)
-		m.Put(LabelUserMetadata, s.timeSeries.Metadata.UserLabels)
+		_, _ = m.Put(LabelSystem, s.timeSeries.Metadata.SystemLabels)
+		_, _ = m.Put(LabelUserMetadata, s.timeSeries.Metadata.UserLabels)
 	}
 
 	return MetadataCollectorData{
