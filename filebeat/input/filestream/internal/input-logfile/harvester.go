@@ -147,7 +147,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // Restart starts the Harvester for a Source if a Harvester is already running
 // it waits for it to shut down for a specified timeout. It does not block.
 // If the harvester limit has been reached, the harvester will wait until it can
-// be started. Start does not block.
+// be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 

@@ -154,7 +154,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			onRun: harvesterRun,
 			wg:    &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
-		hg.tg = task.NewGroup(1, 1)
+		hg.tg = task.NewGroup(1, time.Second, &logp.Logger{}, "")
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -388,7 +388,7 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
 		identifier: &sourceIdentifier{"filestream::.global::"},
-		tg:         task.NewGroup(0, 0),
+		tg:         task.NewGroup(0, time.Second, &logp.Logger{}, ""),
 	}
 }
 

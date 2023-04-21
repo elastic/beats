@@ -1,25 +1,37 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package task
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"strings"
 	"sync"
+	"time"
 
 	"golang.org/x/sync/semaphore"
 )
 
 type Group struct {
-	limit uint64
-
 	sem *semaphore.Weighted
 	wg  *sync.WaitGroup
 
-	errs     []error
-	errsSize uint64
-	errsNext uint64
-	errsMu   *sync.Mutex
+	stopTimeout time.Duration
+	logErr      func(error)
 
 	ctx       context.Context
 	cancelCtx context.CancelFunc
@@ -29,101 +41,88 @@ type Goer interface {
 	Go(fn func(context.Context) error) error
 }
 
-func NewGroup(limit uint64, maxErrors uint64) *Group {
-	if maxErrors < 1 {
-		maxErrors = 1
-	}
+type Logger interface {
+	Errorf(format string, args ...interface{})
+}
+
+func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errFormat string) *Group {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	g := Group{
-		limit:     limit,
-		wg:        &sync.WaitGroup{},
-		errsSize:  maxErrors,
-		errs:      make([]error, maxErrors),
-		errsMu:    &sync.Mutex{},
-		ctx:       ctx,
-		cancelCtx: cancel,
+	var logErr = func(error) {}
+	if log != nil {
+		logErr = func(err error) {
+			log.Errorf(errFormat, err)
+		}
 	}
 
+	var sem *semaphore.Weighted
 	if limit > 0 {
-		g.sem = semaphore.NewWeighted(int64(limit))
+		sem = semaphore.NewWeighted(int64(limit))
 	}
 
-	return &g
+	return &Group{
+		cancelCtx:   cancel,
+		ctx:         ctx,
+		logErr:      logErr,
+		sem:         sem,
+		stopTimeout: stopTimeout,
+		wg:          &sync.WaitGroup{},
+	}
 }
 
 // Go starts fn on a goroutine when a worker becomes available.
 // If the worker pool was already closed, Go returns a context.Canceled error.
 // If there are no workers available and Group.Stop() is called, fn is discarded.
 // Go does not block.
-func (p *Group) Go(fn func(context.Context) error) error {
-	if err := p.ctx.Err(); err != nil {
+func (g *Group) Go(fn func(context.Context) error) error {
+	if err := g.ctx.Err(); err != nil {
 		return fmt.Errorf("task group is closed: %w", err)
 	}
 
-	p.wg.Add(1)
+	g.wg.Add(1)
 	go func() {
-		defer p.wg.Done()
+		defer g.wg.Done()
 
-		if p.limit != 0 {
-			defer p.sem.Release(1)
-			err := p.sem.Acquire(p.ctx, 1)
+		if g.sem != nil {
+			defer g.sem.Release(1)
+			err := g.sem.Acquire(g.ctx, 1)
 			if err != nil {
-				p.addErr(err)
+				g.logErr(fmt.Errorf(
+					"task.Group: semaphore acquire failed, was the task group closed? err: %v",
+					err))
 				return
 			}
 		}
 
-		p.addErr(fn(p.ctx))
+		err := fn(g.ctx)
+		if err != nil {
+			g.logErr(err)
+		}
+		return
 	}()
 
 	return nil
 }
 
-func (p *Group) addErr(err error) {
-	if err == nil {
-		return
-	}
+// Stop stops the task group accepting new goroutines to launch and waits until
+// either all running tasks finishes or the stop timeout is reached, whatever
+// happens first. It returns an error if the timout is reached or nil otherwise.
+func (g *Group) Stop() error {
+	g.cancelCtx()
 
-	p.errsMu.Lock()
-	defer p.errsMu.Unlock()
+	done := make(chan struct{})
+	go func() {
+		g.wg.Wait()
+		done <- struct{}{}
+	}()
 
-	p.errs[p.errsNext] = err
-	p.errsNext++
+	timeout, cancel := context.WithTimeout(context.Background(), g.stopTimeout)
+	defer cancel()
 
-	if p.errsNext >= p.errsSize {
-		p.errsNext = 0
-	}
-}
-
-func (p *Group) Stop() error {
-	p.cancelCtx()
-
-	p.wg.Wait()
-	p.errsMu.Lock()
-	defer p.errsMu.Unlock()
-
-	if p.errs[0] == nil {
+	select {
+	case <-timeout.Done():
+		return fmt.Errorf("task group Stop timeout: %w", timeout.Err())
+	case <-done:
 		return nil
 	}
-
-	// TODO: use errors.Join once we update to go1.20
-	buf := &strings.Builder{}
-	buf.WriteString("last errors:")
-	for i, err := range p.errs {
-		if err == nil {
-			break
-		}
-
-		if i == 0 {
-			// safe to ignore as strings.Builder.Write does not fail.
-			_, _ = fmt.Fprintf(buf, " %v", err)
-			continue
-		}
-
-		// safe to ignore as strings.Builder.Write does not fail.
-		_, _ = fmt.Fprintf(buf, " | %v", err)
-	}
-
-	return errors.New(buf.String())
 }
