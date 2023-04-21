@@ -67,7 +67,7 @@ function process(evt) {
 }
 `
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	require.NoError(t, err)
 
@@ -103,7 +103,7 @@ function process(evt) {
 }
 `
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	require.NoError(t, err)
 
@@ -128,7 +128,7 @@ function process(evt) {
 }
 `
 
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	_, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	require.Error(t, err, "processor that implements Closer() shouldn't be allowed")
 }
@@ -155,7 +155,7 @@ func newMock(c *config.C) (beat.Processor, error) {
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the mock processor configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the mock processor configuration: %w", err)
 	}
 
 	return &mockProcessor{

@@ -65,7 +65,7 @@ func NewTruncateFields(c *conf.C) (beat.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the truncate_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the truncate_fields configuration: %w", err)
 	}
 
 	var truncateFunc truncater

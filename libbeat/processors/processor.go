@@ -143,9 +143,7 @@ func (procs *Processors) All() []beat.Processor {
 	}
 
 	ret := make([]beat.Processor, len(procs.List))
-	for i, p := range procs.List {
-		ret[i] = p
-	}
+	copy(ret, procs.List)
 	return ret
 }
 

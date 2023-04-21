@@ -47,7 +47,7 @@ func newIncludeFields(c *conf.C) (beat.Processor, error) {
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %w", err)
 	}
 
 	/* add read only fields if they are not yet */

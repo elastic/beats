@@ -57,7 +57,7 @@ func (u decodeDuration) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	d, err := time.ParseDuration(durationString)
 	if err != nil {
-		return event, nil
+		return event, fmt.Errorf("couldn't parse field '%s' as duration: %w", fieldName, err)
 	}
 	switch u.config.Format {
 	case "milliseconds":

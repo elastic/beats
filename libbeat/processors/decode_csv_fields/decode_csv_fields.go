@@ -53,8 +53,6 @@ var (
 		Separator:   ",",
 		FailOnError: true,
 	}
-
-	errFieldAlreadySet = errors.New("field already has a value")
 )
 
 func init() {
