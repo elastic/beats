@@ -30,7 +30,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 
 	instancesOutputs, err := getInstancesPerRegion(svcEC2)
 	if err != nil {
-		return events, fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err)
+		return events, fmt.Errorf("aws.ec2.instance fields are not available, skipping region %s: %w", regionName, err)
 	}
 
 	// collect monitoring state for each instance
