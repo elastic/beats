@@ -112,6 +112,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
 - Sanitize filenames for request tracer in httpjson and cel inputs. {pull}35143[35143]
 - decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
+- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
 
 *Heartbeat*
 
