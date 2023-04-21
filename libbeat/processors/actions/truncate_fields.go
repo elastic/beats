@@ -19,11 +19,10 @@ package actions
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -108,7 +107,7 @@ func (f *truncateFields) truncateSingleField(field string, event *beat.Event) er
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return errors.Wrapf(err, "could not fetch value for key: %s", field)
+		return fmt.Errorf("could not fetch value for key '%s': %w", field, err)
 	}
 
 	switch value := v.(type) {
@@ -129,7 +128,7 @@ func (f *truncateFields) addTruncatedString(field, value string, event *beat.Eve
 	}
 	_, err = event.PutValue(field, string(truncated))
 	if err != nil {
-		return fmt.Errorf("could not add truncated string value for key: %s, Error: %+v", field, err)
+		return fmt.Errorf("could not add truncated string value for key: %s, Error: %w", field, err)
 	}
 
 	if isTruncated {
@@ -145,7 +144,7 @@ func (f *truncateFields) addTruncatedByte(field string, value []byte, event *bea
 	}
 	_, err = event.PutValue(field, truncated)
 	if err != nil {
-		return fmt.Errorf("could not add truncated byte slice value for key: %s, Error: %+v", field, err)
+		return fmt.Errorf("could not add truncated byte slice value for key: %s, Error: %w", field, err)
 	}
 
 	if isTruncated {

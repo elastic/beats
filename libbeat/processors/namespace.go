@@ -48,7 +48,7 @@ func (ns *Namespace) Register(name string, factory Constructor) error {
 	p := plugin{NewConditional(factory)}
 	names := strings.Split(name, ".")
 	if err := ns.add(names, p); err != nil {
-		return fmt.Errorf("plugin %s registration fail %v", name, err)
+		return fmt.Errorf("plugin %s registration fail %w", name, err)
 	}
 	return nil
 }
