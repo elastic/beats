@@ -6,6 +6,7 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -52,7 +53,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 	it := r.client.ListTimeSeries(ctx, req)
 	for {
 		resp, err := it.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 

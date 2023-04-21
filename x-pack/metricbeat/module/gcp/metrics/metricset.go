@@ -6,6 +6,7 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
@@ -142,12 +142,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ctx := context.Background()
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating Stackdriver client")
+		return nil, fmt.Errorf("error creating Stackdriver client: %w", err)
 	}
 
 	m.metricsMeta, err = m.metricDescriptor(ctx, client)
 	if err != nil {
-		return nil, errors.Wrap(err, "error calling metricDescriptor function")
+		return nil, fmt.Errorf("error calling metricDescriptor function: %w", err)
 	}
 
 	m.requester = &metricsRequester{
@@ -175,14 +175,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		}
 		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
-			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
+			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
 
 		events, err := m.eventMapping(ctx, responses, sdc)
 		if err != nil {
-			err = errors.Wrap(err, "eventMapping failed")
+			err = fmt.Errorf("eventMapping failed: %w", err)
 			m.Logger().Error(err)
 			return err
 		}
@@ -203,13 +203,13 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 
 	if !m.config.ExcludeLabels {
 		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
-			return nil, errors.Wrap(err, "error trying to create metadata service")
+			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}
 
 	tsGrouped, err := m.timeSeriesGrouped(ctx, gcpService, tss, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "error trying to group time series data")
+		return nil, fmt.Errorf("error trying to group time series data: %w", err)
 	}
 
 	//Create single events for each group of data that matches some common patterns like labels and timestamp
@@ -242,7 +242,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 // validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
 	if d.Seconds() < gcp.MonitoringMetricsSamplingRate {
-		return errors.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", gcp.MonitoringMetricsSamplingRate)
+		return fmt.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", gcp.MonitoringMetricsSamplingRate)
 	}
 
 	return nil
@@ -257,7 +257,7 @@ func (mc *metricsConfig) Validate() error {
 
 	if mc.Aligner != "" {
 		if _, ok := gcp.AlignersMapToGCP[mc.Aligner]; !ok {
-			return errors.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
+			return fmt.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
 		}
 	}
 	return nil
@@ -279,8 +279,8 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 			for {
 				out, err := it.Next()
-				if err != nil && err != iterator.Done {
-					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
+				if err != nil && !errors.Is(err, iterator.Done) {
+					err = fmt.Errorf("Could not make ListMetricDescriptors request for metric type %s: %w", mt, err)
 					m.Logger().Error(err)
 					return metricsWithMeta, err
 				}
@@ -289,7 +289,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 					metricsWithMeta = m.getMetadata(out, metricsWithMeta)
 				}
 
-				if err == iterator.Done {
+				if errors.Is(err, iterator.Done) {
 					break
 				}
 
