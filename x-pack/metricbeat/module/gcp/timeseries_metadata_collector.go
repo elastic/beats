@@ -137,45 +137,34 @@ func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *Met
 
 	if s.timeSeries.Metric != nil {
 		if s.timeSeries.Metric.Type != "" {
-			m.Put("metric.type", s.timeSeries.Metric.Type)
+			_, _ = m.Put("metric.type", s.timeSeries.Metric.Type)
 		}
 
 		if s.timeSeries.Metric.Labels != nil {
-			m.Put("metric.labels", s.timeSeries.Metric.Labels)
+			_, _ = m.Put("metric.labels", s.timeSeries.Metric.Labels)
 		}
 	}
 
 	if s.timeSeries.Resource != nil {
 		if s.timeSeries.Resource.Type != "" {
-			m.Put("resource.type", s.timeSeries.Resource.Type)
+			_, _ = m.Put("resource.type", s.timeSeries.Resource.Type)
 		}
 
 		if s.timeSeries.Resource.Labels != nil {
-			m.Put("resource.labels", s.timeSeries.Resource.Labels)
+			_, _ = m.Put("resource.labels", s.timeSeries.Resource.Labels)
 		}
 	}
 
 	if s.timeSeries.Metadata != nil {
 		if s.timeSeries.Metadata.SystemLabels != nil {
-			m.Put("metadata.system.labels", s.timeSeries.Metadata.SystemLabels)
+			_, _ = m.Put("metadata.system.labels", s.timeSeries.Metadata.SystemLabels)
 		}
 		if s.timeSeries.Metadata.UserLabels != nil {
-			m.Put("metadata.user.labels", s.timeSeries.Metadata.UserLabels)
+			_, _ = m.Put("metadata.user.labels", s.timeSeries.Metadata.UserLabels)
 		}
 	}
 
 	return m.String(), nil
-}
-
-func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Point) (t time.Time, err error) {
-	// Don't add point intervals that can't be "stated" at some timestamp.
-	if p != nil && p.Interval != nil {
-		if t, err = ptypes.Timestamp(p.Interval.StartTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.StartTime)
-		}
-	}
-
-	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
 }
 
 func getRegionName(availabilityZone string) (region string) {
@@ -184,5 +173,6 @@ func getRegionName(availabilityZone string) (region string) {
 		return ""
 	}
 	region = azSplit[0] + "-" + azSplit[1]
+	//nolint:nakedret // using named return value
 	return
 }

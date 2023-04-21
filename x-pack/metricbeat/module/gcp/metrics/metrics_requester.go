@@ -67,6 +67,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 
 	out.aligner = aligner
 	out.timeSeries = timeSeries
+	//nolint:nakedret // using named return value
 	return
 }
 
@@ -153,6 +154,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 		}
 	}
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
+	//nolint:nakedret // using named return value
 	return
 }
 
