@@ -48,7 +48,7 @@ func createAddTags(c *conf.C) (beat.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the add_tags configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the add_tags configuration: %w", err)
 	}
 
 	return NewAddTags(config.Target, config.Tags), nil
@@ -65,7 +65,7 @@ func NewAddTags(target string, tags []string) beat.Processor {
 	// make sure capacity == length such that different processors adding more tags
 	// do not change/overwrite each other on append
 	if cap(tags) != len(tags) {
-		tmp := make([]string, len(tags), len(tags))
+		tmp := make([]string, len(tags))
 		copy(tmp, tags)
 		tags = tmp
 	}
@@ -74,7 +74,7 @@ func NewAddTags(target string, tags []string) beat.Processor {
 }
 
 func (at *addTags) Run(event *beat.Event) (*beat.Event, error) {
-	mapstr.AddTagsWithKey(event.Fields, at.target, at.tags)
+	_ = mapstr.AddTagsWithKey(event.Fields, at.target, at.tags)
 	return event, nil
 }
 

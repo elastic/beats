@@ -55,7 +55,7 @@ func CreateAddFields(c *conf.C) (beat.Processor, error) {
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %w", err)
 	}
 
 	return makeFieldsProcessor(
