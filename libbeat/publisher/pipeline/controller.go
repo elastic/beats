@@ -184,6 +184,9 @@ func (c *outputController) Reload(
 func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
 	c.queueLock.Lock()
 	if c.queue != nil {
+		// We defer the unlock only after the nil check because if the
+		// queue doesn't exist we'll need to block until it does, and
+		// in that case we need to manually unlock before we start waiting.
 		defer c.queueLock.Unlock()
 		return c.queue.Producer(config)
 	}
