@@ -110,6 +110,18 @@ func (c *outputController) Close() error {
 	if c.queue != nil {
 		c.queue.Close()
 	}
+	for _, req := range c.pendingRequests {
+		// We can only end up here if there was an attempt to connect to the
+		// pipeline but it was shut down before any output was set.
+		// In this case, return nil and Pipeline.ConnectWith will pass on a
+		// real error to the caller.
+		// NOTE: under the current shutdown process, Pipeline.Close (and hence
+		// outputController.Close) is ~never called. So even if we did have
+		// blocked callers here, in a real shutdown they will never be woken
+		// up. But in hopes of a day when the shutdown process is more robust,
+		// I've decided to do the right thing here anyway.
+		req.responseChan <- nil
+	}
 	c.queueLock.Unlock()
 
 	return nil
@@ -185,6 +197,14 @@ func (c *outputController) Reload(
 // queueProducer creates a queue producer with the given config, blocking
 // until the queue is created if it does not yet exist.
 func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
+	if publishDisabled {
+		// If publishDisabled is set ("-N" command line flag), then no output
+		// will ever be set, and no queue will ever be created. In this case,
+		// return a no-op producer, so attempts to connect to the pipeline
+		// don't deadlock the shutdown process because the Beater is blocked
+		// on a (*Pipeline).Connect call that will never return.
+		return emptyProducer{}
+	}
 	c.queueLock.Lock()
 	if c.queue != nil {
 		// We defer the unlock only after the nil check because if the
@@ -259,4 +279,21 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 		req.responseChan <- c.queue.Producer(req.config)
 	}
 	c.pendingRequests = nil
+}
+
+// emptyProducer is a placeholder queue producer that is used only when
+// publishDisabled is set, so beats don't block forever waiting for
+// a producer for a nonexistent queue.
+type emptyProducer struct{}
+
+func (emptyProducer) Publish(_ interface{}) (queue.EntryID, bool) {
+	return 0, false
+}
+
+func (emptyProducer) TryPublish(_ interface{}) (queue.EntryID, bool) {
+	return 0, false
+}
+
+func (emptyProducer) Cancel() int {
+	return 0
 }

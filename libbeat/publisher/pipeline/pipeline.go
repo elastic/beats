@@ -289,6 +289,11 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	client.eventListener = ackHandler
 	client.waiter = waiter
 	client.producer = p.outputController.queueProducer(producerCfg)
+	if client.producer == nil {
+		// This can only happen if the pipeline was shut down while clients
+		// were still waiting to connect.
+		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
+	}
 
 	p.observer.clientConnected()
 
