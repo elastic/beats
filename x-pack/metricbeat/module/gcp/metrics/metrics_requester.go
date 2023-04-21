@@ -113,17 +113,13 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 
 		region := r.config.Region
 		if region != "" {
-			if strings.HasSuffix(region, "*") {
-				region = strings.TrimSuffix(region, "*")
-			}
+			region = strings.TrimSuffix(region, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
 			break
 		}
 		zone := r.config.Zone
 		if zone != "" {
-			if strings.HasSuffix(zone, "*") {
-				zone = strings.TrimSuffix(zone, "*")
-			}
+			zone = strings.TrimSuffix(zone, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		}
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
