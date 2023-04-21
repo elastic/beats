@@ -70,7 +70,11 @@ func (inp *managedInput) Run(
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
-		tg:           task.NewGroup(inp.harvesterLimit, 2*inp.harvesterLimit),
+		tg: task.NewGroup(
+			inp.harvesterLimit,
+			time.Minute, // magic number
+			ctx.Logger,
+			"harvester:"),
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()

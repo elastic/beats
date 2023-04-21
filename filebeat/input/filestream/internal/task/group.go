@@ -84,8 +84,8 @@ func (g *Group) Go(fn func(context.Context) error) error {
 		defer g.wg.Done()
 
 		if g.sem != nil {
-			defer g.sem.Release(1)
 			err := g.sem.Acquire(g.ctx, 1)
+			defer g.sem.Release(1)
 			if err != nil {
 				g.logErr(fmt.Errorf(
 					"task.Group: semaphore acquire failed, was the task group closed? err: %v",
