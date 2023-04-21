@@ -37,21 +37,33 @@ type Group struct {
 	cancelCtx context.CancelFunc
 }
 
-type Goer interface {
-	Go(fn func(context.Context) error) error
-}
-
 type Logger interface {
 	Errorf(format string, args ...interface{})
 }
 
-func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errFormat string) *Group {
+// NewGroup returns a new task group which will run tasks on a goroutine. See
+// Group.Go for details.
+//
+// The number of concurrent running tasks is limited by limit, if limit is zero,
+// there is no limit.
+// The group can be stopped by calling Group.Stop which will close the group,
+// it'll not accept new tasks, and it will wait for all running tasks to
+// complete or stopTimeout to elapse, what ever comes first.
+// log is used to log any error returned by the tasks or internal errors. The
+// logs will be prefixed by errPrefix.
+func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix string) *Group {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	var logErr = func(error) {}
 	if log != nil {
 		logErr = func(err error) {
-			log.Errorf(errFormat, err)
+			var format string
+			if errPrefix == "" {
+				format = "%v"
+			} else {
+				format = errPrefix + ": %v"
+			}
+			log.Errorf(format, err)
 		}
 	}
 
@@ -70,10 +82,11 @@ func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errFormat str
 	}
 }
 
-// Go starts fn on a goroutine when a worker becomes available.
-// If the worker pool was already closed, Go returns a context.Canceled error.
-// If there are no workers available and Group.Stop() is called, fn is discarded.
-// Go does not block.
+// Go starts fn on a goroutine. If the limit of concurrent tasks has been reached,
+// fn will wait until it can run. Go won't block while fn waits to run.
+// If the group was already closed, Go returns a context.Canceled error.
+// If the limit of concurrent tasks has been reached and Group.Stop() is called,
+// fn is discarded and an error is logged.
 func (g *Group) Go(fn func(context.Context) error) error {
 	if err := g.ctx.Err(); err != nil {
 		return fmt.Errorf("task group is closed: %w", err)
@@ -104,9 +117,9 @@ func (g *Group) Go(fn func(context.Context) error) error {
 	return nil
 }
 
-// Stop stops the task group accepting new goroutines to launch and waits until
-// either all running tasks finishes or the stop timeout is reached, whatever
-// happens first. It returns an error if the timout is reached or nil otherwise.
+// Stop stops the task group accepting new goroutines and waits until all
+// running tasks to finish or the stop timeout to elapse, whatever
+// happens first. It returns an error if the timout is reached, nil otherwise.
 func (g *Group) Stop() error {
 	g.cancelCtx()
 
