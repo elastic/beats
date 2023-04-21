@@ -43,11 +43,8 @@ func NewConditional(
 // NewConditionList takes a slice of Config objects and turns them into real Condition objects.
 func NewConditionList(configs []conditions.Config) ([]conditions.Condition, error) {
 	out := make([]conditions.Condition, len(configs))
-	for i, condConfig := range configs {
-		cfg := condConfig
-		// This should be ok but pass in a local copy to be safe. NewCondition
-		// should really take a struct, not a pointer.
-		cond, err := conditions.NewCondition(&cfg)
+	for i := range configs {
+		cond, err := conditions.NewCondition(&configs[i])
 		if err != nil {
 			return nil, err
 		}
