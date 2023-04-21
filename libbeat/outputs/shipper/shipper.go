@@ -109,9 +109,10 @@ func makeShipper(
 	swb := outputs.WithBackoff(s, config.Backoff.Init, config.Backoff.Max)
 
 	return outputs.Group{
-		Clients:       []outputs.Client{swb},
-		Retry:         config.MaxRetries,
-		QueueSettings: proxyqueue.Settings{BatchSize: config.BulkMaxSize},
+		Clients: []outputs.Client{swb},
+		Retry:   config.MaxRetries,
+		QueueFactory: proxyqueue.FactoryForSettings(
+			proxyqueue.Settings{BatchSize: config.BulkMaxSize}),
 	}, nil
 }
 

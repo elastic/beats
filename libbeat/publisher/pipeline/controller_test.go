@@ -143,7 +143,9 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 	controller := outputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
-		queueSettings: memqueue.Settings{Events: 1},
+		queueFactory: memqueue.FactoryForSettings(
+			memqueue.Settings{Events: 1},
+		),
 		consumer: &eventConsumer{
 			// We aren't testing the values sent to eventConsumer, we
 			// just need a placeholder here so outputController can
@@ -163,19 +165,21 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 	assert.Equal(t, 1, controller.queue.BufferConfig().MaxEvents, "Queue should be created using provided settings")
 }
 
-func TestOutputQueueSettingsTakePrecedence(t *testing.T) {
+func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
 	controller := outputController{
-		queueSettings: memqueue.Settings{Events: 1},
+		queueFactory: memqueue.FactoryForSettings(
+			memqueue.Settings{Events: 1},
+		),
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},
 		observer: nilObserver,
 	}
 	controller.Set(outputs.Group{
-		Clients:       []outputs.Client{newMockClient(nil)},
-		QueueSettings: memqueue.Settings{Events: 2},
+		Clients:      []outputs.Client{newMockClient(nil)},
+		QueueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 2}),
 	})
 
 	// The pipeline queue settings has max events 1, the output has
@@ -183,10 +187,13 @@ func TestOutputQueueSettingsTakePrecedence(t *testing.T) {
 	assert.Equal(t, 2, controller.queue.BufferConfig().MaxEvents, "Queue should be created using settings from the output")
 }
 
-func TestInvalidQueueSettingsRevertsToDefault(t *testing.T) {
+func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
+	failedFactory := func(_ *logp.Logger, _ func(int)) (queue.Queue, error) {
+		return nil, fmt.Errorf("This queue creation intentionally failed")
+	}
 	controller := outputController{
-		queueSettings: "This is not a queue settings object",
+		queueFactory: failedFactory,
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},
@@ -204,7 +211,7 @@ func TestInvalidQueueSettingsRevertsToDefault(t *testing.T) {
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	controller := outputController{
-		queueSettings: memqueue.Settings{Events: 1},
+		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},

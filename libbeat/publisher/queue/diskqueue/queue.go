@@ -102,6 +102,18 @@ type metricsRequestResponse struct {
 	sizeOnDisk uint64
 }
 
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings)
+	}
+}
+
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
 func NewQueue(
@@ -258,6 +270,10 @@ func (dq *diskQueue) Close() error {
 	dq.waitGroup.Wait()
 
 	return nil
+}
+
+func (dq *diskQueue) QueueType() string {
+	return QueueType
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {

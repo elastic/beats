@@ -153,13 +153,13 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueSettings, err := queueSettingsForUserConfig(
+	queueFactory, err := queueFactoryForUserConfig(
 		queueType, userQueueConfig.Config(), settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueSettings)
+	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueFactory)
 	if err != nil {
 		return nil, err
 	}
@@ -390,12 +390,11 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 	return p.outputController
 }
 
-// Parses the given config and returns a memqueue.Settings or
-// diskqueue.Settings based on it. This helper exists to frontload config
-// parsing errors: if there is an error in the queue config, we want it to
-// show up as fatal during initialization, even if the queue itself isn't
-// created until later.
-func queueSettingsForUserConfig(queueType string, userConfig *conf.C, inQueueSize int) (interface{}, error) {
+// Parses the given config and returns a QueueFactory based on it.
+// This helper exists to frontload config parsing errors: if there is an
+// error in the queue config, we want it to show up as fatal during
+// initialization, even if the queue itself isn't created until later.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, inQueueSize int) (queue.QueueFactory, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
@@ -405,9 +404,13 @@ func queueSettingsForUserConfig(queueType string, userConfig *conf.C, inQueueSiz
 		// The memory queue has a special override during pipeline
 		// initialization for the size of its API channel buffer.
 		settings.InputQueueSize = inQueueSize
-		return settings, nil
+		return memqueue.FactoryForSettings(settings), nil
 	case diskqueue.QueueType:
-		return diskqueue.SettingsForUserConfig(userConfig)
+		settings, err := diskqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, err
+		}
+		return diskqueue.FactoryForSettings(settings), nil
 	default:
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}

@@ -25,9 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -55,9 +53,10 @@ type outputController struct {
 	queueLock       sync.Mutex
 	pendingRequests []producerRequest
 
-	// queueSettings must be one of memqueue.Settings, diskqueue.Settings, or
-	// proxyqueue.Settings.
-	queueSettings interface{}
+	// This factory will be used to create the queue when needed, unless
+	// it is overridden by output configuration when outputController.Set
+	// is called.
+	queueFactory queue.QueueFactory
 
 	workerChan chan publisher.Batch
 
@@ -81,14 +80,14 @@ func newOutputController(
 	monitors Monitors,
 	observer outputObserver,
 	eventWaitGroup *sync.WaitGroup,
-	queueSettings interface{},
+	queueFactory queue.QueueFactory,
 ) (*outputController, error) {
 	controller := &outputController{
 		beat:           beat,
 		monitors:       monitors,
 		observer:       observer,
 		eventWaitGroup: eventWaitGroup,
-		queueSettings:  queueSettings,
+		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
 		consumer:       newEventConsumer(monitors.Logger, observer),
 	}
@@ -230,43 +229,22 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 
 	// Queue settings from the output take precedence, otherwise fall back
 	// on what we were given during initialization.
-	settings := outGrp.QueueSettings
-	if settings == nil {
-		settings = c.queueSettings
+	factory := outGrp.QueueFactory
+	if factory == nil {
+		factory = c.queueFactory
 	}
 
-	var queueType string
-	switch s := settings.(type) {
-	case proxyqueue.Settings:
-		queueType = proxyqueue.QueueType
-		c.queue = proxyqueue.NewQueue(logger, c.onACK, s)
-
-	case memqueue.Settings:
-		queueType = memqueue.QueueType
-		c.queue = memqueue.NewQueue(logger, c.onACK, s)
-
-	case diskqueue.Settings:
-		queueType = diskqueue.QueueType
-		queue, err := diskqueue.NewQueue(logger, c.onACK, s)
-		if err != nil {
-			logger.Errorf("couldn't initialize disk queue: %v", err)
-		}
-		c.queue = queue
-	default:
-		logger.Errorf("outputController received unrecognized queue settings")
-	}
-	// If we have no valid settings or the disk queue failed, fall back on the
-	// memory queue since that is guaranteed to succeed.
-	if c.queue == nil {
-		queueType = memqueue.QueueType
-		logger.Errorf("falling back to default memory queue, check your queue configuration")
+	queue, err := factory(logger, c.onACK)
+	if err != nil {
+		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		c.queue = memqueue.NewQueue(logger, c.onACK, s)
+		queue = memqueue.NewQueue(logger, c.onACK, s)
 	}
+	c.queue = queue
 
 	if c.monitors.Telemetry != nil {
 		queueReg := c.monitors.Telemetry.NewRegistry("queue")
-		monitoring.NewString(queueReg, "name").Set(queueType)
+		monitoring.NewString(queueReg, "name").Set(c.queue.QueueType())
 	}
 	maxEvents := c.queue.BufferConfig().MaxEvents
 	c.observer.queueMaxEvents(maxEvents)

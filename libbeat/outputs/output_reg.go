@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -55,11 +56,10 @@ type IndexSelector interface {
 // output, but it also provides a natural migration path for moving queue
 // configuration into the outputs.
 type Group struct {
-	Clients   []Client
-	BatchSize int
-	Retry     int
-	// Must be one of memqueue.Settings, diskqueue.Settings, proxyqueue.Settings.
-	QueueSettings interface{}
+	Clients      []Client
+	BatchSize    int
+	Retry        int
+	QueueFactory queue.QueueFactory
 }
 
 // RegisterType registers a new output type.
