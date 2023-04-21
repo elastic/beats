@@ -35,7 +35,7 @@ func ConfigChecked(
 	return func(cfg *config.C) (beat.Processor, error) {
 		err := validator(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("%v in %v", err.Error(), cfg.Path())
+			return nil, fmt.Errorf("%w in %v", err, cfg.Path())
 		}
 
 		return constr(cfg)

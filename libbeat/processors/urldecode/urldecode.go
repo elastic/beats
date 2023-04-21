@@ -122,7 +122,7 @@ func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error
 	}
 
 	if _, err := event.PutValue(target, decodedData); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", decodedData, target, err)
+		return fmt.Errorf("could not put value: %s: %v, %w", decodedData, target, err)
 	}
 
 	return nil

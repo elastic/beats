@@ -103,7 +103,10 @@ func NewCondition(config *Config) (Condition, error) {
 func NewConditionList(config []Config) ([]Condition, error) {
 	out := make([]Condition, len(config))
 	for i, condConfig := range config {
-		cond, err := NewCondition(&condConfig)
+		cfg := condConfig
+		// This should be ok but pass in a local copy to be safe. NewCondition
+		// should really take a struct, not a pointer.
+		cond, err := NewCondition(&cfg)
 		if err != nil {
 			return nil, err
 		}

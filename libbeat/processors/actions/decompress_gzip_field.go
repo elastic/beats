@@ -113,6 +113,7 @@ func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 	}
 
 	var outBuf bytes.Buffer
+	//nolint:gosec // This is potentially vulnerable to "decompression bomb" DoS but that is inherent to this processor.
 	_, err = io.Copy(&outBuf, r)
 	if err != nil {
 		r.Close()
