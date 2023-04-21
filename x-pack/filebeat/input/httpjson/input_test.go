@@ -1248,6 +1248,7 @@ func TestInput(t *testing.T) {
 			assert.NoError(t, g.Wait())
 		})
 	}
+	t.Cleanup(func() { os.RemoveAll(t.TempDir()) })
 }
 
 func newTestServer(
