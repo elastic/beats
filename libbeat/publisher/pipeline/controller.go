@@ -106,7 +106,11 @@ func (c *outputController) Close() error {
 	// Closing the queue stops ACKs from propagating, so we close everything
 	// else first to give it a chance to wait for any outstanding events to be
 	// acknowledged.
-	c.queue.Close()
+	c.queueLock.Lock()
+	if c.queue != nil {
+		c.queue.Close()
+	}
+	c.queueLock.Unlock()
 
 	return nil
 }
