@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 :stack-version: 7.17.10
 :doc-branch: 7.17
 :go-version: 1.19.7
+=======
+:stack-version: 8.8.0
+:doc-branch: master
+:go-version: 1.19.8
+>>>>>>> e0a59fe8cd ([updatecli][githubrelease] Bump version to 1.19.8 (#35041))
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
