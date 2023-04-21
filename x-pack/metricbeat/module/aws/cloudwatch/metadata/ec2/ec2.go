@@ -55,7 +55,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 			if output.InstanceType != "" {
 				_, _ = events[eventIdentifier].RootFields.Put("cloud.machine.type", output.InstanceType)
 			} else {
-				logp.L().Errorf("InstanceType is empty")
+				logp.L().Error("InstanceType is empty")
 			}
 
 			placement := output.Placement
