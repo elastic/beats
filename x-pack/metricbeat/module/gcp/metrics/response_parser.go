@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -63,8 +62,8 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringp
 func (e *incomingFieldExtractor) getTimestamp(p *monitoringpb.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
-		if ts, err = ptypes.Timestamp(p.Interval.EndTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.EndTime)
+		if err = p.Interval.EndTime.CheckValid(); err != nil {
+			return time.Time{}, fmt.Errorf("end time timestamp '%#v' from metric is not valid: %w", p.Interval.EndTime, err)
 		}
 		return ts, nil
 	}

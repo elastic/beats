@@ -8,10 +8,8 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"time"
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
