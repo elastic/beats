@@ -102,9 +102,25 @@ type metricsRequestResponse struct {
 	sizeOnDisk uint64
 }
 
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings)
+	}
+}
+
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
-func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
+func NewQueue(
+	logger *logp.Logger,
+	writeToDiskCallback func(eventCount int),
+	settings Settings,
+) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
@@ -209,7 +225,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
 		readerLoop:  newReaderLoop(settings),
-		writerLoop:  newWriterLoop(logger, settings),
+		writerLoop:  newWriterLoop(logger, writeToDiskCallback, settings),
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
@@ -254,6 +270,10 @@ func (dq *diskQueue) Close() error {
 	dq.waitGroup.Wait()
 
 	return nil
+}
+
+func (dq *diskQueue) QueueType() string {
+	return QueueType
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {
