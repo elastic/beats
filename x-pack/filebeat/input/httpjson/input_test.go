@@ -28,11 +28,12 @@ func TestInput(t *testing.T) {
 	tempDirectory := t.TempDir()
 	fileLocation := tempDirectory + "/http-request-trace-*.ndjson"
 	testCases := []struct {
-		name        string
-		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
-		baseConfig  map[string]interface{}
-		handler     http.HandlerFunc
-		expected    []string
+		name         string
+		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig   map[string]interface{}
+		handler      http.HandlerFunc
+		expected     []string
+		expectedfile string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -329,7 +330,6 @@ func TestInput(t *testing.T) {
 					},
 				},
 				"request.tracer.filename": fileLocation,
-				"verifyfilepath":          true,
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -337,6 +337,7 @@ func TestInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
+			expectedfile: "/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson",
 		},
 		{
 			name: "Test pagination",
@@ -1237,8 +1238,8 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
-			if tc.baseConfig["verifyfilepath"] != nil {
-				if _, err := os.Stat(tempDirectory + "/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"); err == nil {
+			if len(tc.expectedfile) > 0 {
+				if _, err := os.Stat(tempDirectory + tc.expectedfile); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
