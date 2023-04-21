@@ -21,14 +21,13 @@
 package add_docker_metadata
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -80,7 +79,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	var dockerAvailable bool
@@ -93,7 +92,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		dockerAvailable = true
 		log.Debugf("%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
-			return nil, errors.Wrap(err, "failed to start watcher")
+			return nil, fmt.Errorf("failed to start watcher: %w", err)
 		}
 	}
 
@@ -162,11 +161,11 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if cid == "" && len(d.pidFields) > 0 {
 		id, err := d.lookupContainerIDByPID(event)
 		if err != nil {
-			return nil, errors.Wrap(err, "error reading container ID")
+			return nil, fmt.Errorf("error reading container ID: %w", err)
 		}
 		if id != "" {
 			cid = id
-			event.PutValue(dockerContainerIDKey, cid)
+			_, _ = event.PutValue(dockerContainerIDKey, cid)
 		}
 	}
 
@@ -198,17 +197,17 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 			for k, v := range container.Labels {
 				if d.dedot {
 					label := common.DeDot(k)
-					labels.Put(label, v)
+					_, _ = labels.Put(label, v)
 				} else {
-					safemapstr.Put(labels, k, v)
+					_ = safemapstr.Put(labels, k, v)
 				}
 			}
-			meta.Put("container.labels", labels)
+			_, _ = meta.Put("container.labels", labels)
 		}
 
-		meta.Put("container.id", container.ID)
-		meta.Put("container.image.name", container.Image)
-		meta.Put("container.name", container.Name)
+		_, _ = meta.Put("container.id", container.ID)
+		_, _ = meta.Put("container.image.name", container.Image)
+		_, _ = meta.Put("container.name", container.Name)
 		event.Fields.DeepUpdate(meta.Clone())
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
@@ -227,7 +226,7 @@ func (d *addDockerMetadata) Close() error {
 	}
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
-		return errors.Wrap(err, "closing source processor of add_docker_metadata")
+		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
 	}
 	return nil
 }
@@ -281,7 +280,7 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 
 	cgroups, err := processCgroupPaths(d.hostFS, pid)
 	if err != nil {
-		return cgroups, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
+		return cgroups, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
 
 	d.cgroups.Put(pid, cgroups)

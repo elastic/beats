@@ -280,7 +280,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	metaClone := metadata.Clone()
-	metaClone.Delete("kubernetes.container.name")
+	_ = metaClone.Delete("kubernetes.container.name")
 	containerImage, err := metadata.GetValue("kubernetes.container.image")
 	if err == nil {
 		metaClone.Delete("kubernetes.container.image")
