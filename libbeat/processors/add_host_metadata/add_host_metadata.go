@@ -67,7 +67,7 @@ type addHostMetadata struct {
 }
 
 // New constructs a new add_host_metadata processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)

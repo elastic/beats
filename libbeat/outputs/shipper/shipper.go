@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
+
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
 	sc "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
@@ -106,7 +108,12 @@ func makeShipper(
 
 	swb := outputs.WithBackoff(s, config.Backoff.Init, config.Backoff.Max)
 
-	return outputs.Success(config.BulkMaxSize, config.MaxRetries, swb)
+	return outputs.Group{
+		Clients: []outputs.Client{swb},
+		Retry:   config.MaxRetries,
+		QueueFactory: proxyqueue.FactoryForSettings(
+			proxyqueue.Settings{BatchSize: config.BulkMaxSize}),
+	}, nil
 }
 
 // Connect establishes connection to the shipper server and implements `outputs.Connectable`.

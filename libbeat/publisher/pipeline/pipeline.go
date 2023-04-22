@@ -21,6 +21,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 	"time"
@@ -33,6 +34,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -62,10 +65,12 @@ type Pipeline struct {
 
 	observer observer
 
-	// wait close support
-	waitOnClose      bool
+	// wait close support. If eventWaitGroup is non-nil, then publishing
+	// an event through this pipeline will increment it and acknowledging
+	// a published event will decrement it, so the pipeline can wait on
+	// the group on shutdown to allow pending events to be acknowledged.
 	waitCloseTimeout time.Duration
-	waitCloseGroup   sync.WaitGroup
+	eventWaitGroup   *sync.WaitGroup
 
 	// closeRef signal propagation support
 	guardStartSigPropagation sync.Once
@@ -128,35 +133,33 @@ func New(
 		beatInfo:         beat,
 		monitors:         monitors,
 		observer:         nilObserver,
-		waitOnClose:      settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+	}
+	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
+		// If wait-on-close is enabled, give the pipeline a WaitGroup for
+		// events that have been Published but not yet ACKed.
+		p.eventWaitGroup = &sync.WaitGroup{}
 	}
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 
-	ackCallback := func(eventCount int) {
-		p.observer.queueACKed(eventCount)
-		if p.waitOnClose {
-			p.waitCloseGroup.Add(-eventCount)
-		}
-	}
-
+	// Convert the raw queue config to a parsed Settings object that will
+	// be used during queue creation. This lets us fail immediately on startup
+	// if there's a configuration problem.
 	queueType := defaultQueueType
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueConfig := queueConfig{
-		logger:      monitors.Logger,
-		queueType:   queueType,
-		userConfig:  userQueueConfig.Config(),
-		ackCallback: ackCallback,
-		inQueueSize: settings.InputQueueSize,
+	queueFactory, err := queueFactoryForUserConfig(
+		queueType, userQueueConfig.Config(), settings.InputQueueSize)
+	if err != nil {
+		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueConfig)
+	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueFactory)
 	if err != nil {
 		return nil, err
 	}
@@ -175,10 +178,10 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.waitOnClose {
+	if p.eventWaitGroup != nil {
 		ch := make(chan struct{})
 		go func() {
-			p.waitCloseGroup.Wait()
+			p.eventWaitGroup.Wait()
 			ch <- struct{}{}
 		}()
 
@@ -229,7 +232,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	waitClose := cfg.WaitClose
-	reportEvents := p.waitOnClose
 
 	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
 	if err != nil {
@@ -237,7 +239,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
-		pipeline:       p,
+		logger:         p.monitors.Logger,
 		closeRef:       cfg.CloseRef,
 		done:           make(chan struct{}),
 		isOpen:         atomic.MakeBool(true),
@@ -245,21 +247,22 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
-		reportEvents:   reportEvents,
+		eventWaitGroup: p.eventWaitGroup,
+		observer:       p.observer,
 	}
 
 	ackHandler := cfg.EventListener
 
 	producerCfg := queue.ProducerConfig{}
 
-	if reportEvents || cfg.ClientListener != nil {
+	if client.eventWaitGroup != nil || cfg.ClientListener != nil {
 		producerCfg.OnDrop = func(event interface{}) {
 			publisherEvent, _ := event.(publisher.Event)
 			if cfg.ClientListener != nil {
 				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
 			}
-			if reportEvents {
-				p.waitCloseGroup.Add(-1)
+			if client.eventWaitGroup != nil {
+				client.eventWaitGroup.Add(-1)
 			}
 		}
 	}
@@ -286,6 +289,11 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	client.eventListener = ackHandler
 	client.waiter = waiter
 	client.producer = p.outputController.queueProducer(producerCfg)
+	if client.producer == nil {
+		// This can only happen if the pipeline was shut down while clients
+		// were still waiting to connect.
+		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
+	}
 
 	p.observer.clientConnected()
 
@@ -385,4 +393,30 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
 	return p.outputController
+}
+
+// Parses the given config and returns a QueueFactory based on it.
+// This helper exists to frontload config parsing errors: if there is an
+// error in the queue config, we want it to show up as fatal during
+// initialization, even if the queue itself isn't created until later.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, inQueueSize int) (queue.QueueFactory, error) {
+	switch queueType {
+	case memqueue.QueueType:
+		settings, err := memqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, err
+		}
+		// The memory queue has a special override during pipeline
+		// initialization for the size of its API channel buffer.
+		settings.InputQueueSize = inQueueSize
+		return memqueue.FactoryForSettings(settings), nil
+	case diskqueue.QueueType:
+		settings, err := diskqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, err
+		}
+		return diskqueue.FactoryForSettings(settings), nil
+	default:
+		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
+	}
 }

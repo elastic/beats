@@ -208,7 +208,7 @@ func (p *setRawIndex) String() string {
 }
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
-func makeProcessors(procs ...processors.Processor) *processors.Processors {
+func makeProcessors(procs ...beat.Processor) *processors.Processors {
 	procList := processors.NewList(nil)
 	procList.List = procs
 	return procList
