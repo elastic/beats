@@ -102,7 +102,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	return input{}.run(env, src.(*source), cursor, pub)
 }
 
-// The sanitizeFileName sanitizes characters like ":" and "/" to replace them with "_"
+// The sanitizeFileName sanitizeFileName replaces ":" and "/" with "_", removing repeated instances.
 // The request.tracer.filename may have ":" when a httpjson input has cursor config and
 // the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
 func sanitizeFileName(name string) string {
