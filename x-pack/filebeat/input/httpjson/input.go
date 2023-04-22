@@ -161,7 +161,7 @@ func run(
 	return nil
 }
 
-// The sanitizeFileName sanitizeFileName replaces ":" and "/" with "_", removing repeated instances.
+// The sanitizeFileName replaces ":" and "/" with "_", removing repeated instances.
 // The request.tracer.filename may have ":" when a httpjson input has cursor config and
 // the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
 func sanitizeFileName(name string) string {
