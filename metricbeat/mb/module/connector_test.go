@@ -105,7 +105,7 @@ func (fmsr *fakeMetricSetRegister) ProcessorsForMetricSet(moduleName, metricSetN
 	}
 
 	procs := new(processors.Processors)
-	procs.List = []processors.Processor{nil, nil}
+	procs.List = []beat.Processor{nil, nil}
 	return procs, nil
 }
 
@@ -125,7 +125,7 @@ func TestUseMetricSetProcessors_ReadingProcessorsSucceeded(t *testing.T) {
 
 	connector := Connector{
 		processors: &processors.Processors{
-			List: []processors.Processor{},
+			List: []beat.Processor{},
 		},
 	}
 	err := connector.UseMetricSetProcessors(r, "module", "metricset")

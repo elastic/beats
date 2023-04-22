@@ -53,17 +53,17 @@ func (p *mockCloserProcessor) Close() error {
 
 func newMockCloserConstructor() (Constructor, *mockCloserProcessor) {
 	p := mockCloserProcessor{}
-	constructor := func(config *config.C) (Processor, error) {
+	constructor := func(config *config.C) (beat.Processor, error) {
 		return &p, nil
 	}
 	return constructor, &p
 }
 
-func mockConstructor(config *config.C) (Processor, error) {
+func mockConstructor(config *config.C) (beat.Processor, error) {
 	return &mockProcessor{}, nil
 }
 
-func mockCloserConstructor(config *config.C) (Processor, error) {
+func mockCloserConstructor(config *config.C) (beat.Processor, error) {
 	return &mockCloserProcessor{}, nil
 }
 
@@ -88,7 +88,7 @@ func TestSafeWrap(t *testing.T) {
 func TestSafeProcessor(t *testing.T) {
 	cons, p := newMockCloserConstructor()
 	var (
-		sp  Processor
+		sp  beat.Processor
 		err error
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
