@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -25,16 +26,13 @@ import (
 )
 
 func TestInput(t *testing.T) {
-	dir := os.TempDir() + "/http-request-trace-*.ndjson"
-	defer os.RemoveAll(dir)
-
 	testCases := []struct {
 		name         string
 		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
 		baseConfig   map[string]interface{}
 		handler      http.HandlerFunc
 		expected     []string
-		expectedfile string
+		expectedFile string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -298,7 +296,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test tracer file sanitization",
+			name: "Test tracer filename sanitization",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
@@ -312,6 +310,7 @@ func TestInput(t *testing.T) {
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 				t.Cleanup(func() { timeNow = time.Now })
+				defer os.RemoveAll(filepath.Join(os.TempDir(), "logs"))
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -330,7 +329,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": dir,
+				"request.tracer.filename": filepath.Join(os.TempDir(), "logs", "http-request-trace-*.ndjson"),
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -338,7 +337,7 @@ func TestInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
-			expectedfile: os.TempDir() + "/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson",
+			expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 		},
 		{
 			name: "Test pagination",
@@ -1239,8 +1238,8 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
-			if len(tc.expectedfile) > 0 {
-				if _, err := os.Stat(tc.expectedfile); err == nil {
+			if len(tc.expectedFile) > 0 {
+				if _, err := os.Stat(filepath.Join(os.TempDir(), tc.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")

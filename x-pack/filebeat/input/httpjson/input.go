@@ -161,10 +161,9 @@ func run(
 	return nil
 }
 
-// The request.tracer.filename may have ":" when a httpjson input has cursor config
-// The macOS Finder will treat this as path-separator and causes to show up strange filepaths.
-// This function will sanitize characters like ":" and "/" to replace them with "_" just to be
-// safe on all operating systems.
+// The sanitizeFileName sanitizes characters like ":" and "/" to replace them with "_"
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
 func sanitizeFileName(name string) string {
 	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
 	name = filepath.Clean(name)
