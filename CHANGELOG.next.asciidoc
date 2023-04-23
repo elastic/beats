@@ -113,6 +113,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Sanitize filenames for request tracer in httpjson and cel inputs. {pull}35143[35143]
 - decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
 - Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 
 *Heartbeat*
 

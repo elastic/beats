@@ -24,8 +24,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -58,10 +56,10 @@ type processor struct {
 //
 // Other IP-borne protocols:
 // IP src / IP dst / IP proto
-func New(cfg *cfg.C) (processors.Processor, error) {
+func New(cfg *cfg.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")
+		return nil, fmt.Errorf("fail to unpack the community_id configuration: %w", err)
 	}
 
 	return newFromConfig(c)
@@ -228,7 +226,7 @@ func tryToUint(from interface{}) (uint, bool) {
 	case int64:
 		return uint(v), true
 	case uint:
-		return uint(v), true
+		return v, true
 	case uint8:
 		return uint(v), true
 	case uint16:

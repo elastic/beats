@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// PluginConfig represents the list of processors.
+// PluginConfig represents the list of processors given in beat configuration.
 type PluginConfig []*config.C
 
 // MandatoryExportedFields are fields that should be always exported

@@ -100,7 +100,7 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 	}
 	s.UseCompression = compress
 	s.UseProtobuf = protobuf
-	q, err := NewQueue(logp.L(), s)
+	q, err := NewQueue(logp.L(), nil, s)
 	if err != nil {
 		panic(err)
 	}
