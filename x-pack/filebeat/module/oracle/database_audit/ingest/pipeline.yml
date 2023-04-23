@@ -315,7 +315,7 @@ processors:
       field: related.user
       value: "{{client.user.name}}"
       allow_duplicates: false
-      if: ctx?.client?.user?.name != null && ctx?.client?.user?.name != '/'
+      if: ctx.client?.user?.name != null && ctx.client.user.name != '/'
   - append:
       field: related.user
       value: "{{server.user.name}}"
