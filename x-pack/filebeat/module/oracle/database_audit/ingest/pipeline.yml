@@ -320,7 +320,7 @@ processors:
       field: related.user
       value: "{{server.user.name}}"
       allow_duplicates: false
-      if: ctx?.server?.user?.name != null && ctx?.server?.user?.name != '/'
+      if: ctx.server?.user?.name != null && ctx.server.user.name != '/'
   - append:
       value: "{{server.domain}}"
       if: ctx?.server?.domain != null
