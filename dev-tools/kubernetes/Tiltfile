@@ -52,7 +52,7 @@ def build(
         #   aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin XXXXX.dkr.ecr.us-east-2.amazonaws.com/metricbeat-debug
         #
         # More info at https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html
-        docker_registry = "627286350134.dkr.ecr.us-east-2.amazonaws.com".format(
+        docker_registry = "XXXXX.dkr.ecr.us-east-2.amazonaws.com".format(
             docker_image)
 
         default_registry(docker_registry)
