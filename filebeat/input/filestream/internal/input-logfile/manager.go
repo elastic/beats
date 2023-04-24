@@ -177,7 +177,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 			" duplication, please add an ID and restart Filebeat")
 	}
 
-	cim.Logger.Infow("inputmanager ids", "ids", cim.ids)
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
 		cim.Logger.Warnf("filestream input with ID '%s' already exists, this "+
@@ -185,7 +184,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	cim.ids[settings.ID] = struct{}{}
-	cim.Logger.Infof("inputmanager added %q", settings.ID)
 	cim.idsMux.Unlock()
 
 	prospector, harvester, err := cim.Configure(config)
@@ -236,7 +234,7 @@ func (cim *InputManager) Delete(cfg *conf.C) error {
 		ID string `config:"id"`
 	}{}
 	if err := cfg.Unpack(&settings); err != nil {
-		return fmt.Errorf("could not umpack conig to get inut ID: %w", err)
+		return fmt.Errorf("could not unpack config to get the input ID: %w", err)
 	}
 
 	cim.StopInput(settings.ID)

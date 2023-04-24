@@ -77,7 +77,7 @@ func (f *factory) CheckConfig(cfg *conf.C) error {
 
 	if err = f.loader.Delete(cfg); err != nil {
 		return fmt.Errorf(
-			"runner factory failed to delet input after checking config: %w",
+			"runner factory failed to delete an input after config check: %w",
 			err)
 	}
 
@@ -153,7 +153,11 @@ func configID(config *conf.C) (string, error) {
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return "", fmt.Errorf("can not compute id from configuration: unpack failed: %w", err)
+	}
+
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return "", fmt.Errorf("can not compute id from configuration: %w", err)

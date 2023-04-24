@@ -124,7 +124,7 @@ func (l *Loader) Delete(cfg *conf.C) error {
 		return err
 	}
 
-	pp, ok := p.Manager.(Deleter)
+	pp, ok := p.Manager.(interface{ Delete(cfg *conf.C) error })
 	if ok {
 		return pp.Delete(cfg)
 	}

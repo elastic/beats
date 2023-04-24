@@ -45,10 +45,6 @@ type InputManager interface {
 	Create(*conf.C) (Input, error)
 }
 
-type Deleter interface {
-	Delete(cfg *conf.C) error
-}
-
 // Mode tells the InputManager in which mode it is initialized.
 type Mode uint8
 
