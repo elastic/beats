@@ -79,6 +79,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kibana-status,status>>
 
+* <<metricbeat-metricset-kibana-task_manager_utilization,task_manager_utilization>>
+
 include::kibana/cluster_actions.asciidoc[]
 
 include::kibana/cluster_rules.asciidoc[]
@@ -92,5 +94,7 @@ include::kibana/settings.asciidoc[]
 include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
+
+include::kibana/task_manager_utilization.asciidoc[]
 
 :edit_url!:
