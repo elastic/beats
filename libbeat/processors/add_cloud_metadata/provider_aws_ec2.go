@@ -33,6 +33,22 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
+type IMDSClient interface {
+	GetInstanceIdentityDocument(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+}
+
+var NewIMDSClient func(cfg awssdk.Config) IMDSClient = func(cfg awssdk.Config) IMDSClient {
+	return imds.NewFromConfig(cfg)
+}
+
+type EC2Client interface {
+	DescribeTags(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error)
+}
+
+var NewEC2Client func(cfg awssdk.Config) EC2Client = func(cfg awssdk.Config) EC2Client {
+	return ec2.NewFromConfig(cfg)
+}
+
 // AWS EC2 Metadata Service
 var ec2MetadataFetcher = provider{
 	Name: "aws-ec2",
@@ -66,8 +82,7 @@ func fetchRawProviderMetadata(
 		logger.Debugf("error loading AWS default configuration: %s.", err)
 		return
 	}
-
-	awsClient := imds.NewFromConfig(awsConfig)
+	awsClient := NewIMDSClient(awsConfig)
 
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
@@ -85,25 +100,25 @@ func fetchRawProviderMetadata(
 
 	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
 
+	result.metadata.Put("instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
+	result.metadata.Put("machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
+	result.metadata.Put("region", awsRegion)
+	result.metadata.Put("availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
+	result.metadata.Put("account.id", accountID)
+	result.metadata.Put("image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+
 	// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
 	// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
-	if *clusterName != "" {
-		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", awsRegion, accountID, *clusterName)
+	if clusterName != "" {
+		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
 
-		result.metadata.Put("cloud.orchestrator.cluster.name", clusterName)
-		result.metadata.Put("cloud.orchestrator.cluster.id", clusterARN)
+		result.metadata.Put("orchestrator.cluster.name", clusterName)
+		result.metadata.Put("orchestrator.cluster.id", clusterARN)
 	}
-
-	result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
-	result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
-	result.metadata.Put("cloud.region", awsRegion)
-	result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
-	result.metadata.Put("cloud.account.id", accountID)
-	result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
 }
 
-func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (*string, error) {
-	svc := ec2.NewFromConfig(awsConfig)
+func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string, error) {
+	svc := NewEC2Client(awsConfig)
 	input := &ec2.DescribeTagsInput{
 		Filters: []types.Filter{
 			{
@@ -123,7 +138,10 @@ func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (*string
 
 	tagsResult, err := svc.DescribeTags(context.TODO(), input)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching EC2 Tags: %s", err)
+		return "", fmt.Errorf("error fetching EC2 Tags: %s", err)
 	}
-	return tagsResult.Tags[0].Value, nil
+	if len(tagsResult.Tags) > 0 {
+		return *tagsResult.Tags[0].Value, nil
+	}
+	return "", nil
 }
