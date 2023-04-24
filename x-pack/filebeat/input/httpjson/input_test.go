@@ -26,6 +26,7 @@ import (
 )
 
 func TestInput(t *testing.T) {
+	tempDirectory := t.TempDir()
 	testCases := []struct {
 		name         string
 		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -310,7 +311,6 @@ func TestInput(t *testing.T) {
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 				t.Cleanup(func() { timeNow = time.Now })
-				defer os.RemoveAll(filepath.Join(os.TempDir(), "logs"))
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -329,7 +329,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": filepath.Join(os.TempDir(), "logs", "http-request-trace-*.ndjson"),
+				"request.tracer.filename": filepath.Join(tempDirectory, "logs", "http-request-trace-*.ndjson"),
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -1239,7 +1239,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			if len(tc.expectedFile) > 0 {
-				if _, err := os.Stat(filepath.Join(os.TempDir(), tc.expectedFile)); err == nil {
+				if _, err := os.Stat(filepath.Join(tempDirectory, tc.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")

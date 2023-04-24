@@ -179,6 +179,11 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 
 	if config.Request.Tracer != nil {
 		w := zapcore.AddSync(config.Request.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			config.Request.Tracer.Close()
+		}()
 		core := ecszap.NewCore(
 			ecszap.NewDefaultEncoderConfig(),
 			w,
