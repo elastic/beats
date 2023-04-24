@@ -21,6 +21,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -212,7 +213,6 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25805")
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
@@ -252,7 +252,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg.Stop(source)
 
 		err := hg.StopHarvesters()
-		require.Error(t, err)
+		require.NoError(t, err)
 
 		require.Equal(t, 1, mockHarvester.getRunCount())
 	})
@@ -281,8 +281,10 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert a harvester error is handled", func(t *testing.T) {
+		testLog := &testLogger{}
 		mockHarvester := &mockHarvester{onRun: errorOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg.tg = task.NewGroup(0, 100*time.Millisecond, testLog, "")
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
 		defer goroutinesChecker.WaitUntilOriginalCount()
@@ -294,7 +296,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		requireSourceRemovedFromBookkeeper(t, hg, source)
 
 		err := hg.StopHarvesters()
-		require.Error(t, err)
+		assert.NoError(t, err)
+
+		assert.Contains(t, testLog.String(), harvesterErr.Error())
 	})
 
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
@@ -332,8 +336,10 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert already locked resource has no problem when harvestergroup is cancelled", func(t *testing.T) {
+		testLog := &testLogger{}
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		hg.tg = task.NewGroup(0, 50*time.Millisecond, testLog, "")
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
 		goroutinesChecker := resources.NewGoroutinesChecker()
@@ -348,9 +354,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg.Start(inputCtx, source)
 
 		goroutinesChecker.WaitUntilIncreased(1)
-		require.Error(t, hg.StopHarvesters())
+		assert.NoError(t, hg.StopHarvesters())
 
-		require.Equal(t, 0, mockHarvester.getRunCount())
+		assert.Equal(t, 0, mockHarvester.getRunCount())
 	})
 
 	t.Run("assert harvester can be restarted", func(t *testing.T) {
@@ -388,7 +394,7 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
 		identifier: &sourceIdentifier{"filestream::.global::"},
-		tg:         task.NewGroup(0, time.Second, &logp.Logger{}, ""),
+		tg:         task.NewGroup(0, time.Second, logp.L(), ""),
 	}
 }
 
@@ -435,10 +441,23 @@ func blockUntilCancelOnRun(c input.Context, _ Source, _ Cursor, _ Publisher) err
 	return nil
 }
 
+var harvesterErr = fmt.Errorf("harvester error")
+
 func errorOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
-	return fmt.Errorf("harvester error")
+	return harvesterErr
 }
 
 func panicOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
 	panic("don't panic")
+}
+
+type testLogger strings.Builder
+
+func (tl *testLogger) Errorf(format string, args ...interface{}) {
+	sb := (*strings.Builder)(tl)
+	sb.WriteString(fmt.Sprintf(format, args...))
+	sb.WriteString("\n")
+}
+func (tl *testLogger) String() string {
+	return (*strings.Builder)(tl).String()
 }
