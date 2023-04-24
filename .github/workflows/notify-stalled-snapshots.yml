@@ -12,6 +12,7 @@ permissions:
 env:
   EMAIL_VAULT_SECRET: secret/observability-team/ci/service-account/email-github-actions
   EMAIL: beats-contrib@elastic.co
+  URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call'
 
 jobs:
   filter:
@@ -57,7 +58,7 @@ jobs:
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           channel: "#ingest-notifications"
-          message: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call|open PRs>)"
+          message: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         uses: hashicorp/vault-action@v2.5.0
@@ -84,6 +85,4 @@ jobs:
           to: ${{ env.EMAIL }}
           from: ${{ env.MAIL_FROM }}
           reply_to: ${{ env.MAIL_REPLY }}
-          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call'
-        env:
-          EMAIL: ${{ steps.issue-parser.outputs.issueparser_email }}
+          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in ${{ env.URL_QUERY }}'
