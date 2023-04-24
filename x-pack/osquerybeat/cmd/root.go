@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -43,9 +44,13 @@ var RootCmd = Osquerybeat()
 
 func Osquerybeat() *cmd.BeatsRootCmd {
 	management.ConfigTransform.SetTransform(osquerybeatCfg)
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
+	if err != nil { // these are hard-coded, shouldn't fail
+		panic(fmt.Errorf("error creating global processors: %w", err))
+	}
 	settings := instance.Settings{
 		Name:            Name,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:      processing.MakeDefaultSupport(true, globalProcs, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		ElasticLicensed: true,
 	}
 	command := cmd.GenRootCmdWithSettings(beater.New, settings)
@@ -97,9 +102,7 @@ func osquerybeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo
 
 	rawIn.Streams = streams
 
-	procs := defaultProcessors()
-
-	modules, err := management.CreateInputsFromStreams(rawIn, "osquery", agentInfo, procs...)
+	modules, err := management.CreateInputsFromStreams(rawIn, "osquery", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}

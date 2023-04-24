@@ -110,6 +110,10 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
+	if cfg.Resource.Tracer != nil {
+		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", env.ID)
+	}
+
 	client, err := newClient(ctx, cfg, log)
 	if err != nil {
 		return err
@@ -803,9 +807,11 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 var (
 	// mimetypes holds supported MIME type mappings.
 	mimetypes = map[string]interface{}{
-		"application/gzip":     func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
-		"application/x-ndjson": lib.NDJSON,
-		"application/zip":      lib.Zip,
+		"application/gzip":         func(r io.Reader) (io.Reader, error) { return gzip.NewReader(r) },
+		"application/x-ndjson":     lib.NDJSON,
+		"application/zip":          lib.Zip,
+		"text/csv; header=absent":  lib.CSVNoHeader,
+		"text/csv; header=present": lib.CSVHeader,
 	}
 
 	// limitPolicies are the provided rate limit policy helpers.

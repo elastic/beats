@@ -21,18 +21,9 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
-
-// Factory for creating a queue used by a pipeline instance.
-type Factory func(ACKListener, *logp.Logger, *config.C, int) (Queue, error)
-
-// ACKListener listens to special events to be send by queue implementations.
-type ACKListener interface {
-	OnACK(eventCount int) // number of consecutively published events acked by producers
-}
 
 // Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
@@ -71,6 +62,7 @@ var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 type Queue interface {
 	Close() error
 
+	QueueType() string
 	BufferConfig() BufferConfig
 
 	Producer(cfg ProducerConfig) Producer
@@ -81,6 +73,8 @@ type Queue interface {
 
 	Metrics() (Metrics, error)
 }
+
+type QueueFactory func(logger *logp.Logger, ack func(eventCount int)) (Queue, error)
 
 // BufferConfig returns the pipelines buffering settings,
 // for the pipeline to use.
@@ -100,11 +94,10 @@ type ProducerConfig struct {
 	// by the producer instance and being ACKed by the queue.
 	ACK func(count int)
 
-	// OnDrop provided to the queue, to report events being silently dropped by
-	// the queue. For example an async producer close and publish event,
-	// with close happening early might result in the event being dropped. The callback
-	// gives a queue user a chance to keep track of total number of events
-	// being buffered by the queue.
+	// OnDrop is called to report events being silently dropped by
+	// the queue. Currently this can only happen when a Publish call is sent
+	// to the memory queue's request channel but the producer is cancelled
+	// before it reaches the queue buffer.
 	OnDrop func(interface{})
 
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects

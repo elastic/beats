@@ -80,7 +80,7 @@ func (f *onCreateFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (
 //   - *processors*: list of local processors to be added to the processing pipeline
 //   - *keep_null*: keep or remove 'null' from events to be published
 //   - *_module_name* (hidden setting): Add fields describing the module name
-//   - *_ fileset_name* (hiddrn setting):
+//   - *_ fileset_name* (hidden setting):
 //   - *pipeline*: Configure the ES Ingest Node pipeline name to be used for events from this input
 //   - *index*: Configure the index name for events to be collected from this input
 //   - *type*: implicit event type
@@ -134,7 +134,7 @@ func newCommonConfigEditor(
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		var indexProcessor processors.Processor
+		var indexProcessor beat.Processor
 		if !config.Index.IsEmpty() {
 			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
 			timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)

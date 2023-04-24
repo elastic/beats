@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 	gproto "google.golang.org/protobuf/proto"
@@ -100,9 +99,16 @@ func WithStopOnEmptyUnits(m *BeatV2Manager) {
 // Init Functions
 // ================================
 
+// Register the agent manager, so that calls to lbmanagement.NewManager will
+// invoke NewV2AgentManager when linked with x-pack.
+func init() {
+	lbmanagement.SetManagerFactory(NewV2AgentManager)
+}
+
 // NewV2AgentManager returns a remote config manager for the agent V2 protocol.
-// This is meant to be used by the management plugin system, which will register this as a callback.
-func NewV2AgentManager(config *conf.C, registry *reload.Registry, _ uuid.UUID) (lbmanagement.Manager, error) {
+// This is registered as the manager factory in init() so that calls to
+// lbmanagement.NewManager will be forwarded here.
+func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
@@ -158,6 +164,11 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // ================================
 // Beats central management interface implementation
 // ================================
+
+// RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
+func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
+	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, hook)
+}
 
 // UpdateStatus updates the manager with the current status for the beat.
 func (cm *BeatV2Manager) UpdateStatus(status lbmanagement.Status, msg string) {
