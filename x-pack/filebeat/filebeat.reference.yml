@@ -3389,6 +3389,14 @@ filebeat.inputs:
   # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
   #expiration_timeout: 30m
 
+  # Share Templates
+  # This option allows v9 and ipfix templates to be shared within a session without
+  # reference to the origin of the template.
+  #
+  # Setting this to true is not recommended as it can result in the wrong template
+  # being applied under certain conditions, but it may be required for some systems.
+  #share_templates: false
+
   # Queue size limits the number of netflow packets that are queued awaiting
   # processing.
   #queue_size: 8192

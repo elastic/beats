@@ -18,10 +18,9 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -41,13 +40,13 @@ func init() {
 			checks.AllowedFields("fields", "when")))
 }
 
-func newIncludeFields(c *conf.C) (processors.Processor, error) {
+func newIncludeFields(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the include_fields configuration: %w", err)
 	}
 
 	/* add read only fields if they are not yet */
