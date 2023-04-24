@@ -58,10 +58,6 @@ type Settings struct {
 	// this limit can keep it from overflowing memory.
 	WriteAheadLimit int
 
-	// A callback that is called when an event is successfully
-	// written to disk.
-	WriteToDiskCallback func(eventCount int)
-
 	// RetryInterval specifies how long to wait before retrying a fatal error
 	// writing to disk. If MaxRetryInterval is nonzero, subsequent retries will
 	// use exponential backoff up to the specified limit.

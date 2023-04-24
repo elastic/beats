@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -38,7 +37,7 @@ const (
 
 func init() {
 	processors.RegisterPlugin(procName, New)
-	jsprocessor.RegisterPlugin(strings.Title(procName), New)
+	jsprocessor.RegisterPlugin("Fingerprint", New)
 }
 
 type fingerprint struct {
@@ -48,7 +47,7 @@ type fingerprint struct {
 }
 
 // New constructs a new fingerprint processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
@@ -86,6 +85,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *fingerprint) String() string {
+	//nolint:staticcheck // https://github.com/elastic/beats/issues/35174
 	json, _ := json.Marshal(p.config)
 	return procName + "=" + string(json)
 }
@@ -111,6 +111,6 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		fmt.Fprintf(to, "|%v|%v", k, v)
 	}
 
-	io.WriteString(to, "|")
+	_, _ = io.WriteString(to, "|")
 	return nil
 }

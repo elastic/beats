@@ -21,6 +21,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 
@@ -61,6 +62,7 @@ var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 type Queue interface {
 	Close() error
 
+	QueueType() string
 	BufferConfig() BufferConfig
 
 	Producer(cfg ProducerConfig) Producer
@@ -71,6 +73,8 @@ type Queue interface {
 
 	Metrics() (Metrics, error)
 }
+
+type QueueFactory func(logger *logp.Logger, ack func(eventCount int)) (Queue, error)
 
 // BufferConfig returns the pipelines buffering settings,
 // for the pipeline to use.

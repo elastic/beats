@@ -49,8 +49,7 @@ func TestClient(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		// Close the built-in queue and replace with the given one.
-		p.outputController.queue.Close()
+		// Inject a test queue so the outputController doesn't create one
 		p.outputController.queue = qu
 
 		return p
@@ -137,8 +136,7 @@ func TestClientWaitClose(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		// Close the built-in queue and replace with the given one.
-		p.outputController.queue.Close()
+		// Inject a test queue so the outputController doesn't create one
 		p.outputController.queue = qu
 
 		return p
@@ -146,7 +144,7 @@ func TestClientWaitClose(t *testing.T) {
 	err := logp.TestingSetup()
 	assert.Nil(t, err)
 
-	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
+	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1})
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 
