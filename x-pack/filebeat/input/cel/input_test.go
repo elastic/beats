@@ -1161,7 +1161,7 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
 				}
 			}
-			if len(test.wantFile) > 0 {
+			if len(test.wantFile) != 0 {
 				if _, err := os.Stat(filepath.Join(tempDirectory, test.wantFile)); err != nil {
 					t.Errorf("Expected log filename not found")
 				}

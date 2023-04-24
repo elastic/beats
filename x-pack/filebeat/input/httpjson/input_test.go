@@ -1238,7 +1238,7 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
-			if len(tc.expectedFile) > 0 {
+			if len(tc.expectedFile) != 0 {
 				if _, err := os.Stat(filepath.Join(tempDirectory, tc.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
