@@ -43,7 +43,7 @@ const (
 	NodeRulesPath              = "api/monitoring_collection/node_rules"
 	ClusterActionsPath         = "api/monitoring_collection/cluster_actions"
 	NodeActionsPath            = "api/monitoring_collection/node_actions"
-	TaskManagerUtilizationPath = "internal/task_manager/_background_task_utilization"
+	TaskManagerUtilizationPath = "api/task_manager/_background_task_utilization"
 	SettingsPath               = "api/settings"
 )
 
@@ -54,7 +54,7 @@ var (
 	v7_0_0 = version.MustNew("7.0.0")
 	v7_0_1 = version.MustNew("7.0.1")
 	v8_2_0 = version.MustNew("8.2.0")
-	v8_8_0 = version.MustNew("8.8.0")
+	v8_9_0 = version.MustNew("8.9.0")
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
@@ -66,7 +66,7 @@ var (
 	RulesAPIAvailableVersion   = v8_2_0
 	ActionsAPIAvailableVersion = v8_2_0
 
-	TaskManagerUtilizationAPIAvailableVersion = v8_8_0
+	TaskManagerUtilizationAPIAvailableVersion = v8_9_0
 )
 
 var (

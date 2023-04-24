@@ -33,27 +33,6 @@ var (
 	taskManagerStatsSchema = s.Schema{
 		"timestamp": c.Str("timestamp"),
 		"value": c.Dict("value", s.Schema{
-			"adhoc": c.Dict("adhoc", s.Schema{
-				"created": c.Dict("created", s.Schema{
-					"counter": c.Int("counter"),
-				}),
-				"ran": c.Dict("ran", s.Schema{
-					"service_time": c.Dict("service_time", s.Schema{
-						"actual":       c.Int("actual"),
-						"adjusted":     c.Int("adjusted"),
-						"task_counter": c.Int("task_counter"),
-					}),
-				}),
-			}),
-			"recurring": c.Dict("recurring", s.Schema{
-				"ran": c.Dict("ran", s.Schema{
-					"service_time": c.Dict("service_time", s.Schema{
-						"actual":       c.Int("actual"),
-						"adjusted":     c.Int("adjusted"),
-						"task_counter": c.Int("task_counter"),
-					}),
-				}),
-			}),
 			"load": c.Int("load"),
 		}),
 	}

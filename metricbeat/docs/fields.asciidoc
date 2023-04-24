@@ -43006,6 +43006,19 @@ type: long
 
 --
 
+[float]
+=== task_manager_utilization
+
+The percentage of task manager workers running or about to run tasks during the latest claim cycle.
+
+
+*`kibana.task_manager.utilization.load`*::
++
+--
+type: scaled_float
+
+--
+
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
@@ -47061,7 +47074,7 @@ type: long
 *`linux.conntrack.summary.insert_failed`*::
 +
 --
-Number of entries where list insert insert failed 
+Number of entries where list insert insert failed
 
 
 type: long
@@ -63645,7 +63658,7 @@ type: keyword
 *`system.raid.sync_action`*::
 +
 --
-Current sync action, if the RAID array is redundant 
+Current sync action, if the RAID array is redundant
 
 
 type: keyword
@@ -64086,7 +64099,7 @@ All TCP connections
 *`system.socket.summary.tcp.memory`*::
 +
 --
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
 
 
 type: integer
@@ -64232,7 +64245,7 @@ All UDP connections
 *`system.socket.summary.udp.memory`*::
 +
 --
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
 
 
 type: integer
