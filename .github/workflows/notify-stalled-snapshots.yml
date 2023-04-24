@@ -11,6 +11,7 @@ permissions:
 
 env:
   EMAIL_VAULT_SECRET: secret/observability-team/ci/service-account/email-github-actions
+  EMAIL: beats-contrib@elastic.co
 
 jobs:
   filter:
