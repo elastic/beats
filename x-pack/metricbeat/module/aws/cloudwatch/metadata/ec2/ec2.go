@@ -55,7 +55,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 			if output.InstanceType != "" {
 				_, _ = events[eventIdentifier].RootFields.Put("cloud.machine.type", output.InstanceType)
 			} else {
-				logp.L().Error("InstanceType is empty")
+				logp.L().Named("cloudwatch").Error("InstanceType is empty")
 			}
 
 			placement := output.Placement
@@ -66,14 +66,14 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 			if output.State.Name != "" {
 				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
 			} else {
-				logp.L().Error("instance.State.Name is empty")
+				logp.L().Named("cloudwatch").Error("instance.State.Name is empty")
 			}
 
 			if output.Monitoring.State != "" {
 				monitoringStates[eventIdentifier] = string(output.Monitoring.State)
 				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
 			} else {
-				logp.L().Error("Monitoring.State is empty")
+				logp.L().Named("cloudwatch").Error("Monitoring.State is empty")
 			}
 
 			cpuOptions := output.CpuOptions
