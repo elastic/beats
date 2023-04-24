@@ -287,7 +287,7 @@ func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
 			defer rec.Release()
 			val, err := rec.MarshalJSON()
 			if err != nil {
-				panic(err)
+				return fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
 			}
 			err = p.readParquetJSON(bytes.NewReader(val))
 			if err != nil {
