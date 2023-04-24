@@ -162,6 +162,13 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
+	ParquetConfig            parquetConfig           `config:",inline"`
+}
+
+type parquetConfig struct {
+	ProcessAsParquet bool `config:"process_as_parquet"`
+	processParallel  bool `config:"parquet_process_parallel"`
+	BatchSize        int  `config:"parquet_batch_size" default:"1"`
 }
 
 func (rc *readerConfig) Validate() error {

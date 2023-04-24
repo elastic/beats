@@ -15,11 +15,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"reflect"
 	"strings"
 	"time"
 
+	"github.com/apache/arrow/go/arrow/memory"
+	"github.com/apache/arrow/go/v11/parquet"
+	"github.com/apache/arrow/go/v11/parquet/file"
+	"github.com/apache/arrow/go/v11/parquet/pqarrow"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -156,6 +159,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	switch {
 	case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
 		err = p.readJSON(reader)
+	case p.readerConfig.ParquetConfig.ProcessAsParquet:
+		err = p.readParquet(reader)
 	default:
 		err = p.readFile(reader)
 	}
@@ -233,6 +238,98 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	return nil
 }
 
+// readParquet reads a parquet file based on config options and processes it
+// decoding it to JSON and sends the decoded data to the readJSON method to process
+// further as JSON
+func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
+	batchSize := 1
+	if p.readerConfig.ParquetConfig.BatchSize > 1 {
+		batchSize = p.readerConfig.ParquetConfig.BatchSize
+	}
+
+	// read the contents of the S3 object
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return fmt.Errorf("failed to data from read S3 object reader: %w", err)
+	}
+
+	// define a memory allocator
+	pool := memory.NewCheckedAllocator(memory.DefaultAllocator)
+
+	pf, err := file.NewParquetReader(bytes.NewReader(data), file.WithReadProps(parquet.NewReaderProperties(pool)))
+	if err != nil {
+		return fmt.Errorf("failed to create parquet reader: %w", err)
+	}
+	defer pf.Close()
+
+	// constructs a reader for converting to Arrow objects from an existing parquet file reader object.
+	reader, err := pqarrow.NewFileReader(pf, pqarrow.ArrowReadProperties{
+		Parallel:  p.readerConfig.ParquetConfig.processParallel,
+		BatchSize: int64(batchSize),
+	}, pool)
+	if err != nil {
+		return fmt.Errorf("failed to create pqarrow parquet reader: %w", err)
+	}
+
+	// constructs a record reader that is capable of reding entire sets of arrow records
+	rr, err := reader.GetRecordReader(context.Background(), nil, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create parquet record reader: %w", err)
+	}
+	defer rr.Release()
+
+	for rr.Next() {
+		rec, err := rr.Read()
+		if err != nil {
+			return fmt.Errorf("failed to read records from parquet record reader: %w", err)
+		}
+		if rec != nil {
+			defer rec.Release()
+			val, err := rec.MarshalJSON()
+			if err != nil {
+				panic(err)
+			}
+			err = p.readParquetJSON(bytes.NewReader(val))
+			if err != nil {
+				return fmt.Errorf("failed to read JSON data from arrow record: %w", err)
+			}
+		}
+	}
+
+	return nil
+}
+
+// readParquetJSON uses an array of json.RawMessage to decode parquet json data
+// since the result of readParquet method is always a stringified json array
+func (p *s3ObjectProcessor) readParquetJSON(r io.Reader) error {
+	dec := json.NewDecoder(r)
+	dec.UseNumber()
+
+	for dec.More() && p.ctx.Err() == nil {
+		offset := dec.InputOffset()
+
+		var items []json.RawMessage
+		if err := dec.Decode(&items); err != nil {
+			return fmt.Errorf("failed to decode json: %w", err)
+		}
+
+		for _, item := range items {
+			if p.readerConfig.ExpandEventListFromField != "" {
+				if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
+					return err
+				}
+				continue
+			}
+
+			data, _ := item.MarshalJSON()
+			evt := p.createEvent(string(data), offset)
+			p.publish(p.acker, &evt)
+		}
+	}
+
+	return nil
+}
+
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
@@ -285,7 +382,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	var reader reader.Reader
-	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
+	reader, err = readfile.NewEncodeReader(io.NopCloser(r), readfile.Config{
 		Codec:        enc,
 		BufferSize:   int(p.readerConfig.BufferSize),
 		Terminator:   p.readerConfig.LineTerminator,
