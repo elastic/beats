@@ -100,6 +100,7 @@ func (g *Group) Go(fn func(context.Context) error) error {
 			err := g.sem.Acquire(g.ctx, 1)
 			defer g.sem.Release(1)
 			if err != nil {
+				//nolint:errorlint // it's intentional
 				g.logErr(fmt.Errorf(
 					"task.Group: semaphore acquire failed, was the task group closed? err: %v",
 					err))
@@ -111,7 +112,6 @@ func (g *Group) Go(fn func(context.Context) error) error {
 		if err != nil {
 			g.logErr(err)
 		}
-		return
 	}()
 
 	return nil

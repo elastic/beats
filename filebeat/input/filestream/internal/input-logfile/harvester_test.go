@@ -298,7 +298,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		err := hg.StopHarvesters()
 		assert.NoError(t, err)
 
-		assert.Contains(t, testLog.String(), harvesterErr.Error())
+		assert.Contains(t, testLog.String(), errHarvester.Error())
 	})
 
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
@@ -441,10 +441,10 @@ func blockUntilCancelOnRun(c input.Context, _ Source, _ Cursor, _ Publisher) err
 	return nil
 }
 
-var harvesterErr = fmt.Errorf("harvester error")
+var errHarvester = fmt.Errorf("harvester error")
 
 func errorOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
-	return harvesterErr
+	return errHarvester
 }
 
 func panicOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
