@@ -168,6 +168,7 @@ func TestInputManager_Create(t *testing.T) {
 		func(t *testing.T) {
 			storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 			testStore, err := storeReg.Get("test")
+			require.NoError(t, err)
 
 			log, buff := newBufferLogger()
 
@@ -190,6 +191,7 @@ func TestInputManager_Create(t *testing.T) {
 			_, err = cim.Create(cfg)
 			require.ErrorIs(t, err, errNoInputRunner)
 			err = cim.Delete(cfg)
+			require.NoError(t, err)
 
 			assert.NotContains(t, buff.String(),
 				"filestream input with ID")
