@@ -264,6 +264,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
+- Add oracle authentication messages parsing {pull}35127[35127]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
