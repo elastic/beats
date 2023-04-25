@@ -3,10 +3,57 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-8.6.2]]
 === Beats version 8.6.2
 https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
 
+=======
+[[release-notes-8.7.1]]
+=== Beats version 8.7.1
+https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix Beats started by agent not respecting the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Beats started by agent now configure one global instance of each default add_x_metadata processor instead of creating one processor per input. Fixes a significant performance degradation for the aws-s3 input. {issue}35000[35000] {pull}35031[35031]
+
+*Filebeat*
+
+- [GCS Input] Added missing locks for safe concurrency {pull}34914[34914]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35037[35037]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
+- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
+- Sanitize filenames for request tracer in httpjson and cel inputs. {pull}35143[35143]
+- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
+- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
+
+*Heartbeat*
+
+- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+
+*Packetbeat*
+
+- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
+
+==== Added
+
+*Affecting all Beats*
+
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
+
+*Winlogbeat*
+
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
+
+[[release-notes-8.7.0]]
+=== Beats version 8.7.0
+https://github.com/elastic/beats/compare/v8.6.2\...v8.7.0[View commits]
+>>>>>>> b18985eaf7 (docs: Prepare Changelog for 8.7.1 (#35115))
 
 ==== Bugfixes
 

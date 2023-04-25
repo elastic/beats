@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -26,6 +26,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
 
 
@@ -37,6 +40,9 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
 
 *Functionbeat*
+
+
+*Elastic Logging Plugin*
 
 
 ==== Bugfixes
@@ -67,7 +73,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
 
 *Auditbeat*
-
 
 *Filebeat*
 - [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
@@ -156,6 +161,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Filebeat*
 
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 
 *Heartbeat*
 
@@ -184,7 +190,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
-- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
 
 *Winlogbeat*
 
@@ -196,7 +201,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Functionbeat*
 
 - Fix Kinesis events timestamp to use timestamp of the event record instead of when the record was processed {pull}33593[33593]
-
 
 *Elastic Logging Plugin*
 
@@ -297,7 +301,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 
-*Packetbeat*
+*Osquerybeat*
 
 - Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
 - Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
@@ -311,6 +315,9 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Packetbeat*
 
 
+*Winlogbeat*
+
+
 *Functionbeat*
 
 
@@ -321,11 +328,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
 
 *Elastic Log Driver*
+*Elastic Logging Plugin*
 
 
 ==== Deprecated
 
-*Affecting all Beats*
+*Auditbeat*
 
 
 *Filebeat*
@@ -337,14 +345,25 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
+
 
 *Winlogbeat*
 
 
 *Functionbeat*
 
-==== Known Issue
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
 
 
 
