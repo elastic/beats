@@ -183,6 +183,8 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 			"will lead to data duplication, please use a different ID", settings.ID)
 	}
 
+	// TODO: improve how inputs with empty IDs are tracked.
+	// https://github.com/elastic/beats/issues/35202
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
 
