@@ -790,6 +790,7 @@ processors:
               ]);
               relatedHosts.add(parts[2]);
             } else if (parts.length == 2) {
+              // Missing data, for example with "type:  33 ;"
               answers.add([
                 "type": params[parts[1]],
                 "data": ""
