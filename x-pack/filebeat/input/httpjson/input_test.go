@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -25,12 +26,14 @@ import (
 )
 
 func TestInput(t *testing.T) {
+	tempDirectory := t.TempDir()
 	testCases := []struct {
-		name        string
-		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
-		baseConfig  map[string]interface{}
-		handler     http.HandlerFunc
-		expected    []string
+		name         string
+		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig   map[string]interface{}
+		handler      http.HandlerFunc
+		expected     []string
+		expectedFile string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -294,7 +297,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test filename truncation",
+			name: "Test tracer filename sanitization",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
@@ -326,8 +329,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": "../../logs/httpjson/http-request-trace-*.ndjson",
-				"verifyfilepath":          true,
+				"request.tracer.filename": filepath.Join(tempDirectory, "logs", "http-request-trace-*.ndjson"),
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -335,6 +337,7 @@ func TestInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
+			expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 		},
 		{
 			name: "Test pagination",
@@ -1235,8 +1238,8 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
-			if tc.baseConfig["verifyfilepath"] != nil {
-				if _, err := os.Stat("../../logs/httpjson/http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"); err == nil {
+			if len(tc.expectedFile) != 0 {
+				if _, err := os.Stat(filepath.Join(tempDirectory, tc.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
