@@ -37,6 +37,12 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
+
+	secretValue           string
+	CRCProvider           string
+	CRCKey                string
+	CRCValue              string
+	CRCToken              string
 }
 
 // Triggers if middleware validation returns successful
@@ -59,14 +65,44 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
-	for _, obj := range objs {
-		if err = h.publishEvent(obj, headers); err != nil {
+	var responseBody string
+	var responseCode int
+
+	// Validate webhook
+	CRCToken, found := jsontransform.SearchJSONKeys(objs[0], h.CRCToken)
+	if (h.CRCProvider != "") && found {
+		CRCToken, ok := CRCToken.(string)
+		if !ok {
+			err := fmt.Errorf("failed decoding '%s' from CRC request.", h.CRCToken)
+			sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
+			return
+		}
+		if (h.CRCKey != "" && h.CRCValue != "") {
+			CRCValue, found := jsontransform.SearchJSONKeys(objs[0], h.CRCKey)
+			CRCValue, ok := CRCValue.(string)
+			if !found || !ok || (CRCValue != h.CRCValue) {
+				err := fmt.Errorf("failed decoding '%s' from CRC request.", h.CRCKey)
+				sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
+				return
+			}
+		}
+		var err error
+		responseBody, responseCode, err = validateCRC(h, string(CRCToken))
+		if err != nil {
 			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
+	} else {
+		for _, obj := range objs {
+			if err = h.publishEvent(obj, headers); err != nil {
+				sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+				return
+			}
+		}
+		responseBody, responseCode = h.responseBody, h.responseCode
 	}
 
-	h.sendResponse(w, h.responseCode, h.responseBody)
+	h.sendResponse(w, responseCode, responseBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {
