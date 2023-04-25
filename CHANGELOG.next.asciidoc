@@ -110,9 +110,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
 - Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
 - Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
-- Sanitize filenames for request tracer in httpjson and cel inputs. {pull}35143[35143]
+- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
 - decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
 - Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 
 *Heartbeat*
