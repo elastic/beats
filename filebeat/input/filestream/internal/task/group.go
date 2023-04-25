@@ -45,24 +45,27 @@ type Logger interface {
 // Group.Go for details.
 //
 // The number of concurrent running tasks is limited by limit, if limit is zero,
-// there is no limit.
+// the group is unlimited.
+//
 // The group can be stopped by calling Group.Stop which will close the group,
-// it'll not accept new tasks, and it will wait for all running tasks to
+// it'll not accept new tasks, and Group.Stop will wait for all running tasks to
 // complete or stopTimeout to elapse, what ever comes first.
+//
 // log is used to log any error returned by the tasks or internal errors. The
-// logs will be prefixed by errPrefix.
+// log message will be prefixed by errPrefix.
 func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix string) *Group {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	var logErr = func(error) {}
 	if log != nil {
+		var format string
+		if errPrefix == "" {
+			format = "%v"
+		} else {
+			format = errPrefix + ": %v"
+		}
+
 		logErr = func(err error) {
-			var format string
-			if errPrefix == "" {
-				format = "%v"
-			} else {
-				format = errPrefix + ": %v"
-			}
 			log.Errorf(format, err)
 		}
 	}
