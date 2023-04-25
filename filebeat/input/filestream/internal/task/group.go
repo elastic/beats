@@ -98,7 +98,6 @@ func (g *Group) Go(fn func(context.Context) error) error {
 
 		if g.sem != nil {
 			err := g.sem.Acquire(g.ctx, 1)
-			defer g.sem.Release(1)
 			if err != nil {
 				//nolint:errorlint // it's intentional
 				g.logErr(fmt.Errorf(
@@ -106,6 +105,7 @@ func (g *Group) Go(fn func(context.Context) error) error {
 					err))
 				return
 			}
+			defer g.sem.Release(1)
 		}
 
 		err := fn(g.ctx)
