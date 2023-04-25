@@ -29,6 +29,7 @@ func init() {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/35211")
 	service := compose.EnsureUp(t, "cockroachdb")
 
 	f := mbtest.NewFetcher(t, getConfig(service.Host()))
