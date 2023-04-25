@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -144,4 +145,24 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 	}
 
 	return time.Time{}, ErrInvalidTimestamp
+}
+
+// Look for a key (may be nested as for example `key1.key2`) inside a JSON decoded tree
+// Returns true/false and the key value if found
+func SearchJSONKeys(obj mapstr.M, nestedKey string) (interface{}, bool) {
+	keys := strings.Split(nestedKey, ".")
+
+	for i, key := range keys {
+		if _, ok := obj[key].(mapstr.M); !ok {
+			return nil, false
+		}
+
+		if i == len(keys)-1 {
+			return obj[key], true
+		}
+
+		obj = obj[key].(mapstr.M)
+	}
+
+	return nil, false
 }
