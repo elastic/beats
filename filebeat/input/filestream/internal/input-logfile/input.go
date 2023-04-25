@@ -21,12 +21,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
 )
 
 type managedInput struct {
@@ -64,15 +64,17 @@ func (inp *managedInput) Run(
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      newReaderGroupWithLimit(inp.harvesterLimit),
+		readers:      newReaderGroup(),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
-		tg: unison.TaskGroup{
-			OnQuit: unison.ContinueOnErrors, // harvester should keep running if a single harvester errored
-		},
+		tg: task.NewGroup(
+			inp.harvesterLimit,
+			time.Minute, // magic number
+			ctx.Logger,
+			"harvester:"),
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
