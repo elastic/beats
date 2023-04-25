@@ -38,11 +38,11 @@ type httpHandler struct {
 	includeHeaders        []string
 	preserveOriginalEvent bool
 
-	secretValue           string
-	CRCProvider           string
-	CRCKey                string
-	CRCValue              string
-	CRCToken              string
+	secretValue string
+	CRCProvider string
+	CRCKey      string
+	CRCValue    string
+	CRCToken    string
 }
 
 // Triggers if middleware validation returns successful
@@ -73,21 +73,21 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	if (h.CRCProvider != "") && found {
 		CRCToken, ok := CRCToken.(string)
 		if !ok {
-			err := fmt.Errorf("failed decoding '%s' from CRC request.", h.CRCToken)
+			err := fmt.Errorf("failed decoding '%s' from CRC request", h.CRCToken)
 			sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
 			return
 		}
-		if (h.CRCKey != "" && h.CRCValue != "") {
+		if h.CRCKey != "" && h.CRCValue != "" {
 			CRCValue, found := jsontransform.SearchJSONKeys(objs[0], h.CRCKey)
 			CRCValue, ok := CRCValue.(string)
 			if !found || !ok || (CRCValue != h.CRCValue) {
-				err := fmt.Errorf("failed decoding '%s' from CRC request.", h.CRCKey)
+				err := fmt.Errorf("failed decoding '%s' from CRC request", h.CRCKey)
 				sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
 				return
 			}
 		}
 		var err error
-		responseBody, responseCode, err = validateCRC(h, string(CRCToken))
+		responseBody, responseCode, err = validateCRC(h, CRCToken)
 		if err != nil {
 			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return

@@ -14,7 +14,7 @@ import (
 )
 
 // Available providers for CRC validation
-var ValidCRCProviders = []string{
+var validCRCProviders = []string{
 	"Zoom",
 }
 
@@ -108,7 +108,7 @@ func (c *config) Validate() error {
 func validateCRCProvider(value string) error {
 	value = strings.ToLower(value)
 
-	for _, v := range ValidCRCProviders {
+	for _, v := range validCRCProviders {
 		if strings.ToLower(v) == value {
 			return nil
 		}

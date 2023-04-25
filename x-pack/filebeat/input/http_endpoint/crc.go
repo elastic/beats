@@ -5,21 +5,21 @@
 package http_endpoint
 
 import (
-	"encoding/hex"
-	"encoding/json"
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
-	"strings"
 	"net/http"
+	"strings"
 )
 
 func validateCRC(h *httpHandler, plainToken string) (string, int, error) {
 	var response string
-    var status int
-    var err error
+	var status int
+	var err error
 
-	switch strings.ToLower(h.CRCProvider){
+	switch strings.ToLower(h.CRCProvider) {
 	case "zoom":
 		response, status, err = generateZoomCRC(h.secretValue, plainToken)
 	default:
