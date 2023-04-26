@@ -788,7 +788,7 @@ var inputTests = []struct {
 		},
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.tracer.filename": "http-request-trace-*.ndjson",
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1105,7 +1105,7 @@ func TestInput(t *testing.T) {
 			var tempDir string
 			if conf.Resource.Tracer != nil {
 				tempDir = t.TempDir()
-				conf.Resource.Tracer.Filename = filepath.Join(tempDir, "logs", conf.Resource.Tracer.Filename)
+				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
 			name := input{}.Name()
