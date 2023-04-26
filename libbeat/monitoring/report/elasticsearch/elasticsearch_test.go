@@ -20,6 +20,9 @@ package elasticsearch
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,4 +40,14 @@ func TestMakeClientParams(t *testing.T) {
 	})
 
 	require.Equal(t, expected, p)
+}
+
+func TestMakeReporter(t *testing.T) {
+	c, err := conf.NewConfigFrom(map[string]interface{}{
+		"hosts": []string{"127.0.0.1"},
+	})
+	require.NoError(t, err)
+
+	_, err = makeReporter(beat.Info{}, report.Settings{}, c)
+	require.NoError(t, err)
 }
