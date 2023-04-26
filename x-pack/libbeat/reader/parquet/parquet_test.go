@@ -2,10 +2,10 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//nolint:errcheck // It's a test file, we don't care about errors here.
 package parquet
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,12 +26,11 @@ func BenchmarkReadParquetSingleSerialBatch_1000(b *testing.B) {
 	path, _ := filepath.Abs(f)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("failed to open parquet file: %v\n", err)
-		return
+		b.Fatalf("failed to open parquet file: %v\n", err)
 	}
 	defer file.Close()
 
-	fn, size := getFileData(file)
+	fn, size := getFileData(b, file)
 	var batches int
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -39,7 +38,7 @@ func BenchmarkReadParquetSingleSerialBatch_1000(b *testing.B) {
 		batches = readParquet(b, cfg, file)
 	}
 
-	fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 }
 
 func BenchmarkReadParquetSingleSerialBatch_10000(b *testing.B) {
@@ -53,12 +52,11 @@ func BenchmarkReadParquetSingleSerialBatch_10000(b *testing.B) {
 	path, _ := filepath.Abs(f)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("failed to open parquet file: %v\n", err)
-		return
+		b.Fatalf("failed to open parquet file: %v\n", err)
 	}
 	defer file.Close()
 
-	fn, size := getFileData(file)
+	fn, size := getFileData(b, file)
 	var batches int
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -66,7 +64,7 @@ func BenchmarkReadParquetSingleSerialBatch_10000(b *testing.B) {
 		batches = readParquet(b, cfg, file)
 	}
 
-	fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 }
 
 func BenchmarkReadParquetSingleVPCSerialBatch_1000(b *testing.B) {
@@ -80,12 +78,11 @@ func BenchmarkReadParquetSingleVPCSerialBatch_1000(b *testing.B) {
 	path, _ := filepath.Abs(f)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("failed to open parquet file: %v\n", err)
-		return
+		b.Fatalf("failed to open parquet file: %v\n", err)
 	}
 	defer file.Close()
 
-	fn, size := getFileData(file)
+	fn, size := getFileData(b, file)
 	var batches int
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -93,7 +90,7 @@ func BenchmarkReadParquetSingleVPCSerialBatch_1000(b *testing.B) {
 		batches = readParquet(b, cfg, file)
 	}
 
-	fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 }
 
 func BenchmarkReadParquetMultiSerialBatch_1000(b *testing.B) {
@@ -113,8 +110,7 @@ func BenchmarkReadParquetMultiSerialBatch_1000(b *testing.B) {
 		path, _ := filepath.Abs(f)
 		file, err := os.Open(path)
 		if err != nil {
-			fmt.Printf("failed to open parquet file: %v\n", err)
-			return
+			b.Fatalf("failed to open parquet file: %v\n", err)
 		}
 		defer file.Close()
 		filePtrArr[i] = file
@@ -129,9 +125,9 @@ func BenchmarkReadParquetMultiSerialBatch_1000(b *testing.B) {
 	}
 
 	for _, f := range filePtrArr {
-		fn, size := getFileData(f)
+		fn, size := getFileData(b, f)
 		batches := batchMap[f.Name()]
-		fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+		b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 	}
 }
 
@@ -153,8 +149,7 @@ func BenchmarkReadParquetMultiGoRoutineBatch_1000(b *testing.B) {
 		path, _ := filepath.Abs(f)
 		file, err := os.Open(path)
 		if err != nil {
-			fmt.Printf("failed to open parquet file: %v\n", err)
-			return
+			b.Fatalf("failed to open parquet file: %v\n", err)
 		}
 		defer file.Close()
 		filePtrArr[i] = file
@@ -170,8 +165,8 @@ func BenchmarkReadParquetMultiGoRoutineBatch_1000(b *testing.B) {
 	}
 
 	for _, f := range filePtrArr {
-		fn, size := getFileData(f)
-		fmt.Printf("file: %s, size: %dB\n", fn, size)
+		fn, size := getFileData(b, f)
+		b.Logf("file: %s, size: %dB\n", fn, size)
 	}
 }
 
@@ -192,8 +187,7 @@ func BenchmarkReadParquetMultiSerialBatch_10000(b *testing.B) {
 		path, _ := filepath.Abs(f)
 		file, err := os.Open(path)
 		if err != nil {
-			fmt.Printf("failed to open parquet file: %v\n", err)
-			return
+			b.Fatalf("failed to open parquet file: %v\n", err)
 		}
 		defer file.Close()
 		filePtrArr[i] = file
@@ -209,9 +203,9 @@ func BenchmarkReadParquetMultiSerialBatch_10000(b *testing.B) {
 	}
 
 	for _, f := range filePtrArr {
-		fn, size := getFileData(f)
+		fn, size := getFileData(b, f)
 		batches := batchMap[f.Name()]
-		fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+		b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 	}
 }
 
@@ -225,12 +219,11 @@ func BenchmarkReadParquetSingleParallelBatch_1000(b *testing.B) {
 	path, _ := filepath.Abs(f)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("failed to open parquet file: %v\n", err)
-		return
+		b.Fatalf("failed to open parquet file: %v\n", err)
 	}
 	defer file.Close()
 
-	fn, size := getFileData(file)
+	fn, size := getFileData(b, file)
 	var batches int
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
@@ -240,7 +233,7 @@ func BenchmarkReadParquetSingleParallelBatch_1000(b *testing.B) {
 		}
 	})
 
-	fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 }
 
 func BenchmarkReadParquetSingleParallelBatch_10000(b *testing.B) {
@@ -253,12 +246,11 @@ func BenchmarkReadParquetSingleParallelBatch_10000(b *testing.B) {
 	path, _ := filepath.Abs(f)
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("failed to open parquet file: %v\n", err)
-		return
+		b.Fatalf("failed to open parquet file: %v\n", err)
 	}
 	defer file.Close()
 
-	fn, size := getFileData(file)
+	fn, size := getFileData(b, file)
 	var batches int
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
@@ -268,7 +260,7 @@ func BenchmarkReadParquetSingleParallelBatch_10000(b *testing.B) {
 		}
 	})
 
-	fmt.Printf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
 }
 
 func readParquet(t testing.TB, cfg *Config, file *os.File) int {
@@ -297,11 +289,12 @@ func readParquetPrallel(t testing.TB, cfg *Config, file *os.File, wg *sync.WaitG
 	wg.Done()
 }
 
-func getFileData(file *os.File) (string, int) {
+func getFileData(t testing.TB, file *os.File) (string, int) {
 	fi, err := file.Stat()
 	size := 0
 	if err != nil {
-		fmt.Printf("could not obtain file stat: %v\n", err)
+		t.Logf("could not obtain file stat: %v\n", err)
+		return "", size
 	} else {
 		size = int(fi.Size())
 	}

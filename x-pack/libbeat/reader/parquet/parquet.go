@@ -7,6 +7,7 @@ package parquet
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -75,7 +76,7 @@ func (sr *StreamReader) Next() bool {
 func (sr *StreamReader) Read() ([]byte, error) {
 	var val []byte
 	rec, err := sr.recordReader.Read()
-	if err != nil && err != io.EOF {
+	if err != nil && !errors.Is(err, io.EOF) {
 		return nil, fmt.Errorf("failed to read records from parquet record reader: %w", err)
 	}
 	if rec != nil {
