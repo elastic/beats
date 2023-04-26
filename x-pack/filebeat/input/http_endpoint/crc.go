@@ -30,7 +30,7 @@ func validateCRC(h *httpHandler, plainToken string) (string, int, error) {
 	return response, status, err
 }
 
-// Generate CRC response to validate a CRC request
+// Generate response to validate a CRC request
 func generateZoomCRC(secretValue string, plainToken string) (string, int, error) {
 	hash := hmac.New(sha256.New, []byte(secretValue))
 	var err error

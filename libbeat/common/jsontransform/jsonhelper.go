@@ -153,15 +153,21 @@ func SearchJSONKeys(obj mapstr.M, nestedKey string) (interface{}, bool) {
 	keys := strings.Split(nestedKey, ".")
 
 	for i, key := range keys {
-		if _, ok := obj[key].(mapstr.M); !ok {
+		value, exists := obj[key]
+		if !exists {
 			return nil, false
 		}
 
 		if i == len(keys)-1 {
-			return obj[key], true
+			return value, true
 		}
 
-		obj = obj[key].(mapstr.M)
+		switch v := value.(type) {
+		case map[string]interface{}:
+			return SearchJSONKeys(v, strings.Join(keys[i+1:], "."))
+		default:
+			return nil, false
+		}
 	}
 
 	return nil, false

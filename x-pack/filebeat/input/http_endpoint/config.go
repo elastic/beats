@@ -97,8 +97,8 @@ func (c *config) Validate() error {
 		err := validateCRCProvider(c.CRCProvider)
 		if err != nil {
 			return err
-		} else if c.CRCToken == "" {
-			return errors.New("CRC token required when CRC provider is defined")
+		} else if c.CRCToken == "" || c.SecretValue == "" {
+			return errors.New("secret.value and crc.token are required when crc.provider is defined")
 		}
 	}
 
