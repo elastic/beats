@@ -27,6 +27,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -80,13 +82,16 @@ func fetchRawProviderMetadata(
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
 		logger.Debugf("error loading AWS default configuration: %s.", err)
+		result.err = errors.Wrapf(err, "failed loading AWS default configuration")
 		return
 	}
 	awsClient := NewIMDSClient(awsConfig)
 
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
-		logger.Warnf("error fetching EC2 Identity Document: %s.", err)
+		logger.Debugf("error fetching EC2 Identity Document: %s.", err)
+		result.err = errors.Wrapf(err, "failed fetching EC2 Identity Document.")
+		return
 	}
 
 	// AWS Region must be set to be able to get EC2 Tags
