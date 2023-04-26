@@ -9,31 +9,15 @@ https://github.com/elastic/beats/compare/v7.17.9\...v7.17.10[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-*Auditbeat*
-
-*Filebeat*
-
 *Heartbeat*
 
 - Update the recommended Node.js version to 18.12.0 for Synthetics {pull}15196[15196]
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
 - Fix panics when a processor is closed twice {pull}34647[34647]
-
-*Auditbeat*
 
 *Filebeat*
 
@@ -46,8 +30,6 @@ https://github.com/elastic/beats/compare/v7.17.9\...v7.17.10[View commits]
 
 - Enable nodejs engine strict validation when bundling synthetics. {pull}34471[34471]
 
-*Metricbeat*
-
 *Packetbeat*
 
 - Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
@@ -59,19 +41,7 @@ https://github.com/elastic/beats/compare/v7.17.9\...v7.17.10[View commits]
 - Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 - Improve documentation for event_logs.name configuration. {pull}34931[34931]
 
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
 ==== Added
-
-*Affecting all Beats*
-
-*Auditbeat*
-
-*Filebeat*
-
-*Auditbeat*
 
 *Filebeat*
 
@@ -85,33 +55,9 @@ https://github.com/elastic/beats/compare/v7.17.9\...v7.17.10[View commits]
 
 - Remove GCP Compute metadata cache {pull}33655[33655]
 
-*Packetbeat*
-
-*Functionbeat*
-
 *Winlogbeat*
 
 - Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
-
-*Elastic Log Driver*
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
 
 [[release-notes-7.17.9]]
 === Beats version 7.17.9
