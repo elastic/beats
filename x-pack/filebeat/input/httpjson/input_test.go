@@ -328,7 +328,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": "http-request-trace-*.ndjson",
+				"request.tracer.filename": "logs/http-request-trace-*.ndjson",
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -1191,7 +1191,7 @@ func TestInput(t *testing.T) {
 			var tempDir string
 			if conf.Request.Tracer != nil {
 				tempDir = t.TempDir()
-				conf.Request.Tracer.Filename = filepath.Join(tempDir, "logs", conf.Request.Tracer.Filename)
+				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
 			}
 
 			input := newStatelessInput(conf)
