@@ -32,14 +32,8 @@ const logName = "processors"
 
 // Processors is
 type Processors struct {
-	List []Processor
+	List []beat.Processor
 	log  *logp.Logger
-}
-
-// Processor is the interface that all processors must implement
-type Processor interface {
-	Run(event *beat.Event) (*beat.Event, error)
-	String() string
 }
 
 // Closer defines the interface for processors that should be closed after using
@@ -52,7 +46,7 @@ type Closer interface {
 }
 
 // Close closes a processor if it implements the Closer interface
-func Close(p Processor) error {
+func Close(p beat.Processor) error {
 	if closer, ok := p.(Closer); ok {
 		return closer.Close()
 	}
@@ -123,7 +117,7 @@ func New(config PluginConfig) (*Processors, error) {
 }
 
 // AddProcessor adds a single Processor to Processors
-func (procs *Processors) AddProcessor(p Processor) {
+func (procs *Processors) AddProcessor(p beat.Processor) {
 	procs.List = append(procs.List, p)
 }
 
@@ -131,7 +125,7 @@ func (procs *Processors) AddProcessor(p Processor) {
 func (procs *Processors) AddProcessors(p Processors) {
 	// Subtlety: it is important here that we append the individual elements of
 	// p, rather than p itself, even though
-	// p implements the processors.Processor interface. This is
+	// p implements the beat.Processor interface. This is
 	// because the contents of what we return are later pulled out into a
 	// processing.group rather than a processors.Processors, and the two have
 	// different error semantics: processors.Processors aborts processing on
@@ -149,9 +143,7 @@ func (procs *Processors) All() []beat.Processor {
 	}
 
 	ret := make([]beat.Processor, len(procs.List))
-	for i, p := range procs.List {
-		ret[i] = p
-	}
+	copy(ret, procs.List)
 	return ret
 }
 

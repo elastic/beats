@@ -94,7 +94,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				p.logger.Errorf("Error running full sync: %v", err)
+				p.logger.Errorw("Error running full sync", "error", err)
 				p.metrics.syncError.Inc()
 			}
 			p.metrics.syncTotal.Inc()
@@ -114,7 +114,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				p.logger.Errorf("Error running incremental update: %v", err)
+				p.logger.Errorw("Error running incremental update", "error", err)
 				p.metrics.updateError.Inc()
 			}
 			p.metrics.updateTotal.Inc()
@@ -129,7 +129,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 // identities from Azure Active Directory, enrich users with group memberships,
 // and publishes all known users (regardless if they have been modified) to the
 // given beat.Client.
-func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (err error) {
+func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger.Debugf("Running full sync...")
 
 	p.logger.Debugf("Opening new transaction...")
@@ -139,14 +139,14 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 	}
 	p.logger.Debugf("Transaction opened")
 	defer func() { // If commit is successful, call to this close will be no-op.
-		if err = state.close(false); err != nil {
-			p.logger.Errorf("Error rolling back transaction: %v", err)
+		if closeErr := state.close(false); closeErr != nil {
+			p.logger.Errorw("Error rolling back full sync transaction", "error", closeErr)
 		}
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	p.logger.Debugf("Starting fetch...")
-	if _, err := p.doFetch(ctx, state, true); err != nil {
+	if _, err = p.doFetch(ctx, state, true); err != nil {
 		return err
 	}
 
@@ -180,7 +180,7 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 // runIncrementalUpdate will run an incremental update. The process is similar
 // to full synchronization, except only users which have changed (newly
 // discovered, modified, or deleted) will be published.
-func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (err error) {
+func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
@@ -188,8 +188,8 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 		return fmt.Errorf("unable to begin transaction: %w", err)
 	}
 	defer func() { // If commit is successful, call to this close will be no-op.
-		if err = state.close(false); err != nil {
-			p.logger.Errorf("Error rolling back transaction: %v", err)
+		if closeErr := state.close(false); closeErr != nil {
+			p.logger.Errorw("Error rolling back incremental update transaction", "error", closeErr)
 		}
 	}()
 

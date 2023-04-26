@@ -54,7 +54,7 @@ func init() {
 }
 
 // NewAppendProcessor returns a new append processor.
-func NewAppendProcessor(c *conf.C) (processors.Processor, error) {
+func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
 	config := appendProcessorConfig{
 		IgnoreMissing:     false,
 		IgnoreEmptyValues: false,

@@ -106,7 +106,7 @@ func defaultConfig() config {
 }
 
 // New creates a new processor from the provided configuration, or an error if the configuration is invalid.
-func New(c *conf.C) (processors.Processor, error) {
+func New(c *conf.C) (beat.Processor, error) {
 	cfg := defaultConfig()
 
 	if err := c.Unpack(&cfg); err != nil {

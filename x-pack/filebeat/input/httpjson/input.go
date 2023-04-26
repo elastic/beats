@@ -161,10 +161,9 @@ func run(
 	return nil
 }
 
-// The Request.Tracer.Filename may have ":" when a httpjson input has cursor config
-// The MacOs Finder will treat this as path-separator and causes to show up strange filepaths.
-// This function will sanitize characters like ":" and "/" to replace them with "_" just to be
-// safe on all operating systems.
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
 func sanitizeFileName(name string) string {
 	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
 	name = filepath.Clean(name)
@@ -180,6 +179,11 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 
 	if config.Request.Tracer != nil {
 		w := zapcore.AddSync(config.Request.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			config.Request.Tracer.Close()
+		}()
 		core := ecszap.NewCore(
 			ecszap.NewDefaultEncoderConfig(),
 			w,
