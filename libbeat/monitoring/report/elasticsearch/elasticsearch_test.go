@@ -48,6 +48,7 @@ func TestMakeReporter(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = makeReporter(beat.Info{}, report.Settings{}, c)
+	r, err := makeReporter(beat.Info{}, report.Settings{}, c)
 	require.NoError(t, err)
+	r.Stop()
 }
