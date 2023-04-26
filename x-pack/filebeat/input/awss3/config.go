@@ -167,7 +167,7 @@ type readerConfig struct {
 
 type parquetConfig struct {
 	ProcessAsParquet bool `config:"process_as_parquet"`
-	processParallel  bool `config:"parquet_process_parallel"`
+	ProcessParallel  bool `config:"parquet_process_parallel"`
 	BatchSize        int  `config:"parquet_batch_size" default:"1"`
 }
 

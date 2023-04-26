@@ -19,10 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/apache/arrow/go/arrow/memory"
-	"github.com/apache/arrow/go/v11/parquet"
-	"github.com/apache/arrow/go/v11/parquet/file"
-	"github.com/apache/arrow/go/v11/parquet/pqarrow"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -30,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/parquet"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -238,58 +235,25 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	return nil
 }
 
-// readParquet reads a parquet file based on config options and processes it
-// decoding it to JSON and sends the decoded data to the readJSON method to process
-// further as JSON
+// readParquet reads a parquet file based on config options and processes it using the parquet reader,
+// decodes it to JSON and sends the decoded data to the readJSON method to process further as JSON
 func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
-	batchSize := 1
-	if p.readerConfig.ParquetConfig.BatchSize > 1 {
-		batchSize = p.readerConfig.ParquetConfig.BatchSize
-	}
-
-	// read the contents of the S3 object
-	data, err := io.ReadAll(r)
+	sReader, err := parquet.NewStreamReader(r, &parquet.Config{
+		ProcessParallel: p.readerConfig.ParquetConfig.ProcessParallel,
+		BatchSize:       p.readerConfig.ParquetConfig.BatchSize,
+	})
 	if err != nil {
-		return fmt.Errorf("failed to data from read S3 object reader: %w", err)
+		return fmt.Errorf("failed to create parquet stream reader: %w", err)
 	}
+	defer sReader.Close()
 
-	// define a memory allocator
-	pool := memory.NewCheckedAllocator(memory.DefaultAllocator)
-
-	pf, err := file.NewParquetReader(bytes.NewReader(data), file.WithReadProps(parquet.NewReaderProperties(pool)))
-	if err != nil {
-		return fmt.Errorf("failed to create parquet reader: %w", err)
-	}
-	defer pf.Close()
-
-	// constructs a reader for converting to Arrow objects from an existing parquet file reader object.
-	reader, err := pqarrow.NewFileReader(pf, pqarrow.ArrowReadProperties{
-		Parallel:  p.readerConfig.ParquetConfig.processParallel,
-		BatchSize: int64(batchSize),
-	}, pool)
-	if err != nil {
-		return fmt.Errorf("failed to create pqarrow parquet reader: %w", err)
-	}
-
-	// constructs a record reader that is capable of reding entire sets of arrow records
-	rr, err := reader.GetRecordReader(context.Background(), nil, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create parquet record reader: %w", err)
-	}
-	defer rr.Release()
-
-	for rr.Next() {
-		rec, err := rr.Read()
+	for sReader.Next() {
+		data, err := sReader.Read()
 		if err != nil {
 			return fmt.Errorf("failed to read records from parquet record reader: %w", err)
 		}
-		if rec != nil {
-			defer rec.Release()
-			val, err := rec.MarshalJSON()
-			if err != nil {
-				return fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
-			}
-			err = p.readParquetJSON(bytes.NewReader(val))
+		if data != nil {
+			err = p.readParquetJSON(bytes.NewReader(data))
 			if err != nil {
 				return fmt.Errorf("failed to read JSON data from arrow record: %w", err)
 			}
