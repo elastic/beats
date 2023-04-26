@@ -49,7 +49,7 @@ func (g *genericFetcher) fetchMetadata(ctx context.Context, client http.Client) 
 		return res
 	}
 	res.metadata = g.schema(res.metadata)
-	res.metadata.Put("cloud.provider", g.provider)
+	_, _ = res.metadata.Put("cloud.provider", g.provider)
 
 	return res
 }

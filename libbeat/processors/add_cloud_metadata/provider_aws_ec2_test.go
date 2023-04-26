@@ -52,14 +52,13 @@ func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTa
 }
 
 func TestMain(m *testing.M) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 	code := m.Run()
 	os.Exit(code)
 }
 
 func TestRetrieveAWSMetadataEC2(t *testing.T) {
-
-	const (
+	var (
 		// not the best way to use a response template
 		// but this should serve until we need to test
 		// documents containing very different values
@@ -69,12 +68,10 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 		imageIDDoc1          = "ami-abcd1234"
 		instanceTypeDoc1     = "t2.medium"
 		instanceIDDoc2       = "i-22222222"
-	)
-	var (
-		clusterNameKey   string = "eks:cluster-name"
-		clusterNameValue string = "test"
-		instanceIDKey    string = "resource-id"
-		instanceIDDoc1   string = "i-11111111"
+		clusterNameKey       = "eks:cluster-name"
+		clusterNameValue     = "test"
+		instanceIDKey        = "resource-id"
+		instanceIDDoc1       = "i-11111111"
 	)
 
 	var tests = []struct {
@@ -167,120 +164,175 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				},
 			},
 		},
+		{
+			testName: "instanceId pre-informed, no overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{
+						{
+							Key:   &clusterNameKey,
+							Value: &clusterNameValue,
+						}, {
+							Key:   &instanceIDKey,
+							Value: &instanceIDDoc1,
+						},
+					},
+				}, nil
+			},
+			processorOverwrite: false,
+			previousEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
+				},
+			},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
+				},
+			},
+		},
+		{
+			// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
+			// it won't detect cloud.provider as a cloud field. This is not the behavior we
+			// expect and will find a better solution later in issue 11697.
+			testName: "only cloud.provider pre-informed, no overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{
+						{
+							Key:   &clusterNameKey,
+							Value: &clusterNameValue,
+						}, {
+							Key:   &instanceIDKey,
+							Value: &instanceIDDoc1,
+						},
+					},
+				}, nil
+			},
+			processorOverwrite: false,
+			previousEvent: mapstr.M{
+				"cloud.provider": "aws",
+			},
+			expectedEvent: mapstr.M{
+				"cloud.provider": "aws",
+				"cloud": mapstr.M{
+					"provider":          "aws",
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
+					"region":            regionDoc1,
+					"availability_zone": availabilityZoneDoc1,
+					"service":           mapstr.M{"name": "EC2"},
+					"orchestrator": mapstr.M{
+						"cluster": mapstr.M{
+							"name": clusterNameValue,
+							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
+						},
+					},
+				},
+			},
+		},
+		{
+			testName: "instanceId pre-informed, overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{},
+				}, nil
+			},
+			processorOverwrite: true,
+			previousEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
+				},
+			},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"provider":          "aws",
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
+					"region":            regionDoc1,
+					"availability_zone": availabilityZoneDoc1,
+					"service":           mapstr.M{"name": "EC2"},
+				},
+			},
+		},
+		{
+			testName: "only cloud.provider pre-informed, overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{},
+				}, nil
+			},
+			processorOverwrite: false,
+			previousEvent: mapstr.M{
+				"cloud.provider": "aws",
+			},
+			expectedEvent: mapstr.M{
+				"cloud.provider": "aws",
+				"cloud": mapstr.M{
+					"provider":          "aws",
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
+					"region":            regionDoc1,
+					"availability_zone": availabilityZoneDoc1,
+					"service":           mapstr.M{"name": "EC2"},
+				},
+			},
+		},
 	}
-	// {
-	// 	testName:           "instanceId pre-informed, no overwrite",
-	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-	// 	processorOverwrite: false,
-	// 	previousEvent: mapstr.M{
-	// 		"cloud": mapstr.M{
-	// 			"instance": mapstr.M{"id": instanceIDDoc2},
-	// 		},
-	// 	},
-	// 	expectedEvent: mapstr.M{
-	// 		"cloud": mapstr.M{
-	// 			"instance": mapstr.M{"id": instanceIDDoc2},
-	// 		},
-	// 	},
-	// },
-
-	// 	// {
-	// 	// 	// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
-	// 	// 	// it won't detect cloud.provider as a cloud field. This is not the behavior we
-	// 	// 	// expect and will find a better solution later in issue 11697.
-	// 	// 	testName:           "only cloud.provider pre-informed, no overwrite",
-	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-	// 	// 	processorOverwrite: false,
-	// 	// 	previousEvent: mapstr.M{
-	// 	// 		"cloud.provider": "aws",
-	// 	// 	},
-	// 	// 	expectedEvent: mapstr.M{
-	// 	// 		"cloud.provider": "aws",
-	// 	// 		"cloud": mapstr.M{
-	// 	// 			"provider":          "aws",
-	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
-	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
-	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
-	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
-	// 	// 			"region":            regionDoc1,
-	// 	// 			"availability_zone": availabilityZoneDoc1,
-	// 	// 			"service": mapstr.M{
-	// 	// 				"name": "EC2",
-	// 	// 			},
-	// 	// 		},
-	// 	// 	},
-	// 	// },
-
-	// 	// {
-	// 	// 	testName:           "all fields from processor, overwrite",
-	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-	// 	// 	processorOverwrite: true,
-	// 	// 	previousEvent:      mapstr.M{},
-	// 	// 	expectedEvent: mapstr.M{
-	// 	// 		"cloud": mapstr.M{
-	// 	// 			"provider":          "aws",
-	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
-	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
-	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
-	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
-	// 	// 			"region":            regionDoc1,
-	// 	// 			"availability_zone": availabilityZoneDoc1,
-	// 	// 			"service": mapstr.M{
-	// 	// 				"name": "EC2",
-	// 	// 			},
-	// 	// 		},
-	// 	// 	},
-	// 	// },
-
-	// 	// {
-	// 	// 	testName:           "instanceId pre-informed, overwrite",
-	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-	// 	// 	processorOverwrite: true,
-	// 	// 	previousEvent: mapstr.M{
-	// 	// 		"cloud": mapstr.M{
-	// 	// 			"instance": mapstr.M{"id": instanceIDDoc2},
-	// 	// 		},
-	// 	// 	},
-	// 	// 	expectedEvent: mapstr.M{
-	// 	// 		"cloud": mapstr.M{
-	// 	// 			"provider":          "aws",
-	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
-	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
-	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
-	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
-	// 	// 			"region":            regionDoc1,
-	// 	// 			"availability_zone": availabilityZoneDoc1,
-	// 	// 			"service": mapstr.M{
-	// 	// 				"name": "EC2",
-	// 	// 			},
-	// 	// 		},
-	// 	// 	},
-	// 	// },
-
-	// 	// {
-	// 	// 	testName:           "only cloud.provider pre-informed, overwrite",
-	// 	// 	ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-	// 	// 	processorOverwrite: false,
-	// 	// 	previousEvent: mapstr.M{
-	// 	// 		"cloud.provider": "aws",
-	// 	// 	},
-	// 	// 	expectedEvent: mapstr.M{
-	// 	// 		"cloud.provider": "aws",
-	// 	// 		"cloud": mapstr.M{
-	// 	// 			"provider":          "aws",
-	// 	// 			"account":           mapstr.M{"id": accountIDDoc1},
-	// 	// 			"instance":          mapstr.M{"id": instanceIDDoc1},
-	// 	// 			"machine":           mapstr.M{"type": instanceTypeDoc1},
-	// 	// 			"image":             mapstr.M{"id": imageIDDoc1},
-	// 	// 			"region":            regionDoc1,
-	// 	// 			"availability_zone": availabilityZoneDoc1,
-	// 	// 			"service": mapstr.M{
-	// 	// 				"name": "EC2",
-	// 	// 			},
-	// 	// 		},
-	// 	// 	},
-	// 	// },
-	// }
 
 	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
@@ -309,13 +361,6 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error creating new metadata processor: %s", err.Error())
 			}
-
-			// client := http.Client{}
-			// res := result{provider: "ec2", metadata: mapstr.M{}}
-			// fetchRawProviderMetadata(context.Background(), client, &res)
-
-			// awsConfig := awssdk.Config{}
-			// , err := fetchIdentityDocument(awsConfig)
 
 			actual, err := cmp.Run(&beat.Event{Fields: tc.previousEvent})
 			if err != nil {
