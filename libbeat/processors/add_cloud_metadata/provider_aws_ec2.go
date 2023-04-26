@@ -100,20 +100,20 @@ func fetchRawProviderMetadata(
 
 	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
 
-	result.metadata.Put("instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
-	result.metadata.Put("machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
-	result.metadata.Put("region", awsRegion)
-	result.metadata.Put("availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
-	result.metadata.Put("account.id", accountID)
-	result.metadata.Put("image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+	_, _ = result.metadata.Put("instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
+	_, _ = result.metadata.Put("machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
+	_, _ = result.metadata.Put("region", awsRegion)
+	_, _ = result.metadata.Put("availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
+	_, _ = result.metadata.Put("account.id", accountID)
+	_, _ = result.metadata.Put("image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
 
 	// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
 	// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
 	if clusterName != "" {
 		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
 
-		result.metadata.Put("orchestrator.cluster.name", clusterName)
-		result.metadata.Put("orchestrator.cluster.id", clusterARN)
+		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
+		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
 	}
 }
 
@@ -138,7 +138,7 @@ func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string,
 
 	tagsResult, err := svc.DescribeTags(context.TODO(), input)
 	if err != nil {
-		return "", fmt.Errorf("error fetching EC2 Tags: %s", err)
+		return "", fmt.Errorf("error fetching EC2 Tags: %w", err)
 	}
 	if len(tagsResult.Tags) > 0 {
 		return *tagsResult.Tags[0].Value, nil
