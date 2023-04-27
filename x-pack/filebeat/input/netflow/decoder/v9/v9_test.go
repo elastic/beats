@@ -30,7 +30,7 @@ func TestNetflowProtocol_New(t *testing.T) {
 func TestOptionTemplates(t *testing.T) {
 	const sourceID = 1234
 	addr := test.MakeAddress(t, "127.0.0.1:12345")
-	key := MakeSessionKey(addr, sourceID)
+	key := MakeSessionKey(addr, sourceID, false)
 
 	t.Run("Single options template", func(t *testing.T) {
 		proto := New(config.Defaults())

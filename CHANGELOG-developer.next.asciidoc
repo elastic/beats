@@ -64,6 +64,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Remove `queue.Consumer`. Queues can now be read via a `Get` call directly on the queue object. {pull}31502[31502]
 - The `queue.Batch` API now provides access to individual events instead of an array. {pull}31699[31699]
 - Rename `queue.Batch.ACK()` to `queue.Batch.Done()`. {pull}31903[31903]
+- `queue.ACKListener` has been removed. Queue configurations now accept an explicit callback function for ACK handling. {pull}35078[35078]
 
 ==== Bugfixes
 

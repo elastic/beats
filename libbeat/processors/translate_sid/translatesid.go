@@ -21,10 +21,10 @@
 package translate_sid
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
@@ -53,10 +53,10 @@ type processor struct {
 
 // New returns a new translate_sid processor for converting windows SID values
 // to names.
-func New(cfg *conf.C) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the translate_sid configuration")
+		return nil, fmt.Errorf("fail to unpack the translate_sid configuration: %w", err)
 	}
 
 	return newFromConfig(c)

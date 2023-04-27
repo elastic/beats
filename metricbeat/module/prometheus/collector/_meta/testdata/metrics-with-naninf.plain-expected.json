@@ -143,30 +143,7 @@
                 "go_gc_duration_seconds_count": 13118,
                 "go_gc_duration_seconds_sum": 3.451780079,
                 "http_request_duration_seconds_count": 3,
-                "http_request_duration_seconds_sum": 6
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:41287",
-                "job": "prometheus"
-            },
-            "metrics": {
+                "http_request_duration_seconds_sum": 6,
                 "up": 1
             }
         },

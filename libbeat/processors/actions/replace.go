@@ -18,10 +18,9 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -59,14 +58,14 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *conf.C) (processors.Processor, error) {
+func NewReplaceString(c *conf.C) (beat.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the replace configuration: %s", err)
+		return nil, fmt.Errorf("failed to unpack the replace configuration: %w", err)
 	}
 
 	f := &replaceString{
@@ -86,13 +85,13 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range f.config.Fields {
 		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
 		if err != nil {
-			errMsg := fmt.Errorf("Failed to replace fields in processor: %s", err)
+			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err)
 			if publisher.LogWithTrace() {
 				f.log.Debug(errMsg.Error())
 			}
 			if f.config.FailOnError {
 				event = backup
-				event.PutValue("error.message", errMsg.Error())
+				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
 		}
@@ -108,13 +107,13 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", field, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 	}
 
 	updatedString := pattern.ReplaceAllString(currentValue.(string), replacement)
 	_, err = event.PutValue(field, updatedString)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", replacement, currentValue, err)
+		return fmt.Errorf("could not put value: %s: %v, %w", replacement, currentValue, err)
 	}
 	return nil
 }

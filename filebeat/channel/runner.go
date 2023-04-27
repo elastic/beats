@@ -134,7 +134,7 @@ func newCommonConfigEditor(
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		var indexProcessor processors.Processor
+		var indexProcessor beat.Processor
 		if !config.Index.IsEmpty() {
 			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
 			timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)

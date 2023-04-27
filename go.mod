@@ -60,7 +60,7 @@ require (
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.1
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
-	github.com/docker/docker v20.10.22+incompatible
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.5.0
@@ -70,7 +70,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.0.3-0.20230315204017-166fd1fd746f
+	github.com/elastic/elastic-agent-client/v7 v7.1.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.2
 	github.com/elastic/go-licenser v0.4.0
@@ -79,7 +79,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.3.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.9.1-0.20230328042007-6dcfe88b8359
+	github.com/elastic/go-sysinfo v1.10.0
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -157,11 +157,11 @@ require (
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.9.0
-	golang.org/x/net v0.2.0
+	golang.org/x/net v0.7.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 	golang.org/x/sync v0.1.0
 	golang.org/x/sys v0.6.0
-	golang.org/x/text v0.4.0
+	golang.org/x/text v0.7.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.1.12
 	google.golang.org/api v0.100.0
@@ -196,7 +196,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.5.0
 	github.com/elastic/elastic-agent-libs v0.3.3
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.5.1-0.20230328163318-a87a0b315c42
+	github.com/elastic/elastic-agent-system-metrics v0.6.0
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
@@ -331,7 +331,7 @@ require (
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20220921023135-46d9e7742f1e // indirect
-	golang.org/x/term v0.2.0 // indirect
+	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

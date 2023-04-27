@@ -45,9 +45,9 @@ type s3ObjectProcessorFactory struct {
 	backupConfig  backupConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig, maxWorkers int) *s3ObjectProcessorFactory {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry())
+		metrics = newInputMetrics("", monitoring.NewRegistry(), maxWorkers)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{

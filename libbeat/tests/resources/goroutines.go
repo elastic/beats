@@ -18,6 +18,7 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -41,8 +42,8 @@ type GoroutinesChecker struct {
 }
 
 // NewGoroutinesChecker creates a new GoroutinesChecker
-func NewGoroutinesChecker() GoroutinesChecker {
-	return GoroutinesChecker{
+func NewGoroutinesChecker() *GoroutinesChecker {
+	return &GoroutinesChecker{
 		before:              runtime.NumGoroutine(),
 		FinalizationTimeout: defaultFinalizationTimeout,
 	}
@@ -50,7 +51,7 @@ func NewGoroutinesChecker() GoroutinesChecker {
 
 // Check if the number of goroutines has increased since the checker
 // was created
-func (c GoroutinesChecker) Check(t testing.TB) {
+func (c *GoroutinesChecker) Check(t testing.TB) {
 	t.Helper()
 	err := c.check()
 	if err != nil {
@@ -61,12 +62,12 @@ func (c GoroutinesChecker) Check(t testing.TB) {
 
 func dumpGoroutines() {
 	profile := pprof.Lookup("goroutine")
-	profile.WriteTo(os.Stdout, 2)
+	_ = profile.WriteTo(os.Stdout, 2)
 }
 
-func (c GoroutinesChecker) check() error {
+func (c *GoroutinesChecker) check() error {
 	after, err := c.WaitUntilOriginalCount()
-	if err == ErrTimeout {
+	if errors.Is(err, ErrTimeout) {
 		return fmt.Errorf("possible goroutines leak, before: %d, after: %d", c.before, after)
 	}
 	return err
@@ -88,7 +89,7 @@ var ErrTimeout = fmt.Errorf("timeout waiting for finalization of goroutines")
 // present before we created the resource checker.
 // It returns the number of goroutines after the check and a timeout error
 // in case the wait has expired.
-func (c GoroutinesChecker) WaitUntilOriginalCount() (int, error) {
+func (c *GoroutinesChecker) WaitUntilOriginalCount() (int, error) {
 	timeout := time.Now().Add(c.FinalizationTimeout)
 
 	var after int

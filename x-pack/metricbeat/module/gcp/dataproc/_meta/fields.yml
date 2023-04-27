@@ -1,6 +1,6 @@
 - name: dataproc
   description: Google Cloud Dataproc metrics
-  release: beta
+  release: ga
   type: group
   fields:
     - name: cluster.hdfs.datanodes.count
