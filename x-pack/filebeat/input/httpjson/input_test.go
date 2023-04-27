@@ -26,7 +26,6 @@ import (
 )
 
 func TestInput(t *testing.T) {
-	tempDirectory := t.TempDir()
 	testCases := []struct {
 		name         string
 		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -329,7 +328,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": filepath.Join(tempDirectory, "logs", "http-request-trace-*.ndjson"),
+				"request.tracer.filename": "logs/http-request-trace-*.ndjson",
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -1189,6 +1188,12 @@ func TestInput(t *testing.T) {
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
 
+			var tempDir string
+			if conf.Request.Tracer != nil {
+				tempDir = t.TempDir()
+				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
+			}
+
 			input := newStatelessInput(conf)
 
 			assert.Equal(t, "httpjson-stateless", input.Name())
@@ -1238,8 +1243,8 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
-			if len(tc.expectedFile) != 0 {
-				if _, err := os.Stat(filepath.Join(tempDirectory, tc.expectedFile)); err == nil {
+			if tc.expectedFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, tc.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
