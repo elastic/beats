@@ -121,10 +121,10 @@ func TestGetStartPosition(t *testing.T) {
 func TestCreateEvent(t *testing.T) {
 	logEvent := &types.FilteredLogEvent{
 		EventId:       awssdk.String("id-1"),
-		IngestionTime: awssdk.Int64(1590000000000),
+		IngestionTime: awssdk.Int64(1590000000123),
 		LogStreamName: awssdk.String("logStreamName1"),
 		Message:       awssdk.String("test-message-1"),
-		Timestamp:     awssdk.Int64(1600000000000),
+		Timestamp:     awssdk.Int64(1600000000123),
 	}
 
 	expectedEventFields := mapstr.M{
@@ -136,12 +136,12 @@ func TestCreateEvent(t *testing.T) {
 		"awscloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
 			"log_stream":     *logEvent.LogStreamName,
-			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+			"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
 		},
 		"aws.cloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
 			"log_stream":     *logEvent.LogStreamName,
-			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+			"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
 		},
 		"cloud": mapstr.M{
 			"provider": "aws",

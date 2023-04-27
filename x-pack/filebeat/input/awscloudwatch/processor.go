@@ -51,7 +51,7 @@ func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event
 
 func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName string) beat.Event {
 	event := beat.Event{
-		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
+		Timestamp: time.UnixMilli(*logEvent.Timestamp).UTC(),
 		Fields: mapstr.M{
 			"message":       *logEvent.Message,
 			"log.file.path": logGroup + "/" + *logEvent.LogStreamName,
@@ -62,12 +62,12 @@ func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName st
 			"awscloudwatch": mapstr.M{
 				"log_group":      logGroup,
 				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+				"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
 			},
 			"aws.cloudwatch": mapstr.M{
 				"log_group":      logGroup,
 				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+				"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
 			},
 			"cloud": mapstr.M{
 				"provider": "aws",
