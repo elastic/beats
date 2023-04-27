@@ -20,10 +20,11 @@ package elasticsearch
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/stretchr/testify/require"
 )
 
 func TestMakeClientParams(t *testing.T) {
