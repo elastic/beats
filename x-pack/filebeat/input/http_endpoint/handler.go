@@ -26,6 +26,7 @@ const headerContentEncoding = "Content-Encoding"
 var (
 	errBodyEmpty       = errors.New("body cannot be empty")
 	errUnsupportedType = errors.New("only JSON objects are accepted")
+	errNotCRC          = errors.New("event not processed as CRC request")
 )
 
 type httpHandler struct {
@@ -37,12 +38,7 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
-
-	secretValue string
-	CRCProvider string
-	CRCKey      string
-	CRCValue    string
-	CRCToken    string
+	crc                   crcValidator
 }
 
 // Triggers if middleware validation returns successful
@@ -65,41 +61,27 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
-	var responseBody string
 	var responseCode int
+	var responseBody string
 
-	// Validate webhook
-	CRCToken, found := jsontransform.SearchJSONKeys(objs[0], h.CRCToken)
-	if (h.CRCProvider != "") && found {
-		CRCToken, ok := CRCToken.(string)
-		if !ok {
-			err := fmt.Errorf("failed decoding '%s' from CRC request", h.CRCToken)
-			sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
-			return
-		}
-		if h.CRCKey != "" && h.CRCValue != "" {
-			CRCValue, found := jsontransform.SearchJSONKeys(objs[0], h.CRCKey)
-			CRCValue, ok := CRCValue.(string)
-			if !found || !ok || (CRCValue != h.CRCValue) {
-				err := fmt.Errorf("failed decoding '%s' from CRC request", h.CRCKey)
-				sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
-				return
-			}
-		}
+	for _, obj := range objs {
 		var err error
-		responseBody, responseCode, err = validateCRC(h, CRCToken)
-		if err != nil {
-			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
-			return
-		}
-	} else {
-		for _, obj := range objs {
-			if err = h.publishEvent(obj, headers); err != nil {
+		if h.crc.provider != "" {
+			responseCode, responseBody, err = h.crc.validator(h.crc, obj)
+			if err == nil {
+				// CRC request processed
+				break
+			} else if !errors.Is(err, errNotCRC) {
 				sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 				return
 			}
 		}
-		responseBody, responseCode = h.responseBody, h.responseCode
+
+		if err = h.publishEvent(obj, headers); err != nil {
+			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			return
+		}
+		responseCode, responseBody = h.responseCode, h.responseBody
 	}
 
 	h.sendResponse(w, responseCode, responseBody)

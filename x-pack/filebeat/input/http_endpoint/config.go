@@ -38,9 +38,6 @@ type config struct {
 	HMACType              string                  `config:"hmac.type"`
 	HMACPrefix            string                  `config:"hmac.prefix"`
 	CRCProvider           string                  `config:"crc.provider"`
-	CRCKey                string                  `config:"crc.key"`
-	CRCValue              string                  `config:"crc.value"`
-	CRCToken              string                  `config:"crc.token"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
 }
@@ -64,9 +61,6 @@ func defaultConfig() config {
 		HMACType:      "",
 		HMACPrefix:    "",
 		CRCProvider:   "",
-		CRCKey:        "",
-		CRCValue:      "",
-		CRCToken:      "",
 	}
 }
 
@@ -97,8 +91,8 @@ func (c *config) Validate() error {
 		err := validateCRCProvider(c.CRCProvider)
 		if err != nil {
 			return err
-		} else if c.CRCToken == "" || c.SecretValue == "" {
-			return errors.New("secret.value and crc.token are required when crc.provider is defined")
+		} else if c.SecretValue == "" {
+			return errors.New("secret.value is required when crc.provider is defined")
 		}
 	}
 
@@ -107,7 +101,6 @@ func (c *config) Validate() error {
 
 func validateCRCProvider(value string) error {
 	value = strings.ToLower(value)
-
 	for _, v := range validCRCProviders {
 		if strings.ToLower(v) == value {
 			return nil
