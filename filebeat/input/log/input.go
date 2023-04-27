@@ -192,7 +192,10 @@ func (p *Input) loadStates(states []file.State) error {
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
 			if !state.Finished {
-				return &common.ErrInputNotFinished{State: state.String()}
+				return &common.ErrInputNotFinished{
+					State: state.String(),
+					File:  state.Fileinfo.Name(),
+				}
 			}
 
 			// Convert state to current identifier if different
