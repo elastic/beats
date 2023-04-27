@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !aix && !windows
-// +build !aix,!windows
 
 package file
 

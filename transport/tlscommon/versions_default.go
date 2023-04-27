@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build go1.13
-// +build go1.13
 
 package tlscommon
 

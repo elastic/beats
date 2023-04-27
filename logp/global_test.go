@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !nologpglobal
-// +build !nologpglobal
 
 package logp
 

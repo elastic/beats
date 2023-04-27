@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows && !openbsd
-// +build !windows,!openbsd
 
 // Test for openbsd are excluded here as info.GID() returns 0 instead of the actual value
 // As the code does not seem to be used in any of the beats, this should be ok
