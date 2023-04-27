@@ -36,6 +36,13 @@ type authResponse struct {
 	AccessToken  string `json:"access_token"`
 	ExpiresIn    int    `json:"expires_in"`
 	ExtExpiresIn int    `json:"ext_expires_in"`
+
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+	ErrorCodes       []int  `json:"error_codes"`
+	CorrelationID    string `json:"correlation_id"`
+	TraceID          string `json:"trace_id"`
+	ErrorURI         string `json:"error_uri"`
 }
 
 // conf contains parameters needed to configure the authenticator.
@@ -89,7 +96,7 @@ func (a *oauth2) renewToken(ctx context.Context) error {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("token request returned unexpected status code: %d body: %s", res.StatusCode, string(resData))
+		return fmt.Errorf("token request returned unexpected status code: %s, body: %s", res.Status, string(resData))
 	}
 
 	var authRes authResponse

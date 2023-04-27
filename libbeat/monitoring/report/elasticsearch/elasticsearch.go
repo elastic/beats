@@ -31,8 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -136,20 +134,25 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		clients = append(clients, client)
 	}
 
-	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return memqueue.NewQueue(log,
-			memqueue.Settings{
-				ACKListener: ackListener,
-				Events:      20,
-			}), nil
-	}
-
 	monitoring := monitoring.Default.GetRegistry("monitoring")
 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
-	processing, err := processing.MakeDefaultSupport(true)(beat, log, conf.NewConfig())
+	processing, err := processing.MakeDefaultSupport(true, nil)(beat, log, conf.NewConfig())
+	if err != nil {
+		return nil, err
+	}
+
+	queueConfig := conf.Namespace{}
+	conf, err := conf.NewConfigFrom(map[string]interface{}{
+		"mem.events":           32,
+		"mem.flush.min_events": 1,
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = queueConfig.Unpack(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +163,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 			Metrics: monitoring,
 			Logger:  log,
 		},
-		queueFactory,
+		queueConfig,
 		outputs.Group{
 			Clients:   []outputs.Client{outClient},
 			BatchSize: windowSize,
@@ -282,7 +285,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			clusterUUID = getClusterUUID()
 		}
 		if clusterUUID != "" {
-			meta.Put("cluster_uuid", clusterUUID)
+			_, _ = meta.Put("cluster_uuid", clusterUUID)
 		}
 
 		r.client.Publish(beat.Event{

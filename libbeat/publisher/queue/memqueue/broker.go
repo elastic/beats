@@ -64,14 +64,11 @@ type broker struct {
 	// chanList of all outstanding ACK channels.
 	scheduledACKs chan chanList
 
-	// A listener that should be notified when ACKs are processed.
-	// ackLoop calls this listener's OnACK function when it advances
-	// the consumer ACK position.
-	// Right now this listener always points at the Pipeline associated with
-	// this queue. Pipeline.OnACK then forwards the notification to
-	// Pipeline.observer.queueACKed(), which updates the beats registry
-	// if needed.
-	ackListener queue.ACKListener
+	// A callback that should be invoked when ACKs are processed.
+	// ackLoop calls this function when it advances the consumer ACK position.
+	// Right now this forwards the notification to queueACKed() in
+	// the pipeline observer, which updates the beats registry if needed.
+	ackCallback func(eventCount int)
 
 	// This channel is used to request/return metrics where such metrics require insight into
 	// the actual eventloop itself. This seems like it might be overkill, but it seems that
@@ -84,7 +81,6 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener    queue.ACKListener
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
@@ -120,11 +116,24 @@ type chanList struct {
 	tail *batchACKState
 }
 
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings), nil
+	}
+}
+
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
+	ackCallback func(eventCount int),
 	settings Settings,
 ) *broker {
 	var (
@@ -162,7 +171,7 @@ func NewQueue(
 		// internal broker and ACK handler channels
 		scheduledACKs: make(chan chanList),
 
-		ackListener: settings.ACKListener,
+		ackCallback: ackCallback,
 		metricChan:  make(chan metricsRequest),
 	}
 
@@ -198,6 +207,10 @@ func NewQueue(
 func (b *broker) Close() error {
 	close(b.done)
 	return nil
+}
+
+func (b *broker) QueueType() string {
+	return QueueType
 }
 
 func (b *broker) BufferConfig() queue.BufferConfig {

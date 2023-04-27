@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -113,7 +114,8 @@ func run(
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if config.Request.Tracer != nil {
-		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", ctx.ID)
+		id := sanitizeFileName(ctx.ID)
+		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
 	}
 
 	httpClient, err := newHTTPClient(stdCtx, config, log)
@@ -159,6 +161,15 @@ func run(
 	return nil
 }
 
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
 	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.settings())...)
@@ -168,6 +179,11 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 
 	if config.Request.Tracer != nil {
 		w := zapcore.AddSync(config.Request.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			config.Request.Tracer.Close()
+		}()
 		core := ecszap.NewCore(
 			ecszap.NewDefaultEncoderConfig(),
 			w,

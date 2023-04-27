@@ -65,8 +65,8 @@ func (n *input) Run(runCtx v2.Context, connector beat.PipelineConnector) (err er
 	}()
 
 	client, err := connector.ConnectWith(beat.ClientConfig{
-		CloseRef:   runCtx.Cancelation,
-		ACKHandler: NewTxACKHandler(),
+		CloseRef:      runCtx.Cancelation,
+		EventListener: NewTxACKHandler(),
 	})
 
 	dataDir := paths.Resolve(paths.Data, "kvstore")

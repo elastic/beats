@@ -101,6 +101,9 @@ type Manager interface {
 
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]interface{})
+
+	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
 }
 
 // ManagerFactory is the factory type for creating a config manager
@@ -192,3 +195,5 @@ func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
 func (n *fallbackManager) RegisterAction(action client.Action)   {}
 func (n *fallbackManager) UnregisterAction(action client.Action) {}
 func (n *fallbackManager) SetPayload(map[string]interface{})     {}
+func (n *fallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+}
