@@ -199,7 +199,7 @@ require (
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.0
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
-	github.com/elastic/mito v0.0.0-20230302005114-1dda06e81678
+	github.com/elastic/mito v0.0.0-20230427032043-b7fe987e263f
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/google/cel-go v0.13.0
@@ -216,6 +216,7 @@ require (
 )
 
 require (
+	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cloud.google.com/go/compute v1.12.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.1 // indirect
 	cloud.google.com/go/iam v0.6.0 // indirect
