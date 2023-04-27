@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.17.9\...v7.17.10[View commits]
 
 *Packetbeat*
 
+- Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
 - Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
 
 *Winlogbeat*
