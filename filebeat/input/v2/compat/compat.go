@@ -155,7 +155,8 @@ func configID(config *conf.C) (string, error) {
 	var h map[string]interface{}
 	err := config.Unpack(&h)
 	if err != nil {
-		return "", fmt.Errorf("can not compute id from configuration: unpack failed: %w", err)
+		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",
+			h, err)
 	}
 
 	id, err := hashstructure.Hash(h, nil)

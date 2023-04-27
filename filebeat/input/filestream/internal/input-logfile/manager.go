@@ -179,7 +179,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		cim.Logger.Warnf("filestream input with ID '%s' already exists, this "+
+		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
 			"will lead to data duplication, please use a different ID", settings.ID)
 	}
 
