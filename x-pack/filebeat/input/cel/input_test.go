@@ -31,133 +31,131 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestInput(t *testing.T) {
-	tempDirectory := t.TempDir()
-	var inputTests = []struct {
-		name          string
-		server        func(*testing.T, http.HandlerFunc, map[string]interface{})
-		handler       http.HandlerFunc
-		config        map[string]interface{}
-		persistCursor map[string]interface{}
-		want          []map[string]interface{}
-		wantCursor    []map[string]interface{}
-		wantErr       error
-		wantFile      string
-	}{
-		// Autonomous tests (no FS or net dependency).
-		{
-			name: "hello_world",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":[{"message":"Hello, World!"}]}`,
-				"state":    nil,
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			want: []map[string]interface{}{
-				{"message": "Hello, World!"},
+var inputTests = []struct {
+	name          string
+	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
+	handler       http.HandlerFunc
+	config        map[string]interface{}
+	persistCursor map[string]interface{}
+	want          []map[string]interface{}
+	wantCursor    []map[string]interface{}
+	wantErr       error
+	wantFile      string
+}{
+	// Autonomous tests (no FS or net dependency).
+	{
+		name: "hello_world",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":"Hello, World!"}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "bad_events_type",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":["Hello, World!"]}`,
-				"state":    nil,
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			wantErr: fmt.Errorf("unexpected type returned for evaluation events: %T", "Hello, World!"),
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
 		},
-		{
-			name: "hello_world_non_nil_state",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":[{"message":"Hello, World!"}]}`,
-				"state":    map[string]interface{}{},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			want: []map[string]interface{}{
-				{"message": "Hello, World!"},
+	},
+	{
+		name: "bad_events_type",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":["Hello, World!"]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "what_is_next",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":[{"message":"Hello, World!"}],"cursor":[{"todo":"What's next?"}]}`,
-				"state":    nil,
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			want: []map[string]interface{}{
-				{"message": "Hello, World!"},
-			},
-			wantCursor: []map[string]interface{}{
-				{"todo": "What's next?"},
+		wantErr: fmt.Errorf("unexpected type returned for evaluation events: %T", "Hello, World!"),
+	},
+	{
+		name: "hello_world_non_nil_state",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":"Hello, World!"}]}`,
+			"state":    map[string]interface{}{},
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "bad_cursor_type",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":[{"message":"Hello, World!"}],"cursor":["What's next?"]}`,
-				"state":    nil,
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			wantErr: fmt.Errorf("unexpected type returned for evaluation cursor element: %T", "What's next?"),
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
 		},
-		{
-			name: "show_state",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":[state]}`,
-				"state":    nil,
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			want: []map[string]interface{}{
-				{"url": ""},
+	},
+	{
+		name: "what_is_next",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":"Hello, World!"}],"cursor":[{"todo":"What's next?"}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "show_provided_state",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events":[state]}`,
-				"state": map[string]interface{}{
-					"we":   "can",
-					"put":  []string{"a", "bunch"},
-					"of":   "stuff",
-					"here": "!",
-				},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
-			},
-			want: []map[string]interface{}{
-				{
-					"we":   "can",
-					"put":  []interface{}{"a", "bunch"}, // We lose typing.
-					"of":   "stuff",
-					"here": "!",
-					"url":  "",
-				},
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"todo": "What's next?"},
+		},
+	},
+	{
+		name: "bad_cursor_type",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":"Hello, World!"}],"cursor":["What's next?"]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "iterative_state",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		wantErr: fmt.Errorf("unexpected type returned for evaluation cursor element: %T", "What's next?"),
+	},
+	{
+		name: "show_state",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[state]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"url": ""},
+		},
+	},
+	{
+		name: "show_provided_state",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[state]}`,
+			"state": map[string]interface{}{
+				"we":   "can",
+				"put":  []string{"a", "bunch"},
+				"of":   "stuff",
+				"here": "!",
+			},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{
+				"we":   "can",
+				"put":  []interface{}{"a", "bunch"}, // We lose typing.
+				"of":   "stuff",
+				"here": "!",
+				"url":  "",
+			},
+		},
+	},
+	{
+		name: "iterative_state",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	{
 		"events":[
 			{"message": state.data[state.cursor.next]},
@@ -168,32 +166,32 @@ func TestInput(t *testing.T) {
 		"data": state.data, // Make sure we have this for the next iteration.
 	}
 	`,
-				"state": map[string]interface{}{
-					"data":   []string{"first", "second", "third"},
-					"cursor": map[string]int{"next": 0},
-				},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
+			"state": map[string]interface{}{
+				"data":   []string{"first", "second", "third"},
+				"cursor": map[string]int{"next": 0},
 			},
-			want: []map[string]interface{}{
-				{"message": "first"},
-				{"message": "second"},
-				{"message": "third"},
-			},
-			wantCursor: []map[string]interface{}{
-				// The serialisation of numbers is to float when under 1<<53 (strings above).
-				// This is not visible within CEL, but presents in Go testing.
-				{"next": 1.0},
-				{"next": 2.0},
-				{"next": 3.0},
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "iterative_state_implicit_initial_cursor",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		want: []map[string]interface{}{
+			{"message": "first"},
+			{"message": "second"},
+			{"message": "third"},
+		},
+		wantCursor: []map[string]interface{}{
+			// The serialisation of numbers is to float when under 1<<53 (strings above).
+			// This is not visible within CEL, but presents in Go testing.
+			{"next": 1.0},
+			{"next": 2.0},
+			{"next": 3.0},
+		},
+	},
+	{
+		name: "iterative_state_implicit_initial_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
 		"events":[
 			{"message": state.data[index]},
@@ -204,31 +202,31 @@ func TestInput(t *testing.T) {
 		"data": state.data, // Make sure we have this for the next iteration.
 	})
 	`,
-				"state": map[string]interface{}{
-					"data": []string{"first", "second", "third"},
-				},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
+			"state": map[string]interface{}{
+				"data": []string{"first", "second", "third"},
 			},
-			want: []map[string]interface{}{
-				{"message": "first"},
-				{"message": "second"},
-				{"message": "third"},
-			},
-			wantCursor: []map[string]interface{}{
-				// The serialisation of numbers is to float when under 1<<53 (strings above).
-				// This is not visible within CEL, but presents in Go testing.
-				{"next": 1.0},
-				{"next": 2.0},
-				{"next": 3.0},
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "iterative_state_provided_stored_cursor",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		want: []map[string]interface{}{
+			{"message": "first"},
+			{"message": "second"},
+			{"message": "third"},
+		},
+		wantCursor: []map[string]interface{}{
+			// The serialisation of numbers is to float when under 1<<53 (strings above).
+			// This is not visible within CEL, but presents in Go testing.
+			{"next": 1.0},
+			{"next": 2.0},
+			{"next": 3.0},
+		},
+	},
+	{
+		name: "iterative_state_provided_stored_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	{
 		"events":[
 			{"message": state.data[state.cursor.next]},
@@ -239,33 +237,33 @@ func TestInput(t *testing.T) {
 		"data": state.data, // Make sure we have this for the next iteration.
 	}
 	`,
-				"state": map[string]interface{}{
-					"data":   []string{"first", "second", "third"},
-					"cursor": map[string]int{"next": 0},
-				},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
+			"state": map[string]interface{}{
+				"data":   []string{"first", "second", "third"},
+				"cursor": map[string]int{"next": 0},
 			},
-			persistCursor: map[string]interface{}{
-				"next": 1,
-			},
-			want: []map[string]interface{}{
-				{"message": "second"},
-				{"message": "third"},
-			},
-			wantCursor: []map[string]interface{}{
-				// The serialisation of numbers is to float when under 1<<53 (strings above).
-				// This is not visible within CEL, but presents in Go testing.
-				{"next": 2.0},
-				{"next": 3.0},
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "iterative_state_implicit_initial_cursor_provided_stored_cursor",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		persistCursor: map[string]interface{}{
+			"next": 1,
+		},
+		want: []map[string]interface{}{
+			{"message": "second"},
+			{"message": "third"},
+		},
+		wantCursor: []map[string]interface{}{
+			// The serialisation of numbers is to float when under 1<<53 (strings above).
+			// This is not visible within CEL, but presents in Go testing.
+			{"next": 2.0},
+			{"next": 3.0},
+		},
+	},
+	{
+		name: "iterative_state_implicit_initial_cursor_provided_stored_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
 		"events":[
 			{"message": state.data[index]},
@@ -276,32 +274,32 @@ func TestInput(t *testing.T) {
 		"data": state.data, // Make sure we have this for the next iteration.
 	})
 	`,
-				"state": map[string]interface{}{
-					"data": []string{"first", "second", "third"},
-				},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
+			"state": map[string]interface{}{
+				"data": []string{"first", "second", "third"},
 			},
-			persistCursor: map[string]interface{}{
-				"next": 1,
-			},
-			want: []map[string]interface{}{
-				{"message": "second"},
-				{"message": "third"},
-			},
-			wantCursor: []map[string]interface{}{
-				// The serialisation of numbers is to float when under 1<<53 (strings above).
-				// This is not visible within CEL, but presents in Go testing.
-				{"next": 2.0},
-				{"next": 3.0},
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
-		{
-			name: "strings_split",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		persistCursor: map[string]interface{}{
+			"next": 1,
+		},
+		want: []map[string]interface{}{
+			{"message": "second"},
+			{"message": "third"},
+		},
+		wantCursor: []map[string]interface{}{
+			// The serialisation of numbers is to float when under 1<<53 (strings above).
+			// This is not visible within CEL, but presents in Go testing.
+			{"next": 2.0},
+			{"next": 3.0},
+		},
+	},
+	{
+		name: "strings_split",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	{
 		"events": state.data.split(":").map(s,
 			{
@@ -310,376 +308,98 @@ func TestInput(t *testing.T) {
 		)
 	}
 	`,
-				"state": map[string]interface{}{
-					"data": "first:second:third",
-				},
-				"resource": map[string]interface{}{
-					"url": "",
-				},
+			"state": map[string]interface{}{
+				"data": "first:second:third",
 			},
-			want: []map[string]interface{}{
-				{"message": "first"},
-				{"message": "second"},
-				{"message": "third"},
+			"resource": map[string]interface{}{
+				"url": "",
 			},
 		},
+		want: []map[string]interface{}{
+			{"message": "first"},
+			{"message": "second"},
+			{"message": "third"},
+		},
+	},
 
-		// FS-based tests.
-		{
-			name: "ndjson_log_file_simple",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-				"resource": map[string]interface{}{
-					"url": "testdata/log-1.ndjson",
-				},
-			},
-			want: []map[string]interface{}{
-				{"level": "info", "message": "something happened"},
-				{"level": "error", "message": "something bad happened"},
+	// FS-based tests.
+	{
+		name: "ndjson_log_file_simple",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
+			"resource": map[string]interface{}{
+				"url": "testdata/log-1.ndjson",
 			},
 		},
-		{
-			name: "ndjson_log_file_simple_file_scheme",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-				"resource": map[string]interface{}{
-					"url": fileSchemePath("testdata/log-1.ndjson"),
-				},
-			},
-			want: []map[string]interface{}{
-				{"level": "info", "message": "something happened"},
-				{"level": "error", "message": "something bad happened"},
+		want: []map[string]interface{}{
+			{"level": "info", "message": "something happened"},
+			{"level": "error", "message": "something bad happened"},
+		},
+	},
+	{
+		name: "ndjson_log_file_simple_file_scheme",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
+			"resource": map[string]interface{}{
+				"url": fileSchemePath("testdata/log-1.ndjson"),
 			},
 		},
-		{
-			name: "ndjson_log_file_corrupted",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-				"resource": map[string]interface{}{
-					"url": "testdata/corrupted-log-1.ndjson",
-				},
-			},
-			want: []map[string]interface{}{
-				{"level": "info", "message": "something happened"},
-				{"error.message": `unexpected end of JSON input: {"message":"Dave, stop. Stop, will you? Stop, Dave. Will you stop, Dave? Stop, Dave."`},
-				{"level": "error", "message": "something bad happened"},
+		want: []map[string]interface{}{
+			{"level": "info", "message": "something happened"},
+			{"level": "error", "message": "something bad happened"},
+		},
+	},
+	{
+		name: "ndjson_log_file_corrupted",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
+			"resource": map[string]interface{}{
+				"url": "testdata/corrupted-log-1.ndjson",
 			},
 		},
-		{
-			name: "missing_file",
-			config: map[string]interface{}{
-				"interval": 1,
-				"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
-				"resource": map[string]interface{}{
-					"url": "testdata/absent.ndjson",
-				},
-			},
-			want: []map[string]interface{}{
-				{"file.error": "file: " + missingFileError("testdata/absent.ndjson")},
+		want: []map[string]interface{}{
+			{"level": "info", "message": "something happened"},
+			{"error.message": `unexpected end of JSON input: {"message":"Dave, stop. Stop, will you? Stop, Dave. Will you stop, Dave? Stop, Dave."`},
+			{"level": "error", "message": "something bad happened"},
+		},
+	},
+	{
+		name: "missing_file",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events": try(file(state.url, "application/x-ndjson").map(e, try(e, "error.message")), "file.error")}`,
+			"resource": map[string]interface{}{
+				"url": "testdata/absent.ndjson",
 			},
 		},
+		want: []map[string]interface{}{
+			{"file.error": "file: " + missingFileError("testdata/absent.ndjson")},
+		},
+	},
 
-		// HTTP-based tests.
-		{
-			name:   "GET_request",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+	// HTTP-based tests.
+	{
+		name:   "GET_request",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	bytes(get(state.url).Body).as(body, {
 		"events": [body.decode_json()]
 	})
 	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
-							},
-						},
-					},
-				},
-			},
 		},
-		{
-			name:   "GET_request_TLS",
-			server: newTestServer(httptest.NewTLSServer),
-			config: map[string]interface{}{
-				"interval":                       1,
-				"resource.ssl.verification_mode": "none",
-				"program": `
-	bytes(get(state.url).Body).as(body, {
-		"events": [body.decode_json()]
-	})
-	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "retry_after_request",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	get(state.url).as(resp, {
-		"url": state.url,
-		"events": [bytes(resp.Body).decode_json()],
-		"status_code": resp.StatusCode,
-		"header": resp.Header,
-	})
-	`,
-			},
-			handler: retryAfterHandler("1"),
-			want: []map[string]interface{}{
-				{"hello": "world"},
-			},
-		},
-		{
-			name:   "retry_after_request_time",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	get(state.url).as(resp, {
-		"url": state.url,
-		"events": [bytes(resp.Body).decode_json()],
-		"status_code": resp.StatusCode,
-		"header": resp.Header,
-	})
-	`,
-			},
-			handler: retryAfterHandler(time.Now().Add(time.Second).UTC().Format(http.TimeFormat)),
-			want: []map[string]interface{}{
-				{"hello": "world"},
-			},
-		},
-		{
-			name:   "rate_limit_request_0",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	get(state.url).as(resp, {
-		"url": state.url,
-		"events": [bytes(resp.Body).decode_json()],
-		"status_code": resp.StatusCode,
-		"header": resp.Header,
-		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
-	})
-	`,
-			},
-			handler: rateLimitHandler("0", 100*time.Millisecond),
-			want: []map[string]interface{}{
-				{"hello": "world"},
-			},
-		},
-		{
-			name:   "rate_limit_request_10",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	get(state.url).as(resp, {
-		"url": state.url,
-		"events": [bytes(resp.Body).decode_json()],
-		"status_code": resp.StatusCode,
-		"header": resp.Header,
-		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
-	})
-	`,
-			},
-			handler: rateLimitHandler("10", 100*time.Millisecond),
-			want: []map[string]interface{}{
-				{"hello": "world"},
-			},
-		},
-		{
-			name:   "rate_limit_request_10_too_slow",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	get(state.url).as(resp, {
-		"url": state.url,
-		"events": [bytes(resp.Body).decode_json()],
-		"status_code": resp.StatusCode,
-		"header": resp.Header,
-		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
-	})
-	`,
-			},
-			handler: rateLimitHandler("10", 10*time.Second),
-			want:    []map[string]interface{}{},
-		},
-		{
-			name:   "retry_failure",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	get(state.url).as(resp, {
-		"url": state.url,
-		"events": [bytes(resp.Body).decode_json()],
-		"status_code": resp.StatusCode,
-		"header": resp.Header,
-	})
-	`,
-			},
-			handler: retryHandler(),
-			want: []map[string]interface{}{
-				{"hello": "world"},
-			},
-		},
-
-		{
-			name:   "POST_request",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
-		"url": state.url,
-		"events": [body.decode_json()]
-	})
-	`,
-			},
-			handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
-			want: []map[string]interface{}{
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "repeated_POST_request",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": "100ms",
-				"program": `
-	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
-		"url": state.url,
-		"events": [body.decode_json()]
-	})
-	`,
-			},
-			handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
-			want: []map[string]interface{}{
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
-							},
-						},
-					},
-				},
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "split_events",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	bytes(get(state.url).Body).as(body, {
-		"events": body.decode_json().hello
-	})
-	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"world": "moon",
-				},
-				{
-					"space": []interface{}{
-						map[string]interface{}{
-							"cake": "pumpkin",
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "split_events_keep_parent",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
-	bytes(get(state.url).Body).as(body, {
-		"events": body.decode_json().hello.map(e,
-		{
-			"hello": e
-		})
-	})
-	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"hello": map[string]interface{}{
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
 						"world": "moon",
 					},
-				},
-				{
-					"hello": map[string]interface{}{
+					map[string]interface{}{
 						"space": []interface{}{
 							map[string]interface{}{
 								"cake": "pumpkin",
@@ -689,12 +409,290 @@ func TestInput(t *testing.T) {
 				},
 			},
 		},
+	},
+	{
+		name:   "GET_request_TLS",
+		server: newTestServer(httptest.NewTLSServer),
+		config: map[string]interface{}{
+			"interval":                       1,
+			"resource.ssl.verification_mode": "none",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "retry_after_request",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+	})
+	`,
+		},
+		handler: retryAfterHandler("1"),
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+	},
+	{
+		name:   "retry_after_request_time",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+	})
+	`,
+		},
+		handler: retryAfterHandler(time.Now().Add(time.Second).UTC().Format(http.TimeFormat)),
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+	},
+	{
+		name:   "rate_limit_request_0",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
+	})
+	`,
+		},
+		handler: rateLimitHandler("0", 100*time.Millisecond),
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+	},
+	{
+		name:   "rate_limit_request_10",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
+	})
+	`,
+		},
+		handler: rateLimitHandler("10", 100*time.Millisecond),
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+	},
+	{
+		name:   "rate_limit_request_10_too_slow",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
+	})
+	`,
+		},
+		handler: rateLimitHandler("10", 10*time.Second),
+		want:    []map[string]interface{}{},
+	},
+	{
+		name:   "retry_failure",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+	})
+	`,
+		},
+		handler: retryHandler(),
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+	},
+
+	{
+		name:   "POST_request",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
+		"url": state.url,
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "repeated_POST_request",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": "100ms",
+			"program": `
+	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
+		"url": state.url,
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "split_events",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": body.decode_json().hello
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"world": "moon",
+			},
+			{
+				"space": []interface{}{
+					map[string]interface{}{
+						"cake": "pumpkin",
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "split_events_keep_parent",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": body.decode_json().hello.map(e,
 		{
-			name:   "nested_split_events",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+			"hello": e
+		})
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"hello": map[string]interface{}{
+					"world": "moon",
+				},
+			},
+			{
+				"hello": map[string]interface{}{
+					"space": []interface{}{
+						map[string]interface{}{
+							"cake": "pumpkin",
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "nested_split_events",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	bytes(get(state.url).Body).decode_json().as(e0, {
 		"events": e0.hello.map(e1, has(e1.space) ?
 			e1.space.map(e2, {
@@ -705,25 +703,25 @@ func TestInput(t *testing.T) {
 		).flatten()
 	})
 	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"world": "moon",
 			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"world": "moon",
-				},
-				{
-					"space": map[string]interface{}{
-						"cake": "pumpkin",
-					},
+			{
+				"space": map[string]interface{}{
+					"cake": "pumpkin",
 				},
 			},
 		},
-		{
-			name:   "absent_split",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+	},
+	{
+		name:   "absent_split",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	bytes(get(state.url).Body).decode_json().as(e, {
 		"url": state.url,
 		"events": has(e.unknown) ?
@@ -734,21 +732,21 @@ func TestInput(t *testing.T) {
 			[]
 	})
 	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want:    []map[string]interface{}(nil),
 		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want:    []map[string]interface{}(nil),
+	},
 
-		// Cursor/pagination tests.
-		{
-			name:   "date_cursor",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"state": map[string]interface{}{
-					"fake_now": "2002-10-02T15:00:00Z",
-				},
-				"program": `
+	// Cursor/pagination tests.
+	{
+		name:   "date_cursor",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
 	// Use terse non-standard check for presence of timestamp. The standard
 	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
 	(!is_error(state.cursor.timestamp) ?
@@ -763,38 +761,38 @@ func TestInput(t *testing.T) {
 		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
 		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
 		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
-	
+
 		// Just for testing, cycle this back into the next state.
 		"fake_now": state.fake_now
 	}))
 	`,
-			},
-			handler: dateCursorHandler(),
-			want: []map[string]interface{}{
-				{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-				{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-				{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
-			},
-			wantCursor: []map[string]interface{}{
-				{"timestamp": "2002-10-02T15:00:00Z"},
-				{"timestamp": "2002-10-02T15:00:01Z"},
-				{"timestamp": "2002-10-02T15:00:02Z"},
-			},
 		},
-		{
-			name: "tracer_filename_sanitization",
-			server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				server := httptest.NewServer(h)
-				config["resource.url"] = server.URL
-				t.Cleanup(server.Close)
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+	},
+	{
+		name: "tracer_filename_sanitization",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
 			},
-			config: map[string]interface{}{
-				"interval":                 1,
-				"resource.tracer.filename": filepath.Join(tempDirectory, "logs", "http-request-trace-*.ndjson"),
-				"state": map[string]interface{}{
-					"fake_now": "2002-10-02T15:00:00Z",
-				},
-				"program": `
+			"program": `
 	// Use terse non-standard check for presence of timestamp. The standard
 	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
 	(!is_error(state.cursor.timestamp) ?
@@ -809,31 +807,31 @@ func TestInput(t *testing.T) {
 		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
 		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
 		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
-	
+
 		// Just for testing, cycle this back into the next state.
 		"fake_now": state.fake_now
 	}))
 	`,
-			},
-			handler: dateCursorHandler(),
-			want: []map[string]interface{}{
-				{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-				{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-				{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
-			},
-			wantCursor: []map[string]interface{}{
-				{"timestamp": "2002-10-02T15:00:00Z"},
-				{"timestamp": "2002-10-02T15:00:01Z"},
-				{"timestamp": "2002-10-02T15:00:02Z"},
-			},
-			wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 		},
-		{
-			name:   "pagination_cursor_object",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
+	},
+	{
+		name:   "pagination_cursor_object",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	(!is_error(state.cursor.page) ?
 		state.cursor.page
 	:
@@ -846,23 +844,23 @@ func TestInput(t *testing.T) {
 		"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, {"page": page}),
 	}))
 	`,
-			},
-			handler: paginationHandler(),
-			want: []map[string]interface{}{
-				{"foo": "a"},
-				{"foo": "b"},
-			},
-			wantCursor: []map[string]interface{}{
-				{"page": "bar"},
-				{"page": ""},
-			},
 		},
-		{
-			name:   "pagination_cursor_array",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		handler: paginationHandler(),
+		want: []map[string]interface{}{
+			{"foo": "a"},
+			{"foo": "b"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"page": "bar"},
+			{"page": ""},
+		},
+	},
+	{
+		name:   "pagination_cursor_array",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	(!is_error(state.cursor.page) ?
 		state.cursor.page
 	:
@@ -872,34 +870,34 @@ func TestInput(t *testing.T) {
 		"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
 	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
 		"events": resp.items,
-	
+
 		// The use of map here is to ensure the cursor is size-matched with the
 		// events. In the test case all the items arrays are size 1, but this
 		// may not be the case. In any case, calculate the page token only once.
 		"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, resp.items.map(e, {"page": page})),
 	}))
 	`,
-			},
-			handler: paginationHandler(),
-			want: []map[string]interface{}{
-				{"foo": "a"},
-				{"foo": "b"},
-			},
-			wantCursor: []map[string]interface{}{
-				{"page": "bar"},
-				{"page": ""},
-			},
 		},
-		{
-			// This doesn't match the behaviour of the equivalent test in httpjson ("Test first
-			// event"), but I am not entirely sure what the basis of that behaviour is.
-			// In particular the transition {"first":"a", "foo":"b"} => {"first":"a", "foo":"c"}
-			// retaining identity in "first" doesn't follow a logic that I understand.
-			name:   "first_event_cursor",
-			server: newTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+		handler: paginationHandler(),
+		want: []map[string]interface{}{
+			{"foo": "a"},
+			{"foo": "b"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"page": "bar"},
+			{"page": ""},
+		},
+	},
+	{
+		// This doesn't match the behaviour of the equivalent test in httpjson ("Test first
+		// event"), but I am not entirely sure what the basis of that behaviour is.
+		// In particular the transition {"first":"a", "foo":"b"} => {"first":"a", "foo":"c"}
+		// retaining identity in "first" doesn't follow a logic that I understand.
+		name:   "first_event_cursor",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	(!is_error(state.cursor.page) ?
 		state.cursor.page
 	:
@@ -917,58 +915,58 @@ func TestInput(t *testing.T) {
 		})),
 	}))
 	`,
-			},
-			handler: paginationHandler(),
-			want: []map[string]interface{}{
-				{"first": "none", "foo": "a"},
-				{"first": "a", "foo": "b"},
-				{"first": "b", "foo": "c"},
-				{"first": "c", "foo": "d"},
-			},
-			wantCursor: []map[string]interface{}{
-				{"first": "a", "page": "bar"},
-				{"first": "b", "page": ""},
-				{"first": "c", "page": ""},
-				{"first": "d", "page": ""},
-			},
 		},
+		handler: paginationHandler(),
+		want: []map[string]interface{}{
+			{"first": "none", "foo": "a"},
+			{"first": "a", "foo": "b"},
+			{"first": "b", "foo": "c"},
+			{"first": "c", "foo": "d"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"first": "a", "page": "bar"},
+			{"first": "b", "page": ""},
+			{"first": "c", "page": ""},
+			{"first": "d", "page": ""},
+		},
+	},
 
-		// Authenticated access tests.
-		{
-			name: "OAuth2",
-			server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				s := httptest.NewServer(h)
-				config["resource.url"] = s.URL
-				config["auth.oauth2.token_url"] = s.URL + "/token"
-				t.Cleanup(s.Close)
+	// Authenticated access tests.
+	{
+		name: "OAuth2",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			config["auth.oauth2.token_url"] = s.URL + "/token"
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                  1,
+			"auth.oauth2.client.id":     "a_client_id",
+			"auth.oauth2.client.secret": "a_client_secret",
+			"auth.oauth2.endpoint_params": map[string]interface{}{
+				"param1": "v1",
 			},
-			config: map[string]interface{}{
-				"interval":                  1,
-				"auth.oauth2.client.id":     "a_client_id",
-				"auth.oauth2.client.secret": "a_client_secret",
-				"auth.oauth2.endpoint_params": map[string]interface{}{
-					"param1": "v1",
-				},
-				"auth.oauth2.scopes": []string{"scope1", "scope2"},
-				"program": `
+			"auth.oauth2.scopes": []string{"scope1", "scope2"},
+			"program": `
 	bytes(post(state.url, '', '').Body).as(body, {
 		"events": body.decode_json()
 	})
 	`,
-			},
-			handler: oauth2Handler,
-			want: []map[string]interface{}{
-				{"hello": "world"},
-			},
 		},
+		handler: oauth2Handler,
+		want: []map[string]interface{}{
+			{"hello": "world"},
+		},
+	},
 
-		// Multi-step requests.
-		{
-			name:   "simple_multistep_GET_request",
-			server: newChainTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+	// Multi-step requests.
+	{
+		name:   "simple_multistep_GET_request",
+		server: newChainTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	// Get the record IDs.
 	bytes(get(state.url).Body).decode_json().records.map(r,
 		// Get each event by its ID.
@@ -976,45 +974,45 @@ func TestInput(t *testing.T) {
 			"events": events,
 	})
 	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
 							},
 						},
 					},
 				},
 			},
 		},
-		{
-			name: "three_step_GET_request",
-			server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					switch r.URL.Path {
-					case "/":
-						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-					case "/1":
-						fmt.Fprintln(w, `{"file_name": "file_1"}`)
-					case "/file_1":
-						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-					}
-				})
-				server := httptest.NewServer(r)
-				config["resource.url"] = server.URL
-				t.Cleanup(server.Close)
-			},
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+	},
+	{
+		name: "three_step_GET_request",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+				case "/1":
+					fmt.Fprintln(w, `{"file_name": "file_1"}`)
+				case "/file_1":
+					fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	// Get the record IDs.
 	bytes(get(state.url).Body).decode_json().records.map(r,
 		// Get the set of all files from the set of IDs.
@@ -1024,71 +1022,74 @@ func TestInput(t *testing.T) {
 			"events": events,
 	})
 	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"hello": []interface{}{
-						map[string]interface{}{
-							"world": "moon",
-						},
-						map[string]interface{}{
-							"space": []interface{}{
-								map[string]interface{}{
-									"cake": "pumpkin",
-								},
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
 							},
 						},
 					},
 				},
 			},
 		},
+	},
 
-		// Programmer error.
-		{
-			name:   "type_error_message",
-			server: newChainTestServer(httptest.NewServer),
-			config: map[string]interface{}{
-				"interval": 1,
-				"program": `
+	// Programmer error.
+	{
+		name:   "type_error_message",
+		server: newChainTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
 	bytes(get(state.url).Body).decode_json().records.map(r,
 		bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
 	//                          ^~~~ r.id not converted to string: can't add integer to string.
 			"events": events,
 	})
 	`,
-			},
-			handler: defaultHandler(http.MethodGet, ""),
-			want: []map[string]interface{}{
-				{
-					"error": map[string]interface{}{
-						"message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
-					},
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
 				},
 			},
 		},
+	},
 
-		// not yet done from httpjson (some are redundant since they are compositional products).
-		//
-		// cursor/pagination (place above auth test block)
-		//  Test pagination with array response
-		//  Test request transforms can access state from previous transforms
-		//  Test response transforms can't access request state from previous transforms
-		// more chain tests (place after other chain tests)
-		//  Test date cursor while using chain
-		//  Test split by json objects array in chain
-		//  Test split by json objects array with keep parent in chain
-		//  Test nested split in chain
-	}
+	// not yet done from httpjson (some are redundant since they are compositional products).
+	//
+	// cursor/pagination (place above auth test block)
+	//  Test pagination with array response
+	//  Test request transforms can access state from previous transforms
+	//  Test response transforms can't access request state from previous transforms
+	// more chain tests (place after other chain tests)
+	//  Test date cursor while using chain
+	//  Test split by json objects array in chain
+	//  Test split by json objects array with keep parent in chain
+	//  Test nested split in chain
+}
 
+func TestInput(t *testing.T) {
 	skipOnWindows := map[string]string{
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
+
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
 				t.Skip(reason)
 			}
+
 			if test.server != nil {
 				test.server(t, test.handler, test.config)
 			}
@@ -1099,6 +1100,12 @@ func TestInput(t *testing.T) {
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				t.Fatalf("unexpected error unpacking config: %v", err)
+			}
+
+			var tempDir string
+			if conf.Resource.Tracer != nil {
+				tempDir = t.TempDir()
+				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
 			name := input{}.Name()
@@ -1161,9 +1168,9 @@ func TestInput(t *testing.T) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
 				}
 			}
-			if len(test.wantFile) != 0 {
-				if _, err := os.Stat(filepath.Join(tempDirectory, test.wantFile)); err != nil {
-					t.Errorf("Expected log filename not found")
+			if test.wantFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
+					t.Errorf("expected log file not found: %v", err)
 				}
 			}
 		})
