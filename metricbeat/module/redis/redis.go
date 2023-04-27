@@ -67,12 +67,12 @@ func ParseRedisInfo(info string) map[string]string {
 }
 
 // ParseRedisLine parses a single line returned by INFO
-func ParseRedisLine(s string, delimiter string) []string {
+func ParseRedisLine(s, delimiter string) []string {
 	return strings.Split(s, delimiter)
 }
 
 // ParseRedisCommandStats parses a map of stats returned by INFO COMMANDSTATS
-func ParseRedisCommandStats(key string, s string) map[string]string {
+func ParseRedisCommandStats(key, s string) map[string]string {
 	// calls=XX,usec=XXX,usec_per_call=XXX
 	results := strings.Split(s, ",")
 
@@ -208,27 +208,23 @@ func (p *Pool) DBNumber() int {
 }
 
 // CreatePool creates a redis connection pool
-func CreatePool(
-	host, password, network string,
-	dbNumber int,
-	maxConn int,
-	idleTimeout, connTimeout time.Duration,
-) *Pool {
+func CreatePool(host, user, password string, dbNumber int, config *ModuleConfig, connTimeout time.Duration) *Pool {
 	pool := &rd.Pool{
-		MaxIdle:     maxConn,
-		IdleTimeout: idleTimeout,
+		MaxIdle:     config.MaxConn,
+		IdleTimeout: config.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
-			return rd.Dial(network, host,
+			return rd.Dial(config.Network, host,
+				rd.DialUsername(user),
 				rd.DialPassword(password),
 				rd.DialDatabase(dbNumber),
 				rd.DialConnectTimeout(connTimeout),
 				rd.DialReadTimeout(connTimeout),
-				rd.DialWriteTimeout(connTimeout))
+				rd.DialWriteTimeout(connTimeout),
+				rd.DialUseTLS(config.UseTLS),
+				rd.DialTLSConfig(config.UseTLSConfig),
+			)
 		},
 	}
 
-	return &Pool{
-		Pool:     pool,
-		dbNumber: dbNumber,
-	}
+	return &Pool{Pool: pool, dbNumber: dbNumber}
 }

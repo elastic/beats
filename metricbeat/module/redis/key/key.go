@@ -20,8 +20,6 @@ package key
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/redis"
@@ -30,9 +28,7 @@ import (
 var hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
 
 func init() {
-	mb.Registry.MustAddMetricSet("redis", "key", New,
-		mb.WithHostParser(hostParser),
-	)
+	mb.Registry.MustAddMetricSet("redis", "key", New, mb.WithHostParser(hostParser))
 }
 
 // MetricSet for fetching Redis server information and statistics.
@@ -55,12 +51,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}{}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read configuration for 'key' metricset")
+		return nil, fmt.Errorf("failed to read configuration for 'key' metricset: %w", err)
 	}
 
 	ms, err := redis.NewMetricSet(base)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create 'key' metricset")
+		return nil, fmt.Errorf("failed to create 'key' metricset: %w", err)
 	}
 
 	return &MetricSet{
@@ -74,7 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
+			m.Logger().Debugf("Failed to release connection: %s", err)
 		}
 	}()
 
@@ -86,16 +82,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			keyspace = *p.Keyspace
 		}
 		if err := redis.Select(conn, keyspace); err != nil {
-			msg := errors.Wrapf(err, "Failed to select keyspace %d", keyspace)
-			m.Logger().Error(msg)
+			m.Logger().Errorf("Failed to select keyspace %d: %s", keyspace, err)
 			r.Error(err)
 			continue
 		}
 
 		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
-			msg := errors.Wrapf(err, "Failed to list keys in keyspace %d with pattern '%s'", keyspace, p.Pattern)
-			m.Logger().Error(msg)
+			m.Logger().Errorf("Failed to list keys in keyspace %d with pattern '%s': %s", keyspace, p.Pattern)
 			r.Error(err)
 			continue
 		}
@@ -107,8 +101,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		for _, key := range keys {
 			keyInfo, err := redis.FetchKeyInfo(conn, key)
 			if err != nil {
-				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, keyspace)
-				m.Logger().Error(msg)
+				m.Logger().Errorf("Failed to fetch key info for key %s in keyspace %d: %s", key, keyspace, err)
 				r.Error(err)
 				continue
 			}

@@ -32,9 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-const (
-	password = "foobared"
-)
+const password = "foobared"
 
 func TestPasswords(t *testing.T) {
 	t.Skip("Changing password affects other tests, see https://github.com/elastic/beats/v7/issues/10955")
@@ -142,7 +140,7 @@ func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interfa
 	return ms.MetricSet
 }
 
-func getConfig(host string, password string) map[string]interface{} {
+func getConfig(host, password string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": "test",

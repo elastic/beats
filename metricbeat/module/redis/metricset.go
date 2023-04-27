@@ -18,15 +18,17 @@
 package redis
 
 import (
+	"crypto/tls"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
 	rd "github.com/gomodule/redigo/redis"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // MetricSet for fetching Redis server information and statistics.
@@ -35,32 +37,43 @@ type MetricSet struct {
 	pool *Pool
 }
 
+type ModuleConfig struct {
+	IdleTimeout time.Duration     `config:"idle_timeout"`
+	Network     string            `config:"network"`
+	MaxConn     int               `config:"maxconn" validate:"min=1"`
+	TLS         *tlscommon.Config `config:"ssl"`
+
+	UseTLS       bool
+	UseTLSConfig *tls.Config
+}
+
 // NewMetricSet creates the base for Redis metricsets
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Unpack additional configuration options.
-	config := struct {
-		IdleTimeout time.Duration `config:"idle_timeout"`
-		Network     string        `config:"network"`
-		MaxConn     int           `config:"maxconn" validate:"min=1"`
-	}{
-		Network: "tcp",
-		MaxConn: 10,
-	}
+	config := ModuleConfig{Network: "tcp", MaxConn: 10}
 
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read configuration")
+		return nil, fmt.Errorf("failed to read configuration: %w", err)
 	}
 
-	password, dbNumber, err := getPasswordDBNumber(base.HostData())
+	user, password, dbNumber, err := getUserPasswordDBNumber(base.HostData())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to getPasswordDBNumber from URI")
+		return nil, fmt.Errorf("failed to getPasswordDBNumber from URI: %w", err)
+	}
+
+	if config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+		config.UseTLS = true
+		config.UseTLSConfig = tlsConfig.ToConfig()
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool: CreatePool(base.Host(), password, config.Network, dbNumber,
-			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
+		pool:          CreatePool(base.Host(), user, password, dbNumber, &config, base.Module().Config().Timeout),
 	}, nil
 }
 
@@ -80,11 +93,26 @@ func (m *MetricSet) OriginalDBNumber() uint {
 	return uint(m.pool.DBNumber())
 }
 
-func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
-	// If there are more than one place specified password/db-number, use password/db-number in query
+// getUserPasswordDBNumber parses user, password and dbNumber from URI.
+//
+// As per security consideration RFC-2396: Uniform Resource Identifiers (URI): Generic Syntax
+// https://www.rfc-editor.org/rfc/rfc2396.html#section-7
+//
+// """
+// It is clearly unwise to use a URL that contains a password which is
+// intended to be secret. In particular, the use of a password within
+// the 'userinfo' component of a URL is strongly disrecommended except
+// in those rare cases where the 'password' parameter is intended to be
+// public.
+// """
+//
+// In some environments, this is safe but not all. We shouldn't ideally take
+// username and password from URI's userinfo or query parameters.
+func getUserPasswordDBNumber(hostData mb.HostData) (string, string, int, error) {
+	// If there are more than one place specified user/password/db-number, use user/password/db-number in query
 	uriParsed, err := url.Parse(hostData.URI)
 	if err != nil {
-		return "", 0, errors.Wrapf(err, "failed to parse URL '%s'", hostData.URI)
+		return "", "", 0, fmt.Errorf("failed to parse URL '%s': %w", hostData.URI, err)
 	}
 
 	// get db-number from URI if it exists
@@ -94,17 +122,23 @@ func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
 		if db != "" {
 			database, err = strconv.Atoi(db)
 			if err != nil {
-				return "", 0, errors.Wrapf(err, "redis database in url should be an integer, found: %s", db)
+				return "", "", 0, fmt.Errorf("redis database in url should be an integer, found: %s: %w", db, err)
 			}
 		}
 	}
 
-	// get password from query and also check db-number
+	// get user and password from query and also check db-number
 	password := hostData.Password
+	user := hostData.User
 	if uriParsed.RawQuery != "" {
 		queryParsed, err := url.ParseQuery(uriParsed.RawQuery)
 		if err != nil {
-			return "", 0, errors.Wrapf(err, "failed to parse query string in '%s'", hostData.URI)
+			return "", "", 0, fmt.Errorf("failed to parse query string in '%s': %w", hostData.URI, err)
+		}
+
+		usr := queryParsed.Get("user")
+		if usr != "" {
+			user = usr
 		}
 
 		pw := queryParsed.Get("password")
@@ -116,9 +150,10 @@ func getPasswordDBNumber(hostData mb.HostData) (string, int, error) {
 		if db != "" {
 			database, err = strconv.Atoi(db)
 			if err != nil {
-				return "", 0, errors.Wrapf(err, "redis database in query should be an integer, found: %s", db)
+				return "", "", 0, fmt.Errorf("redis database in query should be an integer, found: %s: %w", db, err)
 			}
 		}
 	}
-	return password, database, nil
+
+	return user, password, database, nil
 }
