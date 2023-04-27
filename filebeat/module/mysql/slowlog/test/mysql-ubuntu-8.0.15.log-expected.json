@@ -71,7 +71,17 @@
         "mysql.slowlog.sort_scan_count": 1,
         "mysql.slowlog.tmp_disk_tables": 0,
         "mysql.slowlog.tmp_tables": 1,
+<<<<<<< HEAD
         "mysql.thread_id": "16",
+=======
+        "mysql.thread_id": [
+            16,
+            "16"
+        ],
+        "related.user": [
+            "root"
+        ],
+>>>>>>> f5ace09f10 (IIS and MYSQL  expected json logfile update (#35221))
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
