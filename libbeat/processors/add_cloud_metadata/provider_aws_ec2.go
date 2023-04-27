@@ -27,7 +27,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -82,7 +81,7 @@ func fetchRawProviderMetadata(
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
 		logger.Debugf("error loading AWS default configuration: %s.", err)
-		result.err = errors.Wrapf(err, "failed loading AWS default configuration")
+		result.err = fmt.Errorf("failed loading AWS default configuration: %w", err)
 		return
 	}
 	awsClient := NewIMDSClient(awsConfig)
@@ -90,7 +89,7 @@ func fetchRawProviderMetadata(
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
 		logger.Debugf("error fetching EC2 Identity Document: %s.", err)
-		result.err = errors.Wrapf(err, "failed fetching EC2 Identity Document.")
+		result.err = fmt.Errorf("failed fetching EC2 Identity Document: %w", err)
 		return
 	}
 
@@ -100,7 +99,7 @@ func fetchRawProviderMetadata(
 
 	clusterName, err := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
 	if err != nil {
-		logger.Debugf("error fetching cluster name metadata: %s.", err)
+		logger.Warnf("error fetching cluster name metadata: %s.", err)
 	}
 
 	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
