@@ -2,302 +2,183 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//nolint:errcheck // It's a test file, we don't care about errors here.
 package parquet
 
 import (
+	"fmt"
+	"math/rand"
 	"os"
-	"path/filepath"
-	"strings"
-	"sync"
+	"os/signal"
+	"syscall"
 	"testing"
+	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/apache/arrow/go/arrow/memory"
+	"github.com/apache/arrow/go/v11/arrow"
+	"github.com/apache/arrow/go/v11/arrow/array"
+	"github.com/apache/arrow/go/v11/parquet/pqarrow"
+	"gotest.tools/assert"
 )
 
-func BenchmarkReadParquetSingleSerialBatch_1000(b *testing.B) {
-	f := "testdata/taxi_2023_1.parquet"
+// all test files are read from/stored within the "testdata" directory
+const testDataPath = "testdata/"
 
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       1000,
+// test file used for reading/writing temporary parquet data
+const testFile = "test.parquet"
+
+func TestParquet(t *testing.T) {
+	testCases := []struct {
+		columns int
+		rows    int
+	}{
+		{
+			columns: 10,
+			rows:    20,
+		},
+		{
+			columns: 15,
+			rows:    30,
+		},
+		{
+			columns: 5,
+			rows:    50,
+		},
+		{
+			columns: 10,
+			rows:    1000,
+		},
+		{
+			columns: 19,
+			rows:    10000,
+		},
+		{
+			columns: 25,
+			rows:    10000,
+		},
 	}
 
-	path, _ := filepath.Abs(f)
-	file, err := os.Open(path)
-	if err != nil {
-		b.Fatalf("failed to open parquet file: %v\n", err)
-	}
-	defer file.Close()
+	// cleanup process in case of abrupt exit
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+	go func() {
+		<-sigc
+		os.Remove(testDataPath + testFile)
+		os.Exit(1)
+	}()
 
-	fn, size := getFileData(b, file)
-	var batches int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		file.Seek(0, 0)
-		batches = readParquet(b, cfg, file)
-	}
+	for _, tc := range testCases {
+		name := fmt.Sprintf("Test parquet files with rows=%d, and columns=%d", tc.rows, tc.columns)
+		t.Run(name, func(t *testing.T) {
+			fName := testDataPath + testFile
+			data := createRandomParquet(t, fName, tc.columns, tc.rows)
+			file, err := os.Open(fName)
+			if err != nil {
+				t.Fatalf("Failed to open parquet test file: %v", err)
+			}
+			defer file.Close()
+			defer os.Remove(fName)
 
-	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
-}
+			// we set a timeout to prevent the test from running forever
+			// 10 minutes should be more than enough for any test case with rows * cols < 1000000
+			timeout := time.NewTimer(10 * time.Minute)
+			t.Cleanup(func() { timeout.Stop() })
 
-func BenchmarkReadParquetSingleSerialBatch_10000(b *testing.B) {
-	f := "testdata/taxi_2023_1.parquet"
-
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       10000,
-	}
-
-	path, _ := filepath.Abs(f)
-	file, err := os.Open(path)
-	if err != nil {
-		b.Fatalf("failed to open parquet file: %v\n", err)
-	}
-	defer file.Close()
-
-	fn, size := getFileData(b, file)
-	var batches int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		file.Seek(0, 0)
-		batches = readParquet(b, cfg, file)
-	}
-
-	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
-}
-
-func BenchmarkReadParquetSingleVPCSerialBatch_1000(b *testing.B) {
-	f := "testdata/vpc_flow.gz.parquet"
-
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       1000,
-	}
-
-	path, _ := filepath.Abs(f)
-	file, err := os.Open(path)
-	if err != nil {
-		b.Fatalf("failed to open parquet file: %v\n", err)
-	}
-	defer file.Close()
-
-	fn, size := getFileData(b, file)
-	var batches int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		file.Seek(0, 0)
-		batches = readParquet(b, cfg, file)
-	}
-
-	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
-}
-
-func BenchmarkReadParquetMultiSerialBatch_1000(b *testing.B) {
-	farr := []string{
-		"testdata/taxi_2023_1.parquet",
-		"testdata/taxi_2023_2.parquet",
-		"testdata/vpc_flow.gz.parquet",
-	}
-
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       1000,
-	}
-
-	filePtrArr := make([]*os.File, len(farr))
-	for i, f := range farr {
-		path, _ := filepath.Abs(f)
-		file, err := os.Open(path)
-		if err != nil {
-			b.Fatalf("failed to open parquet file: %v\n", err)
-		}
-		defer file.Close()
-		filePtrArr[i] = file
-	}
-	batchMap := make(map[string]int)
-	for i := 0; i < b.N; i++ {
-		for _, f := range filePtrArr {
-			f.Seek(0, 0)
-			batches := readParquet(b, cfg, f)
-			batchMap[f.Name()] = batches
-		}
-	}
-
-	for _, f := range filePtrArr {
-		fn, size := getFileData(b, f)
-		batches := batchMap[f.Name()]
-		b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
+			cfg := &Config{
+				// we set ProcessParallel to true as this always has the best performance
+				ProcessParallel: true,
+				// batch size is set to 1 because we need to compare individual records one by one
+				BatchSize: 1,
+			}
+			rows := readAndValidateParquetFile(t, cfg, file, data)
+			// asserts of number of rows read is the same as the number of rows written
+			assert.Equal(t, rows, tc.rows)
+		})
 	}
 }
 
-func BenchmarkReadParquetMultiGoRoutineBatch_1000(b *testing.B) {
-	farr := []string{
-		"testdata/taxi_2023_1.parquet",
-		"testdata/taxi_2023_2.parquet",
-		"testdata/vpc_flow.gz.parquet",
-	}
-
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       1000,
-	}
-
-	wg := sync.WaitGroup{}
-	filePtrArr := make([]*os.File, len(farr))
-	for i, f := range farr {
-		path, _ := filepath.Abs(f)
-		file, err := os.Open(path)
-		if err != nil {
-			b.Fatalf("failed to open parquet file: %v\n", err)
-		}
-		defer file.Close()
-		filePtrArr[i] = file
-	}
-
-	for i := 0; i < b.N; i++ {
-		for _, f := range filePtrArr {
-			f.Seek(0, 0)
-			wg.Add(1)
-			go readParquetPrallel(b, cfg, f, &wg)
-		}
-		wg.Wait()
-	}
-
-	for _, f := range filePtrArr {
-		fn, size := getFileData(b, f)
-		b.Logf("file: %s, size: %dB\n", fn, size)
-	}
-}
-
-func BenchmarkReadParquetMultiSerialBatch_10000(b *testing.B) {
-	farr := []string{
-		"testdata/taxi_2023_1.parquet",
-		"testdata/taxi_2023_2.parquet",
-		"testdata/vpc_flow.gz.parquet",
-	}
-
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       10000,
-	}
-
-	filePtrArr := make([]*os.File, len(farr))
-	for i, f := range farr {
-		path, _ := filepath.Abs(f)
-		file, err := os.Open(path)
-		if err != nil {
-			b.Fatalf("failed to open parquet file: %v\n", err)
-		}
-		defer file.Close()
-		filePtrArr[i] = file
-	}
-
-	batchMap := make(map[string]int)
-	for i := 0; i < b.N; i++ {
-		for _, f := range filePtrArr {
-			f.Seek(0, 0)
-			batches := readParquet(b, cfg, f)
-			batchMap[f.Name()] = batches
-		}
-	}
-
-	for _, f := range filePtrArr {
-		fn, size := getFileData(b, f)
-		batches := batchMap[f.Name()]
-		b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
-	}
-}
-
-func BenchmarkReadParquetSingleParallelBatch_1000(b *testing.B) {
-	f := "testdata/taxi_2023_1.parquet"
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       1000,
-	}
-
-	path, _ := filepath.Abs(f)
-	file, err := os.Open(path)
-	if err != nil {
-		b.Fatalf("failed to open parquet file: %v\n", err)
-	}
-	defer file.Close()
-
-	fn, size := getFileData(b, file)
-	var batches int
-	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			file.Seek(0, 0)
-			batches = readParquet(b, cfg, file)
-		}
-	})
-
-	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
-}
-
-func BenchmarkReadParquetSingleParallelBatch_10000(b *testing.B) {
-	f := "testdata/taxi_2023_1.parquet"
-	cfg := &Config{
-		ProcessParallel: true,
-		BatchSize:       10000,
-	}
-
-	path, _ := filepath.Abs(f)
-	file, err := os.Open(path)
-	if err != nil {
-		b.Fatalf("failed to open parquet file: %v\n", err)
-	}
-	defer file.Close()
-
-	fn, size := getFileData(b, file)
-	var batches int
-	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			file.Seek(0, 0)
-			batches = readParquet(b, cfg, file)
-		}
-	})
-
-	b.Logf("file: %s, size: %dB,  approx_records: %d, batches: %d \n", fn, size, batches*cfg.BatchSize, batches)
-}
-
-func readParquet(t testing.TB, cfg *Config, file *os.File) int {
-	count := 0
+// readAndValidateParquetFile reads the parquet file and validates the data
+func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data map[string]bool) int {
 	sReader, err := NewStreamReader(file, cfg)
-	require.NoError(t, err)
-
-	for sReader.Next() {
-		_, err := sReader.Read()
-		require.NoError(t, err)
-		count++
-	}
-
-	return count
-}
-
-func readParquetPrallel(t testing.TB, cfg *Config, file *os.File, wg *sync.WaitGroup) {
-	sReader, err := NewStreamReader(file, cfg)
-	require.NoError(t, err)
-
-	for sReader.Next() {
-		_, err := sReader.Read()
-		require.NoError(t, err)
-	}
-
-	wg.Done()
-}
-
-func getFileData(t testing.TB, file *os.File) (string, int) {
-	fi, err := file.Stat()
-	size := 0
 	if err != nil {
-		t.Logf("could not obtain file stat: %v\n", err)
-		return "", size
-	} else {
-		size = int(fi.Size())
+		t.Fatalf("failed to init stream reader: %v\n", err)
 	}
-	fn := strings.Split(file.Name(), "/")
-	return fn[len(fn)-1], size
+
+	rowCount := 0
+	for sReader.Next() {
+		val, err := sReader.Record()
+		if err != nil {
+			t.Fatalf("failed to read stream: %v\n", err)
+		}
+		if val != nil {
+			rowCount++
+			// this is where we check if the column values are the same as the ones we wrote
+			if _, ok := data[string(val)]; !ok {
+				t.Fatalf("failed to find record in parquet file: %v\n", err)
+			}
+		}
+	}
+	return rowCount
+}
+
+// createRandomParquet creates a parquet file with random data
+func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) map[string]bool {
+	// defines a map to store the parquet data for validation
+	data := make(map[string]bool)
+	// creates a new Arrow schema
+	var fields []arrow.Field
+	for i := 0; i < numCols; i++ {
+		fieldType := arrow.PrimitiveTypes.Int32
+		field := arrow.Field{Name: fmt.Sprintf("col%d", i), Type: fieldType, Nullable: true}
+		fields = append(fields, field)
+	}
+	schema := arrow.NewSchema(fields, nil)
+	file, err := os.Create(fname)
+	if err != nil {
+		t.Fatalf("Failed to create parquet test file: %v", err)
+	}
+	defer file.Close()
+
+	// creates a new file writer
+	fileWriter, err := pqarrow.NewFileWriter(schema, file, nil, pqarrow.ArrowWriterProperties{})
+	if err != nil {
+		t.Fatalf("Failed to create parquet file writer: %v", err)
+	}
+	defer fileWriter.Close()
+
+	// creates an Arrow memory pool for managing memory allocations
+	memoryPool := memory.NewGoAllocator()
+
+	// generates random data for writing to the parquet file
+	for rowIdx := int64(0); rowIdx < int64(numRows); rowIdx++ {
+		// creates an Arrow record with random data
+		var recordColumns []arrow.Array
+		for colIdx := 0; colIdx < numCols; colIdx++ {
+			randData := make([]int32, 1)
+			randData[0] = rand.Int31()
+			builder := array.NewInt32Builder(memoryPool)
+			builder.AppendValues(randData, nil)
+			defer builder.Release()
+			columnArray := array.NewInt32Data(builder.NewArray().Data())
+			recordColumns = append(recordColumns, columnArray)
+		}
+		record := array.NewRecord(schema, recordColumns, 1)
+		defer record.Release()
+		val, err := record.MarshalJSON()
+		if err != nil {
+			t.Fatalf("Failed to marshal record to JSON: %v", err)
+		}
+		data[string(val)] = true
+
+		// writes the record batch to the Parquet file
+		err = fileWriter.Write(record)
+		if err != nil {
+			t.Fatalf("Failed to write record to parquet file: %v", err)
+		}
+	}
+
+	return data
 }

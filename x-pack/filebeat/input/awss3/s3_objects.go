@@ -248,7 +248,7 @@ func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
 	defer sReader.Close()
 
 	for sReader.Next() {
-		data, err := sReader.Read()
+		data, err := sReader.Record()
 		if err != nil {
 			return fmt.Errorf("failed to read records from parquet record reader: %w", err)
 		}
