@@ -930,8 +930,23 @@ metricbeat.modules:
   #  - include_fields:
   #      fields: ["beat", "metricset", "redis.info.stats"]
 
+  # Redis AUTH username (Redis 6.0+). Empty by default.
+  #username: foouser
+
   # Redis AUTH password. Empty by default.
   #password: foobared
+
+  # Optional SSL (Redis 6.0+). By default is off.
+  #ssl.enabled: true
+
+  # List of root certificates for TLS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
 
 #------------------------------- Traefik Module -------------------------------
 - module: traefik

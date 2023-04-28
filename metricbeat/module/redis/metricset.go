@@ -57,9 +57,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, fmt.Errorf("failed to read configuration: %w", err)
 	}
 
-	user, password, dbNumber, err := getUserPasswordDBNumber(base.HostData())
+	username, password, dbNumber, err := getUsernamePasswordDBNumber(base.HostData())
 	if err != nil {
-		return nil, fmt.Errorf("failed to getPasswordDBNumber from URI: %w", err)
+		return nil, fmt.Errorf("failed to parse username, password and dbNumber from URI: %w", err)
 	}
 
 	if config.TLS.IsEnabled() {
@@ -73,7 +73,14 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool:          CreatePool(base.Host(), user, password, dbNumber, &config, base.Module().Config().Timeout),
+		pool: CreatePool(
+			base.Host(),
+			username,
+			password,
+			dbNumber,
+			&config,
+			base.Module().Config().Timeout,
+		),
 	}, nil
 }
 
@@ -93,7 +100,8 @@ func (m *MetricSet) OriginalDBNumber() uint {
 	return uint(m.pool.DBNumber())
 }
 
-// getUserPasswordDBNumber parses user, password and dbNumber from URI.
+// getUserPasswordDBNumber parses username, password and dbNumber from URI or else default
+// is used (mentioned in config).
 //
 // As per security consideration RFC-2396: Uniform Resource Identifiers (URI): Generic Syntax
 // https://www.rfc-editor.org/rfc/rfc2396.html#section-7
@@ -108,7 +116,7 @@ func (m *MetricSet) OriginalDBNumber() uint {
 //
 // In some environments, this is safe but not all. We shouldn't ideally take
 // username and password from URI's userinfo or query parameters.
-func getUserPasswordDBNumber(hostData mb.HostData) (string, string, int, error) {
+func getUsernamePasswordDBNumber(hostData mb.HostData) (string, string, int, error) {
 	// If there are more than one place specified user/password/db-number, use user/password/db-number in query
 	uriParsed, err := url.Parse(hostData.URI)
 	if err != nil {
@@ -129,16 +137,16 @@ func getUserPasswordDBNumber(hostData mb.HostData) (string, string, int, error) 
 
 	// get user and password from query and also check db-number
 	password := hostData.Password
-	user := hostData.User
+	username := hostData.User
 	if uriParsed.RawQuery != "" {
 		queryParsed, err := url.ParseQuery(uriParsed.RawQuery)
 		if err != nil {
 			return "", "", 0, fmt.Errorf("failed to parse query string in '%s': %w", hostData.URI, err)
 		}
 
-		usr := queryParsed.Get("user")
+		usr := queryParsed.Get("username")
 		if usr != "" {
-			user = usr
+			username = usr
 		}
 
 		pw := queryParsed.Get("password")
@@ -155,5 +163,5 @@ func getUserPasswordDBNumber(hostData mb.HostData) (string, string, int, error) 
 		}
 	}
 
-	return user, password, database, nil
+	return username, password, database, nil
 }

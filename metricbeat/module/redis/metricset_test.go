@@ -93,8 +93,8 @@ func TestGetPasswordDBNumber(t *testing.T) {
 		},
 		{
 			"test redis URI with db number, user & password in URI's query parameter and user & password in userinfo",
-			mb.HostData{URI: "redis://antirez:password1@127.0.0.2:6379/1?user=salvatore&password=password2&db=2", User: "antirez", Password: "password1"},
-			"antirez",
+			mb.HostData{URI: "redis://antirez:password1@127.0.0.2:6379/1?username=salvatore&password=password2&db=2", User: "antirez", Password: "password1"},
+			"salvatore",
 			"password2",
 			2,
 		},
@@ -102,9 +102,9 @@ func TestGetPasswordDBNumber(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			user, password, database, err := getUserPasswordDBNumber(c.hostData)
+			username, password, database, err := getUsernamePasswordDBNumber(c.hostData)
 			assert.NoError(t, err)
-			assert.Equal(t, c.expectedUser, user)
+			assert.Equal(t, c.expectedUser, username)
 			assert.Equal(t, c.expectedPassword, password)
 			assert.Equal(t, c.expectedDatabase, database)
 		})
