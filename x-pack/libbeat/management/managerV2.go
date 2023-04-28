@@ -688,7 +688,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 				// reloader implemented on libbeat/cfgfile/reload.go
 				inputNotFinishedErr := &common.ErrInputNotFinished{}
 				if ok := errors.As(causeErr, &inputNotFinishedErr); ok {
-					cm.logger.Debugf("file %q is not finished, will retry starting the input in %s", inputNotFinishedErr.File)
+					cm.logger.Debugf("file '%s' is not finished, will retry starting the input soon", inputNotFinishedErr.File)
 					cm.forceReload.Store(true)
 					cm.logger.Debug("ForceReload set to TRUE")
 					continue
