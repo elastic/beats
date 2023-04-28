@@ -208,13 +208,13 @@ func (p *Pool) DBNumber() int {
 }
 
 // CreatePool creates a redis connection pool
-func CreatePool(host, user, password string, dbNumber int, config *ModuleConfig, connTimeout time.Duration) *Pool {
+func CreatePool(host, username, password string, dbNumber int, config *ModuleConfig, connTimeout time.Duration) *Pool {
 	pool := &rd.Pool{
 		MaxIdle:     config.MaxConn,
 		IdleTimeout: config.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
 			return rd.Dial(config.Network, host,
-				rd.DialUsername(user),
+				rd.DialUsername(username),
 				rd.DialPassword(password),
 				rd.DialDatabase(dbNumber),
 				rd.DialConnectTimeout(connTimeout),

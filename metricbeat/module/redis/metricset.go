@@ -117,7 +117,7 @@ func (m *MetricSet) OriginalDBNumber() uint {
 // In some environments, this is safe but not all. We shouldn't ideally take
 // username and password from URI's userinfo or query parameters.
 func getUsernamePasswordDBNumber(hostData mb.HostData) (string, string, int, error) {
-	// If there are more than one place specified user/password/db-number, use user/password/db-number in query
+	// If there are more than one place specified username/password/db-number, use username/password/db-number in query
 	uriParsed, err := url.Parse(hostData.URI)
 	if err != nil {
 		return "", "", 0, fmt.Errorf("failed to parse URL '%s': %w", hostData.URI, err)
@@ -135,7 +135,7 @@ func getUsernamePasswordDBNumber(hostData mb.HostData) (string, string, int, err
 		}
 	}
 
-	// get user and password from query and also check db-number
+	// get username and password from query and also check db-number
 	password := hostData.Password
 	username := hostData.User
 	if uriParsed.RawQuery != "" {
