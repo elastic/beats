@@ -93,7 +93,9 @@ func NewInput(
 	cleanupNeeded := true
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
-			f()
+			if err := f(); err != nil {
+				logp.L().Named("input.log").Errorf("clean up function retruned an error: %w", err)
+			}
 		}
 	}
 
@@ -103,10 +105,10 @@ func NewInput(
 		return nil, err
 	}
 	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err)
 	}
 	if err := inputConfig.normalizeGlobPatterns(); err != nil {
-		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %w", err)
 	}
 
 	if len(inputConfig.Paths) == 0 {
@@ -115,7 +117,7 @@ func NewInput(
 
 	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize file identity generator: %+v", err)
+		return nil, fmt.Errorf("failed to initialize file identity generator: %w", err)
 	}
 
 	// Note: underlying output.
@@ -551,7 +553,7 @@ func (p *Input) scan() {
 		if isNewState {
 			logger.Debugf("Start harvester for new file: %s", newState.Source)
 			err := p.startHarvester(logger, newState, 0)
-			if err == errHarvesterLimit {
+			if errors.Is(err, errHarvesterLimit) {
 				logger.Debugf(harvesterErrMsg, newState.Source, err)
 				continue
 			}
@@ -676,11 +678,7 @@ func (p *Input) isIgnoreOlder(state file.State) bool {
 	}
 
 	modTime := state.Fileinfo.ModTime()
-	if time.Since(modTime) > p.config.IgnoreOlder {
-		return true
-	}
-
-	return false
+	return time.Since(modTime) > p.config.IgnoreOlder
 }
 
 // isCleanInactive checks if the given state false under clean_inactive
@@ -691,11 +689,7 @@ func (p *Input) isCleanInactive(state file.State) bool {
 	}
 
 	modTime := state.Fileinfo.ModTime()
-	if time.Since(modTime) > p.config.CleanInactive {
-		return true
-	}
-
-	return false
+	return time.Since(modTime) > p.config.CleanInactive
 }
 
 // subOutletWrap returns a factory method that will wrap the passed outlet
