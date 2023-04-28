@@ -7,43 +7,67 @@
 
 package azureeventhub
 
-import "strings"
+import (
+	"bytes"
+	"errors"
+)
 
-type sanitizationFunc func(jsonStr string) []byte
+type sanitizationOption string
 
-func getSanitizationFuncs() map[string]sanitizationFunc {
-	return map[string]sanitizationFunc{
-		"NEW_LINES":     sanitizeNewLines,
-		"SINGLE_QUOTES": sanitizeSingleQuotes,
+const (
+	NewLines     sanitizationOption = "NEW_LINES"
+	SingleQuotes sanitizationOption = "SINGLE_QUOTES"
+	Unknown      sanitizationOption = "UNKNOWN"
+)
+
+func sanitizationOptFromString(s string) (sanitizationOption, error) {
+	switch s {
+	case "NEW_LINES":
+		return NewLines, nil
+	case "SINGLE_QUOTES":
+		return SingleQuotes, nil
+	default:
+		return Unknown, errors.New("invalid sanitization option")
 	}
 }
 
-func sanitize(jsonStr string, opts ...string) []byte {
-	var res []byte
+// sanitize applies the sanitization options specified in the config
+// if no sanitization options are provided, the message remains unchanged
+func sanitize(jsonStr []byte, opts ...string) []byte {
+	res := jsonStr
 
 	for _, opt := range opts {
-		f := getSanitizationFuncs()[opt]
-		res = f(jsonStr)
+		switch sanitizationOption(opt) {
+		case NewLines:
+			res = sanitizeNewLines(res)
+		case SingleQuotes:
+			res = sanitizeSingleQuotes(res)
+		}
 	}
 
 	return res
 }
 
-func sanitizeNewLines(jsonStr string) []byte {
-	var result strings.Builder
+// sanitizeNewLines removes newlines found in the message
+func sanitizeNewLines(jsonStr []byte) []byte {
+	var result bytes.Buffer
 
 	for _, r := range jsonStr {
 		if r == '\n' {
 			continue
 		}
-		result.WriteRune(r)
+
+		result.WriteByte(r)
 	}
 
-	return []byte(result.String())
+	return result.Bytes()
 }
 
-func sanitizeSingleQuotes(jsonStr string) []byte {
-	var result strings.Builder
+// sanitizeSingleQuotes replaces single quotes with double quotes in the message
+// single quotes that are in between double quotes remain unchanged
+func sanitizeSingleQuotes(jsonStr []byte) []byte {
+	var result bytes.Buffer
+
 	inDoubleQuotes := false
 
 	for _, r := range jsonStr {
@@ -54,9 +78,9 @@ func sanitizeSingleQuotes(jsonStr string) []byte {
 		if r == '\'' && !inDoubleQuotes {
 			result.WriteRune('"')
 		} else {
-			result.WriteRune(r)
+			result.WriteByte(r)
 		}
 	}
 
-	return []byte(result.String())
+	return result.Bytes()
 }
