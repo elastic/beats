@@ -76,8 +76,7 @@ func TestSanitize(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			res := sanitize(jsonStr, tc.opts...)
-			assert.Equal(t, []byte(tc.expected), res)
-			fmt.Println(string(res))
+			assert.Equal(t, tc.expected, res)
 		})
 	}
 }
