@@ -268,6 +268,84 @@ func Test_apiResponse(t *testing.T) {
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"encryptedToken":"70c1f2e2e6ca2d39297490d1f9142c7d701415ea8e6151f6562a08fa657a40ff","plainToken":"qgg8vlvZRS6UYooatFL8Aw"}`,
 		},
+		{
+			name: "validate CRC request",
+			conf: config{
+				SecretHeader: "secretHeaderTest",
+				SecretValue:  "secretValueTest",
+				CRCProvider:  "Zoom",
+			},
+			request: func() *http.Request {
+				buf := bytes.NewBufferString(
+					`{
+						"event_ts":1654503849680,
+						"event":"endpoint.url_validation",
+						"payload": {
+							"plainToken":"qgg8vlvZRS6UYooatFL8Aw"
+						}
+					}`,
+				)
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("secretHeaderTest", "secretValueTest")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"encryptedToken":"70c1f2e2e6ca2d39297490d1f9142c7d701415ea8e6151f6562a08fa657a40ff","plainToken":"qgg8vlvZRS6UYooatFL8Aw"}`,
+		},
+		{
+			name: "malformed CRC request",
+			conf: config{
+				SecretHeader: "secretHeaderTest",
+				SecretValue:  "secretValueTest",
+				CRCProvider:  "Zoom",
+			},
+			request: func() *http.Request {
+				buf := bytes.NewBufferString(
+					`{
+						"event_ts":1654503849680,
+						"event":"endpoint.url_validation",
+						"payload": {
+							"plainToken":"qgg8vlvZRS6UYooatFL8Aw
+						}
+					}`,
+				)
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("secretHeaderTest", "secretValueTest")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"malformed JSON object at stream position 0: invalid character '\\n' in string literal"}`,
+		},
+		{
+			name: "empty CRC challenge",
+			conf: config{
+				SecretHeader: "secretHeaderTest",
+				SecretValue:  "secretValueTest",
+				CRCProvider:  "Zoom",
+			},
+			request: func() *http.Request {
+				buf := bytes.NewBufferString(
+					`{
+						"event_ts":1654503849680,
+						"event":"endpoint.url_validation",
+						"payload": {
+							"plainToken":""
+						}
+					}`,
+				)
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("secretHeaderTest", "secretValueTest")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"failed decoding 'payload.plainToken' from CRC request"}`,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -282,7 +360,7 @@ func Test_apiResponse(t *testing.T) {
 
 			// Validate responses.
 			assert.Equal(t, tc.wantStatus, respRec.Code)
-			assert.Equal(t, tc.wantResponse, respRec.Body.String())
+			assert.Equal(t, tc.wantResponse, strings.TrimSuffix(respRec.Body.String(), "\n"))
 			require.Len(t, pub.events, len(tc.events))
 
 			for i, evt := range pub.events {

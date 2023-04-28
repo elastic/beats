@@ -68,7 +68,7 @@ func validateZoomCRC(crc crcValidator, obj mapstr.M) (int, string, error) {
 			return 0, "", errNotCRC
 		}
 		crcValue, ok := crcValue.(string)
-		if !ok {
+		if !ok || crcValue == "" {
 			err := fmt.Errorf("failed decoding '%s' from CRC request", crc.key)
 			return 0, "", err
 		} else if crcValue != crc.value {
@@ -83,7 +83,7 @@ func validateZoomCRC(crc crcValidator, obj mapstr.M) (int, string, error) {
 
 	var ok bool
 	crc.challengeValue, ok = challengeValue.(string)
-	if !ok {
+	if !ok || crc.challengeValue == "" {
 		err := fmt.Errorf("failed decoding '%s' from CRC request", crc.challenge)
 		return 0, "", err
 	}

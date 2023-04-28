@@ -72,7 +72,7 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 				// CRC request processed
 				break
 			} else if !errors.Is(err, errNotCRC) {
-				sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+				sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
 				return
 			}
 		}
