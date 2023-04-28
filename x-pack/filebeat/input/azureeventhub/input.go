@@ -167,12 +167,10 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
+
 	// clean up the message for known issues producing a malformed JSON
-	if a.config.SanitizeOptions != nil {
-		for _, opt := range a.config.SanitizeOptions {
-			bMessage = sanitize(string(bMessage), opt)
-		}
-	}
+	bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
 	if err == nil {
