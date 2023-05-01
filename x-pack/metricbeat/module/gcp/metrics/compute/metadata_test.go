@@ -7,11 +7,11 @@ package compute
 import (
 	"testing"
 
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
-	monitoring "google.golang.org/genproto/googleapis/monitoring/v3"
 )
 
 var fake = &monitoring.TimeSeries{

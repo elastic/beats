@@ -42,15 +42,15 @@ func TestClient(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			func(_ queue.ACKListener) (queue.Queue, error) {
-				return qu, nil
-			},
+			conf.Namespace{},
 			outputs.Group{},
 			settings,
 		)
 		if err != nil {
 			panic(err)
 		}
+		// Inject a test queue so the outputController doesn't create one
+		p.outputController.queue = qu
 
 		return p
 	}
@@ -129,20 +129,22 @@ func TestClientWaitClose(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			func(queue.ACKListener) (queue.Queue, error) { return qu, nil },
+			conf.Namespace{},
 			outputs.Group{},
 			settings,
 		)
 		if err != nil {
 			panic(err)
 		}
+		// Inject a test queue so the outputController doesn't create one
+		p.outputController.queue = qu
 
 		return p
 	}
 	err := logp.TestingSetup()
 	assert.Nil(t, err)
 
-	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
+	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1})
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 
@@ -192,8 +194,8 @@ func TestClientWaitClose(t *testing.T) {
 			return nil
 		})
 		defer output.Close()
-		pipeline.output.Set(outputs.Group{Clients: []outputs.Client{output}})
-		defer pipeline.output.Set(outputs.Group{})
+		pipeline.outputController.Set(outputs.Group{Clients: []outputs.Client{output}})
+		defer pipeline.outputController.Set(outputs.Group{})
 
 		client.Publish(beat.Event{})
 

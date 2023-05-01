@@ -7,10 +7,10 @@ package cloudsql
 import (
 	"testing"
 
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
-	monitoring "google.golang.org/genproto/googleapis/monitoring/v3"
 	"gotest.tools/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
