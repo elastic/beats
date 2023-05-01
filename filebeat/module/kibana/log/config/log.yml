@@ -8,7 +8,11 @@ exclude_files: [".gz$"]
 processors:
   # non-ECS: same as json.keys_under_root: false, allows compatibility with non-ecs logs.
 - decode_json_fields:
+    when:
+      regexp:
+        message: '^{'
     fields: [message]
+    add_error_key: true
     target: 'json'
 - add_fields:
     target: ""
