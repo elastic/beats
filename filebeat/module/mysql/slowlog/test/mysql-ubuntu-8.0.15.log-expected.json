@@ -75,9 +75,6 @@
             16,
             "16"
         ],
-        "related.user": [
-            "root"
-        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
