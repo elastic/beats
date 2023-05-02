@@ -1,11 +1,12 @@
 [
     {
         "@timestamp": "2018-08-28T18:24:25.000Z",
-        "destination.address": "10.100.220.70",
-        "destination.ip": "10.100.220.70",
+        "destination.address": [
+            "10.100.220.70",
+            "10.100.220.70"
+        ],
         "destination.port": 80,
         "event.category": [
-            "network",
             "web"
         ],
         "event.dataset": "iis.access",
@@ -14,9 +15,6 @@
         "event.module": "iis",
         "event.original": "2018-08-28 18:24:25 [10.100.220.70](http://10.100.220.70) GET / - 80 - [10.100.118.31](http://10.100.118.31) Mozilla/4.0+(compatible;+MSIE+7.0;+Windows+NT+6.3;+WOW64;+Trident/7.0;+.NET4.0E;+.NET4.0C;+.NET+CLR+3.5.30729;+.NET+CLR[+2.0.50727](tel:+2050727);+.NET+CLR+3.0.30729) 404 4 2 792",
         "event.outcome": "failure",
-        "event.type": [
-            "connection"
-        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.response.status_code": 404,
@@ -24,13 +22,11 @@
         "iis.access.win32_status": 2,
         "input.type": "log",
         "log.offset": 244,
-        "related.ip": [
-            "10.100.118.31",
-            "10.100.220.70"
-        ],
         "service.type": "iis",
-        "source.address": "10.100.118.31",
-        "source.ip": "10.100.118.31",
+        "source.address": [
+            "10.100.118.31",
+            "10.100.118.31"
+        ],
         "url.original": "/",
         "url.path": "/",
         "user_agent.device.name": "Other",
