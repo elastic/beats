@@ -36,6 +36,9 @@ jobs:
           fetch-depth: 0
           ref: "${{ matrix.branch }}"
 
+      - id: date
+        run: echo "date=$(date +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
+
       - id: search
         run: |-
           if git --no-pager \
@@ -81,7 +84,7 @@ jobs:
           server_address: ${{ env.MAIL_SERVER }}
           username: ${{ env.MAIL_USERNAME }}
           password: ${{ env.MAIL_PASSWORD }}
-          subject: '[${{ matrix.branch }}] Elastic Stack version has not been updated recently.'
+          subject: '[${{ matrix.branch }}] ${{ steps.date.outputs.date }}: Elastic Stack version has not been updated recently.'
           to: ${{ env.EMAIL }}
           from: ${{ env.MAIL_FROM }}
           reply_to: ${{ env.MAIL_REPLY }}
