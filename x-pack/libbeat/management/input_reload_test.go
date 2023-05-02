@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -18,7 +17,8 @@ import (
 )
 
 func TestInputReload(t *testing.T) {
-	logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*", "centralmgmt.V2-manager"))
+	// Uncomment this line to see the debug logs for this test
+	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*", "centralmgmt.V2-manager"))
 	r := reload.NewRegistry()
 
 	output := &reloadable{}
@@ -29,14 +29,12 @@ func TestInputReload(t *testing.T) {
 		ReloadImpl: func(configs []*reload.ConfigWithMeta) error {
 			reloadCallCount++
 			if reloadCallCount == 1 {
-				t.Log("Reload implementation retruning an error")
 				e1 := multierror.Errors{withCause{&common.ErrInputNotFinished{
 					State: "<state string goes here>",
 					File:  "/tmp/foo.log",
 				}}}
 				return e1.Err()
 			}
-			t.Log("reload implementation retruning 'nil'")
 
 			return nil
 		},
@@ -44,14 +42,10 @@ func TestInputReload(t *testing.T) {
 	r.MustRegisterInput(inputs)
 
 	configIdx := -1
-
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
 		configIdx = currentIdx
-		t.Log(currentIdx, "on observed called")
-		for _, unit := range observed.Units {
-			t.Log(unit.Id, unit.Payload.String(), unit.Message, unit.GetState().String(), unit.Type.String(), unit.ConfigStateIdx)
-		}
 	}
+
 	srv := mockSrv([][]*proto.UnitExpected{
 		{
 			{
@@ -163,7 +157,6 @@ func TestInputReload(t *testing.T) {
 		// That detects a state change, we only count/advance steps
 		// on state changes
 		if forceReload != forceReloadLastState {
-			t.Log("================ Force reload state change")
 			forceReloadLastState = forceReload
 			if forceReload == forceReloadState[forceReloadStateIdx] {
 				// Setp to the next state
@@ -178,7 +171,7 @@ func TestInputReload(t *testing.T) {
 				}
 			}
 		}
-		t.Log("forcereload False cont: ", forceReloadFalseCount, "config idx:", configIdx, "Force reload status:", mm.forceReload.Load(), "force reload state idx:", forceReloadStateIdx)
+
 		return configIdx == 1 && forceReloadFalseCount == 2
 	}, 15*time.Hour, 300*time.Millisecond)
 }
