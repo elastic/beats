@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Filebeat*
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
+- Fixing the grok expression outputs of log files {pull}35221[35221]
 
 *Heartbeat*
 
