@@ -30,9 +30,9 @@ processors:
       (?:-|%{NUMBER:http.response.status_code:long}) (?:-|%{NUMBER:iis.access.sub_status:long})
       (?:-|%{NUMBER:iis.access.win32_status:long}) (?:-|%{NUMBER:http.response.body.bytes:long})
       (?:-|%{NUMBER:http.request.body.bytes:long}) (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
-    - '%{TIMESTAMP_ISO8601:iis.access.time} \[%{IPORHOST:destination.address}\]\(http://%{IPORHOST:destination.address}\)
+    - '%{TIMESTAMP_ISO8601:iis.access.time} \[%{IPORHOST:destination.address}\]\(http://%{IPORHOST}\)
       (?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:_tmp.url_path}) (?:-|%{NOTSPACE:_tmp.url_query}) (?:-|%{NUMBER:destination.port:long})
-      (?:-|%{NOTSPACE:user.name}) \[%{IPORHOST:source.address}\]\(http://%{IPORHOST:source.address}\)
+      (?:-|%{NOTSPACE:user.name}) \[%{IPORHOST:source.address}\]\(http://%{IPORHOST}\)
       (?:-|%{NOTSPACE:user_agent.original}) (?:-|%{NUMBER:http.response.status_code:long}) (?:-|%{NUMBER:iis.access.sub_status:long})
       (?:-|%{NUMBER:iis.access.win32_status:long}) (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
     - '%{TIMESTAMP_ISO8601:iis.access.time} (?:-|%{IPORHOST:destination.address}) (?:-|%{WORD:http.request.method})
