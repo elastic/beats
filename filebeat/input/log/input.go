@@ -471,7 +471,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	var absolutePath string
 	absolutePath, err = filepath.Abs(path)
 	if err != nil {
-		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %s", absolutePath, err)
+		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %w", absolutePath, err)
 	}
 	p.logger.Debugf("Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
@@ -745,7 +745,7 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	err = h.Setup()
 	if err != nil {
 		p.numHarvesters.Dec()
-		return fmt.Errorf("error setting up harvester: %s", err)
+		return fmt.Errorf("error setting up harvester: %w", err)
 	}
 
 	// Update state before staring harvester
@@ -780,7 +780,7 @@ func (p *Input) updateState(state file.State) error {
 		stateToRemove := file.State{Id: state.PrevId, TTL: 0, Finished: true, Meta: nil}
 		err := p.doUpdate(stateToRemove)
 		if err != nil {
-			return fmt.Errorf("failed to remove outdated states based on prev_id: %v", err)
+			return fmt.Errorf("failed to remove outdated states based on prev_id: %w", err)
 		}
 	}
 

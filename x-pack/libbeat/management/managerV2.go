@@ -849,6 +849,8 @@ func cause(err error) error {
 	}
 
 	for err != nil {
+		//nolint: errorlint // This is the original github.com/pkg/errors
+		// implementation.
 		cause, ok := err.(causer)
 		if !ok {
 			break
