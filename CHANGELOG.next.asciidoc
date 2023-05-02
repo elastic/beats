@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
+- Fixes "Can only start an input when all related states are finished" when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
 
 *Heartbeat*
 
