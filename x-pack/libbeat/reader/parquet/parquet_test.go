@@ -104,20 +104,20 @@ func TestParquet(t *testing.T) {
 func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data map[string]bool) int {
 	sReader, err := NewStreamReader(file, cfg)
 	if err != nil {
-		t.Fatalf("failed to init stream reader: %v\n", err)
+		t.Fatalf("failed to init stream reader: %v", err)
 	}
 
 	rowCount := 0
 	for sReader.Next() {
 		val, err := sReader.Record()
 		if err != nil {
-			t.Fatalf("failed to read stream: %v\n", err)
+			t.Fatalf("failed to read stream: %v", err)
 		}
 		if val != nil {
 			rowCount++
 			// this is where we check if the column values are the same as the ones we wrote
 			if _, ok := data[string(val)]; !ok {
-				t.Fatalf("failed to find record in parquet file: %v\n", err)
+				t.Fatalf("failed to find record in parquet file: %v", err)
 			}
 		}
 	}

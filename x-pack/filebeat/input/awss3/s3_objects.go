@@ -236,7 +236,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 }
 
 // readParquet reads a parquet file based on config options and processes it using the parquet reader,
-// decodes it to JSON and sends the decoded data to the readJSON method to process further as JSON
+// decodes it to JSON and sends the decoded data to the readJSON method to process further as JSON.
 func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
 	sReader, err := parquet.NewStreamReader(r, &parquet.Config{
 		ProcessParallel: p.readerConfig.ParquetConfig.ProcessParallel,
@@ -264,7 +264,7 @@ func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
 }
 
 // readParquetJSON uses an array of json.RawMessage to decode parquet json data
-// since the result of readParquet method is always a stringified json array
+// since the result of readParquet method is always a stringified json array.
 func (p *s3ObjectProcessor) readParquetJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()

@@ -275,13 +275,13 @@ func readParquetFile(b *testing.B, cfg *Config, file *os.File, checkMem bool) {
 	}
 	sReader, err := NewStreamReader(file, cfg)
 	if err != nil {
-		b.Fatalf("failed to init stream reader: %v\n", err)
+		b.Fatalf("failed to init stream reader: %v", err)
 	}
 
 	for sReader.Next() {
 		_, err := sReader.Record()
 		if err != nil {
-			b.Fatalf("failed to read stream: %v\n", err)
+			b.Fatalf("failed to read stream: %v", err)
 		}
 	}
 }
@@ -293,13 +293,13 @@ func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File, checkMem boo
 	}
 	sReader, err := NewStreamReader(file, cfg)
 	if err != nil {
-		b.Fatalf("failed to init stream reader: %v\n", err)
+		b.Fatalf("failed to init stream reader: %v", err)
 	}
 
 	if sReader.Next() {
 		_, err := sReader.Record()
 		if err != nil {
-			b.Fatalf("failed to read stream: %v\n", err)
+			b.Fatalf("failed to read stream: %v", err)
 		}
 	}
 }
@@ -311,7 +311,7 @@ func constructStreamReader(b *testing.B, cfg *Config, file *os.File, checkMem bo
 	}
 	_, err := NewStreamReader(file, cfg)
 	if err != nil {
-		b.Fatalf("failed to init stream reader: %v\n", err)
+		b.Fatalf("failed to init stream reader: %v", err)
 	}
 }
 
@@ -321,7 +321,7 @@ func openFiles(b *testing.B, files []string) []*os.File {
 	for i, f := range files {
 		file, err := os.Open(f)
 		if err != nil {
-			b.Fatalf("failed to open parquet file: %v\n", err)
+			b.Fatalf("failed to open parquet file: %v", err)
 		}
 		filePtrArr[i] = file
 	}

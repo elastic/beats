@@ -30,10 +30,10 @@ func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
 		batchSize = cfg.BatchSize
 	}
 
-	// reads the contents of the reader object into a byte array
+	// reads the contents of the reader object into a byte slice
 	data, err := io.ReadAll(r)
 	if err != nil {
-		return nil, fmt.Errorf("failed to data from stream reader: %w", err)
+		return nil, fmt.Errorf("failed to read data from stream reader: %w", err)
 	}
 
 	// defines a memory allocator for allocating memory for Arrow objects
@@ -72,9 +72,9 @@ func (sr *StreamReader) Next() bool {
 	return sr.recordReader.Next()
 }
 
-// Record reads the current record from the parquet file and returns it as a json marshaled byte array.
-// If no more records are available, the []byte array will be nil. It will return
-// an error if the record could not be marshalled.
+// Record reads the current record from the parquet file and returns it as a JSON marshaled byte slice.
+// If no more records are available, the []byte slice will be nil. It will return
+// an error if the record cannot be marshalled.
 func (sr *StreamReader) Record() ([]byte, error) {
 	var val []byte
 	var err error
