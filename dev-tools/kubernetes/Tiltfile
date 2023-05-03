@@ -48,7 +48,7 @@ def build(
         print("Docker registry: {}".format(docker_registry))
 
     if k8s_env == "aws":
-        # In order to push to AWS you need ti run:
+        # In order to push to AWS you need to run:
         #   aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin XXXXX.dkr.ecr.us-east-2.amazonaws.com/metricbeat-debug
         #
         # More info at https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html
