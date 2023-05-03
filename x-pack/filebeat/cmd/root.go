@@ -50,8 +50,8 @@ func defaultProcessors() []mapstr.M {
 				"when.not.contains.tags": "forwarded",
 			},
 		},
-		{"add_cloud_metadata": nil},
-		{"add_docker_metadata": nil},
-		{"add_kubernetes_metadata": nil},
+		// {"add_cloud_metadata": nil},
+		// {"add_docker_metadata": nil},
+		// {"add_kubernetes_metadata": nil},
 	}
 }

@@ -295,6 +295,11 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	}
 }
 
+func (producer *diskQueue) PersistedIndex() (queue.EntryID, error) {
+	// the disk queue currently doesn't implement OldestEntryID, which is needed for the persistedIndex values
+	return queue.EntryID(0), nil
+}
+
 // Metrics returns current disk metrics
 func (dq *diskQueue) Metrics() (queue.Metrics, error) {
 	respChan := make(chan metricsRequestResponse, 1)

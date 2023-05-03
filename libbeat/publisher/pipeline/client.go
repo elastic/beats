@@ -70,14 +70,14 @@ func (c *client) PublishAll(events []beat.Event) {
 	}
 }
 
-func (c *client) Publish(e beat.Event) {
+func (c *client) Publish(e beat.Event) queue.EntryID {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.publish(e)
+	return c.publish(e)
 }
 
-func (c *client) publish(e beat.Event) {
+func (c *client) publish(e beat.Event) queue.EntryID {
 	var (
 		event   = &e
 		publish = true
@@ -88,7 +88,7 @@ func (c *client) publish(e beat.Event) {
 	if !c.isOpen.Load() {
 		// client is closing down -> report event as dropped and return
 		c.onDroppedOnPublish(e)
-		return
+		return queue.EntryID(0)
 	}
 
 	if c.processors != nil {
@@ -110,7 +110,7 @@ func (c *client) publish(e beat.Event) {
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
 		c.onFilteredOut(e)
-		return
+		return queue.EntryID(0)
 	}
 
 	e = *event
@@ -120,10 +120,11 @@ func (c *client) publish(e beat.Event) {
 	}
 
 	var published bool
+	var id queue.EntryID
 	if c.canDrop {
-		_, published = c.producer.TryPublish(pubEvent)
+		id, published = c.producer.TryPublish(pubEvent)
 	} else {
-		_, published = c.producer.Publish(pubEvent)
+		id, published = c.producer.Publish(pubEvent)
 	}
 
 	if published {
@@ -131,6 +132,8 @@ func (c *client) publish(e beat.Event) {
 	} else {
 		c.onDroppedOnPublish(e)
 	}
+
+	return id
 }
 
 func (c *client) Close() error {

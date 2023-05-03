@@ -20,6 +20,7 @@ package testing
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // ClientCounter can be used to create a beat.PipelineConnector that count
@@ -60,11 +61,16 @@ func (c FakeConnector) Connect() (beat.Client, error) {
 	return c.ConnectWith(beat.ClientConfig{})
 }
 
+func (c FakeConnector) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
+}
+
 // Publish calls PublishFunc, if PublishFunc is not nil.
-func (c *FakeClient) Publish(event beat.Event) {
+func (c *FakeClient) Publish(event beat.Event) queue.EntryID {
 	if c.PublishFunc != nil {
 		c.PublishFunc(event)
 	}
+	return queue.EntryID(0)
 }
 
 // Close calls CloseFunc, if CloseFunc is not nil. Otherwise it returns nil.

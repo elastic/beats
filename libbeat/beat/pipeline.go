@@ -20,6 +20,7 @@ package beat
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -28,13 +29,14 @@ import (
 type Pipeline interface {
 	ConnectWith(ClientConfig) (Client, error)
 	Connect() (Client, error)
+	PersistedIndex() (queue.EntryID, error)
 }
 
 type PipelineConnector = Pipeline
 
 // Client holds a connection to the beats publisher pipeline
 type Client interface {
-	Publish(Event)
+	Publish(Event) queue.EntryID
 	PublishAll([]Event)
 	Close() error
 }

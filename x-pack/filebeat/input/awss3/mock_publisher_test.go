@@ -14,6 +14,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	beat "github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // MockBeatClient is a mock of Client interface.
@@ -54,9 +55,10 @@ func (mr *MockBeatClientMockRecorder) Close() *gomock.Call {
 }
 
 // Publish mocks base method.
-func (m *MockBeatClient) Publish(arg0 beat.Event) {
+func (m *MockBeatClient) Publish(arg0 beat.Event) queue.EntryID {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Publish", arg0)
+	return queue.EntryID(0)
 }
 
 // Publish indicates an expected call of Publish.
@@ -122,6 +124,10 @@ func (m *MockBeatPipeline) ConnectWith(arg0 beat.ClientConfig) (beat.Client, err
 	ret0, _ := ret[0].(beat.Client)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
+}
+
+func (m *MockBeatPipeline) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
 }
 
 // ConnectWith indicates an expected call of ConnectWith.

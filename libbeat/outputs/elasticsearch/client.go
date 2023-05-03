@@ -332,7 +332,7 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 		err := fmt.Errorf("failed to select pipeline: %w", err)
 		return nil, err
 	}
-
+	client.log.Infof("metadata at output: %s", event.Meta.String())
 	index, err := client.index.Select(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select event index: %w", err)
@@ -356,12 +356,18 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete)
 		}
 	}
+
+	client.log.Infof("index is: %s", index)
+	client.log.Infof("ID for event is: %s", id)
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
 		if opType == events.OpTypeIndex {
+			client.log.Info("OpTypeIndex, creating BulkIndexAction")
 			return eslegclient.BulkIndexAction{Index: meta}, nil
 		}
+		client.log.Infof("op type %s, creating BulkCreateAction", opType)
 		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
+	client.log.Infof("id %s, creating BulkIndexAction", id)
 	return eslegclient.BulkIndexAction{Index: meta}, nil
 }
 

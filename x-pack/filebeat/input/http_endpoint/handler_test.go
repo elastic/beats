@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -151,10 +152,11 @@ type publisher struct {
 	events []beat.Event
 }
 
-func (p *publisher) Publish(e beat.Event) {
+func (p *publisher) Publish(e beat.Event) queue.EntryID {
 	p.mu.Lock()
 	p.events = append(p.events, e)
 	p.mu.Unlock()
+	return queue.EntryID(0)
 }
 
 func Test_apiResponse(t *testing.T) {

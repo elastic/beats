@@ -294,6 +294,10 @@ func (emptyProducer) TryPublish(_ interface{}) (queue.EntryID, bool) {
 	return 0, false
 }
 
+func (emptyProducer) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
+}
+
 func (emptyProducer) Cancel() int {
 	return 0
 }

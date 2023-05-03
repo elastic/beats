@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -104,12 +105,13 @@ func (c *mockClient) IsClosed() bool {
 	return c.closed
 }
 
-func (c *mockClient) Publish(e beat.Event) {
+func (c *mockClient) Publish(e beat.Event) queue.EntryID {
 	if c.clientConfig.Processing.Processor != nil {
 		outE, _ := c.clientConfig.Processing.Processor.Run(&e)
 		e = *outE
 	}
 	c.PublishAll([]beat.Event{e})
+	return queue.EntryID(0)
 }
 
 func (c *mockClient) PublishAll(events []beat.Event) {
@@ -162,6 +164,10 @@ func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	pc.Clients = append(pc.Clients, c)
 
 	return c, nil
+}
+
+func (pc *MockPipeline) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
 }
 
 // Convenience function for tests

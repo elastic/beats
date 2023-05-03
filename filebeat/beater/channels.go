@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -131,9 +132,10 @@ func withPipelineEventCounter(pipeline beat.PipelineConnector, counter *eventCou
 	return pipeline
 }
 
-func (c *countingClient) Publish(event beat.Event) {
+func (c *countingClient) Publish(event beat.Event) queue.EntryID {
 	c.counter.Add(1)
 	c.client.Publish(event)
+	return queue.EntryID(0)
 }
 
 func (c *countingClient) PublishAll(events []beat.Event) {

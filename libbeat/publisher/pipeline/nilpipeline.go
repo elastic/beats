@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type nilPipeline struct{}
@@ -47,8 +48,14 @@ func (p *nilPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}, nil
 }
 
-func (c *nilClient) Publish(event beat.Event) {
+func (p *nilPipeline) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
+}
+
+func (c *nilClient) Publish(event beat.Event) queue.EntryID {
 	c.PublishAll([]beat.Event{event})
+
+	return queue.EntryID(0)
 }
 
 func (c *nilClient) PublishAll(events []beat.Event) {

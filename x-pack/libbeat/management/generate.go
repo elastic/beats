@@ -112,6 +112,35 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 	return inputs, nil
 }
 
+// CreateShipperInput is a modified version of CreateInputsFromStreams made for forwarding input units to the shipper beat
+// this does not create separate inputs for each stream, and instead passes it along as a single input, with just the processors added
+func CreateShipperInput(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
+	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
+	for iter, stream := range raw.GetStreams() {
+		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
+		streamSource = injectIndexStream(inputType, raw, stream, streamSource)
+		// 1. global processors
+		streamSource = injectGlobalProcesssors(raw, streamSource)
+
+		// 2. agentInfo
+		streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
+		if err != nil {
+			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
+		}
+
+		// 3. stream processors
+		streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource, defaultProcessors)
+		if err != nil {
+			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
+		}
+		inputs[iter] = streamSource
+	}
+	rawMap := raw.Source.AsMap()
+	rawMap["streams"] = inputs
+
+	return []map[string]interface{}{rawMap}, nil
+}
+
 // CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
 func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
@@ -130,6 +159,40 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 // ===========
 // config injection
 // ===========
+
+// convinence method for wrapping all the stream transformations needed by the shipper and other inputs
+func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, inputType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
+
+	streamSource = injectIndexStream(inputType, raw, stream, streamSource)
+
+	// the order of building the processors is important
+	// prepend is used to ensure that the processors defined directly on the stream
+	// come last in the order as they take priority over the others as they are the
+	// most specific to this one stream
+
+	// 1. global processors
+	streamSource = injectGlobalProcesssors(raw, streamSource)
+
+	// 2. agentInfo
+	streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("Error injecting agent processors: %w", err)
+	}
+
+	// 3. stream processors
+	streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource, defaultProcessors)
+	if err != nil {
+		return nil, fmt.Errorf("Error injecting stream processors: %w", err)
+	}
+
+	// now the order of the processors on this input is as follows
+	// 1. stream processors
+	// 2. agentInfo processors
+	// 3. global processors
+	// 4. stream specific processors
+
+	return streamSource, nil
+}
 
 // Emulates the InjectAgentInfoRule and InjectHeadersRule ast rules
 // adds processors for agent-related metadata

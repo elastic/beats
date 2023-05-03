@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type dummyClient struct {
@@ -33,8 +34,9 @@ func newDummyClient() *dummyClient {
 	return &dummyClient{Received: make(chan int)}
 }
 
-func (c *dummyClient) Publish(event beat.Event) {
+func (c *dummyClient) Publish(_ beat.Event) queue.EntryID {
 	c.Received <- 1
+	return queue.EntryID(0)
 }
 
 func (c *dummyClient) PublishAll(events []beat.Event) {
@@ -58,8 +60,12 @@ func (d *dummyPipeline) Connect() (beat.Client, error) {
 	return d.client, nil
 }
 
-func (d *dummyPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+func (d *dummyPipeline) ConnectWith(_ beat.ClientConfig) (beat.Client, error) {
 	return d.client, nil
+}
+
+func (d *dummyPipeline) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
 }
 
 func TestSyncClient(t *testing.T) {

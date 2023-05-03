@@ -19,6 +19,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	client "github.com/elastic/go-lumber/client/v2"
@@ -164,7 +165,7 @@ func newEventCollector(ctx context.Context, expectedSize int) *eventCollector {
 	}
 }
 
-func (c *eventCollector) Publish(evt beat.Event) {
+func (c *eventCollector) Publish(evt beat.Event) queue.EntryID {
 	c.Lock()
 	defer c.Unlock()
 
@@ -174,6 +175,8 @@ func (c *eventCollector) Publish(evt beat.Event) {
 	if len(c.events) == c.expectedSize {
 		c.awaitCancel()
 	}
+
+	return queue.EntryID(0)
 }
 
 func (c *eventCollector) Await(t testing.TB) []beat.Event {

@@ -146,6 +146,11 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK)
 }
 
+func (p *broker) PersistedIndex() (queue.EntryID, error) {
+	// the proxy queue doesn't have metrics
+	return queue.EntryID(0), nil
+}
+
 func (b *broker) Get(_ int) (queue.Batch, error) {
 	// The response channel needs a buffer size of 1 to guarantee that the
 	// broker routine will not block when sending the response.

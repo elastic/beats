@@ -304,6 +304,11 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return client, nil
 }
 
+// PersistedIndex returns the oldest unacked event in the queue
+func (p *Pipeline) PersistedIndex() (queue.EntryID, error) {
+	return p.outputController.queue.PersistedIndex()
+}
+
 func (p *Pipeline) registerSignalPropagation(c *client) {
 	p.guardStartSigPropagation.Do(func() {
 		p.sigNewClient = make(chan *client, 1)
