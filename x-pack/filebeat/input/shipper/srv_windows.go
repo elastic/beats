@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	NTAUTHORITY_SYSTEM   = "S-1-5-18"     //nolint:stylecheck // Constant
-	ADMINISTRATORS_GROUP = "S-1-5-32-544" //nolint:stylecheck // Constant
+	NTAUTHORITY_SYSTEM   = "S-1-5-18"
+	ADMINISTRATORS_GROUP = "S-1-5-32-544"
 )
 
 func newListener(log *logp.Logger, addr string) (net.Listener, error) {

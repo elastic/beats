@@ -146,7 +146,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK)
 }
 
-func (p *broker) PersistedIndex() (queue.EntryID, error) {
+func (b *broker) PersistedIndex() (queue.EntryID, error) {
 	// the proxy queue doesn't have metrics
 	return queue.EntryID(0), nil
 }
