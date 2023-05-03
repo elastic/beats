@@ -69,6 +69,18 @@ var gceMetadataFetcher = provider{
 				_, _ = cloud.Put(key, path.Base(p))
 			}
 
+			getValue := func(sourceKey string) string {
+				v, err := cloud.GetValue(sourceKey)
+				if err != nil {
+					return ""
+				}
+				p, ok := v.(string)
+				if !ok {
+					return ""
+				}
+				return p
+			}
+
 			if instance, ok := m["instance"].(map[string]interface{}); ok {
 				s.Schema{
 					"instance": s.Object{
@@ -82,6 +94,10 @@ var gceMetadataFetcher = provider{
 				}.ApplyTo(cloud, instance)
 				trimLeadingPath("machine.type")
 				trimLeadingPath("availability_zone")
+
+				if zone := getValue("availability_zone"); len(zone) >= 2 {
+					_, _ = cloud.Put("region", zone[:len(zone)-2])
+				}
 				s.Schema{
 					"orchestrator": s.Object{
 						"cluster": c.Dict(
@@ -92,6 +108,7 @@ var gceMetadataFetcher = provider{
 							}),
 					},
 				}.ApplyTo(meta, instance)
+
 			}
 
 			if kubeconfig, err := meta.GetValue("orchestrator.cluster.kubeconfig"); err == nil {
