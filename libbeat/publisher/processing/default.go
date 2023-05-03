@@ -406,7 +406,7 @@ func (b *builder) Close() error {
 func makeClientProcessors(
 	log *logp.Logger,
 	cfg beat.ProcessingConfig,
-) processors.Processor {
+) beat.Processor {
 	procs := cfg.Processor
 	if procs == nil || len(procs.All()) == 0 {
 		return nil

@@ -31,15 +31,15 @@ import (
 
 // client connects a beat with the processors and pipeline queue.
 type client struct {
-	pipeline   *Pipeline
+	logger     *logp.Logger
 	processors beat.Processor
 	producer   queue.Producer
 	mutex      sync.Mutex
 	waiter     *clientCloseWaiter
 
-	eventFlags   publisher.EventFlags
-	canDrop      bool
-	reportEvents bool
+	eventFlags     publisher.EventFlags
+	canDrop        bool
+	eventWaitGroup *sync.WaitGroup
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
 	isOpen    atomic.Bool   // set to false during shutdown, such that no new events will be accepted anymore.
@@ -47,6 +47,7 @@ type client struct {
 	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
 	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
 
+	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
 }
@@ -80,7 +81,6 @@ func (c *client) publish(e beat.Event) {
 	var (
 		event   = &e
 		publish = true
-		log     = c.pipeline.monitors.Logger
 	)
 
 	c.onNewEvent()
@@ -99,7 +99,7 @@ func (c *client) publish(e beat.Event) {
 		if err != nil {
 			// If we introduce a dead-letter queue, this is where we should
 			// route the event to it.
-			log.Errorf("Failed to publish event: %v", err)
+			c.logger.Errorf("Failed to publish event: %v", err)
 		}
 	}
 
@@ -134,8 +134,6 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	log := c.logger()
-
 	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
 	// for pending events to be ACKed.
 	c.closeOnce.Do(func() {
@@ -144,32 +142,28 @@ func (c *client) Close() error {
 		c.isOpen.Store(false)
 		c.onClosing()
 
-		log.Debug("client: closing acker")
+		c.logger.Debug("client: closing acker")
 		c.waiter.signalClose()
 		c.waiter.wait()
 
 		c.eventListener.ClientClosed()
-		log.Debug("client: done closing acker")
+		c.logger.Debug("client: done closing acker")
 
-		log.Debug("client: close queue producer")
+		c.logger.Debug("client: close queue producer")
 		cancelledEventCount := c.producer.Cancel()
 		c.onClosed(cancelledEventCount)
-		log.Debug("client: done producer close")
+		c.logger.Debug("client: done producer close")
 
 		if c.processors != nil {
-			log.Debug("client: closing processors")
+			c.logger.Debug("client: closing processors")
 			err := processors.Close(c.processors)
 			if err != nil {
-				log.Errorf("client: error closing processors: %v", err)
+				c.logger.Errorf("client: error closing processors: %v", err)
 			}
-			log.Debug("client: done closing processors")
+			c.logger.Debug("client: done closing processors")
 		}
 	})
 	return nil
-}
-
-func (c *client) logger() *logp.Logger {
-	return c.pipeline.monitors.Logger
 }
 
 func (c *client) onClosing() {
@@ -179,51 +173,46 @@ func (c *client) onClosing() {
 }
 
 func (c *client) onClosed(cancelledEventCount int) {
-	log := c.logger()
-	log.Debugf("client: cancelled %v events", cancelledEventCount)
+	c.logger.Debugf("client: cancelled %v events", cancelledEventCount)
 
-	if c.reportEvents {
-		log.Debugf("client: remove client events")
+	if c.eventWaitGroup != nil {
+		c.logger.Debugf("client: remove client events")
 		if cancelledEventCount > 0 {
-			c.pipeline.waitCloseGroup.Add(-cancelledEventCount)
+			c.eventWaitGroup.Add(-cancelledEventCount)
 		}
 	}
 
-	c.pipeline.observer.clientClosed()
+	c.observer.clientClosed()
 	if c.clientListener != nil {
 		c.clientListener.Closed()
 	}
 }
 
 func (c *client) onNewEvent() {
-	c.pipeline.observer.newEvent()
+	c.observer.newEvent()
 }
 
 func (c *client) onPublished() {
-	if c.reportEvents {
-		c.pipeline.waitCloseGroup.Add(1)
+	if c.eventWaitGroup != nil {
+		c.eventWaitGroup.Add(1)
 	}
-	c.pipeline.observer.publishedEvent()
+	c.observer.publishedEvent()
 	if c.clientListener != nil {
 		c.clientListener.Published()
 	}
 }
 
 func (c *client) onFilteredOut(e beat.Event) {
-	log := c.logger()
-
-	log.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
-	c.pipeline.observer.filteredEvent()
+	c.logger.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
+	c.observer.filteredEvent()
 	if c.clientListener != nil {
 		c.clientListener.FilteredOut(e)
 	}
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
-	log := c.logger()
-
-	log.Debugf("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
-	c.pipeline.observer.failedPublishEvent()
+	c.logger.Debugf("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
+	c.observer.failedPublishEvent()
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)
 	}

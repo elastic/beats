@@ -48,7 +48,7 @@ type Monitors struct {
 // OutputFactory is used by the publisher pipeline to create an output instance.
 // If the group returned can be empty. The pipeline will accept events, but
 // eventually block.
-type OutputFactory func(outputs.Observer) (string, outputs.Group, error)
+type outputFactory func(outputs.Observer) (string, outputs.Group, error)
 
 func init() {
 	flag.BoolVar(&publishDisabled, "N", false, "Disable actual publishing for testing")
@@ -108,7 +108,7 @@ func LoadWithSettings(
 
 func loadOutput(
 	monitors Monitors,
-	makeOutput OutputFactory,
+	makeOutput outputFactory,
 ) (outputs.Group, error) {
 	if publishDisabled {
 		return outputs.Group{}, nil

@@ -59,8 +59,7 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKCallback func(eventCount int)
-	BatchSize   int
+	BatchSize int
 }
 
 type queueEntry struct {
@@ -82,11 +81,26 @@ type blockedRequests struct {
 	last  *blockedRequest
 }
 
+const QueueType = "proxy"
+
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings), nil
+	}
+}
+
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
+	ackCallback func(eventCount int),
 	settings Settings,
 ) *broker {
 	if logger == nil {
@@ -102,7 +116,7 @@ func NewQueue(
 		pushChan: make(chan *pushRequest),
 		getChan:  make(chan getRequest),
 
-		ackCallback: settings.ACKCallback,
+		ackCallback: ackCallback,
 	}
 
 	b.wg.Add(1)
@@ -118,6 +132,10 @@ func (b *broker) Close() error {
 	close(b.doneChan)
 	b.wg.Wait()
 	return nil
+}
+
+func (b *broker) QueueType() string {
+	return QueueType
 }
 
 func (b *broker) BufferConfig() queue.BufferConfig {
