@@ -14,7 +14,7 @@ import (
 )
 
 func filebeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	modules := []map[string]interface{}{}
+	var modules []map[string]interface{}
 	var err error
 	if rawIn.Type == "shipper" { // place filebeat in "shipper mode", with one filebeat input per agent config input
 		modules, err = management.CreateShipperInput(rawIn, "logs", agentInfo)

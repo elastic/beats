@@ -77,34 +77,10 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
-
-		streamSource = injectIndexStream(inputType, raw, stream, streamSource)
-
-		// the order of building the processors is important
-		// prepend is used to ensure that the processors defined directly on the stream
-		// come last in the order as they take priority over the others as they are the
-		// most specific to this one stream
-
-		// 1. global processors
-		streamSource = injectGlobalProcesssors(raw, streamSource)
-
-		// 2. agentInfo
-		streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
+		streamSource, err := createStreamRules(raw, streamSource, stream, inputType, agentInfo, defaultProcessors...)
 		if err != nil {
-			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
+			return nil, fmt.Errorf("error creating stream rules: %w", err)
 		}
-
-		// 3. stream processors
-		streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource, defaultProcessors)
-		if err != nil {
-			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
-		}
-
-		// now the order of the processors on this input is as follows
-		// 1. stream processors
-		// 2. agentInfo processors
-		// 3. global processors
-		// 4. stream specific processors
 
 		inputs[iter] = streamSource
 	}
