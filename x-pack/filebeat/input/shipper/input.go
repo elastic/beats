@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package shipper
 
 import (
@@ -7,7 +11,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/docker/go-units"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -17,11 +20,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/shipper/tools"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
 	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 	"github.com/elastic/go-concert/unison"
+
+	"github.com/docker/go-units"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -40,8 +44,6 @@ func Plugin(log *logp.Logger, _ inputcursor.StateStore) v2.Plugin {
 }
 
 // InputManager wraps one stateless input manager
-// and one cursor input manager. It will create one or the other
-// based on the config that is passed.
 type InputManager struct {
 	log *logp.Logger
 }
@@ -56,30 +58,36 @@ func NewInputManager(log *logp.Logger) *InputManager {
 }
 
 // Init initializes the manager
-func (im *InputManager) Init(grp unison.Group, mode v2.Mode) error {
-	im.log.Infof("initializing InputManager")
+// not sure if the shipper needs to do anything at this point?
+func (im *InputManager) Init(_ unison.Group, _ v2.Mode) error {
 	return nil
 }
 
 // Create creates the input from a given config
+// in an attempt to speed things up, this will create the processors from the config before we have access to the pipeline to create the clients
 func (im *InputManager) Create(cfg *config.C) (v2.Input, error) {
+
 	config := Instance{}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error unpacking config: %w", err)
 	}
-	raw := mapstr.M{}
-	err := cfg.Unpack(&raw)
-	if err != nil {
-		return nil, fmt.Errorf("error unpacking debug config: %w", err)
-	}
-	im.log.Infof("creating a new shipper input with config: %s", raw.String())
-	im.log.Infof("parsed config as: %#v", config)
-	//create a mapping of streams
+
+	// following lines are helpful for debugging config,
+	// will be useful as we figure out how to integrate with agent
+
+	// raw := mapstr.M{}
+	// err := cfg.Unpack(&raw)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error unpacking debug config: %w", err)
+	// }
+	// im.log.Infof("creating a new shipper input with config: %s", raw.String())
+	// im.log.Infof("parsed config as: %#v", config)
+
+	// create a mapping of streams
 	// when we get a new event, we use this to decide what processors to use
 	streamDataMap := map[string]streamData{}
 	for _, stream := range config.Input.Streams {
 		// convert to an actual processor used by the client
-
 		procList, err := processors.New(stream.Processors)
 		if err != nil {
 			return nil, fmt.Errorf("error creating processors for input: %w", err)
@@ -114,10 +122,18 @@ func (in *shipperInput) Test(ctx v2.TestContext) error {
 }
 
 // Stop the shipper
-// TODO: this needs to call Close() on all the clients
 func (in *shipperInput) Stop() {
 	in.log.Infof("shipper shutting down")
-	if in.server != nil {
+	//stop individual clients
+	for streamID, stream := range in.streams {
+		err := stream.client.Close()
+		if err != nil {
+			in.log.Infof("error closing client for stream: %s: %w", streamID, stream)
+		}
+	}
+	in.srvMut.Lock()
+	defer in.srvMut.Unlock()
+	if in.shipper != nil {
 		err := in.shipper.Close()
 		if err != nil {
 			in.log.Debugf("Error stopping shipper input: %s", err)
@@ -135,6 +151,7 @@ func (in *shipperInput) Stop() {
 	}
 }
 
+// Run the shipper
 func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	in.log.Infof("Running shipper input")
 	// create clients ahead of time
@@ -156,23 +173,26 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 	}
 
 	//setup gRPC
-	in.setupgRPC(pipeline)
+	err := in.setupgRPC(pipeline)
+	if err != nil {
+		return fmt.Errorf("error starting shipper gRPC server: %w", err)
+	}
 	in.log.Infof("done setting up gRPC server")
-	// wait for shutdown
 
+	// wait for shutdown
 	<-inputContext.Cancelation.Done()
+
 	in.Stop()
 
 	return nil
 }
 
 func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
-
 	in.shipperSrv = strings.TrimPrefix(in.cfg.Conn.Server, "unix://")
 	in.log.Infof("initializing grpc server at %s", in.shipperSrv)
+	// Currently no TLS until we figure out mTLS issues in agent/shipper
 	creds := insecure.NewCredentials()
 	opts := []grpc.ServerOption{
-		// TODO: figure out TLS
 		grpc.Creds(creds),
 		grpc.MaxRecvMsgSize(64 * units.MiB),
 	}
@@ -222,6 +242,7 @@ func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
 		}
 	}()
 
+	// make sure connection is up before mutex is released
 	defer in.srvMut.Unlock()
 	con, err := tools.DialTestAddr(in.shipperSrv)
 	if err != nil {
@@ -237,7 +258,7 @@ func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
 func (in *shipperInput) sendEvent(event *messages.Event) (queue.EntryID, error) {
 	//look for matching processor config
 	stream, ok := in.streams[event.Source.StreamId]
-	// should this be an error? can we continue on if there's no data stream associated with an event
+	// should this be an error? can we continue on if there's no data stream associated with an event?
 	if !ok {
 		return queue.EntryID(0), fmt.Errorf("could not find data stream associated with ID '%s'", event.Source.StreamId)
 	}
@@ -247,7 +268,6 @@ func (in *shipperInput) sendEvent(event *messages.Event) (queue.EntryID, error) 
 	metadata := helpers.AsMap(event.Metadata)
 	metadata["index"] = stream.index
 
-	// This will change if we move the events back to JSON.
 	evt := beat.Event{
 		Timestamp: event.Timestamp.AsTime(),
 		Fields:    helpers.AsMap(event.Fields),

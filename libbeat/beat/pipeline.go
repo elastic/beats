@@ -29,14 +29,18 @@ import (
 type Pipeline interface {
 	ConnectWith(ClientConfig) (Client, error)
 	Connect() (Client, error)
+	// PersistedIndex returns the EntryID of the oldest event currently persisted in the queue
 	PersistedIndex() (queue.EntryID, error)
 }
 
+// PipelineConnector wraps the Pipeline interface
 type PipelineConnector = Pipeline
 
 // Client holds a connection to the beats publisher pipeline
 type Client interface {
+	// Publish the event, and return the EntryID of the event in the backing queue
 	Publish(Event) queue.EntryID
+	// PublishAll events specified in the Event array
 	PublishAll([]Event)
 	Close() error
 }

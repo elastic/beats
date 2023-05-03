@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package shipper
 
 import (
@@ -11,15 +15,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/gofrs/uuid"
 
 	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
+// ShipperServer handles the actual gRPC server and associated connections
 type ShipperServer struct {
 	logger   *logp.Logger
 	pipeline beat.Pipeline
@@ -62,7 +68,7 @@ func NewShipperServer(pipeline beat.Pipeline, shipper *shipperInput) (*ShipperSe
 }
 
 // PublishEvents is the server implementation of the gRPC PublishEvents call.
-func (serv *ShipperServer) PublishEvents(ctx context.Context, req *messages.PublishRequest) (*messages.PublishReply, error) {
+func (serv *ShipperServer) PublishEvents(_ context.Context, req *messages.PublishRequest) (*messages.PublishReply, error) {
 	resp := &messages.PublishReply{
 		Uuid: serv.uuid,
 	}
@@ -94,7 +100,6 @@ func (serv *ShipperServer) PublishEvents(ctx context.Context, req *messages.Publ
 		} else {
 			resp.AcceptedCount++
 		}
-		//TODO: There's probably a better way to track accepted count, presumably using the callbacks in the beat client
 
 	}
 	resp.AcceptedIndex = uint64(accIdx)
@@ -102,7 +107,6 @@ func (serv *ShipperServer) PublishEvents(ctx context.Context, req *messages.Publ
 		Debugf("finished publishing a batch. Events = %d, accepted = %d, accepted index = %d",
 			len(req.Events),
 			resp.AcceptedCount,
-			//TODO: we don't get an index like we do from TryPublish in the queue. Should we use anything else?
 			resp.AcceptedIndex,
 		)
 
@@ -111,9 +115,6 @@ func (serv *ShipperServer) PublishEvents(ctx context.Context, req *messages.Publ
 
 // PersistedIndex implementation. Will track and send the oldest unacked event in the queue.
 func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, producer pb.Producer_PersistedIndexServer) error {
-	//TODO: not yet sure how to implement this in the beat
-	// on the old shipper this is done via the PersistedIndex() call from the raw queue interface, which I don't think we have access to here
-
 	serv.logger.Debug("new subscriber for persisted index change")
 	defer serv.logger.Debug("unsubscribed from persisted index change")
 	idx, err := serv.pipeline.PersistedIndex()
@@ -150,7 +151,6 @@ func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, p
 			if err != nil {
 				return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
 			}
-			serv.logger.Infof("sending PersistedIndex reply. ID=%d", persistedIndex)
 			err = producer.Send(&messages.PersistedIndexReply{
 				Uuid:           serv.uuid,
 				PersistedIndex: uint64(persistedIndex),
@@ -163,6 +163,7 @@ func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, p
 
 }
 
+// Close the server connection
 func (serv *ShipperServer) Close() error {
 	return nil
 }
