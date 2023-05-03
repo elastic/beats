@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
+
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
 	sc "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
@@ -106,7 +108,12 @@ func makeShipper(
 
 	swb := outputs.WithBackoff(s, config.Backoff.Init, config.Backoff.Max)
 
-	return outputs.Success(config.BulkMaxSize, config.MaxRetries, swb)
+	return outputs.Group{
+		Clients: []outputs.Client{swb},
+		Retry:   config.MaxRetries,
+		QueueFactory: proxyqueue.FactoryForSettings(
+			proxyqueue.Settings{BatchSize: config.BulkMaxSize}),
+	}, nil
 }
 
 // Connect establishes connection to the shipper server and implements `outputs.Connectable`.
@@ -199,7 +206,29 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 			Events: toSend,
 		})
 
-		if status.Code(err) != codes.OK {
+		if err != nil {
+			if status.Code(err) == codes.ResourceExhausted {
+				// This error can only come from the gRPC connection, and
+				// most likely indicates this request exceeds the shipper's
+				// RPC size limit. Split the batch if possible, otherwise we
+				// need to drop it.
+				if batch.SplitRetry() {
+					// Report that we split a batch
+					s.observer.Split()
+				} else {
+					batch.Drop()
+					s.observer.Dropped(len(events))
+					s.log.Errorf("dropping %d events because of RPC failure: %v", len(events), err)
+				}
+				return nil
+			}
+			// All other known errors are, in theory, retryable once the
+			// RPC connection is successfully restarted, and don't depend on
+			// the contents of the request. We should be cautious, though: if an
+			// error is deterministic based on the contents of a publish
+			// request, then cancelling here (instead of dropping or retrying)
+			// will cause an infinite retry loop, wedging the pipeline.
+
 			batch.Cancelled()                 // does not decrease the TTL
 			s.observer.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)

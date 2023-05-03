@@ -47,6 +47,10 @@ func (q *testQueue) Close() error {
 	return nil
 }
 
+func (q *testQueue) QueueType() string {
+	return "test"
+}
+
 func (q *testQueue) BufferConfig() queue.BufferConfig {
 	if q.bufferConfig != nil {
 		return q.bufferConfig()

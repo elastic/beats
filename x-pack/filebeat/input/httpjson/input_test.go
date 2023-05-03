@@ -11,6 +11,8 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -25,11 +27,12 @@ import (
 
 func TestInput(t *testing.T) {
 	testCases := []struct {
-		name        string
-		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
-		baseConfig  map[string]interface{}
-		handler     http.HandlerFunc
-		expected    []string
+		name         string
+		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig   map[string]interface{}
+		handler      http.HandlerFunc
+		expected     []string
+		expectedFile string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -291,6 +294,49 @@ func TestInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
+		},
+		{
+			name: "Test tracer filename sanitization",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				// mock timeNow func to return a fixed value
+				timeNow = func() time.Time {
+					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+					return t
+				}
+
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+				t.Cleanup(func() { timeNow = time.Now })
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":  "url.params.$filter",
+							"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+							"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"timestamp": map[string]interface{}{
+						"value": `[[index .last_response.body "@timestamp"]]`,
+					},
+				},
+				"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			},
+			handler: dateCursorHandler(),
+			expected: []string{
+				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+			},
+			expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 		},
 		{
 			name: "Test pagination",
@@ -730,8 +776,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -808,8 +855,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -844,8 +892,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -1139,6 +1188,12 @@ func TestInput(t *testing.T) {
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
 
+			var tempDir string
+			if conf.Request.Tracer != nil {
+				tempDir = t.TempDir()
+				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
+			}
+
 			input := newStatelessInput(conf)
 
 			assert.Equal(t, "httpjson-stateless", input.Name())
@@ -1186,6 +1241,13 @@ func TestInput(t *testing.T) {
 						cancel()
 						break wait
 					}
+				}
+			}
+			if tc.expectedFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, tc.expectedFile)); err == nil {
+					assert.NoError(t, g.Wait())
+				} else {
+					t.Errorf("Expected log filename not found")
 				}
 			}
 			assert.NoError(t, g.Wait())
@@ -1254,7 +1316,7 @@ func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
+		ID:          "httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi",
 		Cancelation: ctx,
 	}, cancel
 }

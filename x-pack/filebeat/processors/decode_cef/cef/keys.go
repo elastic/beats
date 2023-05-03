@@ -13,12 +13,12 @@ type mappedField struct {
 
 // extensionMapping is a mapping of CEF key names to full field names and data
 // types. This mapping was generated from tables contained in:
-// - "Micro Focus Security ArcSight Common Event Format Version 25"
-//   dated September 28, 2017.
-// - "Check Point Log Exporter CEF Field Mappings"
-//   dated November 23, 2018.
-// - "HPE Security ArcSight Common Event Format Version 23"
-//   dated May 16, 2016.
+//   - "Micro Focus Security ArcSight Common Event Format Version 25"
+//     dated September 28, 2017.
+//   - "Check Point Log Exporter CEF Field Mappings"
+//     dated November 23, 2018.
+//   - "HPE Security ArcSight Common Event Format Version 23"
+//     dated May 16, 2016.
 var extensionMapping = map[string]mappedField{
 	"agt": {
 		Target: "agentAddress",

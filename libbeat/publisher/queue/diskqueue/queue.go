@@ -24,12 +24,13 @@ import (
 	"os"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
+
+// The string used to specify this queue in beats configurations.
+const QueueType = "disk"
 
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
@@ -101,32 +102,25 @@ type metricsRequestResponse struct {
 	sizeOnDisk uint64
 }
 
-func init() {
-	queue.RegisterQueueType(
-		"disk",
-		queueFactory,
-		feature.MakeDetails(
-			"Disk queue",
-			"Buffer events on disk before sending to the output.",
-			feature.Stable))
-}
-
-// queueFactory matches the queue.Factory interface, and is used to add the
-// disk queue to the registry.
-func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
-) (queue.Queue, error) {
-	settings, err := SettingsForUserConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("disk queue couldn't load user config: %w", err)
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings)
 	}
-	settings.WriteToDiskListener = ackListener
-	return NewQueue(logger, settings)
 }
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
-func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
+func NewQueue(
+	logger *logp.Logger,
+	writeToDiskCallback func(eventCount int),
+	settings Settings,
+) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
@@ -231,7 +225,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
 		readerLoop:  newReaderLoop(settings),
-		writerLoop:  newWriterLoop(logger, settings),
+		writerLoop:  newWriterLoop(logger, writeToDiskCallback, settings),
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
@@ -276,6 +270,10 @@ func (dq *diskQueue) Close() error {
 	dq.waitGroup.Wait()
 
 	return nil
+}
+
+func (dq *diskQueue) QueueType() string {
+	return QueueType
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {

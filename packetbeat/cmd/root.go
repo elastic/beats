@@ -25,6 +25,7 @@ import (
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/packetbeat/beater"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -49,7 +50,7 @@ var withECSVersion = processing.WithFields(mapstr.M{
 var RootCmd *cmd.BeatsRootCmd
 
 // PacketbeatSettings contains the default settings for packetbeat
-func PacketbeatSettings() instance.Settings {
+func PacketbeatSettings(globals processors.PluginConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))
@@ -61,7 +62,7 @@ func PacketbeatSettings() instance.Settings {
 		RunFlags:       runFlags,
 		Name:           Name,
 		HasDashboards:  true,
-		Processing:     processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:     processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		InputQueueSize: 400,
 	}
 }
@@ -74,5 +75,5 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 }
 
 func init() {
-	RootCmd = Initialize(PacketbeatSettings())
+	RootCmd = Initialize(PacketbeatSettings(nil))
 }

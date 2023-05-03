@@ -42,13 +42,12 @@ type broker struct {
 	// Consumers send requests to getChan to read entries from the queue.
 	getChan chan getRequest
 
-	// A listener that should be notified when ACKs are processed.
-	// Right now this listener always points at the Pipeline associated with
-	// this queue, and Pipeline.OnACK forwards the notification to
-	// Pipeline.observer.queueACKed(), which updates the beats registry
-	// if needed. This pointer is included in batches created by the proxy
-	// queue, so they can call it when they receive a Done call.
-	ackListener queue.ACKListener
+	// A callback that should be invoked when ACKs are processed.
+	// This is used to forward notifications back to the pipeline observer,
+	// which updates the beats registry if needed. This callback is included
+	// in batches created by the proxy queue, so they can invoke it when they
+	// receive a Done call.
+	ackCallback func(eventCount int)
 
 	// Internal state for the broker's run loop.
 	queuedEntries      []queueEntry
@@ -60,8 +59,7 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener queue.ACKListener
-	BatchSize   int
+	BatchSize int
 }
 
 type queueEntry struct {
@@ -83,11 +81,26 @@ type blockedRequests struct {
 	last  *blockedRequest
 }
 
+const QueueType = "proxy"
+
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings), nil
+	}
+}
+
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
+	ackCallback func(eventCount int),
 	settings Settings,
 ) *broker {
 	if logger == nil {
@@ -103,7 +116,7 @@ func NewQueue(
 		pushChan: make(chan *pushRequest),
 		getChan:  make(chan getRequest),
 
-		ackListener: settings.ACKListener,
+		ackCallback: ackCallback,
 	}
 
 	b.wg.Add(1)
@@ -119,6 +132,10 @@ func (b *broker) Close() error {
 	close(b.doneChan)
 	b.wg.Wait()
 	return nil
+}
+
+func (b *broker) QueueType() string {
+	return QueueType
 }
 
 func (b *broker) BufferConfig() queue.BufferConfig {
@@ -184,8 +201,8 @@ func (b *broker) run() {
 			}
 			// Notify the pipeline's metrics reporter
 			//nolint:typecheck // this nil check is ok
-			if b.ackListener != nil {
-				b.ackListener.OnACK(ackedBatch.originalEntryCount)
+			if b.ackCallback != nil {
+				b.ackCallback(ackedBatch.originalEntryCount)
 			}
 		}
 	}

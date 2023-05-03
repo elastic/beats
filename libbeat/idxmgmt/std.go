@@ -219,7 +219,6 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 	return warn == "", warn
 }
 
-//
 func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	log := m.support.log
 

@@ -18,6 +18,8 @@
 package mage
 
 import (
+	"go.uber.org/multierr"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
@@ -34,7 +36,10 @@ func GolangCrossBuild() error {
 		params.Env["CGO_CFLAGS"] = flags
 	}
 
-	return devtools.GolangCrossBuild(params)
+	return multierr.Combine(
+		devtools.GolangCrossBuild(params),
+		devtools.TestLinuxForCentosGLIBC(),
+	)
 }
 
 // -----------------------------------------------------------------------------

@@ -20,13 +20,11 @@ package tcp
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"math/bits"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"runtime"
 	"strconv"
 	"testing"
 
@@ -49,9 +47,6 @@ import (
 
 // Tests that we can check a TLS connection with a cert for a SAN IP
 func TestTLSSANIPConnection(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
-	}
 	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
 	defer teardown()
 
