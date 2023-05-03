@@ -18,6 +18,7 @@
 package channel
 
 import (
+	"fmt"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -59,6 +60,8 @@ type commonInputConfig struct {
 	// Output meta data settings
 	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
 	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
+
+	Dataset string `config:"dataset"`
 }
 
 func (f *onCreateFactory) CheckConfig(cfg *conf.C) error {
@@ -134,6 +137,14 @@ func newCommonConfigEditor(
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
+		if config.Dataset != "" {
+			index, err := fmtstr.CompileEvent(fmt.Sprintf("logs-%s-default", config.Dataset))
+			if err != nil {
+				return clientCfg, err
+			}
+
+			config.Index = *index
+		}
 		var indexProcessor beat.Processor
 		if !config.Index.IsEmpty() {
 			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)

@@ -25,7 +25,9 @@ filebeat.inputs:
   id: my-filestream-id
 
   # Change to true to enable this input configuration.
-  enabled: false
+  enabled: true
+
+  dataset: foo
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
@@ -141,12 +143,13 @@ output.elasticsearch:
   hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
-  #protocol: "https"
+  protocol: "https"
 
+  ssl.verification_mode: none
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
