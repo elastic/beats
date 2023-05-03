@@ -20,7 +20,6 @@ package jsontransform
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -145,30 +144,4 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 	}
 
 	return time.Time{}, ErrInvalidTimestamp
-}
-
-// Look for a key (may be nested as for example `key1.key2`) inside a JSON decoded tree
-// Returns true/false and the key value if found
-func SearchJSONKeys(obj mapstr.M, nestedKey string) (interface{}, bool) {
-	keys := strings.Split(nestedKey, ".")
-
-	for i, key := range keys {
-		value, exists := obj[key]
-		if !exists {
-			return nil, false
-		}
-
-		if i == len(keys)-1 {
-			return value, true
-		}
-
-		switch v := value.(type) {
-		case map[string]interface{}:
-			return SearchJSONKeys(v, strings.Join(keys[i+1:], "."))
-		default:
-			return nil, false
-		}
-	}
-
-	return nil, false
 }
