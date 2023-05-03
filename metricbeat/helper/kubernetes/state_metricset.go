@@ -25,8 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-
-	"hash/fnv"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -90,12 +89,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func hash(s string) uint32 {
-	h := fnv.New32a()
-	h.Write([]byte(s))
-	return h.Sum32()
-}
-
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
 	log.Printf("%s KSM took %s", name, elapsed)
@@ -108,7 +101,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	startTime := time.Now()
 
 	m.enricher.Start()
-	hashString := hash("Pasole")
+	hashString, err := uuid.NewV4()
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheusClient)
 	if err != nil {
@@ -134,7 +127,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 		elapsed := time.Since(startTime)
 
-		e.MetricSetFields.Put("FetchProcessTime", elapsed)
+		e.MetricSetFields.Put("FetchProcessTime", elapsed.Seconds())
 		e.MetricSetFields.Put("FetchHashString", hashString)
 
 		if reported := reporter.Event(e); !reported {
