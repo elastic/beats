@@ -3,12 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-[[release-notes-8.6.2]]
-=== Beats version 8.6.2
-https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
-
-=======
 [[release-notes-8.7.1]]
 === Beats version 8.7.1
 https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
@@ -53,7 +47,12 @@ https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
 [[release-notes-8.7.0]]
 === Beats version 8.7.0
 https://github.com/elastic/beats/compare/v8.6.2\...v8.7.0[View commits]
->>>>>>> b18985eaf7 (docs: Prepare Changelog for 8.7.1 (#35115))
+
+
+[[release-notes-8.6.2]]
+=== Beats version 8.6.2
+https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
+
 
 ==== Bugfixes
 
