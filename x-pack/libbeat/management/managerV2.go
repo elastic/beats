@@ -665,7 +665,9 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 	}
 
 	if cm.forceReload.Load() {
-		cm.logger.Debug("Reloading Beats inputs because forceReload is true")
+		cm.logger.Info("Reloading Beats inputs because forceReload is true. " +
+			"Set log level to debug to get more information about which " +
+			"inputs are causing this.")
 	}
 
 	if err := obj.Reload(inputBeatCfgs); err != nil {
@@ -705,7 +707,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 	} else {
 		// no issues while reloading inputs, set forceReload to false
 		cm.forceReload.Store(false)
-		cm.logger.Info("ForceReload set to FALSE")
+		cm.logger.Debug("ForceReload set to FALSE")
 	}
 
 	cm.lastInputCfgs = inputCfgs
