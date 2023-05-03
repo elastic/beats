@@ -102,6 +102,7 @@ func (eventlogRunner) Run(
 
 runLoop:
 	for {
+		//nolint:nilerr // only log error if we are not shutting down
 		if cancelCtx.Err() != nil {
 			return nil
 		}
@@ -154,7 +155,7 @@ runLoop:
 					return nil
 				}
 
-				// only log error if we are not shutting down
+				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					return nil
 				}
