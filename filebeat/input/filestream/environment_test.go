@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -499,8 +500,9 @@ func (c *mockClient) GetEvents() []beat.Event {
 }
 
 // Publish mocks the Client Publish method
-func (c *mockClient) Publish(e beat.Event) {
+func (c *mockClient) Publish(e beat.Event) queue.EntryID {
 	c.PublishAll([]beat.Event{e})
+	return queue.EntryID(0)
 }
 
 // PublishAll mocks the Client PublishAll method
@@ -577,6 +579,10 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
+}
+
+func (pc *mockPipelineConnector) PersistedIndex() (queue.EntryID, error) {
+	return queue.EntryID(0), nil
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
