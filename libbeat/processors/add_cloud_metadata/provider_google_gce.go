@@ -19,6 +19,7 @@ package add_cloud_metadata
 
 import (
 	"path"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -69,18 +70,6 @@ var gceMetadataFetcher = provider{
 				_, _ = cloud.Put(key, path.Base(p))
 			}
 
-			getValue := func(sourceKey string) string {
-				v, err := cloud.GetValue(sourceKey)
-				if err != nil {
-					return ""
-				}
-				p, ok := v.(string)
-				if !ok {
-					return ""
-				}
-				return p
-			}
-
 			if instance, ok := m["instance"].(map[string]interface{}); ok {
 				s.Schema{
 					"instance": s.Object{
@@ -95,8 +84,12 @@ var gceMetadataFetcher = provider{
 				trimLeadingPath("machine.type")
 				trimLeadingPath("availability_zone")
 
-				if zone := getValue("availability_zone"); len(zone) >= 2 {
-					_, _ = cloud.Put("region", zone[:len(zone)-2])
+				zone, err := cloud.GetValue("availability_zone")
+				if err == nil {
+					// the region is extracted from the zone by removing <zone> characters from the zone name,
+					// that is made up of <region>-<zone>
+					regionSlice := strings.Split(zone.(string), "-")
+					_, _ = cloud.Put("region", strings.Join(regionSlice[:len(regionSlice)-1], "-"))
 				}
 				s.Schema{
 					"orchestrator": s.Object{
