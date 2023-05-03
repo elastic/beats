@@ -151,13 +151,11 @@ func TestInputReload(t *testing.T) {
 	require.NoError(t, err)
 	defer m.Stop()
 
-	forceReloadFalseCount := 0
 	forceReloadState := []bool{false, true, false}
 	forceReloadStateIdx := 0
 	forceReloadLastState := true // starts on true so the first iteratiction is already a change
 
-	// TODO: write a state machine to check the ForceReload Flip alongside the config indes (from the observe callback)
-	require.Eventually(t, func() bool {
+	eventuallyCheck := func() bool {
 		forceReload := mm.forceReload.Load()
 		// That detects a state change, we only count/advance steps
 		// on state changes
@@ -177,8 +175,11 @@ func TestInputReload(t *testing.T) {
 			}
 		}
 
-		return configIdx == 1 && forceReloadFalseCount == 2
-	}, 15*time.Hour, 300*time.Millisecond)
+		return false
+	}
+
+	require.Eventually(t, eventuallyCheck, 20*time.Second, 300*time.Millisecond,
+		"the expected changes on forceReload did not happen")
 }
 
 type reloadableListMock struct {
