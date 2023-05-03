@@ -97,6 +97,7 @@ func (eventlogRunner) Run(
 	})
 	defer cancelFn()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
 	channelNotFoundErrDetected := false
 
 runLoop:
