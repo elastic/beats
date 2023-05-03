@@ -15,7 +15,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 *Heartbeat*
-- Update the recommended Node.js version to 18.12.0 for Synthetics {pull}15196[15196]
 
 *Metricbeat*
 
@@ -30,37 +29,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix panics when a processor is closed twice {pull}34647[34647]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
-- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
-- Fix panics when a processor is closed twice {pull}34647[34647]
-- Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
-- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
 
 *Heartbeat*
 
-- Enable nodejs engine strict validation when bundling synthetics. {pull}34471[34471]
 
 *Metricbeat*
 
 
 *Packetbeat*
 
-- Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
-- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
 
 *Winlogbeat*
 
-- Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
-- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
-- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
-- Improve documentation for event_logs.name configuration. {pull}34931[34931]
 
 *Functionbeat*
 
@@ -84,15 +70,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Allow user configuration of keep-alive behaviour for HTTPJSON input. {issue}33951[33951] {pull}34014[34014] {pull}34743[34743]
 
 *Heartbeat*
 
-- Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
 *Metricbeat*
 
-- Remove GCP Compute metadata cache {pull}33655[33655]
 
 *Packetbeat*
 
@@ -103,7 +86,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 
-- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
 
 *Elastic Log Driver*
 
@@ -128,3 +110,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
