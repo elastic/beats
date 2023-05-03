@@ -168,6 +168,14 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 		}
 	}
 
+	if cfg.HasField("dataset") {
+		indexName, err = cfg.String("dataset", -1)
+		indexName = "logs-" + indexName + "-default"
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// no index name configuration found yet -> define default index name based on
 	// beat.Info provided to the indexSupport on during setup.
 	if indexName == "" {
