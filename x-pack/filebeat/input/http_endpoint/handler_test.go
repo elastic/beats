@@ -269,32 +269,6 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"encryptedToken":"70c1f2e2e6ca2d39297490d1f9142c7d701415ea8e6151f6562a08fa657a40ff","plainToken":"qgg8vlvZRS6UYooatFL8Aw"}`,
 		},
 		{
-			name: "validate CRC request",
-			conf: config{
-				SecretHeader: "secretHeaderTest",
-				SecretValue:  "secretValueTest",
-				CRCProvider:  "Zoom",
-			},
-			request: func() *http.Request {
-				buf := bytes.NewBufferString(
-					`{
-						"event_ts":1654503849680,
-						"event":"endpoint.url_validation",
-						"payload": {
-							"plainToken":"qgg8vlvZRS6UYooatFL8Aw"
-						}
-					}`,
-				)
-				req := httptest.NewRequest(http.MethodPost, "/", buf)
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("secretHeaderTest", "secretValueTest")
-				return req
-			}(),
-			events:       nil,
-			wantStatus:   http.StatusOK,
-			wantResponse: `{"encryptedToken":"70c1f2e2e6ca2d39297490d1f9142c7d701415ea8e6151f6562a08fa657a40ff","plainToken":"qgg8vlvZRS6UYooatFL8Aw"}`,
-		},
-		{
 			name: "malformed CRC request",
 			conf: config{
 				SecretHeader: "secretHeaderTest",
