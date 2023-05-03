@@ -200,7 +200,7 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 
 		if err != nil {
 			s.logger.Errorf("error getting next instance from InstancesScopedListPairIterator: %v", err)
-			return
+			break
 		}
 
 		instances := instancesScopedListPair.Value.GetInstances()
