@@ -6,7 +6,7 @@ on_failure:
 processors:
 # Ensures the correct pipeline is called regardless of whether `json` object is present or not
 - pipeline:
-    if: "ctx?.json?.type != null || ctx?.type != null "
+    if: "ctx?.json?.type != null || ctx?.type != null"
     name: '{< IngestPipeline "pipeline-7" >}'
 - pipeline:
     if: "ctx?.json?.ecs?.version != null || ctx?.ecs?.version != null"
