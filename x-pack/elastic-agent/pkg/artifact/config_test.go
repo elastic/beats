@@ -241,7 +241,6 @@ func TestReload(t *testing.T) {
 		if tc.expectedTLS {
 			require.NotNil(t, cfg.TLS)
 			require.Equal(t, tc.expectedTLSEnabled, *cfg.TLS.Enabled)
-			//require.Equal(t, tc.expectedFingerprint, cfg.TLS.CATrustedFingerprint)
 		} else {
 			require.Nil(t, cfg.TLS)
 		}
