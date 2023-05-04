@@ -19,13 +19,14 @@ package kubernetes
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/gofrs/uuid"
+
+	"crypto/rand"
+	"math/big"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -89,19 +90,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func timeTrack(start time.Time, name string) {
-	elapsed := time.Since(start)
-	log.Printf("%s KSM took %s", name, elapsed)
-}
-
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	startTime := time.Now()
-
 	m.enricher.Start()
-	hashString, err := uuid.NewV4()
+
+	max := big.NewInt(100000000)
+	hashString, err := rand.Int(rand.Reader, max)
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheusClient)
 	if err != nil {
@@ -109,6 +106,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		reporter.Error(err)
 		return
 	}
+	fetchtimestamp := time.Now()
+
 	events, err := m.prometheusClient.ProcessMetrics(families, m.prometheusMapping)
 	if err != nil {
 		m.Logger().Error(err)
@@ -125,10 +124,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Error(err)
 		}
 
-		elapsed := time.Since(startTime)
+		e.Timestamp = fetchtimestamp
+		e.MetricSetFields.Put("FetchHashString2", hashString)
 
-		e.MetricSetFields.Put("FetchProcessTime", elapsed.Seconds())
-		e.MetricSetFields.Put("FetchHashString", hashString)
+		elapsed := time.Since(startTime)
+		e.MetricSetFields.Put("FetchProcessTime2", elapsed.Seconds())
 
 		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
