@@ -10,8 +10,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == IBM MQ module
 
-beta[]
-
 This module periodically fetches metrics from a containerized distribution of IBM MQ.
 
 [float]

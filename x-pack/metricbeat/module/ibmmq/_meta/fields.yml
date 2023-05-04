@@ -1,6 +1,6 @@
 - key: ibmmq
   title: 'IBM MQ'
-  release: beta
+  release: ga
   description: >
     IBM MQ module
   settings: ["ssl", "http"]
