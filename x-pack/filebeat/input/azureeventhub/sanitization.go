@@ -19,8 +19,8 @@ const (
 	singleQuotes sanitizationOption = "SINGLE_QUOTES"
 )
 
-// sanitizationOptFromString returns an error for unknown sanitization options
-func sanitizationOptFromString(s string) error {
+// sanitizeOptionsValidate validates for supported sanitization options
+func sanitizeOptionsValidate(s string) error {
 	switch s {
 	case "NEW_LINES":
 		return nil
