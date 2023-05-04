@@ -30347,6 +30347,13 @@ type: keyword
 
 --
 
+*`elasticsearch.cluster.stats.state.nodes`*::
++
+--
+type: flattened
+
+--
+
 *`elasticsearch.cluster.stats.status`*::
 +
 --
@@ -35353,6 +35360,102 @@ type: keyword
 +
 --
 Total billing amount.
+
+type: float
+
+--
+
+[float]
+=== carbon
+
+Google Cloud Carbon Footprint metrics
+
+
+*`gcp.carbon.project_id`*::
++
+--
+Project ID the carbon footprint report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.carbon.project_name`*::
++
+--
+Project name the carbon footprint report belongs to.
+
+type: keyword
+
+--
+
+*`gcp.carbon.service_id`*::
++
+--
+Service ID for the carbon footprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.service_description`*::
++
+--
+Service description for the carbon footprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.region`*::
++
+--
+Region for the carbon fooprint usage.
+
+type: keyword
+
+--
+
+*`gcp.carbon.footprint.scope1`*::
++
+--
+Scope 1 carbon footprint.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope2.location`*::
++
+--
+Scope 2 carbon footprint using location-based methodology.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope2.market`*::
++
+--
+Scope 2 carbon footprint using market-based methodology.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.scope3`*::
++
+--
+Scope 3 carbon footprint.
+
+type: float
+
+--
+
+*`gcp.carbon.footprint.offsets`*::
++
+--
+Total carbon offsets.
 
 type: float
 
@@ -42097,6 +42200,33 @@ alias to: kibana.stats.process.event_loop_delay.ms
 
 --
 
+*`kibana_stats.process.event_loop_utilization.active`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_utilization.active
+
+--
+
+*`kibana_stats.process.event_loop_utilization.idle`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_utilization.idle
+
+--
+
+*`kibana_stats.process.event_loop_utilization.utilization`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_utilization.utilization
+
+--
+
 *`kibana_stats.requests.total`*::
 +
 --
@@ -42608,6 +42738,43 @@ type: long
 +
 --
 Event loop delay in milliseconds
+
+
+type: scaled_float
+
+--
+
+[float]
+=== event_loop_utilization
+
+The ratio of time the event loop is not idling in the event provider to the total time the event loop is running.
+
+
+
+*`kibana.stats.process.event_loop_utilization.active`*::
++
+--
+Duration of time event loop has been active since last measurement.
+
+
+type: scaled_float
+
+--
+
+*`kibana.stats.process.event_loop_utilization.idle`*::
++
+--
+Duration of time event loop has been idle since last measurement.
+
+
+type: scaled_float
+
+--
+
+*`kibana.stats.process.event_loop_utilization.utilization`*::
++
+--
+Computed utilization value representing ratio of active to idle time since last measurement.
 
 
 type: scaled_float
@@ -45910,6 +46077,16 @@ type: keyword
 +
 --
 Node PIDPressure status (true, false or unknown)
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.status.network_unavailable`*::
++
+--
+Node NetworkUnavailable status (true, false or unknown)
 
 
 type: keyword

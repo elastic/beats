@@ -20,6 +20,7 @@ package processors
 import (
 	"errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	p "github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -47,7 +48,7 @@ func init() {
 	})
 }
 
-type Constructor func(config *config.C) (Processor, error)
+type Constructor func(config *config.C) (beat.Processor, error)
 
 var registry = NewNamespace()
 

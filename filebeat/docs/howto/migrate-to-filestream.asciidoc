@@ -97,6 +97,8 @@ defined `log` input, we need to add `take_over: true` to each new `filestream`. 
 that the new `filestream` inputs will continue ingesting files from the same offset where the `log`
 inputs stopped.
 
+WARNING: The `take over` mode is in beta.
+
 IMPORTANT: If this parameter is not set, all the files will be re-ingested from the beginning
 and this will lead to data duplication. Please, double-check that this parameter is set.
 

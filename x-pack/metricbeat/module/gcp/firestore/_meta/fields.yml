@@ -1,6 +1,6 @@
 - name: firestore
   description: Google Cloud Firestore metrics
-  release: beta
+  release: ga
   type: group
   fields:
     - name: document.delete.count

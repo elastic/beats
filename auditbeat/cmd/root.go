@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
@@ -53,13 +54,13 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // AuditbeatSettings contains the default settings for auditbeat
-func AuditbeatSettings() instance.Settings {
+func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 }
 
@@ -76,5 +77,5 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 }
 
 func init() {
-	RootCmd = Initialize(AuditbeatSettings())
+	RootCmd = Initialize(AuditbeatSettings(nil))
 }

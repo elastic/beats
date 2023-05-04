@@ -3389,6 +3389,14 @@ filebeat.inputs:
   # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
   #expiration_timeout: 30m
 
+  # Share Templates
+  # This option allows v9 and ipfix templates to be shared within a session without
+  # reference to the origin of the template.
+  #
+  # Setting this to true is not recommended as it can result in the wrong template
+  # being applied under certain conditions, but it may be required for some systems.
+  #share_templates: false
+
   # Queue size limits the number of netflow packets that are queued awaiting
   # processing.
   #queue_size: 8192
@@ -3908,6 +3916,13 @@ output.elasticsearch:
 
   # Number of workers per Elasticsearch host.
   #worker: 1
+
+  # If set to true and multiple hosts are configured, the output plugin load
+  # balances published events onto all Elasticsearch hosts. If set to false,
+  # the output plugin sends all events to only one host (determined at random)
+  # and will switch to another host if the currently selected one becomes
+  # unreachable. The default value is true.
+  #loadbalance: true
 
   # Optional data stream or index name. The default is "filebeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.

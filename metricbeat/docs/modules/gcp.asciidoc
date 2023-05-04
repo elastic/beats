@@ -10,8 +10,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == Google Cloud Platform module
 
-beta[]
-
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 :modulename!:
@@ -329,6 +327,15 @@ metricbeat.modules:
   dataset_id: "dataset id"
   table_pattern: "table pattern"
   cost_type: "regular"
+
+- module: gcp
+  metricsets:
+    - carbon
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"
 ----
 
 [float]
@@ -337,6 +344,8 @@ metricbeat.modules:
 The following metricsets are available:
 
 * <<metricbeat-metricset-gcp-billing,billing>>
+
+* <<metricbeat-metricset-gcp-carbon,carbon>>
 
 * <<metricbeat-metricset-gcp-compute,compute>>
 
@@ -355,6 +364,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-gcp-storage,storage>>
 
 include::gcp/billing.asciidoc[]
+
+include::gcp/carbon.asciidoc[]
 
 include::gcp/compute.asciidoc[]
 
