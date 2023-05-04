@@ -70,6 +70,12 @@ Valid encodings:
 
 The `plain` encoding is special, because it does not validate or transform any input.
 
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  encoding: utf-8
+----
 [float]
 [id="{beatname_lc}-input-{type}-exclude-lines"]
 ===== `exclude_lines`
