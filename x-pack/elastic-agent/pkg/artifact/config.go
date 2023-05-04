@@ -11,13 +11,113 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
 	darwin  = "darwin"
 	linux   = "linux"
 	windows = "windows"
+
+	DefaultSourceURI = "https://artifacts.elastic.co/downloads/"
 )
+
+type ConfigReloader interface {
+	Reload(*Config) error
+}
+
+type Reloader struct {
+	log       *logger.Logger
+	cfg       *Config
+	reloaders []ConfigReloader
+}
+
+func NewReloader(cfg *Config, log *logger.Logger, rr ...ConfigReloader) *Reloader {
+	return &Reloader{
+		cfg:       cfg,
+		log:       log,
+		reloaders: rr,
+	}
+}
+
+func (r *Reloader) Reload(rawConfig *config.Config) error {
+	if err := r.reloadConfig(rawConfig); err != nil {
+		return errors.New(err, "failed to reload config")
+	}
+
+	if err := r.reloadSourceURI(rawConfig); err != nil {
+		return errors.New(err, "failed to reload source URI")
+	}
+
+	for _, reloader := range r.reloaders {
+		if err := reloader.Reload(r.cfg); err != nil {
+			return errors.New(err, "failed reloading config")
+		}
+	}
+
+	return nil
+}
+
+func (r *Reloader) reloadConfig(rawConfig *config.Config) error {
+	type reloadConfig struct {
+		C *Config `json:"agent.download" config:"agent.download"`
+	}
+	tmp := &reloadConfig{
+		C: DefaultConfig(),
+	}
+	if err := rawConfig.Unpack(&tmp); err != nil {
+		return err
+	}
+
+	*(r.cfg) = Config{
+		OperatingSystem:       tmp.C.OperatingSystem,
+		Architecture:          tmp.C.Architecture,
+		SourceURI:             tmp.C.SourceURI,
+		TargetDirectory:       tmp.C.TargetDirectory,
+		InstallPath:           tmp.C.InstallPath,
+		DropPath:              tmp.C.DropPath,
+		HTTPTransportSettings: tmp.C.HTTPTransportSettings,
+	}
+
+	return nil
+}
+
+func (r *Reloader) reloadSourceURI(rawConfig *config.Config) error {
+	type reloadConfig struct {
+		// SourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/
+		SourceURI string `json:"agent.download.sourceURI" config:"agent.download.sourceURI"`
+
+		// FleetSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/ coming from fleet which uses
+		// different naming.
+		FleetSourceURI string `json:"agent.download.source_uri" config:"agent.download.source_uri"`
+	}
+	cfg := &reloadConfig{}
+	if err := rawConfig.Unpack(&cfg); err != nil {
+		return errors.New(err, "failed to unpack config during reload")
+	}
+
+	var newSourceURI string
+	if fleetURI := strings.TrimSpace(cfg.FleetSourceURI); fleetURI != "" {
+		// fleet configuration takes precedence
+		newSourceURI = fleetURI
+	} else if sourceURI := strings.TrimSpace(cfg.SourceURI); sourceURI != "" {
+		newSourceURI = sourceURI
+	}
+
+	if newSourceURI != "" {
+		r.log.Infof("Source URI changed from %q to %q", r.cfg.SourceURI, newSourceURI)
+		r.cfg.SourceURI = newSourceURI
+	} else {
+		// source uri unset, reset to default
+		r.log.Infof("Source URI reset from %q to %q", r.cfg.SourceURI, DefaultSourceURI)
+		r.cfg.SourceURI = DefaultSourceURI
+	}
+
+	return nil
+}
 
 // Config is a configuration used for verifier and downloader
 type Config struct {
@@ -56,7 +156,7 @@ func DefaultConfig() *Config {
 	transport.Timeout = 10 * time.Minute
 
 	return &Config{
-		SourceURI:             "https://artifacts.elastic.co/downloads/",
+		SourceURI:             DefaultSourceURI,
 		TargetDirectory:       paths.Downloads(),
 		InstallPath:           paths.Install(),
 		HTTPTransportSettings: transport,
@@ -96,4 +196,43 @@ func (c *Config) Arch() string {
 
 	c.Architecture = arch
 	return c.Architecture
+}
+
+// Unpack reads a config object into the settings.
+func (c *Config) Unpack(cfg *c.C) error {
+	tmp := struct {
+		OperatingSystem string `json:"-" config:",ignore"`
+		Architecture    string `json:"-" config:",ignore"`
+		SourceURI       string `json:"sourceURI" config:"sourceURI"`
+		TargetDirectory string `json:"targetDirectory" config:"target_directory"`
+		InstallPath     string `yaml:"installPath" config:"install_path"`
+		DropPath        string `yaml:"dropPath" config:"drop_path"`
+	}{
+		OperatingSystem: c.OperatingSystem,
+		Architecture:    c.Architecture,
+		SourceURI:       c.SourceURI,
+		TargetDirectory: c.TargetDirectory,
+		InstallPath:     c.InstallPath,
+		DropPath:        c.DropPath,
+	}
+
+	if err := cfg.Unpack(&tmp); err != nil {
+		return err
+	}
+
+	transport := DefaultConfig().HTTPTransportSettings
+	if err := cfg.Unpack(&transport); err != nil {
+		return err
+	}
+
+	*c = Config{
+		OperatingSystem:       tmp.OperatingSystem,
+		Architecture:          tmp.Architecture,
+		SourceURI:             tmp.SourceURI,
+		TargetDirectory:       tmp.TargetDirectory,
+		InstallPath:           tmp.InstallPath,
+		DropPath:              tmp.DropPath,
+		HTTPTransportSettings: transport,
+	}
+	return nil
 }

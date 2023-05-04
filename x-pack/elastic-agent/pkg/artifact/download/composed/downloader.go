@@ -9,7 +9,9 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 
@@ -46,4 +48,17 @@ func (e *Downloader) Download(ctx context.Context, spec program.Spec, version st
 	}
 
 	return "", err
+}
+func (e *Downloader) Reload(c *artifact.Config) error {
+	for _, d := range e.dd {
+		reloadable, ok := d.(download.Reloader)
+		if !ok {
+			continue
+		}
+
+		if err := reloadable.Reload(c); err != nil {
+			return errors.New(err, "failed reloading artifact config for composed downloader")
+		}
+	}
+	return nil
 }

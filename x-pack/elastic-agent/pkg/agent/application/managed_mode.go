@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -140,6 +141,11 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
 
+	routerArtifactReloader, ok := router.(emitter.Reloader)
+	if !ok {
+		return nil, errors.New("router not capable of artifact reload") // Needed for client reloading
+	}
+
 	emit, err := emitter.New(
 		managedApplication.bgContext,
 		log,
@@ -152,6 +158,8 @@ func newManaged(
 		},
 		caps,
 		monitor,
+		artifact.NewReloader(cfg.Settings.DownloadConfig, log),
+		routerArtifactReloader,
 	)
 	if err != nil {
 		return nil, err

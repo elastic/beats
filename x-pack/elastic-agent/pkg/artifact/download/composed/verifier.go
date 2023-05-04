@@ -7,7 +7,9 @@ package composed
 import (
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 )
 
@@ -44,4 +46,18 @@ func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure boo
 	}
 
 	return false, err
+}
+
+func (e *Verifier) Reload(c *artifact.Config) error {
+	for _, v := range e.vv {
+		reloadable, ok := v.(download.Reloader)
+		if !ok {
+			continue
+		}
+
+		if err := reloadable.Reload(c); err != nil {
+			return errors.New(err, "failed reloading artifact config for composed verifier")
+		}
+	}
+	return nil
 }

@@ -18,9 +18,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -113,10 +115,87 @@ func NewOperator(
 
 	operator.initHandlerMap()
 
-	os.MkdirAll(config.DownloadConfig.TargetDirectory, 0755)
-	os.MkdirAll(config.DownloadConfig.InstallPath, 0755)
+	if err := os.MkdirAll(config.DownloadConfig.TargetDirectory, 0755); err != nil {
+		// can already exists from previous runs, not an error
+		logger.Warnf("failed creating %q: %v", config.DownloadConfig.TargetDirectory, err)
+	}
+	if err := os.MkdirAll(config.DownloadConfig.InstallPath, 0755); err != nil {
+		// can already exists from previous runs, not an error
+		logger.Warnf("failed creating %q: %v", config.DownloadConfig.InstallPath, err)
+	}
 
 	return operator, nil
+}
+
+func (o *Operator) Reload(rawConfig *config.Config) error {
+	// save some unpacking in downloaders
+	type reloadConfig struct {
+		C *artifact.Config `json:"agent.download" config:"agent.download"`
+	}
+	tmp := &reloadConfig{
+		C: artifact.DefaultConfig(),
+	}
+	if err := rawConfig.Unpack(&tmp); err != nil {
+		return errors.New(err, "failed to unpack artifact config")
+	}
+
+	sourceURI, err := reloadSourceURI(o.logger, rawConfig)
+	if err != nil {
+		return errors.New(err, "failed to parse source URI")
+	}
+	tmp.C.SourceURI = sourceURI
+
+	if err := o.reloadComponent(o.downloader, "downloader", tmp.C); err != nil {
+		return err
+	}
+
+	return o.reloadComponent(o.verifier, "verifier", tmp.C)
+}
+
+func reloadSourceURI(logger *logger.Logger, rawConfig *config.Config) (string, error) {
+	type reloadConfig struct {
+		// SourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/
+		SourceURI string `json:"agent.download.sourceURI" config:"agent.download.sourceURI"`
+
+		// FleetSourceURI: source of the artifacts, e.g https://artifacts.elastic.co/downloads/ coming from fleet which uses
+		// different naming.
+		FleetSourceURI string `json:"agent.download.source_uri" config:"agent.download.source_uri"`
+	}
+	cfg := &reloadConfig{}
+	if err := rawConfig.Unpack(&cfg); err != nil {
+		return "", errors.New(err, "failed to unpack config during reload")
+	}
+
+	var newSourceURI string
+	if fleetURI := strings.TrimSpace(cfg.FleetSourceURI); fleetURI != "" {
+		// fleet configuration takes precedence
+		newSourceURI = fleetURI
+	} else if sourceURI := strings.TrimSpace(cfg.SourceURI); sourceURI != "" {
+		newSourceURI = sourceURI
+	}
+
+	if newSourceURI != "" {
+		logger.Infof("Source URI in operator changed to %q", newSourceURI)
+		return newSourceURI, nil
+	}
+
+	// source uri unset, reset to default
+	logger.Infof("Source URI in reset %q", artifact.DefaultSourceURI)
+	return artifact.DefaultSourceURI, nil
+}
+
+func (o *Operator) reloadComponent(component interface{}, name string, cfg *artifact.Config) error {
+	r, ok := component.(artifact.ConfigReloader)
+	if !ok {
+		o.logger.Debugf("failed reloading %q: component is not reloadable", name)
+		return nil // not an error, could be filesystem downloader/verifier
+	}
+
+	if err := r.Reload(cfg); err != nil {
+		return errors.New(err, fmt.Sprintf("failed reloading %q config", component))
+	}
+
+	return nil
 }
 
 // State describes the current state of the system.

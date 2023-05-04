@@ -15,10 +15,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
@@ -459,6 +462,51 @@ func TestConfigurableService(t *testing.T) {
 
 	if err := cmd.Wait(); err != nil {
 		t.Fatalf("Process failed: %v", err)
+	}
+}
+
+func TestReloadSourceURI(t *testing.T) {
+	testCases := map[string]struct {
+		IncomingConfig    map[string]interface{}
+		ExpectedSourceURI string
+	}{
+		"no-config": {
+			IncomingConfig:    map[string]interface{}{},
+			ExpectedSourceURI: artifact.DefaultSourceURI,
+		},
+		"source-uri-provided": {
+			IncomingConfig: map[string]interface{}{
+				"agent.download.sourceURI": "http://source-uri",
+			},
+			ExpectedSourceURI: "http://source-uri",
+		},
+		"fleet-source-uri-provided": {
+			IncomingConfig: map[string]interface{}{
+				"agent.download.source_uri": "http://fleet-source-uri",
+			},
+			ExpectedSourceURI: "http://fleet-source-uri",
+		},
+		"both-source-uri-provided": {
+			IncomingConfig: map[string]interface{}{
+				"agent.download.sourceURI":  "http://source-uri",
+				"agent.download.source_uri": "http://fleet-source-uri",
+			},
+			ExpectedSourceURI: "http://fleet-source-uri",
+		},
+	}
+
+	l := getLogger()
+	for testName, tc := range testCases {
+		t.Run(testName, func(t *testing.T) {
+			cfg, err := config.NewConfigFrom(tc.IncomingConfig)
+			require.NoError(t, err)
+			require.NotNil(t, cfg)
+
+			sourceUri, err := reloadSourceURI(l, cfg)
+			require.NoError(t, err)
+			require.Equal(t, tc.ExpectedSourceURI, sourceUri)
+
+		})
 	}
 }
 

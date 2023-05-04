@@ -67,6 +67,24 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 	return v, nil
 }
 
+func (v *Verifier) Reload(c *artifact.Config) error {
+	// reload client
+	client, err := c.HTTPTransportSettings.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
+			return download.WithHeaders(rt, download.Headers)
+		}),
+	)
+	if err != nil {
+		return errors.New(err, "http.verifier: failed to generate client out of config")
+	}
+
+	v.client = *client
+	v.config = c
+
+	return nil
+}
+
 // Verify checks downloaded package on preconfigured
 // location against a key stored on elastic.co website.
 func (v *Verifier) Verify(spec program.Spec, version string, removeOnFailure bool, pgpBytes ...string) (isMatch bool, err error) {

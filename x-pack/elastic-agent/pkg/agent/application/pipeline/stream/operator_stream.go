@@ -6,8 +6,10 @@ package stream
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
@@ -23,6 +25,15 @@ type stater interface {
 
 type specer interface {
 	Specs() map[string]program.Spec
+}
+
+func (b *operatorStream) Reload(c *config.Config) error {
+	r, ok := b.configHandler.(emitter.Reloader)
+	if !ok {
+		return nil
+	}
+
+	return r.Reload(c)
 }
 
 func (b *operatorStream) Close() error {
