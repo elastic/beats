@@ -19,5 +19,5 @@ func init() {
 // AssetIbmmq returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/ibmmq.
 func AssetIbmmq() string {
-	return "eJxUzrGugkAQheF+n+LPNjSXF9jiFnYWFNbGAmTEjbuwMkPB2xvFRJ1ycr6cU3OTNRC7nO8OLFqSQLXfNTSHysEsSVqVQCfWOuhFz3MsFqcx8O8AtjB56pckDlTM4jho4OhVk//DX82KPzm4REm9hperGdssn/Ln2VokMMzTUt6fb7Gp30mPAAAA//+eWDd6"
+	return "eJxMjrGugkAURPv9ipNtaB4/sMUr7CworI0FyhU37sLKvRT8vUFMZMrJnJypecoSiNecXw4sWpJAdTw0NKfKwSRJWpVA3zroRG9TLBbHIfDvALYpeezmJA5UzOLQa+DsVZP/wz/Mir84uEdJnYYPVzO0WX7qNbaU1TSNc/k2e2Kj9ofeAQAA//+a1zXS"
 }
