@@ -192,6 +192,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
+- Fix double channel close panic when reloading. {pull}35324[35324]
 
 *Winlogbeat*
 
