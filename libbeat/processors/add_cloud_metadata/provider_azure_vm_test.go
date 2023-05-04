@@ -79,7 +79,7 @@ const azInstanceIdentityDocument = `{
 func initAzureTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == "/metadata/instance/compute?api-version=2021-02-01" && r.Header.Get("Metadata") == "true" {
-			w.Write([]byte(azInstanceIdentityDocument))
+			_, _ = w.Write([]byte(azInstanceIdentityDocument))
 			return
 		}
 
@@ -88,7 +88,7 @@ func initAzureTestServer() *httptest.Server {
 }
 
 func TestRetrieveAzureMetadata(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := initAzureTestServer()
 	defer server.Close()
