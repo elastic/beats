@@ -48,6 +48,7 @@ func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure boo
 	return false, err
 }
 
+// Reload reloads config
 func (e *Verifier) Reload(c *artifact.Config) error {
 	for _, v := range e.vv {
 		reloadable, ok := v.(download.Reloader)

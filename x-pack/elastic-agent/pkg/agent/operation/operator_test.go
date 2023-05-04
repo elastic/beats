@@ -502,9 +502,9 @@ func TestReloadSourceURI(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, cfg)
 
-			sourceUri, err := reloadSourceURI(l, cfg)
+			sourceURI, err := reloadSourceURI(l, cfg)
 			require.NoError(t, err)
-			require.Equal(t, tc.ExpectedSourceURI, sourceUri)
+			require.Equal(t, tc.ExpectedSourceURI, sourceURI)
 
 		})
 	}

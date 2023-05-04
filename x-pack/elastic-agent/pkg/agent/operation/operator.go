@@ -127,6 +127,7 @@ func NewOperator(
 	return operator, nil
 }
 
+// Reload reloads config
 func (o *Operator) Reload(rawConfig *config.Config) error {
 	// save some unpacking in downloaders
 	type reloadConfig struct {

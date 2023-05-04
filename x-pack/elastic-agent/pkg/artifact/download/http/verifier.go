@@ -67,6 +67,7 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 	return v, nil
 }
 
+// Reload reloads config
 func (v *Verifier) Reload(c *artifact.Config) error {
 	// reload client
 	client, err := c.HTTPTransportSettings.Client(

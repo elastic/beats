@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
+// Downloader is responsible for downloading artifacts
 type Downloader struct {
 	downloader      download.Downloader
 	versionOverride string
@@ -51,6 +52,7 @@ func (e *Downloader) Download(ctx context.Context, spec program.Spec, version st
 	return e.downloader.Download(ctx, spec, version)
 }
 
+// Reload reloads config
 func (e *Downloader) Reload(c *artifact.Config) error {
 	reloader, ok := e.downloader.(artifact.ConfigReloader)
 	if !ok {

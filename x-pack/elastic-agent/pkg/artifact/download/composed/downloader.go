@@ -49,6 +49,8 @@ func (e *Downloader) Download(ctx context.Context, spec program.Spec, version st
 
 	return "", err
 }
+
+// Reload reloads config
 func (e *Downloader) Reload(c *artifact.Config) error {
 	for _, d := range e.dd {
 		reloadable, ok := d.(download.Reloader)

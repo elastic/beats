@@ -36,10 +36,12 @@ func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Router, erro
 	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
 }
 
+// Routes returns routes used in operator
 func (r *router) Routes() *sorted.Set {
 	return r.routes
 }
 
+// Reload reloads config
 func (r *router) Reload(c *config.Config) error {
 	keys := r.routes.Keys()
 	for _, key := range keys {

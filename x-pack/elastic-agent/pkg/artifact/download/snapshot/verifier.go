@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/http"
 )
 
+// Verifier is responsible for verifying downloaded artifacts
 type Verifier struct {
 	verifier        download.Verifier
 	versionOverride string
@@ -41,6 +42,7 @@ func (e *Verifier) Verify(spec program.Spec, version string, removeOnFailure boo
 	return e.verifier.Verify(spec, version, removeOnFailure, pgpBytes...)
 }
 
+// Reload reloads config
 func (e *Verifier) Reload(c *artifact.Config) error {
 	reloader, ok := e.verifier.(artifact.ConfigReloader)
 	if !ok {

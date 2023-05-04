@@ -27,6 +27,7 @@ type specer interface {
 	Specs() map[string]program.Spec
 }
 
+// Reload reloads config
 func (b *operatorStream) Reload(c *config.Config) error {
 	r, ok := b.configHandler.(emitter.Reloader)
 	if !ok {

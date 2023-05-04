@@ -22,19 +22,23 @@ const (
 	linux   = "linux"
 	windows = "windows"
 
+	// DefaultSourceURI used in artifact downloads
 	DefaultSourceURI = "https://artifacts.elastic.co/downloads/"
 )
 
+// ConfigReloader implements reloading a config.
 type ConfigReloader interface {
 	Reload(*Config) error
 }
 
+// Reloader reloads config and handles source URI properly
 type Reloader struct {
 	log       *logger.Logger
 	cfg       *Config
 	reloaders []ConfigReloader
 }
 
+// NewReloader initializes a new config reloader.
 func NewReloader(cfg *Config, log *logger.Logger, rr ...ConfigReloader) *Reloader {
 	return &Reloader{
 		cfg:       cfg,
@@ -43,6 +47,7 @@ func NewReloader(cfg *Config, log *logger.Logger, rr ...ConfigReloader) *Reloade
 	}
 }
 
+// Reload reloads config and applies source URI.
 func (r *Reloader) Reload(rawConfig *config.Config) error {
 	if err := r.reloadConfig(rawConfig); err != nil {
 		return errors.New(err, "failed to reload config")

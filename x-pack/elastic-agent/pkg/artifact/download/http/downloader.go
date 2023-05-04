@@ -68,6 +68,7 @@ func NewDownloaderWithClient(log progressLogger, config *artifact.Config, client
 	}
 }
 
+// Reload reloads config
 func (e *Downloader) Reload(c *artifact.Config) error {
 	// reload client
 	client, err := c.HTTPTransportSettings.Client(
