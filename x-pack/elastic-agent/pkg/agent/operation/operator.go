@@ -245,7 +245,7 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) (err error) {
 
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		if err == filterContextCancelled(err) {
+		if errors.Is(err, filterContextCancelled(err)) {
 			// error is not filtered and should be reported
 			o.statusReporter.Update(state.Failed, err.Error(), nil)
 			err = errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
