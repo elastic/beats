@@ -66,8 +66,9 @@ func (conf *azureInputConfig) Validate() error {
 		return err
 	}
 
+	// log a warning for each sanitization option not supported
 	for _, opt := range conf.SanitizeOptions {
-		_, err := sanitizationOptFromString(opt)
+		err := sanitizationOptFromString(opt)
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)
 		}

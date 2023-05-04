@@ -15,19 +15,19 @@ import (
 type sanitizationOption string
 
 const (
-	NewLines     sanitizationOption = "NEW_LINES"
-	SingleQuotes sanitizationOption = "SINGLE_QUOTES"
-	Unknown      sanitizationOption = "UNKNOWN"
+	newLines     sanitizationOption = "NEW_LINES"
+	singleQuotes sanitizationOption = "SINGLE_QUOTES"
 )
 
-func sanitizationOptFromString(s string) (sanitizationOption, error) {
+// sanitizationOptFromString returns an error for unknown sanitization options
+func sanitizationOptFromString(s string) error {
 	switch s {
 	case "NEW_LINES":
-		return NewLines, nil
+		return nil
 	case "SINGLE_QUOTES":
-		return SingleQuotes, nil
+		return nil
 	default:
-		return Unknown, errors.New("invalid sanitization option")
+		return errors.New("invalid sanitization option")
 	}
 }
 
@@ -38,9 +38,9 @@ func sanitize(jsonStr []byte, opts ...string) []byte {
 
 	for _, opt := range opts {
 		switch sanitizationOption(opt) {
-		case NewLines:
+		case newLines:
 			res = sanitizeNewLines(res)
-		case SingleQuotes:
+		case singleQuotes:
 			res = sanitizeSingleQuotes(res)
 		}
 	}
