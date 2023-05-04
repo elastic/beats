@@ -168,8 +168,10 @@ RUN for iter in {1..10}; do \
 done; \
 (exit $exit_code)
 {{- end }}
+USER 1000
+{{- else }}
+USER 0
 {{- end }}
-USER {{ .user }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
