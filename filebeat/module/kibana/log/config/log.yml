@@ -5,15 +5,16 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
+json.keys_under_root: false
+json.add_error_key: true
 processors:
-  # non-ECS: same as json.keys_under_root: false, allows compatibility with non-ecs logs.
-- decode_json_fields:
-    fields: [message]
-    target: 'json'
 - add_fields:
     target: ""
     fields:
       ecs.version: 1.12.0
     when:
-      not:
-        has_fields: ['ecs.version']
+      and:
+        - not:
+            has_fields: ['ecs.version']
+        - not:
+            has_fields: ['json.ecs.version']
