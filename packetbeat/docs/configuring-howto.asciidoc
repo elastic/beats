@@ -57,6 +57,8 @@ include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/http-endpoint.asciidoc[]
 
+include::./protocol-metrics-packetbeat.asciidoc[]
+
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 include::{libbeat-dir}/shared-feature-flags.asciidoc[]

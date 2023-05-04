@@ -114,7 +114,7 @@ func NewInput(
 
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		ACKHandler: acker.ConnectionOnly(
+		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
 				for _, priv := range privates {
 					if msg, ok := priv.(*pubsub.Message); ok {

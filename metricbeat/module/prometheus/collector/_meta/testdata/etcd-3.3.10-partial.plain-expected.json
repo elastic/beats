@@ -61,30 +61,6 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:42999",
-                "job": "prometheus"
-            },
-            "metrics": {
-                "up": 1
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
                 "action": "getRecursive",
                 "instance": "127.0.0.1:42999",
                 "job": "prometheus"
@@ -278,7 +254,8 @@
                 "go_memstats_stack_inuse_bytes": 1114112,
                 "go_memstats_stack_sys_bytes": 1114112,
                 "go_memstats_sys_bytes": 11815160,
-                "go_threads": 13
+                "go_threads": 13,
+                "up": 1
             }
         },
         "service": {

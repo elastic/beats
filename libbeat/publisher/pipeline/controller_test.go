@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"testing/quick"
@@ -30,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -53,17 +55,13 @@ func TestOutputReload(t *testing.T) {
 			//defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
-				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999
-				numOutputReloads := 350 + (q % 150)     // 350 to 499
+				numEventsToPublish := 15000 + (q % 5000) // 15000 to 19999
+				numOutputReloads := 350 + (q % 150)      // 350 to 499
 
-				queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
-					return memqueue.NewQueue(
-						logp.L(),
-						memqueue.Settings{
-							ACKListener: ackListener,
-							Events:      int(numEventsToPublish),
-						}), nil
-				}
+				queueConfig := conf.Namespace{}
+				conf, _ := conf.NewConfigFrom(
+					fmt.Sprintf("mem.events: %v", numEventsToPublish))
+				_ = queueConfig.Unpack(conf)
 
 				var publishedCount atomic.Uint
 				countingPublishFn := func(batch publisher.Batch) error {
@@ -74,20 +72,23 @@ func TestOutputReload(t *testing.T) {
 				pipeline, err := New(
 					beat.Info{},
 					Monitors{},
-					queueFactory,
+					queueConfig,
 					outputs.Group{},
 					Settings{},
 				)
 				require.NoError(t, err)
 				defer pipeline.Close()
 
-				pipelineClient, err := pipeline.Connect()
-				require.NoError(t, err)
-				defer pipelineClient.Close()
-
 				var wg sync.WaitGroup
 				wg.Add(1)
 				go func() {
+					// Our initial pipeline has no outputs set, so we need
+					// to create the client in a goroutine since any
+					// Connect calls will block until the pipeline has an
+					// output.
+					pipelineClient, err := pipeline.Connect()
+					require.NoError(t, err)
+					defer pipelineClient.Close()
 					for i := uint(0); i < numEventsToPublish; i++ {
 						pipelineClient.Publish(beat.Event{})
 					}
@@ -99,7 +100,7 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					pipeline.output.Set(out)
+					pipeline.outputController.Set(out)
 				}
 
 				wg.Wait()
@@ -136,4 +137,109 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 	assert.Nil(t, target.ch, "consumerTarget should receive a nil channel to block batch assembly")
 	target = <-controller.consumer.targetChan
 	assert.Nil(t, target.ch, "consumerTarget should receive a nil channel to block batch assembly")
+}
+
+func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
+	controller := outputController{
+		// Set event limit to 1 so we can easily tell if our settings
+		// were used to create the queue.
+		queueFactory: memqueue.FactoryForSettings(
+			memqueue.Settings{Events: 1},
+		),
+		consumer: &eventConsumer{
+			// We aren't testing the values sent to eventConsumer, we
+			// just need a placeholder here so outputController can
+			// send configuration updates without blocking.
+			targetChan: make(chan consumerTarget, 4),
+		},
+		observer: nilObserver,
+	}
+	// Set to an empty output group. This should not create a queue.
+	controller.Set(outputs.Group{})
+	require.Nil(t, controller.queue, "Queue should be nil after setting empty output")
+
+	controller.Set(outputs.Group{
+		Clients: []outputs.Client{newMockClient(nil)},
+	})
+	require.NotNil(t, controller.queue, "Queue should be created after setting nonempty output")
+	assert.Equal(t, 1, controller.queue.BufferConfig().MaxEvents, "Queue should be created using provided settings")
+}
+
+func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
+	// If there are queue settings provided by both the pipeline and
+	// the output, the output settings should be used.
+	controller := outputController{
+		queueFactory: memqueue.FactoryForSettings(
+			memqueue.Settings{Events: 1},
+		),
+		consumer: &eventConsumer{
+			targetChan: make(chan consumerTarget, 4),
+		},
+		observer: nilObserver,
+	}
+	controller.Set(outputs.Group{
+		Clients:      []outputs.Client{newMockClient(nil)},
+		QueueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 2}),
+	})
+
+	// The pipeline queue settings has max events 1, the output has
+	// max events 2, the result should be a queue with max events 2.
+	assert.Equal(t, 2, controller.queue.BufferConfig().MaxEvents, "Queue should be created using settings from the output")
+}
+
+func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
+	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
+	failedFactory := func(_ *logp.Logger, _ func(int)) (queue.Queue, error) {
+		return nil, fmt.Errorf("This queue creation intentionally failed")
+	}
+	controller := outputController{
+		queueFactory: failedFactory,
+		consumer: &eventConsumer{
+			targetChan: make(chan consumerTarget, 4),
+		},
+		observer: nilObserver,
+		monitors: Monitors{
+			Logger: logp.NewLogger("tests"),
+		},
+	}
+	controller.Set(outputs.Group{
+		Clients: []outputs.Client{newMockClient(nil)},
+	})
+
+	assert.Equal(t, defaultSettings.Events, controller.queue.BufferConfig().MaxEvents, "Queue should fall back on default settings when input is invalid")
+}
+
+func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
+	controller := outputController{
+		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
+		consumer: &eventConsumer{
+			targetChan: make(chan consumerTarget, 4),
+		},
+		observer: nilObserver,
+	}
+	// Send producer requests from different goroutines. They should all
+	// block, because there is no queue, but they should become unblocked
+	// once we set a nonempty output.
+	const producerCount = 10
+	remaining := atomic.MakeInt(producerCount)
+	for i := 0; i < producerCount; i++ {
+		go func() {
+			controller.queueProducer(queue.ProducerConfig{})
+			remaining.Dec()
+		}()
+	}
+	allStarted := waitUntilTrue(time.Second, func() bool {
+		return len(controller.pendingRequests) == producerCount
+	})
+	assert.True(t, allStarted, "All queueProducer requests should be saved as pending requests by outputController")
+	assert.Equal(t, producerCount, remaining.Load(), "No queueProducer request should return before an output is set")
+
+	// Set the output, then ensure that it unblocks all the waiting goroutines.
+	controller.Set(outputs.Group{
+		Clients: []outputs.Client{newMockClient(nil)},
+	})
+	allFinished := waitUntilTrue(time.Second, func() bool {
+		return remaining.Load() == 0
+	})
+	assert.True(t, allFinished, "All queueProducer requests should be unblocked once an output is set")
 }

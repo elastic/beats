@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -49,10 +50,15 @@ type IndexSelector interface {
 
 // Group configures and combines multiple clients into load-balanced group of clients
 // being managed by the publisher pipeline.
+// If QueueFactory is set then the pipeline will use it to create the queue.
+// Currently it is only used to activate the proxy queue when using the Shipper
+// output, but it also provides a natural migration path for moving queue
+// configuration into the outputs.
 type Group struct {
-	Clients   []Client
-	BatchSize int
-	Retry     int
+	Clients      []Client
+	BatchSize    int
+	Retry        int
+	QueueFactory queue.QueueFactory
 }
 
 // RegisterType registers a new output type.

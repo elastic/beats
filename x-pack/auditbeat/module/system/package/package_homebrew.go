@@ -11,7 +11,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -28,7 +27,7 @@ type InstallReceipt struct {
 }
 
 func listBrewPackages(brewCellarPath string) ([]*Package, error) {
-	packageDirs, err := ioutil.ReadDir(brewCellarPath)
+	packageDirs, err := os.ReadDir(brewCellarPath)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +38,7 @@ func listBrewPackages(brewCellarPath string) ([]*Package, error) {
 			continue
 		}
 		pkgPath := path.Join(brewCellarPath, packageDir.Name())
-		versions, err := ioutil.ReadDir(pkgPath)
+		versions, err := os.ReadDir(pkgPath)
 		if err != nil {
 			return nil, fmt.Errorf("error reading directory: %s: %w", pkgPath, err)
 		}
@@ -49,16 +48,18 @@ func listBrewPackages(brewCellarPath string) ([]*Package, error) {
 				continue
 			}
 			pkg := &Package{
-				Name:        packageDir.Name(),
-				Version:     version.Name(),
-				InstallTime: version.ModTime(),
-				Type:        "brew",
+				Name:    packageDir.Name(),
+				Version: version.Name(),
+				Type:    "brew",
+			}
+			if info, err := version.Info(); err == nil {
+				pkg.InstallTime = info.ModTime()
 			}
 
 			// Read formula
 			var formulaPath string
 			installReceiptPath := path.Join(brewCellarPath, pkg.Name, pkg.Version, "INSTALL_RECEIPT.json")
-			contents, err := ioutil.ReadFile(installReceiptPath)
+			contents, err := os.ReadFile(installReceiptPath)
 			if err != nil {
 				pkg.error = fmt.Errorf("error reading %v: %w", installReceiptPath, err)
 			} else {

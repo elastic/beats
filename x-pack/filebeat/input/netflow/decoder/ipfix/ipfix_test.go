@@ -81,7 +81,7 @@ func TestMessageWithOptions(t *testing.T) {
 
 func TestOptionTemplates(t *testing.T) {
 	addr := test.MakeAddress(t, "127.0.0.1:12345")
-	key := v9.MakeSessionKey(addr, 1234)
+	key := v9.MakeSessionKey(addr, 1234, false)
 
 	t.Run("Single options template", func(t *testing.T) {
 		proto := New(config.Defaults())

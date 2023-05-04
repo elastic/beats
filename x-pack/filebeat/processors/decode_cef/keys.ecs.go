@@ -60,7 +60,12 @@ var ecsExtensionMapping = map[string]mappedField{
 	"destinationUserName":          {Target: "destination.user.name"},
 	"destinationUserPrivileges":    {Target: "destination.user.group.name"},
 	"deviceAction":                 {Target: "event.action"},
-	"deviceAddress":                {Target: "observer.ip"},
+	"deviceAddress": {
+		Target: "observer.ip",
+		Translate: func(in *cef.Field) (interface{}, error) {
+			return []string{in.String}, nil
+		},
+	},
 	"deviceDirection": {
 		Target: "network.direction",
 		Translate: func(in *cef.Field) (interface{}, error) {

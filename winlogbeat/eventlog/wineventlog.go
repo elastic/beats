@@ -287,9 +287,9 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
-	}
-	l.message = func(event win.EvtHandle) (string, error) {
-		return win.Message(event, l.renderBuf, l.cache.get)
+		l.message = func(event win.EvtHandle) (string, error) {
+			return win.Message(event, l.renderBuf, l.cache.get)
+		}
 	}
 
 	return l, nil
@@ -463,7 +463,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 			l.metrics.logError(err)
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
-		if r.Message == "" {
+		if r.Message == "" && l.message != nil {
 			r.Message, err = l.message(h)
 			if err != nil {
 				l.metrics.logError(err)
@@ -664,7 +664,7 @@ func newInputMetrics(name, id string) *inputMetrics {
 	if id == "" {
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry(name, id, nil)
+	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
 	out := &inputMetrics{
 		unregister:  unreg,
 		name:        monitoring.NewString(reg, "provider"),

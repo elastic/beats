@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
