@@ -167,12 +167,15 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	}
 	loc := getLocation(f.beatLocation, sf)
 	geoMap, _ := util.GeoConfigToMap(loc.Geo)
-	c.Merge(map[string]interface{}{
+	err = c.Merge(map[string]interface{}{
 		"run_from": map[string]interface{}{
 			"id":  f.beatLocation.ID,
 			"geo": geoMap,
 		},
 	})
+	if err != nil {
+		return nil, fmt.Errorf("could not merge location into monitor map: %w", err)
+	}
 
 	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
 	if err != nil {
