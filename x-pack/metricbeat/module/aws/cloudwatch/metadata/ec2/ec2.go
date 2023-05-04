@@ -20,7 +20,7 @@ import (
 const metadataPrefix = "aws.ec2.instance."
 
 // AddMetadata adds metadata for EC2 instances from a specific region
-func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
 		if fips_enabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
@@ -55,7 +55,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 			if output.InstanceType != "" {
 				_, _ = events[eventIdentifier].RootFields.Put("cloud.machine.type", output.InstanceType)
 			} else {
-				logp.L().Named("cloudwatch").Error("InstanceType is empty")
+				logger.Error("InstanceType is empty")
 			}
 
 			placement := output.Placement
@@ -66,14 +66,14 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 			if output.State.Name != "" {
 				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
 			} else {
-				logp.L().Named("cloudwatch").Error("instance.State.Name is empty")
+				logger.Error("instance.State.Name is empty")
 			}
 
 			if output.Monitoring.State != "" {
 				monitoringStates[eventIdentifier] = string(output.Monitoring.State)
 				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
 			} else {
-				logp.L().Named("cloudwatch").Error("Monitoring.State is empty")
+				logger.Error("Monitoring.State is empty")
 			}
 
 			cpuOptions := output.CpuOptions

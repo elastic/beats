@@ -208,7 +208,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			events, err := addMetadata(namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
+			events, err := addMetadata(m.logger, namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
 			if err != nil {
 				// TODO What to do if add metadata fails? I guess to continue, probably we have an 90% of reliable data
 				m.Logger().Warnf("could not add metadata to events: %v", err)
