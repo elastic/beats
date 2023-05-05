@@ -343,7 +343,12 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+<<<<<<< HEAD
 			"project": common.MapStr{
+=======
+			"region":            "us-east1",
+			"project": mapstr.M{
+>>>>>>> 42ca469f99 ([add_cloud_metadata processor] add cloud.region field to GCE cloud provider (#35300))
 				"id": "test-dev",
 			},
 			"service": common.MapStr{
@@ -391,7 +396,12 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+<<<<<<< HEAD
 			"project": common.MapStr{
+=======
+			"region":            "us-east1",
+			"project": mapstr.M{
+>>>>>>> 42ca469f99 ([add_cloud_metadata processor] add cloud.region field to GCE cloud provider (#35300))
 				"id": "test-dev",
 			},
 			"service": common.MapStr{
@@ -456,7 +466,12 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+<<<<<<< HEAD
 			"project": common.MapStr{
+=======
+			"region":            "us-east1",
+			"project": mapstr.M{
+>>>>>>> 42ca469f99 ([add_cloud_metadata processor] add cloud.region field to GCE cloud provider (#35300))
 				"id": "test-dev",
 			},
 			"service": common.MapStr{
@@ -510,7 +525,12 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+<<<<<<< HEAD
 			"project": common.MapStr{
+=======
+			"region":            "us-east1",
+			"project": mapstr.M{
+>>>>>>> 42ca469f99 ([add_cloud_metadata processor] add cloud.region field to GCE cloud provider (#35300))
 				"id": "test-dev",
 			},
 			"service": common.MapStr{

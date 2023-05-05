@@ -29,6 +29,108 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Support for multiline zookeeper logs {issue}2496[2496]
+- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
+- Disable lockfile when running under elastic-agent. {pull}33988[33988]
+- Fix lockfile logic, retry locking {pull}34194[34194]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
+- Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
+- Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
+- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
+
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Fix panics when a processor is closed twice {pull}34647[34647]
+- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
+- In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+
+*Auditbeat*
+
+*Filebeat*
+
+- [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
+- [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
+   with the ecs field name `container`. {pull}34403[34403]
+- [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
+   automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- [httpsjon] Improved error handling during pagination with chaining & split processor {pull}34127[34127]
+- [Azure blob storage] Added support for more mime types & introduced offset tracking via cursor state. {pull}33981[33981]
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
+- Fix handling of error in states in direct aws-s3 listing input {issue}33513[33513] {pull}33722[33722]
+- Fix `httpjson` input page number initialization and documentation. {pull}33400[33400]
+- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
+- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
+- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- Fix reporting of `filebeat.events.active` in log events such that the current value is always reported instead of the difference from the last value. {pull}33597[33597]
+- Fix splitting array of strings/arrays in httpjson input {issue}30345[30345] {pull}33609[33609]
+- Fix Google workspace pagination and document ID generation. {pull}33666[33666]
+- Fix PANW handling of messages with event.original already set. {issue}33829[33829] {pull}33830[33830]
+- Rename identity as identity_name when the value is a string in Azure Platform Logs. {pull}33654[33654]
+- Fix 'requires pointer' error while getting cursor metadata. {pull}33956[33956]
+- Fix input cancellation handling when HTTP client does not support contexts. {issue}33962[33962] {pull}33968[33968]
+- Update mito CEL extension library to v0.0.0-20221207004749-2f0f2875e464 {pull}33974[33974]
+- Fix CEL result deserialisation when evaluation fails. {issue}33992[33992] {pull}33996[33996]
+- Fix handling of non-200/non-429 status codes. {issue}33999[33999] {pull}34002[34002]
+- [azure-eventhub input] Switch the run EPH run mode to non-blocking {pull}34075[34075]
+- [google_workspace] Fix pagination and cursor value update. {pull}34274[34274]
+- Fix handling of quoted values in auditd module. {issue}22587[22587] {pull}34069[34069]
+- Fixing system tests not returning expected content encoding for azure blob storage input. {pull}34412[34412]
+- [Azure Logs] Fix authentication_processing_details parsing in sign-in logs. {issue}34330[34330] {pull}34478[34478]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
+- Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
+- Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
+- Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
+- Fix errors and panics due to re-used processors {pull}34761[34761]
+- Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
+- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
+- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
+- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
+- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
+- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
+- Fixing the grok expression outputs of log files {pull}35221[35221]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+
+*Heartbeat*
+
+- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix integration hashing to prevent reloading all when updated. {pull}34697[34697]
+- Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
+- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
+with the ecs field name `container`. {pull}34403[34403]
+automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Fix broken mapping for state.ends field. {pull}34891[34891]
+- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Heartbeat*
+
 
 *Auditbeat*
 
