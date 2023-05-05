@@ -29,6 +29,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+
 
 *Auditbeat*
 
