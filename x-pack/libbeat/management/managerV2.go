@@ -16,6 +16,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	gproto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 
@@ -112,22 +114,38 @@ func init() {
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
 func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, fmt.Errorf("parsing fleet management settings: %w", err)
 		}
 	}
-	agentClient, _, err := client.NewV2FromReader(os.Stdin, client.VersionInfo{
-		Name:    "beat-v2-client",
-		Version: version.GetDefaultVersion(),
-		Meta: map[string]string{
-			"commit":     version.Commit(),
-			"build_time": version.BuildTime().String(),
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error reading control config from agent: %w", err)
+
+	var agentClient client.V2
+	var err error
+	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
+		// Insecure for testing Elastic-Agent-Client initialisation
+		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
+		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
+			"", // Insecure connection for test, no token needed
+			client.VersionInfo{
+				Name:    "testing program",
+				Version: "v1.0.0",
+			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else {
+		// Normal Elastic-Agent-Client initialisation
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
+			Name:    "beat-v2-client",
+			Version: version.GetDefaultVersion(),
+			Meta: map[string]string{
+				"commit":     version.Commit(),
+				"build_time": version.BuildTime().String(),
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error reading control config from agent: %w", err)
+		}
 	}
 
 	// officially running under the elastic-agent; we set the publisher pipeline
@@ -420,7 +438,8 @@ func (cm *BeatV2Manager) unitListen() {
 			return
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
-				"BeatV2Manager.unitListen UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				change.Unit.ID(),
 				change.Type, int64(change.Triggers), change.Type, change.Triggers)
 
 			switch change.Type {
