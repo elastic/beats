@@ -101,7 +101,7 @@ func (serv *ShipperServer) PublishEvents(_ context.Context, req *messages.Publis
 		}
 
 	}
-	resp.AcceptedIndex = uint64(accIdx)
+	resp.AcceptedIndex = accIdx
 	serv.logger.
 		Debugf("finished publishing a batch. Events = %d, accepted = %d, accepted index = %d",
 			len(req.Events),
