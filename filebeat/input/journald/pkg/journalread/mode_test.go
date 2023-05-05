@@ -27,6 +27,7 @@ func TestMode_Unpack(t *testing.T) {
 			"head":   SeekHead,
 			"tail":   SeekTail,
 			"cursor": SeekCursor,
+			"since":  SeekSince,
 		}
 
 		for str, want := range tests {

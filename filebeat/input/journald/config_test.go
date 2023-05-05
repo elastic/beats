@@ -20,11 +20,14 @@
 package journald
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	jr "github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -61,4 +64,73 @@ include_matches:
 
 		verify(t, yaml)
 	})
+}
+
+func TestConfigValidate(t *testing.T) {
+	nameOf := [...]string{
+		jr.SeekInvalid: "invalid",
+		jr.SeekHead:    "head",
+		jr.SeekTail:    "tail",
+		jr.SeekCursor:  "cursor",
+		jr.SeekSince:   "since",
+	}
+
+	modes := []jr.SeekMode{
+		jr.SeekInvalid,
+		jr.SeekHead,
+		jr.SeekTail,
+		jr.SeekCursor,
+		jr.SeekSince,
+	}
+	const n = jr.SeekSince + 1
+
+	errSeek := errInvalidSeek
+	errFall := errInvalidSeekFallback
+	errSince := errInvalidSeekSince
+	// Want is the tables of expectations: seek in major, fallback in minor.
+	want := map[bool][n][n]error{
+		false: { // No since option set.
+			jr.SeekInvalid: {jr.SeekInvalid: errSeek, jr.SeekHead: errSeek, jr.SeekTail: errSeek, jr.SeekCursor: errSeek, jr.SeekSince: errSeek},
+			jr.SeekHead:    {jr.SeekInvalid: errFall, jr.SeekHead: nil, jr.SeekTail: nil, jr.SeekCursor: errFall, jr.SeekSince: nil},
+			jr.SeekTail:    {jr.SeekInvalid: errFall, jr.SeekHead: nil, jr.SeekTail: nil, jr.SeekCursor: errFall, jr.SeekSince: nil},
+			jr.SeekCursor:  {jr.SeekInvalid: errFall, jr.SeekHead: nil, jr.SeekTail: nil, jr.SeekCursor: errFall, jr.SeekSince: errSince},
+			jr.SeekSince:   {jr.SeekInvalid: errFall, jr.SeekHead: errSince, jr.SeekTail: errSince, jr.SeekCursor: errFall, jr.SeekSince: errSince},
+		},
+		true: { // Since option set.
+			jr.SeekInvalid: {jr.SeekInvalid: errSeek, jr.SeekHead: errSeek, jr.SeekTail: errSeek, jr.SeekCursor: errSeek, jr.SeekSince: errSeek},
+			jr.SeekHead:    {jr.SeekInvalid: errFall, jr.SeekHead: errSince, jr.SeekTail: errSince, jr.SeekCursor: errFall, jr.SeekSince: errSince},
+			jr.SeekTail:    {jr.SeekInvalid: errFall, jr.SeekHead: errSince, jr.SeekTail: errSince, jr.SeekCursor: errFall, jr.SeekSince: errSince},
+			jr.SeekCursor:  {jr.SeekInvalid: errFall, jr.SeekHead: errSince, jr.SeekTail: errSince, jr.SeekCursor: errFall, jr.SeekSince: nil},
+			jr.SeekSince:   {jr.SeekInvalid: errFall, jr.SeekHead: nil, jr.SeekTail: nil, jr.SeekCursor: errFall, jr.SeekSince: nil},
+		},
+	}
+
+	for setSince := range want {
+		for _, seek := range modes {
+			for _, fallback := range modes {
+				name := fmt.Sprintf("seek_%s_fallback_%s_since_%t", nameOf[seek], nameOf[fallback], setSince)
+				t.Run(name, func(t *testing.T) {
+					cfg := config{Seek: seek, CursorSeekFallback: fallback}
+					if setSince {
+						cfg.Since = new(time.Duration)
+					}
+					got := cfg.Validate()
+					if !sameError(got, want[setSince][seek][fallback]) {
+						t.Errorf("unexpected error: got:%v want:%v", got, want[setSince][seek][fallback])
+					}
+				})
+			}
+		}
+	}
+}
+
+func sameError(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
+	}
 }
