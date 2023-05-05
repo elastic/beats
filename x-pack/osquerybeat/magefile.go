@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
@@ -144,7 +143,7 @@ func extractFromMSI() error {
 			return err
 		}
 		// Chmod set to the same as other executables in the final package
-		if err = os.Chmod(dp, 0o755); err != nil {
+		if err = os.Chmod(dp, 0755); err != nil {
 			return err
 		}
 	}
@@ -170,20 +169,6 @@ func GolangCrossBuild() error {
 	// The cross build is currently called for two binaries osquerybeat and osqquery-extension
 	// Only install msitools and extract osqueryd.exe during osquerybeat build on windows
 	args := devtools.DefaultGolangCrossBuildArgs()
-
-	// fix up stretch sources.list
-	err := sh.Run("grep", "stretch", "/etc/os-release")
-	if err == nil {
-		if err := sh.Run("sed", "-i", "5,6d", "/etc/apt/sources.list"); err != nil {
-			return err
-		}
-		if err := sh.Run("sed", "-i", "s/deb.debian.org/archive.debian.org/g", "/etc/apt/sources.list"); err != nil {
-			return err
-		}
-		if err := sh.Run("sed", "-i", "s/security.debian.org/archive.debian.org/g", "/etc/apt/sources.list"); err != nil {
-			return err
-		}
-	}
 
 	// Install msitools only
 	if !strings.HasPrefix(args.Name, "osquery-extension-") {
