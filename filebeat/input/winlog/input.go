@@ -97,8 +97,12 @@ func (eventlogRunner) Run(
 	})
 	defer cancelFn()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
+	channelNotFoundErrDetected := false
+
 runLoop:
 	for {
+		//nolint:nilerr // only log error if we are not shutting down
 		if cancelCtx.Err() != nil {
 			return nil
 		}
@@ -112,12 +116,18 @@ runLoop:
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
 		case !api.IsFile() && eventlog.IsChannelNotFound(openErr):
-			log.Errorw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+			if !channelNotFoundErrDetected {
+				log.Errorw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+			} else {
+				log.Debugw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+			}
+			channelNotFoundErrDetected = true
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
 		case openErr != nil:
 			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
+		channelNotFoundErrDetected = false
 
 		log.Debug("Windows Event Log opened successfully")
 
@@ -145,7 +155,7 @@ runLoop:
 					return nil
 				}
 
-				// only log error if we are not shutting down
+				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					return nil
 				}
