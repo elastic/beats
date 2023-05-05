@@ -39,7 +39,6 @@ func TestPureServe(t *testing.T) {
 							"password": "testing",
 							"protocol": "http",
 							"enabled":  true,
-							"index":    "foo-index",
 						}),
 				},
 			},
@@ -60,7 +59,6 @@ func TestPureServe(t *testing.T) {
 								"enabled": true,
 								"type":    "log",
 								"paths":   []interface{}{"/tmp/flog.log"},
-								"index":   "foo-index",
 							}),
 						},
 					},
@@ -86,7 +84,6 @@ func TestPureServe(t *testing.T) {
 							"password": "testing",
 							"protocol": "http",
 							"enabled":  true,
-							"index":    "foo-index",
 						}),
 				},
 			},
@@ -107,7 +104,6 @@ func TestPureServe(t *testing.T) {
 								"enabled": true,
 								"type":    "log",
 								"paths":   []interface{}{"/tmp/flog.log"},
-								"index":   "foo-index",
 							}),
 						},
 					},
@@ -124,7 +120,6 @@ func TestPureServe(t *testing.T) {
 			if time.Now().After(when) {
 				idx = (idx + 1) % len(units)
 				waiting = false
-				t.Logf("done waiting, new state is %d", idx)
 				return
 			}
 			return
@@ -134,30 +129,15 @@ func TestPureServe(t *testing.T) {
 	}
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			t.Log("====================================================================================================")
-			defer t.Log("====================================================================================================")
-			t.Logf("[%s] Got %d units", time.Now().Format(time.RFC3339), len(observed.Units))
 			if doesStateMatch(observed, units[idx], 0) {
-				t.Logf("++++++++++ reached desired state, sending units[%d]", idx)
 				nextState()
 			}
-			for i, unit := range observed.GetUnits() {
-				t.Logf("Unit %d", i)
-				t.Logf("ID %s, Type: %s, Message: %s, State %s, Payload %s",
-					unit.GetId(),
-					unit.GetType(),
-					unit.GetMessage(),
-					unit.GetState(),
-					unit.GetPayload().String())
-
+			for _, unit := range observed.GetUnits() {
 				if state := unit.GetState(); !(state == proto.State_HEALTHY || state != proto.State_CONFIGURING || state == proto.State_STARTING) {
 					t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
 				}
 			}
 			return &proto.CheckinExpected{
-				// AgentInfo:   agentInfo,
-				// Features:    features[i],
-				// FeaturesIdx: featuresIdxs[i],
 				Units: units[idx],
 			}
 		},
@@ -169,18 +149,21 @@ func TestPureServe(t *testing.T) {
 
 	require.NoError(t, server.Start())
 	defer server.Stop()
-	t.Logf("server started on port %d", server.Port)
 
-	p := NewProc(t, "../../filebeat.test", nil, server.Port)
+	p := NewProc(
+		t,
+		"../../filebeat.test",
+		[]string{"-d",
+			"centralmgmt, centralmgmt.V2-manager",
+		},
+		server.Port)
 	p.Start()
-	t.Log("Filebeat started")
 
 	p.LogContains("Can only start an input when all related states are finished", 2*time.Minute)        // centralmgmt
 	p.LogContains("file 'flog.log' is not finished, will retry starting the input soon", 2*time.Minute) // centralmgmt.V2-manager
 	p.LogContains("ForceReload set to TRUE", 2*time.Minute)                                             // centralmgmt.V2-manager
 	p.LogContains("Reloading Beats inputs because forceReload is true", 2*time.Minute)                  // centralmgmt.V2-manager
 	p.LogContains("ForceReload set to FALSE", 2*time.Minute)                                            // centralmgmt.V2-manager
-	t.Log("********************************************* IT WORKS ****************************************************************************************************")
 }
 
 func doesStateMatch(

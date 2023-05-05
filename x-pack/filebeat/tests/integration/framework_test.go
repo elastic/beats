@@ -29,9 +29,6 @@ func NewProc(t *testing.T, binary string, args []string, port int) Proc {
 		Args: append([]string{
 			"--systemTest",
 			"-e",
-			"-d",
-			// "*",
-			"centralmgmt, centralmgmt.V2-manager",
 			"-E",
 			fmt.Sprintf("management.insecure_grpc_url_for_testing=\"localhost:%d\"", port),
 			"-E",
@@ -65,9 +62,6 @@ func (p *Proc) Start() {
 }
 
 func (p *Proc) LogContains(s string, timeout time.Duration) bool {
-	p.t.Log("LogContans called")
-	defer p.t.Log("LogContans done")
-
 	ticker := time.NewTicker(10 * time.Millisecond)
 	defer ticker.Stop()
 
