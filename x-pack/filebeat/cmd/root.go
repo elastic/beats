@@ -9,6 +9,7 @@ import (
 
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
@@ -44,14 +45,18 @@ func defaultProcessors() []mapstr.M {
 	// - add_cloud_metadata: ~
 	// - add_docker_metadata: ~
 	// - add_kubernetes_metadata: ~
+	if fleetmode.ShipperMode() {
+		return []mapstr.M{}
+	}
 	return []mapstr.M{
 		{
 			"add_host_metadata": mapstr.M{
 				"when.not.contains.tags": "forwarded",
 			},
 		},
-		// {"add_cloud_metadata": nil},
-		// {"add_docker_metadata": nil},
-		// {"add_kubernetes_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
 	}
+
 }
