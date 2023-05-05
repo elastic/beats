@@ -116,10 +116,6 @@ func (serv *ShipperServer) PublishEvents(_ context.Context, req *messages.Publis
 func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, producer pb.Producer_PersistedIndexServer) error {
 	serv.logger.Debug("new subscriber for persisted index change")
 	defer serv.logger.Debug("unsubscribed from persisted index change")
-	// idx, err := serv.pipeline.PersistedIndex()
-	// if err != nil {
-	// 	return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
-	// }
 
 	err := producer.Send(&messages.PersistedIndexReply{
 		Uuid:           serv.uuid,
@@ -130,7 +126,6 @@ func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, p
 	}
 
 	pollingIntervalDur := req.PollingInterval.AsDuration()
-
 	if pollingIntervalDur == 0 {
 		return nil
 	}
@@ -148,10 +143,6 @@ func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, p
 
 		case <-ticker.C:
 			serv.logger.Infof("persistedIndex=%d", serv.beatInput.acker.PersistedIndex())
-			// persistedIndex, err := serv.pipeline.PersistedIndex()
-			// if err != nil {
-			// 	return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
-			// }
 			err = producer.Send(&messages.PersistedIndexReply{
 				Uuid:           serv.uuid,
 				PersistedIndex: serv.beatInput.acker.PersistedIndex(),
