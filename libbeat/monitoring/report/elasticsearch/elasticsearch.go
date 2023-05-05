@@ -145,7 +145,10 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 	}
 
 	queueConfig := conf.Namespace{}
-	conf, err := conf.NewConfigFrom("mem.events: 20")
+	conf, err := conf.NewConfigFrom(map[string]interface{}{
+		"mem.events":           32,
+		"mem.flush.min_events": 1,
+	})
 	if err != nil {
 		return nil, err
 	}

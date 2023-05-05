@@ -40,6 +40,7 @@ var inputTests = []struct {
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
 	wantErr       error
+	wantFile      string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -155,16 +156,16 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-{
-	"events":[
-		{"message": state.data[state.cursor.next]},
-	],
-	"cursor":[
-		{"next": int(state.cursor.next)+1}, // Ensure we have a number index.
-	],
-	"data": state.data, // Make sure we have this for the next iteration.
-}
-`,
+	{
+		"events":[
+			{"message": state.data[state.cursor.next]},
+		],
+		"cursor":[
+			{"next": int(state.cursor.next)+1}, // Ensure we have a number index.
+		],
+		"data": state.data, // Make sure we have this for the next iteration.
+	}
+	`,
 			"state": map[string]interface{}{
 				"data":   []string{"first", "second", "third"},
 				"cursor": map[string]int{"next": 0},
@@ -191,16 +192,16 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
-	"events":[
-		{"message": state.data[index]},
-	],
-	"cursor":[
-		{"next": index+1},
-	],
-	"data": state.data, // Make sure we have this for the next iteration.
-})
-`,
+	int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
+		"events":[
+			{"message": state.data[index]},
+		],
+		"cursor":[
+			{"next": index+1},
+		],
+		"data": state.data, // Make sure we have this for the next iteration.
+	})
+	`,
 			"state": map[string]interface{}{
 				"data": []string{"first", "second", "third"},
 			},
@@ -226,16 +227,16 @@ int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(inde
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-{
-	"events":[
-		{"message": state.data[state.cursor.next]},
-	],
-	"cursor":[
-		{"next": int(state.cursor.next)+1}, // Ensure we have a number index.
-	],
-	"data": state.data, // Make sure we have this for the next iteration.
-}
-`,
+	{
+		"events":[
+			{"message": state.data[state.cursor.next]},
+		],
+		"cursor":[
+			{"next": int(state.cursor.next)+1}, // Ensure we have a number index.
+		],
+		"data": state.data, // Make sure we have this for the next iteration.
+	}
+	`,
 			"state": map[string]interface{}{
 				"data":   []string{"first", "second", "third"},
 				"cursor": map[string]int{"next": 0},
@@ -263,16 +264,16 @@ int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(inde
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
-	"events":[
-		{"message": state.data[index]},
-	],
-	"cursor":[
-		{"next": index+1},
-	],
-	"data": state.data, // Make sure we have this for the next iteration.
-})
-`,
+	int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(index, {
+		"events":[
+			{"message": state.data[index]},
+		],
+		"cursor":[
+			{"next": index+1},
+		],
+		"data": state.data, // Make sure we have this for the next iteration.
+	})
+	`,
 			"state": map[string]interface{}{
 				"data": []string{"first", "second", "third"},
 			},
@@ -299,14 +300,14 @@ int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(inde
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-{
-	"events": state.data.split(":").map(s,
-		{
-			"message": s
-		}
-	)
-}
-`,
+	{
+		"events": state.data.split(":").map(s,
+			{
+				"message": s
+			}
+		)
+	}
+	`,
 			"state": map[string]interface{}{
 				"data": "first:second:third",
 			},
@@ -386,10 +387,10 @@ int(has(state.cursor) && has(state.cursor.next) ? state.cursor.next : 0).as(inde
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(get(state.url).Body).as(body, {
-	"events": [body.decode_json()]
-})
-`,
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -416,10 +417,10 @@ bytes(get(state.url).Body).as(body, {
 			"interval":                       1,
 			"resource.ssl.verification_mode": "none",
 			"program": `
-bytes(get(state.url).Body).as(body, {
-	"events": [body.decode_json()]
-})
-`,
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -445,13 +446,13 @@ bytes(get(state.url).Body).as(body, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-get(state.url).as(resp, {
-	"url": state.url,
-	"events": [bytes(resp.Body).decode_json()],
-	"status_code": resp.StatusCode,
-	"header": resp.Header,
-})
-`,
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+	})
+	`,
 		},
 		handler: retryAfterHandler("1"),
 		want: []map[string]interface{}{
@@ -464,13 +465,13 @@ get(state.url).as(resp, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-get(state.url).as(resp, {
-	"url": state.url,
-	"events": [bytes(resp.Body).decode_json()],
-	"status_code": resp.StatusCode,
-	"header": resp.Header,
-})
-`,
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+	})
+	`,
 		},
 		handler: retryAfterHandler(time.Now().Add(time.Second).UTC().Format(http.TimeFormat)),
 		want: []map[string]interface{}{
@@ -483,14 +484,14 @@ get(state.url).as(resp, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-get(state.url).as(resp, {
-	"url": state.url,
-	"events": [bytes(resp.Body).decode_json()],
-	"status_code": resp.StatusCode,
-	"header": resp.Header,
-	"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
-})
-`,
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
+	})
+	`,
 		},
 		handler: rateLimitHandler("0", 100*time.Millisecond),
 		want: []map[string]interface{}{
@@ -503,14 +504,14 @@ get(state.url).as(resp, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-get(state.url).as(resp, {
-	"url": state.url,
-	"events": [bytes(resp.Body).decode_json()],
-	"status_code": resp.StatusCode,
-	"header": resp.Header,
-	"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
-})
-`,
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
+	})
+	`,
 		},
 		handler: rateLimitHandler("10", 100*time.Millisecond),
 		want: []map[string]interface{}{
@@ -523,14 +524,14 @@ get(state.url).as(resp, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-get(state.url).as(resp, {
-	"url": state.url,
-	"events": [bytes(resp.Body).decode_json()],
-	"status_code": resp.StatusCode,
-	"header": resp.Header,
-	"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
-})
-`,
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+		"rate_limit": rate_limit(resp.Header, 'okta', duration('1m')),
+	})
+	`,
 		},
 		handler: rateLimitHandler("10", 10*time.Second),
 		want:    []map[string]interface{}{},
@@ -541,13 +542,13 @@ get(state.url).as(resp, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-get(state.url).as(resp, {
-	"url": state.url,
-	"events": [bytes(resp.Body).decode_json()],
-	"status_code": resp.StatusCode,
-	"header": resp.Header,
-})
-`,
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [bytes(resp.Body).decode_json()],
+		"status_code": resp.StatusCode,
+		"header": resp.Header,
+	})
+	`,
 		},
 		handler: retryHandler(),
 		want: []map[string]interface{}{
@@ -561,11 +562,11 @@ get(state.url).as(resp, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
-	"url": state.url,
-	"events": [body.decode_json()]
-})
-`,
+	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
+		"url": state.url,
+		"events": [body.decode_json()]
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
 		want: []map[string]interface{}{
@@ -591,11 +592,11 @@ bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
 		config: map[string]interface{}{
 			"interval": "100ms",
 			"program": `
-bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
-	"url": state.url,
-	"events": [body.decode_json()]
-})
-`,
+	bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
+		"url": state.url,
+		"events": [body.decode_json()]
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodPost, `{"test":"abc"}`),
 		want: []map[string]interface{}{
@@ -635,10 +636,10 @@ bytes(post(state.url, "application/json", '{"test":"abc"}').Body).as(body, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(get(state.url).Body).as(body, {
-	"events": body.decode_json().hello
-})
-`,
+	bytes(get(state.url).Body).as(body, {
+		"events": body.decode_json().hello
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -660,13 +661,13 @@ bytes(get(state.url).Body).as(body, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(get(state.url).Body).as(body, {
-	"events": body.decode_json().hello.map(e,
-	{
-		"hello": e
+	bytes(get(state.url).Body).as(body, {
+		"events": body.decode_json().hello.map(e,
+		{
+			"hello": e
+		})
 	})
-})
-`,
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -692,16 +693,16 @@ bytes(get(state.url).Body).as(body, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(get(state.url).Body).decode_json().as(e0, {
-	"events": e0.hello.map(e1, has(e1.space) ?
-		e1.space.map(e2, {
-			"space": e2,
-		})
-	:
-		[e1] // Make sure the two conditions are the same shape.
-	).flatten()
-})
-`,
+	bytes(get(state.url).Body).decode_json().as(e0, {
+		"events": e0.hello.map(e1, has(e1.space) ?
+			e1.space.map(e2, {
+				"space": e2,
+			})
+		:
+			[e1] // Make sure the two conditions are the same shape.
+		).flatten()
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -721,16 +722,16 @@ bytes(get(state.url).Body).decode_json().as(e0, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(get(state.url).Body).decode_json().as(e, {
-	"url": state.url,
-	"events": has(e.unknown) ?
-		e.unknown.map(u, {
-			"unknown": u,
-		})
-	:
-		[]
-})
-`,
+	bytes(get(state.url).Body).decode_json().as(e, {
+		"url": state.url,
+		"events": has(e.unknown) ?
+			e.unknown.map(u, {
+				"unknown": u,
+			})
+		:
+			[]
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want:    []map[string]interface{}(nil),
@@ -746,25 +747,25 @@ bytes(get(state.url).Body).decode_json().as(e, {
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
 			"program": `
-// Use terse non-standard check for presence of timestamp. The standard
-// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
-(!is_error(state.cursor.timestamp) ?
-	state.cursor.timestamp
-:
-	timestamp(state.fake_now)-duration('10m')
-).as(time_cursor,
-string(state.url).parse_url().with_replace({
-	"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
-}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
-	"events": [event],
-	// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
-	// Due to the name of the @timestamp field, we can't use has(), so use is_error().
-	"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
 
-	// Just for testing, cycle this back into the next state.
-	"fake_now": state.fake_now
-}))
-`,
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
 		},
 		handler: dateCursorHandler(),
 		want: []map[string]interface{}{
@@ -779,23 +780,70 @@ string(state.url).parse_url().with_replace({
 		},
 	},
 	{
+		name: "tracer_filename_sanitization",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
+	},
+	{
 		name:   "pagination_cursor_object",
 		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-(!is_error(state.cursor.page) ?
-	state.cursor.page
-:
-	""
-).as(page_cursor,
-string(state.url).parse_url().with_replace({
-	"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
-}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
-	"events": resp.items,
-	"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, {"page": page}),
-}))
-`,
+	(!is_error(state.cursor.page) ?
+		state.cursor.page
+	:
+		""
+	).as(page_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
+		"events": resp.items,
+		"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, {"page": page}),
+	}))
+	`,
 		},
 		handler: paginationHandler(),
 		want: []map[string]interface{}{
@@ -813,22 +861,22 @@ string(state.url).parse_url().with_replace({
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-(!is_error(state.cursor.page) ?
-	state.cursor.page
-:
-	""
-).as(page_cursor,
-string(state.url).parse_url().with_replace({
-	"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
-}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
-	"events": resp.items,
+	(!is_error(state.cursor.page) ?
+		state.cursor.page
+	:
+		""
+	).as(page_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
+		"events": resp.items,
 
-	// The use of map here is to ensure the cursor is size-matched with the
-	// events. In the test case all the items arrays are size 1, but this
-	// may not be the case. In any case, calculate the page token only once.
-	"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, resp.items.map(e, {"page": page})),
-}))
-`,
+		// The use of map here is to ensure the cursor is size-matched with the
+		// events. In the test case all the items arrays are size 1, but this
+		// may not be the case. In any case, calculate the page token only once.
+		"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, resp.items.map(e, {"page": page})),
+	}))
+	`,
 		},
 		handler: paginationHandler(),
 		want: []map[string]interface{}{
@@ -850,23 +898,23 @@ string(state.url).parse_url().with_replace({
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-(!is_error(state.cursor.page) ?
-	state.cursor.page
-:
-	""
-).as(page_cursor,
-string(state.url).parse_url().with_replace({
-	"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
-}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
-	"events": resp.items.map(e, e.with_update({
-		"first": (!is_error(state.cursor.first) ? state.cursor.first : "none"),
-	})),
-	"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, resp.items.map(e, {
-		"page": page,
-		"first": e.foo,
-	})),
-}))
-`,
+	(!is_error(state.cursor.page) ?
+		state.cursor.page
+	:
+		""
+	).as(page_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": (page_cursor != "" ? {"page": [page_cursor]}.format_query() : "")
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(resp, {
+		"events": resp.items.map(e, e.with_update({
+			"first": (!is_error(state.cursor.first) ? state.cursor.first : "none"),
+		})),
+		"cursor": (has(resp.nextPageToken) ? resp.nextPageToken : "").as(page, resp.items.map(e, {
+			"page": page,
+			"first": e.foo,
+		})),
+	}))
+	`,
 		},
 		handler: paginationHandler(),
 		want: []map[string]interface{}{
@@ -901,10 +949,10 @@ string(state.url).parse_url().with_replace({
 			},
 			"auth.oauth2.scopes": []string{"scope1", "scope2"},
 			"program": `
-bytes(post(state.url, '', '').Body).as(body, {
-	"events": body.decode_json()
-})
-`,
+	bytes(post(state.url, '', '').Body).as(body, {
+		"events": body.decode_json()
+	})
+	`,
 		},
 		handler: oauth2Handler,
 		want: []map[string]interface{}{
@@ -919,13 +967,13 @@ bytes(post(state.url, '', '').Body).as(body, {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-// Get the record IDs.
-bytes(get(state.url).Body).decode_json().records.map(r,
-	// Get each event by its ID.
-	bytes(get(state.url+'/'+string(r.id)).Body).decode_json()).as(events, {
-		"events": events,
-})
-`,
+	// Get the record IDs.
+	bytes(get(state.url).Body).decode_json().records.map(r,
+		// Get each event by its ID.
+		bytes(get(state.url+'/'+string(r.id)).Body).decode_json()).as(events, {
+			"events": events,
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -965,15 +1013,15 @@ bytes(get(state.url).Body).decode_json().records.map(r,
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-// Get the record IDs.
-bytes(get(state.url).Body).decode_json().records.map(r,
-	// Get the set of all files from the set of IDs.
-	bytes(get(state.url+'/'+string(r.id)).Body).decode_json()).map(f,
-	// Collate all the files into the events list.
-	bytes(get(state.url+'/'+f.file_name).Body).decode_json()).as(events, {
-		"events": events,
-})
-`,
+	// Get the record IDs.
+	bytes(get(state.url).Body).decode_json().records.map(r,
+		// Get the set of all files from the set of IDs.
+		bytes(get(state.url+'/'+string(r.id)).Body).decode_json()).map(f,
+		// Collate all the files into the events list.
+		bytes(get(state.url+'/'+f.file_name).Body).decode_json()).as(events, {
+			"events": events,
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -1001,12 +1049,12 @@ bytes(get(state.url).Body).decode_json().records.map(r,
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-bytes(get(state.url).Body).decode_json().records.map(r,
-	bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
-//                          ^~~~ r.id not converted to string: can't add integer to string.
-		"events": events,
-})
-`,
+	bytes(get(state.url).Body).decode_json().records.map(r,
+		bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
+	//                          ^~~~ r.id not converted to string: can't add integer to string.
+			"events": events,
+	})
+	`,
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
@@ -1035,11 +1083,13 @@ func TestInput(t *testing.T) {
 	skipOnWindows := map[string]string{
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
+
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
 				t.Skip(reason)
 			}
+
 			if test.server != nil {
 				test.server(t, test.handler, test.config)
 			}
@@ -1050,6 +1100,12 @@ func TestInput(t *testing.T) {
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				t.Fatalf("unexpected error unpacking config: %v", err)
+			}
+
+			var tempDir string
+			if conf.Resource.Tracer != nil {
+				tempDir = t.TempDir()
+				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
 			name := input{}.Name()
@@ -1110,6 +1166,11 @@ func TestInput(t *testing.T) {
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
+				}
+			}
+			if test.wantFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
+					t.Errorf("expected log file not found: %v", err)
 				}
 			}
 		})

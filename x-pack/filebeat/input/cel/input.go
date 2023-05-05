@@ -18,6 +18,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -101,6 +102,15 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	return input{}.run(env, src.(*source), cursor, pub)
 }
 
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
 func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -111,7 +121,8 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	if cfg.Resource.Tracer != nil {
-		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", env.ID)
+		id := sanitizeFileName(env.ID)
+		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
 	client, err := newClient(ctx, cfg, log)
@@ -663,6 +674,11 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 
 	if cfg.Resource.Tracer != nil {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			cfg.Resource.Tracer.Close()
+		}()
 		core := ecszap.NewCore(
 			ecszap.NewDefaultEncoderConfig(),
 			w,

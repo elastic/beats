@@ -26,6 +26,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -927,6 +928,42 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.waitUntilInputStops()
 
 	env.requireRegistryEntryCount(1)
+}
+
+func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFiles := []struct {
+		path  string
+		lines []string
+	}{
+		{path: "log-a.log",
+			lines: []string{"1-aaaaaaaaaa", "2-aaaaaaaaaa"}},
+		{path: "log-b.log",
+			lines: []string{"1-bbbbbbbbbb", "2-bbbbbbbbbb"}},
+	}
+	for _, lf := range logFiles {
+		env.mustWriteToFile(
+			lf.path, []byte(strings.Join(lf.lines, "\n")+"\n"))
+	}
+
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                  "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded",
+		"harvester_limit":     1,
+		"close.reader.on_eof": true,
+		"paths": []string{
+			env.abspath(logFiles[0].path),
+			env.abspath(logFiles[1].path)},
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCountCtx(ctx, 4)
+
+	cancel()
+	env.waitUntilInputStops()
 }
 
 func TestGlobalIDCannotBeUsed(t *testing.T) {

@@ -30347,6 +30347,13 @@ type: keyword
 
 --
 
+*`elasticsearch.cluster.stats.state.nodes`*::
++
+--
+type: flattened
+
+--
+
 *`elasticsearch.cluster.stats.status`*::
 +
 --
