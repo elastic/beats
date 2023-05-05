@@ -356,7 +356,6 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete)
 		}
 	}
-
 	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
 		if opType == events.OpTypeIndex {
 			return eslegclient.BulkIndexAction{Index: meta}, nil
