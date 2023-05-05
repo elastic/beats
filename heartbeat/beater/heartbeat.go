@@ -131,7 +131,11 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}),
 		trace: trace,
 	}
-	logp.L().Infof("heartbeat starting, running from: %v", parsedConfig.RunFrom.ID)
+	runFromID := "<unknown location>"
+	if parsedConfig.RunFrom != nil {
+		runFromID = parsedConfig.RunFrom.ID
+	}
+	logp.L().Infof("heartbeat starting, running from: %v", runFromID)
 	return bt, nil
 }
 

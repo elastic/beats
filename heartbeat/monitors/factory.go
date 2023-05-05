@@ -166,15 +166,17 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		return nil, fmt.Errorf("could not load stdfields in factory: %w", err)
 	}
 	loc := getLocation(f.beatLocation, sf)
-	geoMap, _ := util.GeoConfigToMap(loc.Geo)
-	err = c.Merge(map[string]interface{}{
-		"run_from": map[string]interface{}{
-			"id":  f.beatLocation.ID,
-			"geo": geoMap,
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("could not merge location into monitor map: %w", err)
+	if loc != nil {
+		geoMap, _ := util.GeoConfigToMap(loc.Geo)
+		err = c.Merge(map[string]interface{}{
+			"run_from": map[string]interface{}{
+				"id":  f.beatLocation.ID,
+				"geo": geoMap,
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("could not merge location into monitor map: %w", err)
+		}
 	}
 
 	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
@@ -201,6 +203,7 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
+// getLocation returns the location either from the stdfields or the beat preferring stdfields. Returns nil if declared in neither spot.
 func getLocation(beatLocation *config.LocationWithID, sf stdfields.StdMonitorFields) (loc *config.LocationWithID) {
 	// Use the monitor-specific location if possible, otherwise use the beat's location
 	// Generally speaking direct HB users would use the beat location, and the synthetics service may as well (TBD)
