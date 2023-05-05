@@ -76,6 +76,22 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
 - Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
+- Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
+- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
+- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
+- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
+- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
+- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
+- Fixing the grok expression outputs of log files {pull}35221[35221]
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 
 *Heartbeat*
 
@@ -131,6 +147,9 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
+- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
+- Improve documentation for event_logs.name configuration. {pull}34931[34931]
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 *Functionbeat*
 
