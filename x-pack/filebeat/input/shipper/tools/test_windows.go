@@ -16,7 +16,7 @@ import (
 
 // DialTestAddr dials the address with the operating specific function
 func DialTestAddr(addr string, timeout time.Duration) (net.Conn, error) {
-	return winio.DialPipe(addr, timeout)
+	return winio.DialPipe(addr, &timeout)
 }
 
 // GenerateTestAddr creates a grpc address that is specific to the operating system
