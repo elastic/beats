@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -55,8 +54,7 @@ type BeatV2Manager struct {
 	mx          sync.Mutex
 	units       map[unitKey]*client.Unit
 	actions     []client.Action
-	forceReload atomic.Bool
-	reloadLock  sync.Mutex
+	forceReload bool
 
 	// status is reported as a whole for every unit sent to this component
 	// hopefully this can be improved in the future to be separated per unit
@@ -450,7 +448,7 @@ func (cm *BeatV2Manager) unitListen() {
 			}
 			cm.mx.Unlock()
 			cm.reload(units)
-			if cm.forceReload.Load() {
+			if cm.forceReload {
 				// Restart the debounce timer so we try to reload the inputs.
 				t.Reset(forceReloadDebounce)
 			}
@@ -633,8 +631,6 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 }
 
 func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
-	cm.reloadLock.Lock()
-	defer cm.reloadLock.Unlock()
 	obj := cm.registry.GetInputList()
 	if obj == nil {
 		return fmt.Errorf("failed to find beat reloadable type 'input'")
@@ -659,12 +655,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload.Load() {
+	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
 
-	if cm.forceReload.Load() {
+	if cm.forceReload {
 		cm.logger.Info("Reloading Beats inputs because forceReload is true. " +
 			"Set log level to debug to get more information about which " +
 			"inputs are causing this.")
@@ -691,7 +687,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 				inputNotFinishedErr := &common.ErrInputNotFinished{}
 				if ok := errors.As(causeErr, &inputNotFinishedErr); ok {
 					cm.logger.Debugf("file '%s' is not finished, will retry starting the input soon", inputNotFinishedErr.File)
-					cm.forceReload.Store(true)
+					cm.forceReload = true
 					cm.logger.Debug("ForceReload set to TRUE")
 					continue
 				}
@@ -706,7 +702,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		}
 	} else {
 		// no issues while reloading inputs, set forceReload to false
-		cm.forceReload.Store(false)
+		cm.forceReload = false
 		cm.logger.Debug("ForceReload set to FALSE")
 	}
 

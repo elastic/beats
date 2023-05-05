@@ -156,7 +156,7 @@ func TestInputReload(t *testing.T) {
 	forceReloadLastState := true // starts on true so the first iteratiction is already a change
 
 	eventuallyCheck := func() bool {
-		forceReload := mm.forceReload.Load()
+		forceReload := mm.forceReload
 		// That detects a state change, we only count/advance steps
 		// on state changes
 		if forceReload != forceReloadLastState {
