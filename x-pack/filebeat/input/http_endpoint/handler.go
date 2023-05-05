@@ -38,7 +38,7 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
-	crc                   crcValidator
+	crc                   *crcValidator
 }
 
 // Triggers if middleware validation returns successful
@@ -61,13 +61,15 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
-	var responseCode int
-	var responseBody string
+	var (
+		respCode int
+		respBody string
+	)
 
 	for _, obj := range objs {
 		var err error
-		if h.crc.provider != "" {
-			responseCode, responseBody, err = h.crc.validator(h.crc, obj)
+		if h.crc != nil {
+			respCode, respBody, err = h.crc.validate(obj)
 			if err == nil {
 				// CRC request processed
 				break
@@ -81,10 +83,10 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
-		responseCode, responseBody = h.responseCode, h.responseBody
+		respCode, respBody = h.responseCode, h.responseBody
 	}
 
-	h.sendResponse(w, responseCode, responseBody)
+	h.sendResponse(w, respCode, respBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {

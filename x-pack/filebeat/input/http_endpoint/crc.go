@@ -16,7 +16,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type Validator func(crcValidator, mapstr.M) (int, string, error)
+// Type Validator points to the function in charge of validating
+// CRC requests defined for each provider in the crcValidator struct.
+//
+// Params:
+//
+//	*crcValidator: pointer to the CRC handler for the webhook provider
+//	mapstr.M: input JSON to be validated
+//
+// Returns:
+//
+//	status: response code to send back to the endpoint
+//	resp: response body
+//	error: failure reason if proceed
+type Validator func(*crcValidator, mapstr.M) (status int, resp string, _ error)
+
+func (v *crcValidator) validate(m mapstr.M) (status int, resp string, _ error) {
+	return v.validator(v, m)
+}
 
 type crcValidator struct {
 	provider  string    // Name of the webhook provider
@@ -29,20 +46,17 @@ type crcValidator struct {
 }
 
 // Create new CRC handler based in the webhook provider
-func newCRC(crcProvider string, secret string) crcValidator {
-	var newCRC crcValidator
-	switch strings.ToLower(crcProvider) {
-	case "zoom":
-		newCRC = newZoomCRC(secret)
-	default:
-		// Do nothing
+func newCRC(name, secret string) *crcValidator {
+	fn, ok := crcProviders[strings.ToLower(name)]
+	if !ok {
+		return nil
 	}
-	return newCRC
+	return fn(secret)
 }
 
-// Initialize CRC struct for Zoom provider
-func newZoomCRC(secretValue string) crcValidator {
-	return crcValidator{
+// newZoomCRC returns a CRC handler for the Zoom API
+func newZoomCRC(secretValue string) *crcValidator {
+	return &crcValidator{
 		provider:  "zoom",
 		key:       "event",
 		value:     "endpoint.url_validation",
@@ -56,7 +70,7 @@ func newZoomCRC(secretValue string) crcValidator {
 	}
 }
 
-func validateZoomCRC(crc crcValidator, obj mapstr.M) (int, string, error) {
+func validateZoomCRC(crc *crcValidator, obj mapstr.M) (status int, resp string, _ error) {
 	/* Verify it is a CRC request. It must contain the following data:
 	{
 	  "payload": {
@@ -79,7 +93,7 @@ func validateZoomCRC(crc crcValidator, obj mapstr.M) (int, string, error) {
 	if !ok {
 		return 0, "", errNotCRC
 	} else if challengeValue == "" {
-		err := fmt.Errorf("failed decoding '%s' from CRC request", crc.challenge)
+		err := fmt.Errorf("failed decoding %q from CRC request", crc.challenge)
 		return http.StatusBadRequest, "", err
 	}
 

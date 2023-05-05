@@ -7,15 +7,17 @@ package http_endpoint
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/textproto"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// Available providers for CRC validation
-var validCRCProviders = []string{
-	"Zoom",
+// Available providers for CRC validation (use lowercase)
+// Constructor function as a value for each provider
+var crcProviders = map[string]func(string) *crcValidator{
+	"zoom": newZoomCRC,
 }
 
 // Config contains information about httpjson configuration
@@ -88,9 +90,8 @@ func (c *config) Validate() error {
 	}
 
 	if c.CRCProvider != "" {
-		err := validateCRCProvider(c.CRCProvider)
-		if err != nil {
-			return err
+		if !isValidCRCProvider(c.CRCProvider) {
+			return fmt.Errorf("not a valid CRC provider: %q", c.CRCProvider)
 		} else if c.SecretValue == "" {
 			return errors.New("secret.value is required when crc.provider is defined")
 		}
@@ -99,15 +100,9 @@ func (c *config) Validate() error {
 	return nil
 }
 
-func validateCRCProvider(value string) error {
-	value = strings.ToLower(value)
-	for _, v := range validCRCProviders {
-		if strings.ToLower(v) == value {
-			return nil
-		}
-	}
-
-	return errors.New("CRC provider unrecognized")
+func isValidCRCProvider(name string) bool {
+	_, exists := crcProviders[strings.ToLower(name)]
+	return exists
 }
 
 func canonicalizeHeaders(headerConf []string) (includeHeaders []string) {

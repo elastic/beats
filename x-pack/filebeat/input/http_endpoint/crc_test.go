@@ -16,12 +16,12 @@ import (
 
 func Test_validateZoomCRC(t *testing.T) {
 	testCases := []struct {
-		name         string       // Sub-test name.
-		crc          crcValidator // Load CRC parameters.
-		inputJSON    mapstr.M     // Input JSON event.
-		wantStatus   int          // Expected response code.
-		wantResponse string       // Expected response message.
-		wantError    error        // Expected error
+		name         string        // Sub-test name.
+		crc          *crcValidator // Load CRC parameters.
+		inputJSON    mapstr.M      // Input JSON event.
+		wantStatus   int           // Expected response code.
+		wantResponse string        // Expected response message.
+		wantError    error         // Expected error
 	}{
 		{
 			name: "valid request",
@@ -59,7 +59,7 @@ func Test_validateZoomCRC(t *testing.T) {
 			},
 			wantStatus:   http.StatusBadRequest,
 			wantResponse: "",
-			wantError:    fmt.Errorf("failed decoding 'payload.plainToken' from CRC request"),
+			wantError:    fmt.Errorf("failed decoding \"payload.plainToken\" from CRC request"),
 		},
 	}
 

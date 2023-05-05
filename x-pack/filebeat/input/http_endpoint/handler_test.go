@@ -318,7 +318,7 @@ func Test_apiResponse(t *testing.T) {
 			}(),
 			events:       nil,
 			wantStatus:   http.StatusBadRequest,
-			wantResponse: `{"message":"failed decoding 'payload.plainToken' from CRC request"}`,
+			wantResponse: `{"message":"failed decoding \"payload.plainToken\" from CRC request"}`,
 		},
 	}
 
