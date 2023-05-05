@@ -7,6 +7,9 @@
 package management
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -18,7 +21,65 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
+func generateLogFile(t *testing.T, fullPath string) {
+	t.Helper()
+	f, err := os.Create(fullPath)
+	if err != nil {
+		t.Fatalf("could not create file '%s: %s", fullPath, err)
+	}
+
+	go func() {
+		t.Helper()
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		defer f.Close()
+		for {
+			now := <-ticker.C
+			_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
+			if err != nil {
+				// The Go compiler does not allow me to call t.Fatalf from a non-test
+				// goroutine, so just log it instead
+				t.Errorf("could not write data to log file '%s': %s", fullPath, err)
+				return
+			}
+			// make sure log lines are synced as quickly as possible
+			if err := f.Sync(); err != nil {
+				t.Errorf("could not sync file '%s': %s", fullPath, err)
+			}
+		}
+	}()
+}
+
 func TestPureServe(t *testing.T) {
+	// We create our own temp dir so the files can be persisted
+	// in case the test fails. This will help debugging issues on CI
+	//
+	// testFailed will be set to 'false' as the very last thing on this test,
+	// it allows us to use t.CleanUp to remove the temporary files
+	testFailed := true
+	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
+		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.MkdirAll(tempDir, 0766); err != nil {
+		t.Fatalf("cannot create tmp dir: %#v, msg: %s", err, err.Error())
+	}
+	defer func() { testFailed = true }() //debug stuff
+	t.Cleanup(func() {
+		if !testFailed {
+			if err := os.RemoveAll(tempDir); err != nil {
+				t.Fatalf("could not remove temp dir '%s': %s", tempDir, err)
+			}
+			t.Logf("temprary directory '%s' removed", tempDir)
+		}
+	})
+
+	t.Logf("temporary directory: %s", tempDir)
+
+	logFilePath := filepath.Join(tempDir, "flog.log")
+	generateLogFile(t, logFilePath)
 	var units = [][]*proto.UnitExpected{
 		{
 			{
@@ -58,7 +119,7 @@ func TestPureServe(t *testing.T) {
 							Source: requireNewStruct(t, map[string]interface{}{
 								"enabled": true,
 								"type":    "log",
-								"paths":   []interface{}{"/tmp/flog.log"},
+								"paths":   []interface{}{logFilePath},
 							}),
 						},
 					},
@@ -103,7 +164,7 @@ func TestPureServe(t *testing.T) {
 							Source: requireNewStruct(t, map[string]interface{}{
 								"enabled": true,
 								"type":    "log",
-								"paths":   []interface{}{"/tmp/flog.log"},
+								"paths":   []interface{}{logFilePath},
 							}),
 						},
 					},
@@ -150,20 +211,27 @@ func TestPureServe(t *testing.T) {
 	require.NoError(t, server.Start())
 	defer server.Stop()
 
-	p := NewProc(
+	p := NewBeat(
 		t,
 		"../../filebeat.test",
-		[]string{"-d",
-			"centralmgmt, centralmgmt.V2-manager",
+		[]string{
+			// "-d", "centralmgmt, centralmgmt.V2-manager",
+			"-E", fmt.Sprintf("management.insecure_grpc_url_for_testing=\"localhost:%d\"", server.Port),
+			"-E", "management.enabled=true",
 		},
-		server.Port)
+		tempDir,
+	)
+
 	p.Start()
 
-	p.LogContains("Can only start an input when all related states are finished", 2*time.Minute)        // centralmgmt
-	p.LogContains("file 'flog.log' is not finished, will retry starting the input soon", 2*time.Minute) // centralmgmt.V2-manager
-	p.LogContains("ForceReload set to TRUE", 2*time.Minute)                                             // centralmgmt.V2-manager
-	p.LogContains("Reloading Beats inputs because forceReload is true", 2*time.Minute)                  // centralmgmt.V2-manager
-	p.LogContains("ForceReload set to FALSE", 2*time.Minute)                                            // centralmgmt.V2-manager
+	p.LogContains("Can only start an input when all related states are finished", 2*time.Minute)        // logger: centralmgmt
+	p.LogContains("file 'flog.log' is not finished, will retry starting the input soon", 2*time.Minute) // logger: centralmgmt.V2-manager
+	p.LogContains("ForceReload set to TRUE", 2*time.Minute)                                             // logger: centralmgmt.V2-manager
+	p.LogContains("Reloading Beats inputs because forceReload is true", 2*time.Minute)                  // logger: centralmgmt.V2-manager
+	p.LogContains("ForceReload set to FALSE", 2*time.Minute)                                            // logger: centralmgmt.V2-manager
+
+	// Set it to false, so the temporaty directory is removed
+	testFailed = false
 }
 
 func doesStateMatch(
