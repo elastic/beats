@@ -22,6 +22,11 @@ type reloadable interface {
 	Reload(cfg *config.Config) error
 }
 
+// Reloader is an interface for reloading configuration
+type Reloader interface {
+	Reload(cfg *config.Config) error
+}
+
 // Controller is an emitter controller handling config updates.
 type Controller struct {
 	logger      *logger.Logger

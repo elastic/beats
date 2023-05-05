@@ -68,6 +68,24 @@ func NewDownloaderWithClient(log progressLogger, config *artifact.Config, client
 	}
 }
 
+// Reload reloads config
+func (e *Downloader) Reload(c *artifact.Config) error {
+	// reload client
+	client, err := c.HTTPTransportSettings.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+	)
+	if err != nil {
+		return errors.New(err, "http.downloader: failed to generate client out of config")
+	}
+
+	client.Transport = download.WithHeaders(client.Transport, download.Headers)
+
+	e.client = *client
+	e.config = c
+
+	return nil
+}
+
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
 func (e *Downloader) Download(ctx context.Context, spec program.Spec, version string) (_ string, err error) {
@@ -75,7 +93,9 @@ func (e *Downloader) Download(ctx context.Context, spec program.Spec, version st
 	defer func() {
 		if err != nil {
 			for _, path := range downloadedFiles {
-				os.Remove(path)
+				if err := os.Remove(path); err != nil {
+					e.log.Warnf("failed to cleanup %s: %v", path, err)
+				}
 			}
 		}
 	}()
@@ -159,12 +179,14 @@ func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, f
 
 	resp, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
-		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+		// return path, file already exists and needs to be cleaned up
+		return fullPath, errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return "", errors.New(fmt.Sprintf("call to '%s' returned unsuccessful status code: %d", sourceURI, resp.StatusCode), errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+		// return path, file already exists and needs to be cleaned up
+		return fullPath, errors.New(fmt.Sprintf("call to '%s' returned unsuccessful status code: %d", sourceURI, resp.StatusCode), errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}
 
 	fileSize := -1
@@ -181,7 +203,8 @@ func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, f
 	if err != nil {
 		reportCancel()
 		dp.ReportFailed(err)
-		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+		// return path, file already exists and needs to be cleaned up
+		return fullPath, errors.New(err, "copying fetched package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
 	}
 	reportCancel()
 	dp.ReportComplete()

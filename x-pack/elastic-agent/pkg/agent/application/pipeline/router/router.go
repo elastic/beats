@@ -10,8 +10,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
@@ -34,8 +36,31 @@ func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Router, erro
 	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
 }
 
+// Routes returns routes used in operator
 func (r *router) Routes() *sorted.Set {
 	return r.routes
+}
+
+// Reload reloads config
+func (r *router) Reload(c *config.Config) error {
+	keys := r.routes.Keys()
+	for _, key := range keys {
+		route, found := r.routes.Get(key)
+		if !found {
+			continue
+		}
+
+		routeReloader, ok := route.(emitter.Reloader)
+		if !ok {
+			continue
+		}
+
+		if err := routeReloader.Reload(c); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *router) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
