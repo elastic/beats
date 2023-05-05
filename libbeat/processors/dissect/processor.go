@@ -18,9 +18,8 @@
 package dissect
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -41,7 +40,7 @@ func init() {
 }
 
 // NewProcessor constructs a new dissect processor.
-func NewProcessor(c *cfg.C) (processors.Processor, error) {
+func NewProcessor(c *cfg.C) (beat.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -97,7 +96,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 			beat.FlagField,
 			[]string{flagParsingError},
 		); err != nil {
-			return event, errors.Wrap(err, "cannot add new flag the event")
+			return event, fmt.Errorf("cannot add new flag the event: %w", err)
 		}
 		if p.config.IgnoreFailure {
 			return event, nil
@@ -127,12 +126,12 @@ func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 	var prefixKey string
 	for k, v := range m {
 		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); err == mapstr.ErrKeyNotFound || p.config.OverwriteKeys {
-			event.PutValue(prefixKey, v)
+		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
+			_, _ = event.PutValue(prefixKey, v)
 		} else {
 			// When the target key exists but is a string instead of a map.
 			if err != nil {
-				return event, errors.Wrapf(err, "cannot override existing key with `%s`", prefixKey)
+				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
 			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}

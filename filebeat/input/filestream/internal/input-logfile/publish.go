@@ -132,7 +132,10 @@ func (op *updateOp) Execute(store *store, n uint) {
 		resource.cursor = resource.pendingCursor()
 		resource.pendingCursorValue = nil
 	} else {
-		typeconv.Convert(&resource.cursor, op.delta)
+		err := typeconv.Convert(&resource.cursor, op.delta)
+		if err != nil {
+			store.log.Errorf("failed to perform type conversion: %w", err)
+		}
 	}
 
 	if resource.internalState.Updated.Before(op.timestamp) {

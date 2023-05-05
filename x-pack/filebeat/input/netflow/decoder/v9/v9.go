@@ -25,12 +25,13 @@ const (
 )
 
 type NetflowV9Protocol struct {
-	decoder     Decoder
-	logger      *log.Logger
-	Session     SessionMap
-	timeout     time.Duration
-	done        chan struct{}
-	detectReset bool
+	decoder        Decoder
+	logger         *log.Logger
+	Session        SessionMap
+	timeout        time.Duration
+	done           chan struct{}
+	detectReset    bool
+	shareTemplates bool
 }
 
 func init() {
@@ -79,7 +80,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	}
 	buf = payload
 
-	session := p.Session.GetOrCreate(MakeSessionKey(source, header.SourceID))
+	session := p.Session.GetOrCreate(MakeSessionKey(source, header.SourceID, p.shareTemplates))
 	remote := source.String()
 
 	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)

@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
+
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
 	sc "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
@@ -106,7 +108,12 @@ func makeShipper(
 
 	swb := outputs.WithBackoff(s, config.Backoff.Init, config.Backoff.Max)
 
-	return outputs.Success(config.BulkMaxSize, config.MaxRetries, swb)
+	return outputs.Group{
+		Clients: []outputs.Client{swb},
+		Retry:   config.MaxRetries,
+		QueueFactory: proxyqueue.FactoryForSettings(
+			proxyqueue.Settings{BatchSize: config.BulkMaxSize}),
+	}, nil
 }
 
 // Connect establishes connection to the shipper server and implements `outputs.Connectable`.
@@ -203,13 +210,16 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 			if status.Code(err) == codes.ResourceExhausted {
 				// This error can only come from the gRPC connection, and
 				// most likely indicates this request exceeds the shipper's
-				// RPC size limit. The correct thing to do here is split
-				// the batch as in https://github.com/elastic/beats/issues/29778.
-				// Since this isn't supported yet, we drop this batch to avoid
-				// permanently blocking the pipeline.
-				s.log.Errorf("dropping %d events because of RPC failure: %v", len(events), err)
-				batch.Drop()
-				s.observer.Dropped(len(events))
+				// RPC size limit. Split the batch if possible, otherwise we
+				// need to drop it.
+				if batch.SplitRetry() {
+					// Report that we split a batch
+					s.observer.Split()
+				} else {
+					batch.Drop()
+					s.observer.Dropped(len(events))
+					s.log.Errorf("dropping %d events because of RPC failure: %v", len(events), err)
+				}
 				return nil
 			}
 			// All other known errors are, in theory, retryable once the

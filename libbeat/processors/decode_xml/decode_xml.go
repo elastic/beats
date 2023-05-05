@@ -63,7 +63,7 @@ func init() {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *config.C) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {
@@ -73,7 +73,7 @@ func New(c *config.C) (processors.Processor, error) {
 	return newDecodeXML(config)
 }
 
-func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
+func newDecodeXML(config decodeXMLConfig) (beat.Processor, error) {
 	// Default target to overwriting field.
 	if config.Target == nil {
 		config.Target = &config.Field
@@ -88,7 +88,7 @@ func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
 func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 	if err := x.run(event); err != nil && !x.IgnoreFailure {
 		err = fmt.Errorf("failed in decode_xml on the %q field: %w", x.Field, err)
-		event.PutValue("error.message", err.Error())
+		_, _ = event.PutValue("error.message", err.Error())
 		return event, err
 	}
 	return event, nil
@@ -97,7 +97,7 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 func (x *decodeXML) run(event *beat.Event) error {
 	data, err := event.GetValue(x.Field)
 	if err != nil {
-		if x.IgnoreMissing && err == mapstr.ErrKeyNotFound {
+		if x.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return err
@@ -114,10 +114,10 @@ func (x *decodeXML) run(event *beat.Event) error {
 	}
 
 	var id string
-	if tmp, err := mapstr.M(xmlOutput).GetValue(x.DocumentID); err == nil {
+	if tmp, err := xmlOutput.GetValue(x.DocumentID); err == nil {
 		if v, ok := tmp.(string); ok {
 			id = v
-			mapstr.M(xmlOutput).Delete(x.DocumentID)
+			_ = xmlOutput.Delete(x.DocumentID)
 		}
 	}
 

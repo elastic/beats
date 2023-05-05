@@ -146,8 +146,8 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   ctx.Cancelation,
-		ACKHandler: newInputACKHandler(ctx.Logger),
+		CloseRef:      ctx.Cancelation,
+		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err
@@ -175,7 +175,7 @@ func (inp *managedInput) createSourceID(s Source) string {
 	return fmt.Sprintf("%v::%v", inp.manager.Type, s.Name())
 }
 
-func newInputACKHandler(log *logp.Logger) beat.ACKer {
+func newInputACKHandler(log *logp.Logger) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int

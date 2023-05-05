@@ -35,7 +35,7 @@ type sqsReader struct {
 
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry())
+		metrics = newInputMetrics("", monitoring.NewRegistry(), maxMessagesInflight)
 	}
 	return &sqsReader{
 		maxMessagesInflight: maxMessagesInflight,
@@ -79,13 +79,12 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		// Process each SQS message asynchronously with a goroutine.
 		r.log.Debugf("Received %v SQS messages.", len(msgs))
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-		r.metrics.sqsMessagesInflight.Add(uint64(len(msgs)))
 		workerWg.Add(len(msgs))
 		for _, msg := range msgs {
 			go func(msg types.Message, start time.Time) {
+				id := r.metrics.beginSQSWorker()
 				defer func() {
-					r.metrics.sqsMessagesInflight.Dec()
-					r.metrics.sqsMessageProcessingTime.Update(time.Since(start).Nanoseconds())
+					r.metrics.endSQSWorker(id)
 					workerWg.Done()
 					r.workerSem.Release(1)
 				}()

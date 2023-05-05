@@ -68,6 +68,11 @@ var (
 			"event_loop_delay": s.Object{
 				"ms": c.Float("event_loop_delay"),
 			},
+			"event_loop_utilization": c.Dict("event_loop_utilization", s.Schema{
+				"active":      c.Float("active"),
+				"idle":        c.Float("idle"),
+				"utilization": c.Float("utilization"),
+			}, c.DictOptional),
 			"memory": c.Dict("memory", s.Schema{
 				"resident_set_size": s.Object{
 					"bytes": c.Int("resident_set_size_bytes"),

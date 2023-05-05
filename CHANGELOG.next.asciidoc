@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -23,13 +23,20 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
 
 
 *Winlogbeat*
 
+- Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
 
 *Functionbeat*
+
+
+*Elastic Logging Plugin*
 
 
 ==== Bugfixes
@@ -53,11 +60,15 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - Fix panics when a processor is closed twice {pull}34647[34647]
 - Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
+- In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
 
 *Auditbeat*
 
-
 *Filebeat*
+
 - [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
    with the ecs field name `container`. {pull}34403[34403]
@@ -92,7 +103,20 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
 - Fix errors and panics due to re-used processors {pull}34761[34761]
 - Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
+- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
+- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
+- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
+- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
+- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
+- Fixing the grok expression outputs of log files {pull}35221[35221]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 
 *Heartbeat*
 
@@ -131,6 +155,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Filebeat*
 
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 
 *Heartbeat*
 
@@ -155,16 +180,16 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Osquerybeat*
 
+- Adds the `elastic_file_analysis` table to the Osquery extension for macOS builds. {pull}35056[35056]
 
 *Packetbeat*
 
-
+- Fix double channel close panic when reloading. {pull}35324[35324]
 
 *Winlogbeat*
 
 
 *Functionbeat*
-
 
 
 *Elastic Logging Plugin*
@@ -225,14 +250,19 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
 - Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
 - Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
+- Added metric `sqs_worker_utilization` for aws-s3 input. {pull}34793[34793]
 - Improve CEL input documentation {pull}34831[34831]
 - Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
 - Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
 - Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
 - Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
+- Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
+- Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
+- Add support for collecting IPv6 metrics. {pull}35123[35123]
+- Add oracle authentication messages parsing {pull}35127[35127]
 
 *Auditbeat*
-
+   - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
 
 *Filebeat*
 
@@ -246,6 +276,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
+- Add GCP Redis metadata {pull}33701[33701]
 - Remove GCP Compute metadata cache {pull}33655[33655]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Redis regions support {pull}33728[33728]
@@ -254,11 +285,15 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
 - Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
+- Add event loop utilization metric to Kibana module {pull}35020[35020]
+
+*Osquerybeat*
+
 
 *Packetbeat*
 
 
-*Packetbeat*
+*Winlogbeat*
 
 
 *Functionbeat*
@@ -268,11 +303,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 *Elastic Log Driver*
+*Elastic Logging Plugin*
 
 
 ==== Deprecated
 
-*Affecting all Beats*
+*Auditbeat*
 
 
 *Filebeat*
@@ -284,14 +320,25 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
+
 
 *Winlogbeat*
 
 
 *Functionbeat*
 
-==== Known Issue
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
 
 
 

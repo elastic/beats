@@ -29,7 +29,7 @@ import (
 var ErrClosed = errors.New("attempt to use a closed processor")
 
 type SafeProcessor struct {
-	Processor
+	beat.Processor
 	closed uint32
 }
 
@@ -62,7 +62,7 @@ func (p *SafeProcessor) Close() (err error) {
 // We make it easer for processor developers and take care of it
 // in the processor registry instead.
 func SafeWrap(constructor Constructor) Constructor {
-	return func(config *config.C) (Processor, error) {
+	return func(config *config.C) (beat.Processor, error) {
 		processor, err := constructor(config)
 		if err != nil {
 			return nil, err

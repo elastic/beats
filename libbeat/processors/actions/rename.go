@@ -18,9 +18,8 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -57,14 +56,14 @@ func init() {
 }
 
 // NewRenameFields returns a new rename processor.
-func NewRenameFields(c *conf.C) (processors.Processor, error) {
+func NewRenameFields(c *conf.C) (beat.Processor, error) {
 	config := renameFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the rename configuration: %s", err)
+		return nil, fmt.Errorf("failed to unpack the rename configuration: %w", err)
 	}
 
 	f := &renameFields{
@@ -84,13 +83,13 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range f.config.Fields {
 		err := f.renameField(field.From, field.To, event)
 		if err != nil {
-			errMsg := fmt.Errorf("Failed to rename fields in processor: %s", err)
+			errMsg := fmt.Errorf("Failed to rename fields in processor: %w", err)
 			if publisher.LogWithTrace() {
 				f.logger.Debug(errMsg.Error())
 			}
 			if f.config.FailOnError {
 				event = backup
-				event.PutValue("error.message", errMsg.Error())
+				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
 		}
@@ -112,18 +111,18 @@ func (f *renameFields) renameField(from string, to string, event *beat.Event) er
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %w", from, err)
 	}
 
 	// Deletion must happen first to support cases where a becomes a.b
 	err = event.Delete(from)
 	if err != nil {
-		return fmt.Errorf("could not delete key: %s,  %+v", from, err)
+		return fmt.Errorf("could not delete key: %s,  %w", from, err)
 	}
 
 	_, err = event.PutValue(to, value)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", to, value, err)
+		return fmt.Errorf("could not put value: %s: %v, %w", to, value, err)
 	}
 	return nil
 }
