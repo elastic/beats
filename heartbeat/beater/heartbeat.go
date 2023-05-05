@@ -131,6 +131,11 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}),
 		trace: trace,
 	}
+	runFromID := "<unknown location>"
+	if parsedConfig.RunFrom != nil {
+		runFromID = parsedConfig.RunFrom.ID
+	}
+	logp.L().Infof("heartbeat starting, running from: %v", runFromID)
 	return bt, nil
 }
 
@@ -300,7 +305,7 @@ func makeStatesClient(cfg *conf.C, replace func(monitorstate.StateLoader), runFr
 	}
 
 	if esClient != nil {
-		logp.L().Info("replacing states loader")
+		logp.L().Info("using ES states loader")
 		replace(monitorstate.MakeESLoader(esClient, "synthetics-*,heartbeat-*", runFrom))
 	}
 
