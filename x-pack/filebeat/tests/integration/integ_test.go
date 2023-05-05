@@ -10,9 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/stretchr/testify/require"
 )
 
 func TestPureServe(t *testing.T) {
@@ -168,7 +171,7 @@ func TestPureServe(t *testing.T) {
 	defer server.Stop()
 	t.Logf("server started on port %d", server.Port)
 
-	p := NewProc(t, "../../filebeat/filebeat.test", nil, server.Port)
+	p := NewProc(t, "../../filebeat.test", nil, server.Port)
 	p.Start()
 	t.Log("Filebeat started")
 
@@ -178,4 +181,46 @@ func TestPureServe(t *testing.T) {
 	p.LogContains("Reloading Beats inputs because forceReload is true", 2*time.Minute)                  // centralmgmt.V2-manager
 	p.LogContains("ForceReload set to FALSE", 2*time.Minute)                                            // centralmgmt.V2-manager
 	t.Log("********************************************* IT WORKS ****************************************************************************************************")
+}
+
+func doesStateMatch(
+	observed *proto.CheckinObserved,
+	expectedUnits []*proto.UnitExpected,
+	expectedFeaturesIdx uint64,
+) bool {
+	if len(observed.Units) != len(expectedUnits) {
+		return false
+	}
+	expectedMap := make(map[unitKey]*proto.UnitExpected)
+	for _, exp := range expectedUnits {
+		expectedMap[unitKey{client.UnitType(exp.Type), exp.Id}] = exp
+	}
+	for _, unit := range observed.Units {
+		exp, ok := expectedMap[unitKey{client.UnitType(unit.Type), unit.Id}]
+		if !ok {
+			return false
+		}
+		if unit.State != exp.State || unit.ConfigStateIdx != exp.ConfigStateIdx {
+			return false
+		}
+	}
+
+	if observed.FeaturesIdx != expectedFeaturesIdx {
+		return false
+	}
+
+	return true
+}
+
+type unitKey struct {
+	Type client.UnitType
+	ID   string
+}
+
+func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
+	str, err := structpb.NewStruct(v)
+	if err != nil {
+		require.NoError(t, err)
+	}
+	return str
 }

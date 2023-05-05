@@ -79,8 +79,8 @@ func (p *Proc) LogContains(s string, timeout time.Duration) bool {
 		default:
 			if p.stdout.Scan() {
 				line := p.stdout.Text()
+				// fmt.Println(line)
 				if strings.Contains(line, s) {
-					fmt.Println(line)
 					return true
 				}
 			}
