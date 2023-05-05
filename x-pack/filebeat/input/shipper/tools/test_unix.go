@@ -9,12 +9,13 @@ import (
 	"net"
 	"net/url"
 	"path/filepath"
-	"strings"
+	"time"
 )
 
 // DialTestAddr dials the address with the operating specific function
-func DialTestAddr(addr string) (net.Conn, error) {
-	return net.Dial("unix", strings.TrimPrefix(addr, "unix://"))
+func DialTestAddr(addr string, timeout time.Duration) (net.Conn, error) {
+	dailer := net.Dialer{Timeout: timeout}
+	return dailer.Dial("unix", addr)
 }
 
 // GenerateTestAddr creates a grpc address that is specific to the operating system

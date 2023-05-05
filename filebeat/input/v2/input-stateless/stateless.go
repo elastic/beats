@@ -25,7 +25,6 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -44,7 +43,7 @@ type Input interface {
 
 // Publisher is used by the Input to emit events.
 type Publisher interface {
-	Publish(beat.Event) queue.EntryID
+	Publish(beat.Event)
 }
 
 type configuredInput struct {

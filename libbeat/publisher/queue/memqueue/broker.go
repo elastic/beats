@@ -18,7 +18,6 @@
 package memqueue
 
 import (
-	"fmt"
 	"io"
 	"sync"
 	"time"
@@ -259,15 +258,6 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
 		OldestEntryID:         resp.oldestEntryID,
 	}, nil
-}
-
-func (b *broker) PersistedIndex() (queue.EntryID, error) {
-	metrics, err := b.Metrics()
-	if err != nil {
-		return queue.EntryID(0), fmt.Errorf("error fetching metrics: %w", err)
-	}
-
-	return metrics.OldestEntryID, nil
 }
 
 var ackChanPool = sync.Pool{

@@ -70,14 +70,14 @@ func (c *client) PublishAll(events []beat.Event) {
 	}
 }
 
-func (c *client) Publish(e beat.Event) queue.EntryID {
+func (c *client) Publish(e beat.Event) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	return c.publish(e)
+	c.publish(e)
 }
 
-func (c *client) publish(e beat.Event) queue.EntryID {
+func (c *client) publish(e beat.Event) {
 	var (
 		event   = &e
 		publish = true
@@ -88,7 +88,7 @@ func (c *client) publish(e beat.Event) queue.EntryID {
 	if !c.isOpen.Load() {
 		// client is closing down -> report event as dropped and return
 		c.onDroppedOnPublish(e)
-		return queue.EntryID(0)
+		return
 	}
 
 	if c.processors != nil {
@@ -110,7 +110,7 @@ func (c *client) publish(e beat.Event) queue.EntryID {
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
 		c.onFilteredOut(e)
-		return queue.EntryID(0)
+		return
 	}
 
 	e = *event
@@ -120,11 +120,10 @@ func (c *client) publish(e beat.Event) queue.EntryID {
 	}
 
 	var published bool
-	var id queue.EntryID
 	if c.canDrop {
-		id, published = c.producer.TryPublish(pubEvent)
+		_, published = c.producer.TryPublish(pubEvent)
 	} else {
-		id, published = c.producer.Publish(pubEvent)
+		_, published = c.producer.Publish(pubEvent)
 	}
 
 	if published {
@@ -132,8 +131,6 @@ func (c *client) publish(e beat.Event) queue.EntryID {
 	} else {
 		c.onDroppedOnPublish(e)
 	}
-
-	return id
 }
 
 func (c *client) Close() error {
@@ -208,6 +205,9 @@ func (c *client) onPublished() {
 func (c *client) onFilteredOut(e beat.Event) {
 	c.logger.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
 	c.observer.filteredEvent()
+	if c.clientListener != nil {
+		c.clientListener.FilteredOut(e)
+	}
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {

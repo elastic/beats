@@ -13,7 +13,6 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -59,17 +58,13 @@ func (t testPipeline) Connect() (beat.Client, error) {
 	return &testClient{}, nil
 }
 
-func (t testPipeline) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
-}
-
 var _ beat.Client = &testClient{}
 
 type testClient struct {
 }
 
-func (c *testClient) Publish(_ beat.Event) queue.EntryID {
-	return queue.EntryID(0)
+func (c *testClient) Publish(_ beat.Event) {
+
 }
 
 func (c *testClient) PublishAll(_ []beat.Event) {

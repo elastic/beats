@@ -72,8 +72,6 @@ type Queue interface {
 	Get(eventCount int) (Batch, error)
 
 	Metrics() (Metrics, error)
-
-	PersistedIndex() (EntryID, error)
 }
 
 type QueueFactory func(logger *logp.Logger, ack func(eventCount int)) (Queue, error)

@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -132,10 +131,9 @@ func withPipelineEventCounter(pipeline beat.PipelineConnector, counter *eventCou
 	return pipeline
 }
 
-func (c *countingClient) Publish(event beat.Event) queue.EntryID {
+func (c *countingClient) Publish(event beat.Event) {
 	c.counter.Add(1)
 	c.client.Publish(event)
-	return queue.EntryID(0)
 }
 
 func (c *countingClient) PublishAll(events []beat.Event) {
@@ -151,6 +149,7 @@ func (*countingClientListener) Closing()   {}
 func (*countingClientListener) Closed()    {}
 func (*countingClientListener) Published() {}
 
+func (c *countingClientListener) FilteredOut(_ beat.Event) {}
 func (c *countingClientListener) DroppedOnPublish(_ beat.Event) {
 	c.wgEvents.Done()
 }
@@ -168,6 +167,11 @@ func (c *combinedClientListener) Closed() {
 func (c *combinedClientListener) Published() {
 	c.a.Published()
 	c.b.Published()
+}
+
+func (c *combinedClientListener) FilteredOut(event beat.Event) {
+	c.a.FilteredOut(event)
+	c.b.FilteredOut(event)
 }
 
 func (c *combinedClientListener) DroppedOnPublish(event beat.Event) {

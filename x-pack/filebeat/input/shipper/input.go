@@ -5,18 +5,20 @@
 package shipper
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/shipper/tools"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -71,7 +73,8 @@ func (im *InputManager) Create(cfg *config.C) (v2.Input, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error unpacking config: %w", err)
 	}
-
+	// strip the config we get from agent
+	config.Conn.Server = strings.TrimPrefix(config.Conn.Server, "unix://")
 	// following lines are helpful for debugging config,
 	// will be useful as we figure out how to integrate with agent
 
@@ -95,20 +98,28 @@ func (im *InputManager) Create(cfg *config.C) (v2.Input, error) {
 		im.log.Infof("created processors for %s: %s", stream.ID, procList.String())
 		streamDataMap[stream.ID] = streamData{index: stream.Index, processors: procList}
 	}
-	return &shipperInput{log: im.log, cfg: config, srvMut: &sync.Mutex{}, streams: streamDataMap}, nil
+	return &shipperInput{log: im.log, cfg: config, srvMut: &sync.Mutex{}, streams: streamDataMap, shipperSrv: config.Conn.Server, acker: newShipperAcker()}, nil
 }
 
+// shipperInput is the main runtime object for the shipper
 type shipperInput struct {
 	log     *logp.Logger
 	cfg     Instance
 	streams map[string]streamData
 
-	server     *grpc.Server
-	shipper    *ShipperServer
+	server  *grpc.Server
+	shipper *ShipperServer
+	// TODO: we probably don't need this, and can just fetch the config
 	shipperSrv string
 	srvMut     *sync.Mutex
+
+	acker *shipperAcker
+
+	// incrementing counter that serves as an event ID
+	eventIDInc uint64
 }
 
+// all the data associated with a given stream that the shipper needs access to.
 type streamData struct {
 	index      string
 	client     beat.Client
@@ -157,7 +168,7 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 	// create clients ahead of time
 	for streamID, streamProc := range in.streams {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			// TODO: need an EventListener?
+			EventListener: acker.TrackingCounter(in.acker.Track),
 			Processing: beat.ProcessingConfig{
 				Processor: streamProc.processors,
 			},
@@ -188,7 +199,6 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 }
 
 func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
-	in.shipperSrv = strings.TrimPrefix(in.cfg.Conn.Server, "unix://")
 	in.log.Infof("initializing grpc server at %s", in.shipperSrv)
 	// Currently no TLS until we figure out mTLS issues in agent/shipper
 	creds := insecure.NewCredentials()
@@ -208,24 +218,20 @@ func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
 
 	in.srvMut.Lock()
 
+	// treat most of these checking errors as "soft" errors
+	// Try to make the environment clean, but trust newListener() to fail if it can't just start.
+
 	// paranoid checking, make sure we have the base directory.
 	dir := filepath.Dir(in.shipperSrv)
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err = os.MkdirAll(dir, 0o755)
-		if err != nil {
-			in.srvMut.Unlock()
-			return fmt.Errorf("could not create directory for unix socket %s: %w", dir, err)
-		}
+	err = os.MkdirAll(dir, 0o755)
+	if err != nil {
+		in.log.Warnf("could not create directory for unix socket %s: %w", dir, err)
 	}
 
 	// on linux, net.Listen will fail if the file already exists
-	if _, err = os.Stat(in.shipperSrv); err == nil {
-		in.log.Debugf("listen address %s already exists, removing", in.shipperSrv)
-		err = os.Remove(in.shipperSrv)
-		if err != nil {
-			in.srvMut.Unlock()
-			return fmt.Errorf("error removing unix socket %s: %w", in.shipperSrv, err)
-		}
+	err = os.Remove(in.shipperSrv)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		in.log.Warnf("could not remove pre-existing socket at %s: %w", in.shipperSrv, err)
 	}
 
 	lis, err := newListener(in.log, in.shipperSrv)
@@ -242,9 +248,10 @@ func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
 		}
 	}()
 
-	// make sure connection is up before mutex is released
+	// make sure connection is up before mutex is released;
+	// if close() on the socket is called before it's started, it will trigger a race.
 	defer in.srvMut.Unlock()
-	con, err := tools.DialTestAddr(in.shipperSrv)
+	con, err := tools.DialTestAddr(in.shipperSrv, in.cfg.Conn.InitialTimeout)
 	if err != nil {
 		// this will stop the other go routine in the wait group
 		in.server.Stop()
@@ -255,25 +262,21 @@ func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
 	return nil
 }
 
-func (in *shipperInput) sendEvent(event *messages.Event) (queue.EntryID, error) {
+func (in *shipperInput) sendEvent(event *messages.Event) (uint64, error) {
 	//look for matching processor config
 	stream, ok := in.streams[event.Source.StreamId]
-	// should this be an error? can we continue on if there's no data stream associated with an event?
 	if !ok {
-		return queue.EntryID(0), fmt.Errorf("could not find data stream associated with ID '%s'", event.Source.StreamId)
+		return 0, fmt.Errorf("could not find data stream associated with ID '%s'", event.Source.StreamId)
 	}
-
-	// inject index from stream config into metadata
-	// not sure how stock beats do this, and also not sure if it's actually needed?
-	metadata := helpers.AsMap(event.Metadata)
-	metadata["index"] = stream.index
 
 	evt := beat.Event{
 		Timestamp: event.Timestamp.AsTime(),
 		Fields:    helpers.AsMap(event.Fields),
-		Meta:      metadata,
+		Meta:      helpers.AsMap(event.Metadata),
 	}
-	in.log.Infof("metadata from incoming event: %s", evt.Meta.String())
+	atomic.AddUint64(&in.eventIDInc, 1)
 
-	return stream.client.Publish(evt), nil
+	stream.client.Publish(evt)
+
+	return in.eventIDInc, nil
 }

@@ -9,13 +9,14 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/Microsoft/go-winio"
 )
 
 // DialTestAddr dials the address with the operating specific function
-func DialTestAddr(addr string) (net.Conn, error) {
-	return winio.DialPipe(addr, nil)
+func DialTestAddr(addr string, timeout time.Duration) (net.Conn, error) {
+	return winio.DialPipe(addr, timeout)
 }
 
 // GenerateTestAddr creates a grpc address that is specific to the operating system

@@ -14,7 +14,6 @@ import (
 	"golang.org/x/net/netutil"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -25,14 +24,14 @@ import (
 type server struct {
 	config         config
 	log            *logp.Logger
-	publish        func(beat.Event) queue.EntryID
+	publish        func(beat.Event)
 	metrics        *inputMetrics
 	ljSvr          lumber.Server
 	ljSvrCloseOnce sync.Once
 	bindAddress    string
 }
 
-func newServer(c config, log *logp.Logger, pub func(beat.Event) queue.EntryID, metrics *inputMetrics) (*server, error) {
+func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputMetrics) (*server, error) {
 	ljSvr, bindAddress, err := newLumberjack(c)
 	if err != nil {
 		return nil, err

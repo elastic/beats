@@ -4,7 +4,11 @@
 
 package shipper
 
-import "github.com/elastic/elastic-agent-libs/config"
+import (
+	"time"
+
+	"github.com/elastic/elastic-agent-libs/config"
+)
 
 // Instance represents all the config needed to start a single shipper input
 // because a beat works fundamentally differently from the old shipper, we dont have to deal with async config that's being pieced together,
@@ -17,8 +21,9 @@ type Instance struct {
 
 // ConnectionConfig is the shipper-relevant portion of the config received from input units
 type ConnectionConfig struct {
-	Server string `config:"server"`
-	TLS    TLS    `config:"ssl"`
+	Server         string        `config:"server"`
+	InitialTimeout time.Duration `config:"grpc_setup_timeout"`
+	TLS            TLS           `config:"ssl"`
 }
 
 // TLS is TLS-specific shipper client settings

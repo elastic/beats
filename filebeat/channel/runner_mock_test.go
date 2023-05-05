@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 
@@ -109,9 +108,9 @@ type clientMock struct {
 	cfg beat.ClientConfig
 }
 
-func (clientMock) Publish(beat.Event) queue.EntryID { return queue.EntryID(0) }
-func (clientMock) PublishAll([]beat.Event)          {}
-func (clientMock) Close() error                     { return nil }
+func (clientMock) Publish(beat.Event)      {}
+func (clientMock) PublishAll([]beat.Event) {}
+func (clientMock) Close() error            { return nil }
 
 type pipelineConnectorMock struct{}
 
@@ -124,8 +123,4 @@ func (pipelineConnectorMock) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 
 func (pipelineConnectorMock) Connect() (beat.Client, error) {
 	return &clientMock{}, nil
-}
-
-func (pipelineConnectorMock) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
 }

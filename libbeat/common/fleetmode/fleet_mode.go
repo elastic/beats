@@ -32,13 +32,10 @@ func Enabled() bool {
 	}
 	var managementSettings management
 
-	cfgFlag := flag.Lookup("E")
-	if cfgFlag == nil {
+	found, cliCfg := fetchSettingsFlags()
+	if !found {
 		return false
 	}
-
-	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
-	cliCfg := cfgObject.Config()
 
 	err := cliCfg.Unpack(&managementSettings)
 	if err != nil {
@@ -46,4 +43,37 @@ func Enabled() bool {
 	}
 
 	return managementSettings.Enabled
+}
+
+// ShipperMode checks to see if we're running filebeat as a shipper.
+// This is primarily used to disable global processors.
+// Handling global processors in the shipper is an ongoing issue, see https://github.com/elastic/elastic-agent-shipper/issues/292
+func ShipperMode() bool {
+	found, cfg := fetchSettingsFlags()
+	if !found {
+		return false
+	}
+
+	type shipper struct {
+		Enabled bool `config:"shipper.enabled"`
+	}
+	var shipperMode shipper
+
+	err := cfg.Unpack(&shipperMode)
+	if err != nil {
+		return false
+	}
+	return shipperMode.Enabled
+}
+
+func fetchSettingsFlags() (bool, *config.C) {
+	cfgFlag := flag.Lookup("E")
+	if cfgFlag == nil {
+		return false, nil
+	}
+
+	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
+	cliCfg := cfgObject.Config()
+
+	return true, cliCfg
 }

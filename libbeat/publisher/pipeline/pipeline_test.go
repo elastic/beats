@@ -40,10 +40,6 @@ func (q *testQueue) Metrics() (queue.Metrics, error) {
 	return queue.Metrics{}, nil
 }
 
-func (q *testQueue) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
-}
-
 func (q *testQueue) Close() error {
 	if q.close != nil {
 		return q.close()
@@ -88,10 +84,6 @@ func (p *testProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
 		return p.publish(true, event)
 	}
 	return 0, false
-}
-
-func (p *testProducer) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
 }
 
 func (p *testProducer) Cancel() int {

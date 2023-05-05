@@ -20,7 +20,6 @@ package pipetool
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,10 +45,6 @@ func (p *connectEditPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, e
 	return p.parent.ConnectWith(cfg)
 }
 
-func (p *connectEditPipeline) PersistedIndex() (queue.EntryID, error) {
-	return p.parent.PersistedIndex()
-}
-
 // wrapClientPipeline applies edit to the beat.Client returned by Connect and ConnectWith.
 // The edit function can wrap the client to add additional functionality to clients
 // that connect to the pipeline.
@@ -71,10 +66,6 @@ func (p *wrapClientPipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 		client = p.wrapper(client)
 	}
 	return client, err
-}
-
-func (p *wrapClientPipeline) PersistedIndex() (queue.EntryID, error) {
-	return p.parent.PersistedIndex()
 }
 
 // WithClientConfigEdit creates a pipeline connector, that allows the

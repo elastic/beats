@@ -28,7 +28,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -174,10 +173,6 @@ func (c *fakePipeline) Connect() (beat.Client, error) {
 	panic("Connect() is not implemented.")
 }
 
-func (c *fakePipeline) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
-}
-
 var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
@@ -185,10 +180,9 @@ type ackClient struct{}
 
 func (c *ackClient) Close() error { return nil }
 
-func (c *ackClient) Publish(event beat.Event) queue.EntryID {
+func (c *ackClient) Publish(event beat.Event) {
 	// Fake the ACK handling.
 	event.Private.(*awscommon.EventACKTracker).ACK()
-	return queue.EntryID(0)
 }
 
 func (c *ackClient) PublishAll(event []beat.Event) {

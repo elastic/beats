@@ -20,7 +20,6 @@ package testing
 // ChanClient implements Client interface, forwarding published events to some
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type TestPublisher struct {
@@ -44,10 +43,6 @@ func (pub *TestPublisher) Connect() (beat.Client, error) {
 
 func (pub *TestPublisher) ConnectWith(_ beat.ClientConfig) (beat.Client, error) {
 	return pub.client, nil
-}
-
-func (pub *TestPublisher) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
 }
 
 func NewChanClientWithCallback(bufSize int, callback func(event beat.Event)) *ChanClient {
@@ -79,7 +74,7 @@ func (c *ChanClient) Close() error {
 
 // PublishEvent will publish the event on the channel. Options will be ignored.
 // Always returns true.
-func (c *ChanClient) Publish(event beat.Event) queue.EntryID {
+func (c *ChanClient) Publish(event beat.Event) {
 	select {
 	case <-c.done:
 	case c.Channel <- event:
@@ -88,8 +83,6 @@ func (c *ChanClient) Publish(event beat.Event) queue.EntryID {
 			<-c.Channel
 		}
 	}
-
-	return queue.EntryID(0)
 }
 
 func (c *ChanClient) PublishAll(event []beat.Event) {

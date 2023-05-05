@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // MockBeatClient mocks the Client interface
@@ -28,9 +27,8 @@ func (c *MockBeatClient) GetEvents() []beat.Event {
 }
 
 // Publish mocks the Client Publish method
-func (c *MockBeatClient) Publish(e beat.Event) queue.EntryID {
+func (c *MockBeatClient) Publish(e beat.Event) {
 	c.PublishAll([]beat.Event{e})
-	return queue.EntryID(0)
 }
 
 // PublishAll mocks the Client PublishAll method
@@ -86,8 +84,4 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
-}
-
-func (pc *MockPipelineConnector) PersistedIndex() (queue.EntryID, error) {
-	return queue.EntryID(0), nil
 }

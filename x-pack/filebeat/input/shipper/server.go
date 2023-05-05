@@ -18,7 +18,6 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
@@ -91,7 +90,7 @@ func (serv *ShipperServer) PublishEvents(_ context.Context, req *messages.Publis
 		}
 	}
 
-	var accIdx queue.EntryID
+	var accIdx uint64
 	var err error
 	for _, evt := range req.Events {
 		accIdx, err = serv.beatInput.sendEvent(evt)
@@ -117,13 +116,14 @@ func (serv *ShipperServer) PublishEvents(_ context.Context, req *messages.Publis
 func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, producer pb.Producer_PersistedIndexServer) error {
 	serv.logger.Debug("new subscriber for persisted index change")
 	defer serv.logger.Debug("unsubscribed from persisted index change")
-	idx, err := serv.pipeline.PersistedIndex()
-	if err != nil {
-		return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
-	}
-	err = producer.Send(&messages.PersistedIndexReply{
+	// idx, err := serv.pipeline.PersistedIndex()
+	// if err != nil {
+	// 	return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
+	// }
+
+	err := producer.Send(&messages.PersistedIndexReply{
 		Uuid:           serv.uuid,
-		PersistedIndex: uint64(idx),
+		PersistedIndex: serv.beatInput.acker.PersistedIndex(),
 	})
 	if err != nil {
 		return fmt.Errorf("error sending index reply: %w", err)
@@ -147,13 +147,14 @@ func (serv *ShipperServer) PersistedIndex(req *messages.PersistedIndexRequest, p
 			return fmt.Errorf("server is stopped: %w", serv.ctx.Err())
 
 		case <-ticker.C:
-			persistedIndex, err := serv.pipeline.PersistedIndex()
-			if err != nil {
-				return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
-			}
+			serv.logger.Infof("persistedIndex=%d", serv.beatInput.acker.PersistedIndex())
+			// persistedIndex, err := serv.pipeline.PersistedIndex()
+			// if err != nil {
+			// 	return fmt.Errorf("error fetching persisted index from pipeline: %w", err)
+			// }
 			err = producer.Send(&messages.PersistedIndexReply{
 				Uuid:           serv.uuid,
-				PersistedIndex: uint64(persistedIndex),
+				PersistedIndex: serv.beatInput.acker.PersistedIndex(),
 			})
 			if err != nil {
 				return fmt.Errorf("failed to send the update: %w", err)
