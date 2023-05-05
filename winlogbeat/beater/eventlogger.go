@@ -130,6 +130,9 @@ func (e *eventLogger) run(
 		}
 	}()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
+	channelNotFoundErrDetected := false
+
 runLoop:
 	for stop := false; !stop; {
 		err = api.Open(state)
@@ -140,13 +143,19 @@ runLoop:
 			time.Sleep(time.Second * 5)
 			continue
 		case !api.IsFile() && eventlog.IsChannelNotFound(err):
-			e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			if !channelNotFoundErrDetected {
+				e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			} else {
+				e.log.Debugw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			}
+			channelNotFoundErrDetected = true
 			time.Sleep(time.Second * 5)
 			continue
 		case err != nil:
 			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
+		channelNotFoundErrDetected = false
 
 		e.log.Debug("Opened successfully.")
 
