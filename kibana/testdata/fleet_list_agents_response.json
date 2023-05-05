@@ -1,0 +1,244 @@
+{
+  "list": [
+    {
+      "id": "eba58282-ec1c-4d9e-aac0-2b29f754b437",
+      "access_api_key_id": "j_8N6IcBB-dm5bw4JI7t",
+      "action_seq_no": [
+        -1
+      ],
+      "active": true,
+      "agent": {
+        "id": "eba58282-ec1c-4d9e-aac0-2b29f754b437",
+        "version": "8.8.0"
+      },
+      "enrolled_at": "2023-05-04T18:36:28Z",
+      "local_metadata": {
+        "elastic": {
+          "agent": {
+            "build.original": "8.8.0 (build: 0098d8b60382ac6bdbd361853125a192e597f9f3 at 2023-05-04 06:23:33 +0000 UTC)",
+            "id": "eba58282-ec1c-4d9e-aac0-2b29f754b437",
+            "log_level": "info",
+            "snapshot": false,
+            "upgradeable": false,
+            "version": "8.8.0"
+          }
+        },
+        "host": {
+          "architecture": "x86_64",
+          "hostname": "c75d66b1dac5",
+          "id": "",
+          "ip": [
+            "127.0.0.1/8",
+            "172.17.0.8/16"
+          ],
+          "mac": [
+            "02:42:ac:11:00:08"
+          ],
+          "name": "c75d66b1dac5"
+        },
+        "os": {
+          "family": "debian",
+          "full": "Ubuntu focal(20.04.6 LTS (Focal Fossa))",
+          "kernel": "5.4.0-1049-gcp",
+          "name": "Ubuntu",
+          "platform": "ubuntu",
+          "version": "20.04.6 LTS (Focal Fossa)"
+        }
+      },
+      "policy_id": "policy-elastic-agent-on-cloud",
+      "type": "PERMANENT",
+      "outputs": {
+        "es-containerhost": {
+          "api_key": "y-8N6IcBkZQG_EerOj1v:Q3lPaiDpSWKVysxYXeODMw",
+          "permissions_hash": "9a26f8124248db9d9f2a344192e114495ba7ad99b6c17bab999265078fedba47",
+          "type": "elasticsearch",
+          "api_key_id": "y-8N6IcBkZQG_EerOj1v"
+        }
+      },
+      "policy_revision_idx": 5,
+      "policy_coordinator_idx": 1,
+      "updated_at": "2023-05-04T18:44:05Z",
+      "components": [
+        {
+          "id": "fleet-server-es-containerhost",
+          "units": [
+            {
+              "id": "fleet-server-es-containerhost-fleet-server-fleet_server-elastic-cloud-fleet-server",
+              "type": "input",
+              "message": "Re-configuring",
+              "status": "CONFIGURING"
+            },
+            {
+              "id": "fleet-server-es-containerhost",
+              "type": "output",
+              "message": "Re-configuring",
+              "status": "CONFIGURING"
+            }
+          ],
+          "type": "fleet-server",
+          "message": "Healthy: communicating with pid '207'",
+          "status": "HEALTHY"
+        },
+        {
+          "id": "apm-es-containerhost",
+          "units": [
+            {
+              "id": "apm-es-containerhost-elastic-cloud-apm",
+              "type": "input",
+              "message": "Healthy",
+              "status": "HEALTHY"
+            },
+            {
+              "id": "apm-es-containerhost",
+              "type": "output",
+              "message": "Healthy",
+              "status": "HEALTHY"
+            }
+          ],
+          "type": "apm",
+          "message": "Healthy: communicating with pid '227'",
+          "status": "HEALTHY"
+        }
+      ],
+      "last_checkin_message": "Running",
+      "last_checkin_status": "online",
+      "last_checkin": "2023-05-04T18:44:02Z",
+      "policy_revision": 5,
+      "status": "online",
+      "packages": [],
+      "sort": [
+        1683225388000,
+        "c75d66b1dac5"
+      ],
+      "metrics": {}
+    }
+  ],
+  "items": [
+    {
+      "id": "eba58282-ec1c-4d9e-aac0-2b29f754b437",
+      "access_api_key_id": "j_8N6IcBB-dm5bw4JI7t",
+      "action_seq_no": [
+        -1
+      ],
+      "active": true,
+      "agent": {
+        "id": "eba58282-ec1c-4d9e-aac0-2b29f754b437",
+        "version": "8.8.0"
+      },
+      "enrolled_at": "2023-05-04T18:36:28Z",
+      "local_metadata": {
+        "elastic": {
+          "agent": {
+            "build.original": "8.8.0 (build: 0098d8b60382ac6bdbd361853125a192e597f9f3 at 2023-05-04 06:23:33 +0000 UTC)",
+            "id": "eba58282-ec1c-4d9e-aac0-2b29f754b437",
+            "log_level": "info",
+            "snapshot": false,
+            "upgradeable": false,
+            "version": "8.8.0"
+          }
+        },
+        "host": {
+          "architecture": "x86_64",
+          "hostname": "c75d66b1dac5",
+          "id": "",
+          "ip": [
+            "127.0.0.1/8",
+            "172.17.0.8/16"
+          ],
+          "mac": [
+            "02:42:ac:11:00:08"
+          ],
+          "name": "c75d66b1dac5"
+        },
+        "os": {
+          "family": "debian",
+          "full": "Ubuntu focal(20.04.6 LTS (Focal Fossa))",
+          "kernel": "5.4.0-1049-gcp",
+          "name": "Ubuntu",
+          "platform": "ubuntu",
+          "version": "20.04.6 LTS (Focal Fossa)"
+        }
+      },
+      "policy_id": "policy-elastic-agent-on-cloud",
+      "type": "PERMANENT",
+      "outputs": {
+        "es-containerhost": {
+          "api_key": "y-8N6IcBkZQG_EerOj1v:Q3lPaiDpSWKVysxYXeODMw",
+          "permissions_hash": "9a26f8124248db9d9f2a344192e114495ba7ad99b6c17bab999265078fedba47",
+          "type": "elasticsearch",
+          "api_key_id": "y-8N6IcBkZQG_EerOj1v"
+        }
+      },
+      "policy_revision_idx": 5,
+      "policy_coordinator_idx": 1,
+      "updated_at": "2023-05-04T18:44:05Z",
+      "components": [
+        {
+          "id": "fleet-server-es-containerhost",
+          "units": [
+            {
+              "id": "fleet-server-es-containerhost-fleet-server-fleet_server-elastic-cloud-fleet-server",
+              "type": "input",
+              "message": "Re-configuring",
+              "status": "CONFIGURING"
+            },
+            {
+              "id": "fleet-server-es-containerhost",
+              "type": "output",
+              "message": "Re-configuring",
+              "status": "CONFIGURING"
+            }
+          ],
+          "type": "fleet-server",
+          "message": "Healthy: communicating with pid '207'",
+          "status": "HEALTHY"
+        },
+        {
+          "id": "apm-es-containerhost",
+          "units": [
+            {
+              "id": "apm-es-containerhost-elastic-cloud-apm",
+              "type": "input",
+              "message": "Healthy",
+              "status": "HEALTHY"
+            },
+            {
+              "id": "apm-es-containerhost",
+              "type": "output",
+              "message": "Healthy",
+              "status": "HEALTHY"
+            }
+          ],
+          "type": "apm",
+          "message": "Healthy: communicating with pid '227'",
+          "status": "HEALTHY"
+        }
+      ],
+      "last_checkin_message": "Running",
+      "last_checkin_status": "online",
+      "last_checkin": "2023-05-04T18:44:02Z",
+      "policy_revision": 5,
+      "status": "online",
+      "packages": [],
+      "sort": [
+        1683225388000,
+        "c75d66b1dac5"
+      ],
+      "metrics": {}
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "perPage": 20,
+  "statusSummary": {
+    "online": 1,
+    "error": 0,
+    "inactive": 0,
+    "offline": 0,
+    "updating": 0,
+    "unenrolled": 0,
+    "degraded": 0,
+    "enrolling": 0,
+    "unenrolling": 0
+  }
+}
