@@ -26,7 +26,7 @@
   TIME_SECOND     = ([0-5][0-9])>tok %second;
   TIME_SECFRAC    = '.' digit{1,6}>tok %nanosecond;
   TIME_NUMOFFSET  = ('+' | '-') ([0-5][0-9]) ':' ([0-5][0-9]);
-  TIME_OFFSET     = 'Z' | TIME_NUMOFFSET >tok %timezone;
+  TIME_OFFSET     = ('Z' | TIME_NUMOFFSET) >tok %timezone;
   PARTIAL_TIME    = TIME_HOUR ":" TIME_MINUTE ":" TIME_SECOND  TIME_SECFRAC?;
   FULL_TIME       = PARTIAL_TIME TIME_OFFSET;
 
