@@ -124,7 +124,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
-- RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone {pull}35360[35360]
+- RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 
 *Heartbeat*
 
