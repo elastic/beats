@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 *Filebeat*
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 
 *Heartbeat*
@@ -69,6 +70,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 *Functionbeat*
 
