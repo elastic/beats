@@ -149,7 +149,6 @@ func (*countingClientListener) Closing()   {}
 func (*countingClientListener) Closed()    {}
 func (*countingClientListener) Published() {}
 
-func (c *countingClientListener) FilteredOut(_ beat.Event) {}
 func (c *countingClientListener) DroppedOnPublish(_ beat.Event) {
 	c.wgEvents.Done()
 }
@@ -167,11 +166,6 @@ func (c *combinedClientListener) Closed() {
 func (c *combinedClientListener) Published() {
 	c.a.Published()
 	c.b.Published()
-}
-
-func (c *combinedClientListener) FilteredOut(event beat.Event) {
-	c.a.FilteredOut(event)
-	c.b.FilteredOut(event)
 }
 
 func (c *combinedClientListener) DroppedOnPublish(event beat.Event) {
