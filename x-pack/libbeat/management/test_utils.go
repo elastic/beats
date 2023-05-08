@@ -9,6 +9,8 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
+// DoesStateMatch retkurns true if the observed state matches
+// the expectedUnits and Features.
 func DoesStateMatch(
 	observed *proto.CheckinObserved,
 	expectedUnits []*proto.UnitExpected,

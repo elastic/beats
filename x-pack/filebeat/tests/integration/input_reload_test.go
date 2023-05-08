@@ -4,7 +4,7 @@
 
 //go:build integration
 
-package input
+package integration
 
 import (
 	"fmt"
@@ -17,7 +17,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -210,40 +209,6 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 
 	// Set it to false, so the temporaty directory is removed
 	testFailed = false
-}
-
-func doesStateMatch(
-	observed *proto.CheckinObserved,
-	expectedUnits []*proto.UnitExpected,
-	expectedFeaturesIdx uint64,
-) bool {
-	if len(observed.Units) != len(expectedUnits) {
-		return false
-	}
-	expectedMap := make(map[unitKey]*proto.UnitExpected)
-	for _, exp := range expectedUnits {
-		expectedMap[unitKey{client.UnitType(exp.Type), exp.Id}] = exp
-	}
-	for _, unit := range observed.Units {
-		exp, ok := expectedMap[unitKey{client.UnitType(unit.Type), unit.Id}]
-		if !ok {
-			return false
-		}
-		if unit.State != exp.State || unit.ConfigStateIdx != exp.ConfigStateIdx {
-			return false
-		}
-	}
-
-	if observed.FeaturesIdx != expectedFeaturesIdx {
-		return false
-	}
-
-	return true
-}
-
-type unitKey struct {
-	Type client.UnitType
-	ID   string
 }
 
 func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {

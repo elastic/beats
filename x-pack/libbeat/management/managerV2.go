@@ -151,8 +151,8 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
 			"", // Insecure connection for test, no token needed
 			client.VersionInfo{
-				Name:    "testing program",
-				Version: "v1.0.0",
+				Name:    "beat-v2-client-for-testing",
+				Version: version.GetDefaultVersion(),
 			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	} else {
 		// Normal Elastic-Agent-Client initialisation

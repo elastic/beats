@@ -4,7 +4,7 @@
 
 //go:build integration
 
-package input
+package integration
 
 import (
 	"bufio"
