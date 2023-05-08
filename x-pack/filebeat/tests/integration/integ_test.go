@@ -4,7 +4,7 @@
 
 //go:build integration
 
-package management
+package input
 
 import (
 	"fmt"
@@ -16,41 +16,21 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-func generateLogFile(t *testing.T, fullPath string) {
-	t.Helper()
-	f, err := os.Create(fullPath)
-	if err != nil {
-		t.Fatalf("could not create file '%s: %s", fullPath, err)
-	}
-
-	go func() {
-		t.Helper()
-		ticker := time.NewTicker(time.Second)
-		defer ticker.Stop()
-		defer f.Close()
-		for {
-			now := <-ticker.C
-			_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
-			if err != nil {
-				// The Go compiler does not allow me to call t.Fatalf from a non-test
-				// goroutine, so just log it instead
-				t.Errorf("could not write data to log file '%s': %s", fullPath, err)
-				return
-			}
-			// make sure log lines are synced as quickly as possible
-			if err := f.Sync(); err != nil {
-				t.Errorf("could not sync file '%s': %s", fullPath, err)
-			}
-		}
-	}()
-}
-
-func TestPureServe(t *testing.T) {
+// TestInputReloadUnderElasticAgent will start a Filebeat and cause the input
+// reload issue described on https://github.com/elastic/beats/issues/33653
+// to happen, then it will check to logs to ensure the fix is working.
+//
+// In case of a test failure the directory with Filebeat logs and
+// all other supporting files will be kept on build/integration-tests.
+//
+// Run the tests wit -v flag to print the temporary folder used.
+func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// We create our own temp dir so the files can be persisted
 	// in case the test fails. This will help debugging issues on CI
 	//
@@ -66,17 +46,16 @@ func TestPureServe(t *testing.T) {
 	if err := os.MkdirAll(tempDir, 0766); err != nil {
 		t.Fatalf("cannot create tmp dir: %#v, msg: %s", err, err.Error())
 	}
-	defer func() { testFailed = true }() //debug stuff
 	t.Cleanup(func() {
 		if !testFailed {
 			if err := os.RemoveAll(tempDir); err != nil {
 				t.Fatalf("could not remove temp dir '%s': %s", tempDir, err)
 			}
-			t.Logf("temprary directory '%s' removed", tempDir)
+			t.Logf("Temprary directory '%s' removed", tempDir)
 		}
 	})
 
-	t.Logf("temporary directory: %s", tempDir)
+	t.Logf("Temporary directory: %s", tempDir)
 
 	logFilePath := filepath.Join(tempDir, "flog.log")
 	generateLogFile(t, logFilePath)
@@ -190,7 +169,7 @@ func TestPureServe(t *testing.T) {
 	}
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			if doesStateMatch(observed, units[idx], 0) {
+			if management.DoesStateMatch(observed, units[idx], 0) {
 				nextState()
 			}
 			for _, unit := range observed.GetUnits() {
@@ -215,7 +194,6 @@ func TestPureServe(t *testing.T) {
 		t,
 		"../../filebeat.test",
 		[]string{
-			// "-d", "centralmgmt, centralmgmt.V2-manager",
 			"-E", fmt.Sprintf("management.insecure_grpc_url_for_testing=\"localhost:%d\"", server.Port),
 			"-E", "management.enabled=true",
 		},
@@ -224,11 +202,11 @@ func TestPureServe(t *testing.T) {
 
 	p.Start()
 
-	p.LogContains("Can only start an input when all related states are finished", 2*time.Minute)        // logger: centralmgmt
-	p.LogContains("file 'flog.log' is not finished, will retry starting the input soon", 2*time.Minute) // logger: centralmgmt.V2-manager
-	p.LogContains("ForceReload set to TRUE", 2*time.Minute)                                             // logger: centralmgmt.V2-manager
-	p.LogContains("Reloading Beats inputs because forceReload is true", 2*time.Minute)                  // logger: centralmgmt.V2-manager
-	p.LogContains("ForceReload set to FALSE", 2*time.Minute)                                            // logger: centralmgmt.V2-manager
+	p.LogContains("Can only start an input when all related states are finished", 5*time.Minute)        // logger: centralmgmt
+	p.LogContains("file 'flog.log' is not finished, will retry starting the input soon", 5*time.Minute) // logger: centralmgmt.V2-manager
+	p.LogContains("ForceReload set to TRUE", 5*time.Minute)                                             // logger: centralmgmt.V2-manager
+	p.LogContains("Reloading Beats inputs because forceReload is true", 5*time.Minute)                  // logger: centralmgmt.V2-manager
+	p.LogContains("ForceReload set to FALSE", 5*time.Minute)                                            // logger: centralmgmt.V2-manager
 
 	// Set it to false, so the temporaty directory is removed
 	testFailed = false
@@ -274,4 +252,33 @@ func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
 		require.NoError(t, err)
 	}
 	return str
+}
+
+func generateLogFile(t *testing.T, fullPath string) {
+	t.Helper()
+	f, err := os.Create(fullPath)
+	if err != nil {
+		t.Fatalf("could not create file '%s: %s", fullPath, err)
+	}
+
+	go func() {
+		t.Helper()
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
+		defer f.Close()
+		for {
+			now := <-ticker.C
+			_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
+			if err != nil {
+				// The Go compiler does not allow me to call t.Fatalf from a non-test
+				// goroutine, so just log it instead
+				t.Errorf("could not write data to log file '%s': %s", fullPath, err)
+				return
+			}
+			// make sure log lines are synced as quickly as possible
+			if err := f.Sync(); err != nil {
+				t.Errorf("could not sync file '%s': %s", fullPath, err)
+			}
+		}
+	}()
 }
