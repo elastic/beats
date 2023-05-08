@@ -159,6 +159,26 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 	if err != nil {
 		return nil, fmt.Errorf("could not create pipeline client via factory: %w", err)
 	}
+
+	// The state loader needs the beat location to accurately load the last state
+	sf, err := stdfields.ConfigToStdMonitorFields(c)
+	if err != nil {
+		return nil, fmt.Errorf("could not load stdfields in factory: %w", err)
+	}
+	loc := getLocation(f.beatLocation, sf)
+	if loc != nil {
+		geoMap, _ := util.GeoConfigToMap(loc.Geo)
+		err = c.Merge(map[string]interface{}{
+			"run_from": map[string]interface{}{
+				"id":  f.beatLocation.ID,
+				"geo": geoMap,
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("could not merge location into monitor map: %w", err)
+		}
+	}
+
 	monitor, err := newMonitor(c, f.pluginsReg, pc, f.addTask, f.stateLoader, safeStop)
 	if err != nil {
 		return nil, fmt.Errorf("factory could not create monitor: %w", err)
@@ -183,6 +203,19 @@ func (f *RunnerFactory) CheckConfig(config *conf.C) error {
 	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
+// getLocation returns the location either from the stdfields or the beat preferring stdfields. Returns nil if declared in neither spot.
+func getLocation(beatLocation *config.LocationWithID, sf stdfields.StdMonitorFields) (loc *config.LocationWithID) {
+	// Use the monitor-specific location if possible, otherwise use the beat's location
+	// Generally speaking direct HB users would use the beat location, and the synthetics service may as well (TBD)
+	// while Fleet configured monitors will always use a per location monitor
+	if sf.RunFrom != nil {
+		loc = sf.RunFrom
+	} else {
+		loc = beatLocation
+	}
+	return loc
+}
+
 func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID, cfg *conf.C) (pipetool.ConfigEditor, error) {
 	var settings publishSettings
 	if err := cfg.Unpack(&settings); err != nil {
@@ -195,16 +228,8 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 	}
 
 	// Early stage processors for setting data_stream, event.dataset, and index to write to
+	loc := getLocation(beatLocation, sf)
 
-	// Use the monitor-specific location if possible, otherwise use the beat's location
-	// Generally speaking direct HB users would use the beat location, and the synthetics service may as well (TBD)
-	// while Fleet configured monitors will always use a per location monitor
-	var loc *config.LocationWithID
-	if sf.RunFrom != nil {
-		loc = sf.RunFrom
-	} else {
-		loc = beatLocation
-	}
 	preProcs, err := preProcessors(info, loc, settings, sf.Type)
 	if err != nil {
 		return nil, err

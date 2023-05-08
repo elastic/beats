@@ -139,6 +139,7 @@ with the ecs field name `container`. {pull}34403[34403]
 automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 - Fix broken mapping for state.ends field. {pull}34891[34891]
 - Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+- Fix broken state ID location naming. {pull}35336[35336]
 
 *Heartbeat*
 
