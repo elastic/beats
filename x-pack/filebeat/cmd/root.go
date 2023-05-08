@@ -50,10 +50,8 @@ func defaultProcessors() []mapstr.M {
 	// so use an environment variable.
 	shipperEnv := os.Getenv("SHIPPER_MODE")
 	if shipperEnv == "True" {
-		fmt.Printf("In shipper mode\n")
 		return []mapstr.M{}
 	}
-	fmt.Printf("shipper NOT enabled\n")
 	return []mapstr.M{
 		{
 			"add_host_metadata": mapstr.M{
