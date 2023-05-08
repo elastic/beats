@@ -8,7 +8,7 @@
 # https://www.elastic.co/guide/en/beats/heartbeat/index.html
 
 ############################# Heartbeat ######################################
-
+heartbeat.run_once: true
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
@@ -23,7 +23,7 @@ heartbeat.config.monitors:
 heartbeat.monitors:
 - type: http
   # Set enabled to true (or delete the following line) to enable this example monitor
-  enabled: false
+  enabled: true
   # ID used to uniquely identify this monitor in elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere
