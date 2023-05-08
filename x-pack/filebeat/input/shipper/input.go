@@ -168,6 +168,7 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 	// create clients ahead of time
 	for streamID, streamProc := range in.streams {
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
+			PublishMode:   beat.GuaranteedSend,
 			EventListener: acker.TrackingCounter(in.acker.Track),
 			Processing: beat.ProcessingConfig{
 				Processor: streamProc.processors,

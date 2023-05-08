@@ -6,8 +6,6 @@ package shipper
 
 import (
 	"sync/atomic"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type shipperAcker struct {
@@ -24,7 +22,6 @@ func newShipperAcker() *shipperAcker {
 // The acked parameter includes only those events that were successfully sent upstream rather than dropped by processors, etc.,
 // but since we don't make that distinction in persistedIndex we can probably ignore it.
 func (acker *shipperAcker) Track(_ int, total int) {
-	logp.L().Infof("Tracking, total is %d", total)
 	atomic.AddUint64(&acker.persistedIndex, uint64(total))
 }
 
