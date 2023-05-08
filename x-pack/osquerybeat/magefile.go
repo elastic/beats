@@ -161,6 +161,10 @@ func GolangCrossBuild() error {
 	// Only extract osqueryd.exe during osquerybeat build on windows
 	args := devtools.DefaultGolangCrossBuildArgs()
 
+<<<<<<< HEAD
+=======
+	// Install msitools only
+>>>>>>> b74056d007 (bump golang 1.19.9 (#35342))
 	if !strings.HasPrefix(args.Name, "osquery-extension-") {
 		// Extract osqueryd.exe from MSI
 		if err := extractFromMSI(); err != nil {

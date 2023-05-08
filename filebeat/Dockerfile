@@ -1,17 +1,15 @@
-<<<<<<< HEAD
-FROM golang:1.19.8
-=======
 FROM golang:1.19.9
->>>>>>> b74056d007 (bump golang 1.19.9 (#35342))
 
 RUN \
     apt-get update \
       && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+         libsystemd-dev \
+         netcat \
+         rsync \
          python3 \
          python3-pip \
          python3-venv \
-         librpm-dev \
-         iproute2 \
+         libpcap-dev \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade pip==20.1.1

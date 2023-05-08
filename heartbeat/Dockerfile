@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.19.8
+=======
+FROM golang:1.19.9
+>>>>>>> b74056d007 (bump golang 1.19.9 (#35342))
 
 RUN \
     apt-get update \

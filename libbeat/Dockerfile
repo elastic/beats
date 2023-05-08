@@ -1,19 +1,18 @@
-<<<<<<< HEAD
-FROM golang:1.19.8
-=======
 FROM golang:1.19.9
->>>>>>> b74056d007 (bump golang 1.19.9 (#35342))
 
 RUN \
     apt-get update \
       && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+         netcat \
+         libpcap-dev \
          python3 \
          python3-pip \
          python3-venv \
-         librpm-dev \
-         iproute2 \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade pip==20.1.1
 RUN pip3 install --upgrade setuptools==47.3.2
 RUN pip3 install --upgrade docker-compose==1.23.2
+
+# Libbeat specific
+RUN mkdir -p /etc/pki/tls/certs
