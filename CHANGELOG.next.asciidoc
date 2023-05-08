@@ -118,6 +118,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 
 *Heartbeat*
 
@@ -193,6 +195,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 - Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 - Improve documentation for event_logs.name configuration. {pull}34931[34931]
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 *Functionbeat*
 
