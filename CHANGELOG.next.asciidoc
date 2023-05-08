@@ -68,10 +68,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
-- Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
-- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
-- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
-- Improve documentation for event_logs.name configuration. {pull}34931[34931]
 - Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 *Functionbeat*
