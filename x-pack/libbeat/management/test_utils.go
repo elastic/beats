@@ -33,9 +33,5 @@ func DoesStateMatch(
 		}
 	}
 
-	if observed.FeaturesIdx != expectedFeaturesIdx {
-		return false
-	}
-
-	return true
+	return observed.FeaturesIdx == expectedFeaturesIdx
 }
