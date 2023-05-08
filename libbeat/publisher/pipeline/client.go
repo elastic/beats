@@ -205,9 +205,6 @@ func (c *client) onPublished() {
 func (c *client) onFilteredOut(e beat.Event) {
 	c.logger.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
 	c.observer.filteredEvent()
-	if c.clientListener != nil {
-		c.clientListener.FilteredOut(e)
-	}
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
