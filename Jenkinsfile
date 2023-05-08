@@ -708,6 +708,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         } finally {
           if (archive) {
             archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/build/system-tests/docker-logs/TEST-docker-compose-*.log")
+            archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/build//build/integration-tests/*")
             archiveTestOutput(directory: directory, testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
           }
           tearDown()
