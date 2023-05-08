@@ -140,9 +140,15 @@ func TestInputReload(t *testing.T) {
 		},
 	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	m, err := NewV2AgentManagerWithClient(&Config{
-		Enabled: true,
-	}, r, client)
+	m, err := NewV2AgentManagerWithClient(
+		&Config{
+			Enabled: true,
+		},
+		r,
+		client,
+		WithChangeDebounce(300*time.Millisecond),
+		WithForceReloadDebounce(800*time.Millisecond),
+	)
 	require.NoError(t, err)
 
 	mm := m.(*BeatV2Manager)

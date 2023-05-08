@@ -25,7 +25,6 @@ import (
 )
 
 func TestManagerV2(t *testing.T) {
-
 	r := reload.NewRegistry()
 
 	output := &reloadable{}

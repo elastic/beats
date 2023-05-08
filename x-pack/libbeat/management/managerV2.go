@@ -89,6 +89,13 @@ type BeatV2Manager struct {
 	lastBeatOutputCfg   *reload.ConfigWithMeta
 	lastBeatInputCfgs   []*reload.ConfigWithMeta
 	lastBeatFeaturesCfg *conf.C
+
+	// changeDebounce is the debounce time for a configuration change
+	changeDebounce time.Duration
+	// forceReloadDebounce is the time the manager will wait before
+	// trying to reload the configuration after an input not finished error
+	// happens
+	forceReloadDebounce time.Duration
 }
 
 // ================================
@@ -98,6 +105,20 @@ type BeatV2Manager struct {
 // WithStopOnEmptyUnits enables stopping the beat when agent sends no units.
 func WithStopOnEmptyUnits(m *BeatV2Manager) {
 	m.stopOnEmptyUnits = true
+}
+
+// WithChangeDebounce sets the changeDeboung value
+func WithChangeDebounce(d time.Duration) func(b *BeatV2Manager) {
+	return func(b *BeatV2Manager) {
+		b.changeDebounce = d
+	}
+}
+
+// WithForceReloadDebounce sets the forceReloadDebounce value
+func WithForceReloadDebounce(d time.Duration) func(b *BeatV2Manager) {
+	return func(b *BeatV2Manager) {
+		b.forceReloadDebounce = d
+	}
 }
 
 // ================================
@@ -171,6 +192,12 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		status:             lbmanagement.Running,
 		message:            "Healthy",
 		stopChan:           make(chan struct{}, 1),
+		changeDebounce:     time.Second,
+		// forceReloadDebounce is greater than changeDebounce because it is only
+		// used when an input has not reached its finished state, this means some events
+		// still need to be acked by the acker, hence the longer we wait the more likely
+		// for the input to have reached its finished state.
+		forceReloadDebounce: time.Second * 10,
 	}
 
 	if config.Enabled {
@@ -399,21 +426,13 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 }
 
 func (cm *BeatV2Manager) unitListen() {
-	const changeDebounce = time.Second
-
-	// forceReloadDebounce is greater than changeDebounce because it is only
-	// used when an input has not reached its finished state, this means some events
-	// still need to be acked by the acker, hence the longer we wait the more likely
-	// for the input to have reached its finished state.
-	const forceReloadDebounce = changeDebounce * 10
-
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	// timer is used to provide debounce on unit changes
 	// this allows multiple changes to come in and only a single reload be performed
-	t := time.NewTimer(changeDebounce)
+	t := time.NewTimer(cm.changeDebounce)
 	t.Stop() // starts stopped, until a change occurs
 
 	cm.logger.Debug("Listening for agent unit changes")
@@ -448,11 +467,11 @@ func (cm *BeatV2Manager) unitListen() {
 			case client.UnitChangedAdded:
 				cm.addUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
-				t.Reset(changeDebounce)
+				t.Reset(cm.changeDebounce)
 			case client.UnitChangedModified:
 				cm.modifyUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
-				t.Reset(changeDebounce)
+				t.Reset(cm.changeDebounce)
 			case client.UnitChangedRemoved:
 				cm.deleteUnit(change.Unit)
 			}
@@ -469,7 +488,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.reload(units)
 			if cm.forceReload {
 				// Restart the debounce timer so we try to reload the inputs.
-				t.Reset(forceReloadDebounce)
+				t.Reset(cm.forceReloadDebounce)
 			}
 		}
 	}
