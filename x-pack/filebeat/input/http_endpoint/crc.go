@@ -16,19 +16,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Type Validator points to the function in charge of validating
-// CRC requests defined for each provider in the crcValidator struct.
-//
-// Params:
-//
-//	*crcValidator: pointer to the CRC handler for the webhook provider
-//	mapstr.M: input JSON to be validated
-//
-// Returns:
-//
-//	status: response code to send back to the endpoint
-//	resp: response body
-//	error: failure reason if proceed
+// Validator is a CRC validation function type. It applies the provided validator
+// to the challenge sent by an API and returns an HTTP status code and response
+// body to be sent to the challenging API server.
 type Validator func(*crcValidator, mapstr.M) (status int, resp string, _ error)
 
 func (v *crcValidator) validate(m mapstr.M) (status int, resp string, _ error) {
