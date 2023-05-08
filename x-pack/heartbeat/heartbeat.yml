@@ -8,7 +8,6 @@
 # https://www.elastic.co/guide/en/beats/heartbeat/index.html
 
 ############################# Heartbeat ######################################
-heartbeat.run_once: true
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
