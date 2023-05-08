@@ -112,27 +112,15 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	expected := common.MapStr{
 		"cloud": common.MapStr{
 			"provider": "azure",
-<<<<<<< HEAD
 			"instance": common.MapStr{
-				"id":   "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-				"name": "test-az-vm",
-			},
-			"machine": common.MapStr{
-				"type": "Standard_D3_v2",
-			},
-			"account": common.MapStr{
-				"id": "5tfb04c3-63de-4709-a9f9-9ab8c0411d5e",
-=======
-			"instance": mapstr.M{
 				"id":   "220e2b43-0913-492f-ada0-b6b2795bdb9b",
 				"name": "aks-agentpool-12628255-vmss_2",
 			},
-			"machine": mapstr.M{
-				"type": "Standard_DS2_v2",
+			"machine": common.MapStr{
+				"type": "Standard_DS2_v",
 			},
-			"account": mapstr.M{
+			"account": common.MapStr{
 				"id": "0e073ec1-c22f-4488-adde-da35ed609ccd",
->>>>>>> 25e882fcd4 ([add_cloud_metadata processor] Update azure metadata api version (#35302))
 			},
 			"service": common.MapStr{
 				"name": "Virtual Machines",
