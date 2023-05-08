@@ -219,18 +219,6 @@ func installDependencies(arch string, pkgs ...string) error {
 	// going to be used unnecessary when building using non-debian7 images
 	// (like when making the linux/arm binaries) and we should remove it soonish.
 	// See https://github.com/elastic/beats/v7/issues/11750 for more details.
-	err := sh.Run("grep", "stretch", "/etc/os-release")
-	if err == nil {
-		if err := sh.Run("sed", "-i", "5,6d", "/etc/apt/sources.list"); err != nil {
-			return err
-		}
-		if err := sh.Run("sed", "-i", "s/deb.debian.org/archive.debian.org/g", "/etc/apt/sources.list"); err != nil {
-			return err
-		}
-		if err := sh.Run("sed", "-i", "s/security.debian.org/archive.debian.org/g", "/etc/apt/sources.list"); err != nil {
-			return err
-		}
-	}
 	if err := sh.Run("apt-get", "update", "-o", "Acquire::Check-Valid-Until=false"); err != nil {
 		return err
 	}
