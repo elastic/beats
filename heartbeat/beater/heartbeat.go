@@ -259,7 +259,8 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 			return nil
 		}
 
-		esClient, err := makeESClient(outCfg.Config(), 1, 0)
+		// Backoff panics with 0 duration, set to smallest unit
+		esClient, err := makeESClient(outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
 			logp.L().Warnf("could not connect to ES for state management during managed reload: %s", err)
 		} else {
