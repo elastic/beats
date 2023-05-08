@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 
 *Heartbeat*
@@ -48,6 +49,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Winlogbeat*
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 
 *Functionbeat*
@@ -112,6 +114,5 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-
 
 
