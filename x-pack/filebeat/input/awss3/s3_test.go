@@ -30,6 +30,8 @@ func TestS3Poller(t *testing.T) {
 	const pollInterval = 2 * time.Second
 	const testTimeout = 1 * time.Second
 
+	testMetrics := newInputMetrics("metrics-s3-test", nil, 1)
+
 	t.Run("Poll success", func(t *testing.T) {
 		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 		store, err := storeReg.Get("test")
@@ -125,8 +127,8 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{}, numberOfWorkers)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), testMetrics, mockAPI, nil, backupConfig{})
+		receiver := newS3Poller(logp.NewLogger(inputName), testMetrics, mockAPI, mockPublisher, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
 		assert.Equal(t, numberOfWorkers, receiver.workerSem.Available())
 	})
@@ -248,8 +250,8 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{}, numberOfWorkers)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), testMetrics, mockAPI, nil, backupConfig{})
+		receiver := newS3Poller(logp.NewLogger(inputName), testMetrics, mockAPI, mockPublisher, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
 		assert.Equal(t, numberOfWorkers, receiver.workerSem.Available())
 	})

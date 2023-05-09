@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -105,11 +104,7 @@ func newSQSS3EventProcessor(
 	maxReceiveCount int,
 	pipeline beat.Pipeline,
 	s3 s3ObjectHandlerFactory,
-	maxWorkers int,
 ) *sqsS3EventProcessor {
-	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry(), maxWorkers)
-	}
 	return &sqsS3EventProcessor{
 		s3ObjectHandler:      s3,
 		sqsVisibilityTimeout: sqsVisibilityTimeout,

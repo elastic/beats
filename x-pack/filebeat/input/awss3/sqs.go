@@ -15,7 +15,6 @@ import (
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -34,9 +33,6 @@ type sqsReader struct {
 }
 
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
-	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry(), maxMessagesInflight)
-	}
 	return &sqsReader{
 		maxMessagesInflight: maxMessagesInflight,
 		workerSem:           awscommon.NewSem(maxMessagesInflight),
