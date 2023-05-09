@@ -336,11 +336,12 @@ func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	resp, err := rt.transport.RoundTrip(req)
 	rt.metrics.roundTripTime.Update(time.Since(reqStart).Nanoseconds())
 
+	if resp != nil {
+		rt.metrics.resps.Add(1)
+	}
+
 	if resp == nil || err != nil {
 		rt.metrics.respErrs.Add(1)
-		if resp != nil {
-			rt.metrics.resps.Add(1)
-		}
 		return resp, err
 	}
 
