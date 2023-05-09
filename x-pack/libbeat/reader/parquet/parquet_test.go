@@ -100,7 +100,6 @@ func TestParquetWithRandomData(t *testing.T) {
 			rows := readAndValidateParquetFile(t, cfg, file, data)
 			// asserts of number of rows read is the same as the number of rows written
 			assert.Equal(t, rows, tc.rows)
-			//	assert.JSONEq()
 		})
 	}
 }
