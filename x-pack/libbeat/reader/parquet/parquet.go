@@ -66,7 +66,7 @@ func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
 	}, nil
 }
 
-// Next returns true if there are more records to read.
+// Next advances the pointer to point to the next record and returns true if the next record exists.
 // It will return false if there are no more records to read.
 func (sr *StreamReader) Next() bool {
 	return sr.recordReader.Next()

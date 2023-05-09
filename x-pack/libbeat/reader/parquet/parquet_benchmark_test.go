@@ -156,7 +156,7 @@ func BenchmarkReadParquet(b *testing.B) {
 			desc:                       "Construct and read a single large parquet file in batches of 1000 serially",
 			constructAndReadLargeFiles: true,
 			largeFiles: []parquetFile{{
-				name: "largeFile_1.parquet",
+				name: "large_file_1.parquet",
 				cols: 4,
 				rows: 100000,
 			}},
@@ -167,7 +167,7 @@ func BenchmarkReadParquet(b *testing.B) {
 			desc:                       "Construct and read a single large parquet file in batches of 10000 serially",
 			constructAndReadLargeFiles: true,
 			largeFiles: []parquetFile{{
-				name: "largeFile_1.parquet",
+				name: "large_file_2.parquet",
 				cols: 4,
 				rows: 100000,
 			}},
