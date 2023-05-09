@@ -9,7 +9,6 @@ package integration
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -66,43 +65,37 @@ func (b *BeatProc) Start() {
 
 // LogContains looks for s as a sub string of every log line,
 // if it's not found until timeout is reached, the test fails
-func (b *BeatProc) LogContains(s string, timeout time.Duration) bool {
+func (b *BeatProc) LogContains(s string) bool {
 	logFile := b.openLogFile()
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			b.t.Errorf("could not close log file: %s", err)
+		}
+	}()
 	scanner := bufio.NewScanner(logFile)
 
-	timer := time.NewTimer(timeout)
-	defer timer.Stop()
-
-	linesScanned := 0
-	defer func() {
-		b.t.Logf("lines scanned: %d", linesScanned)
-		pos, err := logFile.Seek(0, io.SeekCurrent)
-		if err != nil {
-			b.t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
-		}
-		b.t.Logf("last position on '%s': %d", logFile.Name(), pos)
-	}()
-	for {
-		select {
-		default:
-			if scanner.Scan() {
-				linesScanned++
-				if strings.Contains(scanner.Text(), s) {
-					return true
-				}
-			}
-			// scanner.Scan() will return false when it reaches the end of the file,
-			// then it will stop reading from the file.
-			// So if it's error is nil, we create a new scanner
-			//
-			// This kind of creates a busy loop, but for a test it's acceptable.
-			if err := scanner.Err(); err == nil {
-				scanner = bufio.NewScanner(logFile)
-			}
-		case <-timer.C:
-			b.t.Fatalf("timeout reached while trying to find '%s' in the logs", s)
+	// TODO(Tiago) Remove this very verbose debugging code
+	// startTime := time.Now()
+	// linesScanned := 0
+	// defer func() {
+	// 	b.t.Logf("lines scanned: %d", linesScanned)
+	// 	pos, err := logFile.Seek(0, io.SeekCurrent)
+	// 	if err != nil {
+	// 		b.t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
+	// 	}
+	// 	b.t.Logf("last position on '%s': %d", logFile.Name(), pos)
+	// 	b.t.Logf("took %s", time.Now().Sub(startTime).String())
+	// }()
+	for scanner.Scan() {
+		// linesScanned++
+		if strings.Contains(scanner.Text(), s) {
+			return true
 		}
 	}
+
+	return false
 }
 
 // openLogFile opens the log file for reading and returns it.
@@ -141,8 +134,7 @@ func (b *BeatProc) openLogFile() *os.File {
 	if err != nil {
 		t.Fatalf("could not open log file '%s': %s", files[0], err)
 	}
-	t.Cleanup(func() { f.Close() })
 
-	t.Logf("file: '%s' successfully opened", files[0])
+	// t.Logf("file: '%s' successfully opened", files[0])
 	return f
 }

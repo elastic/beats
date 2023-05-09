@@ -201,11 +201,31 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 
 	p.Start()
 
-	p.LogContains("Can only start an input when all related states are finished", 5*time.Minute)        // logger: centralmgmt
-	p.LogContains("file 'flog.log' is not finished, will retry starting the input soon", 5*time.Minute) // logger: centralmgmt.V2-manager
-	p.LogContains("ForceReload set to TRUE", 5*time.Minute)                                             // logger: centralmgmt.V2-manager
-	p.LogContains("Reloading Beats inputs because forceReload is true", 5*time.Minute)                  // logger: centralmgmt.V2-manager
-	p.LogContains("ForceReload set to FALSE", 5*time.Minute)                                            // logger: centralmgmt.V2-manager
+	// logger: centralmgmt
+	// logger: centralmgmt.V2-manager
+	// logger: centralmgmt.V2-manager
+	// logger: centralmgmt.V2-manager
+	// logger: centralmgmt.V2-manager
+
+	require.Eventually(t, func() bool {
+		return p.LogContains("Can only start an input when all related states are finished")
+	}, 5*time.Minute, 200*time.Millisecond)
+
+	require.Eventually(t, func() bool {
+		return p.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
+	}, 5*time.Minute, 200*time.Millisecond)
+
+	require.Eventually(t, func() bool {
+		return p.LogContains("ForceReload set to TRUE")
+	}, 5*time.Minute, 200*time.Millisecond)
+
+	require.Eventually(t, func() bool {
+		return p.LogContains("Reloading Beats inputs because forceReload is true")
+	}, 5*time.Minute, 200*time.Millisecond)
+
+	require.Eventually(t, func() bool {
+		return p.LogContains("ForceReload set to FALSE")
+	}, 5*time.Minute, 200*time.Millisecond)
 
 	// Set it to false, so the temporaty directory is removed
 	testFailed = false
