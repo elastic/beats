@@ -72,14 +72,26 @@ func validateFileContents(t *testing.T, dir string) {
 		"examples/todos/advanced.journey.ts",
 	}
 	for _, file := range expected {
-		_, err := os.Stat(path.Join(dir, file))
+		stat, err := os.Stat(path.Join(dir, file))
 		assert.NoError(t, err)
+		// Permissions should be greater than (rwxrwx---), for setuid group access
+		mode := stat.Mode().Perm()
+		require.GreaterOrEqualf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
+			stat.Name(), os.FileMode(0770), mode)
 	}
 }
 
 func fetchAndValidate(t *testing.T, psrc *ProjectSource) {
 	err := psrc.Fetch()
 	require.NoError(t, err)
+
+	dir, err := os.Stat(psrc.Workdir())
+	require.NoError(t, err)
+
+	// Permissions should be greater than (rwxrwx---), for setuid group access
+	mode := dir.Mode().Perm()
+	require.GreaterOrEqualf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
+		dir.Name(), os.FileMode(0770), mode)
 
 	validateFileContents(t, psrc.Workdir())
 	// check if the working directory is deleted

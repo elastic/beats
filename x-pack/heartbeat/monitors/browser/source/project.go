@@ -59,6 +59,10 @@ func (p *ProjectSource) Fetch() error {
 	if err != nil {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
+	err = os.Chmod(p.TargetDirectory, defaultMod)
+	if err != nil {
+		return fmt.Errorf("failed assigning default mode %s to temp dir: %w", defaultMod, err)
+	}
 
 	err = unzip(tf, p.Workdir(), "")
 	if err != nil {
