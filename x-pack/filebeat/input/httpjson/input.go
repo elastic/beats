@@ -24,10 +24,12 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -118,7 +120,10 @@ func run(
 		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
 	}
 
-	httpClient, err := newHTTPClient(stdCtx, config, log)
+	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
+	defer unreg()
+
+	httpClient, err := newHTTPClient(stdCtx, config, log, reg)
 	if err != nil {
 		return err
 	}
@@ -170,7 +175,7 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
+func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
 	// Make retryable HTTP client
 	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.settings())...)
 	if err != nil {
@@ -192,6 +197,10 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 		traceLogger := zap.New(core)
 
 		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+	}
+
+	if reg != nil {
+		netHTTPClient.Transport = httplog.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
 	}
 
 	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
