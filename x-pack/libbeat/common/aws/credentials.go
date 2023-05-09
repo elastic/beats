@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
@@ -75,6 +76,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 		tlsConfig = TLSConfig.ToConfig()
 	}
 	awsConfig.HTTPClient = &http.Client{
+		Timeout: 5 * time.Second,
 		Transport: &http.Transport{
 			Proxy:           proxy,
 			TLSClientConfig: tlsConfig,
