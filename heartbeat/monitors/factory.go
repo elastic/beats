@@ -170,7 +170,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, erro
 		geoMap, _ := util.GeoConfigToMap(loc.Geo)
 		err = c.Merge(map[string]interface{}{
 			"run_from": map[string]interface{}{
-				"id":  f.beatLocation.ID,
+				"id":  loc.ID,
 				"geo": geoMap,
 			},
 		})
