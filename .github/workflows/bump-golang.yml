@@ -9,6 +9,9 @@ permissions:
   pull-requests: write
   contents: write
 
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
 jobs:
   bump:
     runs-on: ubuntu-latest
