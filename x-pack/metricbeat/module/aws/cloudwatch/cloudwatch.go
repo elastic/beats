@@ -507,11 +507,12 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 	for resourceType, tagsFilter := range resourceTypeTagFilters {
 		m.logger.Debugf("resourceType = %s", resourceType)
 		m.logger.Debugf("tagsFilter = %s", tagsFilter)
-		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
-		if err != nil {
-			// If GetResourcesTags failed, continue report event just without tags.
-			m.logger.Info(fmt.Errorf("getResourcesTags failed, skipping region %s: %w", regionName, err))
-		}
+		resourceTagMap := map[string][]resourcegroupstaggingapitypes.Tag{}
+		// resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
+		//	if err != nil {
+		//		// If GetResourcesTags failed, continue report event just without tags.
+		//		m.logger.Info(fmt.Errorf("getResourcesTags failed, skipping region %s: %w", regionName, err))
+		//	}
 
 		if len(tagsFilter) != 0 && len(resourceTagMap) == 0 {
 			continue
