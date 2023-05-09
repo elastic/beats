@@ -70,7 +70,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.1.0
+	github.com/elastic/elastic-agent-client/v7 v7.1.1
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.2
 	github.com/elastic/go-licenser v0.4.0
@@ -164,7 +164,7 @@ require (
 	golang.org/x/text v0.7.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.1.12
-	google.golang.org/api v0.100.0
+	google.golang.org/api v0.102.0
 	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
@@ -185,6 +185,7 @@ require (
 
 require (
 	cloud.google.com/go v0.105.0
+	cloud.google.com/go/redis v1.10.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
 	github.com/Azure/go-autorest/autorest/adal v0.9.14
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
@@ -215,8 +216,10 @@ require (
 )
 
 require (
-	cloud.google.com/go/compute v1.10.0 // indirect
+	cloud.google.com/go/compute v1.12.1 // indirect
+	cloud.google.com/go/compute/metadata v0.2.1 // indirect
 	cloud.google.com/go/iam v0.6.0 // indirect
+	cloud.google.com/go/longrunning v0.1.1 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect

@@ -13,6 +13,7 @@ env:
   EMAIL_VAULT_SECRET: secret/observability-team/ci/service-account/email-github-actions
   EMAIL: beats-contrib@elastic.co
   URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call'
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 jobs:
   filter:
@@ -35,6 +36,9 @@ jobs:
         with:
           fetch-depth: 0
           ref: "${{ matrix.branch }}"
+
+      - id: date
+        run: echo "date=$(date +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
 
       - id: search
         run: |-
@@ -81,8 +85,8 @@ jobs:
           server_address: ${{ env.MAIL_SERVER }}
           username: ${{ env.MAIL_USERNAME }}
           password: ${{ env.MAIL_PASSWORD }}
-          subject: '[${{ matrix.branch }}] Elastic Stack version has not been updated recently.'
+          subject: '[${{ matrix.branch }}] ${{ steps.date.outputs.date }}: Elastic Stack version has not been updated recently.'
           to: ${{ env.EMAIL }}
           from: ${{ env.MAIL_FROM }}
           reply_to: ${{ env.MAIL_REPLY }}
-          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in ${{ env.URL_QUERY }}'
+          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in ${{ env.URL_QUERY }}. Generated automatically with ${{ env.JOB_URL }}'
