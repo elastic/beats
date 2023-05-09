@@ -19,6 +19,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const requestNamespace = "request"
@@ -109,7 +110,7 @@ type requestFactory struct {
 	saveFirstResponse      bool
 }
 
-func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
@@ -134,7 +135,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 		if ch.Step != nil {
 			ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
-			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log)
+			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log, reg)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
 			}
@@ -160,7 +161,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
-			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, policy)
+			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
 			}

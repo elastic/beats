@@ -128,7 +128,7 @@ func run(
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, config, log)
+	requestFactory, err := newRequestFactory(stdCtx, config, log, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		return err
@@ -177,33 +177,10 @@ func sanitizeFileName(name string) string {
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.settings())...)
+	netHTTPClient, err := newNetHTTPClient(ctx, config.Request, log, reg)
 	if err != nil {
 		return nil, err
 	}
-
-	if config.Request.Tracer != nil {
-		w := zapcore.AddSync(config.Request.Tracer)
-		go func() {
-			// Close the logger when we are done.
-			<-ctx.Done()
-			config.Request.Tracer.Close()
-		}()
-		core := ecszap.NewCore(
-			ecszap.NewDefaultEncoderConfig(),
-			w,
-			zap.DebugLevel,
-		)
-		traceLogger := zap.New(core)
-
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
-	}
-
-	if reg != nil {
-		netHTTPClient.Transport = httplog.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
-	}
-
-	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
 
 	client := &retryablehttp.Client{
 		HTTPClient:   netHTTPClient,
@@ -226,6 +203,39 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *mo
 	}
 
 	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+}
+
+func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
+	// Make retryable HTTP client
+	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.Tracer != nil {
+		w := zapcore.AddSync(cfg.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			cfg.Tracer.Close()
+		}()
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		traceLogger := zap.New(core)
+
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+	}
+
+	if reg != nil {
+		netHTTPClient.Transport = httplog.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
+	}
+
+	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)
+
+	return netHTTPClient, nil
 }
 
 // clientOption returns constructed client configuration options, including
