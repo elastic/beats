@@ -117,7 +117,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 				"name": "aks-agentpool-12628255-vmss_2",
 			},
 			"machine": common.MapStr{
-				"type": "Standard_DS2_v",
+				"type": "Standard_DS2_v2",
 			},
 			"account": common.MapStr{
 				"id": "0e073ec1-c22f-4488-adde-da35ed609ccd",
