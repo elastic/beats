@@ -151,7 +151,7 @@ RUN cd /usr/share/heartbeat/.node \
 RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
-RUN npm i -g --loglevel verbose -f @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
+RUN npm i -g --loglevel verbose --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
 RUN chmod ug+rwX -R $NODE_PATH 
 USER root
 
@@ -168,8 +168,10 @@ RUN for iter in {1..10}; do \
 done; \
 (exit $exit_code)
 {{- end }}
+USER 1000
+{{- else }}
+USER 0
 {{- end }}
-USER {{ .user }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}

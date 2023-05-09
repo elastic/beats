@@ -113,7 +113,7 @@ type reporterFactory interface {
 func (s ProtocolsStruct) Init(
 	testMode bool,
 	pub reporterFactory,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	configs map[string]*conf.C,
 	listConfigs []*conf.C,
 ) error {
@@ -150,7 +150,7 @@ func (s ProtocolsStruct) Init(
 func (s ProtocolsStruct) configureProtocol(
 	testMode bool,
 	pub reporterFactory,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	name string,
 	config *conf.C,
 ) error {

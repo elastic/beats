@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//nolint: errcheck // It's a test file
+//nolint:errcheck // It's a test file
 package filestream
 
 import (
@@ -496,7 +496,7 @@ func (t *testHarvesterGroup) Stop(s loginp.Source) {
 	t.events = append(t.events, harvesterStop(s.Name()))
 }
 
-func (t *testHarvesterGroup) StopGroup() error {
+func (t *testHarvesterGroup) StopHarvesters() error {
 	t.events = append(t.events, harvesterGroupStop{})
 	return nil
 }

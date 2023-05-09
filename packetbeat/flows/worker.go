@@ -127,7 +127,7 @@ func (w *worker) periodically(tick time.Duration, fn func() error) {
 // reporting will be done at flow lifetime end.
 // Flows are published via the pub Reporter after being enriched with process information
 // by watcher.
-func newFlowsWorker(pub Reporter, watcher procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
+func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
 	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
@@ -222,7 +222,7 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 
 type flowsProcessor struct {
 	spool    spool
-	watcher  procs.ProcessesWatcher
+	watcher  *procs.ProcessesWatcher
 	table    *flowMetaTable
 	counters *counterReg
 	timeout  time.Duration
@@ -287,7 +287,7 @@ func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver b
 	fw.spool.publish(event)
 }
 
-func createEvent(watcher procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string) beat.Event {
+func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string) beat.Event {
 	timestamp := ts
 
 	event := mapstr.M{

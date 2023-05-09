@@ -1,108 +1,28 @@
 {
-    "@timestamp": "2022-12-30T08:40:23.878Z",
-    "orchestrator": {
-        "cluster": {
-            "url": "newcluster-external-load-balancer:6443",
-            "name": "newcluster"
-        }
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
         "dataset": "kubernetes.proxy",
-        "module": "kubernetes",
-        "duration": 11422247
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "proxy": {
+            "client": {
+                "request": {
+                    "count": 25
+                }
+            },
+            "code": "200",
+            "host": "kind-control-plane:6443",
+            "method": "GET"
+        }
     },
     "metricset": {
         "name": "proxy",
         "period": 10000
     },
-    "agent": {
-        "version": "8.7.0",
-        "ephemeral_id": "6bc1b515-402f-4d22-ab53-d72c97ed8df7",
-        "id": "0ba47f13-5b2c-4278-a42b-69a829397534",
-        "name": "newcluster-control-plane",
-        "type": "metricbeat"
-    },
-    "ecs": {
-        "version": "8.0.0"
-    },
-    "host": {
-        "name": "newcluster-control-plane"
-    },
     "service": {
-        "address": "http://localhost:10249/metrics",
+        "address": "127.0.0.1:55555",
         "type": "kubernetes"
-    },
-    "kubernetes": {
-        "proxy": {
-            "verb": "GET",
-            "client": {
-                "response": {
-                    "size": {
-                        "bytes": {
-                            "sum": 11102,
-                            "count": 4,
-                            "bucket": {
-                                "64": 0,
-                                "256": 0,
-                                "512": 0,
-                                "1024": 0,
-                                "4096": 4,
-                                "16384": 4,
-                                "65536": 4,
-                                "262144": 4,
-                                "1048576": 4,
-                                "4194304": 4,
-                                "16777216": 4,
-                                "+Inf": 4
-                            }
-                        }
-                    }
-                },
-                "request": {
-                    "size": {
-                        "bytes": {
-                            "bucket": {
-                                "64": 4,
-                                "256": 4,
-                                "512": 4,
-                                "1024": 4,
-                                "4096": 4,
-                                "16384": 4,
-                                "65536": 4,
-                                "262144": 4,
-                                "1048576": 4,
-                                "4194304": 4,
-                                "16777216": 4,
-                                "+Inf": 4
-                            },
-                            "sum": 0,
-                            "count": 4
-                        }
-                    },
-                    "duration": {
-                        "us": {
-                            "sum": 20194.653,
-                            "count": 4,
-                            "bucket": {
-                                "5000": 3,
-                                "25000": 4,
-                                "100000": 4,
-                                "250000": 4,
-                                "500000": 4,
-                                "1000000": 4,
-                                "2000000": 4,
-                                "4000000": 4,
-                                "8000000": 4,
-                                "15000000": 4,
-                                "30000000": 4,
-                                "60000000": 4,
-                                "+Inf": 4
-                            }
-                        }
-                    }
-                }
-            },
-            "host": "newcluster-external-load-balancer:6443"
-        }
     }
 }

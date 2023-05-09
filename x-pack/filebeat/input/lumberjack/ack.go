@@ -65,7 +65,7 @@ func (t *batchACKTracker) ACK() {
 // an event has been ACKed an output. If the event contains a private metadata
 // pointing to a batchACKTracker then it will invoke the tracker's ACK() method
 // to decrement the number of pending ACKs.
-func newEventACKHandler() beat.ACKer {
+func newEventACKHandler() beat.EventListener {
 	return acker.ConnectionOnly(
 		acker.EventPrivateReporter(func(_ int, privates []interface{}) {
 			for _, private := range privates {

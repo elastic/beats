@@ -59,7 +59,7 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 	var mysql mysqlPlugin
 	config := defaultConfig
 	config.Ports = []int{serverPort}
-	mysql.init(callback, procs.ProcessesWatcher{}, &config)
+	mysql.init(callback, &procs.ProcessesWatcher{}, &config)
 	return &mysql
 }
 

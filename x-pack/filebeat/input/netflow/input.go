@@ -117,7 +117,8 @@ func NewInput(
 		WithExpiration(config.ExpirationTimeout).
 		WithLogOutput(&logDebugWrapper{Logger: logger}).
 		WithCustomFields(customFields...).
-		WithSequenceResetEnabled(config.DetectSequenceReset))
+		WithSequenceResetEnabled(config.DetectSequenceReset).
+		WithSharedTemplates(config.ShareTemplates))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}

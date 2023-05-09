@@ -71,7 +71,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(context.Background(), c.Program, root, client, nil, patterns)
+	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -149,7 +149,7 @@ func (c rateLimitConfig) Validate() error {
 		return errors.New("limit must be greater than zero")
 	}
 	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("limit must be greater than zero if limit is specified")
+		return errors.New("burst must be greater than zero if limit is not specified")
 	}
 	return nil
 }

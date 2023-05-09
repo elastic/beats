@@ -18,6 +18,8 @@ processors:
           +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app})
           +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid})
           +\[%{GREEDYDATA:syslog5424_sd}\]'
+      pattern_definitions:
+        TIMESTAMP_ISO8601: "%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE:_temp_.tz}?"
   - kv:
       field: syslog5424_sd
       field_split: "; "
@@ -51,10 +53,41 @@ processors:
       field: "@timestamp"
       target_field: "event.created"
       ignore_missing: true
+  # Time zone can come from three sources, choose in order: log, config, locale, default to UTC.
+  - set:
+      field: _temp_.tz
+      value: UTC
+      if: ctx._temp_?.tz == 'Z'
+  - set:
+      field: _temp_.tz
+      copy_from: _temp_.timezone_offset
+      override: false
+      if: ctx._temp_?.timezone_offset != null && ctx._temp_?.timezone_offset != 'local'
+  - set:
+      field: _temp_.tz
+      copy_from: event.timezone
+      override: false
+      if: ctx.event?.timezone != null
+  - set:
+      field: _temp_.tz
+      value: UTC
+      override: false
+  - set:
+      field: event.timezone
+      copy_from: _temp_.tz
   - date:
       field: "syslog5424_ts"
+      timezone: "{{{ event.timezone }}}"
       formats: ["ISO8601", "UNIX"]
       if: "ctx.checkpoint?.time == null"
+      on_failure:
+        - remove:
+            field: event.timezone
+            ignore_missing: true
+        # Try to re-parse as UTC to catch when TZ is invalid or unknown.
+        - date:
+            field: "syslog5424_ts"
+            formats: ["ISO8601", "UNIX"]
   - append:
       field: event.category
       value: network

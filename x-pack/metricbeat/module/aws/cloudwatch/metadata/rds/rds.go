@@ -7,6 +7,7 @@ package rds
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
@@ -43,37 +44,41 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 		}
 	}
 
-	for identifier, output := range dbDetailsMap {
-		if _, ok := events[identifier]; !ok {
-			continue
-		}
+	for dbInstanceIdentifier, output := range dbDetailsMap {
+		for eventIdentifier := range events {
+			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+			potentialDBInstanceIdentifier := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			if dbInstanceIdentifier != potentialDBInstanceIdentifier {
+				continue
+			}
 
-		if output.DBInstanceArn != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
-		}
+			if output.DBInstanceArn != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
+			}
 
-		if output.DBInstanceStatus != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
-		}
+			if output.DBInstanceStatus != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
+			}
 
-		if output.DBInstanceIdentifier != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
-		}
+			if output.DBInstanceIdentifier != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
+			}
 
-		if output.DBClusterIdentifier != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
-		}
+			if output.DBClusterIdentifier != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
+			}
 
-		if output.DBInstanceClass != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
-		}
+			if output.DBInstanceClass != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
+			}
 
-		if output.Engine != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
-		}
+			if output.Engine != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
+			}
 
-		if output.AvailabilityZone != nil {
-			_, _ = events[identifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			if output.AvailabilityZone != nil {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			}
 		}
 	}
 	return events, nil

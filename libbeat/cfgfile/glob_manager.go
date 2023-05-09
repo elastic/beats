@@ -44,9 +44,9 @@ type CfgFile struct {
 
 // NewGlobManager takes a glob and enabled/disabled extensions and returns a GlobManager object.
 // Parameters:
-//  - glob - matching conf files (ie: modules.d/*.yml)
-//  - enabledExtension - extension for enabled confs, must match the glob (ie: .yml)
-//  - disabledExtension - extension to append for disabled confs (ie: .disabled)
+//   - glob - matching conf files (ie: modules.d/*.yml)
+//   - enabledExtension - extension for enabled confs, must match the glob (ie: .yml)
+//   - disabledExtension - extension to append for disabled confs (ie: .disabled)
 func NewGlobManager(glob, enabledExtension, disabledExtension string) (*GlobManager, error) {
 	if !strings.HasSuffix(glob, enabledExtension) {
 		return nil, errors.New("Glob should have the enabledExtension as suffix")

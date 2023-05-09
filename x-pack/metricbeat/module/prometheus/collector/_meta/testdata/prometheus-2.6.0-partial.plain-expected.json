@@ -192,6 +192,9 @@
             },
             "prometheus_api_remote_read_queries": {
                 "value": 0
+            },
+            "up": {
+                "value": 1
             }
         },
         "service": {
@@ -335,30 +338,6 @@
                 "instance": "127.0.0.1:34181",
                 "job": "prometheus",
                 "quantile": "0"
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:34181",
-                "job": "prometheus"
-            },
-            "up": {
-                "value": 1
             }
         },
         "service": {

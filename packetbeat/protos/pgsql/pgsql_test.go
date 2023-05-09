@@ -55,7 +55,7 @@ func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
 
 	var pgsql pgsqlPlugin
 	config := defaultConfig
-	pgsql.init(callback, procs.ProcessesWatcher{}, &config)
+	pgsql.init(callback, &procs.ProcessesWatcher{}, &config)
 	return &pgsql
 }
 

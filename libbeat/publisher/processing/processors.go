@@ -81,7 +81,7 @@ func newGroup(title string, log *logp.Logger) *group {
 	}
 }
 
-func (p *group) add(processor processors.Processor) {
+func (p *group) add(processor beat.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
 	}
@@ -206,6 +206,7 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 
 			b, err := encoder.Encode(info.Beat, event)
 			if err != nil {
+				//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
 				return event, nil
 			}
 
