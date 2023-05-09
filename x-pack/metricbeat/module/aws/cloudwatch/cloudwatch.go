@@ -218,8 +218,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			for _, event := range events {
 				report.Event(event)
 			}
+
+			m.logger.Debugf("%d events reported for namespace %s in region %s", len(events), namespace, regionName)
 		}
+
+		m.logger.Debug("done reporting events for all namespaces")
 	}
+
+	m.logger.Debug("done reporting events for all regions")
 	return nil
 }
 
