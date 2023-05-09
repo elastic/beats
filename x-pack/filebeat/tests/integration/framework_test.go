@@ -9,6 +9,7 @@ package integration
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -72,10 +73,20 @@ func (b *BeatProc) LogContains(s string, timeout time.Duration) bool {
 	timer := time.NewTimer(timeout)
 	defer timer.Stop()
 
+	linesScanned := 0
+	defer func() {
+		b.t.Logf("lines scanned: %d", linesScanned)
+		pos, err := logFile.Seek(0, io.SeekCurrent)
+		if err != nil {
+			b.t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
+		}
+		b.t.Logf("last position on '%s': %d", logFile.Name(), pos)
+	}()
 	for {
 		select {
 		default:
 			if scanner.Scan() {
+				linesScanned++
 				if strings.Contains(scanner.Text(), s) {
 					return true
 				}
@@ -131,5 +142,7 @@ func (b *BeatProc) openLogFile() *os.File {
 		t.Fatalf("could not open log file '%s': %s", files[0], err)
 	}
 	t.Cleanup(func() { f.Close() })
+
+	t.Logf("file: '%s' successfully opened", files[0])
 	return f
 }
