@@ -9,6 +9,7 @@ package integration
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -77,19 +78,19 @@ func (b *BeatProc) LogContains(s string) bool {
 	scanner := bufio.NewScanner(logFile)
 
 	// TODO(Tiago) Remove this very verbose debugging code
-	// startTime := time.Now()
-	// linesScanned := 0
-	// defer func() {
-	// 	b.t.Logf("lines scanned: %d", linesScanned)
-	// 	pos, err := logFile.Seek(0, io.SeekCurrent)
-	// 	if err != nil {
-	// 		b.t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
-	// 	}
-	// 	b.t.Logf("last position on '%s': %d", logFile.Name(), pos)
-	// 	b.t.Logf("took %s", time.Now().Sub(startTime).String())
-	// }()
+	startTime := time.Now()
+	linesScanned := 0
+	defer func() {
+		b.t.Logf("lines scanned: %d", linesScanned)
+		pos, err := logFile.Seek(0, io.SeekCurrent)
+		if err != nil {
+			b.t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
+		}
+		b.t.Logf("last position on '%s': %d", logFile.Name(), pos)
+		b.t.Logf("took %s", time.Now().Sub(startTime).String())
+	}()
 	for scanner.Scan() {
-		// linesScanned++
+		linesScanned++
 		if strings.Contains(scanner.Text(), s) {
 			return true
 		}
@@ -135,6 +136,6 @@ func (b *BeatProc) openLogFile() *os.File {
 		t.Fatalf("could not open log file '%s': %s", files[0], err)
 	}
 
-	// t.Logf("file: '%s' successfully opened", files[0])
+	t.Logf("file: '%s' successfully opened", files[0])
 	return f
 }

@@ -209,23 +209,23 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return p.LogContains("Can only start an input when all related states are finished")
-	}, 5*time.Minute, 200*time.Millisecond)
+	}, 5*time.Minute, 10*time.Second)
 
 	require.Eventually(t, func() bool {
 		return p.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
-	}, 5*time.Minute, 200*time.Millisecond)
+	}, 5*time.Minute, 10*time.Second)
 
 	require.Eventually(t, func() bool {
 		return p.LogContains("ForceReload set to TRUE")
-	}, 5*time.Minute, 200*time.Millisecond)
+	}, 5*time.Minute, 10*time.Second)
 
 	require.Eventually(t, func() bool {
 		return p.LogContains("Reloading Beats inputs because forceReload is true")
-	}, 5*time.Minute, 200*time.Millisecond)
+	}, 5*time.Minute, 10*time.Second)
 
 	require.Eventually(t, func() bool {
 		return p.LogContains("ForceReload set to FALSE")
-	}, 5*time.Minute, 200*time.Millisecond)
+	}, 5*time.Minute, 10*time.Second)
 
 	// Set it to false, so the temporaty directory is removed
 	testFailed = false
