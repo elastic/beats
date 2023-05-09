@@ -54,25 +54,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	rulesHTTP, err := helper.NewHTTP(ms.BaseMetricSet)
-	if err != nil {
-		return nil, err
-	}
-
-	kibanaVersion, err := kibana.GetVersion(rulesHTTP, kibana.NodeRulesPath)
-	if err != nil {
-		return nil, err
-	}
-
-	isMetricsAPIAvailable := kibana.IsRulesAPIAvailable(kibanaVersion)
-	if !isMetricsAPIAvailable {
-		const errorMsg = "the %v node_rules is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return nil, fmt.Errorf(errorMsg, ms.FullyQualifiedName(), kibana.RulesAPIAvailableVersion, kibanaVersion)
-	}
-
 	return &MetricSet{
 		MetricSet: ms,
-		rulesHTTP: rulesHTTP,
 	}, nil
 }
 
@@ -80,9 +63,35 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
+	if err = m.init(); err != nil {
+		return err
+	}
+
 	if err = m.fetchMetrics(r); err != nil {
 		return fmt.Errorf("error trying to get node rule data from Kibana: %w", err)
 	}
+
+	return nil
+}
+
+func (m *MetricSet) init() error {
+	rulesHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	if err != nil {
+		return err
+	}
+
+	kibanaVersion, err := kibana.GetVersion(rulesHTTP, kibana.NodeRulesPath)
+	if err != nil {
+		return err
+	}
+
+	isMetricsAPIAvailable := kibana.IsRulesAPIAvailable(kibanaVersion)
+	if !isMetricsAPIAvailable {
+		const errorMsg = "the %v node actions is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
+	}
+
+	m.rulesHTTP = rulesHTTP
 
 	return nil
 }
