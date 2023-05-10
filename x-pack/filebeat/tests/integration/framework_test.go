@@ -97,6 +97,12 @@ func (b *BeatProc) LogContains(s string) bool {
 		}
 	}
 
+	fstat, err := logFile.Stat()
+	if err != nil {
+		b.t.Logf("cannot stat file: %s:", err)
+	}
+	b.t.Logf("[Stat] Name: %s, Size %d, ModTime: %s, Sys: %#v", fstat.Name(), fstat.Size(), fstat.ModTime().Format(time.RFC3339), fstat.Sys())
+
 	return false
 }
 
