@@ -740,7 +740,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		}
 	} else {
 		// If there was no error reloading input and forceReload was
-		// true, then set it to false. This prevents unecessary logging
+		// true, then set it to false. This prevents unnecessary logging
 		// and make it clear this was the monent when the input reload
 		// finally worked.
 		if cm.forceReload {
