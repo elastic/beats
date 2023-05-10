@@ -7,9 +7,10 @@ package httpjson
 import (
 	"time"
 
+	"github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/rcrowley/go-metrics"
 )
 
 type inputMetrics struct {
