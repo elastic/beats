@@ -54,8 +54,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	actionsHTTP, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
-		MetricSet: ms,
+		MetricSet:   ms,
+		actionsHTTP: actionsHTTP,
 	}, nil
 }
 
@@ -63,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
-	if err = m.init(); err != nil {
+	if err = m.validate(); err != nil {
 		return err
 	}
 
@@ -74,13 +80,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	return nil
 }
 
-func (m *MetricSet) init() error {
-	actionsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
-	if err != nil {
-		return err
-	}
-
-	kibanaVersion, err := kibana.GetVersion(actionsHTTP, kibana.NodeActionsPath)
+func (m *MetricSet) validate() error {
+	kibanaVersion, err := kibana.GetVersion(m.actionsHTTP, kibana.NodeActionsPath)
 	if err != nil {
 		return err
 	}
@@ -90,8 +91,6 @@ func (m *MetricSet) init() error {
 		const errorMsg = "the %v node actions is only supported with Kibana >= %v. You are currently running Kibana %v"
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
 	}
-
-	m.actionsHTTP = actionsHTTP
 
 	return nil
 }
