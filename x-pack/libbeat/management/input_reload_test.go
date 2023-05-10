@@ -157,7 +157,7 @@ func TestInputReload(t *testing.T) {
 	require.NoError(t, err)
 	defer m.Stop()
 
-	forceReloadState := []bool{false, true, false}
+	forceReloadStates := []bool{false, true, false}
 	forceReloadStateIdx := 0
 	forceReloadLastState := true // starts on true so the first iteratiction is already a change
 
@@ -167,13 +167,13 @@ func TestInputReload(t *testing.T) {
 		// on state changes
 		if forceReload != forceReloadLastState {
 			forceReloadLastState = forceReload
-			if forceReload == forceReloadState[forceReloadStateIdx] {
+			if forceReload == forceReloadStates[forceReloadStateIdx] {
 				// Setp to the next state
 				forceReloadStateIdx++
 			}
 
 			// If we went through all states, then succeed
-			if forceReloadStateIdx == len(forceReloadState) {
+			if forceReloadStateIdx == len(forceReloadStates) {
 				// If we went through all states
 				if configIdx == 1 {
 					return true

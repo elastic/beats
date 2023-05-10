@@ -33,9 +33,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// We create our own temp dir so the files can be persisted
 	// in case the test fails. This will help debugging issues on CI
 	//
-	// testFailed will be set to 'false' as the very last thing on this test,
+	// testSucceeded will be set to 'true' as the very last thing on this test,
 	// it allows us to use t.CleanUp to remove the temporary files
-	testFailed := true
+	testSucceeded := false
 	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
 		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
 	if err != nil {
@@ -46,7 +46,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		t.Fatalf("cannot create tmp dir: %#v, msg: %s", err, err.Error())
 	}
 	t.Cleanup(func() {
-		if !testFailed {
+		if testSucceeded {
 			if err := os.RemoveAll(tempDir); err != nil {
 				t.Fatalf("could not remove temp dir '%s': %s", tempDir, err)
 			}
@@ -227,8 +227,8 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		return p.LogContains("ForceReload set to FALSE")
 	}, 5*time.Minute, 10*time.Second)
 
-	// Set it to false, so the temporaty directory is removed
-	testFailed = false
+	// Set it to true, so the temporaty directory is removed
+	testSucceeded = true
 }
 
 func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {

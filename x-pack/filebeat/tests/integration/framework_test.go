@@ -65,7 +65,8 @@ func (b *BeatProc) Start() {
 }
 
 // LogContains looks for s as a sub string of every log line,
-// if it's not found until timeout is reached, the test fails
+// it will open the log file on every call, read it until EOF,
+// then close it.
 func (b *BeatProc) LogContains(s string) bool {
 	logFile := b.openLogFile()
 	defer func() {
