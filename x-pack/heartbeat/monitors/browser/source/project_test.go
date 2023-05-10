@@ -77,7 +77,8 @@ func validateFileContents(t *testing.T, dir string) {
 	for _, file := range expected {
 		stat, err := os.Stat(path.Join(dir, file))
 		assert.NoError(t, err)
-		// Permissions should be greater than (rwxrwx---), for setuid group access
+		// Permissions should be greater than (rwxrwx---), for running when process has changed its UID
+		// note that the files themselves should not have the setuid bit set
 		mode := stat.Mode().Perm()
 		require.GreaterOrEqualf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
 			stat.Name(), os.FileMode(0770), mode)
