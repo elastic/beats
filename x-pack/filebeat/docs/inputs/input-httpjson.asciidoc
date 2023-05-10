@@ -1528,26 +1528,31 @@ observe the activity of the input.
 
 [options="header"]
 |=======
-| Metric                       | Description
-| `http.request.total`         | Total number of processed requests.
-| `http.request.errors`        | Total number of request errors.
-| `http.request.delete`        | Total number of `DELETE` requests.
-| `http.request.get`           | Total number of `GET` requests.
-| `http.request.head`          | Total number of `HEAD` requests.
-| `http.request.options`       | Total number of `OPTIONS` requests.
-| `http.request.patch`         | Total number of `PATCH` requests.
-| `http.request.post`          | Total number of `POST` requests.
-| `http.request.put`           | Total number of `PUT` requests.
-| `http.request.body.size`     | Histogram of the requests body size.
-| `http.response.total`        | Total number of responses received.
-| `http.response.errors`       | Total number of response errors.
-| `http.response.1xx`          | Total number of `1xx` responses.
-| `http.response.2xx`          | Total number of `2xx` responses.
-| `http.response.3xx`          | Total number of `3xx` responses.
-| `http.response.4xx`          | Total number of `4xx` responses.
-| `http.response.5xx`          | Total number of `5xx` responses.
-| `http.response.body.size`    | Histogram of the responses body size.
-| `http.round_trip.time`       | Histogram of the round trip time.
+| Metric                                     | Description
+| `http.request.total`                       | Total number of processed requests.
+| `http.request.errors`                      | Total number of request errors.
+| `http.request.delete`                      | Total number of `DELETE` requests.
+| `http.request.get`                         | Total number of `GET` requests.
+| `http.request.head`                        | Total number of `HEAD` requests.
+| `http.request.options`                     | Total number of `OPTIONS` requests.
+| `http.request.patch`                       | Total number of `PATCH` requests.
+| `http.request.post`                        | Total number of `POST` requests.
+| `http.request.put`                         | Total number of `PUT` requests.
+| `http.request.body.size`                   | Histogram of the requests body size.
+| `http.response.total`                      | Total number of responses received.
+| `http.response.errors`                     | Total number of response errors.
+| `http.response.1xx`                        | Total number of `1xx` responses.
+| `http.response.2xx`                        | Total number of `2xx` responses.
+| `http.response.3xx`                        | Total number of `3xx` responses.
+| `http.response.4xx`                        | Total number of `4xx` responses.
+| `http.response.5xx`                        | Total number of `5xx` responses.
+| `http.response.body.size`                  | Histogram of the responses body size.
+| `http.round_trip.time`                     | Histogram of the round trip time.
+| `httpjson.interval.total`                  | Total number of intervals executed.
+| `httpjson.interval.errors`                 | Total number of interval errors.
+| `httpjson.interval.execution_time`         | Histogram of the interval execution time.
+| `httpjson.interval.pages.total`            | Histogram of the total number of pages per interval.
+| `httpjson.interval.pages.execution_time`   | Histogram of the interval pages execution time.
 |=======
 
 [id="{beatname_lc}-input-{type}-common-options"]

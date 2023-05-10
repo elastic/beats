@@ -14,7 +14,7 @@ import (
 
 type inputMetrics struct {
 	intervalExecutionTime     metrics.Sample   // histogram of the total time elapsed during an interval
-	intervalPageExecutionTime metrics.Sample   // histogram of per page exectuion time during an interval
+	intervalPageExecutionTime metrics.Sample   // histogram of per page execution time during an interval
 	intervalPages             metrics.Sample   // histogram of pages per interval
 	intervals                 *monitoring.Uint // total number of intervals executed
 	intervalErrs              *monitoring.Uint // total number of interval errors
