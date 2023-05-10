@@ -119,7 +119,7 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 		if err != nil {
 			rmErr := os.RemoveAll(targetDir)
 			if rmErr != nil {
-				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, (original unzip error: %s)", rmErr, err.Error())
+				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, %s", rmErr, fmt.Sprintf(`(original unzip error: %s)`, err.Error()))
 			}
 			return err
 		}
