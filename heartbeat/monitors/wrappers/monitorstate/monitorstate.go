@@ -19,6 +19,7 @@ package monitorstate
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -169,10 +170,13 @@ func (s *State) copy() *State {
 	return &copied
 }
 
+var normalizeRunFromIDRegexp = regexp.MustCompile("[^A-Za-z0-9_-]")
+
 func LoaderDBKey(sf stdfields.StdMonitorFields, at time.Time, ctr int) string {
 	rfid := "default"
 	if sf.RunFrom != nil {
-		rfid = sf.RunFrom.ID
+		rfid = normalizeRunFromIDRegexp.ReplaceAllString(sf.RunFrom.ID, "_")
+
 	}
 	return fmt.Sprintf("%s-%x-%x", rfid, at.UnixMilli(), ctr)
 }
