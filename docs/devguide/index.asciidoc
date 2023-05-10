@@ -19,6 +19,13 @@ include::./pull-request-guidelines.asciidoc[]
 
 include::./contributing.asciidoc[]
 
+<<<<<<< HEAD
+=======
+include::./documentation.asciidoc[]
+
+include::./testing.asciidoc[]
+
+>>>>>>> 0aca37315d (Add more detail about generated docs to the contributors guide (#35386))
 include::{libbeat-dir}/communitybeats.asciidoc[]
 
 include::./newbeat.asciidoc[]

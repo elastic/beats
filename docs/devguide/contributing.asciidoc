@@ -159,19 +159,29 @@ Running the testsuite has the following requirements:
 * Docker >= {docker}
 * Docker-compose >= {docker-compose}
 
-For more details check the <<testing>> guide.
-
+For more details, refer to the <<testing>> guide.
 
 [float]
 [[documentation]]
 === Documentation
 
+<<<<<<< HEAD
 The documentation for each Beat is located under `{beatname}/docs` and is based
 on asciidoc. After changing the docs, you should verify that the docs are still
 building to avoid breaking the automated docs build. To build the docs run
 `make docs`. If you want to preview the docs for a specific Beat, run
 `make docs-preview` inside the folder for the Beat. This will automatically open
 your browser with the docs for preview.
+=======
+The main documentation for each Beat is located under `<beatname>/docs` and is
+based on https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc]. The Beats
+documentation also makes extensive use of conditionals and content reuse to
+ensure consistency and accuracy. Before contributing to the documentation, read
+the following resources:
+
+* https://github.com/elastic/docs/blob/master/README.asciidoc[Docs HOWTO]
+* <<contributing-docs>>
+>>>>>>> 0aca37315d (Add more detail about generated docs to the contributors guide (#35386))
 
 [float]
 [[dependencies]]
@@ -193,4 +203,9 @@ To update the contents of `vendor/`, run `mage vendor`.
 
 To keep up to date with changes to the official Beats for community developers,
 follow the developer changelog
+<<<<<<< HEAD
 https://github.com/elastic/beats/blob/master/CHANGELOG-developer.next.asciidoc[here].
+=======
+https://github.com/elastic/beats/blob/main/CHANGELOG-developer.next.asciidoc[here].
+
+>>>>>>> 0aca37315d (Add more detail about generated docs to the contributors guide (#35386))
