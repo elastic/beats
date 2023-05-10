@@ -68,40 +68,49 @@ func (b *BeatProc) Start() {
 // it will open the log file on every call, read it until EOF,
 // then close it.
 func (b *BeatProc) LogContains(s string) bool {
+	t := b.t
 	logFile := b.openLogFile()
 	defer func() {
 		if err := logFile.Close(); err != nil {
 			// That's not quite a test error, but it can impact
 			// next executions of LogContains, so treat it as an error
-			b.t.Errorf("could not close log file: %s", err)
+			t.Errorf("could not close log file: %s", err)
 		}
 	}()
-	scanner := bufio.NewScanner(logFile)
 
-	// TODO(Tiago) Remove this very verbose debugging code
+	// TODO(Tiago) Remove this very verbose debugging codex
 	startTime := time.Now()
 	linesScanned := 0
 	defer func() {
-		b.t.Logf("lines scanned: %d", linesScanned)
+		t.Logf("lines scanned: %d", linesScanned)
 		pos, err := logFile.Seek(0, io.SeekCurrent)
 		if err != nil {
-			b.t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
+			t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
 		}
-		b.t.Logf("last position on '%s': %d", logFile.Name(), pos)
-		b.t.Logf("took %s", time.Now().Sub(startTime).String())
+		t.Logf("last position on '%s': %d", logFile.Name(), pos)
+		t.Logf("took %s", time.Now().Sub(startTime).String())
 	}()
-	for scanner.Scan() {
+
+	r := bufio.NewReader(logFile)
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
 		linesScanned++
-		if strings.Contains(scanner.Text(), s) {
+		if strings.Contains(line, s) {
 			return true
 		}
 	}
 
 	fstat, err := logFile.Stat()
 	if err != nil {
-		b.t.Logf("cannot stat file: %s:", err)
+		t.Logf("cannot stat file: %s:", err)
 	}
-	b.t.Logf("[Stat] Name: %s, Size %d, ModTime: %s, Sys: %#v", fstat.Name(), fstat.Size(), fstat.ModTime().Format(time.RFC3339), fstat.Sys())
+	t.Logf("[Stat] Name: %s, Size %d, ModTime: %s, Sys: %#v", fstat.Name(), fstat.Size(), fstat.ModTime().Format(time.RFC3339), fstat.Sys())
 
 	return false
 }

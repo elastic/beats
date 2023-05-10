@@ -739,9 +739,14 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
 		}
 	} else {
-		// no issues while reloading inputs, set forceReload to false
-		cm.forceReload = false
-		cm.logger.Debug("ForceReload set to FALSE")
+		// If there was no error reloading input and forceReload was
+		// true, then set it to false. This prevents unecessary logging
+		// and make it clear this was the monent when the input reload
+		// finally worked.
+		if cm.forceReload {
+			cm.forceReload = false
+			cm.logger.Debug("ForceReload set to FALSE")
+		}
 	}
 
 	cm.lastInputCfgs = inputCfgs
