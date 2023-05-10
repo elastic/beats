@@ -34,12 +34,12 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		intervalPages:             metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.NewGoMetrics(reg, "httpjson.interval.execution_time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.intervalExecutionTime))
-	_ = adapter.NewGoMetrics(reg, "httpjson.interval.pages.execution_time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.intervalPageExecutionTime))
-	_ = adapter.NewGoMetrics(reg, "httpjson.interval.pages.total", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.intervalPages))
+	_ = adapter.GetGoMetrics(reg, "httpjson.interval.execution_time", adapter.Accept).
+		GetOrRegister("histogram", metrics.NewHistogram(out.intervalExecutionTime))
+	_ = adapter.GetGoMetrics(reg, "httpjson.interval.pages.execution_time", adapter.Accept).
+		GetOrRegister("histogram", metrics.NewHistogram(out.intervalPageExecutionTime))
+	_ = adapter.GetGoMetrics(reg, "httpjson.interval.pages.total", adapter.Accept).
+		GetOrRegister("histogram", metrics.NewHistogram(out.intervalPages))
 
 	return out
 }

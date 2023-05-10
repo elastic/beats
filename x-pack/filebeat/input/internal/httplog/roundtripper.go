@@ -280,12 +280,12 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 		roundTripTime: metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.NewGoMetrics(reg, "http.request.body.size", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.reqsSize))
-	_ = adapter.NewGoMetrics(reg, "http.response.body.size", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.respsSize))
-	_ = adapter.NewGoMetrics(reg, "http.round_trip.time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.roundTripTime))
+	_ = adapter.GetGoMetrics(reg, "http.request.body.size", adapter.Accept).
+		GetOrRegister("histogram", metrics.NewHistogram(out.reqsSize))
+	_ = adapter.GetGoMetrics(reg, "http.response.body.size", adapter.Accept).
+		GetOrRegister("histogram", metrics.NewHistogram(out.respsSize))
+	_ = adapter.GetGoMetrics(reg, "http.round_trip.time", adapter.Accept).
+		GetOrRegister("histogram", metrics.NewHistogram(out.roundTripTime))
 
 	return out
 }
