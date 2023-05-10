@@ -197,7 +197,10 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Info("process repeated request")
-		var waitUntil time.Time
+		var (
+			budget    = *cfg.MaxExecutions
+			waitUntil time.Time
+		)
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
@@ -448,6 +451,13 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			state["cursor"] = goodCursor
 
 			if more, _ := state["want_more"].(bool); !more {
+				return nil
+			}
+
+			// Check we have a remaining execution budget.
+			budget--
+			if budget <= 0 {
+				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
 				return nil
 			}
 		}
@@ -828,6 +838,14 @@ var (
 		"application/zip":          lib.Zip,
 		"text/csv; header=absent":  lib.CSVNoHeader,
 		"text/csv; header=present": lib.CSVHeader,
+
+		// Include the undocumented space-less syntax to head off typo-related
+		// user issues.
+		//
+		// TODO: Consider changing the MIME type look-ups to a formal parser
+		// rather than a simple map look-up.
+		"text/csv;header=absent":  lib.CSVNoHeader,
+		"text/csv;header=present": lib.CSVHeader,
 	}
 
 	// limitPolicies are the provided rate limit policy helpers.
