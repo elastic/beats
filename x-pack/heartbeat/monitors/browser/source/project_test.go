@@ -20,9 +20,11 @@ import (
 )
 
 func setUpTests() func() {
-	GoOffline()
+	// Since we only symlink now,
+	// go online and test package.json perms
+	GoOnline()
 	return func() {
-		GoOnline()
+		GoOffline()
 	}
 }
 
@@ -70,6 +72,7 @@ func validateFileContents(t *testing.T, dir string) {
 	expected := []string{
 		"examples/todos/helpers.ts",
 		"examples/todos/advanced.journey.ts",
+		"package.json",
 	}
 	for _, file := range expected {
 		stat, err := os.Stat(path.Join(dir, file))
