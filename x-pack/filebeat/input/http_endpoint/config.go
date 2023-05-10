@@ -7,10 +7,18 @@ package http_endpoint
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/textproto"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
+
+// Available providers for CRC validation (use lowercase)
+// Constructor function as a value for each provider
+var crcProviders = map[string]func(string) *crcValidator{
+	"zoom": newZoomCRC,
+}
 
 // Config contains information about httpjson configuration
 type config struct {
@@ -31,6 +39,7 @@ type config struct {
 	HMACKey               string                  `config:"hmac.key"`
 	HMACType              string                  `config:"hmac.type"`
 	HMACPrefix            string                  `config:"hmac.prefix"`
+	CRCProvider           string                  `config:"crc.provider"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
 }
@@ -53,6 +62,7 @@ func defaultConfig() config {
 		HMACKey:       "",
 		HMACType:      "",
 		HMACPrefix:    "",
+		CRCProvider:   "",
 	}
 }
 
@@ -79,7 +89,20 @@ func (c *config) Validate() error {
 		return errors.New("hmac.type must be sha1 or sha256")
 	}
 
+	if c.CRCProvider != "" {
+		if !isValidCRCProvider(c.CRCProvider) {
+			return fmt.Errorf("not a valid CRC provider: %q", c.CRCProvider)
+		} else if c.SecretValue == "" {
+			return errors.New("secret.value is required when crc.provider is defined")
+		}
+	}
+
 	return nil
+}
+
+func isValidCRCProvider(name string) bool {
+	_, exists := crcProviders[strings.ToLower(name)]
+	return exists
 }
 
 func canonicalizeHeaders(headerConf []string) (includeHeaders []string) {
