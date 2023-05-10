@@ -24,17 +24,20 @@ import (
 	"net/http"
 )
 
+const (
+	fleetAgentPoliciesAPI     = "/api/fleet/agent_policies"
+	fleetAgentPolicyAPI       = "/api/fleet/agent_policies/%s"
+	fleetEnrollmentAPIKeysAPI = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
+	fleetAgentsAPI            = "/api/fleet/agents"
+	fleetUnEnrollAgentAPI     = "/api/fleet/agents/%s/unenroll"
+	fleetUpgradeAgentAPI      = "/api/fleet/agents/%s/upgrade"
+	fleetFleetServerHostsAPI  = "/api/fleet/fleet_server_hosts"
+	fleetFleetServerHostAPI   = "/api/fleet/fleet_server_hosts/%s"
+)
+
 //
 // Create Policy
 //
-
-const (
-	fleetAgentPoliciesAPI     = "/api/fleet/agent_policies"
-	fleetEnrollmentAPIKeysAPI = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
-	fleetListAgentsAPI        = "/api/fleet/agents"
-	fleetUnEnrollAgentAPI     = "/api/fleet/agents/%s/unenroll"
-	fleetUpgradeAgentAPI      = "/api/fleet/agents/%s/upgrade"
-)
 
 type MonitoringEnabledOption string
 
@@ -43,13 +46,16 @@ const (
 	MonitoringEnabledMetrics MonitoringEnabledOption = "metrics"
 )
 
-type CreatePolicyRequest struct {
+type Policy struct {
 	ID                string                    `json:"id"`
 	Name              string                    `json:"name"`
 	Namespace         string                    `json:"namespace"`
 	Description       string                    `json:"description"`
 	MonitoringEnabled []MonitoringEnabledOption `json:"monitoring_enabled"`
+	FleetServerHostID string                    `json:"fleet_server_host_id"`
 }
+
+type CreatePolicyRequest Policy
 
 type CreatePolicyResponse struct {
 	ID                string                    `json:"id,omitempty"`
@@ -81,6 +87,37 @@ func (client *Client) CreatePolicy(request CreatePolicyRequest) (*CreatePolicyRe
 
 	if err := json.Unmarshal(respBody, &resp); err != nil {
 		return nil, fmt.Errorf("unable to parse create policy API response: %w", err)
+	}
+
+	return &resp.Item, nil
+}
+
+//
+// Get Policy
+//
+
+type GetPolicyRequest struct {
+	ID string
+}
+
+type GetPolicyResponse Policy
+
+func (client *Client) GetPolicy(request GetPolicyRequest) (*GetPolicyResponse, error) {
+	apiURL := fmt.Sprintf(fleetAgentPolicyAPI, request.ID)
+	statusCode, respBody, err := client.Request(http.MethodGet, apiURL, nil, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error calling get policy API: %w", err)
+	}
+	if statusCode != 200 {
+		return nil, fmt.Errorf("unable to get policy; API returned status code [%d] and body [%s]", statusCode, string(respBody))
+	}
+
+	var resp struct {
+		Item GetPolicyResponse `json:"item"`
+	}
+
+	if err := json.Unmarshal(respBody, &resp); err != nil {
+		return nil, fmt.Errorf("unable to parse get policy API response: %w", err)
 	}
 
 	return &resp.Item, nil
@@ -156,7 +193,7 @@ type ListAgentsResponse struct {
 }
 
 func (client *Client) ListAgents(request ListAgentsRequest) (*ListAgentsResponse, error) {
-	statusCode, respBody, err := client.Request(http.MethodGet, fleetListAgentsAPI, nil, nil, nil)
+	statusCode, respBody, err := client.Request(http.MethodGet, fleetAgentsAPI, nil, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error calling list agents API: %w", err)
 	}
@@ -245,4 +282,73 @@ func (client *Client) UpgradeAgent(request UpgradeAgentRequest) (*UpgradeAgentRe
 	}
 
 	return &resp, nil
+}
+
+//
+// List Fleet Server Hosts
+//
+
+type FleetServerHost struct {
+	ID              string   `json:"id"`
+	Name            string   `json:"name"`
+	IsDefault       bool     `json:"is_default"`
+	HostURLs        []string `json:"host_urls"`
+	IsPreconfigured bool     `json:"is_preconfigured"`
+}
+
+type ListFleetServerHostsRequest struct {
+	// For future use
+}
+
+type ListFleetServerHostsResponse struct {
+	Items []FleetServerHost `json:"items"`
+}
+
+func (client *Client) ListFleetServerHosts(request ListFleetServerHostsRequest) (*ListFleetServerHostsResponse, error) {
+	statusCode, respBody, err := client.Request(http.MethodGet, fleetFleetServerHostsAPI, nil, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error calling list fleet server hosts API: %w", err)
+	}
+	if statusCode != 200 {
+		return nil, fmt.Errorf("unable to list fleet server hosts; API returned status code [%d] and body [%s]", statusCode, string(respBody))
+	}
+
+	var resp ListFleetServerHostsResponse
+
+	if err := json.Unmarshal(respBody, &resp); err != nil {
+		return nil, fmt.Errorf("unable to parse list fleet server hosts API response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+//
+// Get Fleet Server Host
+//
+
+type GetFleetServerHostRequest struct {
+	ID string
+}
+
+type GetFleetServerHostResponse FleetServerHost
+
+func (client *Client) GetFleetServerHost(request GetFleetServerHostRequest) (*GetFleetServerHostResponse, error) {
+	apiURL := fmt.Sprintf(fleetFleetServerHostAPI, request.ID)
+	statusCode, respBody, err := client.Request(http.MethodGet, apiURL, nil, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error calling get fleet server host API: %w", err)
+	}
+	if statusCode != 200 {
+		return nil, fmt.Errorf("unable to get fleet server host; API returned status code [%d] and body [%s]", statusCode, string(respBody))
+	}
+
+	var resp struct {
+		Item GetFleetServerHostResponse `json:"item"`
+	}
+
+	if err := json.Unmarshal(respBody, &resp); err != nil {
+		return nil, fmt.Errorf("unable to parse get fleet server host API response: %w", err)
+	}
+
+	return &resp.Item, nil
 }

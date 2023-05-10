@@ -36,8 +36,17 @@ var (
 	//go:embed testdata/fleet_create_policy_response.json
 	fleetCreatePolicyResponse []byte
 
+	//go:embed testdata/fleet_get_policy_response.json
+	fleetGetPolicyResponse []byte
+
 	//go:embed testdata/fleet_create_enrollment_api_key_response.json
 	fleetCreateEnrollmentAPIKeyResponse []byte
+
+	//go:embed testdata/fleet_list_fleet_server_hosts_response.json
+	fleetListServerHostsResponse []byte
+
+	//go:embed testdata/fleet_get_fleet_server_host_response.json
+	fleetGetFleetServerHostResponse []byte
 )
 
 func TestFleetCreatePolicy(t *testing.T) {
@@ -78,6 +87,34 @@ func TestFleetCreatePolicy(t *testing.T) {
 	require.Equal(t, resp.MonitoringEnabled, []MonitoringEnabledOption{MonitoringEnabledLogs, MonitoringEnabledMetrics})
 }
 
+func TestFleetGetPolicy(t *testing.T) {
+	const id = "elastic-agent-managed-ep"
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case fmt.Sprintf(fleetAgentPolicyAPI, id):
+			_, _ = w.Write(fleetGetPolicyResponse)
+		}
+	}
+
+	client, err := createTestServerAndClient(handler)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	req := GetPolicyRequest{
+		ID: id,
+	}
+	resp, err := client.GetPolicy(req)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	require.Equal(t, id, resp.ID)
+	require.Equal(t, "Elastic-Agent (elastic-package)", resp.Name)
+	require.Equal(t, "default", resp.Namespace)
+	require.Equal(t, "", resp.Description)
+	require.Equal(t, "fleet-custom-fleet-server-host", resp.FleetServerHostID)
+	require.Equal(t, []MonitoringEnabledOption{MonitoringEnabledLogs}, resp.MonitoringEnabled)
+}
+
 func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 	const (
 		id       = "880c7460-a7e4-43df-8fc3-6a9593c6d555"
@@ -114,7 +151,7 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 func TestFleetListAgents(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case fleetListAgentsAPI:
+		case fleetAgentsAPI:
 			_, _ = w.Write(fleetListAgentsResponse)
 		}
 	}
@@ -177,6 +214,59 @@ func TestFleetUpgradeAgent(t *testing.T) {
 	resp, err := client.UpgradeAgent(req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
+}
+
+func TestFleetListFleetServerHosts(t *testing.T) {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case fleetFleetServerHostsAPI:
+			_, _ = w.Write(fleetListServerHostsResponse)
+		}
+	}
+
+	client, err := createTestServerAndClient(handler)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	req := ListFleetServerHostsRequest{}
+	resp, err := client.ListFleetServerHosts(req)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	require.Len(t, resp.Items, 1)
+	item := resp.Items[0]
+	require.Equal(t, "fleet-default-fleet-server-host", item.ID)
+	require.Equal(t, "Default", item.Name)
+	require.True(t, item.IsDefault)
+	require.Equal(t, []string{"https://fleet-server:8220"}, item.HostURLs)
+	require.True(t, item.IsPreconfigured)
+}
+
+func TestFleetGetFleetServerHost(t *testing.T) {
+	const id = "fleet-default-fleet-server-host"
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case fmt.Sprintf(fleetFleetServerHostAPI, id):
+			_, _ = w.Write(fleetGetFleetServerHostResponse)
+		}
+	}
+
+	client, err := createTestServerAndClient(handler)
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	req := GetFleetServerHostRequest{
+		ID: id,
+	}
+	resp, err := client.GetFleetServerHost(req)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	require.Equal(t, id, resp.ID)
+	require.Equal(t, "Default", resp.Name)
+	require.True(t, resp.IsDefault)
+	require.Equal(t, []string{"https://fleet-server:8220"}, resp.HostURLs)
+	require.True(t, resp.IsPreconfigured)
 }
 
 func createTestServerAndClient(handler http.HandlerFunc) (*Client, error) {
