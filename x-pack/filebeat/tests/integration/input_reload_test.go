@@ -23,7 +23,7 @@ import (
 
 // TestInputReloadUnderElasticAgent will start a Filebeat and cause the input
 // reload issue described on https://github.com/elastic/beats/issues/33653
-// to happen, then it will check to logs to ensure the fix is working.
+// to happen, then it will check the logs to ensure the fix is working.
 //
 // In case of a test failure the directory with Filebeat logs and
 // all other supporting files will be kept on build/integration-tests.

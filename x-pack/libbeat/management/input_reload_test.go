@@ -22,7 +22,7 @@ import (
 )
 
 func TestInputReload(t *testing.T) {
-	// Uncomment this line to see the debug logs for this test
+	// Uncomment the line below to see the debug logs for this test
 	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*", "centralmgmt.V2-manager"))
 	r := reload.NewRegistry()
 

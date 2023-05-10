@@ -94,7 +94,7 @@ func NewInput(
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
 			if err := f(); err != nil {
-				logp.L().Named("input.log").Errorf("clean up function retruned an error: %w", err)
+				logp.L().Named("input.log").Errorf("clean up function returned an error: %w", err)
 			}
 		}
 	}
