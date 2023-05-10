@@ -110,7 +110,7 @@ type requestFactory struct {
 	saveFirstResponse      bool
 }
 
-func newRequestFactory(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
@@ -143,7 +143,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, reg
 				rf.user = ch.Step.Auth.Basic.User
 				rf.password = ch.Step.Auth.Basic.Password
 			}
-			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
+			responseProcessor := newChainResponseProcessor(ch, httpClient, metrics, log)
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -169,7 +169,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, reg
 				rf.user = ch.While.Auth.Basic.User
 				rf.password = ch.While.Auth.Basic.Password
 			}
-			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
+			responseProcessor := newChainResponseProcessor(ch, httpClient, metrics, log)
 			rf = &requestFactory{
 				url:                    *ch.While.Request.URL.URL,
 				method:                 ch.While.Request.Method,

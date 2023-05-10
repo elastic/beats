@@ -123,18 +123,20 @@ func run(
 	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
 	defer unreg()
 
+	metrics := newInputMetrics(reg)
+
 	httpClient, err := newHTTPClient(stdCtx, config, log, reg)
 	if err != nil {
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, config, log, reg)
+	requestFactory, err := newRequestFactory(stdCtx, config, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		return err
 	}
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config, pagination, log)
+	responseProcessor := newResponseProcessor(config, pagination, metrics, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
@@ -144,11 +146,16 @@ func run(
 	doFunc := func() error {
 		log.Info("Process another repeated request.")
 
-		if err := requester.doRequest(stdCtx, trCtx, publisher); err != nil {
+		startTime := time.Now()
+
+		var err error
+		if err = requester.doRequest(stdCtx, trCtx, publisher); err != nil {
 			log.Errorf("Error while processing http request: %v", err)
 		}
 
-		if stdCtx.Err() != nil {
+		metrics.updateIntervalMetrics(err, startTime)
+
+		if err := stdCtx.Err(); err != nil {
 			return err
 		}
 
