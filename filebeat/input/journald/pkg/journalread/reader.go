@@ -39,7 +39,7 @@ import (
 type Reader struct {
 	log     *logp.Logger
 	backoff backoff.Backoff
-	journal journal
+	journal *sdjournal.Journal
 }
 
 type canceler interface {
@@ -47,23 +47,12 @@ type canceler interface {
 	Err() error
 }
 
-type journal interface {
-	Close() error
-	Next() (uint64, error)
-	Wait(time.Duration) int
-	GetEntry() (*sdjournal.JournalEntry, error)
-	SeekHead() error
-	SeekTail() error
-	SeekRealtimeUsec(usec uint64) error
-	SeekCursor(string) error
-}
-
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 
 // NewReader creates a new Reader for an already opened journal. The reader assumed to take
 // ownership of the journal, and needs to be closed.
-func NewReader(log *logp.Logger, journal journal, backoff backoff.Backoff) *Reader {
+func NewReader(log *logp.Logger, journal *sdjournal.Journal, backoff backoff.Backoff) *Reader {
 	return &Reader{log: log, journal: journal, backoff: backoff}
 }
 
