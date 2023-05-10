@@ -78,10 +78,10 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			if parsedConfig.RunOnce {
 				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
 			} else {
-				logp.L().Warn(err)
+				logp.L().Warnf("skipping monitor state management: %w", err)
 			}
 		} else {
-			replaceStateLoader(monitorstate.MakeESLoader(esClient, "synthetics-*,heartbeat-*", parsedConfig.RunFrom))
+			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom))
 		}
 	} else if b.Manager.Enabled() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
@@ -267,9 +267,9 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		// Backoff panics with 0 duration, set to smallest unit
 		esClient, err := makeESClient(outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
-			logp.L().Warnf("could not connect to ES for state management during managed reload: %s", err)
+			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
 		} else {
-			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, "synthetics-*,heartbeat-*", bt.config.RunFrom))
+			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}
 
 		return nil
@@ -329,11 +329,12 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 	for i := 0; i < attempts; i++ {
 		esClient, err = eslegclient.NewConnectedClient(cfg, "Heartbeat")
 		if err == nil {
+			connectDelay.Reset()
 			return esClient, nil
 		} else {
 			connectDelay.Wait()
 		}
 	}
 
-	return nil, fmt.Errorf("could not establish connection on %d attempts. Last error: %w", attempts, err)
+	return nil, fmt.Errorf("could not establish states loader connection after %d attempts, with %s delay", attempts, wait)
 }
