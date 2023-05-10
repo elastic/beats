@@ -31,7 +31,7 @@ var azureVMMetadataFetcher = provider{
 	Local: true,
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
-		azMetadataURI := "/metadata/instance/compute?api-version=2017-04-02"
+		azMetadataURI := "/metadata/instance/compute?api-version=2021-02-01"
 		azHeaders := map[string]string{"Metadata": "true"}
 		azSchema := func(m map[string]interface{}) mapstr.M {
 			m["serviceName"] = "Virtual Machines"

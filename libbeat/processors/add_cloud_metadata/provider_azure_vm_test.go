@@ -31,24 +31,55 @@ import (
 )
 
 const azInstanceIdentityDocument = `{
-	"location": "eastus2",
-	"name": "test-az-vm",
-	"offer": "UbuntuServer",
+	"azEnvironment": "AzurePublicCloud",
+	"customData": "",
+	"evictionPolicy": "",
+	"isHostCompatibilityLayerVm": "false",
+	"licenseType": "",
+	"location": "eastus",
+	"name": "aks-agentpool-12628255-vmss_2",
+	"offer": "",
+	"osProfile": {
+		"adminUsername": "azureuser",
+		"computerName": "aks-agentpool-12628255-vmss000002",
+		"disablePasswordAuthentication": "true"
+	},
 	"osType": "Linux",
+	"placementGroupId": "43e6bd16-b9ae-4a0c-a7e3-6c9ab23482a7",
+	"plan": {
+		"name": "",
+		"product": "",
+		"publisher": ""
+	},
 	"platformFaultDomain": "0",
 	"platformUpdateDomain": "0",
-	"publisher": "Canonical",
-	"sku": "14.04.4-LTS",
-	"version": "14.04.201605091",
-	"vmId": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-	"vmSize": "Standard_D3_v2",
-	"subscriptionId": "5tfb04c3-63de-4709-a9f9-9ab8c0411d5e"
+	"priority": "",
+	"provider": "Microsoft.Compute",
+	"publicKeys": [],
+	"publisher": "",
+	"resourceGroupName": "MC_myname_group_myname_eastus",
+	"resourceId": "/subscriptions/0e073ec1-c22f-4488-adde-da35ed609ccd/resourceGroups/MC_myname_group_myname_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-agentpool-12628255-vmss/virtualMachines/2",
+	"securityProfile": {
+		"secureBootEnabled": "false",
+		"virtualTpmEnabled": "false"
+	},
+	"sku": "",
+	"storageProfile": {},
+	"subscriptionId": "0e073ec1-c22f-4488-adde-da35ed609ccd",
+	"tags": "aks-managed-coordination:true;aks-managed-createOperationID:29bea4bf-8a24-4dcb-aecb-c2fb07d5bd29;aks-managed-creationSource:vmssclient-aks-agentpool-12628255-vmss;aks-managed-kubeletIdentityClientID:64efabb1-53aa-4868-8a07-9e385f00e527;aks-managed-orchestrator:Kubernetes:1.25.6;aks-managed-poolName:agentpool;aks-managed-resourceNameSuffix:80220090",
+	"tagsList": [],
+	"userData": "",
+	"version": "",
+	"vmId": "220e2b43-0913-492f-ada0-b6b2795bdb9b",
+	"vmScaleSetName": "aks-agentpool-12628255-vmss",
+	"vmSize": "Standard_DS2_v2",
+	"zone": "3"
 }`
 
 func initAzureTestServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI == "/metadata/instance/compute?api-version=2017-04-02" && r.Header.Get("Metadata") == "true" {
-			w.Write([]byte(azInstanceIdentityDocument))
+		if r.RequestURI == "/metadata/instance/compute?api-version=2021-02-01" && r.Header.Get("Metadata") == "true" {
+			_, _ = w.Write([]byte(azInstanceIdentityDocument))
 			return
 		}
 
@@ -57,7 +88,7 @@ func initAzureTestServer() *httptest.Server {
 }
 
 func TestRetrieveAzureMetadata(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := initAzureTestServer()
 	defer server.Close()
@@ -83,19 +114,19 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 		"cloud": mapstr.M{
 			"provider": "azure",
 			"instance": mapstr.M{
-				"id":   "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-				"name": "test-az-vm",
+				"id":   "220e2b43-0913-492f-ada0-b6b2795bdb9b",
+				"name": "aks-agentpool-12628255-vmss_2",
 			},
 			"machine": mapstr.M{
-				"type": "Standard_D3_v2",
+				"type": "Standard_DS2_v2",
 			},
 			"account": mapstr.M{
-				"id": "5tfb04c3-63de-4709-a9f9-9ab8c0411d5e",
+				"id": "0e073ec1-c22f-4488-adde-da35ed609ccd",
 			},
 			"service": mapstr.M{
 				"name": "Virtual Machines",
 			},
-			"region": "eastus2",
+			"region": "eastus",
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

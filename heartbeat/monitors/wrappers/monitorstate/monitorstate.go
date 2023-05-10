@@ -74,6 +74,13 @@ type State struct {
 	ctr             int
 }
 
+func (s *State) String() string {
+	if s == nil {
+		return "<monitorstate:nil>"
+	}
+	return fmt.Sprintf("<monitorstate:id=%s,started=%s,up=%d,down=%d>", s.ID, s.StartedAt, s.Up, s.Down)
+}
+
 func (s *State) incrementCounters(status StateStatus) {
 	s.DurationMs = time.Since(s.StartedAt).Milliseconds()
 	s.Checks++
