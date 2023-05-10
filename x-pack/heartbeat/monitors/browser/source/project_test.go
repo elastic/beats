@@ -19,19 +19,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func setUpTests() func() {
-	// Since we only symlink now,
-	// go online and test package.json perms
-	GoOnline()
-	return func() {
-		GoOffline()
-	}
-}
-
 func TestProjectSource(t *testing.T) {
-	teardown := setUpTests()
-	defer teardown()
-
 	type testCase struct {
 		name    string
 		cfg     mapstr.M
@@ -77,10 +65,10 @@ func validateFileContents(t *testing.T, dir string) {
 	for _, file := range expected {
 		stat, err := os.Stat(path.Join(dir, file))
 		assert.NoError(t, err)
-		// Permissions should be greater than (rwxrwx---), for running when process has changed its UID
+		// Permissions should be (rwxrwx---), for running when process has changed its UID
 		// note that the files themselves should not have the setuid bit set
 		mode := stat.Mode().Perm()
-		require.GreaterOrEqualf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
+		require.Equalf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
 			stat.Name(), os.FileMode(0770), mode)
 	}
 }
@@ -92,9 +80,10 @@ func fetchAndValidate(t *testing.T, psrc *ProjectSource) {
 	dir, err := os.Stat(psrc.Workdir())
 	require.NoError(t, err)
 
-	// Permissions should be greater than (rwxrwx---), for setuid group access
+	// Permissions should be (rwxrwx---), for running when process has changed its UID
+	// note that the files themselves should not have the setuid bit set
 	mode := dir.Mode().Perm()
-	require.GreaterOrEqualf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
+	require.Equalf(t, mode, os.FileMode(0770), "file %v has wrong permissions: expected=%v actual=%v",
 		dir.Name(), os.FileMode(0770), mode)
 
 	validateFileContents(t, psrc.Workdir())
