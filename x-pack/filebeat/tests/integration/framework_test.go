@@ -78,19 +78,6 @@ func (b *BeatProc) LogContains(s string) bool {
 		}
 	}()
 
-	// TODO(Tiago) Remove this very verbose debugging codex
-	startTime := time.Now()
-	linesScanned := 0
-	defer func() {
-		t.Logf("lines scanned: %d", linesScanned)
-		pos, err := logFile.Seek(0, io.SeekCurrent)
-		if err != nil {
-			t.Errorf("could not seek file '%s': %s", logFile.Name(), err)
-		}
-		t.Logf("last position on '%s': %d", logFile.Name(), pos)
-		t.Logf("took %s", time.Now().Sub(startTime).String())
-	}()
-
 	r := bufio.NewReader(logFile)
 	for {
 		line, err := r.ReadString('\n')
@@ -100,17 +87,10 @@ func (b *BeatProc) LogContains(s string) bool {
 			}
 			break
 		}
-		linesScanned++
 		if strings.Contains(line, s) {
 			return true
 		}
 	}
-
-	fstat, err := logFile.Stat()
-	if err != nil {
-		t.Logf("cannot stat file: %s:", err)
-	}
-	t.Logf("[Stat] Name: %s, Size %d, ModTime: %s, Sys: %#v", fstat.Name(), fstat.Size(), fstat.ModTime().Format(time.RFC3339), fstat.Sys())
 
 	return false
 }
@@ -152,6 +132,5 @@ func (b *BeatProc) openLogFile() *os.File {
 		t.Fatalf("could not open log file '%s': %s", files[0], err)
 	}
 
-	t.Logf("file: '%s' successfully opened", files[0])
 	return f
 }
