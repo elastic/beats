@@ -145,7 +145,7 @@ available. Valid options are `head`, `tail` and `since`.
 [id="{beatname_lc}-input-{type}-since"]
 ==== `since`
 
-A time offset from the current time's record to start reading from. To use
+A time offset from the current time to start reading from. To use
 `since`, either the `seek` option must be set to `since`, or the `seek` mode
 must be set to `cursor` and the `cursor_seek_fallback` set to `since`.
 

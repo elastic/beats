@@ -107,7 +107,7 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 var (
 	errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")
 	errInvalidSeek         = errors.New("invalid setting for seek")
-	errInvalidSeekSince    = errors.New("incompatible setting for since and seek or cursor")
+	errInvalidSeekSince    = errors.New("incompatible setting for since and seek or cursor_seek_fallback")
 )
 
 func defaultConfig() config {

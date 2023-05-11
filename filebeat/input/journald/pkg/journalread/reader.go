@@ -136,18 +136,11 @@ func (r *Reader) Seek(mode SeekMode, cursor string) (err error) {
 	return err
 }
 
-// Seek moves the read pointer to a new position.
-// If a cursor or SeekTail is given, Seek tries to ignore the entry at the
-// given position, jumping right to the next entry.
+// SeekRealtimeUsec moves the read pointer to the entry with the
+// specified CLOCK_REALTIME timestamp. This corresponds to
+// sd_journal_seek_realtime_usec.
 func (r *Reader) SeekRealtimeUsec(usec uint64) error {
-	err := r.journal.SeekRealtimeUsec(usec)
-	if err != nil {
-		return err
-	}
-	// A call to Next is required for the journal to be in a valid state to call Get.
-	// https://pkg.go.dev/github.com/coreos/go-systemd/v22/sdjournal#Journal.SeekRealtimeUsec
-	_, err = r.journal.Next()
-	return err
+	return r.journal.SeekRealtimeUsec(usec)
 }
 
 // Next reads a new journald entry from the journal. It blocks if there is
