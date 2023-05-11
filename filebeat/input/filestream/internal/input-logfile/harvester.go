@@ -202,7 +202,7 @@ func startHarvester(
 				return nil
 			}
 
-			return err
+			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
 
 		ctx.Cancelation = harvesterCtx
