@@ -193,13 +193,16 @@ func startHarvester(
 			// behaviour of the Filestream input, it's not really an error, it's just an situation.
 			// If the harvester is already running we don't need to start a new one.
 			// At the moment of writing even the returned error is ignored. So the
-			// only real effect of the next line is to not start a second harvester.
+			// only real effect of this branch is to not start a second harvester.
 			//
 			// Currently the only places this error is checked is on task.Group and the
 			// only thing it does is to log the error. So to avoid unnecessary errors,
 			// we just return nil.
-			//nolint: nilerr // Read the comment above
-			return nil
+			if errors.Is(err, ErrHarvesterAlreadyRunning) {
+				return nil
+			}
+
+			return err
 		}
 
 		ctx.Cancelation = harvesterCtx
