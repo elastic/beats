@@ -19,6 +19,8 @@ include::./pull-request-guidelines.asciidoc[]
 
 include::./contributing.asciidoc[]
 
+include::./documentation.asciidoc[]
+
 include::./testing.asciidoc[]
 
 include::{libbeat-dir}/communitybeats.asciidoc[]
