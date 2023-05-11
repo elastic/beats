@@ -134,7 +134,7 @@ func run(
 	if config.Response.XSD != "" {
 		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
 		if err != nil {
-			log.Errorf("Error while creating requestFactory: %v", err)
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
 			return err
 		}
 	}

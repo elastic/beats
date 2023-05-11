@@ -226,11 +226,11 @@ func decodeAsZip(p []byte, dst *response) error {
 }
 
 func decodeAsXML(p []byte, dst *response) error {
-	cdata, v, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
+	cdata, body, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
 	if err != nil {
 		return err
 	}
-	dst.body = v
+	dst.body = body
 	dst.header["XML-CDATA"] = []string{cdata}
 	return nil
 }
