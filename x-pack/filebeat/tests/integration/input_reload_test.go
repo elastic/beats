@@ -31,7 +31,8 @@ import (
 // Run the tests wit -v flag to print the temporary folder used.
 func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// We create our own temp dir so the files can be persisted
-	// in case the test fails. This will help debugging issues on CI
+	// in case the test fails. This will help debugging issues
+	// locally and on CI.
 	//
 	// testSucceeded will be set to 'true' as the very last thing on this test,
 	// it allows us to use t.CleanUp to remove the temporary files
@@ -43,8 +44,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	}
 
 	if err := os.MkdirAll(tempDir, 0766); err != nil {
-		t.Fatalf("cannot create tmp dir: %#v, msg: %s", err, err.Error())
+		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
 	}
+	t.Logf("Temporary directory: %s", tempDir)
 	t.Cleanup(func() {
 		if testSucceeded {
 			if err := os.RemoveAll(tempDir); err != nil {
@@ -53,8 +55,6 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 			t.Logf("Temprary directory '%s' removed", tempDir)
 		}
 	})
-
-	t.Logf("Temporary directory: %s", tempDir)
 
 	logFilePath := filepath.Join(tempDir, "flog.log")
 	generateLogFile(t, logFilePath)
@@ -151,6 +151,12 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		},
 	}
 
+	// Once the desired state is reached (aka Filebeat finished applying
+	// the policy changes) we still want for a little bit before sending
+	// another policy. This will allow the input to run and get some data
+	// into the publishing pipeline.j
+	//
+	// nextState is a helper function to handle this delay.
 	idx := 0
 	waiting := false
 	when := time.Now()
@@ -167,6 +173,18 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		when = time.Now().Add(10 * time.Second)
 	}
 	server := &mock.StubServerV2{
+		// The Beat will call the checkin function multiple times:
+		// - At least once at startup
+		// - At every state change (starting, configuring, healthy, etc)
+		// for every Unit.
+		//
+		// Because of that we can't rely on the number of times it is called
+		// we need some sort of state machine to handle when to send the next
+		// policy and when to just re-send the current one.
+		//
+		// If the Elastic-Agent wants the Beat to keep running the same policy,
+		// it will just keep re-sending it every time the Beat calls the checkin
+		// method.
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			if management.DoesStateMatch(observed, units[idx], 0) {
 				nextState()
@@ -180,46 +198,49 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 				Units: units[idx],
 			}
 		},
-		ActionImpl: func(response *proto.ActionResponse) error {
-			return nil
-		},
-		ActionsChan: make(chan *mock.PerformAction, 100),
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+		// ActionsChan: make(chan *mock.PerformAction, 100),
 	}
 
 	require.NoError(t, server.Start())
-	defer server.Stop()
+	t.Cleanup(server.Stop)
 
-	p := NewBeat(
+	filebeat := NewBeat(
 		t,
 		"../../filebeat.test",
 		[]string{
-			"-E", fmt.Sprintf("management.insecure_grpc_url_for_testing=\"localhost:%d\"", server.Port),
+			"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 			"-E", "management.enabled=true",
 		},
 		tempDir,
 	)
 
-	p.Start()
+	filebeat.Start()
 
 	require.Eventually(t, func() bool {
-		return p.LogContains("Can only start an input when all related states are finished")
-	}, 5*time.Minute, 100*time.Millisecond)
+		return filebeat.LogContains("Can only start an input when all related states are finished")
+	}, 5*time.Minute, 100*time.Millisecond,
+		"String 'Can only start an input when all related states are finished' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
-		return p.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
-	}, 5*time.Minute, 100*time.Millisecond)
+		return filebeat.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
+	}, 5*time.Minute, 100*time.Millisecond,
+		"String 'file 'flog.log' is not finished, will retry starting the input soon' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
-		return p.LogContains("ForceReload set to TRUE")
-	}, 5*time.Minute, 100*time.Millisecond)
+		return filebeat.LogContains("ForceReload set to TRUE")
+	}, 5*time.Minute, 100*time.Millisecond,
+		"String 'ForceReload set to TRUE' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
-		return p.LogContains("Reloading Beats inputs because forceReload is true")
-	}, 5*time.Minute, 100*time.Millisecond)
+		return filebeat.LogContains("Reloading Beats inputs because forceReload is true")
+	}, 5*time.Minute, 100*time.Millisecond,
+		"String 'Reloading Beats inputs because forceReload is true' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
-		return p.LogContains("ForceReload set to FALSE")
-	}, 5*time.Minute, 100*time.Millisecond)
+		return filebeat.LogContains("ForceReload set to FALSE")
+	}, 5*time.Minute, 100*time.Millisecond,
+		"String 'ForceReload set to FALSE' not found on Filebeat logs")
 
 	// Set it to true, so the temporaty directory is removed
 	testSucceeded = true
@@ -233,6 +254,8 @@ func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
 	return str
 }
 
+// generateLogFile generates a log file by appending the current
+// time to it every second.
 func generateLogFile(t *testing.T, fullPath string) {
 	t.Helper()
 	f, err := os.Create(fullPath)

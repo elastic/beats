@@ -46,20 +46,22 @@ func NewBeat(t *testing.T, binary string, args []string, tempDir string) BeatPro
 	return p
 }
 
+// Start starts the Beat process
 func (b *BeatProc) Start() {
+	t := b.t
 	fullPath, err := filepath.Abs(b.Binary)
 	if err != nil {
-		b.t.Fatalf("could got get full path from %q, err: %s", b.Binary, err)
+		t.Fatalf("could got get full path from %q, err: %s", b.Binary, err)
 	}
 	b.Cmd = exec.Command(fullPath, b.Args...)
 
 	if err := b.Cmd.Start(); err != nil {
-		b.t.Fatalf("could not start process: %s", err)
+		t.Fatalf("could not start process: %s", err)
 	}
-	b.t.Cleanup(func() {
+	t.Cleanup(func() {
 		pid := b.Cmd.Process.Pid
 		if err := b.Cmd.Process.Kill(); err != nil {
-			b.t.Fatalf("could not stop process with PID: %d, err: %s", pid, err)
+			t.Fatalf("could not stop process with PID: %d, err: %s", pid, err)
 		}
 	})
 }
