@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build darwin
+//go:build darwin && cgo
 
 package file_integrity
 
