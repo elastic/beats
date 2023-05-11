@@ -140,9 +140,9 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 	ch := make(chan maybeMsg)
 	go func() {
 		defer close(ch)
-		for i, httpResp := range resps {
-			var npages int64
+		var npages int64
 
+		for i, httpResp := range resps {
 			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
 			for {
 				pageStartTime := time.Now()
@@ -208,9 +208,8 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 					break
 				}
 			}
-
-			rp.metrics.updatePagesPerInterval(npages)
 		}
+		rp.metrics.updatePagesPerInterval(npages)
 	}()
 
 	return ch
