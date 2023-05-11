@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
+var DefaultDataStreams = "synthetics-*,heartbeat-*"
+
 func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
