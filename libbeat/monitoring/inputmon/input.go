@@ -28,23 +28,32 @@ import (
 // string values for the input and id. When the input stops it should invoke
 // the returned cancel function to unregister the metrics. For testing purposes
 // an optional monitoring.Registry may be provided as an alternative to using
-// the global 'dataset' monitoring namespace.
+// the global 'dataset' monitoring namespace. The inputType and id must be
+// non-empty for the metrics to be published to the global 'dataset' monitoring
+// namespace.
 func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
-	rootRegistry := optionalParent
-	if rootRegistry == nil {
-		rootRegistry = globalRegistry()
+	parentRegistry := optionalParent
+	if parentRegistry == nil {
+		parentRegistry = globalRegistry()
+	}
+
+	// If an ID has not been assigned to an input then metrics cannot be exposed
+	// in the global metric registry. The returned registry still behaves the same.
+	if (id == "" || inputType == "") && parentRegistry == globalRegistry() {
+		// Null route metrics without ID or input type.
+		parentRegistry = monitoring.NewRegistry()
 	}
 
 	// Sanitize dots from the id because they created nested objects within
 	// the monitoring registry, and we want a consistent flat level of nesting
 	key := sanitizeID(id)
 
-	reg = rootRegistry.NewRegistry(key)
+	reg = parentRegistry.NewRegistry(key)
 	monitoring.NewString(reg, "input").Set(inputType)
 	monitoring.NewString(reg, "id").Set(id)
 
-	return reg, func() { rootRegistry.Remove(key) }
+	return reg, func() { parentRegistry.Remove(key) }
 }
 
 func sanitizeID(id string) string {
