@@ -18,6 +18,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -101,6 +102,15 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	return input{}.run(env, src.(*source), cursor, pub)
 }
 
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
 func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -111,7 +121,8 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	if cfg.Resource.Tracer != nil {
-		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", env.ID)
+		id := sanitizeFileName(env.ID)
+		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
 	client, err := newClient(ctx, cfg, log)
@@ -186,7 +197,10 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Info("process repeated request")
-		var waitUntil time.Time
+		var (
+			budget    = *cfg.MaxExecutions
+			waitUntil time.Time
+		)
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
@@ -439,6 +453,13 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			if more, _ := state["want_more"].(bool); !more {
 				return nil
 			}
+
+			// Check we have a remaining execution budget.
+			budget--
+			if budget <= 0 {
+				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
+				return nil
+			}
 		}
 	})
 	switch {
@@ -663,6 +684,11 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 
 	if cfg.Resource.Tracer != nil {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			cfg.Resource.Tracer.Close()
+		}()
 		core := ecszap.NewCore(
 			ecszap.NewDefaultEncoderConfig(),
 			w,
@@ -812,6 +838,14 @@ var (
 		"application/zip":          lib.Zip,
 		"text/csv; header=absent":  lib.CSVNoHeader,
 		"text/csv; header=present": lib.CSVHeader,
+
+		// Include the undocumented space-less syntax to head off typo-related
+		// user issues.
+		//
+		// TODO: Consider changing the MIME type look-ups to a formal parser
+		// rather than a simple map look-up.
+		"text/csv;header=absent":  lib.CSVNoHeader,
+		"text/csv;header=present": lib.CSVHeader,
 	}
 
 	// limitPolicies are the provided rate limit policy helpers.

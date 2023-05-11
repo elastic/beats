@@ -75,7 +75,7 @@ func TestGoroutinesChecker(t *testing.T) {
 
 // goroutineTesterControl helps keeping track of goroutines started for each test case.
 type goroutineTesterControl struct {
-	checker GoroutinesChecker
+	checker *GoroutinesChecker
 	blocker chan struct{}
 }
 

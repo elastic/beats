@@ -19,16 +19,14 @@ actions:
     kind: github/pullrequest
     scmid: githubConfig
     sourceid: latestGoVersion
+    title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
     spec:
       automerge: false
       labels:
         - dependencies
         - backport-skip
-      title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
       description: |
-        It requires the version to be bumped first in golang-crossbuild project, then a new release will be added to:
-        https://github.com/elastic/golang-crossbuild/releases/tag/v{{ source "latestGoVersion" }}.
-        Otherwise it will fail until the docker images are available.
+        Generated automatically with {{ requiredEnv "JOB_URL" }}
 
 sources:
   minor:
@@ -47,15 +45,15 @@ sources:
     dependson:
       - minor
     transformers:
-      - trimprefix: go
+      - trimprefix: v
     spec:
-      owner: golang
-      repository: go
+      owner: elastic
+      repository: golang-crossbuild
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
       versionfilter:
         kind: regex
-        pattern: go1\.{{ source "minor" }}\.(\d*)$
+        pattern: v1\.{{ source "minor" }}\.(\d*)$
 
   gomod:
     dependson:
@@ -110,9 +108,9 @@ targets:
     scmid: githubConfig
     kind: file
     spec:
-      content: '{{ source "latestGoVersion" }}'
+      content: ':go-version: {{ source "latestGoVersion" }}'
       file: libbeat/docs/version.asciidoc
-      matchpattern: '\d+.\d+.\d+'
+      matchpattern: ':go-version: \d+.\d+.\d+'
   update-dockerfiles:
     name: "Update from dockerfiles"
     sourceid: latestGoVersion

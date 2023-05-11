@@ -69,7 +69,7 @@ func TestSerialize(t *testing.T) {
 			event = &messages.Event{
 				Fields: &messages.Struct{
 					Data: map[string]*messages.Value{
-						"test_field": &messages.Value{
+						"test_field": {
 							Kind: &messages.Value_StringValue{
 								StringValue: tc.value,
 							},

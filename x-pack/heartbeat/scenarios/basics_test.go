@@ -83,6 +83,7 @@ func TestRunFromOverride(t *testing.T) {
 	scenarioDB.RunAllWithATwist(t, TwistAddRunFrom, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		for _, e := range mtr.Events() {
 			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
+				"state": hbtestllext.IsMonitorStateInLocation(TestLocationDefault.ID),
 				"observer": map[string]interface{}{
 					"name": TestLocationDefault.ID,
 					"geo": map[string]interface{}{

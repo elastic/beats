@@ -74,7 +74,10 @@
         "mysql.slowlog.sort_scan_count": 1,
         "mysql.slowlog.tmp_disk_tables": 0,
         "mysql.slowlog.tmp_tables": 1,
-        "mysql.thread_id": "16",
+        "mysql.thread_id": [
+            16,
+            "16"
+        ],
         "related.user": [
             "root"
         ],
