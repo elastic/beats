@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/otiai10/copy"
@@ -33,27 +34,10 @@ func ErrInvalidPath(path string) error {
 	return fmt.Errorf("local source has invalid path '%s'", path)
 }
 
-func (l *LocalSource) Validate() error {
-	logp.L().Warn("local browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
-	if l.OrigPath == "" {
-		return ErrNoPath
-	}
+var ErrLocalUnsupportedType = fmt.Errorf("local %s", ErrUnsupportedSource)
 
-	s, err := os.Stat(l.OrigPath)
-	base := ErrInvalidPath(l.OrigPath)
-	if err != nil {
-		return fmt.Errorf("%s: %w", base, err)
-	}
-	if !s.IsDir() {
-		return fmt.Errorf("path points to a non-directory: %w", base)
-	}
-	// ensure the used synthetics version dep used in project does not
-	// exceed our supported range
-	err = validatePackageJSON(path.Join(l.OrigPath, "package.json"))
-	if err != nil {
-		return err
-	}
-	return nil
+func (l *LocalSource) Validate() (err error) {
+	return ecserr.NewUnsupportedMonitorTypeError(ErrLocalUnsupportedType)
 }
 
 func (l *LocalSource) Fetch() (err error) {

@@ -60,6 +60,10 @@ func createWithResolver(
 	cfg *conf.C,
 	resolver monitors.Resolver,
 ) (p plugin.Plugin, err error) {
+	if err := monitors.UnsupportedIntegrationType(cfg); err != nil {
+		return plugin.Plugin{}, err
+	}
+
 	jc, err := newJobFactory(cfg, resolver)
 	if err != nil {
 		return plugin.Plugin{}, err

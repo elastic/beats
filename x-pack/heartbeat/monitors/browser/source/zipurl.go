@@ -19,6 +19,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -42,12 +43,10 @@ type ZipURLSource struct {
 
 var ErrNoEtag = fmt.Errorf("no ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
+var ErrZipURLUnsupportedType = fmt.Errorf("zip_url %s", ErrUnsupportedSource)
+
 func (z *ZipURLSource) Validate() (err error) {
-	logp.L().Warn("Zip URL browser monitors are now deprecated! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
-	if z.httpClient == nil {
-		z.httpClient, _ = z.Transport.Client()
-	}
-	return err
+	return ecserr.NewUnsupportedMonitorTypeError(ErrZipURLUnsupportedType)
 }
 
 func (z *ZipURLSource) Fetch() error {

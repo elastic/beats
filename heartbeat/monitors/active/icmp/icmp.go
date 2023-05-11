@@ -45,6 +45,10 @@ func create(
 	name string,
 	commonConfig *conf.C,
 ) (p plugin.Plugin, err error) {
+	if err := monitors.UnsupportedIntegrationType(commonConfig); err != nil {
+		return plugin.Plugin{}, err
+	}
+
 	loop, err := getStdLoop()
 	if err != nil {
 		logp.Warn("Failed to initialize ICMP loop %v", err)
