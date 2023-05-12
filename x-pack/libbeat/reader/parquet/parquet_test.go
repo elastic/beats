@@ -159,8 +159,6 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	}
 
 	// closes the file handlers and asserts the errors
-	err = file.Close()
-	assert.NoError(t, err)
 	err = fileWriter.Close()
 	assert.NoError(t, err)
 
