@@ -92,7 +92,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if stConfig != nil {
 		// Note this, intentionally, blocks until connected to the trace endpoint
 		var err error
-		logp.L().Info("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
+		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
 		trace, err = tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
 		if err != nil {
 			logp.L().Fatalf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
