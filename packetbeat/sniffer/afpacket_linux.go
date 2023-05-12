@@ -44,7 +44,13 @@ type afpacketHandle struct {
 	log                          *logp.Logger
 }
 
-func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
+func newAfpacketHandle(
+	device string,
+	snaplen, block_size, num_blocks int,
+	timeout time.Duration,
+	autoPromiscMode bool,
+	fanoutGroup *uint16,
+) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
 	log := logp.NewLogger("sniffer")
@@ -86,8 +92,18 @@ func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeo
 			afpacket.OptNumBlocks(num_blocks),
 			afpacket.OptPollTimeout(timeout))
 	}
+	if err != nil {
+		return nil, fmt.Errorf("failed creating af_packet socket: %w", err)
+	}
 
-	return h, err
+	if fanoutGroup != nil {
+		if err = h.TPacket.SetFanout(afpacket.FanoutHashWithDefrag, *fanoutGroup); err != nil {
+			return nil, fmt.Errorf("failed setting af_packet fanout group: %w", err)
+		}
+		log.Infof("Joined af_packet fanout group %v", *fanoutGroup)
+	}
+
+	return h, nil
 }
 
 func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {

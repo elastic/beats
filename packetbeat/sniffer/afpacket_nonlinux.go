@@ -32,7 +32,7 @@ var errAFPacketLinuxOnly = errors.New("af_packet MMAP sniffing is only available
 
 type afpacketHandle struct{}
 
-func newAfpacketHandle(_ string, _, _, _ int, _ time.Duration, _ bool) (*afpacketHandle, error) {
+func newAfpacketHandle(_ string, _, _, _ int, _ time.Duration, _ bool, _ *uint16) (*afpacketHandle, error) {
 	return nil, errAFPacketLinuxOnly
 }
 
