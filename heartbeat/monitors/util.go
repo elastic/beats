@@ -23,14 +23,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -263,45 +260,4 @@ func filterIPs(ips []net.IP, filt func(net.IP) bool) []net.IP {
 		}
 	}
 	return out
-}
-
-var ErrUnsupportedIntegration = fmt.Errorf("fleet-managed Elastic Synthetics Integrations are now unsupported, please consider migrating existing monitors to use either Project monitors or the Synthetics app. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetics-migrate-from-integration.html")
-
-type integrationConfig struct {
-	Type       string                  `config:"type" validate:"required"`
-	Processors processors.PluginConfig `config:"processors"`
-}
-type processorConfig struct {
-	Fields mapstr.M `config:"fields" validate:"required"`
-}
-
-// Prevent running deprecated integrations on managed mode.
-// Taking a conservative approach, need to check for managed without config_id
-func UnsupportedIntegrationType(cfg *conf.C) error {
-	var ic integrationConfig
-	if err := cfg.Unpack(&ic); err != nil {
-		return err
-	}
-
-	var addFieldsP []*processorConfig
-	for _, processor := range ic.Processors {
-		if cfg, err := processor.Child("add_fields", -1); err == nil {
-			var p processorConfig
-			if err = cfg.Unpack(&p); err == nil {
-				addFieldsP = append(addFieldsP, &p)
-			}
-		}
-	}
-
-	for _, p := range addFieldsP {
-		v, err := p.Fields.GetValue("monitor.fleet_managed")
-		if managed, ok := v.(bool); err == nil && ok && managed {
-			configID, _ := p.Fields.HasKey("config_id")
-			if !configID {
-				return ecserr.NewUnsupportedMonitorTypeError(ErrUnsupportedIntegration)
-			}
-		}
-	}
-
-	return nil
 }

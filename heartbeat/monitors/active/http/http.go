@@ -22,7 +22,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -47,10 +46,6 @@ func create(
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return plugin.Plugin{}, err
-	}
-
-	if err := monitors.UnsupportedIntegrationType(cfg); err != nil {
 		return plugin.Plugin{}, err
 	}
 
