@@ -152,9 +152,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	}
 
 	// Once the desired state is reached (aka Filebeat finished applying
-	// the policy changes) we still want for a little bit before sending
+	// the policy changes) we still wait for a little bit before sending
 	// another policy. This will allow the input to run and get some data
-	// into the publishing pipeline.j
+	// into the publishing pipeline.
 	//
 	// nextState is a helper function to handle this delay.
 	idx := 0
