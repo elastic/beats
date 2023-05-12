@@ -113,11 +113,7 @@ func (b *BeatProc) openLogFile() *os.File {
 		if err != nil {
 			t.Fatalf("could not expand log file glob: %s", err)
 		}
-		if len(files) == 1 {
-			return true
-		}
-
-		return false
+		return len(files) == 1
 	}, 5*time.Second, 100*time.Millisecond,
 		"waiting for log file matching glob '%s' to be created", glob)
 
