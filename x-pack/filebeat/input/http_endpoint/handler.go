@@ -26,6 +26,7 @@ const headerContentEncoding = "Content-Encoding"
 var (
 	errBodyEmpty       = errors.New("body cannot be empty")
 	errUnsupportedType = errors.New("only JSON objects are accepted")
+	errNotCRC          = errors.New("event not processed as CRC request")
 )
 
 type httpHandler struct {
@@ -37,6 +38,7 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
+	crc                   *crcValidator
 }
 
 // Triggers if middleware validation returns successful
@@ -59,14 +61,32 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
+	var (
+		respCode int
+		respBody string
+	)
+
 	for _, obj := range objs {
+		var err error
+		if h.crc != nil {
+			respCode, respBody, err = h.crc.validate(obj)
+			if err == nil {
+				// CRC request processed
+				break
+			} else if !errors.Is(err, errNotCRC) {
+				sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
+				return
+			}
+		}
+
 		if err = h.publishEvent(obj, headers); err != nil {
 			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
+		respCode, respBody = h.responseCode, h.responseBody
 	}
 
-	h.sendResponse(w, h.responseCode, h.responseBody)
+	h.sendResponse(w, respCode, respBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {

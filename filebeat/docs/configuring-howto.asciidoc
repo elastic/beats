@@ -23,7 +23,6 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<filtering-and-enhancing-data>>
 * <<configuration-autodiscover>>
 * <<configuring-internal-queue>>
-* <<load-balancing>>
 * <<configuration-logging>>
 * <<http-endpoint>>
 * <<regexp-support>>
@@ -63,8 +62,6 @@ include::./filebeat-filtering.asciidoc[]
 include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 
 include::{libbeat-dir}/queueconfig.asciidoc[]
-
-include::./load-balancing.asciidoc[]
 
 include::{libbeat-dir}/loggingconfig.asciidoc[]
 
