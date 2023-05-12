@@ -93,9 +93,11 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		// Note this, intentionally, blocks until connected to the trace endpoint
 		var err error
 		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
-		trace, err = tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
-		if err != nil {
-			logp.L().Fatalf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
+		sockTrace, err := tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
+		if err == nil {
+			trace = sockTrace
+		} else {
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
 		}
 	}
 
@@ -152,7 +154,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
-	err := bt.trace.Write("start\n")
+	err := bt.trace.Write("start")
 	if err != nil {
 		logp.L().Errorf("could not start trace: %s", err)
 	}
@@ -216,7 +218,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
-	err = bt.trace.Write("stop")
 	if err != nil {
 		logp.L().Errorf("could not write trace stop event: %s", err)
 	}

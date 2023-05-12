@@ -66,11 +66,12 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 func (st SockTracer) Write(message string) error {
 	// Note, we don't need to worry about partial writes here: https://pkg.go.dev/io?utm_source=godoc#Writer
 	// an error will be returned here, which shouldn't really happen with unix sockets only
-	_, err := st.sock.Write([]byte(message))
+	_, err := st.sock.Write([]byte(message + "\n"))
 	return err
 }
 
 func (st SockTracer) Close() error {
+	_ = st.Write("stop")
 	return st.sock.Close()
 }
 
