@@ -156,7 +156,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// another policy. This will allow the input to run and get some data
 	// into the publishing pipeline.
 	//
-	// nextState is a helper function to handle this delay.
+	// nextState is a helper function that will keep cycling through both
+	// elements of the `units` slice. Once one is fully applied, we wait
+	// at least 10s then send the next one.
 	idx := 0
 	waiting := false
 	when := time.Now()
@@ -217,29 +219,49 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 
 	filebeat.Start()
 
+	// waitDeadlineOr5Mins looks at the test deadline
+	// and returns a reasonable value of waiting for a
+	// condition to be met. The possible values are:
+	// - if no test deadline is set, return 5 minuets
+	// - if a deadline is set and there is less than
+	//   0.5 second left, return the time left
+	// - otherwise return the time left minus 0.5 second.
+	waitDeadlineOr5Min := func() time.Duration {
+		deadline, deadileSet := t.Deadline()
+		if deadileSet {
+			left := deadline.Sub(time.Now())
+			final := left - 500*time.Millisecond
+			if final <= 0 {
+				return left
+			}
+			return final
+		}
+		return 5 * time.Minute
+	}
+
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("Can only start an input when all related states are finished")
-	}, 5*time.Minute, 100*time.Millisecond,
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'Can only start an input when all related states are finished' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
-	}, 5*time.Minute, 100*time.Millisecond,
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'file 'flog.log' is not finished, will retry starting the input soon' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("ForceReload set to TRUE")
-	}, 5*time.Minute, 100*time.Millisecond,
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'ForceReload set to TRUE' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("Reloading Beats inputs because forceReload is true")
-	}, 5*time.Minute, 100*time.Millisecond,
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'Reloading Beats inputs because forceReload is true' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("ForceReload set to FALSE")
-	}, 5*time.Minute, 100*time.Millisecond,
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'ForceReload set to FALSE' not found on Filebeat logs")
 
 	// Set it to true, so the temporaty directory is removed
