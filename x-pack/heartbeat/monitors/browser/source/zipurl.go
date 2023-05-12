@@ -118,7 +118,7 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 		if err != nil {
 			rmErr := os.RemoveAll(targetDir)
 			if rmErr != nil {
-				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, (original unzip error: %s)", rmErr, err)
+				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, %s", rmErr, fmt.Sprintf(`(original unzip error: %s)`, err.Error()))
 			}
 			return err
 		}
@@ -184,7 +184,7 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	// if its not set up properly
 	destDir := filepath.Dir(destPath)
 	if _, err := os.Stat(destDir); os.IsNotExist(err) {
-		err = os.MkdirAll(destDir, 0700) // Create your file
+		err = os.MkdirAll(destDir, defaultMod) // Create your file
 		if err != nil {
 			return fmt.Errorf("could not make dest zip dir '%s': %w", destDir, err)
 		}
@@ -194,6 +194,11 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 	if err != nil {
 		return fmt.Errorf("could not create dest file for zip '%s': %w", destPath, err)
 	}
+	err = os.Chmod(destPath, defaultMod)
+	if err != nil {
+		return fmt.Errorf("failed assigning default mode %s to %s: %w", defaultMod, destPath, err)
+	}
+
 	defer dest.Close()
 
 	rdr, err := f.Open()
