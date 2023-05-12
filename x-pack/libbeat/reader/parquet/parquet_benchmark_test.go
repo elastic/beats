@@ -6,15 +6,13 @@ package parquet
 
 import (
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"testing"
 )
 
 // fn is a function type that takes a testing.B, a Config, and a file and performs some operation on the file
 // this is the common signature for all the benchmark functions in this file
-type fn func(b *testing.B, cfg *Config, file *os.File, checkMem bool)
+type fn func(b *testing.B, cfg *Config, file *os.File)
 
 // parquetFile is a struct that contains the name of the parquet
 // file to be created and the number of columns and rows in the file
@@ -176,25 +174,6 @@ func BenchmarkReadParquet(b *testing.B) {
 		},
 	}
 
-	// cleanup process in case of abrupt exit
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT)
-	go func() {
-		<-sigc
-		for _, tc := range testCases {
-			if tc.constructAndReadLargeFiles {
-				for _, f := range tc.largeFiles {
-					os.Remove(testDataPath + f.name)
-				}
-			}
-		}
-		os.Exit(1)
-	}()
-
 	for _, tc := range testCases {
 		b.Run(tc.desc, func(b *testing.B) {
 			cfg := &Config{
@@ -203,42 +182,37 @@ func BenchmarkReadParquet(b *testing.B) {
 				BatchSize:       tc.batchSize,
 			}
 
-			var checkMem bool
+			var files []string
 			if tc.constructAndReadLargeFiles {
-				checkMem = true
+				tempDir := b.TempDir()
 				for _, f := range tc.largeFiles {
-					fName := testDataPath + f.name
+					fName := tempDir + "/" + f.name
 					createRandomParquet(b, fName, f.cols, f.rows)
-					tc.files = append(tc.files, fName)
-					defer os.Remove(fName)
+					files = append(files, fName)
 				}
 			} else {
-				for i, f := range tc.files {
-					tc.files[i] = testDataPath + f
+				for _, f := range tc.files {
+					files = append(files, testDataPath+f)
+
 				}
 			}
 
 			b.ResetTimer()
-			// in case of large files we do not want to report allocations here
-			// as it will skew the results. We report allocations in the invokeFn.
-			if !tc.constructAndReadLargeFiles {
-				b.ReportAllocs()
-			}
 			//nolint:errcheck // we do not care about handling errors from file.Seek()
 			switch {
 			case tc.processParallel:
 				b.RunParallel(func(pb *testing.PB) {
-					filePtrArr := openFiles(b, tc.files)
+					filePtrArr := openFiles(b, files)
 					for pb.Next() {
 						for _, f := range filePtrArr {
 							defer f.Close()
 							f.Seek(0, 0)
-							tc.invokeFn(b, cfg, f, checkMem)
+							tc.invokeFn(b, cfg, f)
 						}
 					}
 				})
 			case tc.useGoRoutiunes:
-				filePtrArr := openFiles(b, tc.files)
+				filePtrArr := openFiles(b, files)
 				wg := sync.WaitGroup{}
 				for i := 0; i < b.N; i++ {
 					for _, f := range filePtrArr {
@@ -248,19 +222,19 @@ func BenchmarkReadParquet(b *testing.B) {
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
-							tc.invokeFn(b, cfg, cf, checkMem)
+							tc.invokeFn(b, cfg, cf)
 						}()
 					}
 					wg.Wait()
 				}
 			// default case is set to serial processing of files
 			default:
-				filePtrArr := openFiles(b, tc.files)
+				filePtrArr := openFiles(b, files)
 				for i := 0; i < b.N; i++ {
 					for _, f := range filePtrArr {
 						defer f.Close()
 						f.Seek(0, 0)
-						tc.invokeFn(b, cfg, f, checkMem)
+						tc.invokeFn(b, cfg, f)
 					}
 				}
 			}
@@ -269,10 +243,7 @@ func BenchmarkReadParquet(b *testing.B) {
 }
 
 // readParquetFile reads entire parquet file
-func readParquetFile(b *testing.B, cfg *Config, file *os.File, checkMem bool) {
-	if checkMem {
-		b.ReportAllocs()
-	}
+func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
 	sReader, err := NewStreamReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
@@ -287,10 +258,7 @@ func readParquetFile(b *testing.B, cfg *Config, file *os.File, checkMem bool) {
 }
 
 // readParquetSingleRow reads only the first row of parquet files
-func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File, checkMem bool) {
-	if checkMem {
-		b.ReportAllocs()
-	}
+func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
 	sReader, err := NewStreamReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
@@ -305,10 +273,7 @@ func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File, checkMem boo
 }
 
 // constructStreamReader constructs a stream reader for reading parquet files
-func constructStreamReader(b *testing.B, cfg *Config, file *os.File, checkMem bool) {
-	if checkMem {
-		b.ReportAllocs()
-	}
+func constructStreamReader(b *testing.B, cfg *Config, file *os.File) {
 	_, err := NewStreamReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)

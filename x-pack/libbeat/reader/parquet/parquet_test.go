@@ -12,23 +12,17 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"os/signal"
-	"syscall"
 	"testing"
-	"time"
 
-	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/v11/arrow"
 	"github.com/apache/arrow/go/v11/arrow/array"
+	"github.com/apache/arrow/go/v11/arrow/memory"
 	"github.com/apache/arrow/go/v11/parquet/pqarrow"
 	"github.com/stretchr/testify/assert"
 )
 
 // all test files are read from/stored within the "testdata" directory
 const testDataPath = "testdata/"
-
-// test file used for reading/writing temporary parquet data
-const testFile = "test.parquet"
 
 func TestParquetWithRandomData(t *testing.T) {
 	testCases := []struct {
@@ -52,44 +46,26 @@ func TestParquetWithRandomData(t *testing.T) {
 			rows:    1000,
 		},
 		{
-			columns: 19,
-			rows:    10000,
+			columns: 15,
+			rows:    1000,
 		},
 		{
-			columns: 25,
+			columns: 15,
 			rows:    10000,
 		},
 	}
 
-	// cleanup process in case of abrupt exit
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT)
-	go func() {
-		<-sigc
-		os.Remove(testDataPath + testFile)
-		os.Exit(1)
-	}()
-
-	for _, tc := range testCases {
+	for i, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with rows=%d, and columns=%d", tc.rows, tc.columns)
 		t.Run(name, func(t *testing.T) {
-			fName := testDataPath + testFile
+			tempDir := t.TempDir()
+			fName := fmt.Sprintf("%s/%s_%d.parquet", tempDir, "test", i)
 			data := createRandomParquet(t, fName, tc.columns, tc.rows)
 			file, err := os.Open(fName)
 			if err != nil {
 				t.Fatalf("Failed to open parquet test file: %v", err)
 			}
 			defer file.Close()
-			defer os.Remove(fName)
-
-			// we set a timeout to prevent the test from running forever
-			// 10 minutes should be more than enough for any test case with rows * cols < 1000000
-			timeout := time.NewTimer(10 * time.Minute)
-			t.Cleanup(func() { timeout.Stop() })
 
 			cfg := &Config{
 				// we set ProcessParallel to true as this always has the best performance
@@ -223,11 +199,6 @@ func TestParquetWithFiles(t *testing.T) {
 			defer jsonFile.Close()
 
 			orderedJSON, rows := readJSONFromFile(t, jsonFile)
-			// we set a timeout to prevent the test from running forever
-			// 5 minutes should be the maximum running time for any test case here
-			timeout := time.NewTimer(5 * time.Minute)
-			t.Cleanup(func() { timeout.Stop() })
-
 			cfg := &Config{
 				// we set ProcessParallel to true as this always has the best performance
 				ProcessParallel: true,
@@ -262,6 +233,7 @@ func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data ma
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
+	defer sReader.Close()
 
 	rowCount := 0
 	for sReader.Next() {

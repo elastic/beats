@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/apache/arrow/go/arrow/memory"
+	"github.com/apache/arrow/go/v11/arrow/memory"
 	"github.com/apache/arrow/go/v11/parquet"
 	"github.com/apache/arrow/go/v11/parquet/file"
 	"github.com/apache/arrow/go/v11/parquet/pqarrow"
@@ -24,6 +24,9 @@ type StreamReader struct {
 }
 
 // NewStreamReader creates a new reader that can decode parquet data from an io.Reader.
+// It will return an error if the parquet file cannot be read.
+// NewStreamReader will read the entire contents of the file into memory, so very large files
+// can cause memory bottleneck issues.
 func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
 	batchSize := 1
 	if cfg.BatchSize > 1 {
@@ -37,7 +40,7 @@ func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
 	}
 
 	// defines a memory allocator for allocating memory for Arrow objects
-	pool := memory.NewCheckedAllocator(memory.DefaultAllocator)
+	pool := memory.NewCheckedAllocator(&memory.GoAllocator{})
 
 	pf, err := file.NewParquetReader(bytes.NewReader(data), file.WithReadProps(parquet.NewReaderProperties(pool)))
 	if err != nil {
