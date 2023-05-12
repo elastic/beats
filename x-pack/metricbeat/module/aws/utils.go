@@ -19,7 +19,6 @@ import (
 )
 
 const DefaultApiTimeout = 5 * time.Second
-const CwApiTimeout = 10 * time.Second
 
 // GetStartTimeEndTime calculates start and end times for queries based on the current time and a duration.
 //
@@ -65,11 +64,9 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 
 	paginator := cloudwatch.NewListMetricsPaginator(svcCloudwatch, listMetricsInput)
 
-	ctx, cancel := getContextWithTimeout(CwApiTimeout)
-	defer cancel()
 	// List metrics of a given namespace for each region
 	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(ctx)
+		page, err := paginator.NextPage(context.TODO())
 		if err != nil {
 			return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
@@ -100,12 +97,10 @@ func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwa
 		}
 
 		paginator := cloudwatch.NewGetMetricDataPaginator(svc, getMetricDataInput)
-		ctx, cancel := getContextWithTimeout(CwApiTimeout)
-		defer cancel()
 		var err error
 		var page *cloudwatch.GetMetricDataOutput
 		for paginator.HasMorePages() {
-			if page, err = paginator.NextPage(ctx); err != nil {
+			if page, err = paginator.NextPage(context.TODO()); err != nil {
 				return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
 			}
 			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
