@@ -295,10 +295,6 @@ func testProcessS3Object(t testing.TB, file, contentType string, numEvents int, 
 	return _testProcessS3Object(t, file, contentType, numEvents, false, selectors)
 }
 
-func benchmarkProcessS3Object(b testing.TB, file, contentType string, selectors ...fileSelectorConfig) []beat.Event {
-	return _benchmarkProcessS3Object(b, file, contentType, false, selectors)
-}
-
 func testProcessS3ObjectError(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {
 	return _testProcessS3Object(t, file, contentType, numEvents, true, selectors)
 }
@@ -334,42 +330,6 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 		require.NoError(t, err)
 		assert.Equal(t, numEvents, len(events))
 		assert.EqualValues(t, numEvents, ack.PendingACKs)
-	} else {
-		require.Error(t, err)
-	}
-
-	return events
-}
-
-func _benchmarkProcessS3Object(t testing.TB, file, contentType string, expectErr bool, selectors []fileSelectorConfig) []beat.Event {
-	t.Helper()
-
-	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
-	defer cancel()
-
-	ctrl, ctx := gomock.WithContext(ctx, t)
-	defer ctrl.Finish()
-	mockS3API := NewMockS3API(ctrl)
-	mockPublisher := NewMockBeatClient(ctrl)
-
-	s3Event, s3Resp := newS3Object(t, file, contentType)
-	var events []beat.Event
-	gomock.InOrder(
-		mockS3API.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
-			Return(s3Resp, nil),
-		mockPublisher.EXPECT().
-			Publish(gomock.Any()).
-			Do(func(event beat.Event) { events = append(events, event) }).
-			AnyTimes(),
-	)
-
-	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, selectors, backupConfig{}, 1)
-	ack := awscommon.NewEventACKTracker(ctx)
-	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
-
-	if !expectErr {
-		require.NoError(t, err)
 	} else {
 		require.Error(t, err)
 	}

@@ -232,37 +232,6 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	return nil
 }
 
-// readParquetJSON uses an array of json.RawMessage to decode parquet json data
-// since the result of readParquet method is always a stringified json array.
-func (p *s3ObjectProcessor) readParquetJSON(r io.Reader) error {
-	dec := json.NewDecoder(r)
-	dec.UseNumber()
-
-	for dec.More() && p.ctx.Err() == nil {
-		offset := dec.InputOffset()
-
-		var items []json.RawMessage
-		if err := dec.Decode(&items); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
-		}
-
-		for _, item := range items {
-			if p.readerConfig.ExpandEventListFromField != "" {
-				if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
-					return err
-				}
-				continue
-			}
-
-			data, _ := item.MarshalJSON()
-			evt := p.createEvent(string(data), offset)
-			p.publish(p.acker, &evt)
-		}
-	}
-
-	return nil
-}
-
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
