@@ -291,28 +291,6 @@ func TestS3ObjectProcessor(t *testing.T) {
 	})
 }
 
-func BenchmarkParquetSerial(b *testing.B) {
-	sel := fileSelectorConfig{ReaderConfig: readerConfig{ParquetConfig: parquetConfig{
-		ProcessAsParquet: true,
-		BatchSize:        1,
-	}}}
-	for i := 0; i < b.N; i++ {
-		benchmarkProcessS3Object(b, "testdata/vpc-flow.gz.parquet", "application/octet-stream", sel)
-	}
-}
-
-func BenchmarkParquetParallel(b *testing.B) {
-	sel := fileSelectorConfig{ReaderConfig: readerConfig{ParquetConfig: parquetConfig{
-		ProcessAsParquet: true,
-		BatchSize:        1,
-	}}}
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			benchmarkProcessS3Object(b, "testdata/vpc-flow.gz.parquet", "application/octet-stream", sel)
-		}
-	})
-}
-
 func testProcessS3Object(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {
 	return _testProcessS3Object(t, file, contentType, numEvents, false, selectors)
 }

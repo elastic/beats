@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/beats/v7/x-pack/libbeat/reader/parquet"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -156,8 +155,6 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	switch {
 	case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
 		err = p.readJSON(reader)
-	case p.readerConfig.ParquetConfig.ProcessAsParquet:
-		err = p.readParquet(reader)
 	default:
 		err = p.readFile(reader)
 	}
@@ -230,34 +227,6 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), offset)
 		p.publish(p.acker, &evt)
-	}
-
-	return nil
-}
-
-// readParquet reads a parquet file based on config options and processes it using the parquet reader,
-// decodes it to JSON and sends the decoded data to the readJSON method to process further as JSON.
-func (p *s3ObjectProcessor) readParquet(r io.Reader) error {
-	sReader, err := parquet.NewStreamReader(r, &parquet.Config{
-		ProcessParallel: p.readerConfig.ParquetConfig.ProcessParallel,
-		BatchSize:       p.readerConfig.ParquetConfig.BatchSize,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create parquet stream reader: %w", err)
-	}
-	defer sReader.Close()
-
-	for sReader.Next() {
-		data, err := sReader.Record()
-		if err != nil {
-			return fmt.Errorf("failed to read records from parquet record reader: %w", err)
-		}
-		if data != nil {
-			err = p.readParquetJSON(bytes.NewReader(data))
-			if err != nil {
-				return fmt.Errorf("failed to read JSON data from arrow record: %w", err)
-			}
-		}
 	}
 
 	return nil
