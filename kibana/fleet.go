@@ -29,6 +29,7 @@ const (
 	fleetAgentPolicyAPI       = "/api/fleet/agent_policies/%s"
 	fleetEnrollmentAPIKeysAPI = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
 	fleetAgentsAPI            = "/api/fleet/agents"
+	fleetAgentAPI             = "/api/fleet/agents/%s"
 	fleetUnEnrollAgentAPI     = "/api/fleet/agents/%s/unenroll"
 	fleetUpgradeAgentAPI      = "/api/fleet/agents/%s/upgrade"
 	fleetFleetServerHostsAPI  = "/api/fleet/fleet_server_hosts"
@@ -46,26 +47,25 @@ const (
 	MonitoringEnabledMetrics MonitoringEnabledOption = "metrics"
 )
 
-type Policy struct {
-	ID                string                    `json:"id"`
+type PolicyCommon struct {
 	Name              string                    `json:"name"`
 	Namespace         string                    `json:"namespace"`
 	Description       string                    `json:"description"`
 	MonitoringEnabled []MonitoringEnabledOption `json:"monitoring_enabled"`
 	FleetServerHostID string                    `json:"fleet_server_host_id"`
-}
-
-type CreatePolicyRequest Policy
-
-type CreatePolicyResponse struct {
-	ID                string                    `json:"id,omitempty"`
-	Name              string                    `json:"name"`
-	Description       string                    `json:"description"`
-	Namespace         string                    `json:"namespace"`
-	IsManaged         bool                      `json:"is_managed"`
+	AgentFeatures     []map[string]interface{}  `json:"agent_features"`
 	Status            string                    `json:"status"`
-	MonitoringEnabled []MonitoringEnabledOption `json:"monitoring_enabled"`
+	IsManaged         bool                      `json:"is_managed"`
 }
+
+type PolicyExisting struct {
+	ID           string `json:"id"`
+	PolicyCommon `json:",inline"`
+}
+
+type CreatePolicyRequest PolicyCommon
+
+type CreatePolicyResponse PolicyExisting
 
 func (client *Client) CreatePolicy(request CreatePolicyRequest) (*CreatePolicyResponse, error) {
 	reqBody, err := json.Marshal(request)
@@ -100,7 +100,7 @@ type GetPolicyRequest struct {
 	ID string
 }
 
-type GetPolicyResponse Policy
+type GetPolicyResponse PolicyExisting
 
 func (client *Client) GetPolicy(request GetPolicyRequest) (*GetPolicyResponse, error) {
 	apiURL := fmt.Sprintf(fleetAgentPolicyAPI, request.ID)
@@ -118,6 +118,40 @@ func (client *Client) GetPolicy(request GetPolicyRequest) (*GetPolicyResponse, e
 
 	if err := json.Unmarshal(respBody, &resp); err != nil {
 		return nil, fmt.Errorf("unable to parse get policy API response: %w", err)
+	}
+
+	return &resp.Item, nil
+}
+
+//
+// Update Policy
+//
+
+type UpdatePolicyRequest PolicyExisting
+
+type UpdatePolicyResponse PolicyExisting
+
+func (client *Client) UpdatePolicy(request UpdatePolicyRequest) (*UpdatePolicyResponse, error) {
+	reqBody, err := json.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("unable to marshal update policy request into JSON: %w", err)
+	}
+
+	apiURL := fmt.Sprintf(fleetAgentPolicyAPI, request.ID)
+	statusCode, respBody, err := client.Request(http.MethodPut, apiURL, nil, nil, bytes.NewReader(reqBody))
+	if err != nil {
+		return nil, fmt.Errorf("error calling update policy API: %w", err)
+	}
+	if statusCode != 200 {
+		return nil, fmt.Errorf("unable to update policy; API returned status code [%d] and body [%s]", statusCode, string(respBody))
+	}
+
+	var resp struct {
+		Item UpdatePolicyResponse `json:"item"`
+	}
+
+	if err := json.Unmarshal(respBody, &resp); err != nil {
+		return nil, fmt.Errorf("unable to parse update policy API response: %w", err)
 	}
 
 	return &resp.Item, nil
@@ -170,7 +204,7 @@ func (client *Client) CreateEnrollmentAPIKey(request CreateEnrollmentAPIKeyReque
 // List Agents
 //
 
-type Agent struct {
+type AgentCommon struct {
 	Active bool   `json:"active"`
 	Status string `json:"status"`
 	Agent  struct {
@@ -182,6 +216,13 @@ type Agent struct {
 			Hostname string `json:"hostname"`
 		} `json:"host"`
 	} `json:"local_metadata"`
+	PolicyID       string `json:"policy_id"`
+	PolicyRevision int    `json:"policy_revision"`
+}
+
+type AgentExisting struct {
+	ID          string `json:"id"`
+	AgentCommon `json:",inline"`
 }
 
 type ListAgentsRequest struct {
@@ -189,7 +230,7 @@ type ListAgentsRequest struct {
 }
 
 type ListAgentsResponse struct {
-	Items []Agent `json:"items"`
+	Items []AgentExisting `json:"items"`
 }
 
 func (client *Client) ListAgents(request ListAgentsRequest) (*ListAgentsResponse, error) {
@@ -208,6 +249,37 @@ func (client *Client) ListAgents(request ListAgentsRequest) (*ListAgentsResponse
 	}
 
 	return &resp, nil
+}
+
+//
+// Get Agent
+//
+
+type GetAgentRequest struct {
+	ID string
+}
+
+type GetAgentResponse AgentExisting
+
+func (client *Client) GetAgent(request GetAgentRequest) (*GetAgentResponse, error) {
+	apiURL := fmt.Sprintf(fleetAgentAPI, request.ID)
+	statusCode, respBody, err := client.Request(http.MethodGet, apiURL, nil, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error calling get agent API: %w", err)
+	}
+	if statusCode != 200 {
+		return nil, fmt.Errorf("unable to get agent; API returned status code [%d] and body [%s]", statusCode, string(respBody))
+	}
+
+	var resp struct {
+		Item GetAgentResponse `json:"item"`
+	}
+
+	if err := json.Unmarshal(respBody, &resp); err != nil {
+		return nil, fmt.Errorf("unable to parse get agent API response: %w", err)
+	}
+
+	return &resp.Item, nil
 }
 
 //
