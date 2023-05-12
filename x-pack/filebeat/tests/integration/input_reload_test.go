@@ -7,7 +7,9 @@
 package integration
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -30,6 +32,11 @@ import (
 //
 // Run the tests wit -v flag to print the temporary folder used.
 func TestInputReloadUnderElasticAgent(t *testing.T) {
+	// First things first, ensure ES is running and we can connect to it.
+	// If ES is not running, the test will timeout and the only way to know
+	// what caused is to go through Filebeat's logs
+	ensureESIsRunning(t)
+
 	// We create our own temp dir so the files can be persisted
 	// in case the test fails. This will help debugging issues
 	// locally and on CI.
@@ -210,11 +217,9 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	filebeat := NewBeat(
 		t,
 		"../../filebeat.test",
-		[]string{
-			"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
-			"-E", "management.enabled=true",
-		},
 		tempDir,
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
 	)
 
 	filebeat.Start()
@@ -305,4 +310,27 @@ func generateLogFile(t *testing.T, fullPath string) {
 			}
 		}
 	}()
+}
+
+func ensureESIsRunning(t *testing.T) {
+	t.Helper()
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:9200", nil)
+	if err != nil {
+		t.Fatalf("cannot create request to ensure ES is running: %s", err)
+	}
+
+	req.SetBasicAuth("admin", "testing")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// If you're reading this message, you probably forgot to start ES
+		// run `mage compose:Up` from Filebeat's folder to start all
+		// containers required for integration tests
+		t.Fatalf("cannot execute HTTP request to ES: %s", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
+	}
 }
