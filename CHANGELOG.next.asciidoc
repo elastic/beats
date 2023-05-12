@@ -201,6 +201,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Improve documentation for event_logs.name configuration. {pull}34931[34931]
 - Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix panic due to misrepresented buffer use. {pull}35437[35437]
+- Prevent panic on closing iterators on empty channels in experimental API. {issue}33966[33966] {pull}35423[35423]
 
 *Functionbeat*
 
