@@ -16,6 +16,17 @@ processors:
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
       if: ctx?.winlog?.channel == 'Microsoft-Windows-PowerShell/Operational'
+  - set:
+      field: host.os.type
+      value: windows
+      override: false
+      if: ctx.tags != null && ctx.tags.contains('forwarded')
+  - set:
+      field: host.os.family
+      value: windows
+      override: false
+      if: ctx.tags != null && ctx.tags.contains('forwarded')
+
 on_failure:
   - set:
       field: error.message

@@ -314,6 +314,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Winlogbeat*
 
+- Set `host.os.type` and `host.os.family` in forwarded events. {pull}35435[35435]
+
 
 *Elastic Log Driver*
 *Elastic Logging Plugin*
