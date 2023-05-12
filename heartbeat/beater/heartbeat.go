@@ -68,6 +68,22 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
+	// The sock tracer should be setup before any other code to ensure its reliability
+	// The ES Loader, for instance, can exit early
+	var trace tracer.Tracer = tracer.NewNoopTracer()
+	stConfig := parsedConfig.SocketTrace
+	if stConfig != nil {
+		// Note this, intentionally, blocks until connected to the trace endpoint
+		var err error
+		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
+		sockTrace, err := tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
+		if err == nil {
+			trace = sockTrace
+		} else {
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
+		}
+	}
+
 	// Check if any of these can prevent using states client
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
@@ -85,20 +101,6 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}
 	} else if b.Manager.Enabled() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
-	}
-
-	var trace tracer.Tracer = tracer.NewNoopTracer()
-	stConfig := parsedConfig.SocketTrace
-	if stConfig != nil {
-		// Note this, intentionally, blocks until connected to the trace endpoint
-		var err error
-		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
-		sockTrace, err := tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
-		if err == nil {
-			trace = sockTrace
-		} else {
-			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
-		}
 	}
 
 	limit := parsedConfig.Scheduler.Limit
