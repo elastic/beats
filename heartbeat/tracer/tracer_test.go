@@ -51,7 +51,7 @@ func TestSockTracer(t *testing.T) {
 	require.NoError(t, err)
 
 	got := <-listenRes
-	require.Equal(t, got, []string{"start"})
+	require.Equal(t, got, []string{"start", "stop"})
 }
 
 func TestSockTracerWaitFail(t *testing.T) {
