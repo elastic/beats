@@ -13,29 +13,46 @@
 # ============================== Filebeat inputs ===============================
 
 filebeat.inputs:
-- type: gcs
-  id: my-gcs-id
-  enabled: true
-  project_id: elastic-sa
-  auth.credentials_json.account_key: '{
-  "type": "service_account",
-  "project_id": "elastic-sa",
-  "private_key_id": "61fb5702cd6c0c4c95918d61c89cc3a625f751e3",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDJTAtuKAjdX14Q\nz+sRRBA7xzOhOXiYWVFDPrJevOl3rM+HozPyQ0suHnEO4BIOCY7KQvsKYi8Eh0Fr\nIFM05MubZshCdjRZ7v/baY7GM+8wdq1nMdjSPlDcrZP873fbt8ka9CxUc+v+e95X\nMlKtjAycC9hMDbcTE4XBXn5PiHTSbApbLVTqAi2A2DsKhlgCwxeM0k/6qwVwkQAz\n4WDNRE+md6LeJRngMmUsb0dmilLnYcU9leRpnxqKboacksv7KwdGu/L9OKMc9U/1\nG4YiANIBWb6d/3nVqEa7LcW4WhWLKHuF/6wKHKld1Xeiuf2RLaXEyGeRlZ4cfnhn\nREw9i8uLAgMBAAECggEAGrQh2A0rj+J04hoS/wlede+pI7wyCVPf+eG5W+QHvL6K\nEV5PJ9ZRhN649NY4zu/pp19XWjtILXub7BAvuZaYhBcQffCcZUnVW1AXhqehFXbI\n7iWos8tcgsnsFePWrKkm3pKBxvpR1kKsbjjYyvkHOzQ/D2fKX5d5aPuWGgrqJHfA\nBn00GyGV7/2ZcdMRkse5L0l66aJyD/KsUf4nQlt1/OoMFkmXuQBU1iKSV8aa5M5N\n0sMSvAELjWzNHEQU/IwklOGr242pCCmzNzaRXbU+50aJ2cfP+wAshft9M24a8wgR\no/rGsN55BpfcVlOeF5raSrOHeLiMkVuhOl0QOm1KkQKBgQD/5MSaDR3gGb5rh1lH\n2Ac3H0J5Mhc5cX8ih+VoKT0zxRJD7g9mDTnPXEyuAm5WuzAsBEOnl8oi14O66b64\nzd88uSAaaVQppVoWayF0xDOtQ3Wg9TuVJN3jHsSfj0z0wtSc72tGiCmruDGrsIrN\n05VrWyBET8lb5pvgqJohGuMqnwKBgQDJYXdvadPXGlICaU7EQrkrMKYYD553EE2h\n78ELDwMJBjOyMzrr3vu2ElilsGeF0ZV1n0tctPtRnKVY42Dn35XX1RhhDSnj1HTJ\ngEQiykLKRQD/jnNlZxz39ApbuWn9AInpbDmB9mbVN16SdnSMSBQyeb1GSjf91y6p\ntPBog9fjlQKBgHFufEP5ioO7hbBuuAHj3hbuMW496ROanwu0h9mrZijbs+QO1B6d\nwEGOHaOJClZB9fGdFkxlOcJGHGuvj86l2840Fen/RMKNPKjxZkw3aNzmKW9nJblQ\nNVenXOuJ/0gEUXEbpEcItsgbB1GfGXhx0StcoqoFYDHvwKtOsbv5CjfrAoGBAI/b\nubd0cSmrmsQwOF2JkL/iy/RKTBigI+U34b6lpbRvosR9Rm0zaLtDVeJfJ0T4WH2j\nIvICM7q0XYYnQJXEKkX566WBAtjHb/p2T7ZOqPHX44OsXpEk3RPgWPn3dViQZvTC\nJD7MJ9/O4xdb2ZxQ7WS1hNnOsTr72lDPeiIfdT0VAoGAf7mlRouq9+MW7uR9+eBs\neXu06heoIs18LylbeqbJfd7SKdpb8V8n7hkdpI4Ovd2EZ6mwaKijOegJD67sGe4z\n9v7mr+v/PmdSJP8sJwKt/R4IuXnrZOrkFDuZiH+iJ6PSqjdi5PaNjm5L8C7hO6ib\nzBv16dANJK0UAI+aJKliryU=\n-----END PRIVATE KEY-----\n",
-  "client_email": "gcs-storage-test@elastic-sa.iam.gserviceaccount.com",
-  "client_id": "113658344993569126332",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gcs-storage-test%40elastic-sa.iam.gserviceaccount.com"
- }'
-  max_workers: 3
-  poll: true
-  poll_interval: 10s
-  bucket_timeout: 120s
-  buckets:
-  - name: sei-cloudflare-zerotrust
-    poll: true
+
+# Each - is an input. Most options can be set at the input level, so
+# you can use different inputs for various configurations.
+# Below are the input specific configurations.
+
+# filestream is an input for collecting log messages from files.
+- type: filestream
+
+  # Unique ID among all inputs, an ID is required.
+  id: my-filestream-id
+
+  # Change to true to enable this input configuration.
+  enabled: false
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list.
+  # Line filtering happens after the parsers pipeline. If you would like to filter lines
+  # before parsers, use include_message parser.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list.
+  # Line filtering happens after the parsers pipeline. If you would like to filter lines
+  # before parsers, use include_message parser.
+  #include_lines: ['^ERR', '^WARN']
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.exclude_files: ['.gz$']
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
 
 # ============================== Filebeat modules ==============================
 
@@ -119,9 +136,9 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 # ---------------------------- Elasticsearch Output ----------------------------
-output.file:
-  path: /Users/exdghost/elastic/ShourieG/beats/x-pack/filebeat
-  filename: output
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -213,4 +230,3 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
-
