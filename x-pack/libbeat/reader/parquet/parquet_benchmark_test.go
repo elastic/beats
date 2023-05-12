@@ -255,6 +255,10 @@ func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
 			b.Fatalf("failed to read stream: %v", err)
 		}
 	}
+	err = sReader.Close()
+	if err != nil {
+		b.Fatalf("failed to close stream reader: %v", err)
+	}
 }
 
 // readParquetSingleRow reads only the first row of parquet files
@@ -270,13 +274,21 @@ func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
 			b.Fatalf("failed to read stream: %v", err)
 		}
 	}
+	err = sReader.Close()
+	if err != nil {
+		b.Fatalf("failed to close stream reader: %v", err)
+	}
 }
 
 // constructStreamReader constructs a stream reader for reading parquet files
 func constructStreamReader(b *testing.B, cfg *Config, file *os.File) {
-	_, err := NewStreamReader(file, cfg)
+	sReader, err := NewStreamReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
+	}
+	err = sReader.Close()
+	if err != nil {
+		b.Fatalf("failed to close stream reader: %v", err)
 	}
 }
 

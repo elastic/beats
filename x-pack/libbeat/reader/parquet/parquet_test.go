@@ -120,14 +120,12 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	if err != nil {
 		t.Fatalf("Failed to create parquet test file: %v", err)
 	}
-	defer file.Close()
 
 	// creates a new file writer
 	fileWriter, err := pqarrow.NewFileWriter(schema, file, nil, pqarrow.ArrowWriterProperties{})
 	if err != nil {
 		t.Fatalf("Failed to create parquet file writer: %v", err)
 	}
-	defer fileWriter.Close()
 
 	// creates an Arrow memory pool for managing memory allocations
 	memoryPool := memory.NewGoAllocator()
@@ -159,6 +157,12 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 			t.Fatalf("Failed to write record to parquet file: %v", err)
 		}
 	}
+
+	// closes the file handlers and asserts the errors
+	err = file.Close()
+	assert.NoError(t, err)
+	err = fileWriter.Close()
+	assert.NoError(t, err)
 
 	return data
 }
@@ -233,8 +237,6 @@ func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data ma
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
-	defer sReader.Close()
-
 	rowCount := 0
 	for sReader.Next() {
 		val, err := sReader.Record()
@@ -247,6 +249,9 @@ func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data ma
 	}
 	// asserts of number of rows read is the same as the number of rows from the input file
 	assert.Equal(t, rows, rowCount)
+	// closes the stream reader and asserts that there are no errors
+	err = sReader.Close()
+	assert.NoError(t, err)
 }
 
 // readAndCompareParquetJSON uses an array of json.RawMessage to decode parquet json data and compare it to the input data
