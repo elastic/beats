@@ -140,6 +140,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
 - Fix broken state ID location naming. {pull}35336[35336]
 - Fix output pipeline exit on run_once. {pull}35376[35376]
+- Fix formatting issue with socket trace timeout. {pull}35434[35434]
 
 *Heartbeat*
 
