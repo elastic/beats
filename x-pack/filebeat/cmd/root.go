@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
@@ -44,6 +45,13 @@ func defaultProcessors() []mapstr.M {
 	// - add_cloud_metadata: ~
 	// - add_docker_metadata: ~
 	// - add_kubernetes_metadata: ~
+
+	// This gets called early enough that the CLI handling isn't properly initialized yet,
+	// so use an environment variable.
+	shipperEnv := os.Getenv("SHIPPER_MODE")
+	if shipperEnv == "True" {
+		return []mapstr.M{}
+	}
 	return []mapstr.M{
 		{
 			"add_host_metadata": mapstr.M{
@@ -54,4 +62,5 @@ func defaultProcessors() []mapstr.M {
 		{"add_docker_metadata": nil},
 		{"add_kubernetes_metadata": nil},
 	}
+
 }
