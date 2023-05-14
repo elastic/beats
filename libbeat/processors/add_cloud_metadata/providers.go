@@ -66,6 +66,7 @@ var cloudMetaProviders = map[string]provider{
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
 	"huawei":        huaweiMetadataFetcher,
+	"hetzner":       hetznerMetadataFetcher,
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
