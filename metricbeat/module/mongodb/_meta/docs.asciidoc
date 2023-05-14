@@ -15,6 +15,12 @@ format:
 [mongodb://][user:pass@]host[:port][?options]
 -----------------------------------
 
+Or
+
+-----------------------------------------------------------------------------------------
+mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
+-----------------------------------------------------------------------------------------
+
 The URL can be as simple as:
 
 [source,yaml]
@@ -31,7 +37,7 @@ Or more complex like:
   hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
 ----------------------------------------------------------------------
 
-some more supported URLS are:
+Some more supported URLs are:
 
 [source,yaml]
 ----------------------------------------------------------------------

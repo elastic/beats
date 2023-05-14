@@ -96,7 +96,7 @@ func TestParseMongoURL(t *testing.T) {
 			ExpectedPassword: "",
 		},
 		{
-			Name:     "with options replicaset",
+			Name:     "with replicaSet option",
 			URL:      "mongodb://localhost:40001,localhost:40002/?replicaSet=dbrs",
 			Username: "anotheruser",
 			Password: "anotherpass",
