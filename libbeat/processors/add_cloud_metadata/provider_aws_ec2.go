@@ -116,8 +116,8 @@ func fetchRawProviderMetadata(
 	if clusterName != "" {
 		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
 
-		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
 		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
+		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
 	}
 }
 
@@ -144,7 +144,7 @@ func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string,
 	if err != nil {
 		return "", fmt.Errorf("error fetching EC2 Tags: %w", err)
 	}
-	if len(tagsResult.Tags) > 0 {
+	if len(tagsResult.Tags) == 1 {
 		return *tagsResult.Tags[0].Value, nil
 	}
 	return "", nil

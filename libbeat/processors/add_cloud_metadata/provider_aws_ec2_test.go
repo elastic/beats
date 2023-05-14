@@ -134,11 +134,10 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				return &ec2.DescribeTagsOutput{
 					Tags: []types.TagDescription{
 						{
-							Key:   &clusterNameKey,
-							Value: &clusterNameValue,
-						}, {
-							Key:   &instanceIDKey,
-							Value: &instanceIDDoc1,
+							Key:          &clusterNameKey,
+							ResourceId:   &instanceIDDoc1,
+							ResourceType: "instance",
+							Value:        &clusterNameValue,
 						},
 					},
 				}, nil
@@ -182,11 +181,10 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				return &ec2.DescribeTagsOutput{
 					Tags: []types.TagDescription{
 						{
-							Key:   &clusterNameKey,
-							Value: &clusterNameValue,
-						}, {
-							Key:   &instanceIDKey,
-							Value: &instanceIDDoc1,
+							Key:          &clusterNameKey,
+							ResourceId:   &instanceIDDoc1,
+							ResourceType: "instance",
+							Value:        &clusterNameValue,
 						},
 					},
 				}, nil
