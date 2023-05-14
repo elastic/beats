@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// nolint: errcheck // Some errors are not checked on tests/helper functions
+//nolint:errcheck // Some errors are not checked on tests/helper functions
 package input_logfile
 
 import (
@@ -30,6 +30,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -396,7 +397,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	})
 }
 
-// nolint: dupl // Test code won't be refactored on this commit
+//nolint:dupl // Test code won't be refactored on this commit
 func TestSourceStore_CleanIf(t *testing.T) {
 	t.Run("entries are cleaned when function returns true", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
@@ -471,7 +472,7 @@ func closeStoreWith(fn func(s *store)) func() {
 	}
 }
 
-// nolint: unparam // It's a test helper
+//nolint:unparam // It's a test helper
 func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
@@ -568,7 +569,8 @@ func storeInSyncSnapshot(store *store) map[string]state {
 // fails with Errorf if the state differ.
 //
 // Note: testify is too strict when comparing timestamp, better use checkEqualStoreState.
-// nolint: unparam // It's a test helper
+//
+//nolint:unparam // It's a test helper
 func checkEqualStoreState(t *testing.T, want, got map[string]state) bool {
 	t.Helper()
 	if d := cmp.Diff(want, got); d != "" {
