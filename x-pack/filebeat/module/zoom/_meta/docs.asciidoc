@@ -10,7 +10,7 @@ include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is a module for Zoom webhook logs. The module creates an HTTP listener that accepts incoming webhooks from Zoom.
 
-To configure Zoom to send webhooks to the filebeat module, please follow the https://marketplace.zoom.us/docs/guides/build/webhook-only-app[Zoom Documentation].
+To configure Zoom to send webhooks to the filebeat module, please follow the https://developers.zoom.us/docs/api/rest/webhook-only-app[Zoom Documentation].
 
 include::../include/gs-link.asciidoc[]
 

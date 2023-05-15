@@ -9,6 +9,7 @@ import (
 	"io"
 	"math"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -19,9 +20,25 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
+var (
+	clockValue atomic.Value // Atomic reference to a clock value.
+	realClock  = clock{Now: time.Now}
+)
+
+type clock struct {
+	Now func() time.Time
+}
+
+func init() {
+	clockValue.Store(realClock)
+}
+
 // currentTime returns the current time. This exists to allow unit tests
 // simulate the passage of time.
-var currentTime = time.Now
+func currentTime() time.Time {
+	clock := clockValue.Load().(clock)
+	return clock.Now()
+}
 
 type inputMetrics struct {
 	registry   *monitoring.Registry

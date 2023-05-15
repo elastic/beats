@@ -239,7 +239,7 @@ func RenderEvent(
 
 	// Only a single string is returned when rendering XML.
 	err = FormatEventString(EvtFormatMessageXml,
-		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
+		eventHandle, providerName, EvtHandle(publisherHandle), lang, out)
 	// Recover by rendering the XML without the RenderingInfo (message string).
 	if err != nil {
 		// Do not try to recover from InsufficientBufferErrors because these
@@ -388,20 +388,17 @@ func Close(h EvtHandle) error {
 // publisherHandle is a handle to the publisher's metadata as provided by
 // EvtOpenPublisherMetadata.
 // lang is the language ID.
-// buffer is optional and if not provided it will be allocated. If the provided
-// buffer is not large enough then an InsufficientBufferError will be returned.
 func FormatEventString(
 	messageFlag EvtFormatMessageFlag,
 	eventHandle EvtHandle,
 	publisher string,
 	publisherHandle EvtHandle,
 	lang uint32,
-	buffer []byte,
 	out io.Writer,
 ) error {
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
-	if ph == 0 {
+	if ph == NilHandle {
 		var err error
 		ph, err = OpenPublisherMetadata(0, publisher, lang)
 		if err != nil {
@@ -410,33 +407,30 @@ func FormatEventString(
 		defer _EvtClose(ph) //nolint:errcheck // This is just a resource release.
 	}
 
-	// Create a buffer if one was not provided.
+	// Determine the buffer size needed (given in WCHARs).
 	var bufferUsed uint32
-	if buffer == nil {
-		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
-			0, nil, &bufferUsed)
-		if err != nil && err != ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-			return err
-		}
-
-		bufferUsed *= 2
-		buffer = make([]byte, bufferUsed)
-		bufferUsed = 0
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag, 0, nil, &bufferUsed)
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
+		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
-		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
-	bufferUsed *= 2
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
-	}
+	// Get a buffer from the pool and adjust its length.
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
+	// The documentation for EvtFormatMessage specifies that the buffer is
+	// requested "in characters", and the buffer itself is LPWSTR, meaning the
+	// characters are WCHAR so double the value.
+	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
+	bb.Reserve(int(bufferUsed * 2))
+
+	err = _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag, bufferUsed, bb.PtrAt(0), &bufferUsed)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	// This assumes there is only a single string value to read. This will
 	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
-	return common.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
+	return common.UTF16ToUTF8Bytes(bb.Bytes(), out)
 }
 
 // Publishers returns a sort list of event publishers on the local computer.

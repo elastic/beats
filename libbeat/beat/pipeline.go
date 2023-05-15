@@ -30,11 +30,14 @@ type Pipeline interface {
 	Connect() (Client, error)
 }
 
+// PipelineConnector wraps the Pipeline interface
 type PipelineConnector = Pipeline
 
 // Client holds a connection to the beats publisher pipeline
 type Client interface {
+	// Publish the event
 	Publish(Event)
+	// PublishAll events specified in the Event array
 	PublishAll([]Event)
 	Close() error
 }
