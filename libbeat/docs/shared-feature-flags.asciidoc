@@ -36,6 +36,8 @@ enabled, the fully-qualified domain name for the host is reported in the
 
 preview::[]
 
+NOTE: FQDN reporting is not currently supported in {endpoint-sec} or APM.
+
 For FQDN reporting to work as expected, the hostname of the current host must either:
 
 * Have a CNAME entry defined in DNS.
@@ -58,3 +60,4 @@ features:
 ===== `enabled`
 Set to `true` to enable the FQDN reporting feature of {beatname_uc}.
 Defaults to `false`.
+
