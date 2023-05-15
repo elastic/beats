@@ -17,12 +17,14 @@
 
 package sniffer
 
-import "fmt"
+import (
+	"fmt"
+)
 
-// Computes the block_size and the num_blocks in such a way that the
-// allocated mmap buffer is close to but smaller than target_size_mb.
-// The restriction is that the block_size must be divisible by both the
-// frame size and page size.
+// afpacketComputeSize computes the block_size and the num_blocks in such a way
+// that the allocated mmap buffer is close to but smaller than target_size_mb.
+// The restriction is that the block_size must be divisible by both the frame
+// size and page size.
 func afpacketComputeSize(targetSizeMb, snaplen, pageSize int) (frameSize, blockSize, numBlocks int, err error) {
 	if snaplen < pageSize {
 		frameSize = pageSize / (pageSize / snaplen)
@@ -35,7 +37,7 @@ func afpacketComputeSize(targetSizeMb, snaplen, pageSize int) (frameSize, blockS
 	numBlocks = (targetSizeMb * 1024 * 1024) / blockSize
 
 	if numBlocks == 0 {
-		return 0, 0, 0, fmt.Errorf("Buffer size too small")
+		return 0, 0, 0, fmt.Errorf("buffer size too small")
 	}
 
 	return frameSize, blockSize, numBlocks, nil
