@@ -454,7 +454,7 @@ protocols:
 				{
 					Device:      "any",
 					Type:        "af_packet",
-					FanoutGroup: Pointer(uint16(1)),
+					FanoutGroup: pointer(uint16(1)),
 				},
 			},
 		},
@@ -542,6 +542,7 @@ func configC(a, b *config.C) bool {
 	return cmp.Equal(ma, mb)
 }
 
-func Pointer[K any](val K) *K {
+// pointer returns a pointer to val.
+func pointer[T any](val T) *T {
 	return &val
 }
