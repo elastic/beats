@@ -14,7 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -79,12 +79,12 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 
 		// We need access to the request body to validate the signature, but we
 		// must leave the body intact for future processing.
-		buf, err := ioutil.ReadAll(r.Body)
+		buf, err := io.ReadAll(r.Body)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
 		}
 		// Set r.Body back to untouched original value.
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		// Compute HMAC of raw body.
 		var mac hash.Hash

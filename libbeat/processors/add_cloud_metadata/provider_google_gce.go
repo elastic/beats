@@ -19,6 +19,7 @@ package add_cloud_metadata
 
 import (
 	"path"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -82,6 +83,14 @@ var gceMetadataFetcher = provider{
 				}.ApplyTo(cloud, instance)
 				trimLeadingPath("machine.type")
 				trimLeadingPath("availability_zone")
+
+				zone, err := cloud.GetValue("availability_zone")
+				if err == nil {
+					// the region is extracted from the zone by removing <zone> characters from the zone name,
+					// that is made up of <region>-<zone>
+					regionSlice := strings.Split(zone.(string), "-")
+					_, _ = cloud.Put("region", strings.Join(regionSlice[:len(regionSlice)-1], "-"))
+				}
 				s.Schema{
 					"orchestrator": s.Object{
 						"cluster": c.Dict(
@@ -92,6 +101,7 @@ var gceMetadataFetcher = provider{
 							}),
 					},
 				}.ApplyTo(meta, instance)
+
 			}
 
 			if kubeconfig, err := meta.GetValue("orchestrator.cluster.kubeconfig"); err == nil {
