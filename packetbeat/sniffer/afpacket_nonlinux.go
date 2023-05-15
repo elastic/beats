@@ -21,35 +21,34 @@
 package sniffer
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 )
 
+var errAFPacketLinuxOnly = errors.New("af_packet MMAP sniffing is only available on Linux")
+
 type afpacketHandle struct{}
 
-func newAfpacketHandle(device string, snaplen int, blockSize int, numBlocks int,
-	timeout time.Duration, enableAutoPromiscMode bool) (*afpacketHandle, error,
-) {
-	return nil, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
+func newAfpacketHandle(_ string, _, _, _ int, _ time.Duration, _ bool) (*afpacketHandle, error) {
+	return nil, errAFPacketLinuxOnly
 }
 
-func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
-	return data, ci, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
+func (*afpacketHandle) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
+	return nil, gopacket.CaptureInfo{}, errAFPacketLinuxOnly
 }
 
-func (h *afpacketHandle) SetBPFFilter(expr string) (_ error) {
-	return fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
+func (*afpacketHandle) SetBPFFilter(_ string) error {
+	return errAFPacketLinuxOnly
 }
 
-func (h *afpacketHandle) LinkType() layers.LinkType {
-	return layers.LinkTypeEthernet
+func (*afpacketHandle) LinkType() layers.LinkType {
+	return 0
 }
 
-func (h *afpacketHandle) Close() {
-}
+func (*afpacketHandle) Close() {}
 
 // isAfpacketErrTimeout returns whether the error is afpacket.ErrTimeout, always false on
 // non-linux systems.
