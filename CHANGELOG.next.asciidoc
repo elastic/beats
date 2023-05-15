@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
 - Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+- Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 
 *Heartbeat*
 
