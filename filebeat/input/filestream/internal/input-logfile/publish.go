@@ -142,7 +142,7 @@ func (op *updateOp) Execute(store *store, n uint) {
 	err := store.persistentStore.Set(resource.key, resource.inSyncStateSnapshot())
 	if err != nil {
 		if !statestore.IsClosed(err) {
-			store.log.Errorf("Failed to update state in the registry for '%v'", resource.key)
+			store.log.Errorf("Failed to update state in the registry for '%v': %s", resource.key, err)
 		}
 	} else {
 		resource.stored = true
