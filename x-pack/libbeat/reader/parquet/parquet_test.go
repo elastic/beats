@@ -96,7 +96,7 @@ func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data m
 		if val != nil {
 			rowCount++
 			// this is where we check if the column values are the same as the ones we wrote
-			if _, ok := data[string(val)]; !ok {
+			if !data[string(val)] {
 				t.Fatalf("failed to find record in parquet file: %v", err)
 			}
 		}
@@ -135,8 +135,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 		// creates an Arrow record with random data
 		var recordColumns []arrow.Array
 		for colIdx := 0; colIdx < numCols; colIdx++ {
-			randData := make([]int32, 1)
-			randData[0] = rand.Int31()
+			randData := []int32{rand.Int31()}
 			builder := array.NewInt32Builder(memoryPool)
 			builder.AppendValues(randData, nil)
 			defer builder.Release()

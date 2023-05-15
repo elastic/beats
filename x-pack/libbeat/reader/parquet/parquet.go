@@ -79,17 +79,15 @@ func (sr *StreamReader) Next() bool {
 // If no more records are available, the []byte slice will be nil. It will return
 // an error if the record cannot be marshalled.
 func (sr *StreamReader) Record() ([]byte, error) {
-	var val []byte
-	var err error
 	rec := sr.recordReader.Record()
-	if rec != nil {
-		defer rec.Release()
-		val, err = rec.MarshalJSON()
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
-		}
+	if rec == nil {
+		return nil, io.EOF
 	}
-
+	defer rec.Release()
+	val, err := rec.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
+	}
 	return val, nil
 }
 

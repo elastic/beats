@@ -10,9 +10,9 @@ import (
 	"testing"
 )
 
-// fn is a function type that takes a testing.B, a Config, and a file and performs some operation on the file
+// invocation is a function type that takes a testing.B, a Config, and a file and performs some operation on the file
 // this is the common signature for all the benchmark functions in this file
-type fn func(b *testing.B, cfg *Config, file *os.File)
+type invocation func(b *testing.B, cfg *Config, file *os.File)
 
 // parquetFile is a struct that contains the name of the parquet
 // file to be created and the number of columns and rows in the file
@@ -31,7 +31,7 @@ func BenchmarkReadParquet(b *testing.B) {
 		constructAndReadLargeFiles bool
 		largeFiles                 []parquetFile
 		batchSize                  int
-		invokeFn                   fn
+		invokeFn                   invocation
 	}{
 		{
 			desc:      "Process single files serially in batches of 1000",
