@@ -30,8 +30,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/etcd"
 )
 
-const testFile = "_meta/test/metrics"
-
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "etcd", "metrics",
 		ptest.TestCases{
