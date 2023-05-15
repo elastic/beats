@@ -275,6 +275,12 @@ Duration between repeated requests. It may make additional pagination requests i
 
 The CEL program that is executed each polling period. This field is required.
 
+[[max_executions-cel]]
+[float]
+==== `max_executions`
+
+`max_executions` is the maximum number of times a CEL program can request to be re-run with a `want_more` field. This is used to ensure that accidental infinite loops do not halt processing. When the execution budget is exceeded, execution will be restarted at the next interval and a warning will be written into the logs. Default: 1000.
+
 [[state-cel]]
 [float]
 ==== `state`

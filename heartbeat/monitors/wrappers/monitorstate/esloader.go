@@ -30,13 +30,20 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
+var DefaultDataStreams = "synthetics-*,heartbeat-*"
+
 func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
 		logp.L().Warn("ES state loader initialized with no index pattern, will not load states from ES")
 		return NilStateLoader
 	}
+
 	return func(sf stdfields.StdMonitorFields) (*State, error) {
+		var runFromID string
+		if sf.RunFrom != nil {
+			runFromID = sf.RunFrom.ID
+		}
 		queryMustClauses := []mapstr.M{
 			{
 				"match": mapstr.M{"monitor.id": sf.ID},
@@ -54,9 +61,9 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 			},
 		}
 
-		if sf.RunFrom != nil {
+		if runFromID != "" {
 			queryMustClauses = append(queryMustClauses, mapstr.M{
-				"match": mapstr.M{"observer.name": sf.RunFrom.ID},
+				"match": mapstr.M{"observer.name": runFromID},
 			})
 		}
 		reqBody := mapstr.M{
@@ -70,7 +77,7 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 
 		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""), "", nil, reqBody)
 		if err != nil || status > 299 {
-			return nil, fmt.Errorf("error executing state search for %s: %w", sf.ID, err)
+			return nil, fmt.Errorf("error executing state search for %s in loc=%s: %w", sf.ID, runFromID, err)
 		}
 
 		type stateHits struct {
@@ -91,7 +98,7 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 		}
 
 		if len(sh.Hits.Hits) == 0 {
-			logp.L().Infof("no previous state found for monitor %s", sf.ID)
+			logp.L().Infof("no previous state found for monitor %s in Elasticsearch (loc=%s)", sf.ID, runFromID)
 			return nil, nil
 		}
 
