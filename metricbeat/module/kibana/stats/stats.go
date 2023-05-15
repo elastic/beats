@@ -19,8 +19,7 @@ package stats
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -48,8 +47,9 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP         *helper.HTTP
-	isUsageExcludable bool
+	statsHTTP                         *helper.HTTP
+	isUsageExcludable                 bool
+	lastRunningKibanaMessageTimestamp time.Time
 }
 
 // New create a new instance of the MetricSet
@@ -73,10 +73,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	}
 
 	if err = m.fetchStats(r); err != nil {
-		return errors.Wrap(err, "error trying to get stats data from Kibana")
+		return fmt.Errorf("error trying to get stats data from Kibana: %w", err)
 	}
 
-	return
+	return nil
 }
 
 func (m *MetricSet) init() error {
@@ -94,8 +94,11 @@ func (m *MetricSet) init() error {
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
 	if !isStatsAPIAvailable {
-		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
+		if time.Since(m.lastRunningKibanaMessageTimestamp) > 5*time.Minute {
+			m.lastRunningKibanaMessageTimestamp = time.Now()
+			const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+			m.Logger().Debugf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
+		}
 	}
 
 	m.statsHTTP = statsHTTP

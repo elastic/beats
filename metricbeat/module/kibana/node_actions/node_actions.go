@@ -19,6 +19,7 @@ package node_actions
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -44,7 +45,8 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	actionsHTTP *helper.HTTP
+	actionsHTTP                       *helper.HTTP
+	lastRunningKibanaMessageTimestamp time.Time
 }
 
 // New create a new instance of the MetricSet
@@ -88,8 +90,11 @@ func (m *MetricSet) validate() error {
 
 	isMetricsAPIAvailable := kibana.IsActionsAPIAvailable(kibanaVersion)
 	if !isMetricsAPIAvailable {
-		const errorMsg = "the %v node actions is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
+		if time.Since(m.lastRunningKibanaMessageTimestamp) > 5*time.Minute {
+			m.lastRunningKibanaMessageTimestamp = time.Now()
+			const errorMsg = "the %v node actions is only supported with Kibana >= %v. You are currently running Kibana %v"
+			m.Logger().Debugf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
+		}
 	}
 
 	return nil
