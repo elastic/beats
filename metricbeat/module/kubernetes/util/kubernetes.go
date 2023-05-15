@@ -60,14 +60,14 @@ type kubernetesConfig struct {
 
 type enricher struct {
 	sync.RWMutex
-	metadata           map[string]common.MapStr
-	index              func(common.MapStr) string
-	watcher            kubernetes.Watcher
-	watcherStarted     bool
-	watcherStartedLock sync.Mutex
-	namespaceWatcher   kubernetes.Watcher
-	nodeWatcher        kubernetes.Watcher
-	isPod              bool
+	metadata            map[string]common.MapStr
+	index               func(common.MapStr) string
+	watcher             kubernetes.Watcher
+	watchersStarted     bool
+	watchersStartedLock sync.Mutex
+	namespaceWatcher    kubernetes.Watcher
+	nodeWatcher         kubernetes.Watcher
+	isPod               bool
 }
 
 const selector = "kubernetes"
@@ -378,40 +378,43 @@ func buildMetadataEnricher(
 }
 
 func (m *enricher) Start() {
-	m.watcherStartedLock.Lock()
-	defer m.watcherStartedLock.Unlock()
-	if m.nodeWatcher != nil {
-		if err := m.nodeWatcher.Start(); err != nil {
-			logp.Warn("Error starting node watcher: %s", err)
+	m.watchersStartedLock.Lock()
+	defer m.watchersStartedLock.Unlock()
+	if !m.watchersStarted {
+		if m.nodeWatcher != nil {
+			if err := m.nodeWatcher.Start(); err != nil {
+				logp.Warn("Error starting node watcher: %s", err)
+			}
 		}
-	}
-	if m.namespaceWatcher != nil {
-		if err := m.namespaceWatcher.Start(); err != nil {
-			logp.Warn("Error starting namespace watcher: %s", err)
+		if m.namespaceWatcher != nil {
+			if err := m.namespaceWatcher.Start(); err != nil {
+				logp.Warn("Error starting namespace watcher: %s", err)
+			}
 		}
-	}
-	if !m.watcherStarted {
+
 		err := m.watcher.Start()
 		if err != nil {
 			logp.Warn("Error starting Kubernetes watcher: %s", err)
 		}
-		m.watcherStarted = true
+		m.watchersStarted = true
 	}
 }
 
 func (m *enricher) Stop() {
-	m.watcherStartedLock.Lock()
-	defer m.watcherStartedLock.Unlock()
-	if m.watcherStarted {
+	m.watchersStartedLock.Lock()
+	defer m.watchersStartedLock.Unlock()
+	if m.watchersStarted {
 		m.watcher.Stop()
-		m.watcherStarted = false
-	}
-	if m.namespaceWatcher != nil {
-		m.namespaceWatcher.Stop()
-	}
 
-	if m.nodeWatcher != nil {
-		m.nodeWatcher.Stop()
+		if m.namespaceWatcher != nil {
+			m.namespaceWatcher.Stop()
+		}
+
+		if m.nodeWatcher != nil {
+			m.nodeWatcher.Stop()
+		}
+
+		m.watchersStarted = false
 	}
 }
 
