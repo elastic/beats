@@ -35,7 +35,7 @@ const testFile = "_meta/test/metrics"
 func TestEventMapping(t *testing.T) {
 	ptest.TestMetricSet(t, "etcd", "metrics",
 		ptest.TestCases{
-			{
+			ptest.TestCase{
 				MetricsFile:  "./_meta/test/metrics",
 				ExpectedFile: "./_meta/test/metrics.expected",
 			},
