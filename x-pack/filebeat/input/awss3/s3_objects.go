@@ -219,31 +219,47 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		}
 
 		if p.readerConfig.ExpandEventListFromField != "" {
-			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
+			// process json as an object with expand_event_list_from_field given
+			var err error
+			if item, err = p.splitEventList(p.readerConfig.ExpandEventListFromField, item); err != nil {
 				return err
 			}
-			continue
+			if err = p.processList(item, offset, p.s3ObjHash); err != nil {
+				return err
+			}
+		} else {
+			// process json assuming it's an array of objects
+			var jsonObject []json.RawMessage
+			if err := json.Unmarshal(item, &jsonObject); err == nil {
+				if err := p.processList(item, offset, p.s3ObjHash); err != nil {
+					return err
+				}
+			} else {
+				// process json as a single object
+				data, _ := item.MarshalJSON()
+				evt := p.createEvent(string(data), offset)
+				p.publish(p.acker, &evt)
+			}
 		}
-
-		data, _ := item.MarshalJSON()
-		evt := p.createEvent(string(data), offset)
-		p.publish(p.acker, &evt)
 	}
 
 	return nil
 }
 
-func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
+func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage) (json.RawMessage, error) {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return err
+		return nil, err
 	}
 
 	raw, found := jsonObject[key]
 	if !found {
-		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		return nil, fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
 	}
+	return raw, nil
+}
 
+func (p *s3ObjectProcessor) processList(raw json.RawMessage, offset int64, objHash string) error {
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
 
@@ -253,7 +269,7 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 	}
 	delim, ok := tok.(json.Delim)
 	if !ok || delim != '[' {
-		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+		return fmt.Errorf("json message is not an array")
 	}
 
 	for dec.More() {
