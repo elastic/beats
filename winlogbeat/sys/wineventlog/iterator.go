@@ -196,6 +196,9 @@ func (itr *EventIterator) Err() error {
 
 // Close closes the subscription handle and any unread event handles.
 func (itr *EventIterator) Close() error {
+	if itr == nil {
+		return errors.New("closing nil event iterator")
+	}
 	itr.mutex.Lock()
 	defer itr.mutex.Unlock()
 

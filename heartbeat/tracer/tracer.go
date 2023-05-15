@@ -47,10 +47,10 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 			return st, fmt.Errorf("wait time for sock trace exceeded: %s", wait)
 		}
 		if _, err := os.Stat(st.path); err == nil {
-			logp.L().Infof("socktracer found file for unix socket: %s, will attempt to connect")
+			logp.L().Infof("socktracer found file for unix socket: %s, will attempt to connect", path)
 			break
 		} else {
-			logp.L().Infof("socktracer could not find file for unix socket at: %s, will retry in %s", delay)
+			logp.L().Infof("socktracer could not find file for unix socket at: %s, will retry in %s", path, delay)
 			time.Sleep(delay)
 		}
 	}
@@ -66,11 +66,12 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 func (st SockTracer) Write(message string) error {
 	// Note, we don't need to worry about partial writes here: https://pkg.go.dev/io?utm_source=godoc#Writer
 	// an error will be returned here, which shouldn't really happen with unix sockets only
-	_, err := st.sock.Write([]byte(message))
+	_, err := st.sock.Write([]byte(message + "\n"))
 	return err
 }
 
 func (st SockTracer) Close() error {
+	_ = st.Write("stop")
 	return st.sock.Close()
 }
 

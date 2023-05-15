@@ -22,6 +22,7 @@ package wineventlog
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"strconv"
 	"sync"
@@ -74,6 +75,9 @@ func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 
 // Close closes all handles held by the Renderer.
 func (r *Renderer) Close() error {
+	if r == nil {
+		return errors.New("closing nil renderer")
+	}
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
