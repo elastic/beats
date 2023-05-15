@@ -171,7 +171,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Metricbeat*
 
-- Add context with timeout in AWS API calls {pull}35425[35425]
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
 - Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
 - Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
@@ -186,7 +185,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 - Make generic SQL GA {pull}34637[34637]
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-
+- Add context with timeout in AWS API calls {pull}35425[35425]
 
 *Osquerybeat*
 
