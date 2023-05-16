@@ -12,7 +12,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/apache/arrow/go/v11/arrow"
@@ -188,13 +188,13 @@ func TestParquetWithFiles(t *testing.T) {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {
 
-			parquetFile, err := os.Open(path.Join(testDataPath, tc.parquetFile))
+			parquetFile, err := os.Open(filepath.Join(testDataPath, tc.parquetFile))
 			if err != nil {
 				t.Fatalf("Failed to open parquet test file: %v", err)
 			}
 			defer parquetFile.Close()
 
-			jsonFile, err := os.Open(path.Join(testDataPath, tc.jsonFile))
+			jsonFile, err := os.Open(filepath.Join(testDataPath, tc.jsonFile))
 			if err != nil {
 				t.Fatalf("Failed to open json test file: %v", err)
 			}

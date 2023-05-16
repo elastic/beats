@@ -6,7 +6,7 @@ package parquet
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"sync"
 	"testing"
 )
@@ -193,7 +193,7 @@ func BenchmarkReadParquet(b *testing.B) {
 				}
 			} else {
 				for _, f := range tc.files {
-					files = append(files, path.Join(testDataPath, f))
+					files = append(files, filepath.Join(testDataPath, f))
 
 				}
 			}
