@@ -33,6 +33,7 @@ type pod struct {
 	store               cache.Store
 	client              k8s.Interface
 	node                MetaGen
+	replicaset          MetaGen
 	resource            *Resource
 	addResourceMetadata *AddResourceMetadataConfig
 }
@@ -44,12 +45,14 @@ func NewPodMetadataGenerator(
 	client k8s.Interface,
 	node MetaGen,
 	namespace MetaGen,
+	replicaset MetaGen,
 	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
 
 	return &pod{
 		resource:            NewNamespaceAwareResourceMetadataGenerator(cfg, client, namespace),
 		store:               pods,
 		node:                node,
+		replicaset:          replicaset,
 		client:              client,
 		addResourceMetadata: addResourceMetadata,
 	}
@@ -88,19 +91,23 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.
 
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
-	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	// same happens with CronJob vs Job. The hierarchy there is CronJob->Job->Pod
+	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment.
+	// The hierarchy there is Deployment->ReplicaSet->Pod.
 	if p.addResourceMetadata.Deployment {
-		rsName, _ := out.GetValue("replicaset.name")
-		if rsName, ok := rsName.(string); ok {
-			dep := p.getRSDeployment(rsName, po.GetNamespace())
-			if dep != "" {
-				_, _ = out.Put("deployment.name", dep)
+		if p.replicaset != nil {
+			rsName, _ := out.GetValue("replicaset.name")
+			if rsName, ok := rsName.(string); ok {
+				meta := p.replicaset.GenerateFromName(rsName)
+				deploymentName, _ := meta.GetValue("deployment.name")
+				if deploymentName != "" {
+					_, _ = out.Put("deployment.name", deploymentName)
+				}
 			}
 		}
 	}
 
-	// check if Pod is handled by a Job which is controlled by a CronJob
+	// check if Pod is handled by a Job which is controlled by a CronJob.
+	// The hierarchy there is CronJob->Job->Pod
 	if p.addResourceMetadata.CronJob {
 		jobName, _ := out.GetValue("job.name")
 		if jobName, ok := jobName.(string); ok {
