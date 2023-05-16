@@ -155,7 +155,20 @@ func NewResourceMetadataEnricher(
 	}
 	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
-	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	if err != nil {
+		logp.Err("Error creating Kubernetes client: %s", err)
+		return &nilEnricher{}
+	}
+	replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		return &nilEnricher{}
+	}
+
+	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, config.AddResourceMetadata)
 
 	namespaceMeta := metadata.NewNamespaceMetadataGenerator(config.AddResourceMetadata.Namespace, namespaceWatcher.Store(), watcher.Client())
 	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, watcher.Client())
@@ -261,6 +274,19 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	if err != nil {
+		logp.Err("Error creating Kubernetes client: %s", err)
+		return &nilEnricher{}
+	}
+	replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		return &nilEnricher{}
+	}
+
 	commonMetaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
@@ -268,7 +294,7 @@ func NewContainerMetadataEnricher(
 	}
 	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
-	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, config.AddResourceMetadata)
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, config.AddResourceMetadata)
 
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
