@@ -20,7 +20,7 @@ var (
 )
 
 func CreateJobObject() (pj Job, err error) {
-	return
+	return 0, nil
 }
 
 // NewJob is noop on unix

@@ -48,16 +48,16 @@ func newINodeMarkerIdentifier(cfg *conf.C) (fileIdentifier, error) {
 	}
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %v", err)
+		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %w", err)
 	}
 
 	fi, err := os.Stat(config.MarkerPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while opening marker file at %s: %v", config.MarkerPath, err)
+		return nil, fmt.Errorf("error while opening marker file at %s: %w", config.MarkerPath, err)
 	}
 	markerContent, err := ioutil.ReadFile(config.MarkerPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading marker file at %s: %v", config.MarkerPath, err)
+		return nil, fmt.Errorf("error while reading marker file at %s: %w", config.MarkerPath, err)
 	}
 	return &inodeMarkerIdentifier{
 		log:                       logp.NewLogger("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
