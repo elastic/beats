@@ -136,6 +136,12 @@ func (e *eventLogger) run(
 
 runLoop:
 	for stop := false; !stop; {
+		select {
+		case <-done:
+			return
+		default:
+		}
+
 		err = api.Open(state)
 
 		switch {
