@@ -6,6 +6,7 @@ package parquet
 
 import (
 	"os"
+	"path"
 	"sync"
 	"testing"
 )
@@ -121,34 +122,34 @@ func BenchmarkReadParquet(b *testing.B) {
 			desc:      "Construct a stream reader for a single file serially",
 			files:     []string{"cloudtrail.parquet"},
 			batchSize: 1,
-			invokeFn:  constructStreamReader,
+			invokeFn:  constructBufferedReader,
 		},
 		{
 			desc:            "Construct a stream reader for a single file parallelly",
 			files:           []string{"cloudtrail.parquet"},
 			processParallel: true,
 			batchSize:       1,
-			invokeFn:        constructStreamReader,
+			invokeFn:        constructBufferedReader,
 		},
 		{
 			desc:      "Construct a stream reader for multiple files serially",
 			files:     []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			batchSize: 1,
-			invokeFn:  constructStreamReader,
+			invokeFn:  constructBufferedReader,
 		},
 		{
 			desc:            "Construct a stream reader for multiple files parallelly",
 			files:           []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			processParallel: true,
 			batchSize:       1,
-			invokeFn:        constructStreamReader,
+			invokeFn:        constructBufferedReader,
 		},
 		{
 			desc:           "Construct a stream reader for multiple files using go routines",
 			files:          []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			useGoRoutiunes: true,
 			batchSize:      1,
-			invokeFn:       constructStreamReader,
+			invokeFn:       constructBufferedReader,
 		},
 		{
 			desc:                       "Construct and read a single large parquet file in batches of 1000 serially",
@@ -192,7 +193,7 @@ func BenchmarkReadParquet(b *testing.B) {
 				}
 			} else {
 				for _, f := range tc.files {
-					files = append(files, testDataPath+f)
+					files = append(files, path.Join(testDataPath, f))
 
 				}
 			}
@@ -244,7 +245,7 @@ func BenchmarkReadParquet(b *testing.B) {
 
 // readParquetFile reads entire parquet file
 func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -263,7 +264,7 @@ func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
 
 // readParquetSingleRow reads only the first row of parquet files
 func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -280,9 +281,9 @@ func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
 	}
 }
 
-// constructStreamReader constructs a stream reader for reading parquet files
-func constructStreamReader(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewStreamReader(file, cfg)
+// constructBufferedReader constructs a stream reader for reading parquet files
+func constructBufferedReader(b *testing.B, cfg *Config, file *os.File) {
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}

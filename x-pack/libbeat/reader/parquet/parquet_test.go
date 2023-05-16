@@ -12,6 +12,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/apache/arrow/go/v11/arrow"
@@ -22,7 +23,7 @@ import (
 )
 
 // all test files are read from/stored within the "testdata" directory
-const testDataPath = "testdata/"
+const testDataPath = "testdata"
 
 func TestParquetWithRandomData(t *testing.T) {
 	testCases := []struct {
@@ -82,7 +83,7 @@ func TestParquetWithRandomData(t *testing.T) {
 
 // readAndValidateParquetFile reads the parquet file and validates the data
 func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data map[string]bool) int {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -187,13 +188,13 @@ func TestParquetWithFiles(t *testing.T) {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {
 
-			parquetFile, err := os.Open(testDataPath + tc.parquetFile)
+			parquetFile, err := os.Open(path.Join(testDataPath, tc.parquetFile))
 			if err != nil {
 				t.Fatalf("Failed to open parquet test file: %v", err)
 			}
 			defer parquetFile.Close()
 
-			jsonFile, err := os.Open(testDataPath + tc.jsonFile)
+			jsonFile, err := os.Open(path.Join(testDataPath, tc.jsonFile))
 			if err != nil {
 				t.Fatalf("Failed to open json test file: %v", err)
 			}
@@ -230,7 +231,7 @@ func readJSONFromFile(t *testing.T, file *os.File) (map[int]string, int) {
 
 // readAndCompareParquetFile reads the parquet file and compares the data with the input data
 func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int) {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
