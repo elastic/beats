@@ -94,6 +94,7 @@ func GetPodMetaGen(
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
 	replicasetWatcher kubernetes.Watcher,
+	jobWatcher kubernetes.Watcher,
 	metaConf *AddResourceMetadataConfig) MetaGen {
 
 	var nodeMetaGen, namespaceMetaGen, rsMetaGen MetaGen
@@ -106,7 +107,18 @@ func GetPodMetaGen(
 	if replicasetWatcher != nil && metaConf.Deployment {
 		rsMetaGen = NewReplicasetMetadataGenerator(cfg, replicasetWatcher.Store(), replicasetWatcher.Client())
 	}
-	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen, rsMetaGen, metaConf)
+	if jobWatcher != nil && metaConf.CronJob {
+		rsMetaGen = NewReplicasetMetadataGenerator(cfg, replicasetWatcher.Store(), replicasetWatcher.Client())
+	}
+	metaGen := NewPodMetadataGenerator(
+		cfg,
+		podWatcher.Store(),
+		podWatcher.Client(),
+		nodeMetaGen,
+		namespaceMetaGen,
+		rsMetaGen,
+		jobWatcher,
+		metaConf)
 	return metaGen
 }
 
