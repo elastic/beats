@@ -23,6 +23,7 @@ package sniffer
 import (
 	"fmt"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"github.com/google/gopacket"
@@ -31,7 +32,9 @@ import (
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/net/bpf"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type afpacketHandle struct {
@@ -41,6 +44,91 @@ type afpacketHandle struct {
 	promiscPreviousStateDetected bool
 	device                       string
 	log                          *logp.Logger
+	metrics                      *metrics
+}
+
+type metrics struct {
+	unregisterFn func()
+
+	device             *monitoring.String // name of the device being monitored
+	socketPackets      *monitoring.Uint   // number of packets delivered by kernel
+	socketDrops        *monitoring.Uint   // number of packets dropped by kernel (i.e., buffer full)
+	socketQueueFreezes *monitoring.Uint   // number of queue freezes
+	packets            *monitoring.Uint   // number of packets read off buffer by packetbeat
+	polls              *monitoring.Uint   // number of blocking syscalls made by packetbeat waiting for packets
+
+	doneCh chan struct{} // used to signal to polling goroutine to stop
+}
+
+func (m *metrics) close() {
+	if m == nil {
+		return
+	}
+	m.unregisterFn()
+	if m.doneCh != nil {
+		close(m.doneCh)
+		m.doneCh = nil
+	}
+}
+
+func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPacket, log *logp.Logger) *metrics {
+	if id == "" || interval == 0 {
+		// An empty id or zero interval signals to not record metrics.
+		return nil
+	}
+
+	devID := fmt.Sprintf("%s-af_packet::%s", id, device)
+	reg, unreg := inputmon.NewInputRegistry("af_packet", devID, nil)
+	out := &metrics{
+		unregisterFn:       unreg,
+		device:             monitoring.NewString(reg, "device"),
+		socketPackets:      monitoring.NewUint(reg, "socket_packets"),
+		socketDrops:        monitoring.NewUint(reg, "socket_drops"),
+		socketQueueFreezes: monitoring.NewUint(reg, "socket_queue_freezes"),
+		packets:            monitoring.NewUint(reg, "packets"),
+		polls:              monitoring.NewUint(reg, "polls"),
+		doneCh:             make(chan struct{}),
+	}
+
+	out.device.Set(device)
+
+	go func() {
+		log.Debug("Starting stats collection goroutine, collection interval: %v", interval)
+
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		if err := handle.InitSocketStats(); err != nil {
+			log.Errorw("Failed to init socket stats", "error", err)
+		}
+
+		for {
+			select {
+			case <-out.doneCh:
+				log.Debug("Shutting down stats collection goroutine")
+				return
+			case <-ticker.C:
+				_, sockStats, err := handle.SocketStats()
+				if err != nil {
+					log.Debugw("Error getting socket stats", "error", err)
+				} else {
+					out.socketPackets.Set(uint64(sockStats.Packets()))
+					out.socketDrops.Set(uint64(sockStats.Drops()))
+					out.socketQueueFreezes.Set(uint64(sockStats.QueueFreezes()))
+				}
+
+				stats, err := handle.Stats()
+				if err != nil {
+					log.Debugw("Error getting packetbeat stats", "error", err)
+				} else {
+					out.packets.Set(uint64(stats.Packets))
+					out.polls.Set(uint64(stats.Polls))
+				}
+			}
+		}
+	}()
+
+	return out
 }
 
 func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
@@ -88,6 +176,10 @@ func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed creating af_packet socket: %w", err)
 	}
+	if err != nil {
+		return nil, err
+	}
+	h.metrics = newMetrics(c.ID, c.Device, c.MetricsInterval, h.TPacket, log)
 
 	if c.FanoutGroupID != nil {
 		if err = h.TPacket.SetFanout(afpacket.FanoutHashWithDefrag, *c.FanoutGroupID); err != nil {
@@ -125,6 +217,10 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 }
 
 func (h *afpacketHandle) Close() {
+	if h.metrics != nil {
+		h.metrics.close()
+	}
+
 	h.TPacket.Close()
 	// previous state detected only if auto mode was on
 	if h.promiscPreviousStateDetected {
