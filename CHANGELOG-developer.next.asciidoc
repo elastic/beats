@@ -155,6 +155,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add DropFields processor to js API {pull}33458[33458]
 - Add support for different folders when testing data {pull}34467[34467]
 - Add logging of metric registration in inputmon. {pull}35647[35647]
+- Add Okta API package for entity analytics. {pull}35478[35478]
 
 ==== Deprecated
 
