@@ -215,9 +215,15 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if err != nil {
 			k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
+		jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+		}
 
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, metaConf)
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher

@@ -116,8 +116,14 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	if err != nil {
 		logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
+	jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+	}
 
-	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, metaConf)
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 	p := &pod{
 		config:           config,

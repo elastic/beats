@@ -164,11 +164,19 @@ func NewResourceMetadataEnricher(
 		SyncTimeout: config.SyncPeriod,
 	}, nil)
 	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 		return &nilEnricher{}
 	}
 
-	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, config.AddResourceMetadata)
+	jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+		return &nilEnricher{}
+	}
+
+	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, config.AddResourceMetadata)
 
 	namespaceMeta := metadata.NewNamespaceMetadataGenerator(config.AddResourceMetadata.Namespace, namespaceWatcher.Store(), watcher.Client())
 	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, watcher.Client())
@@ -287,6 +295,14 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
+	jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+		return &nilEnricher{}
+	}
+
 	commonMetaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
@@ -294,7 +310,7 @@ func NewContainerMetadataEnricher(
 	}
 	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
-	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, config.AddResourceMetadata)
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, config.AddResourceMetadata)
 
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
