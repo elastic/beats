@@ -24,8 +24,14 @@ import (
 )
 
 // TestInputReloadUnderElasticAgent will start a Filebeat and cause the input
-// reload issue described on https://github.com/elastic/beats/issues/33653
-// to happen, then it will check the logs to ensure the fix is working.
+// reload issue described on https://github.com/elastic/beats/issues/33653.
+// In short, a new input for a file needs to be started while there are still
+// events from that file in the publishing pipeline, effectively keeping
+// the harvester status as `finished: false`, which prevents the new input
+// from starting.
+//
+// This tests ensures Filebeat can gracefully recover from this situation
+// and will eventually re-start harvesting the file.
 //
 // In case of a test failure the directory with Filebeat logs and
 // all other supporting files will be kept on build/integration-tests.
@@ -182,7 +188,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		when = time.Now().Add(10 * time.Second)
 	}
 	server := &mock.StubServerV2{
-		// The Beat will call the checkin function multiple times:
+		// The Beat will call the check-in function multiple times:
 		// - At least once at startup
 		// - At every state change (starting, configuring, healthy, etc)
 		// for every Unit.
