@@ -113,6 +113,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.
 			jobName, _ := out.GetValue("job.name")
 			if jobName, ok := jobName.(string); ok {
 				meta := p.replicaset.GenerateFromName(jobName)
+
 				cronjobName, _ := meta.GetValue("cronjob.name")
 				if cronjobName != "" {
 					_, _ = out.Put("cronjob.name", cronjobName)

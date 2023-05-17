@@ -108,7 +108,7 @@ func GetPodMetaGen(
 		rsMetaGen = NewReplicasetMetadataGenerator(cfg, replicasetWatcher.Store(), replicasetWatcher.Client())
 	}
 	if jobWatcher != nil && metaConf.CronJob {
-		jobMetaGen = NewJobMetadataGenerator(cfg, replicasetWatcher.Store(), replicasetWatcher.Client())
+		jobMetaGen = NewJobMetadataGenerator(cfg, jobWatcher.Store(), jobWatcher.Client())
 	}
 	metaGen := NewPodMetadataGenerator(
 		cfg,
