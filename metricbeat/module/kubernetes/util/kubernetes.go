@@ -73,6 +73,8 @@ type enricher struct {
 	watchersStartedLock sync.Mutex
 	namespaceWatcher    kubernetes.Watcher
 	nodeWatcher         kubernetes.Watcher
+	replicasetWatcher   kubernetes.Watcher
+	jobWatcher          kubernetes.Watcher
 	isPod               bool
 }
 
@@ -183,7 +185,7 @@ func NewResourceMetadataEnricher(
 
 	metaGen := metadata.NewNamespaceAwareResourceMetadataGenerator(cfg, watcher.Client(), namespaceMeta)
 
-	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
+	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher,
 		// update
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
@@ -312,7 +314,7 @@ func NewContainerMetadataEnricher(
 
 	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, config.AddResourceMetadata)
 
-	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
+	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher,
 		// update
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			pod, ok := r.(*kubernetes.Pod)
@@ -505,16 +507,20 @@ func buildMetadataEnricher(
 	watcher kubernetes.Watcher,
 	nodeWatcher kubernetes.Watcher,
 	namespaceWatcher kubernetes.Watcher,
+	replicasetWatcher kubernetes.Watcher,
+	jobWatcher kubernetes.Watcher,
 	update func(map[string]mapstr.M, kubernetes.Resource),
 	delete func(map[string]mapstr.M, kubernetes.Resource),
 	index func(e mapstr.M) string) *enricher {
 
 	enricher := enricher{
-		metadata:         map[string]mapstr.M{},
-		index:            index,
-		watcher:          watcher,
-		nodeWatcher:      nodeWatcher,
-		namespaceWatcher: namespaceWatcher,
+		metadata:          map[string]mapstr.M{},
+		index:             index,
+		watcher:           watcher,
+		nodeWatcher:       nodeWatcher,
+		namespaceWatcher:  namespaceWatcher,
+		replicasetWatcher: replicasetWatcher,
+		jobWatcher:        jobWatcher,
 	}
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
@@ -554,6 +560,18 @@ func (m *enricher) Start() {
 			}
 		}
 
+		if m.replicasetWatcher != nil {
+			if err := m.replicasetWatcher.Start(); err != nil {
+				logp.Warn("Error starting replicaset watcher: %s", err)
+			}
+		}
+
+		if m.jobWatcher != nil {
+			if err := m.jobWatcher.Start(); err != nil {
+				logp.Warn("Error starting job watcher: %s", err)
+			}
+		}
+
 		err := m.watcher.Start()
 		if err != nil {
 			logp.Warn("Error starting Kubernetes watcher: %s", err)
@@ -574,6 +592,14 @@ func (m *enricher) Stop() {
 
 		if m.nodeWatcher != nil {
 			m.nodeWatcher.Stop()
+		}
+
+		if m.replicasetWatcher != nil {
+			m.replicasetWatcher.Stop()
+		}
+
+		if m.jobWatcher != nil {
+			m.jobWatcher.Stop()
 		}
 
 		m.watchersStarted = false
