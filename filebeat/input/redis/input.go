@@ -64,7 +64,7 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	if config.PasswordFile != "" {
 		info, err := os.ReadFile(config.PasswordFile)
 		if err != nil {
-			logp.Err("Read Password File Error")
+			logp.Err("Read Password File Error: %s", err)
 		} else {
 			content = string(info)
 		}
