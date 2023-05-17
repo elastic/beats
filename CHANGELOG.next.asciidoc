@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 *Packetbeat*
 
 - Fix double channel close panic when reloading. {pull}35324[35324]
+- Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
 
 *Winlogbeat*
 
