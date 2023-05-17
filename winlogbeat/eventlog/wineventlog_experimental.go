@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
@@ -343,6 +342,9 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 func (l *winEventLogExp) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
+	if l.iterator == nil {
+		return l.renderer.Close()
+	}
 	return multierr.Combine(
 		l.iterator.Close(),
 		l.renderer.Close(),

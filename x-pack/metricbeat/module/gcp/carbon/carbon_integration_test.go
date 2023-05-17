@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration && gcp && carbon
-// +build integration,gcp,carbon
 
 package carbon
 
