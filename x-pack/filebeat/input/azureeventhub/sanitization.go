@@ -50,17 +50,7 @@ func sanitize(jsonStr []byte, opts ...string) []byte {
 
 // sanitizeNewLines removes newlines found in the message
 func sanitizeNewLines(jsonStr []byte) []byte {
-	var result bytes.Buffer
-
-	for _, r := range jsonStr {
-		if r == '\n' {
-			continue
-		}
-
-		result.WriteByte(r)
-	}
-
-	return result.Bytes()
+	return bytes.ReplaceAll(jsonStr, []byte("\n"), []byte{})
 }
 
 // sanitizeSingleQuotes replaces single quotes with double quotes in the message
