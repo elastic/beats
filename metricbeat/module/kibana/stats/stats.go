@@ -59,8 +59,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	statsHTTP, err := helper.NewHTTP(ms.BaseMetricSet)
+	if err != nil {
+		return nil, err
+	}
+
+	statsHTTP.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
 	return &MetricSet{
 		MetricSet: ms,
+		statsHTTP: statsHTTP,
 	}, nil
 }
 
@@ -80,14 +88,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 }
 
 func (m *MetricSet) init() error {
-	statsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
-	if err != nil {
-		return err
-	}
-
-	statsHTTP.SetHeaderDefault(productorigin.Header, productorigin.Beats)
-
-	kibanaVersion, err := kibana.GetVersion(statsHTTP, kibana.StatsPath)
+	kibanaVersion, err := kibana.GetVersion(m.statsHTTP, kibana.StatsPath)
 	if err != nil {
 		return err
 	}
@@ -101,7 +102,6 @@ func (m *MetricSet) init() error {
 		}
 	}
 
-	m.statsHTTP = statsHTTP
 	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
 
 	return nil
