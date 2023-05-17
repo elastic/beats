@@ -148,6 +148,7 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 		}
 
 		child.config = iface
+		child.filter = iface.BpfFilter
 		s.sniffers[i] = child
 	}
 
