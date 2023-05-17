@@ -79,6 +79,7 @@ func (jb *job) GenerateFromName(name string, opts ...FieldOptions) mapstr.M {
 	if jb.store == nil {
 		return nil
 	}
+
 	if obj, ok, _ := jb.store.GetByKey(name); ok {
 		jobObj, ok := obj.(*kubernetes.Job)
 		if !ok {

@@ -97,7 +97,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.
 		if p.replicaset != nil {
 			rsName, _ := out.GetValue("replicaset.name")
 			if rsName, ok := rsName.(string); ok {
-				meta := p.replicaset.GenerateFromName(rsName)
+				meta := p.replicaset.GenerateFromName(po.Namespace + "/" + rsName)
 				deploymentName, _ := meta.GetValue("deployment.name")
 				if deploymentName != "" {
 					_, _ = out.Put("deployment.name", deploymentName)
@@ -112,8 +112,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.
 		if p.job != nil {
 			jobName, _ := out.GetValue("job.name")
 			if jobName, ok := jobName.(string); ok {
-				meta := p.replicaset.GenerateFromName(jobName)
-
+				meta := p.job.GenerateFromName(po.Namespace + "/" + jobName)
 				cronjobName, _ := meta.GetValue("cronjob.name")
 				if cronjobName != "" {
 					_, _ = out.Put("cronjob.name", cronjobName)

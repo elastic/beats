@@ -81,7 +81,7 @@ func (rs *replicaset) GenerateFromName(name string, opts ...FieldOptions) mapstr
 	if rs.store == nil {
 		return nil
 	}
-	
+
 	if obj, ok, _ := rs.store.GetByKey(name); ok {
 		replicaSet, ok := obj.(*kubernetes.ReplicaSet)
 		if !ok {
