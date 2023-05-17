@@ -169,7 +169,10 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var messages []string
 
 	// clean up the message for known issues producing a malformed JSON
-	bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+	// sanitization occurs if options are available and the message produces invalid JSON
+	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
+		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+	}
 
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
