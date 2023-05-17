@@ -30,7 +30,7 @@ type BeatProc struct {
 
 // NewBeat createa a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
-// `tempDir` will be used as a home and a logs directory for the Beat
+// `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, binary string, tempDir string, args ...string) BeatProc {
 	p := BeatProc{

@@ -34,7 +34,7 @@ import (
 func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
-	// what caused is to go through Filebeat's logs
+	// what caused it is going through Filebeat's logs.
 	ensureESIsRunning(t)
 
 	// We create our own temp dir so the files can be persisted
