@@ -63,6 +63,9 @@ func (s *state) savePartial(name string, offset int64, lastModifiedOn *time.Time
 
 // setCheckpoint, sets checkpoint from source to current state instance
 func (s *state) setCheckpoint(chkpt *Checkpoint) {
+	if chkpt.PartiallyProcessed == nil {
+		chkpt.PartiallyProcessed = make(map[string]int64)
+	}
 	s.cp = chkpt
 }
 

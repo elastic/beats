@@ -18,6 +18,8 @@ import (
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 )
 
+const DefaultApiTimeout = 5 * time.Second
+
 // GetStartTimeEndTime calculates start and end times for queries based on the current time and a duration.
 //
 // Whilst the inputs to this function are continuous, the maximum period granularity we can consistently use
@@ -118,6 +120,10 @@ func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (boo
 	return false, -1
 }
 
+func getContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), timeout)
+}
+
 // GetResourcesTags function queries AWS resource groupings tagging API
 // to get a resource tag mapping with specific resource type filters
 func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resourceTypeFilters []string) (map[string][]resourcegroupstaggingapitypes.Tag, error) {
@@ -132,10 +138,12 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 	}
 
 	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(svc, getResourcesInput)
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
 	var err error
 	var page *resourcegroupstaggingapi.GetResourcesOutput
 	for paginator.HasMorePages() {
-		if page, err = paginator.NextPage(context.TODO()); err != nil {
+		if page, err = paginator.NextPage(ctx); err != nil {
 			err = fmt.Errorf("error GetResources with Paginator: %w", err)
 			return nil, err
 		}
