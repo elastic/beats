@@ -298,20 +298,33 @@ func generateLogFile(t *testing.T, fullPath string) {
 	go func() {
 		t.Helper()
 		ticker := time.NewTicker(time.Second)
-		defer ticker.Stop()
-		defer f.Close()
-		for {
-			now := <-ticker.C
-			_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
-			if err != nil {
-				// The Go compiler does not allow me to call t.Fatalf from a non-test
-				// goroutine, so just log it instead
-				t.Errorf("could not write data to log file '%s': %s", fullPath, err)
-				return
+		t.Cleanup(ticker.Stop)
+
+		done := make(chan struct{})
+		t.Cleanup(func() { close(done) })
+
+		defer func() {
+			if err := f.Close(); err != nil {
+				t.Errorf("could not close log file '%s': %s", fullPath, err)
 			}
-			// make sure log lines are synced as quickly as possible
-			if err := f.Sync(); err != nil {
-				t.Errorf("could not sync file '%s': %s", fullPath, err)
+		}()
+
+		for {
+			select {
+			case <-done:
+				return
+			case now := <-ticker.C:
+				_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
+				if err != nil {
+					// The Go compiler does not allow me to call t.Fatalf from a non-test
+					// goroutine, so just log it instead
+					t.Errorf("could not write data to log file '%s': %s", fullPath, err)
+					return
+				}
+				// make sure log lines are synced as quickly as possible
+				if err := f.Sync(); err != nil {
+					t.Errorf("could not sync file '%s': %s", fullPath, err)
+				}
 			}
 		}
 	}()
