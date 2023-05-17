@@ -59,7 +59,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 			if err := os.RemoveAll(tempDir); err != nil {
 				t.Fatalf("could not remove temp dir '%s': %s", tempDir, err)
 			}
-			t.Logf("Temprary directory '%s' removed", tempDir)
+			t.Logf("Temporary directory '%s' removed", tempDir)
 		}
 	})
 
@@ -192,7 +192,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		// policy and when to just re-send the current one.
 		//
 		// If the Elastic-Agent wants the Beat to keep running the same policy,
-		// it will just keep re-sending it every time the Beat calls the checkin
+		// it will just keep re-sending it every time the Beat calls the check-in
 		// method.
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			if management.DoesStateMatch(observed, units[idx], 0) {
@@ -208,7 +208,6 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 			}
 		},
 		ActionImpl: func(response *proto.ActionResponse) error { return nil },
-		// ActionsChan: make(chan *mock.PerformAction, 100),
 	}
 
 	require.NoError(t, server.Start())
@@ -227,7 +226,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// waitDeadlineOr5Mins looks at the test deadline
 	// and returns a reasonable value of waiting for a
 	// condition to be met. The possible values are:
-	// - if no test deadline is set, return 5 minuets
+	// - if no test deadline is set, return 5 minutes
 	// - if a deadline is set and there is less than
 	//   0.5 second left, return the time left
 	// - otherwise return the time left minus 0.5 second.
@@ -269,7 +268,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'ForceReload set to FALSE' not found on Filebeat logs")
 
-	// Set it to true, so the temporaty directory is removed
+	// Set it to true, so the temporary directory is removed
 	testSucceeded = true
 }
 

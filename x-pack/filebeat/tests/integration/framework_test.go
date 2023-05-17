@@ -29,8 +29,8 @@ type BeatProc struct {
 }
 
 // NewBeat createa a new Beat process from the system tests binary.
-// It sets some requried options like the home path, logging, etc.
-// `tempDir` will be used a home a logs directory for the Beat
+// It sets some required options like the home path, logging, etc.
+// `tempDir` will be used as a home and a logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, binary string, tempDir string, args ...string) BeatProc {
 	p := BeatProc{
@@ -53,7 +53,7 @@ func (b *BeatProc) Start() {
 	t := b.t
 	fullPath, err := filepath.Abs(b.Binary)
 	if err != nil {
-		t.Fatalf("could got get full path from %q, err: %s", b.Binary, err)
+		t.Fatalf("could not get full path from %q, err: %s", b.Binary, err)
 	}
 	b.Cmd = exec.Command(fullPath, b.Args...)
 
@@ -68,7 +68,7 @@ func (b *BeatProc) Start() {
 	})
 }
 
-// LogContains looks for s as a sub string of every log line,
+// LogContains looks for `s` as a substring of every log line,
 // it will open the log file on every call, read it until EOF,
 // then close it.
 func (b *BeatProc) LogContains(s string) bool {
