@@ -133,6 +133,8 @@ func NewResourceMetadataEnricher(
 	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
+	var replicaSetWatcher, jobWatcher kubernetes.Watcher
+
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
@@ -143,7 +145,14 @@ func NewResourceMetadataEnricher(
 	if res == nil {
 		return &nilEnricher{}
 	}
-	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, nodeScope)
+
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	if err != nil {
+		logp.Err("Error creating Kubernetes client: %s", err)
+		return &nilEnricher{}
+	}
+
+	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, client, nodeScope)
 
 	if watcher == nil {
 		return &nilEnricher{}
@@ -157,25 +166,26 @@ func NewResourceMetadataEnricher(
 	}
 	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
-	if err != nil {
-		logp.Err("Error creating Kubernetes client: %s", err)
-		return &nilEnricher{}
-	}
-	replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
-		return &nilEnricher{}
-	}
+	// if Resource is Pod then we need to create watchers for Replicasets and Jobs that it might belongs to
+	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+	// Deployment -> Replicaset -> Pod
+	// CronJob -> job -> Pod
+	if resourceName == PodResource {
+		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+			return &nilEnricher{}
+		}
 
-	jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
-		return &nilEnricher{}
+		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			return &nilEnricher{}
+		}
 	}
 
 	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, config.AddResourceMetadata)
@@ -279,16 +289,21 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
-	if watcher == nil {
-		return &nilEnricher{}
-	}
-
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		logp.Err("Error creating Kubernetes client: %s", err)
 		return &nilEnricher{}
 	}
+
+	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, &kubernetes.Pod{}, client, nodeScope)
+	if watcher == nil {
+		return &nilEnricher{}
+	}
+
+	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+	// Deployment -> Replicaset -> Pod
+	// CronJob -> job -> Pod
 	replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 	}, nil)
@@ -296,7 +311,6 @@ func NewContainerMetadataEnricher(
 		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		return &nilEnricher{}
 	}
-
 	jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 	}, nil)
@@ -394,12 +408,12 @@ func NewContainerMetadataEnricher(
 	return enricher
 }
 
-func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
-	if err != nil {
-		logp.Err("Error creating Kubernetes client: %s", err)
-		return nil, nil, nil
-	}
+func getResourceMetadataWatchers(
+	config *kubernetesConfig,
+	resource kubernetes.Resource,
+	client k8sclient.Interface, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
+
+	var err error
 
 	options := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
