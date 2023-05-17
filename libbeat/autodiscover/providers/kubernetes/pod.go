@@ -39,14 +39,16 @@ import (
 )
 
 type pod struct {
-	uuid             uuid.UUID
-	config           *Config
-	metagen          metadata.MetaGen
-	logger           *logp.Logger
-	publishFunc      func([]bus.Event)
-	watcher          kubernetes.Watcher
-	nodeWatcher      kubernetes.Watcher
-	namespaceWatcher kubernetes.Watcher
+	uuid              uuid.UUID
+	config            *Config
+	metagen           metadata.MetaGen
+	logger            *logp.Logger
+	publishFunc       func([]bus.Event)
+	watcher           kubernetes.Watcher
+	nodeWatcher       kubernetes.Watcher
+	namespaceWatcher  kubernetes.Watcher
+	replicasetWatcher kubernetes.Watcher
+	jobWatcher        kubernetes.Watcher
 
 	// Mutex used by configuration updates not triggered by the main watcher,
 	// to avoid race conditions between cross updates and deletions.
@@ -110,6 +112,11 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
+
+	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+	// Deployment -> Replicaset -> Pod
+	// CronJob -> job -> Pod
 	replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 	}, nil)
@@ -126,14 +133,16 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 	p := &pod{
-		config:           config,
-		uuid:             uuid,
-		publishFunc:      publish,
-		metagen:          metaGen,
-		logger:           logger,
-		watcher:          watcher,
-		nodeWatcher:      nodeWatcher,
-		namespaceWatcher: namespaceWatcher,
+		config:            config,
+		uuid:              uuid,
+		publishFunc:       publish,
+		metagen:           metaGen,
+		logger:            logger,
+		watcher:           watcher,
+		nodeWatcher:       nodeWatcher,
+		namespaceWatcher:  namespaceWatcher,
+		replicasetWatcher: replicaSetWatcher,
+		jobWatcher:        jobWatcher,
 	}
 
 	watcher.AddEventHandler(p)
@@ -258,6 +267,20 @@ func (p *pod) Start() error {
 		}
 	}
 
+	if p.replicasetWatcher != nil {
+		err := p.replicasetWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
+	if p.jobWatcher != nil {
+		err := p.jobWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
 	return p.watcher.Start()
 }
 
@@ -271,6 +294,14 @@ func (p *pod) Stop() {
 
 	if p.nodeWatcher != nil {
 		p.nodeWatcher.Stop()
+	}
+
+	if p.replicasetWatcher != nil {
+		p.replicasetWatcher.Stop()
+	}
+
+	if p.jobWatcher != nil {
+		p.jobWatcher.Stop()
 	}
 }
 
