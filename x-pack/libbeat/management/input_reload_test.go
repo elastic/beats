@@ -159,7 +159,7 @@ func TestInputReload(t *testing.T) {
 
 	forceReloadStates := []bool{false, true, false}
 	forceReloadStateIdx := 0
-	forceReloadLastState := true // starts on true so the first iteratiction is already a change
+	forceReloadLastState := true // starts on true so the first iteration is already a change
 
 	eventuallyCheck := func() bool {
 		forceReload := mm.forceReload
@@ -168,7 +168,7 @@ func TestInputReload(t *testing.T) {
 		if forceReload != forceReloadLastState {
 			forceReloadLastState = forceReload
 			if forceReload == forceReloadStates[forceReloadStateIdx] {
-				// Setp to the next state
+				// Set to the next state
 				forceReloadStateIdx++
 			}
 
