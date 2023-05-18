@@ -42,7 +42,7 @@ func TestParseMultipleMessagesSanitization(t *testing.T) {
 }
 
 func TestSanitize(t *testing.T) {
-	jsonStr := []byte("{'test':\"this is 'some' message\n\",\n\"time\":\"2019-12-17T13:43:44.4946995Z\"}")
+	jsonByte := []byte("{'test':\"this is 'some' message\n\",\n\"time\":\"2019-12-17T13:43:44.4946995Z\"}")
 
 	testCases := []struct {
 		name     string
@@ -52,7 +52,7 @@ func TestSanitize(t *testing.T) {
 		{
 			name:     "no options",
 			opts:     []string{},
-			expected: jsonStr,
+			expected: jsonByte,
 		},
 		{
 			name:     "NEW_LINES option",
@@ -75,7 +75,7 @@ func TestSanitize(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			res := sanitize(jsonStr, tc.opts...)
+			res := sanitize(jsonByte, tc.opts...)
 			assert.Equal(t, tc.expected, res)
 		})
 	}

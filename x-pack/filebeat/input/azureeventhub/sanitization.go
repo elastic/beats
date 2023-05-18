@@ -33,8 +33,8 @@ func sanitizeOptionsValidate(s string) error {
 
 // sanitize applies the sanitization options specified in the config
 // if no sanitization options are provided, the message remains unchanged
-func sanitize(jsonStr []byte, opts ...string) []byte {
-	res := jsonStr
+func sanitize(jsonByte []byte, opts ...string) []byte {
+	res := jsonByte
 
 	for _, opt := range opts {
 		switch sanitizationOption(opt) {
@@ -49,19 +49,19 @@ func sanitize(jsonStr []byte, opts ...string) []byte {
 }
 
 // sanitizeNewLines removes newlines found in the message
-func sanitizeNewLines(jsonStr []byte) []byte {
-	return bytes.ReplaceAll(jsonStr, []byte("\n"), []byte{})
+func sanitizeNewLines(jsonByte []byte) []byte {
+	return bytes.ReplaceAll(jsonByte, []byte("\n"), []byte{})
 }
 
 // sanitizeSingleQuotes replaces single quotes with double quotes in the message
 // single quotes that are in between double quotes remain unchanged
-func sanitizeSingleQuotes(jsonStr []byte) []byte {
+func sanitizeSingleQuotes(jsonByte []byte) []byte {
 	var result bytes.Buffer
 	var prevChar byte
 
 	inDoubleQuotes := false
 
-	for _, r := range jsonStr {
+	for _, r := range jsonByte {
 		if r == '"' && prevChar != '\\' {
 			inDoubleQuotes = !inDoubleQuotes
 		}
