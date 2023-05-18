@@ -131,7 +131,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	// creates an Arrow memory pool for managing memory allocations
 	memoryPool := memory.NewGoAllocator()
 
-	// uses a timestamp as the seed for generating random data
+	// uses a fixed seed value of 1 for generating random data
 	seed := int64(1)
 	r := rand.New(rand.NewSource(seed))
 
