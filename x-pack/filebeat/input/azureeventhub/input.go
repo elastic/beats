@@ -167,8 +167,10 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
 
-	// clean up the message for known issues producing a malformed JSON
-	// sanitization occurs if options are available and the message produces invalid JSON
+	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
+	// Sanitization occurs if options are available and the message contains an invalid JSON.
+	//
+	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
 	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
 		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
 	}
