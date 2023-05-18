@@ -148,6 +148,7 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 		}
 
 		child.config = iface
+		child.filter = iface.BpfFilter
 		s.sniffers[i] = child
 	}
 
@@ -499,7 +500,15 @@ func openAFPacket(device, filter string, cfg *config.InterfaceConfig) (snifferHa
 	}
 
 	timeout := 500 * time.Millisecond
-	h, err := newAfpacketHandle(device, szFrame, szBlock, numBlocks, timeout, cfg.EnableAutoPromiscMode)
+	h, err := newAfpacketHandle(afPacketConfig{
+		Device:        device,
+		FrameSize:     szFrame,
+		BlockSize:     szBlock,
+		NumBlocks:     numBlocks,
+		PollTimeout:   timeout,
+		FanoutGroupID: cfg.FanoutGroup,
+		Promiscuous:   cfg.EnableAutoPromiscMode,
+	})
 	if err != nil {
 		return nil, err
 	}

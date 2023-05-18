@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration && windows
-// +build integration,windows
 
 package service
 
