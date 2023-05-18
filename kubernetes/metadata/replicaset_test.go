@@ -171,16 +171,14 @@ func TestReplicase_GenerateFromName(t *testing.T) {
 				},
 			},
 			output: mapstr.M{
-				"kubernetes": mapstr.M{
-					"replicaset": mapstr.M{
-						"name": "nginx-rs",
-						"uid":  uid,
-					},
-					"deployment": mapstr.M{
-						"name": "nginx-deployment",
-					},
-					"namespace": defaultNs,
+				"replicaset": mapstr.M{
+					"name": "nginx-rs",
+					"uid":  uid,
 				},
+				"deployment": mapstr.M{
+					"name": "nginx-deployment",
+				},
+				"namespace": defaultNs,
 			},
 		},
 	}
