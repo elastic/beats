@@ -57,11 +57,12 @@ func sanitizeNewLines(jsonStr []byte) []byte {
 // single quotes that are in between double quotes remain unchanged
 func sanitizeSingleQuotes(jsonStr []byte) []byte {
 	var result bytes.Buffer
+	var prevChar byte
 
 	inDoubleQuotes := false
 
 	for _, r := range jsonStr {
-		if r == '"' {
+		if r == '"' && prevChar != '\\' {
 			inDoubleQuotes = !inDoubleQuotes
 		}
 
@@ -70,6 +71,7 @@ func sanitizeSingleQuotes(jsonStr []byte) []byte {
 		} else {
 			result.WriteByte(r)
 		}
+		prevChar = r
 	}
 
 	return result.Bytes()
