@@ -171,20 +171,24 @@ func NewResourceMetadataEnricher(
 	// Deployment -> Replicaset -> Pod
 	// CronJob -> job -> Pod
 	if resourceName == PodResource {
-		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-		}, nil)
-		if err != nil {
-			logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
-			return &nilEnricher{}
+		if config.AddResourceMetadata.Deployment {
+			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+				return &nilEnricher{}
+			}
 		}
 
-		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-		}, nil)
-		if err != nil {
-			logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
-			return &nilEnricher{}
+		if config.AddResourceMetadata.CronJob {
+			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+				return &nilEnricher{}
+			}
 		}
 	}
 
@@ -283,6 +287,7 @@ func NewContainerMetadataEnricher(
 	metricsRepo *MetricsRepo,
 	nodeScope bool) Enricher {
 
+	var replicaSetWatcher, jobWatcher kubernetes.Watcher
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		logp.Info("Kubernetes metricset enriching is disabled")
@@ -304,19 +309,23 @@ func NewContainerMetadataEnricher(
 	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 	// Deployment -> Replicaset -> Pod
 	// CronJob -> job -> Pod
-	replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-		return &nilEnricher{}
+	if config.AddResourceMetadata.Deployment {
+		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			return &nilEnricher{}
+		}
 	}
-	jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
-		return &nilEnricher{}
+	if config.AddResourceMetadata.CronJob {
+		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			return &nilEnricher{}
+		}
 	}
 
 	commonMetaConfig := metadata.Config{}

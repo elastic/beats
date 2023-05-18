@@ -142,6 +142,8 @@ func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig,
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
+		var replicaSetWatcher, jobWatcher kubernetes.Watcher
+
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -214,17 +216,21 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 		// Deployment -> Replicaset -> Pod
 		// CronJob -> job -> Pod
-		replicaSetWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-		}, nil)
-		if err != nil {
-			k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		if metaConf.Deployment {
+			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			}
 		}
-		jobWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-		}, nil)
-		if err != nil {
-			k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+		if metaConf.CronJob {
+			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			}
 		}
 
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
