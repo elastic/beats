@@ -143,12 +143,11 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 			randData := []int32{r.Int31()}
 			builder := array.NewInt32Builder(memoryPool)
 			builder.AppendValues(randData, nil)
-			defer builder.Release()
 			columnArray := array.NewInt32Data(builder.NewArray().Data())
+			builder.Release()
 			recordColumns = append(recordColumns, columnArray)
 		}
 		record := array.NewRecord(schema, recordColumns, 1)
-		defer record.Release()
 		val, err := record.MarshalJSON()
 		if err != nil {
 			t.Fatalf("Failed to marshal record to JSON: %v", err)
@@ -160,6 +159,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 		if err != nil {
 			t.Fatalf("Failed to write record to parquet file: %v", err)
 		}
+		record.Release()
 	}
 
 	// closes the file handlers and asserts the errors
