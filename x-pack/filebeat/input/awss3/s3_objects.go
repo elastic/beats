@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"reflect"
 	"strings"
 	"time"
@@ -284,7 +285,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	var reader reader.Reader
-	reader, err = readfile.NewEncodeReader(io.NopCloser(r), readfile.Config{
+	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
 		Codec:        enc,
 		BufferSize:   int(p.readerConfig.BufferSize),
 		Terminator:   p.readerConfig.LineTerminator,

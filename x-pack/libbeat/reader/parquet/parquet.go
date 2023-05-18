@@ -24,8 +24,8 @@ type BufferedReader struct {
 }
 
 // NewBufferedReader creates a new reader that can decode parquet data from an io.Reader.
-// It will return an error if the parquet file cannot be read.
-// Note: As io.ReadAll is used, the entire file would be read into memory, so very large files
+// It will return an error if the parquet data stream cannot be read.
+// Note: As io.ReadAll is used, the entire data stream would be read into memory, so very large data streams
 // may cause memory bottleneck issues.
 func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	batchSize := 1

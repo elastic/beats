@@ -206,18 +206,17 @@ func BenchmarkReadParquet(b *testing.B) {
 					filePtrArr := openFiles(b, files)
 					for pb.Next() {
 						for _, f := range filePtrArr {
-							defer f.Close()
 							f.Seek(0, 0)
 							tc.invokeFn(b, cfg, f)
 						}
 					}
+					closeFiles(b, filePtrArr)
 				})
 			case tc.useGoRoutiunes:
 				filePtrArr := openFiles(b, files)
 				wg := sync.WaitGroup{}
 				for i := 0; i < b.N; i++ {
 					for _, f := range filePtrArr {
-						defer f.Close()
 						f.Seek(0, 0)
 						cf := f
 						wg.Add(1)
@@ -228,16 +227,17 @@ func BenchmarkReadParquet(b *testing.B) {
 					}
 					wg.Wait()
 				}
+				closeFiles(b, filePtrArr)
 			// default case is set to serial processing of files
 			default:
 				filePtrArr := openFiles(b, files)
 				for i := 0; i < b.N; i++ {
 					for _, f := range filePtrArr {
-						defer f.Close()
 						f.Seek(0, 0)
 						tc.invokeFn(b, cfg, f)
 					}
 				}
+				closeFiles(b, filePtrArr)
 			}
 		})
 	}
@@ -304,4 +304,14 @@ func openFiles(b *testing.B, files []string) []*os.File {
 		filePtrArr[i] = file
 	}
 	return filePtrArr
+}
+
+// closeFiles closes the parquet files
+func closeFiles(b *testing.B, files []*os.File) {
+	for _, f := range files {
+		err := f.Close()
+		if err != nil {
+			b.Fatalf("failed to close file: %v", err)
+		}
+	}
 }
