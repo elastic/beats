@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/apache/arrow/go/v11/arrow"
 	"github.com/apache/arrow/go/v11/arrow/array"
@@ -131,12 +132,16 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	// creates an Arrow memory pool for managing memory allocations
 	memoryPool := memory.NewGoAllocator()
 
+	// uses a timestamp as the seed for generating random data
+	seed := time.Now().UnixNano()
+	r := rand.New(rand.NewSource(seed))
+
 	// generates random data for writing to the parquet file
 	for rowIdx := int64(0); rowIdx < int64(numRows); rowIdx++ {
 		// creates an Arrow record with random data
 		var recordColumns []arrow.Array
 		for colIdx := 0; colIdx < numCols; colIdx++ {
-			randData := []int32{rand.Int31()}
+			randData := []int32{r.Int31()}
 			builder := array.NewInt32Builder(memoryPool)
 			builder.AppendValues(randData, nil)
 			defer builder.Release()
