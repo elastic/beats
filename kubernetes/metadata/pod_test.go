@@ -429,7 +429,11 @@ func TestPod_Generate(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil, nil, nil, addResourceMetadata)
+	replicaSets := cache.NewStore(cache.MetaNamespaceKeyFunc)
+	err = replicaSets.Add(rs)
+	require.NoError(t, err)
+	rsMeta := NewReplicasetMetadataGenerator(config, replicaSets, client)
+	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil, rsMeta, nil, addResourceMetadata)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
