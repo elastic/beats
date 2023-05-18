@@ -31,7 +31,7 @@ type job struct {
 	resource *Resource
 }
 
-// NewJobMetadataGenerator creates a metagen for namespace resources
+// NewJobMetadataGenerator creates a metagen for job resources
 func NewJobMetadataGenerator(cfg *config.C, jobs cache.Store, client k8s.Interface) MetaGen {
 	return &job{
 		resource: NewResourceMetadataGenerator(cfg, client),
@@ -39,7 +39,7 @@ func NewJobMetadataGenerator(cfg *config.C, jobs cache.Store, client k8s.Interfa
 	}
 }
 
-// Generate generates pod metadata from a resource object
+// Generate generates job metadata from a resource object
 // Metadata map is in the following form:
 //
 //	{
@@ -58,12 +58,12 @@ func (jb *job) Generate(obj kubernetes.Resource, opts ...FieldOptions) mapstr.M 
 	return meta
 }
 
-// GenerateECS generates namespace ECS metadata from a resource object
+// GenerateECS generates job ECS metadata from a resource object
 func (jb *job) GenerateECS(obj kubernetes.Resource) mapstr.M {
 	return jb.resource.GenerateECS(obj)
 }
 
-// GenerateK8s generates namespace metadata from a resource object
+// GenerateK8s generates job metadata from a resource object
 func (jb *job) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.M {
 	_, ok := obj.(*kubernetes.Job)
 	if !ok {
@@ -74,7 +74,7 @@ func (jb *job) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr
 	return meta
 }
 
-// GenerateFromName generates pod metadata from a namespace name
+// GenerateFromName generates job metadata from a namespace name
 func (jb *job) GenerateFromName(name string, opts ...FieldOptions) mapstr.M {
 	if jb.store == nil {
 		return nil

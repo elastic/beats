@@ -33,7 +33,7 @@ type replicaset struct {
 	resource *Resource
 }
 
-// NewReplicasetMetadataGenerator creates a metagen for namespace resources
+// NewReplicasetMetadataGenerator creates a metagen for replicaset resources
 func NewReplicasetMetadataGenerator(cfg *config.C, replicasets cache.Store, client k8s.Interface) MetaGen {
 	return &replicaset{
 		resource: NewResourceMetadataGenerator(cfg, client),
@@ -41,7 +41,7 @@ func NewReplicasetMetadataGenerator(cfg *config.C, replicasets cache.Store, clie
 	}
 }
 
-// Generate generates pod metadata from a resource object
+// Generate generates replicaset metadata from a resource object
 // Metadata map is in the following form:
 //
 //	{
@@ -60,12 +60,12 @@ func (rs *replicaset) Generate(obj kubernetes.Resource, opts ...FieldOptions) ma
 	return meta
 }
 
-// GenerateECS generates namespace ECS metadata from a resource object
+// GenerateECS generates replicaset ECS metadata from a resource object
 func (rs *replicaset) GenerateECS(obj kubernetes.Resource) mapstr.M {
 	return rs.resource.GenerateECS(obj)
 }
 
-// GenerateK8s generates namespace metadata from a resource object
+// GenerateK8s generates replicaset metadata from a resource object
 func (rs *replicaset) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.M {
 	_, ok := obj.(*kubernetes.ReplicaSet)
 	if !ok {
@@ -76,7 +76,7 @@ func (rs *replicaset) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions)
 	return meta
 }
 
-// GenerateFromName generates pod metadata from a namespace name
+// GenerateFromName generates replicaset metadata from a replicaset name
 func (rs *replicaset) GenerateFromName(name string, opts ...FieldOptions) mapstr.M {
 	if rs.store == nil {
 		return nil
