@@ -58,19 +58,7 @@ if (-Not (Get-Command "python" -ErrorAction SilentlyContinue)) {
 }
 
 echo "Updating pip"
-For ($i = 0; $i -lt 5) {
-	try {
-		python -m pip install --upgrade pip 2>&1 | %{ "$_" }
-		Break
-	} catch {
-		Echo "updating pip failed"
-		$i++
-		if ($i -eq 5) {
-			Throw $_
-		}
-		Start-Sleep 5
-	}
-}
+python -m pip install --upgrade pip 2>&1 | %{ "$_" }
 
 if (-Not (Get-Command "git" -ErrorAction SilentlyContinue)) {
     echo "Installing git"
