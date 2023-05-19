@@ -18,6 +18,7 @@
 package redis
 
 import (
+	"os"
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -56,6 +57,22 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, err
+	}
+
+	// 读取文件内容
+	var content = ""
+	if config.PasswordFile != "" {
+		info, err := os.ReadFile(config.PasswordFile)
+		if err != nil {
+			logp.Err("Read Password File Error: %s", err)
+		} else {
+			content = string(info)
+		}
+	}
+
+	// 将文件内容赋值给 config.Password
+	if content != "" {
+		config.Password = content
 	}
 
 	outlet, err := outletFactory(cfg, context.DynamicFields)

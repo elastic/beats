@@ -30,6 +30,7 @@ var defaultConfig = config{
 	Network:  "tcp",
 	MaxConn:  10,
 	Password: "",
+	PasswordFile: "",
 }
 
 type config struct {
@@ -39,4 +40,5 @@ type config struct {
 	Network                   string        `config:"network"`
 	MaxConn                   int           `config:"maxconn" validate:"min=1"`
 	Password                  string        `config:"password"`
+	PasswordFile              string        `config:"password_file"`
 }
