@@ -283,6 +283,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
 - Add execution budget to CEL input. {pull}35409[35409]
+- Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
