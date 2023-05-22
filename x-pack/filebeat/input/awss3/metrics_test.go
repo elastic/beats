@@ -94,10 +94,13 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 var fakeTimeMs = &atomic.Int64{}
 
 func useFakeCurrentTimeThenReset() (reset func()) {
-	currentTime = func() time.Time {
-		return time.UnixMilli(fakeTimeMs.Load())
+	clockValue.Swap(clock{
+		Now: func() time.Time {
+			return time.UnixMilli(fakeTimeMs.Load())
+		},
+	})
+	reset = func() {
+		clockValue.Swap(realClock)
 	}
-	return func() {
-		currentTime = time.Now
-	}
+	return reset
 }

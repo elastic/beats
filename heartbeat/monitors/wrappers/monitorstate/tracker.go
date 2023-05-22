@@ -65,6 +65,7 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 	state := t.getCurrentState(sf)
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
+		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
 		t.states[sf.ID] = state
 	} else {
 		state.recordCheck(sf, newStatus)
@@ -84,6 +85,9 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 	for i := 0; i < tries; i++ {
 		loadedState, err = t.stateLoader(sf)
 		if err == nil {
+			if loadedState != nil {
+				logp.L().Infof("loaded previous state for monitor %s: %s", sf.ID, loadedState.String())
+			}
 			break
 		}
 

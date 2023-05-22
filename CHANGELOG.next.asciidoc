@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -16,9 +16,6 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Fixed error spam from `add_kubernetes_metadata` processor when running on AKS. {pull}33697[33697]
-- Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
-- The `close.on_state_change.inactive` default value is now set to 5 minutes, matching the documentation.
 
 *Heartbeat*
 
@@ -26,23 +23,25 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
 
 
 *Winlogbeat*
 
-- Corrects issue with security events with source IP of "LOCAL" or "Unknown" failing to ingest {issue}19627[19627] {pull}34295[34295]
-- Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
-- Added processing for Windows Event ID's 5140 and 5145 for the Security Ingest Pipeline {pull}34352[34352]
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
 
 *Functionbeat*
 
 
+*Elastic Logging Plugin*
+
+
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix Windows service install/uninstall when Win32_Service returns error, add logic to wait until the Windows Service is stopped before proceeding. {pull}33322[33322]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
@@ -65,11 +64,14 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
 - Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
 - In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+
 
 *Auditbeat*
 
-
 *Filebeat*
+
 - [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
    with the ecs field name `container`. {pull}34403[34403]
@@ -117,6 +119,10 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+- Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
+- RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 
 *Heartbeat*
 
@@ -134,6 +140,13 @@ with the ecs field name `container`. {pull}34403[34403]
 automatic splitting at root level, if root level element is an array. {pull}34155[34155]
 - Fix broken mapping for state.ends field. {pull}34891[34891]
 - Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+- Fix broken state ID location naming. {pull}35336[35336]
+- Fix project monitor temp directories permission to include group access. {pull}35398[35398]
+- Fix output pipeline exit on run_once. {pull}35376[35376]
+- Fix formatting issue with socket trace timeout. {pull}35434[35434]
+
+*Heartbeat*
+
 
 *Heartbeat*
 
@@ -146,16 +159,13 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Filebeat*
 
-- Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
-- Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
-- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
-- Drop empty API response events for Microsoft module. {issue}34786[34786] {pull}34893[34893]
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 
 *Heartbeat*
 
@@ -176,7 +186,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 - Make generic SQL GA {pull}34637[34637]
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-
+- Add context with timeout in AWS API calls {pull}35425[35425]
+- Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 
 *Osquerybeat*
 
@@ -184,7 +195,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
-- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
+- Fix double channel close panic when reloading. {pull}35324[35324]
+- Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
 
 *Winlogbeat*
 
@@ -192,10 +204,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
 - Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
 - Improve documentation for event_logs.name configuration. {pull}34931[34931]
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix panic due to misrepresented buffer use. {pull}35437[35437]
+- Prevent panic on closing iterators on empty channels in experimental API. {issue}33966[33966] {pull}35423[35423]
+- Allow program termination when attempting to open an absent channel. {pull}35474[35474]
 
 *Functionbeat*
-
-- Fix Kinesis events timestamp to use timestamp of the event record instead of when the record was processed {pull}33593[33593]
 
 
 *Elastic Logging Plugin*
@@ -207,6 +221,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
+- Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
+
 
 *Auditbeat*
 
@@ -217,9 +233,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
-- Fix handling of invalid UserIP and LocalIP values. {pull}32896[32896]
-- Allow http_endpoint instances to share ports. {issue}32578[32578] {pull}33377[33377]
-- Improve httpjson documentation for split processor. {pull}33473[33473]
 - Added separation of transform context object inside httpjson. Introduced new clause `.parent_last_response.*` {pull}33499[33499]
 - Cloud Foundry input uses server-side filtering when retrieving logs. {pull}33456[33456]
 - Add `parse_aws_vpc_flow_log` processor. {pull}33656[33656]
@@ -268,6 +281,10 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
 - Add oracle authentication messages parsing {pull}35127[35127]
+- Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
+- Add execution budget to CEL input. {pull}35409[35409]
+- Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
+- Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -278,15 +295,14 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Heartbeat*
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
 - Added status to monitor run log report.
+- Removed beta label for browser monitors. {pull}35424[35424].
 
-- Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
 
 *Metricbeat*
 
-- Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
-- Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
+- Add GCP Redis metadata {pull}33701[33701]
 - Remove GCP Compute metadata cache {pull}33655[33655]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Redis regions support {pull}33728[33728]
@@ -297,18 +313,14 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 
-*Packetbeat*
+*Osquerybeat*
 
-- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
-- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
-- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
-- Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
-- Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
-- Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
-- Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
-- Add metrics documentation for TCP and UDP protocols. {issue}34887[34887] {pull}34889[34889]
 
 *Packetbeat*
+
+- Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+
+*Winlogbeat*
 
 
 *Functionbeat*
@@ -316,16 +328,16 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Winlogbeat*
 
-- Add metrics for log event processing. {pull}33922[33922]
-- Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
-- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
+- Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
+
 
 *Elastic Log Driver*
+*Elastic Logging Plugin*
 
 
 ==== Deprecated
 
-*Affecting all Beats*
+*Auditbeat*
 
 
 *Filebeat*
@@ -337,14 +349,25 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
+
 
 *Winlogbeat*
 
 
 *Functionbeat*
 
-==== Known Issue
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
 
 
 
