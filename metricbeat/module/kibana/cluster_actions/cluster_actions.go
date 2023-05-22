@@ -71,8 +71,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
-	if err = m.validate(); err != nil {
+	err, versionSupported := m.validate()
+	if err != nil {
 		return err
+	}
+
+	if (!versionSupported) {
+		return nil
 	}
 
 	if err = m.fetchMetrics(r); err != nil {
@@ -82,10 +87,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	return nil
 }
 
-func (m *MetricSet) validate() error {
+func (m *MetricSet) validate() (err error, versionSupported bool) {
 	kibanaVersion, err := kibana.GetVersion(m.actionsHTTP, kibana.ClusterActionsPath)
 	if err != nil {
-		return err
+		return err, false;
 	}
 
 	isMetricsAPIAvailable := kibana.IsActionsAPIAvailable(kibanaVersion)
@@ -95,9 +100,11 @@ func (m *MetricSet) validate() error {
 			const errorMsg = "the %v cluster actions is only supported with Kibana >= %v. You are currently running Kibana %v"
 			m.Logger().Debugf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
 		}
+
+		return nil, false;
 	}
 
-	return nil
+	return nil, true;
 }
 
 func (m *MetricSet) fetchMetrics(r mb.ReporterV2) error {

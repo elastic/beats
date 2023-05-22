@@ -76,8 +76,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
-	if err = m.init(); err != nil {
+	err, versionSupported := m.init()
+	if err != nil {
 		return err
+	}
+
+	if (!versionSupported) {
+		return nil
 	}
 
 	if err = m.fetchStats(r); err != nil {
@@ -87,10 +92,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	return nil
 }
 
-func (m *MetricSet) init() error {
+func (m *MetricSet) init() (err error, versionSupported bool) {
 	kibanaVersion, err := kibana.GetVersion(m.statsHTTP, kibana.StatsPath)
 	if err != nil {
-		return err
+		return err, false;
 	}
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
@@ -100,11 +105,13 @@ func (m *MetricSet) init() error {
 			const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
 			m.Logger().Debugf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
 		}
+
+		return nil, false;
 	}
 
 	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
 
-	return nil
+	return err, true;
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2) error {
