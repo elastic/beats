@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || freebsd || openbsd || netbsd || darwin
-// +build linux freebsd openbsd netbsd darwin
 
 package file_integrity
 

@@ -203,6 +203,30 @@ packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
 [float]
+==== `fanout_group`
+
+To scale processing across multiple Packetbeat processes, a fanout group
+identifier can be specified. When `fanout_group` is used the Linux kernel splits
+packets across Packetbeat instances in the same group by using a flow hash. It
+computes the flow hash modulo with the number of Packetbeat processes in order
+to consistently route flows to the same Packetbeat instance.
+
+The value must be between 0 and 65535. By default, no value is set.
+
+This is only available on Linux and requires using `type: af_packet`. Each process
+must be running in same network namespace. All processes must use the same
+interface settings. You must take responsibility for running multiple instances
+of Packetbeat.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.fanout_group: 1
+------------------------------------------------------------------------------
+
+[float]
 ==== `auto_promisc_mode`
 
 With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
