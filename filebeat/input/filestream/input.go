@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"golang.org/x/text/transform"
 
@@ -61,6 +62,7 @@ type filestream struct {
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
 	parsers         parser.Config
+	metrics         *loginp.Metrics
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -126,6 +128,7 @@ func (inp *filestream) Run(
 	src loginp.Source,
 	cursor loginp.Cursor,
 	publisher loginp.Publisher,
+	metrics *loginp.Metrics,
 ) error {
 	fs, ok := src.(fileSource)
 	if !ok {
@@ -140,6 +143,10 @@ func (inp *filestream) Run(
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
+
+	inp.metrics = metrics
+	inp.metrics.FilesActive.Inc()
+	defer inp.metrics.FilesActive.Dec()
 
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
@@ -312,6 +319,8 @@ func (inp *filestream) readFromSource(
 	s state,
 	p loginp.Publisher,
 ) error {
+	inp.metrics.FilesRead.Inc()
+
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
 		if err != nil {
@@ -323,19 +332,31 @@ func (inp *filestream) readFromSource(
 				log.Debugf("EOF has been reached. Closing.")
 			} else {
 				log.Errorf("Read line error: %v", err)
+				inp.metrics.ProcessingErrors.Inc()
 			}
+			inp.metrics.FilesClosed.Inc()
+
 			return nil
 		}
 
 		s.Offset += int64(message.Bytes)
 
+		inp.metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
+		inp.metrics.BytesProcessed.Add(uint64(message.Bytes))
+		inp.metrics.EventsInFlight.Inc()
+
 		if err := p.Publish(message.ToEvent(), s); err != nil {
+			inp.metrics.ProcessingErrors.Inc()
 			return err
 		}
+
+		inp.metrics.EventsInFlight.Dec()
+		inp.metrics.EventsProcessed.Inc()
+		inp.metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}
 	return nil
 }

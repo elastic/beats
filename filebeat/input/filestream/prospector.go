@@ -128,7 +128,7 @@ func (p *fileProspector) Init(
 // Run starts the fileProspector which accepts FS events from a file watcher.
 //
 //nolint:dupl // Different prospectors have a similar run method
-func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup, metrics *loginp.Metrics) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
@@ -153,7 +153,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince, metrics)
 		}
 		return nil
 	})
@@ -172,11 +172,13 @@ func (p *fileProspector) onFSEvent(
 	updater loginp.StateMetadataUpdater,
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
+	metrics *loginp.Metrics,
 ) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
 			log.Debugf("A new file %s has been found", event.NewPath)
+			metrics.FilesCreated.Inc()
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
@@ -184,10 +186,12 @@ func (p *fileProspector) onFSEvent(
 			}
 
 		} else if event.Op == loginp.OpWrite {
+			metrics.FilesUpdated.Inc()
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+			metrics.FilesIgnored.Inc()
 			err := updater.ResetCursor(src, state{Offset: event.Info.Size()})
 			if err != nil {
 				log.Errorf("setting cursor for ignored file: %v", err)
@@ -199,6 +203,7 @@ func (p *fileProspector) onFSEvent(
 
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated", event.NewPath)
+		metrics.FilesTruncated.Inc()
 
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {
@@ -207,11 +212,13 @@ func (p *fileProspector) onFSEvent(
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
+		metrics.FilesDeleted.Inc()
 		log.Debugf("File %s has been removed", event.OldPath)
 
 		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
+		metrics.FilesRenamed.Inc()
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 
 		p.onRename(log, ctx, event, src, updater, group)

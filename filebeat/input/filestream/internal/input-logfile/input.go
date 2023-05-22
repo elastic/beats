@@ -61,6 +61,9 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	metrics := NewMetrics(ctx.ID)
+	defer metrics.Close()
+
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      newReaderGroup(),
@@ -74,13 +77,14 @@ func (inp *managedInput) Run(
 			time.Minute, // magic number
 			ctx.Logger,
 			"harvester:"),
+		metrics: metrics,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
 	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
 
-	inp.prospector.Run(ctx, sourceStore, hg)
+	inp.prospector.Run(ctx, sourceStore, hg, metrics)
 
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs

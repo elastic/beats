@@ -152,6 +152,34 @@ include::../inputs/input-filestream-file-options.asciidoc[]
 
 include::../inputs/input-filestream-reader-options.asciidoc[]
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                    | Description
+| `files_read_total`        | Total number of files read.
+| `files_closed_total`      | Total number of files closed.
+| `files_created_total`     | Total number of file created events detected.
+| `files_updated_total`     | Total number of file updated events detected.
+| `files_ignored_total`     | Total number of file events ignored.
+| `files_truncated_total`   | Total number of file truncated events detected.
+| `files_deleted_total`     | Total number of file deleted events detected.
+| `files_renamed_total`     | Total number of file renamed events detected.
+| `files_active`            | Number of files currently open (gauge).
+| `events_in_flight`        | Number of events currently in flight (gauge).
+| `messages_read_total`     | Total number of messages read.
+| `bytes_processed_total`   | Total number of bytes processed.
+| `events_processed_total`  | Total number of events processed.
+| `processing_errors_total` | Total number of processing errors.
+| `processing_time`         | Histogram of the elapsed time to process messages (expressed in nanoseconds).
+|=======
+
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
 

@@ -243,6 +243,9 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
+			metrics := loginp.NewMetrics("TEST-" + name)
+			defer metrics.Close()
+
 			p := fileProspector{
 				filewatcher: newMockFileWatcher(test.events, len(test.events)),
 				identifier:  mustPathIdentifier(false),
@@ -251,7 +254,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
-			p.Run(ctx, newMockMetadataUpdater(), hg)
+			p.Run(ctx, newMockMetadataUpdater(), hg, metrics)
 
 			assert.ElementsMatch(t, test.expectedEvents, hg.events, "expected different harvester events")
 		})
@@ -279,6 +282,9 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 		harvesterGroupStop{},
 	}
 
+	metrics := loginp.NewMetrics("TEST")
+	defer metrics.Close()
+
 	filewatcher := newMockFileWatcher([]loginp.FSEvent{eventCreate}, 2)
 	p := fileProspector{
 		filewatcher: filewatcher,
@@ -291,7 +297,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		p.Run(ctx, testStore, hg)
+		p.Run(ctx, testStore, hg, metrics)
 
 		wg.Done()
 	}()
@@ -344,6 +350,9 @@ func TestProspectorDeletedFile(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
+			metrics := loginp.NewMetrics("TEST-" + name)
+			defer metrics.Close()
+
 			p := fileProspector{
 				filewatcher:  newMockFileWatcher(test.events, len(test.events)),
 				identifier:   mustPathIdentifier(false),
@@ -354,7 +363,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
 
-			p.Run(ctx, testStore, newTestHarvesterGroup())
+			p.Run(ctx, testStore, newTestHarvesterGroup(), metrics)
 
 			has := testStore.has("path::/path/to/file")
 
@@ -425,6 +434,9 @@ func TestProspectorRenamedFile(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
+			metrics := loginp.NewMetrics("TEST-" + name)
+			defer metrics.Close()
+
 			p := fileProspector{
 				filewatcher:       newMockFileWatcher(test.events, len(test.events)),
 				identifier:        mustPathIdentifier(test.trackRename),
@@ -436,7 +448,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 			testStore.set("path::/old/path/to/file")
 
 			hg := newTestHarvesterGroup()
-			p.Run(ctx, testStore, hg)
+			p.Run(ctx, testStore, hg, metrics)
 
 			has := testStore.has("path::/old/path/to/file")
 			if test.trackRename {
@@ -692,6 +704,9 @@ func TestOnRenameFileIdentity(t *testing.T) {
 
 	for k, tc := range testCases {
 		t.Run(k, func(t *testing.T) {
+			metrics := loginp.NewMetrics("TEST-" + k)
+			defer metrics.Close()
+
 			p := fileProspector{
 				filewatcher:       newMockFileWatcher(tc.events, len(tc.events)),
 				identifier:        mustPathIdentifier(true),
@@ -709,7 +724,7 @@ func TestOnRenameFileIdentity(t *testing.T) {
 			}
 
 			hg := newTestHarvesterGroup()
-			p.Run(ctx, testStore, hg)
+			p.Run(ctx, testStore, hg, metrics)
 
 			got := testStore.table[id]
 			meta := fileMeta{}
