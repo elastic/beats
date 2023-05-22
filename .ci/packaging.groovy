@@ -193,11 +193,15 @@ def runReleaseManager(def args = [:]) {
     }
     sh(label: "prepare-release-manager-artifacts ${type}", script: ".ci/scripts/prepare-release-manager.sh ${type}")
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
-    releaseManager(project: 'beats',
-                   version: env.BEAT_VERSION,
-                   type: type,
-                   artifactsFolder: 'build/distributions',
-                   outputFile: args.outputFile)
+    // This can be remove once https://github.com/elastic/release-eng/issues/456 (internal only) is fixed.
+    def notifyRetry = { log(level: 'WARN', text: 'releaseManager failed, retry again') }
+    retryWithSleep(retries: 3, seconds: 60, backoff: true, sideEffect: notifyRetry) {
+      releaseManager(project: 'beats',
+                     version: env.BEAT_VERSION,
+                     type: type,
+                     artifactsFolder: 'build/distributions',
+                     outputFile: args.outputFile)
+    }
   }
 }
 
