@@ -188,6 +188,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
 - Add context with timeout in AWS API calls {pull}35425[35425]
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
+- Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
 
 *Osquerybeat*
 
