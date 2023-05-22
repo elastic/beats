@@ -23,6 +23,7 @@ import (
 )
 
 type afPacketConfig struct {
+	// ID is the AF_PACKET identifier for metric collection.
 	ID string
 	// Device name (e.g. eth0). 'any' may be used to listen on all interfaces.
 	Device string
