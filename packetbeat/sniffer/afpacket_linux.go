@@ -47,7 +47,7 @@ type afpacketHandle struct {
 }
 
 type metrics struct {
-	unregisterFn func()
+	unregister func()
 
 	device             *monitoring.String // name of the device being monitored
 	socketPackets      *monitoring.Uint   // number of packets delivered by kernel
@@ -63,7 +63,7 @@ func (m *metrics) close() {
 	if m == nil {
 		return
 	}
-	m.unregisterFn()
+	m.unregister()
 	if m.doneCh != nil {
 		close(m.doneCh)
 		m.doneCh = nil
@@ -79,7 +79,7 @@ func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPac
 	devID := fmt.Sprintf("%s-af_packet::%s", id, device)
 	reg, unreg := inputmon.NewInputRegistry("af_packet", devID, nil)
 	out := &metrics{
-		unregisterFn:       unreg,
+		unregister:         unreg,
 		device:             monitoring.NewString(reg, "device"),
 		socketPackets:      monitoring.NewUint(reg, "socket_packets"),
 		socketDrops:        monitoring.NewUint(reg, "socket_drops"),
@@ -174,9 +174,6 @@ func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed creating af_packet socket: %w", err)
-	}
-	if err != nil {
-		return nil, err
 	}
 	h.metrics = newMetrics(c.ID, c.Device, c.MetricsInterval, h.TPacket, log)
 

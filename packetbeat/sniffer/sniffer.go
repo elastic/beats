@@ -64,7 +64,7 @@ type sniffer struct {
 	// filter is the bpf filter program used by the sniffer.
 	filter string
 
-	// id identifies the sniffer.
+	// id identifies the sniffer for metric collection.
 	id string
 
 	decoders Decoders
@@ -87,7 +87,8 @@ const (
 
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
-// is done by the Run method.
+// is done by the Run method. The id parameter is used to specify the metric
+// collection ID for AF_PACKET sniffers on Linux.
 func New(id string, testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
@@ -137,7 +138,7 @@ func New(id string, testMode bool, _ string, decoders Decoders, interfaces []con
 				if iface.BufferSizeMb <= 0 {
 					iface.BufferSizeMb = 24
 				}
-				if iface.MetricsInterval == 0 {
+				if iface.MetricsInterval <= 0 {
 					iface.MetricsInterval = 5 * time.Second
 				}
 

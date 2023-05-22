@@ -232,7 +232,8 @@ packetbeat.interfaces.fanout_group: 1
 Configure the metrics polling interval for supported interface types. Currently,
 only `af_packet` is supported.
 
-The value must be a duration string. The default is `5s` (5 seconds).
+The value must be a duration string. The default is `5s` (5 seconds). A value
+less than or equal to zero will be set to the default value.
 
 Example:
 
