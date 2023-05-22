@@ -44,6 +44,20 @@ packetbeat.interfaces.internal_networks:
 # The default is 30 MB.
 #packetbeat.interfaces.buffer_size_mb: 30
 
+# To scale processing across multiple Packetbeat processes, a fanout group
+# identifier can be specified. When `fanout_group` is used the Linux kernel splits
+# packets across Packetbeat instances in the same group by using a flow hash. It
+# computes the flow hash modulo with the number of Packetbeat processes in order
+# to consistently route flows to the same Packetbeat instance.
+#
+# The value must be between 0 and 65535. By default, no value is set.
+#
+# This is only available on Linux and requires using `type: af_packet`. Each process
+# must be running in same network namespace. All processes must use the same
+# interface settings. You must take responsibility for running multiple instances
+# of Packetbeat.
+#packetbeat.interfaces.fanout_group: ~
+
 # Packetbeat automatically generates a BPF for capturing only the traffic on
 # ports where it expects to find known protocols. Use this settings to tell
 # Packetbeat to generate a BPF filter that accepts VLAN tags.
