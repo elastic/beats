@@ -186,7 +186,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
 - Make generic SQL GA {pull}34637[34637]
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-
+- Add context with timeout in AWS API calls {pull}35425[35425]
+- Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 
 *Osquerybeat*
 
@@ -195,6 +196,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Packetbeat*
 
 - Fix double channel close panic when reloading. {pull}35324[35324]
+- Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
 
 *Winlogbeat*
 
@@ -205,6 +207,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix panic due to misrepresented buffer use. {pull}35437[35437]
 - Prevent panic on closing iterators on empty channels in experimental API. {issue}33966[33966] {pull}35423[35423]
+- Allow program termination when attempting to open an absent channel. {pull}35474[35474]
 
 *Functionbeat*
 
@@ -280,6 +283,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
 - Add execution budget to CEL input. {pull}35409[35409]
+- Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
+- Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -313,6 +318,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
+- Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
 
 *Winlogbeat*
 
@@ -321,6 +327,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 *Winlogbeat*
+
+- Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
 
 
 *Elastic Log Driver*

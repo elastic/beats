@@ -19,6 +19,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -446,6 +447,33 @@ protocols:
 `,
 		wantErr: errors.New("duplicated device configurations: default_route"),
 	},
+	{
+		name: "af_packet_fanout_group",
+		want: Config{
+			Interfaces: []InterfaceConfig{
+				{
+					Device:      "any",
+					Type:        "af_packet",
+					FanoutGroup: pointer(uint16(1)),
+				},
+			},
+		},
+		config: `
+interfaces:
+  device: any
+  type: af_packet
+  fanout_group: 1
+`,
+	},
+	{
+		name:    "invalid_type_fanout_group",
+		wantErr: fmt.Errorf("%w accessing 'interfaces'", errFanoutGroupAFPacketOnly),
+		config: `
+interfaces:
+  device: any
+  fanout_group: 1
+`,
+	},
 }
 
 func TestFromStatic(t *testing.T) {
@@ -512,4 +540,9 @@ func configC(a, b *config.C) bool {
 		panic(err)
 	}
 	return cmp.Equal(ma, mb)
+}
+
+// pointer returns a pointer to val.
+func pointer[T any](val T) *T {
+	return &val
 }
