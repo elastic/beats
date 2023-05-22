@@ -87,7 +87,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	return nil
 }
 
-func (m *MetricSet) validate() (error, bool) {
+func (m *MetricSet) validate() (err error, versionSupported bool) {
 	kibanaVersion, err := kibana.GetVersion(m.rulesHTTP, kibana.NodeRulesPath)
 	if err != nil {
 		return err, false
