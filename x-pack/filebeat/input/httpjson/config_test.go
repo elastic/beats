@@ -299,11 +299,30 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 			setup: func() {
 				// we change the default function to force a failure
-				findDefaultGoogleCredentials = func(context.Context, ...string) (*google.Credentials, error) {
+				findDefaultGoogleCredentials = func(context.Context, google.CredentialsParams) (*google.Credentials, error) {
 					return nil, errors.New("failed")
 				}
 			},
-			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentials },
+			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams },
+		},
+		{
+			name: "google must send scopes and delegated_account if ADC available",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.delegated_account": "delegated@account.com",
+					"scopes":                   []string{"foo"},
+				},
+			},
+			setup: func() {
+				findDefaultGoogleCredentials = func(_ context.Context, p google.CredentialsParams) (*google.Credentials, error) {
+					if len(p.Scopes) != 1 || p.Scopes[0] != "foo" || p.Subject != "delegated@account.com" {
+						return nil, errors.New("failed")
+					}
+					return &google.Credentials{}, nil
+				}
+			},
+			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams },
 		},
 		{
 			name:        "google must fail if credentials file not found",
@@ -432,6 +451,16 @@ func TestConfigOauth2Validation(t *testing.T) {
 					"google.delegated_account": "delegated@account.com",
 				},
 			},
+		},
+		{
+			name: "google must work with delegated_account and ADC set up",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.delegated_account": "delegated@account.com",
+				},
+			},
+			setup: func() { os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./testdata/credentials.json") },
 		},
 	}
 

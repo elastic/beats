@@ -17,6 +17,7 @@ const (
 
 type responseConfig struct {
 	DecodeAs                string           `config:"decode_as"`
+	XSD                     string           `config:"xsd"`
 	RequestBodyOnPagination bool             `config:"request_body_on_pagination"`
 	Transforms              transformsConfig `config:"transforms"`
 	Pagination              transformsConfig `config:"pagination"`

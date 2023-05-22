@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build unix
-// +build unix
 
 package tracer
 

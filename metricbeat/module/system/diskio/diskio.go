@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build (darwin && cgo) || freebsd || linux || windows
-// +build darwin,cgo freebsd linux windows
 
 package diskio
 

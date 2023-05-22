@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build ignore
-// +build ignore
 
 package add_process_metadata
 
