@@ -24,6 +24,7 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const dummyText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
@@ -1263,6 +1264,104 @@ func TestInput(t *testing.T) {
 				`{"hello":{"cake":"pumpkin"}}`,
 				`{"space":{"world":"moon"}}`,
 			},
+		},
+		{
+			name: "Test simple XML decode",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerDecoders()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					const text = `<?xml version="1.0" encoding="UTF-8"?>
+<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
+  <sender>Ástríðr Ragnar</sender>
+  <address>
+    <name>Joord Lennart</name>
+    <company>Sydøstlige Gruppe</company>
+    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+    <city>Boekend</city>
+    <country>Netherlands</country>
+  </address>
+  <item>
+    <name>Egil's Saga</name>
+    <note>Free Sample</note>
+    <number>1</number>
+    <cost>99.95</cost>
+    <sent>FALSE</sent>
+  </item>
+</order>
+`
+					io.ReadAll(r.Body)
+					r.Body.Close()
+					w.Write([]byte(text))
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.xsd": `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sender" type="xs:string"/>
+        <xs:element name="address">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="company" type="xs:string"/>
+              <xs:element name="address" type="xs:string"/>
+              <xs:element name="city" type="xs:string"/>
+              <xs:element name="country" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="item" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+              <xs:element name="number" type="xs:positiveInteger"/>
+              <xs:element name="cost" type="xs:decimal"/>
+              <xs:element name="sent" type="xs:boolean"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+`,
+			},
+			handler: defaultHandler(http.MethodGet, "", ""),
+			expected: []string{mapstr.M{
+				"order": map[string]interface{}{
+					"address": map[string]interface{}{
+						"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
+						"city":    "Boekend",
+						"company": "Sydøstlige Gruppe",
+						"country": "Netherlands",
+						"name":    "Joord Lennart",
+					},
+					"item": []interface{}{
+						map[string]interface{}{
+							"cost":   99.95,
+							"name":   "Egil's Saga",
+							"note":   "Free Sample",
+							"number": 1,
+							"sent":   false,
+						},
+					},
+					"noNamespaceSchemaLocation": "sales.xsd",
+					"orderid":                   "56733",
+					"sender":                    "Ástríðr Ragnar",
+					"xsi":                       "http://www.w3.org/2001/XMLSchema-instance",
+				},
+			}.String()},
 		},
 	}
 

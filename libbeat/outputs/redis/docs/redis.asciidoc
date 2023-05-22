@@ -165,18 +165,17 @@ The number of workers to use for each host configured to publish events to Redis
 
 ===== `loadbalance`
 
-When `loadbalance: true` is set, {beatname_uc} sends data if-and-only-if it can
-send to all hosts in the list. {beatname_uc} connects to all hosts in the list
-and evenly distributes the events to them. This has the side effect of blocking
-publishing to all hosts if any one of them is down or exerting back-pressure.
+When `loadbalance: true` is set, {beatname_uc} connects to all configured
+hosts and sends data through all connections in parallel. If a connection
+fails, data is sent to the remaining hosts until it can be reestablished.
+Data will still be sent as long as {beatname_uc} can connect to at least
+one of its configured hosts.
 
-When `loadbalance: false` is set, {beatname_uc} picks a host at random from the
-list and sends data, switching over to other list entries in the event of a
-failure. {beatname_uc} also accepts a time to live (TTL), which causes it to
-voluntarily reestablish a connection to a new host after a time even if it is
-healthy. Otherwise, if a TTL is not set, as long as the first chosen endpoint is
-available, {beatname_uc} continues to communicate with it and only switches to
-another endpoint in case of a failure.
+When `loadbalance: false` is set, {beatname_uc} sends data to a single host
+at a time. The target host is chosen at random from the list of configured
+hosts, and all data is sent to that target until the connection fails, when
+a new target is selected. Data will still be sent as long as {beatname_uc}
+can connect to at least one of its configured hosts.
 
 The default value is `true`.
 
