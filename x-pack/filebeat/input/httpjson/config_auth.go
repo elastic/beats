@@ -230,7 +230,7 @@ func (o *oAuth2Config) Validate() error {
 }
 
 // findDefaultGoogleCredentials will default to google.FindDefaultCredentials and will only be changed for testing purposes
-var findDefaultGoogleCredentials = google.FindDefaultCredentials
+var findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams
 
 func (o *oAuth2Config) validateGoogleProvider() error {
 	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != nil ||
@@ -266,7 +266,11 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if creds, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
+	params := google.CredentialsParams{
+		Scopes:  o.Scopes,
+		Subject: o.GoogleDelegatedAccount,
+	}
+	if creds, err := findDefaultGoogleCredentials(ctx, params); err == nil {
 		o.GoogleCredentialsJSON = creds.JSON
 		return nil
 	}
