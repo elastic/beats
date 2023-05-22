@@ -33,19 +33,19 @@ import (
 func hetznerMetadataHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == hetznerMetadataInstanceIDURI {
-			w.Write([]byte("111111"))
+			_, _ = w.Write([]byte("111111"))
 			return
 		}
 		if r.RequestURI == hetznerMetadataHostnameURI {
-			w.Write([]byte("my-hetzner-instance"))
+			_, _ = w.Write([]byte("my-hetzner-instance"))
 			return
 		}
 		if r.RequestURI == hetznerMetadataAvailabilityZoneURI {
-			w.Write([]byte("hel1-dc2"))
+			_, _ = w.Write([]byte("hel1-dc2"))
 			return
 		}
 		if r.RequestURI == hetznerMetadataRegionURI {
-			w.Write([]byte("eu-central"))
+			_, _ = w.Write([]byte("eu-central"))
 			return
 		}
 
@@ -54,7 +54,7 @@ func hetznerMetadataHandler() http.HandlerFunc {
 }
 
 func TestRetrieveHetznerMetadata(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	server := httptest.NewServer(hetznerMetadataHandler())
 	defer server.Close()
