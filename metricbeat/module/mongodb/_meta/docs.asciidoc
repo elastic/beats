@@ -51,6 +51,11 @@ Some more supported URLs are:
   hosts: ["mongodb://localhost:27017/?directConnection=true"]
 ----------------------------------------------------------------------
 
+When the parameter directConnection=true is included in the connection URI,
+all operations are executed on the host specified in the URI.
+It's important to note that directConnection=true must be explicitly specified in the URI,
+as it won't be added automatically unless specified.
+
 [source,yaml]
 ----------------------------------------------------------------------
 - module: mongodb
