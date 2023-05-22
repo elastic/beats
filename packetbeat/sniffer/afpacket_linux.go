@@ -48,6 +48,7 @@ type afpacketHandle struct {
 
 type metrics struct {
 	unregister func()
+	done       chan struct{} // used to signal to polling goroutine to stop
 
 	device             *monitoring.String // name of the device being monitored
 	socketPackets      *monitoring.Uint   // number of packets delivered by kernel
@@ -55,8 +56,6 @@ type metrics struct {
 	socketQueueFreezes *monitoring.Uint   // number of queue freezes
 	packets            *monitoring.Uint   // number of packets read off buffer by packetbeat
 	polls              *monitoring.Uint   // number of blocking syscalls made by packetbeat waiting for packets
-
-	doneCh chan struct{} // used to signal to polling goroutine to stop
 }
 
 func (m *metrics) close() {
@@ -64,9 +63,9 @@ func (m *metrics) close() {
 		return
 	}
 	m.unregister()
-	if m.doneCh != nil {
-		close(m.doneCh)
-		m.doneCh = nil
+	if m.done != nil {
+		close(m.done)
+		m.done = nil
 	}
 }
 
@@ -86,7 +85,7 @@ func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPac
 		socketQueueFreezes: monitoring.NewUint(reg, "socket_queue_freezes"),
 		packets:            monitoring.NewUint(reg, "packets"),
 		polls:              monitoring.NewUint(reg, "polls"),
-		doneCh:             make(chan struct{}),
+		done:               make(chan struct{}),
 	}
 
 	out.device.Set(device)
@@ -103,7 +102,7 @@ func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPac
 
 		for {
 			select {
-			case <-out.doneCh:
+			case <-out.done:
 				log.Debug("Shutting down stats collection goroutine")
 				return
 			case <-ticker.C:
