@@ -7,6 +7,8 @@ package awss3
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -27,6 +29,7 @@ type config struct {
 	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
+	RegionName          string               `config:"region_name"`
 	BucketARN           string               `config:"bucket_arn"`
 	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
@@ -76,6 +79,16 @@ func (c *config) Validate() error {
 
 	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
+	}
+
+	if c.QueueURL != "" && c.RegionName != "" {
+		u, err := url.Parse(c.QueueURL)
+		if err != nil {
+			return fmt.Errorf("invalid queue_url: %w", err)
+		}
+		if strings.HasSuffix(u.Host, ".amazonaws.com") {
+			return fmt.Errorf("region_name <%s> must not be set with an amazonaws.com queue_url", c.RegionName)
+		}
 	}
 
 	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {

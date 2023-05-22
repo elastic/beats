@@ -115,9 +115,12 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	defer cancelInputCtx()
 
 	if in.config.QueueURL != "" {
-		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-		if err != nil {
-			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+		regionName := in.config.RegionName
+		if regionName == "" {
+			regionName, err = getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+			if err != nil {
+				return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+			}
 		}
 
 		in.awsConfig.Region = regionName
