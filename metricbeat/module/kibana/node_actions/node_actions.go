@@ -76,7 +76,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 		return err
 	}
 
-	if (!versionSupported) {
+	if !versionSupported {
 		return nil
 	}
 
@@ -87,10 +87,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	return nil
 }
 
-func (m *MetricSet) validate() (err error, versionSupported bool) {
+func (m *MetricSet) validate() (error, bool) {
 	kibanaVersion, err := kibana.GetVersion(m.actionsHTTP, kibana.NodeActionsPath)
 	if err != nil {
-		return err, false;
+		return err, false
 	}
 
 	isMetricsAPIAvailable := kibana.IsActionsAPIAvailable(kibanaVersion)
@@ -101,7 +101,7 @@ func (m *MetricSet) validate() (err error, versionSupported bool) {
 			m.Logger().Debugf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
 		}
 
-		return nil, false;
+		return nil, false
 	}
 
 	return err, true
