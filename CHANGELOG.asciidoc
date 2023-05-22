@@ -3,6 +3,212 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.8.0]]
+=== Beats version 8.8.0
+https://github.com/elastic/beats/compare/v8.7.1\...v8.8.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+- Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+
+
+*Auditbeat*
+
+
+*Filebeat*
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
+- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
+- Fixing the grok expression outputs of log files {pull}35221[35221]
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+- Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
+
+*Heartbeat*
+
+- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix broken state ID location naming. {pull}35336[35336]
+- Fix project monitor temp directories permission to include group access. {pull}35398[35398]
+- Fix output pipeline exit on run_once. {pull}35376[35376]
+- Fix formatting issue with socket trace timeout. {pull}35434[35434]
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Make generic SQL GA {pull}34637[34637]
+- Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
+- Add context with timeout in AWS API calls {pull}35425[35425]
+
+*Osquerybeat*
+
+- Adds the `elastic_file_analysis` table to the Osquery extension for macOS builds. {pull}35056[35056]
+
+*Packetbeat*
+
+- Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
+
+*Winlogbeat*
+
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix panic due to misrepresented buffer use. {pull}35437[35437]
+- Allow program termination when attempting to open an absent channel. {pull}35474[35474]
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Added metric `sqs_messages_waiting_gauge` for aws-s3 input. {pull}34488[34488]
+- Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
+- Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
+- Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
+- Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
+- Added metric `sqs_worker_utilization` for aws-s3 input. {pull}34793[34793]
+- Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
+- Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
+- Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
+- Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
+- Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
+- Add support for collecting IPv6 metrics. {pull}35123[35123]
+- Add oracle authentication messages parsing {pull}35127[35127]
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+- Added status to monitor run log report.
+- Removed beta label for browser monitors. {pull}35424[35424].
+
+
+*Metricbeat*
+
+- Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
+- Add event loop utilization metric to Kibana module {pull}35020[35020]
+
+*Packetbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-8.6.2]]
 === Beats version 8.6.2
 https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
