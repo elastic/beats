@@ -338,7 +338,7 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 	return event
 }
 
-func constructMetricQueries(listMetricsOutput []types.Metric, dataGranularity time.Duration) []types.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []aws.MetricWithID, dataGranularity time.Duration) []types.MetricDataQuery {
 	var metricDataQueries []types.MetricDataQuery
 	metricDataQueryEmpty := types.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
@@ -351,27 +351,32 @@ func constructMetricQueries(listMetricsOutput []types.Metric, dataGranularity ti
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric types.Metric, index int, dataGranularity time.Duration) types.MetricDataQuery {
+func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity time.Duration) types.MetricDataQuery {
 	statistic := "Maximum"
 	dataGranularityInSeconds := int32(dataGranularity.Seconds())
 	id := metricsetName + strconv.Itoa(index)
-	metricDims := metric.Dimensions
-	metricName := *metric.MetricName
+	metricDims := metric.Metric.Dimensions
+	metricName := *metric.Metric.MetricName
 
-	label := metricName + labelSeparator
+	label := metric.AccountID + labelSeparator + metricName + labelSeparator
 	for _, dim := range metricDims {
 		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
 	}
 
-	return types.MetricDataQuery{
+	metricDataQuery := types.MetricDataQuery{
 		Id: &id,
 		MetricStat: &types.MetricStat{
 			Period: &dataGranularityInSeconds,
 			Stat:   &statistic,
-			Metric: &metric,
+			Metric: &metric.Metric,
 		},
 		Label: &label,
 	}
+
+	if metric.AccountID != "" {
+		metricDataQuery.AccountId = &metric.AccountID
+	}
+	return metricDataQuery
 }
 
 func getStartDateEndDate(period time.Duration) (string, string) {

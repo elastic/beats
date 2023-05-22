@@ -93,6 +93,9 @@ func (m *MockCloudWatchClient) ListMetrics(context.Context, *cloudwatch.ListMetr
 				Dimensions: []cloudwatchtypes.Dimension{dim},
 			},
 		},
+		OwningAccounts: []string{
+			"1234",
+		},
 		NextToken: awssdk.String(""),
 	}, nil
 }
@@ -140,11 +143,11 @@ func TestGetListMetricsOutput(t *testing.T) {
 	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
-	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
-	assert.Equal(t, metricName, *listMetricsOutput[0].MetricName)
-	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
-	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
-	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].Metric.MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Metric.Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Metric.Dimensions[0].Name)
+	assert.Equal(t, instanceID, *listMetricsOutput[0].Metric.Dimensions[0].Value)
 }
 
 func TestGetListMetricsOutputWithWildcard(t *testing.T) {
@@ -152,11 +155,11 @@ func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", time.Minute*5, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
-	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
-	assert.Equal(t, metricName, *listMetricsOutput[0].MetricName)
-	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
-	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
-	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].Metric.MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Metric.Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Metric.Dimensions[0].Name)
+	assert.Equal(t, instanceID, *listMetricsOutput[0].Metric.Dimensions[0].Value)
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
