@@ -65,12 +65,11 @@ type Dimension struct {
 
 // Config holds a configuration specific for cloudwatch metricset.
 type Config struct {
-	Namespace       string      `config:"namespace" validate:"nonzero,required"`
-	MetricName      []string    `config:"name"`
-	Dimensions      []Dimension `config:"dimensions"`
-	ResourceType    string      `config:"resource_type"`
-	Statistic       []string    `config:"statistic"`
-	LinkedAccountID string      `config:"linked_account_id"`
+	Namespace    string      `config:"namespace" validate:"nonzero,required"`
+	MetricName   []string    `config:"name"`
+	Dimensions   []Dimension `config:"dimensions"`
+	ResourceType string      `config:"resource_type"`
+	Statistic    []string    `config:"statistic"`
 }
 
 type metricsWithStatistics struct {
@@ -333,9 +332,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 						Dimensions: cloudwatchDimensions,
 					},
 				}
-				if config.LinkedAccountID != "" {
-					cwMetric.AccountID = config.LinkedAccountID
-				}
+
 				metricsWithStats := metricsWithStatistics{
 					cloudwatchMetric: cwMetric,
 					statistic:        config.Statistic,
