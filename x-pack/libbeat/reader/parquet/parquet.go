@@ -16,18 +16,18 @@ import (
 	"github.com/apache/arrow/go/v11/parquet/pqarrow"
 )
 
-// StreamReader parses parquet inputs from io streams.
-type StreamReader struct {
+// BufferedReader parses parquet inputs from io streams.
+type BufferedReader struct {
 	cfg          *Config
 	fileReader   *file.Reader
 	recordReader pqarrow.RecordReader
 }
 
-// NewStreamReader creates a new reader that can decode parquet data from an io.Reader.
-// It will return an error if the parquet file cannot be read.
-// NewStreamReader will read the entire contents of the file into memory, so very large files
-// can cause memory bottleneck issues.
-func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
+// NewBufferedReader creates a new reader that can decode parquet data from an io.Reader.
+// It will return an error if the parquet data stream cannot be read.
+// Note: As io.ReadAll is used, the entire data stream would be read into memory, so very large data streams
+// may cause memory bottleneck issues.
+func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	batchSize := 1
 	if cfg.BatchSize > 1 {
 		batchSize = cfg.BatchSize
@@ -62,7 +62,7 @@ func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
 		return nil, fmt.Errorf("failed to create parquet record reader: %w", err)
 	}
 
-	return &StreamReader{
+	return &BufferedReader{
 		cfg:          cfg,
 		recordReader: rr,
 		fileReader:   pf,
@@ -71,31 +71,29 @@ func NewStreamReader(r io.Reader, cfg *Config) (*StreamReader, error) {
 
 // Next advances the pointer to point to the next record and returns true if the next record exists.
 // It will return false if there are no more records to read.
-func (sr *StreamReader) Next() bool {
+func (sr *BufferedReader) Next() bool {
 	return sr.recordReader.Next()
 }
 
 // Record reads the current record from the parquet file and returns it as a JSON marshaled byte slice.
-// If no more records are available, the []byte slice will be nil. It will return
-// an error if the record cannot be marshalled.
-func (sr *StreamReader) Record() ([]byte, error) {
-	var val []byte
-	var err error
+// If no more records are available, the []byte slice will be nil and io.EOF will be returned as an error.
+// A JSON marshal error will be returned if the record cannot be marshalled.
+func (sr *BufferedReader) Record() ([]byte, error) {
 	rec := sr.recordReader.Record()
-	if rec != nil {
-		defer rec.Release()
-		val, err = rec.MarshalJSON()
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
-		}
+	if rec == nil {
+		return nil, io.EOF
 	}
-
+	defer rec.Release()
+	val, err := rec.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
+	}
 	return val, nil
 }
 
 // Close closes the stream reader and releases all resources.
 // It will return an error if the fileReader fails to close.
-func (sr *StreamReader) Close() error {
+func (sr *BufferedReader) Close() error {
 	sr.recordReader.Release()
 	return sr.fileReader.Close()
 }

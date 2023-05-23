@@ -12,6 +12,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/apache/arrow/go/v11/arrow"
@@ -22,7 +23,7 @@ import (
 )
 
 // all test files are read from/stored within the "testdata" directory
-const testDataPath = "testdata/"
+const testDataPath = "testdata"
 
 func TestParquetWithRandomData(t *testing.T) {
 	testCases := []struct {
@@ -82,7 +83,7 @@ func TestParquetWithRandomData(t *testing.T) {
 
 // readAndValidateParquetFile reads the parquet file and validates the data
 func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data map[string]bool) int {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -96,7 +97,7 @@ func readAndValidateParquetFile(t *testing.T, cfg *Config, file *os.File, data m
 		if val != nil {
 			rowCount++
 			// this is where we check if the column values are the same as the ones we wrote
-			if _, ok := data[string(val)]; !ok {
+			if !data[string(val)] {
 				t.Fatalf("failed to find record in parquet file: %v", err)
 			}
 		}
@@ -130,21 +131,23 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	// creates an Arrow memory pool for managing memory allocations
 	memoryPool := memory.NewGoAllocator()
 
+	// uses a fixed seed value of 1 for generating random data
+	seed := int64(1)
+	r := rand.New(rand.NewSource(seed))
+
 	// generates random data for writing to the parquet file
 	for rowIdx := int64(0); rowIdx < int64(numRows); rowIdx++ {
 		// creates an Arrow record with random data
 		var recordColumns []arrow.Array
 		for colIdx := 0; colIdx < numCols; colIdx++ {
-			randData := make([]int32, 1)
-			randData[0] = rand.Int31()
+			randData := []int32{r.Int31()}
 			builder := array.NewInt32Builder(memoryPool)
 			builder.AppendValues(randData, nil)
-			defer builder.Release()
 			columnArray := array.NewInt32Data(builder.NewArray().Data())
+			builder.Release()
 			recordColumns = append(recordColumns, columnArray)
 		}
 		record := array.NewRecord(schema, recordColumns, 1)
-		defer record.Release()
 		val, err := record.MarshalJSON()
 		if err != nil {
 			t.Fatalf("Failed to marshal record to JSON: %v", err)
@@ -156,6 +159,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 		if err != nil {
 			t.Fatalf("Failed to write record to parquet file: %v", err)
 		}
+		record.Release()
 	}
 
 	// closes the file handlers and asserts the errors
@@ -188,13 +192,13 @@ func TestParquetWithFiles(t *testing.T) {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {
 
-			parquetFile, err := os.Open(testDataPath + tc.parquetFile)
+			parquetFile, err := os.Open(filepath.Join(testDataPath, tc.parquetFile))
 			if err != nil {
 				t.Fatalf("Failed to open parquet test file: %v", err)
 			}
 			defer parquetFile.Close()
 
-			jsonFile, err := os.Open(testDataPath + tc.jsonFile)
+			jsonFile, err := os.Open(filepath.Join(testDataPath, tc.jsonFile))
 			if err != nil {
 				t.Fatalf("Failed to open json test file: %v", err)
 			}
@@ -231,7 +235,7 @@ func readJSONFromFile(t *testing.T, file *os.File) (map[int]string, int) {
 
 // readAndCompareParquetFile reads the parquet file and compares the data with the input data
 func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int) {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
 	}

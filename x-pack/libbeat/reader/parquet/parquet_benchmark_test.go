@@ -6,13 +6,10 @@ package parquet
 
 import (
 	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 )
-
-// fn is a function type that takes a testing.B, a Config, and a file and performs some operation on the file
-// this is the common signature for all the benchmark functions in this file
-type fn func(b *testing.B, cfg *Config, file *os.File)
 
 // parquetFile is a struct that contains the name of the parquet
 // file to be created and the number of columns and rows in the file
@@ -31,124 +28,124 @@ func BenchmarkReadParquet(b *testing.B) {
 		constructAndReadLargeFiles bool
 		largeFiles                 []parquetFile
 		batchSize                  int
-		invokeFn                   fn
+		invocation                 func(b *testing.B, cfg *Config, file *os.File)
 	}{
 		{
-			desc:      "Process single files serially in batches of 1000",
-			files:     []string{"cloudtrail.parquet"},
-			batchSize: 1000,
-			invokeFn:  readParquetFile,
+			desc:       "Process single files serially in batches of 1000",
+			files:      []string{"cloudtrail.parquet"},
+			batchSize:  1000,
+			invocation: readParquetFile,
 		},
 		{
-			desc:      "Process single files serially in batches of 10000",
-			files:     []string{"cloudtrail.parquet"},
-			batchSize: 10000,
-			invokeFn:  readParquetFile,
+			desc:       "Process single files serially in batches of 10000",
+			files:      []string{"cloudtrail.parquet"},
+			batchSize:  10000,
+			invocation: readParquetFile,
 		},
 		{
 			desc:            "Process single files parallelly in batches of 1000",
 			files:           []string{"cloudtrail.parquet"},
 			processParallel: true,
 			batchSize:       1000,
-			invokeFn:        readParquetFile,
+			invocation:      readParquetFile,
 		},
 		{
-			desc:      "Process single VPC flow file serially in batches of 1000",
-			files:     []string{"vpc_flow.gz.parquet"},
-			batchSize: 1000,
-			invokeFn:  readParquetFile,
+			desc:       "Process single VPC flow file serially in batches of 1000",
+			files:      []string{"vpc_flow.gz.parquet"},
+			batchSize:  1000,
+			invocation: readParquetFile,
 		},
 		{
-			desc:      "Process multiple files serially in batches of 1000",
-			files:     []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
-			batchSize: 1000,
-			invokeFn:  readParquetFile,
+			desc:       "Process multiple files serially in batches of 1000",
+			files:      []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
+			batchSize:  1000,
+			invocation: readParquetFile,
 		},
 		{
 			desc:           "Process multiple files using go routines in batches of 1000",
 			files:          []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			batchSize:      1000,
 			useGoRoutiunes: true,
-			invokeFn:       readParquetFile,
+			invocation:     readParquetFile,
 		},
 		{
-			desc:      "Process multiple files serially in batches of 10000",
-			files:     []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
-			batchSize: 10000,
-			invokeFn:  readParquetFile,
+			desc:       "Process multiple files serially in batches of 10000",
+			files:      []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
+			batchSize:  10000,
+			invocation: readParquetFile,
 		},
 		{
 			desc:            "Process multiple files parallelly in batches of 1000",
 			files:           []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			processParallel: true,
 			batchSize:       1000,
-			invokeFn:        readParquetFile,
+			invocation:      readParquetFile,
 		},
 		{
 			desc:            "Read a single row from multiple files parallelly",
 			files:           []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			processParallel: true,
 			batchSize:       1,
-			invokeFn:        readParquetSingleRow,
+			invocation:      readParquetSingleRow,
 		},
 		{
-			desc:      "Read a single row from multiple files serially",
-			files:     []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
-			batchSize: 1,
-			invokeFn:  readParquetSingleRow,
+			desc:       "Read a single row from multiple files serially",
+			files:      []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
+			batchSize:  1,
+			invocation: readParquetSingleRow,
 		},
 		{
 			desc:           "Read a single row from multiple files using go routines",
 			files:          []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			useGoRoutiunes: true,
 			batchSize:      1,
-			invokeFn:       readParquetSingleRow,
+			invocation:     readParquetSingleRow,
 		},
 		{
-			desc:      "Read a single row from a single file serially",
-			files:     []string{"cloudtrail.parquet"},
-			batchSize: 1,
-			invokeFn:  readParquetSingleRow,
+			desc:       "Read a single row from a single file serially",
+			files:      []string{"cloudtrail.parquet"},
+			batchSize:  1,
+			invocation: readParquetSingleRow,
 		},
 		{
 			desc:            "Read a single row from a single file parallelly",
 			files:           []string{"cloudtrail.parquet"},
 			processParallel: true,
 			batchSize:       1,
-			invokeFn:        readParquetSingleRow,
+			invocation:      readParquetSingleRow,
 		},
 		{
-			desc:      "Construct a stream reader for a single file serially",
-			files:     []string{"cloudtrail.parquet"},
-			batchSize: 1,
-			invokeFn:  constructStreamReader,
+			desc:       "Construct a stream reader for a single file serially",
+			files:      []string{"cloudtrail.parquet"},
+			batchSize:  1,
+			invocation: constructBufferedReader,
 		},
 		{
 			desc:            "Construct a stream reader for a single file parallelly",
 			files:           []string{"cloudtrail.parquet"},
 			processParallel: true,
 			batchSize:       1,
-			invokeFn:        constructStreamReader,
+			invocation:      constructBufferedReader,
 		},
 		{
-			desc:      "Construct a stream reader for multiple files serially",
-			files:     []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
-			batchSize: 1,
-			invokeFn:  constructStreamReader,
+			desc:       "Construct a stream reader for multiple files serially",
+			files:      []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
+			batchSize:  1,
+			invocation: constructBufferedReader,
 		},
 		{
 			desc:            "Construct a stream reader for multiple files parallelly",
 			files:           []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			processParallel: true,
 			batchSize:       1,
-			invokeFn:        constructStreamReader,
+			invocation:      constructBufferedReader,
 		},
 		{
 			desc:           "Construct a stream reader for multiple files using go routines",
 			files:          []string{"cloudtrail.parquet", "route53.parquet", "vpc_flow.gz.parquet"},
 			useGoRoutiunes: true,
 			batchSize:      1,
-			invokeFn:       constructStreamReader,
+			invocation:     constructBufferedReader,
 		},
 		{
 			desc:                       "Construct and read a single large parquet file in batches of 1000 serially",
@@ -158,8 +155,8 @@ func BenchmarkReadParquet(b *testing.B) {
 				cols: 4,
 				rows: 100000,
 			}},
-			batchSize: 1000,
-			invokeFn:  readParquetFile,
+			batchSize:  1000,
+			invocation: readParquetFile,
 		},
 		{
 			desc:                       "Construct and read a single large parquet file in batches of 10000 serially",
@@ -169,8 +166,8 @@ func BenchmarkReadParquet(b *testing.B) {
 				cols: 4,
 				rows: 100000,
 			}},
-			batchSize: 10000,
-			invokeFn:  readParquetFile,
+			batchSize:  10000,
+			invocation: readParquetFile,
 		},
 	}
 
@@ -192,7 +189,7 @@ func BenchmarkReadParquet(b *testing.B) {
 				}
 			} else {
 				for _, f := range tc.files {
-					files = append(files, testDataPath+f)
+					files = append(files, filepath.Join(testDataPath, f))
 
 				}
 			}
@@ -205,38 +202,38 @@ func BenchmarkReadParquet(b *testing.B) {
 					filePtrArr := openFiles(b, files)
 					for pb.Next() {
 						for _, f := range filePtrArr {
-							defer f.Close()
 							f.Seek(0, 0)
-							tc.invokeFn(b, cfg, f)
+							tc.invocation(b, cfg, f)
 						}
 					}
+					closeFiles(b, filePtrArr)
 				})
 			case tc.useGoRoutiunes:
 				filePtrArr := openFiles(b, files)
 				wg := sync.WaitGroup{}
 				for i := 0; i < b.N; i++ {
 					for _, f := range filePtrArr {
-						defer f.Close()
 						f.Seek(0, 0)
 						cf := f
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
-							tc.invokeFn(b, cfg, cf)
+							tc.invocation(b, cfg, cf)
 						}()
 					}
 					wg.Wait()
 				}
+				closeFiles(b, filePtrArr)
 			// default case is set to serial processing of files
 			default:
 				filePtrArr := openFiles(b, files)
 				for i := 0; i < b.N; i++ {
 					for _, f := range filePtrArr {
-						defer f.Close()
 						f.Seek(0, 0)
-						tc.invokeFn(b, cfg, f)
+						tc.invocation(b, cfg, f)
 					}
 				}
+				closeFiles(b, filePtrArr)
 			}
 		})
 	}
@@ -244,7 +241,7 @@ func BenchmarkReadParquet(b *testing.B) {
 
 // readParquetFile reads entire parquet file
 func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -263,7 +260,7 @@ func readParquetFile(b *testing.B, cfg *Config, file *os.File) {
 
 // readParquetSingleRow reads only the first row of parquet files
 func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewStreamReader(file, cfg)
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -280,9 +277,9 @@ func readParquetSingleRow(b *testing.B, cfg *Config, file *os.File) {
 	}
 }
 
-// constructStreamReader constructs a stream reader for reading parquet files
-func constructStreamReader(b *testing.B, cfg *Config, file *os.File) {
-	sReader, err := NewStreamReader(file, cfg)
+// constructBufferedReader constructs a stream reader for reading parquet files
+func constructBufferedReader(b *testing.B, cfg *Config, file *os.File) {
+	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		b.Fatalf("failed to init stream reader: %v", err)
 	}
@@ -303,4 +300,14 @@ func openFiles(b *testing.B, files []string) []*os.File {
 		filePtrArr[i] = file
 	}
 	return filePtrArr
+}
+
+// closeFiles closes the parquet files
+func closeFiles(b *testing.B, files []*os.File) {
+	for _, f := range files {
+		err := f.Close()
+		if err != nil {
+			b.Fatalf("failed to close file: %v", err)
+		}
+	}
 }
