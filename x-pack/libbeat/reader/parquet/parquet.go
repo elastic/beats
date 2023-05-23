@@ -77,7 +77,7 @@ func (sr *BufferedReader) Next() bool {
 
 // Record reads the current record from the parquet file and returns it as a JSON marshaled byte slice.
 // If no more records are available, the []byte slice will be nil and io.EOF will be returned as an error.
-// A JSON marshall error will be returned if the record cannot be marshalled.
+// A JSON marshal error will be returned if the record cannot be marshalled.
 func (sr *BufferedReader) Record() ([]byte, error) {
 	rec := sr.recordReader.Record()
 	if rec == nil {
