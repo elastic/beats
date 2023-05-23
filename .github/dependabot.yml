@@ -7,6 +7,7 @@ updates:
       interval: "daily"
     labels:
       - automation
+      - Team:Elastic-Agent-Data-Plane
     allow:
       - dependency-name: "github.com/elastic/*"
     reviewers:
