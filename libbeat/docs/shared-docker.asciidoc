@@ -41,6 +41,29 @@ endif::[]
 
 ifndef::apm-server[]
 
+==== Optional: Verify the image
+
+You can use the https://docs.sigstore.dev/cosign/installation/[Cosign application] to verify the {beatname_uc} Docker image signature.
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+wget https://artifacts.elastic.co/cosign.pub
+cosign verify --key cosign.pub {dockerimage}
+------------------------------------------------
+
+For details about this step, refer to {ref}/docker.html#docker-verify-signature[Verify the {es} Docker image signature] in the {es} documentation.
+
+endif::[]
+
 ==== Run the {beatname_uc} setup
 
 Running {beatname_uc} with the setup command will create the index pattern and
