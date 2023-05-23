@@ -10,7 +10,7 @@ on:
       - 'dependabot/go_modules/**'
 
 jobs:
-  update-notice.txt:
+  update-notice:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
