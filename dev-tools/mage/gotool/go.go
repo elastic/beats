@@ -58,7 +58,9 @@ var Test goTest = runGoTest
 
 // GetModuleName returns the name of the module.
 func GetModuleName() (string, error) {
-	lines, err := getLines(callGo(nil, "list", "-m"))
+	// `go list -buildvcs=false -f '{{.Module}}'` produces the same output as `go list -m`
+	// and it works with go workspace
+	lines, err := getLines(callGo(nil, "list", "-buildvcs=false", "-f", "{{.Module}}"))
 	if err != nil {
 		return "", err
 	}
