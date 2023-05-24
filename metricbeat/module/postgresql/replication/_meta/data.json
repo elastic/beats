@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2023-05-24T12:22:59.233Z",
+    "event": {
+        "dataset": "postgresql.replication",
+        "duration": 115000,
+        "module": "postgresql"
+    },
+    "metricset": {
+        "name": "replication",
+        "period": 10000
+    },
+    "postgresql": {
+        "replication": {
+            "write_lag": "",
+            "state": "streaming",
+            "sync_priority": 0,
+            "backend_start": "2023-05-23T17:01:53.697Z",
+            "replay_lag": "",
+            "flush_lag": "",
+            "pid": 2516780,
+            "client": {
+                "address": "192.168.128.2",
+                "port": 46594,
+                "hostname": ""
+            },
+            "replay_lsn": "A0/60003558",
+            "user": {
+                "name": "replicator",
+                "id": 16442
+            },
+            "sync_state": "async",
+            "flush_lsn": "A0/60003558",
+            "application_name": "walreceiver",
+            "write_lsn": "A0/60003558",
+            "sent_lsn": "A0/60003558"
+        }
+    },
+    "service": {
+        "address": "postgres://localhost:5432/postgres?connect_timeout=10",
+        "type": "postgresql"
+    }
+}

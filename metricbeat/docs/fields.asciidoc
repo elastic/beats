@@ -56305,6 +56305,193 @@ type: date
 --
 
 [float]
+=== replication
+
+One row per replication, showing database replication statistics. Collected by querying pg_stat_database
+
+
+
+*`postgresql.replication.write_lag`*::
++
+--
+Elapsed time during committed WALs from primary to the replica.
+
+
+type: long
+
+--
+
+*`postgresql.replication.state`*::
++
+--
+WAL sender state.
+
+
+type: keyword
+
+--
+
+*`postgresql.replication.sync_priority`*::
++
+--
+Priority of replica server being chosen as synchronous replica.
+
+
+type: long
+
+--
+
+*`postgresql.replication.backend_start`*::
++
+--
+Start time when replica connected to primary.
+
+
+type: long
+
+--
+
+*`postgresql.replication.replay_lag`*::
++
+--
+Elapsed time during committed WALs from primary to the replica. Fully committed in replica node
+
+
+type: long
+
+--
+
+*`postgresql.replication.flush_lag`*::
++
+--
+Elapsed time during committed WALs from primary to the replica. WAL's has already been flushed but not yet applied.
+
+
+type: long
+
+--
+
+*`postgresql.replication.pid`*::
++
+--
+Process id of walsender process
+
+
+type: long
+
+--
+
+*`postgresql.replication.client.address`*::
++
+--
+Address of replica/streaming replication
+
+
+type: long
+
+--
+
+*`postgresql.replication.client.port`*::
++
+--
+Port of replica/streaming replication
+
+
+type: long
+
+--
+
+*`postgresql.replication.client.hostname`*::
++
+--
+Hostname of replica/streaming replication
+
+
+type: long
+
+--
+
+*`postgresql.replication.replay_lsn`*::
++
+--
+Last transaction flush on disk at replica.
+
+
+type: long
+
+--
+
+*`postgresql.replication.user.name`*::
++
+--
+Name of user which is used for Streaming replication
+
+
+type: long
+
+--
+
+*`postgresql.replication.user.id`*::
++
+--
+ID of user which is used for Streaming replication
+
+
+type: long
+
+--
+
+*`postgresql.replication.sync_state`*::
++
+--
+Sync State of replica.
+
+
+type: long
+
+--
+
+*`postgresql.replication.flush_lsn`*::
++
+--
+Last transaction flush on disk at replica.
+
+
+type: long
+
+--
+
+*`postgresql.replication.application_name`*::
++
+--
+Number of queries canceled due to conflicts with recovery in this database.
+
+
+type: long
+
+--
+
+*`postgresql.replication.write_lsn`*::
++
+--
+Last transaction written on disk at replica.
+
+
+type: long
+
+--
+
+*`postgresql.replication.sent_lsn`*::
++
+--
+Last transaction location sent to replica
+
+
+type: long
+
+--
+
+[float]
 === statement
 
 One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.

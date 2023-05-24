@@ -1,0 +1,83 @@
+- name: replication
+  type: group
+  description: >
+    One row per replication, showing database replication statistics. Collected by querying
+    pg_stat_database
+  release: ga
+  fields:
+    - name: write_lag
+      type: long
+      description: >
+        Elapsed time during committed WALs from primary to the replica.
+    - name: state
+      type: keyword
+      description: >
+        WAL sender state.
+    - name: sync_priority
+      type: long
+      description: >
+        Priority of replica server being chosen as synchronous replica.
+    - name: backend_start
+      type: long
+      description: >
+        Start time when replica connected to primary.
+    - name: replay_lag
+      type: long
+      description: >
+        Elapsed time during committed WALs from primary to the replica.
+        Fully committed in replica node
+    - name: flush_lag
+      type: long
+      description: >
+        Elapsed time during committed WALs from primary to the replica.
+        WAL's has already been flushed but not yet applied.
+    - name: pid
+      type: long
+      description: >
+        Process id of walsender process
+    - name: client.address
+      type: long
+      description: >
+        Address of replica/streaming replication
+    - name: client.port
+      type: long
+      description: >
+        Port of replica/streaming replication
+    - name: client.hostname
+      type: long
+      description: >
+        Hostname of replica/streaming replication
+    - name: replay_lsn
+      type: long
+      description: >
+        Last transaction flush on disk at replica.
+    - name: user.name
+      type: long
+      description: >
+        Name of user which is used for Streaming replication
+    - name: user.id
+      type: long
+      description: >
+        ID of user which is used for Streaming replication
+    - name: sync_state
+      type: long
+      description: >
+        Sync State of replica.
+    - name: flush_lsn
+      type: long
+      description: >
+        Last transaction flush on disk at replica.
+    - name: application_name
+      type: long
+      description: >
+        Number of queries canceled due to conflicts with recovery in this
+        database.
+    - name: write_lsn
+      type: long
+      description: >
+        Last transaction written on disk at replica.
+    - name: sent_lsn
+      type: long
+      description: >
+        Last transaction location sent to replica
+

@@ -96,6 +96,9 @@ metricbeat.modules:
     # Stats about every PostgreSQL process
     - activity
 
+    # Stats about every PostgreSQL replication process
+    - replication
+
     # Stats about every statement executed in the server. It requires the
     # `pg_stats_statement` library to be configured in the server.
     #- statement
@@ -126,6 +129,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-postgresql-database,database>>
 
+* <<metricbeat-metricset-postgresql-replication,replication>>
+
 * <<metricbeat-metricset-postgresql-statement,statement>>
 
 include::postgresql/activity.asciidoc[]
@@ -133,6 +138,8 @@ include::postgresql/activity.asciidoc[]
 include::postgresql/bgwriter.asciidoc[]
 
 include::postgresql/database.asciidoc[]
+
+include::postgresql/replication.asciidoc[]
 
 include::postgresql/statement.asciidoc[]
 

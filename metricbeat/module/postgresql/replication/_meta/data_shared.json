@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2023-05-24T12:22:59.233Z",
+    "event": {
+        "dataset": "postgresql.replication",
+        "duration": 115000,
+        "module": "postgresql"
+    },
+    "metricset": {
+        "name": "replication",
+        "period": 10000
+    },
+    "postgresql": {
+        "replication": {
+            "write_lag": "",
+            "state": "",
+            "sync_priority": 0,
+            "backend_start": "",
+            "replay_lag": "",
+            "flush_lag": "",
+            "pid": 0,
+            "client": {
+                "address": "",
+                "port": 0,
+                "hostname": ""
+            },
+            "replay_lsn": "",
+            "user": {
+                "name": "",
+                "id": 0
+            },
+            "sync_state": "",
+            "flush_lsn": "",
+            "application_name": "",
+            "write_lsn": "",
+            "sent_lsn": ""
+        }
+    },
+    "service": {
+        "address": "postgres://localhost:5432/postgres?connect_timeout=10",
+        "type": "postgresql"
+    }
+}
