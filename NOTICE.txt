@@ -1501,11 +1501,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.0.0-20220225172249-27dd8689420f
+Version: v0.7.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20220225172249-27dd8689420f/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.7.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24234,11 +24234,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.0.0-20210817164053-32db794688a5
+Version: v0.0.0-20210921155107-089bfa567519
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.0.0-20210817164053-32db794688a5/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.0.0-20210921155107-089bfa567519/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24419,11 +24419,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.5.1
+Version: v0.6.0-dev.0.20220419223038-86c51ed26bb4
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.5.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.6.0-dev.0.20220419223038-86c51ed26bb4/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24530,11 +24530,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.1.0
+Version: v0.5.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.5.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24567,11 +24567,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.0.0-20210927222741-03fcf44c2211
+Version: v0.5.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.0.0-20210927222741-03fcf44c2211/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.5.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24604,11 +24604,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
-Version: v0.3.7
+Version: v0.7.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.3.7/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.7.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24678,11 +24678,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.1.9
+Version: v0.1.12
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.9/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.12/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
