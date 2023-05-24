@@ -294,7 +294,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-		
+
 		if err == io.EOF {
 			// No more lines
 			break
