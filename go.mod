@@ -71,7 +71,7 @@ require (
 )
 
 require (
-	github.com/docker/distribution v2.8.0+incompatible // indirect
+	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-ucfg v0.8.5
 	github.com/morikuni/aec v1.0.0 // indirect
