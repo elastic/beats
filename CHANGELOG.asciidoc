@@ -11,10 +11,7 @@ https://github.com/elastic/beats/compare/v8.7.1...v8.8.0[View commits]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
-- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
-- Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
 - The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
 - In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
