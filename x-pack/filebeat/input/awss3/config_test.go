@@ -120,16 +120,31 @@ func TestConfig(t *testing.T) {
 			config: mapstr.M{
 				"queue_url":   queueURL,
 				"region_name": "region",
+				"endpoint":    "ep",
 			},
 			expectedErr: "",
 			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
 				c := makeConfig(queueURL, "", "")
 				c.RegionName = "region"
+				c.AWSConfig.Endpoint = "ep"
 				return c
 			},
 		},
 		{
-			name:           "AWS endpoint with explicit region",
+			name:           "explicit AWS endpoint with explicit region",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"queue_url":   "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+				"region_name": "region",
+				"endpoint":    "amazonaws.com",
+			},
+			expectedErr: "region_name <region> must not be set with a queue_url containing a region name",
+			expectedCfg: nil,
+		},
+		{
+			name:           "inferred AWS endpoint with explicit region",
 			queueURL:       queueURL,
 			s3Bucket:       "",
 			nonAWSS3Bucket: "",
@@ -137,8 +152,24 @@ func TestConfig(t *testing.T) {
 				"queue_url":   "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
 				"region_name": "region",
 			},
-			expectedErr: "region_name <region> must not be set with an amazonaws.com queue_url accessing config",
+			expectedErr: "region_name <region> must not be set with a queue_url containing a region name",
 			expectedCfg: nil,
+		},
+		{
+			name:           "localstack_with_region_name",
+			queueURL:       "http://localhost:4566/000000000000/sample-queue",
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"queue_url":   "http://localhost:4566/000000000000/sample-queue",
+				"region_name": "myregion",
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.RegionName = "myregion"
+				return c
+			},
 		},
 		{
 			name:           "error on no queueURL and s3Bucket and nonAWSS3Bucket",

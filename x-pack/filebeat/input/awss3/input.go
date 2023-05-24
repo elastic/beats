@@ -311,9 +311,11 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 		return "", fmt.Errorf(queueURL + " is not a valid URL")
 	}
 	if url.Scheme == "https" && url.Host != "" {
-		queueHostSplit := strings.Split(url.Host, ".")
-		if len(queueHostSplit) > 2 && (strings.Join(queueHostSplit[2:], ".") == endpoint || (endpoint == "" && queueHostSplit[2] == "amazonaws")) {
-			return queueHostSplit[1], nil
+		queueHostSplit := strings.SplitN(url.Host, ".", 3)
+		if len(queueHostSplit) == 3 {
+			if queueHostSplit[2] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
+				return queueHostSplit[1], nil
+			}
 		}
 	}
 	return "", fmt.Errorf("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")

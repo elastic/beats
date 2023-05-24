@@ -261,7 +261,7 @@ URL of the AWS SQS queue that messages will be received from. (Required when `bu
 ==== `region_name`
 
 The name of the AWS region of the end point for testing purposes. This option
-must not be set when using amazonaws.com end points.
+must not be set when using amazonaws end points that provide a region.
 
 [float]
 ==== `visibility_timeout`
