@@ -38,7 +38,7 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 	return startTime, endTime
 }
 
-// MetricWithID contains a specific metric, and it's account ID information.
+// MetricWithID contains a specific metric, and its account ID information.
 type MetricWithID struct {
 	Metric    types.Metric
 	AccountID string

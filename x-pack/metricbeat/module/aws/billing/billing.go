@@ -44,8 +44,9 @@ var (
 
 	dateLayout         = "2006-01-02"
 	accountIdIdx       = 0
-	metricDataValueIdx = 1
-	dimensionStartIdx  = 2
+	accountLabelIdx    = 1
+	metricDataValueIdx = 2
+	dimensionStartIdx  = 3
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -200,7 +201,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 			labels := strings.Split(*output.Label, labelSeparator)
 			event := mb.Event{}
 			if labels[accountIdIdx] != "" {
-				event = aws.InitEvent("", "", labels[accountIdIdx], output.Timestamps[valI])
+				event = aws.InitEvent("", labels[accountLabelIdx], labels[accountIdIdx], output.Timestamps[valI])
 			} else {
 				event = aws.InitEvent("", m.AccountName, m.AccountID, output.Timestamps[valI])
 			}
@@ -366,7 +367,7 @@ func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity t
 	metricDims := metric.Metric.Dimensions
 	metricName := *metric.Metric.MetricName
 
-	label := metric.AccountID + labelSeparator + metricName + labelSeparator
+	label := metric.AccountID + labelSeparator + "${PROP('AccountLabel')}" + labelSeparator + metricName + labelSeparator
 	for _, dim := range metricDims {
 		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
 	}

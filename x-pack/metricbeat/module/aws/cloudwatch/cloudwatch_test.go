@@ -35,14 +35,14 @@ var (
 
 	id1    = "cpu"
 	value1 = 0.25
-	label1 = " |CPUUtilization|AWS/EC2|Average|InstanceId|i-1"
+	label1 = " | |CPUUtilization|AWS/EC2|Average|InstanceId|i-1"
 
 	id2    = "disk"
 	value2 = 5.0
-	label2 = " |DiskReadOps|AWS/EC2|Average|InstanceId|i-1"
+	label2 = " | |DiskReadOps|AWS/EC2|Average|InstanceId|i-1"
 
-	label3 = " |CPUUtilization|AWS/EC2|Average"
-	label4 = " |DiskReadOps|AWS/EC2|Average"
+	label3 = " | |CPUUtilization|AWS/EC2|Average"
+	label4 = " | |DiskReadOps|AWS/EC2|Average"
 
 	instanceID1     = "i-1"
 	instanceID2     = "i-2"
@@ -194,32 +194,32 @@ func TestConstructLabel(t *testing.T) {
 		{
 			listMetric1,
 			"Average",
-			"|CPUUtilization|AWS/EC2|Average|InstanceId|i-1",
+			"|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|Average|InstanceId|i-1",
 		},
 		{
 			listMetric2,
 			"Maximum",
-			"123456789012|StatusCheckFailed|AWS/EC2|Maximum|InstanceId|i-1",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed|AWS/EC2|Maximum|InstanceId|i-1",
 		},
 		{
 			listMetric3,
 			"Minimum",
-			"123456789012|StatusCheckFailed_System|AWS/EC2|Minimum|InstanceId|i-2",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_System|AWS/EC2|Minimum|InstanceId|i-2",
 		},
 		{
 			listMetric4,
 			"Sum",
-			"123456789012|StatusCheckFailed_Instance|AWS/EC2|Sum|InstanceId|i-2",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_Instance|AWS/EC2|Sum|InstanceId|i-2",
 		},
 		{
 			listMetric5,
 			"SampleCount",
-			"123456789012|CPUUtilization|AWS/EC2|SampleCount",
+			"123456789012|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|SampleCount",
 		},
 		{
 			listMetric8,
 			"SampleCount",
-			"123456789012|MemoryUsed|AWS/Kafka|SampleCount",
+			"123456789012|${PROP('AccountLabel')}|MemoryUsed|AWS/Kafka|SampleCount",
 		},
 	}
 
@@ -726,49 +726,49 @@ func TestGenerateFieldName(t *testing.T) {
 		{
 			"test Average",
 			"cloudwatch",
-			[]string{"", "CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.avg",
 		},
 		{
 			"test Maximum",
 			"cloudwatch",
-			[]string{"", "CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.max",
 		},
 		{
 			"test Minimum",
 			"cloudwatch",
-			[]string{"", "CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.min",
 		},
 		{
 			"test Sum",
 			"cloudwatch",
-			[]string{"", "CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.sum",
 		},
 		{
 			"test SampleCount",
 			"cloudwatch",
-			[]string{"", "CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.count",
 		},
 		{
 			"test extended statistic",
 			"cloudwatch",
-			[]string{"", "CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.p10",
 		},
 		{
 			"test other metricset",
 			"ec2",
-			[]string{"", "CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.p10",
 		},
 		{
 			"test metric name with dot",
 			"cloudwatch",
-			[]string{"", "DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
+			[]string{"", "${PROP('AccountLabel')}", "DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
 			"aws.firehose.metrics.DeliveryToS3_Records.avg",
 		},
 	}
@@ -1319,7 +1319,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
-	expectedID := " " + regionName + accountID + namespace
+	expectedID := " " + " " + regionName + accountID + namespace
 	metricValue, err := events[expectedID+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
