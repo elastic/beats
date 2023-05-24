@@ -52,23 +52,7 @@ setup.template.settings:
 # has a value which is computed based on the Beat name and version. For released
 # versions, this URL points to the dashboard archive on the artifacts.elastic.co
 # website.
-#setup.dashboards.url:
-metricbeat.modules:
-- module: postgresql
-  enabled: true
-  metricsets:
-    # Stats about every PostgreSQL database
-    #- database
 
-    # Stats about the background writer process's activity
-    - bgwriter
-
-    # Stats about every PostgreSQL process
-    - activity
-
-    # Stats about every PostgreSQL replication process
-    - replication
-  hosts: ["postgres://localhost:5432"]
 # =================================== Kibana ===================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
