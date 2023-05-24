@@ -433,7 +433,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	)
 
 	for i := 0; ; i++ {
-		b, _, err := reader.Next()
+		b, n, err := reader.Next()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				readLen += n
