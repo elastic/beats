@@ -64,9 +64,8 @@ func Package() {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
-	start := time.Now()
-	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
-	return devtools.Ironbank()
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
