@@ -426,7 +426,12 @@ func TestMaxBytesLimit(t *testing.T) {
 	}
 
 	// Read decodec lines and test
-	var idx int
+
+	var (
+		idx     int
+		readLen int
+	)
+
 	for i := 0; ; i++ {
 		b, _, err := reader.Next()
 		if err != nil {
@@ -450,10 +455,15 @@ func TestMaxBytesLimit(t *testing.T) {
 			break
 		}
 
+		readLen += n
 		s := string(b[:len(b)-len(nl)])
 		if line != s {
 			t.Fatalf("lines do not match, expected: %s got: %s", line, s)
 		}
+	}
+
+	if len(input) != readLen {
+		t.Fatalf("the bytes read are not equal to the bytes input, expected: %d got: %d", len(input), readLen)
 	}
 }
 
