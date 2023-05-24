@@ -19,7 +19,7 @@ require (
 	go.elastic.co/ecszap v1.0.1
 	go.elastic.co/go-licence-detector v0.5.0
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/crypto v0.1.0
 	golang.org/x/net v0.9.0
 	golang.org/x/sys v0.7.0
 	gopkg.in/yaml.v2 v2.4.0
