@@ -1,7 +1,7 @@
-- name: database
+- name: replication
   type: group
   description: >
-    One row per database, showing database-wide statistics. Collected by querying
+    One row per replication, showing database replication statistics. Collected by querying
     pg_stat_database
   release: ga
   fields:
@@ -18,7 +18,7 @@
       description: >
         Priority of replica server being chosen as synchronous replica.
     - name: backend_start
-      type: time
+      type: long
       description: >
         Start time when replica connected to primary.
     - name: replay_lag

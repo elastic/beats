@@ -1,8 +1,8 @@
-- name: replication
+- name: database
   type: group
   description: >
-    One row per replication, showing database replication statistics. Collected by querying
-    pg_stat_replication
+    One row per database, showing database-wide statistics. Collected by querying
+    pg_stat_database
   release: ga
   fields:
     - name: oid
