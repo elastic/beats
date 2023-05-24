@@ -60,7 +60,7 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
-// Package packages the Beat for IronBank distribution.
+// Ironbank packages the Beat for IronBank distribution.
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
