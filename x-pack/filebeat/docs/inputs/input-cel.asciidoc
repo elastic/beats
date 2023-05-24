@@ -5,8 +5,6 @@
 [id="{beatname_lc}-input-{type}"]
 === Common Expression Language input
 
-experimental[]
-
 ++++
 <titleabbrev>CEL</titleabbrev>
 ++++
