@@ -42,7 +42,10 @@ var (
 		"RESERVATION_ID",
 	}
 
-	dateLayout = "2006-01-02"
+	dateLayout         = "2006-01-02"
+	accountIdIdx       = 0
+	metricDataValueIdx = 1
+	dimensionStartIdx  = 2
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -65,7 +68,7 @@ type MetricSet struct {
 	CostExplorerConfig CostExplorerConfig `config:"cost_explorer_config"`
 }
 
-// Config holds a configuration specific for billing metricset.
+// CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
 	GroupByDimensionKeys []string `config:"group_by_dimension_keys"`
 	GroupByTagKeys       []string `config:"group_by_tag_keys"`
@@ -195,11 +198,16 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		}
 		for valI, metricDataResultValue := range output.Values {
 			labels := strings.Split(*output.Label, labelSeparator)
+			event := mb.Event{}
+			if labels[accountIdIdx] != "" {
+				event = aws.InitEvent("", "", labels[accountIdIdx], output.Timestamps[valI])
+			} else {
+				event = aws.InitEvent("", m.AccountName, m.AccountID, output.Timestamps[valI])
+			}
 
-			event := aws.InitEvent("", m.AccountName, m.AccountID, output.Timestamps[valI])
-			_, _ = event.MetricSetFields.Put(labels[0], metricDataResultValue)
+			_, _ = event.MetricSetFields.Put(labels[metricDataValueIdx], metricDataResultValue)
 
-			i := 1
+			i := dimensionStartIdx
 			for i < len(labels)-1 {
 				_, _ = event.MetricSetFields.Put(labels[i], labels[i+1])
 				i += 2
