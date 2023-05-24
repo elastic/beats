@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/mito/lib/xml"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -22,10 +24,11 @@ func registerResponseTransforms() {
 }
 
 type response struct {
-	page   int64
-	url    url.URL
-	header http.Header
-	body   interface{}
+	page       int64
+	url        url.URL
+	header     http.Header
+	xmlDetails map[string]xml.Detail
+	body       interface{}
 }
 
 func (resp *response) clone() *response {
@@ -54,13 +57,15 @@ type responseProcessor struct {
 	transforms []basicTransform
 	split      *split
 	pagination *pagination
+	xmlDetails map[string]xml.Detail
 }
 
-func newResponseProcessor(config config, pagination *pagination, log *logp.Logger) []*responseProcessor {
+func newResponseProcessor(config config, pagination *pagination, xmlDetails map[string]xml.Detail, log *logp.Logger) []*responseProcessor {
 	rps := make([]*responseProcessor, 0, len(config.Chain)+1)
 
 	rp := &responseProcessor{
 		pagination: pagination,
+		xmlDetails: xmlDetails,
 		log:        log,
 	}
 	if config.Response == nil {
@@ -78,6 +83,7 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 	for _, ch := range config.Chain {
 		rp := &responseProcessor{
 			pagination: pagination,
+			xmlDetails: xmlDetails,
 			log:        log,
 		}
 		// chain calls responseProcessor object
@@ -95,11 +101,12 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 	return rps
 }
 
-func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *logp.Logger) *responseProcessor {
+func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDetails map[string]xml.Detail, log *logp.Logger) *responseProcessor {
 	pagination := &pagination{httpClient: httpClient, log: log}
 
 	rp := &responseProcessor{
 		pagination: pagination,
+		xmlDetails: xmlDetails,
 		log:        log,
 	}
 	if config.Step != nil {
@@ -137,7 +144,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 		defer close(ch)
 
 		for i, httpResp := range resps {
-			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp, rp.xmlDetails)
 			for {
 				page, hasNext, err := iter.next()
 				if err != nil {
