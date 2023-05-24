@@ -2,13 +2,16 @@
   enabled: true
   metricsets:
     # Stats about every PostgreSQL database
-    - database
+    #- database
 
     # Stats about the background writer process's activity
-    - bgwriter
+    #- bgwriter
 
     # Stats about every PostgreSQL process
-    - activity
+    #- activity
+
+    # Stats about every PostgreSQL replication process
+    #- replication
 
     # Stats about every statement executed in the server. It requires the
     # `pg_stats_statement` library to be configured in the server.

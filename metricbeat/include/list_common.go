@@ -140,6 +140,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm/process"
 	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql"
 	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql/activity"
+	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql/replication"
 	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql/bgwriter"
 	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql/database"
 	_ "github.com/elastic/beats/v7/metricbeat/module/postgresql/statement"
