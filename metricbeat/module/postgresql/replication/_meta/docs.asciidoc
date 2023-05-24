@@ -1,1 +1,1 @@
-This is the `database` metricset of the PostgreSQL module.
+This is the `replication` metricset of the PostgreSQL module.

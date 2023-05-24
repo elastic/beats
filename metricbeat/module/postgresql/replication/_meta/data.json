@@ -1,53 +1,42 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2023-05-24T12:22:59.233Z",
     "event": {
-        "dataset": "postgresql.database",
+        "dataset": "postgresql.replication",
         "duration": 115000,
         "module": "postgresql"
     },
     "metricset": {
-        "name": "database",
+        "name": "replication",
         "period": 10000
     },
     "postgresql": {
-        "database": {
-            "blocks": {
-                "hit": 43969,
-                "read": 381,
-                "time": {
-                    "read": {
-                        "ms": 0
-                    },
-                    "write": {
-                        "ms": 0
-                    }
-                }
+        "replication": {
+            "write_lag": "",
+            "state": "streaming",
+            "sync_priority": 0,
+            "backend_start": "2023-05-23T17:01:53.697Z",
+            "replay_lag": "",
+            "flush_lag": "",
+            "pid": 2516780,
+            "client": {
+                "address": "192.168.128.2",
+                "port": 46594,
+                "hostname": ""
             },
-            "conflicts": 0,
-            "deadlocks": 0,
-            "name": "postgres",
-            "number_of_backends": 2,
-            "oid": 13395,
-            "rows": {
-                "deleted": 42,
-                "fetched": 26418,
-                "inserted": 98,
-                "returned": 53201,
-                "updated": 14
+            "replay_lsn": "A0/60003558",
+            "user": {
+                "name": "replicator",
+                "id": 16442
             },
-            "stats_reset": "2021-03-05T18:39:18.089Z",
-            "temporary": {
-                "bytes": 0,
-                "files": 0
-            },
-            "transactions": {
-                "commit": 445,
-                "rollback": 5
-            }
+            "sync_state": "async",
+            "flush_lsn": "A0/60003558",
+            "application_name": "walreceiver",
+            "write_lsn": "A0/60003558",
+            "sent_lsn": "A0/60003558"
         }
     },
     "service": {
-        "address": "192.168.128.2:5432",
+        "address": "postgres://localhost:5432/postgres?connect_timeout=10",
         "type": "postgresql"
     }
 }
