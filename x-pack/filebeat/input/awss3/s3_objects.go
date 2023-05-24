@@ -294,32 +294,22 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	var offset int64
 	for {
 		message, err := reader.Next()
-<<<<<<< HEAD
+		
 		if err == io.EOF {
-=======
+			// No more lines
+			break
+		}
+
+		if err != nil {
+			return fmt.Errorf("error reading message: %w", err)
+		}
+
 		if len(message.Content) > 0 {
-			event := p.createEvent(string(message.Content), offset)
+			event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
 			event.Fields.DeepUpdate(message.Fields)
 			offset += int64(message.Bytes)
 			p.publish(p.acker, &event)
 		}
-
-		if errors.Is(err, io.EOF) {
->>>>>>> 7b45320917 (handle EOF on single line content (#33568))
-			// No more lines
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("error reading message: %w", err)
-		}
-<<<<<<< HEAD
-
-		event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
-		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
-		p.publish(p.acker, &event)
-=======
->>>>>>> 7b45320917 (handle EOF on single line content (#33568))
 	}
 
 	return nil

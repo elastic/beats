@@ -94,9 +94,6 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
-<<<<<<< HEAD
-			return nil, 0, err
-=======
 			if errors.Is(err, io.EOF) && r.collectOnEOF {
 				// Found EOF and collectOnEOF is true
 				// -> decode input sequence into outBuffer
@@ -136,7 +133,6 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 			sz := r.byteCount
 			r.byteCount = 0
 			return nil, sz, err
->>>>>>> 7b45320917 (handle EOF on single line content (#33568))
 		}
 		// Check last decoded byte really being newline also unencoded
 		// if not, continue reading
@@ -281,13 +277,8 @@ func (r *LineReader) skipUntilNewLine() (int, error) {
 			idx = bytes.Index(r.tempBuffer[:n], r.nl)
 
 			if idx != -1 {
-<<<<<<< HEAD
-				r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
-				skipped += idx
-=======
 				_, _ = r.inBuffer.Write(r.tempBuffer[idx+len(r.nl) : n])
 				skipped += idx + len(r.nl)
->>>>>>> 7b45320917 (handle EOF on single line content (#33568))
 			} else {
 				skipped += n
 			}
