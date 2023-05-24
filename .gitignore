@@ -10,7 +10,6 @@
 *beat/build
 *beat/logs
 *beat/data
-**/ironbank/build/
 x-pack/functionbeat/pkg
 
 # Files
