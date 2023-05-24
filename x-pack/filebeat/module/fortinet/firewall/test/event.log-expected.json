@@ -1140,7 +1140,7 @@
         ]
     },
     {
-        "@timestamp": "2023-05-22T08:47:25.546743Z",
+        "@timestamp": "2023-05-22T08:19:38.000-02:00",
         "event.dataset": "fortinet.firewall",
         "event.module": "fortinet",
         "event.timezone": "-02:00",
