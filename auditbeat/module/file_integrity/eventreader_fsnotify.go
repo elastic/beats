@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || freebsd || openbsd || netbsd || windows
-// +build linux freebsd openbsd netbsd windows
 
 package file_integrity
 

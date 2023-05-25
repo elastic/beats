@@ -9,6 +9,7 @@ import (
 	"io"
 	"math"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -19,9 +20,25 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
+var (
+	clockValue atomic.Value // Atomic reference to a clock value.
+	realClock  = clock{Now: time.Now}
+)
+
+type clock struct {
+	Now func() time.Time
+}
+
+func init() {
+	clockValue.Store(realClock)
+}
+
 // currentTime returns the current time. This exists to allow unit tests
 // simulate the passage of time.
-var currentTime = time.Now
+func currentTime() time.Time {
+	clock := clockValue.Load().(clock)
+	return clock.Now()
+}
 
 type inputMetrics struct {
 	registry   *monitoring.Registry
@@ -176,12 +193,14 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
-	// Periodically update the sqs worker utilization metric.
-	//nolint:errcheck // This never returns an error.
-	go timed.Periodic(ctx, 5*time.Second, func() error {
-		out.updateSqsWorkerUtilization()
-		return nil
-	})
+	if maxWorkers > 0 {
+		// Periodically update the sqs worker utilization metric.
+		//nolint:errcheck // This never returns an error.
+		go timed.Periodic(ctx, 5*time.Second, func() error {
+			out.updateSqsWorkerUtilization()
+			return nil
+		})
+	}
 
 	return out
 }

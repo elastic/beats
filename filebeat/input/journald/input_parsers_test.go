@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo && withjournald
-// +build linux,cgo,withjournald
 
 package journald
 

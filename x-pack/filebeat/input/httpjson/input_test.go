@@ -23,10 +23,10 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestInput(t *testing.T) {
-	tempDirectory := t.TempDir()
 	testCases := []struct {
 		name         string
 		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
@@ -329,7 +329,7 @@ func TestInput(t *testing.T) {
 						"value": `[[index .last_response.body "@timestamp"]]`,
 					},
 				},
-				"request.tracer.filename": filepath.Join(tempDirectory, "logs", "http-request-trace-*.ndjson"),
+				"request.tracer.filename": "logs/http-request-trace-*.ndjson",
 			},
 			handler: dateCursorHandler(),
 			expected: []string{
@@ -1177,6 +1177,104 @@ func TestInput(t *testing.T) {
 				`{"space":{"world":"moon"}}`,
 			},
 		},
+		{
+			name: "Test simple XML decode",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerDecoders()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					const text = `<?xml version="1.0" encoding="UTF-8"?>
+<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
+  <sender>Ástríðr Ragnar</sender>
+  <address>
+    <name>Joord Lennart</name>
+    <company>Sydøstlige Gruppe</company>
+    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+    <city>Boekend</city>
+    <country>Netherlands</country>
+  </address>
+  <item>
+    <name>Egil's Saga</name>
+    <note>Free Sample</note>
+    <number>1</number>
+    <cost>99.95</cost>
+    <sent>FALSE</sent>
+  </item>
+</order>
+`
+					io.ReadAll(r.Body)
+					r.Body.Close()
+					w.Write([]byte(text))
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.xsd": `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sender" type="xs:string"/>
+        <xs:element name="address">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="company" type="xs:string"/>
+              <xs:element name="address" type="xs:string"/>
+              <xs:element name="city" type="xs:string"/>
+              <xs:element name="country" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="item" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+              <xs:element name="number" type="xs:positiveInteger"/>
+              <xs:element name="cost" type="xs:decimal"/>
+              <xs:element name="sent" type="xs:boolean"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+`,
+			},
+			handler: defaultHandler(http.MethodGet, "", ""),
+			expected: []string{mapstr.M{
+				"order": map[string]interface{}{
+					"address": map[string]interface{}{
+						"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
+						"city":    "Boekend",
+						"company": "Sydøstlige Gruppe",
+						"country": "Netherlands",
+						"name":    "Joord Lennart",
+					},
+					"item": []interface{}{
+						map[string]interface{}{
+							"cost":   99.95,
+							"name":   "Egil's Saga",
+							"note":   "Free Sample",
+							"number": 1,
+							"sent":   false,
+						},
+					},
+					"noNamespaceSchemaLocation": "sales.xsd",
+					"orderid":                   "56733",
+					"sender":                    "Ástríðr Ragnar",
+					"xsi":                       "http://www.w3.org/2001/XMLSchema-instance",
+				},
+			}.String()},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -1188,6 +1286,12 @@ func TestInput(t *testing.T) {
 
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
+
+			var tempDir string
+			if conf.Request.Tracer != nil {
+				tempDir = t.TempDir()
+				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
+			}
 
 			input := newStatelessInput(conf)
 
@@ -1238,8 +1342,8 @@ func TestInput(t *testing.T) {
 					}
 				}
 			}
-			if len(tc.expectedFile) != 0 {
-				if _, err := os.Stat(filepath.Join(tempDirectory, tc.expectedFile)); err == nil {
+			if tc.expectedFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, tc.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")

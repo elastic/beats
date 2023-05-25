@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+var errFanoutGroupAFPacketOnly = errors.New("fanout_group is only valid with af_packet type")
+
 type Config struct {
 	Interface       *InterfaceConfig   `config:"interfaces"`
 	Interfaces      []InterfaceConfig  `config:"interfaces"`
@@ -124,6 +126,7 @@ type InterfaceConfig struct {
 	BufferSizeMb          int           `config:"buffer_size_mb"`
 	EnableAutoPromiscMode bool          `config:"auto_promisc_mode"`
 	InternalNetworks      []string      `config:"internal_networks"`
+	FanoutGroup           *uint16       `config:"fanout_group"` // Fanout group ID for AF_PACKET.
 	TopSpeed              bool
 	Dumpfile              string // Dumpfile is the basename of pcap dumpfiles. The file names will have a creation time stamp and .pcap extension appended.
 	OneAtATime            bool
@@ -150,4 +153,11 @@ type ProtocolCommon struct {
 
 func (f *Flows) IsEnabled() bool {
 	return f != nil && (f.Enabled == nil || *f.Enabled)
+}
+
+func (i InterfaceConfig) Validate() error {
+	if i.Type != "af_packet" && i.FanoutGroup != nil {
+		return errFanoutGroupAFPacketOnly
+	}
+	return nil
 }
