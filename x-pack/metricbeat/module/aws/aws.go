@@ -87,7 +87,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}
 
-	_, err = awsConfig.Credentials.Retrieve(context.Background())
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	_, err = awsConfig.Credentials.Retrieve(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
@@ -126,7 +128,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
-	outputIdentity, err := svcSts.GetCallerIdentity(context.TODO(), &sts.GetCallerIdentityInput{})
+	ctx, cancel = getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	outputIdentity, err := svcSts.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
 	if err != nil {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
 	} else {
@@ -180,7 +184,9 @@ func getRegions(svc describeRegionsClient) ([]string, error) {
 }
 
 func getAccountName(svc *iam.Client, base mb.BaseMetricSet, metricSet MetricSet) string {
-	output, err := svc.ListAccountAliases(context.TODO(), &iam.ListAccountAliasesInput{})
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	output, err := svc.ListAccountAliases(ctx, &iam.ListAccountAliasesInput{})
 
 	accountName := metricSet.AccountID
 	if err != nil {
