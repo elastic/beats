@@ -189,9 +189,19 @@ func startHarvester(
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
-			// The returned may or not be collected by the caller, thus logging
-			// it here is important.
-			ctx.Logger.Errorf("error while adding new reader to the bookkeeper %v", err)
+			// The only possible returned error is ErrHarvesterAlreadyRunning, which is a normal
+			// behaviour of the Filestream input, it's not really an error, it's just an situation.
+			// If the harvester is already running we don't need to start a new one.
+			// At the moment of writing even the returned error is ignored. So the
+			// only real effect of this branch is to not start a second harvester.
+			//
+			// Currently the only places this error is checked is on task.Group and the
+			// only thing it does is to log the error. So to avoid unnecessary errors,
+			// we just return nil.
+			if errors.Is(err, ErrHarvesterAlreadyRunning) {
+				return nil
+			}
+
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
 
