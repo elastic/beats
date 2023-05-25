@@ -189,6 +189,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add context with timeout in AWS API calls {pull}35425[35425]
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 - Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
+- Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
 
 *Osquerybeat*
 
@@ -198,6 +199,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Fix double channel close panic when reloading. {pull}35324[35324]
 - Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
+- Fix handling of Npcap installation options from Fleet. {pull}35541[35541]
 
 *Winlogbeat*
 
