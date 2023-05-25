@@ -1561,7 +1561,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
 	events, err := m.createEvents(cloudwatchMock, resGroupTaggingClientMock, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
-	assert.Equal(t, timestamp, events[" "+regionName+accountID+namespace+"-0"].Timestamp)
+	assert.Equal(t, timestamp, events["  "+regionName+accountID+namespace+"-0"].Timestamp)
 }
 
 func TestGetStartTimeEndTime(t *testing.T) {

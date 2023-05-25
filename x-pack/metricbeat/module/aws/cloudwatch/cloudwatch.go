@@ -36,6 +36,7 @@ var (
 	labelSeparator         = "|"
 	dimensionSeparator     = ","
 	dimensionValueWildcard = "*"
+	labelLengthTotal       = 7
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -395,7 +396,7 @@ func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, dataGranu
 
 func constructLabel(metric aws.MetricWithID, statistic string) string {
 	// label = accountID + accountLabel + metricName + namespace + statistic + dimKeys + dimValues
-	label := metric.AccountID + labelSeparator + "${PROP('AccountLabel')}" + labelSeparator + *metric.Metric.MetricName + labelSeparator + *metric.Metric.Namespace + labelSeparator + statistic
+	label := strings.Join([]string{metric.AccountID, "${PROP('AccountLabel')}", *metric.Metric.MetricName, *metric.Metric.Namespace, statistic}, labelSeparator)
 	dimNames := ""
 	dimValues := ""
 	for i, dim := range metric.Metric.Dimensions {
@@ -450,7 +451,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	namespace := labels[namespaceIdx]
 	_, _ = event.RootFields.Put(generateFieldName(namespace, labels), metricValue)
 	_, _ = event.RootFields.Put("aws.cloudwatch.namespace", namespace)
-	if len(labels) == 5 {
+	if len(labels) != labelLengthTotal {
 		return event
 	}
 
@@ -488,7 +489,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 			}
 			labels := strings.Split(*metricDataResult.Label, labelSeparator)
 			for valI, metricDataResultValue := range metricDataResult.Values {
-				if len(labels) != 7 {
+				if len(labels) != labelLengthTotal {
 					// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
 					identifier := labels[accountIdIdx] + labels[accountLabelIdx] + regionName + m.AccountID + labels[namespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
