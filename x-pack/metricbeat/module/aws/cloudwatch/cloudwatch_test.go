@@ -1354,7 +1354,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
-	expectedID := " " + regionName + accountID
+	expectedID := "  " + regionName + accountID
 	metricValue, err := events[expectedID+namespace+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
 	assert.NoError(t, err)
 	metricValue1, err := events[expectedID+namespace+"-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
