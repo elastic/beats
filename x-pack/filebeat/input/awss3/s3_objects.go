@@ -28,7 +28,6 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -46,7 +45,8 @@ type s3ObjectProcessorFactory struct {
 
 func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig, maxWorkers int) *s3ObjectProcessorFactory {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry(), maxWorkers)
+		// Metrics are optional. Initialize a stub.
+		metrics = newInputMetrics("", nil, 0)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{
