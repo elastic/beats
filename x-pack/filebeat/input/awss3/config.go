@@ -27,7 +27,7 @@ type config struct {
 	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
-	RegionName          string               `config:"region_name"`
+	RegionName          string               `config:"region"`
 	BucketARN           string               `config:"bucket_arn"`
 	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
@@ -77,13 +77,6 @@ func (c *config) Validate() error {
 
 	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
-	}
-
-	if c.QueueURL != "" {
-		region, _ := getRegionFromQueueURL(c.QueueURL, c.AWSConfig.Endpoint)
-		if region != "" && c.RegionName != "" {
-			return fmt.Errorf("region_name <%s> must not be set with a queue_url containing a region name", c.RegionName)
-		}
 	}
 
 	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {

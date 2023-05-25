@@ -57,7 +57,7 @@ func TestConfig(t *testing.T) {
 		nonAWSS3Bucket string
 		config         mapstr.M
 		expectedErr    string
-		expectedCfg    func(queueURL, s3Bucket string, nonAWSS3Bucket string) config
+		expectedCfg    func(queueURL, s3Bucket, nonAWSS3Bucket string) config
 	}{
 		{
 			name:           "input with defaults for queueURL",
@@ -80,7 +80,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers": 5,
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig("", s3Bucket, "")
 				c.NumberOfWorkers = 5
 				return c
@@ -100,7 +100,7 @@ func TestConfig(t *testing.T) {
 				},
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig(queueURL, "", "")
 				regex := match.MustCompile("/CloudTrail/")
 				c.FileSelectors = []fileSelectorConfig{
@@ -113,17 +113,17 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
-			name:           "non-AWS endpoint with explicit region",
+			name:           "non-AWS_endpoint_with_explicit_region",
 			queueURL:       queueURL,
 			s3Bucket:       "",
 			nonAWSS3Bucket: "",
 			config: mapstr.M{
-				"queue_url":   queueURL,
-				"region_name": "region",
-				"endpoint":    "ep",
+				"queue_url": queueURL,
+				"region":    "region",
+				"endpoint":  "ep",
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig(queueURL, "", "")
 				c.RegionName = "region"
 				c.AWSConfig.Endpoint = "ep"
@@ -131,29 +131,40 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
-			name:           "explicit AWS endpoint with explicit region",
+			name:           "explicit_AWS_endpoint_with_explicit_region",
 			queueURL:       queueURL,
 			s3Bucket:       "",
 			nonAWSS3Bucket: "",
 			config: mapstr.M{
-				"queue_url":   "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
-				"region_name": "region",
-				"endpoint":    "amazonaws.com",
+				"queue_url": "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+				"region":    "region",
+				"endpoint":  "amazonaws.com",
 			},
-			expectedErr: "region_name <region> must not be set with a queue_url containing a region name",
-			expectedCfg: nil,
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.QueueURL = "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs"
+				c.AWSConfig.Endpoint = "amazonaws.com"
+				c.RegionName = "region"
+				return c
+			},
 		},
 		{
-			name:           "inferred AWS endpoint with explicit region",
+			name:           "inferred_AWS_endpoint_with_explicit_region",
 			queueURL:       queueURL,
 			s3Bucket:       "",
 			nonAWSS3Bucket: "",
 			config: mapstr.M{
-				"queue_url":   "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
-				"region_name": "region",
+				"queue_url": "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+				"region":    "region",
 			},
-			expectedErr: "region_name <region> must not be set with a queue_url containing a region name",
-			expectedCfg: nil,
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.QueueURL = "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs"
+				c.RegionName = "region"
+				return c
+			},
 		},
 		{
 			name:           "localstack_with_region_name",
@@ -161,11 +172,11 @@ func TestConfig(t *testing.T) {
 			s3Bucket:       "",
 			nonAWSS3Bucket: "",
 			config: mapstr.M{
-				"queue_url":   "http://localhost:4566/000000000000/sample-queue",
-				"region_name": "myregion",
+				"queue_url": "http://localhost:4566/000000000000/sample-queue",
+				"region":    "myregion",
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig(queueURL, "", "")
 				c.RegionName = "myregion"
 				return c
@@ -365,7 +376,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers":   5,
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig("", "", nonAWSS3Bucket)
 				c.NumberOfWorkers = 5
 				return c
@@ -448,7 +459,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers":       5,
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig("", s3Bucket, "")
 				c.BackupConfig.BackupToBucketArn = "arn:aws:s3:::bBucket"
 				c.BackupConfig.BackupToBucketPrefix = "backup"
@@ -468,7 +479,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers":             5,
 			},
 			expectedErr: "",
-			expectedCfg: func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig("", "", nonAWSS3Bucket)
 				c.NonAWSBucketName = nonAWSS3Bucket
 				c.BackupConfig.NonAWSBackupToBucketName = "bBucket"

@@ -258,10 +258,10 @@ configuring multiline options.
 URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `non_aws_bucket_name` are not set).
 
 [float]
-==== `region_name`
+==== `region`
 
-The name of the AWS region of the end point for testing purposes. This option
-must not be set when using amazonaws end points that provide a region.
+The name of the AWS region of the end point. If this option is given it
+takes precedence over the region name obtained from the `queue_url` value.
 
 [float]
 ==== `visibility_timeout`
