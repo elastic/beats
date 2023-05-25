@@ -11,6 +11,9 @@ on:
 
 jobs:
   update-notice:
+    permissions:
+      # Allow job to write to the branch.
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
