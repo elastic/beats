@@ -111,18 +111,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add per-thread metrics to system_summary {pull}33614[33614]
-- Add GCP CloudSQL metadata {pull}33066[33066]
-- Add GCP Redis metadata {pull}33701[33701]
-- Remove GCP Compute metadata cache {pull}33655[33655]
-- Add support for multiple regions in GCP {pull}32964[32964]
-- Add GCP Redis regions support {pull}33728[33728]
-- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
-- Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
-- Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
-- Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
-- Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
-- Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 
 *Osquerybeat*
