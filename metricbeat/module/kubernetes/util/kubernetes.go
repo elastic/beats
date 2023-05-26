@@ -192,18 +192,18 @@ func NewResourceMetadataEnricher(
 		}
 	}
 
-	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, config.AddResourceMetadata)
+	podMetaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, config.AddResourceMetadata) //nolint:all
 
 	namespaceMeta := metadata.NewNamespaceMetadataGenerator(config.AddResourceMetadata.Namespace, namespaceWatcher.Store(), watcher.Client())
-	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, watcher.Client())
+	serviceMetaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, watcher.Client()) //nolint:all
 
-	metaGen := metadata.NewNamespaceAwareResourceMetadataGenerator(cfg, watcher.Client(), namespaceMeta)
+	metaGen := metadata.NewNamespaceAwareResourceMetadataGenerator(cfg, watcher.Client(), namespaceMeta) //nolint:all
 
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher,
 		// update
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
-			id := join(accessor.GetNamespace(), accessor.GetName())
+			id := join(accessor.GetNamespace(), accessor.GetName()) //nolint:all
 
 			switch r := r.(type) {
 			case *kubernetes.Pod:
