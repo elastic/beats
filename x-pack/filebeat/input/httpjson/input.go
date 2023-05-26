@@ -20,6 +20,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/mito/lib/xml"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -144,8 +146,16 @@ func run(
 		log.Errorf("Error while creating requestFactory: %v", err)
 		return err
 	}
+	var xmlDetails map[string]xml.Detail
+	if config.Response.XSD != "" {
+		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return err
+		}
+	}
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config, pagination, metrics, log)
+	responseProcessor := newResponseProcessor(config, pagination, xmlDetails, metrics, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()

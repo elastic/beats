@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/mito/lib/xml"
 )
 
 const requestNamespace = "request"
@@ -128,6 +129,15 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 		rf.user = config.Auth.Basic.User
 		rf.password = config.Auth.Basic.Password
 	}
+	var xmlDetails map[string]xml.Detail
+	if config.Response.XSD != "" {
+		var err error
+		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return nil, err
+		}
+	}
 	rfs = append(rfs, rf)
 	for _, ch := range config.Chain {
 		var rf *requestFactory
@@ -143,7 +153,9 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				rf.user = ch.Step.Auth.Basic.User
 				rf.password = ch.Step.Auth.Basic.Password
 			}
-			responseProcessor := newChainResponseProcessor(ch, httpClient, metrics, log)
+
+			responseProcessor := newChainResponseProcessor(ch, httpClient, xmlDetails, metrics, log)
+
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -169,7 +181,8 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				rf.user = ch.While.Auth.Basic.User
 				rf.password = ch.While.Auth.Basic.Password
 			}
-			responseProcessor := newChainResponseProcessor(ch, httpClient, metrics, log)
+
+			responseProcessor := newChainResponseProcessor(ch, httpClient, xmlDetails, metrics, log)
 			rf = &requestFactory{
 				url:                    *ch.While.Request.URL.URL,
 				method:                 ch.While.Request.Method,

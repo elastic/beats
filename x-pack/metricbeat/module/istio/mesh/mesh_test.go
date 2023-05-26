@@ -4,7 +4,6 @@
 
 // skipping tests on windows 32 bit versions, not supported
 //go:build !integration && !windows && !386
-// +build !integration,!windows,!386
 
 package mesh
 

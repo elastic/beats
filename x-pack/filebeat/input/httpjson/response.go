@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/mito/lib/xml"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -23,10 +25,11 @@ func registerResponseTransforms() {
 }
 
 type response struct {
-	page   int64
-	url    url.URL
-	header http.Header
-	body   interface{}
+	page       int64
+	url        url.URL
+	header     http.Header
+	xmlDetails map[string]xml.Detail
+	body       interface{}
 }
 
 func (resp *response) clone() *response {
@@ -56,13 +59,15 @@ type responseProcessor struct {
 	transforms []basicTransform
 	split      *split
 	pagination *pagination
+	xmlDetails map[string]xml.Detail
 }
 
-func newResponseProcessor(config config, pagination *pagination, metrics *inputMetrics, log *logp.Logger) []*responseProcessor {
+func newResponseProcessor(config config, pagination *pagination, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) []*responseProcessor {
 	rps := make([]*responseProcessor, 0, len(config.Chain)+1)
 
 	rp := &responseProcessor{
 		pagination: pagination,
+		xmlDetails: xmlDetails,
 		log:        log,
 		metrics:    metrics,
 	}
@@ -81,6 +86,7 @@ func newResponseProcessor(config config, pagination *pagination, metrics *inputM
 	for _, ch := range config.Chain {
 		rp := &responseProcessor{
 			pagination: pagination,
+			xmlDetails: xmlDetails,
 			log:        log,
 			metrics:    metrics,
 		}
@@ -99,11 +105,12 @@ func newResponseProcessor(config config, pagination *pagination, metrics *inputM
 	return rps
 }
 
-func newChainResponseProcessor(config chainConfig, httpClient *httpClient, metrics *inputMetrics, log *logp.Logger) *responseProcessor {
+func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) *responseProcessor {
 	pagination := &pagination{httpClient: httpClient, log: log}
 
 	rp := &responseProcessor{
 		pagination: pagination,
+		xmlDetails: xmlDetails,
 		log:        log,
 		metrics:    metrics,
 	}
@@ -143,7 +150,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 		var npages int64
 
 		for i, httpResp := range resps {
-			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp, rp.xmlDetails)
 			for {
 				pageStartTime := time.Now()
 				page, hasNext, err := iter.next()
