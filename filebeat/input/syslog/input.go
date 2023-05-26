@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -92,6 +93,42 @@ func init() {
 	}
 }
 
+// syslogFormatter 兼容syslog数据格式
+func syslogFormatter(event *util.Data) *util.Data {
+
+	fields := event.Event.Fields
+	fields["data"] = fields["message"]
+
+	// 标准syslog RFC3164 格式
+	if _, ok := fields["log"]; ok {
+		address := fields["log"].(common.MapStr)["source"].(common.MapStr)["address"].(string)
+		arr := strings.Split(address, ":")
+		if len(arr) > 1 {
+			port, err := strconv.Atoi(arr[1])
+			if err != nil {
+				port = 0
+			}
+			fields["log"].(common.MapStr)["source"].(common.MapStr)["address"] = arr[0]
+			fields["log"].(common.MapStr)["source"].(common.MapStr)["port"] = port
+		} else {
+			fields["log"].(common.MapStr)["source"].(common.MapStr)["port"] = 0
+		}
+	} else {
+		fields["event"] = common.MapStr{}
+		fields["process"] = common.MapStr{}
+		fields["log"] = common.MapStr{}
+		fields["syslog"] = common.MapStr{}
+	}
+
+	err := fields.Delete("message")
+	log := logp.NewLogger("syslog")
+	if err != nil {
+		log.Errorw("key not found: %v", err)
+	}
+	event.Event.Fields = fields
+	return event
+}
+
 // Input define a syslog input
 type Input struct {
 	sync.Mutex
@@ -146,7 +183,7 @@ func NewInput(
 			event := createEvent(ev, metadata, time.Local, log)
 			d = &util.Data{Event: *event}
 		}
-
+		d = syslogFormatter(d)
 		forwarder.Send(d)
 	}
 
