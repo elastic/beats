@@ -36,18 +36,6 @@ labels:
   ## Product the image belongs to for grouping multiple images
   mil.dso.ironbank.product.name: "heartbeat"
 
-# List of project maintainers
-maintainers:
-  - email: "nassim.kammah@elastic.co"
-    name: "Nassim Kammah"
-    username: "nassim.kammah"
-  - email: "ivan.fernandez@elastic.co"
-    name: "Ivan Fernandez Calvo"
-    username: "ivan.fernandez"
-  - email: "victor.martinez@elastic.co"
-    name: "Victor Martinez"
-    username: "victor.martinez"
-
 # List of resources to make available to the offline build context
 resources:
   - filename: "heartbeat-{{ beat_version }}-linux-x86_64.tar.gz"
@@ -60,6 +48,7 @@ resources:
     validation:
       type: sha256
       value: 93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c
+<<<<<<< HEAD
   - filename: fontconfig-2.13.1-4.el8.x86_64.rpm
     url: https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/Packages/f/fontconfig-2.13.1-4.el8.x86_64.rpm
     validation:
@@ -530,3 +519,17 @@ resources:
     validation:
       type: sha256
       value: aa890887a1630abf9c73ac2568b1d7a59494bf1ed23d44789c162da92655178c
+=======
+
+# List of project maintainers
+maintainers:
+  - email: "nassim.kammah@elastic.co"
+    name: "Nassim Kammah"
+    username: "nassim.kammah"
+  - email: "ivan.fernandez@elastic.co"
+    name: "Ivan Fernandez Calvo"
+    username: "ivan.fernandez"
+  - email: "victor.martinez@elastic.co"
+    name: "Victor Martinez"
+    username: "victor.martinez"
+>>>>>>> 3f5afa5ef9 ([Heartbeat] Remove synthetics support for ironbank (#35551))
