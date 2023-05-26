@@ -99,6 +99,29 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+- RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
+- [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+
+*Heartbeat*
+
+- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
+- Fix integration hashing to prevent reloading all when updated. {pull}34697[34697]
+- Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
+- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
+- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
+- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix beat capabilities on Docker image. {pull}33584[33584]
+- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
+- Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
+with the ecs field name `container`. {pull}34403[34403]
+automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Fix broken mapping for state.ends field. {pull}34891[34891]
+- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+- Fix broken state ID location naming. {pull}35336[35336]
+- Fix project monitor temp directories permission to include group access. {pull}35398[35398]
+- Fix output pipeline exit on run_once. {pull}35376[35376]
+- Fix formatting issue with socket trace timeout. {pull}35434[35434]
 
 *Heartbeat*
 
