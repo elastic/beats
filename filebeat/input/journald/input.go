@@ -144,7 +144,7 @@ func (inp *journald) Run(
 
 	mode, pos := seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)
 	if mode == journalread.SeekSince {
-		err = reader.SeekRealtimeUsec(uint64(time.Now().Add(*inp.Since).UnixNano() / 1000))
+		err = reader.SeekRealtimeUsec(uint64(time.Now().Add(*inp.Since).UnixMicro()))
 	} else {
 		err = reader.Seek(mode, pos)
 	}
