@@ -20,6 +20,7 @@
 package journald
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -115,22 +116,11 @@ func TestConfigValidate(t *testing.T) {
 						cfg.Since = new(time.Duration)
 					}
 					got := cfg.Validate()
-					if !sameError(got, want[setSince][seek][fallback]) {
+					if !errors.Is(got, want[setSince][seek][fallback]) {
 						t.Errorf("unexpected error: got:%v want:%v", got, want[setSince][seek][fallback])
 					}
 				})
 			}
 		}
-	}
-}
-
-func sameError(a, b error) bool {
-	switch {
-	case a == nil && b == nil:
-		return true
-	case a == nil, b == nil:
-		return false
-	default:
-		return a.Error() == b.Error()
 	}
 }
