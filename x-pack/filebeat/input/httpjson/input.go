@@ -105,11 +105,23 @@ func test(url *url.URL) error {
 	return nil
 }
 
+func runWithMetrics(
+	ctx v2.Context,
+	config config,
+	publisher inputcursor.Publisher,
+	cursor *inputcursor.Cursor,
+) error {
+	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
+	defer unreg()
+	return run(ctx, config, publisher, cursor, reg)
+}
+
 func run(
 	ctx v2.Context,
 	config config,
 	publisher inputcursor.Publisher,
 	cursor *inputcursor.Cursor,
+	reg *monitoring.Registry,
 ) error {
 	log := ctx.Logger.With("input_url", config.Request.URL)
 
@@ -119,9 +131,6 @@ func run(
 		id := sanitizeFileName(ctx.ID)
 		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
 	}
-
-	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
-	defer unreg()
 
 	metrics := newInputMetrics(reg)
 

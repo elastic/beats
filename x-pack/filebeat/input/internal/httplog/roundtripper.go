@@ -259,32 +259,32 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 	}
 
 	out := &httpMetrics{
-		reqs:          monitoring.NewUint(reg, "http.request.total"),
-		reqErrs:       monitoring.NewUint(reg, "http.request.errors"),
-		reqDelete:     monitoring.NewUint(reg, "http.request.delete"),
-		reqGet:        monitoring.NewUint(reg, "http.request.get"),
-		reqHead:       monitoring.NewUint(reg, "http.request.head"),
-		reqOptions:    monitoring.NewUint(reg, "http.request.options"),
-		reqPatch:      monitoring.NewUint(reg, "http.request.patch"),
-		reqPost:       monitoring.NewUint(reg, "http.request.post"),
-		reqPut:        monitoring.NewUint(reg, "http.request.put"),
+		reqs:          monitoring.NewUint(reg, "http_request_total"),
+		reqErrs:       monitoring.NewUint(reg, "http_request_errors"),
+		reqDelete:     monitoring.NewUint(reg, "http_request_delete"),
+		reqGet:        monitoring.NewUint(reg, "http_request_get"),
+		reqHead:       monitoring.NewUint(reg, "http_request_head"),
+		reqOptions:    monitoring.NewUint(reg, "http_request_options"),
+		reqPatch:      monitoring.NewUint(reg, "http_request_patch"),
+		reqPost:       monitoring.NewUint(reg, "http_request_post"),
+		reqPut:        monitoring.NewUint(reg, "http_request_put"),
 		reqsSize:      metrics.NewUniformSample(1024),
-		resps:         monitoring.NewUint(reg, "http.response.total"),
-		respErrs:      monitoring.NewUint(reg, "http.response.errors"),
-		resp1xx:       monitoring.NewUint(reg, "http.response.1xx"),
-		resp2xx:       monitoring.NewUint(reg, "http.response.2xx"),
-		resp3xx:       monitoring.NewUint(reg, "http.response.3xx"),
-		resp4xx:       monitoring.NewUint(reg, "http.response.4xx"),
-		resp5xx:       monitoring.NewUint(reg, "http.response.5xx"),
+		resps:         monitoring.NewUint(reg, "http_response_total"),
+		respErrs:      monitoring.NewUint(reg, "http_response_errors"),
+		resp1xx:       monitoring.NewUint(reg, "http_response_1xx"),
+		resp2xx:       monitoring.NewUint(reg, "http_response_2xx"),
+		resp3xx:       monitoring.NewUint(reg, "http_response_3xx"),
+		resp4xx:       monitoring.NewUint(reg, "http_response_4xx"),
+		resp5xx:       monitoring.NewUint(reg, "http_response_5xx"),
 		respsSize:     metrics.NewUniformSample(1024),
 		roundTripTime: metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.GetGoMetrics(reg, "http.request.body.size", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_request_body_size", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.reqsSize))
-	_ = adapter.GetGoMetrics(reg, "http.response.body.size", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_response_body_size", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.respsSize))
-	_ = adapter.GetGoMetrics(reg, "http.round_trip.time", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_round_trip_time", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.roundTripTime))
 
 	return out
@@ -293,25 +293,25 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 // RoundTrip implements the http.RoundTripper interface, sending
 // request and response metrics to the underlying registry.
 //
-//	http.request.total
-//	http.request.errors
-//	http.request.delete
-//	http.request.get
-//	http.request.head
-//	http.request.options
-//	http.request.patch
-//	http.request.post
-//	http.request.put
-//	http.request.body.bytes
-//	http.response.total
-//	http.response.errors
-//	http.response.1xx
-//	http.response.2xx
-//	http.response.3xx
-//	http.response.4xx
-//	http.response.5xx
-//	http.response.body.bytes
-//	http.round_trip.time
+//	http_request_total
+//	http_request_errors
+//	http_request_delete
+//	http_request_get
+//	http_request_head
+//	http_request_options
+//	http_request_patch
+//	http_request_post
+//	http_request_put
+//	http_request_body_bytes
+//	http_response_total
+//	http_response_errors
+//	http_response_1xx
+//	http_response_2xx
+//	http_response_3xx
+//	http_response_4xx
+//	http_response_5xx
+//	http_response_body_bytes
+//	http_round_trip_time
 func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	if rt.metrics == nil {
 		return rt.transport.RoundTrip(req)
