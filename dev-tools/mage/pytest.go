@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -30,7 +31,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 // WINDOWS USERS:
@@ -254,14 +254,16 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 		"VIRTUAL_ENV": ve,
 	}
 
+	vePython := virtualenvPath(ve, pythonExe)
+	// Ensure we are using the latest pip version.
+	// use method described at https://pip.pypa.io/en/stable/installation/#upgrading-pip
+	if err = sh.RunWith(env, vePython, "-m", "pip", "install", "--upgrade", "pip"); err != nil {
+		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
+	}
+
 	pip := virtualenvPath(ve, "pip")
 	pipUpgrade := func(pkg string) error {
 		return sh.RunWith(env, pip, "install", "-U", pkg)
-	}
-
-	// Ensure we are using the latest pip version.
-	if err = pipUpgrade("pip"); err != nil {
-		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
 	}
 
 	// First ensure that wheel is installed so that bdists build cleanly.

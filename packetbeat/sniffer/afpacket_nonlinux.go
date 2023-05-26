@@ -16,13 +16,11 @@
 // under the License.
 
 //go:build !linux
-// +build !linux
 
 package sniffer
 
 import (
 	"errors"
-	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -32,7 +30,7 @@ var errAFPacketLinuxOnly = errors.New("af_packet MMAP sniffing is only available
 
 type afpacketHandle struct{}
 
-func newAfpacketHandle(_ string, _, _, _ int, _ time.Duration, _ bool) (*afpacketHandle, error) {
+func newAfpacketHandle(_ afPacketConfig) (*afpacketHandle, error) {
 	return nil, errAFPacketLinuxOnly
 }
 

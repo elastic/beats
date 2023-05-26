@@ -16,14 +16,12 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package sniffer
 
 import (
 	"fmt"
 	"syscall"
-	"time"
 	"unsafe"
 
 	"github.com/google/gopacket"
@@ -44,50 +42,60 @@ type afpacketHandle struct {
 	log                          *logp.Logger
 }
 
-func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
+func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
 	log := logp.NewLogger("sniffer")
 
-	if autoPromiscMode {
-		promiscEnabled, err = isPromiscEnabled(device)
+	if c.Promiscuous {
+		promiscEnabled, err = isPromiscEnabled(c.Device)
 		if err != nil {
-			log.Errorf("Failed to get promiscuous mode for device '%s': %v", device, err)
+			log.Errorf("Failed to get promiscuous mode for device '%s': %v", c.Device, err)
 		}
 
 		if !promiscEnabled {
-			if setPromiscErr := setPromiscMode(device, true); setPromiscErr != nil {
+			if setPromiscErr := setPromiscMode(c.Device, true); setPromiscErr != nil {
 				log.Warnf("Failed to set promiscuous mode for device '%s'. "+
 					"Packetbeat may be unable to see any network traffic. Please follow packetbeat "+
-					"FAQ to learn about mitigation: Error: %v", device, err)
+					"FAQ to learn about mitigation: Error: %v", c.Device, err)
 			}
 		}
 	}
 
 	h := &afpacketHandle{
 		promiscPreviousState:         promiscEnabled,
-		frameSize:                    snaplen,
-		device:                       device,
-		promiscPreviousStateDetected: autoPromiscMode && err == nil,
+		frameSize:                    c.FrameSize,
+		device:                       c.Device,
+		promiscPreviousStateDetected: c.Promiscuous && err == nil,
 		log:                          log,
 	}
 
-	if device == "any" {
+	if c.Device == "any" {
 		h.TPacket, err = afpacket.NewTPacket(
-			afpacket.OptFrameSize(snaplen),
-			afpacket.OptBlockSize(block_size),
-			afpacket.OptNumBlocks(num_blocks),
-			afpacket.OptPollTimeout(timeout))
+			afpacket.OptFrameSize(c.FrameSize),
+			afpacket.OptBlockSize(c.BlockSize),
+			afpacket.OptNumBlocks(c.NumBlocks),
+			afpacket.OptPollTimeout(c.PollTimeout))
 	} else {
 		h.TPacket, err = afpacket.NewTPacket(
-			afpacket.OptInterface(device),
-			afpacket.OptFrameSize(snaplen),
-			afpacket.OptBlockSize(block_size),
-			afpacket.OptNumBlocks(num_blocks),
-			afpacket.OptPollTimeout(timeout))
+			afpacket.OptInterface(c.Device),
+			afpacket.OptFrameSize(c.FrameSize),
+			afpacket.OptBlockSize(c.BlockSize),
+			afpacket.OptNumBlocks(c.NumBlocks),
+			afpacket.OptPollTimeout(c.PollTimeout))
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed creating af_packet socket: %w", err)
 	}
 
-	return h, err
+	if c.FanoutGroupID != nil {
+		if err = h.TPacket.SetFanout(afpacket.FanoutHashWithDefrag, *c.FanoutGroupID); err != nil {
+			return nil, fmt.Errorf("failed setting af_packet fanout group: %w", err)
+		}
+		log.Infof("Joined af_packet fanout group %v", *c.FanoutGroupID)
+	}
+
+	return h, nil
 }
 
 func (h *afpacketHandle) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {

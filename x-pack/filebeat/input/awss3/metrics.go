@@ -193,12 +193,14 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
-	// Periodically update the sqs worker utilization metric.
-	//nolint:errcheck // This never returns an error.
-	go timed.Periodic(ctx, 5*time.Second, func() error {
-		out.updateSqsWorkerUtilization()
-		return nil
-	})
+	if maxWorkers > 0 {
+		// Periodically update the sqs worker utilization metric.
+		//nolint:errcheck // This never returns an error.
+		go timed.Periodic(ctx, 5*time.Second, func() error {
+			out.updateSqsWorkerUtilization()
+			return nil
+		})
+	}
 
 	return out
 }
