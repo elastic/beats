@@ -319,6 +319,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 
 *Osquerybeat*
 
