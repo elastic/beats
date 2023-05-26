@@ -230,6 +230,7 @@ type httpMetrics struct {
 	reqPatch      *monitoring.Uint // number of PATCH requests
 	reqPost       *monitoring.Uint // number of POST requests
 	reqPut        *monitoring.Uint // number of PUT requests
+	reqsAccSize   *monitoring.Uint // accumulated request body size
 	reqsSize      metrics.Sample   // histogram of the request body size
 	resps         *monitoring.Uint // total number of responses
 	respErrs      *monitoring.Uint // total number of response errors
@@ -238,6 +239,7 @@ type httpMetrics struct {
 	resp3xx       *monitoring.Uint // number of 3xx responses
 	resp4xx       *monitoring.Uint // number of 4xx responses
 	resp5xx       *monitoring.Uint // number of 5xx responses
+	respsAccSize  *monitoring.Uint // accumulated response body size
 	respsSize     metrics.Sample   // histogram of the response body size
 	roundTripTime metrics.Sample   // histogram of the round trip (request -> response) time
 }
@@ -268,6 +270,7 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 		reqPatch:      monitoring.NewUint(reg, "http_request_patch"),
 		reqPost:       monitoring.NewUint(reg, "http_request_post"),
 		reqPut:        monitoring.NewUint(reg, "http_request_put"),
+		reqsAccSize:   monitoring.NewUint(reg, "http_request_body_bytes_total"),
 		reqsSize:      metrics.NewUniformSample(1024),
 		resps:         monitoring.NewUint(reg, "http_response_total"),
 		respErrs:      monitoring.NewUint(reg, "http_response_errors"),
@@ -276,13 +279,14 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 		resp3xx:       monitoring.NewUint(reg, "http_response_3xx"),
 		resp4xx:       monitoring.NewUint(reg, "http_response_4xx"),
 		resp5xx:       monitoring.NewUint(reg, "http_response_5xx"),
+		respsAccSize:  monitoring.NewUint(reg, "http_response_body_bytes_total"),
 		respsSize:     metrics.NewUniformSample(1024),
 		roundTripTime: metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.GetGoMetrics(reg, "http_request_body_size", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_request_body_bytes", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.reqsSize))
-	_ = adapter.GetGoMetrics(reg, "http_response_body_size", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "http_response_body_bytes", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.respsSize))
 	_ = adapter.GetGoMetrics(reg, "http_round_trip_time", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.roundTripTime))
@@ -302,6 +306,7 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 //	http_request_patch
 //	http_request_post
 //	http_request_put
+//	http_request_body_bytes_total
 //	http_request_body_bytes
 //	http_response_total
 //	http_response_errors
@@ -310,6 +315,7 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 //	http_response_3xx
 //	http_response_4xx
 //	http_response_5xx
+//	http_response_body_bytes_total
 //	http_response_body_bytes
 //	http_round_trip_time
 func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -330,6 +336,7 @@ func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	if err != nil {
 		rt.metrics.reqErrs.Add(1)
 	} else {
+		rt.metrics.reqsAccSize.Add(uint64(len(body)))
 		rt.metrics.reqsSize.Update(int64(len(body)))
 	}
 
@@ -352,6 +359,7 @@ func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	if err != nil {
 		rt.metrics.respErrs.Add(1)
 	} else {
+		rt.metrics.respsAccSize.Add(uint64(len(body)))
 		rt.metrics.respsSize.Update(int64(len(body)))
 	}
 
