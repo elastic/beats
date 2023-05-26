@@ -1545,7 +1545,7 @@ observe the activity of the input.
 | `http_request_patch`                       | Total number of `PATCH` requests.
 | `http_request_post`                        | Total number of `POST` requests.
 | `http_request_put`                         | Total number of `PUT` requests.
-| `http_request_body.size`                   | Histogram of the requests body size.
+| `http_request_body_size`                   | Histogram of the requests body size.
 | `http_response_total`                      | Total number of responses received.
 | `http_response_errors`                     | Total number of response errors.
 | `http_response_1xx`                        | Total number of `1xx` responses.
@@ -1553,7 +1553,7 @@ observe the activity of the input.
 | `http_response_3xx`                        | Total number of `3xx` responses.
 | `http_response_4xx`                        | Total number of `4xx` responses.
 | `http_response_5xx`                        | Total number of `5xx` responses.
-| `http_response_body.size`                  | Histogram of the responses body size.
+| `http_response_body_size`                  | Histogram of the responses body size.
 | `http_round_trip_time`                     | Histogram of the round trip time.
 | `httpjson_interval_total`                  | Total number of intervals executed.
 | `httpjson_interval_errors`                 | Total number of interval errors.
