@@ -123,7 +123,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			SyncTimeout: config.SyncPeriod,
 		}, nil)
 		if err != nil {
-			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 		}
 	}
 	if metaConf.CronJob {

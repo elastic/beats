@@ -220,7 +220,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout: config.SyncPeriod,
 			}, nil)
 			if err != nil {
-				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 			}
 		}
 		if metaConf.CronJob {
