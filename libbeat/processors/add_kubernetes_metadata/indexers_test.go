@@ -33,7 +33,7 @@ import (
 )
 
 var addResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
-var metagen = metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
+var metagen = metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, nil, nil, addResourceMetadata)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = config.NewConfig()
