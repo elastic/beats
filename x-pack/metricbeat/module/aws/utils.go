@@ -36,21 +36,41 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 	return startTime, endTime
 }
 
+<<<<<<< HEAD
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
 func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
 	var metricsTotal []cloudwatch.Metric
+=======
+// MetricWithID contains a specific metric, and its account ID information.
+type MetricWithID struct {
+	Metric    types.Metric
+	AccountID string
+}
+
+// GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
+// ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
+// to obtain statistical data.
+// Note: We are not using Dimensions and MetricName in ListMetricsInput because with that we will have to make one ListMetrics
+// API call per metric name and set of dimensions. This will increase API cost.
+// IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
+// monitoring account.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+	var metricWithAccountID []MetricWithID
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
-		NextToken: nextToken,
+		NextToken:             nextToken,
+		IncludeLinkedAccounts: true,
 	}
 	if namespace != "*" {
 		listMetricsInput.Namespace = &namespace
 	}
 
 	// List metrics of a given namespace for each region
+<<<<<<< HEAD
 	req := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 	paginator := cloudwatch.NewListMetricsPaginator(req)
 	for paginator.Next(context.TODO()) {
@@ -62,6 +82,19 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 		return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s. error: %w", regionName, err)
 	}
 	return metricsTotal, nil
+=======
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
+		}
+
+		for i, metric := range page.Metrics {
+			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
+		}
+	}
+	return metricWithAccountID, nil
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.

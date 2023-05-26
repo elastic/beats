@@ -43,7 +43,11 @@ var (
 		"RESERVATION_ID",
 	}
 
-	dateLayout = "2006-01-02"
+	dateLayout         = "2006-01-02"
+	accountIdIdx       = 0
+	accountLabelIdx    = 1
+	metricDataValueIdx = 2
+	dimensionStartIdx  = 3
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -66,7 +70,7 @@ type MetricSet struct {
 	CostExplorerConfig CostExplorerConfig `config:"cost_explorer_config"`
 }
 
-// Config holds a configuration specific for billing metricset.
+// CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
 	GroupByDimensionKeys []string `config:"group_by_dimension_keys"`
 	GroupByTagKeys       []string `config:"group_by_tag_keys"`
@@ -191,11 +195,21 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
 		if exists {
 			labels := strings.Split(*output.Label, labelSeparator)
+			event := mb.Event{}
+			if labels[accountIdIdx] != "" {
+				event = aws.InitEvent("", labels[accountLabelIdx], labels[accountIdIdx], output.Timestamps[valI])
+			} else {
+				event = aws.InitEvent("", m.AccountName, m.AccountID, output.Timestamps[valI])
+			}
 
+<<<<<<< HEAD
 			event := aws.InitEvent("", m.AccountName, m.AccountID, timestamp)
 			event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+=======
+			_, _ = event.MetricSetFields.Put(labels[metricDataValueIdx], metricDataResultValue)
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 
-			i := 1
+			i := dimensionStartIdx
 			for i < len(labels)-1 {
 				event.MetricSetFields.Put(labels[i], labels[i+1])
 				i += 2
@@ -326,9 +340,15 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, 
 	return event
 }
 
+<<<<<<< HEAD
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
 	var metricDataQueries []cloudwatch.MetricDataQuery
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
+=======
+func constructMetricQueries(listMetricsOutput []aws.MetricWithID, dataGranularity time.Duration) []types.MetricDataQuery {
+	var metricDataQueries []types.MetricDataQuery
+	metricDataQueryEmpty := types.MetricDataQuery{}
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 	for i, listMetric := range listMetricsOutput {
 		metricDataQuery := createMetricDataQuery(listMetric, i, period)
 		if metricDataQuery == metricDataQueryEmpty {
@@ -339,28 +359,44 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.D
 	return metricDataQueries
 }
 
+<<<<<<< HEAD
 func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
+=======
+func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity time.Duration) types.MetricDataQuery {
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 	statistic := "Maximum"
 	periodInSeconds := int64(period.Seconds())
 	id := metricsetName + strconv.Itoa(index)
-	metricDims := metric.Dimensions
-	metricName := *metric.MetricName
+	metricDims := metric.Metric.Dimensions
+	metricName := *metric.Metric.MetricName
 
-	label := metricName + labelSeparator
+	label := metric.AccountID + labelSeparator + "${PROP('AccountLabel')}" + labelSeparator + metricName + labelSeparator
 	for _, dim := range metricDims {
 		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
 	}
 
+<<<<<<< HEAD
 	metricDataQuery = cloudwatch.MetricDataQuery{
+=======
+	metricDataQuery := types.MetricDataQuery{
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 		Id: &id,
 		MetricStat: &cloudwatch.MetricStat{
 			Period: &periodInSeconds,
 			Stat:   &statistic,
-			Metric: &metric,
+			Metric: &metric.Metric,
 		},
 		Label: &label,
 	}
+<<<<<<< HEAD
 	return
+=======
+
+	if metric.AccountID != "" {
+		metricDataQuery.AccountId = &metric.AccountID
+	}
+	return metricDataQuery
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 }
 
 func getStartDateEndDate(period time.Duration) (startDate string, endDate string) {

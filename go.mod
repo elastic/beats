@@ -30,8 +30,26 @@ require (
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.13.3
+<<<<<<< HEAD
 	github.com/aws/aws-sdk-go v1.19.48
 	github.com/aws/aws-sdk-go-v2 v0.24.0
+=======
+	github.com/aws/aws-sdk-go-v2 v1.18.0
+	github.com/aws/aws-sdk-go-v2/config v1.15.12
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.7
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.26.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.15.5
+	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.18.4
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1
+	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.18.4
+	github.com/aws/aws-sdk-go-v2/service/iam v1.18.4
+	github.com/aws/aws-sdk-go-v2/service/organizations v1.15.2
+	github.com/aws/aws-sdk-go-v2/service/rds v1.20.1
+	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.13.5
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.12
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.18.4
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.8
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 	github.com/awslabs/goformation/v4 v4.1.0
 	github.com/awslabs/kinesis-aggregation/go v0.0.0-20200810181507-d352038274c0
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
@@ -196,8 +214,41 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.2.11
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
+=======
+	cloud.google.com/go v0.105.0
+	cloud.google.com/go/redis v1.10.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
+	github.com/Azure/go-autorest/autorest/adal v0.9.14
+	github.com/apache/arrow/go/v11 v11.0.0
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
+	github.com/aws/smithy-go v1.13.5
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/elastic-agent-autodiscover v0.5.0
+	github.com/elastic/elastic-agent-libs v0.3.8
+	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
+	github.com/elastic/elastic-agent-system-metrics v0.6.1
+	github.com/elastic/go-elasticsearch/v8 v8.2.0
+	github.com/elastic/mito v1.2.0
+	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
+	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
+	github.com/google/cel-go v0.13.0
+	github.com/googleapis/gax-go/v2 v2.6.0
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/shirou/gopsutil/v3 v3.21.12
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
+	go.elastic.co/apm/v2 v2.0.0
+	go.mongodb.org/mongo-driver v1.5.1
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 )
 
 require (
@@ -214,6 +265,21 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/apache/thrift v0.13.1-0.20200603211036-eac4d0c79a5f // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
+<<<<<<< HEAD
+=======
+	github.com/aws/aws-sdk-go v1.38.60 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.3 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.7 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.33 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.27 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.14 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.7 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.7 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.10 // indirect
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect

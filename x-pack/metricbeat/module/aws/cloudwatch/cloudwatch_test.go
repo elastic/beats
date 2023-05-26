@@ -34,14 +34,14 @@ var (
 
 	id1    = "cpu"
 	value1 = 0.25
-	label1 = "CPUUtilization|AWS/EC2|Average|InstanceId|i-1"
+	label1 = " | |CPUUtilization|AWS/EC2|Average|InstanceId|i-1"
 
 	id2    = "disk"
 	value2 = 5.0
-	label2 = "DiskReadOps|AWS/EC2|Average|InstanceId|i-1"
+	label2 = " | |DiskReadOps|AWS/EC2|Average|InstanceId|i-1"
 
-	label3 = "CPUUtilization|AWS/EC2|Average"
-	label4 = "DiskReadOps|AWS/EC2|Average"
+	label3 = " | |CPUUtilization|AWS/EC2|Average"
+	label4 = " | |DiskReadOps|AWS/EC2|Average"
 
 	instanceID1     = "i-1"
 	instanceID2     = "i-2"
@@ -52,6 +52,7 @@ var (
 	metricName3     = "StatusCheckFailed_System"
 	metricName4     = "StatusCheckFailed_Instance"
 	resourceTypeEC2 = "ec2:instance"
+<<<<<<< HEAD
 	listMetric1     = cloudwatch.Metric{
 		Dimensions: []cloudwatch.Dimension{{
 			Name:  &dimName,
@@ -98,44 +99,124 @@ var (
 	listMetric8  = cloudwatch.Metric{
 		MetricName: &metricName6,
 		Namespace:  &namespaceMSK,
+=======
+	listMetric1     = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			Dimensions: []cloudwatchtypes.Dimension{{
+				Name:  &dimName,
+				Value: &instanceID1,
+			}},
+			MetricName: &metricName1,
+			Namespace:  &namespace,
+		},
+	}
+
+	listMetric2 = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			Dimensions: []cloudwatchtypes.Dimension{{
+				Name:  &dimName,
+				Value: &instanceID1,
+			}},
+			MetricName: &metricName2,
+			Namespace:  &namespace,
+		},
+		AccountID: accountID,
+	}
+
+	listMetric3 = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			Dimensions: []cloudwatchtypes.Dimension{{
+				Name:  &dimName,
+				Value: &instanceID2,
+			}},
+			MetricName: &metricName3,
+			Namespace:  &namespace,
+		},
+		AccountID: accountID,
+	}
+
+	listMetric4 = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			Dimensions: []cloudwatchtypes.Dimension{{
+				Name:  &dimName,
+				Value: &instanceID2,
+			}},
+			MetricName: &metricName4,
+			Namespace:  &namespace,
+		},
+		AccountID: accountID,
+	}
+
+	listMetric5 = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			MetricName: &metricName1,
+			Namespace:  &namespace,
+		},
+		AccountID: accountID,
+	}
+
+	listMetric6 = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			Dimensions: []cloudwatchtypes.Dimension{{
+				Name:  &dimName,
+				Value: &instanceID1,
+			}},
+			MetricName: &metricName5,
+			Namespace:  &namespace,
+		},
+	}
+
+	namespaceMSK = "AWS/Kafka"
+	metricName6  = "MemoryUsed"
+	listMetric8  = aws.MetricWithID{
+		Metric: cloudwatchtypes.Metric{
+			MetricName: &metricName6,
+			Namespace:  &namespaceMSK,
+		},
+		AccountID: accountID,
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 	}
 )
 
 func TestConstructLabel(t *testing.T) {
 	cases := []struct {
+<<<<<<< HEAD
 		listMetricDetail cloudwatch.Metric
+=======
+		listMetricDetail aws.MetricWithID
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 		statistic        string
 		expectedLabel    string
 	}{
 		{
 			listMetric1,
 			"Average",
-			"CPUUtilization|AWS/EC2|Average|InstanceId|i-1",
+			"|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|Average|InstanceId|i-1",
 		},
 		{
 			listMetric2,
 			"Maximum",
-			"StatusCheckFailed|AWS/EC2|Maximum|InstanceId|i-1",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed|AWS/EC2|Maximum|InstanceId|i-1",
 		},
 		{
 			listMetric3,
 			"Minimum",
-			"StatusCheckFailed_System|AWS/EC2|Minimum|InstanceId|i-2",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_System|AWS/EC2|Minimum|InstanceId|i-2",
 		},
 		{
 			listMetric4,
 			"Sum",
-			"StatusCheckFailed_Instance|AWS/EC2|Sum|InstanceId|i-2",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_Instance|AWS/EC2|Sum|InstanceId|i-2",
 		},
 		{
 			listMetric5,
 			"SampleCount",
-			"CPUUtilization|AWS/EC2|SampleCount",
+			"123456789012|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|SampleCount",
 		},
 		{
 			listMetric8,
 			"SampleCount",
-			"MemoryUsed|AWS/Kafka|SampleCount",
+			"123456789012|${PROP('AccountLabel')}|MemoryUsed|AWS/Kafka|SampleCount",
 		},
 	}
 
@@ -178,6 +259,32 @@ func TestReadCloudwatchConfig(t *testing.T) {
 	resourceTypeFiltersEC2RDS := map[string][]aws.Tag{}
 	resourceTypeFiltersEC2RDS["ec2:instance"] = nil
 	resourceTypeFiltersEC2RDS["rds"] = nil
+<<<<<<< HEAD
+=======
+	metricsWithStats := []metricsWithStatistics{
+		{
+			listMetric1,
+			[]string{"Average"},
+		},
+		{
+			aws.MetricWithID{
+				Metric: cloudwatchtypes.Metric{
+					Dimensions: []cloudwatchtypes.Dimension{{
+						Name:  awssdk.String("DBClusterIdentifier"),
+						Value: awssdk.String("test1-cluster"),
+					},
+						{
+							Name:  awssdk.String("Role"),
+							Value: awssdk.String("READER"),
+						}},
+					MetricName: awssdk.String("CommitThroughput"),
+					Namespace:  awssdk.String("AWS/RDS"),
+				},
+			},
+			[]string{"Average"},
+		},
+	}
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 
 	expectedListMetricWithDetailEC2RDS := listMetricWithDetail{
 		metricsWithStats: []metricsWithStatistics{
@@ -435,6 +542,7 @@ func TestReadCloudwatchConfig(t *testing.T) {
 				[]string{"Average"},
 			},
 			{
+<<<<<<< HEAD
 				cloudwatch.Metric{
 					Dimensions: []cloudwatch.Dimension{{
 						Name:  awssdk.String("InstanceId"),
@@ -442,21 +550,41 @@ func TestReadCloudwatchConfig(t *testing.T) {
 					}},
 					MetricName: awssdk.String("DiskReadBytes"),
 					Namespace:  awssdk.String("AWS/EC2"),
+=======
+				aws.MetricWithID{
+					Metric: cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-2"),
+						}},
+						MetricName: awssdk.String("DiskReadBytes"),
+						Namespace:  awssdk.String("AWS/EC2"),
+					},
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 				},
 				[]string{"Sum"},
 			},
 			{
+<<<<<<< HEAD
 				cloudwatch.Metric{
 					Dimensions: []cloudwatch.Dimension{{
 						Name:  awssdk.String("DBClusterIdentifier"),
 						Value: awssdk.String("test1-cluster"),
+=======
+				aws.MetricWithID{
+					Metric: cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{{
+							Name:  awssdk.String("DBClusterIdentifier"),
+							Value: awssdk.String("test1-cluster"),
+						},
+							{
+								Name:  awssdk.String("Role"),
+								Value: awssdk.String("READER"),
+							}},
+						MetricName: awssdk.String("CommitThroughput"),
+						Namespace:  awssdk.String("AWS/RDS"),
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 					},
-						{
-							Name:  awssdk.String("Role"),
-							Value: awssdk.String("READER"),
-						}},
-					MetricName: awssdk.String("CommitThroughput"),
-					Namespace:  awssdk.String("AWS/RDS"),
 				},
 				[]string{"Average"},
 			},
@@ -821,49 +949,49 @@ func TestGenerateFieldName(t *testing.T) {
 		{
 			"test Average",
 			"cloudwatch",
-			[]string{"CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Average", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.avg",
 		},
 		{
 			"test Maximum",
 			"cloudwatch",
-			[]string{"CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Maximum", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.max",
 		},
 		{
 			"test Minimum",
 			"cloudwatch",
-			[]string{"CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Minimum", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.min",
 		},
 		{
 			"test Sum",
 			"cloudwatch",
-			[]string{"CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "Sum", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.sum",
 		},
 		{
 			"test SampleCount",
 			"cloudwatch",
-			[]string{"CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "SampleCount", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.count",
 		},
 		{
 			"test extended statistic",
 			"cloudwatch",
-			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.p10",
 		},
 		{
 			"test other metricset",
 			"ec2",
-			[]string{"CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
+			[]string{"", "${PROP('AccountLabel')}", "CPUUtilization", "AWS/EC2", "p10", "InstanceId", "i-1"},
 			"aws.ec2.metrics.CPUUtilization.p10",
 		},
 		{
 			"test metric name with dot",
 			"cloudwatch",
-			[]string{"DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
+			[]string{"", "${PROP('AccountLabel')}", "DeliveryToS3.Records", "AWS/Firehose", "Average", "DeliveryStreamName", "test-1"},
 			"aws.firehose.metrics.DeliveryToS3_Records.avg",
 		},
 	}
@@ -1108,12 +1236,18 @@ func TestConstructTagsFilters(t *testing.T) {
 func TestFilterListMetricsOutput(t *testing.T) {
 	cases := []struct {
 		title                        string
+<<<<<<< HEAD
 		listMetricsOutput            []cloudwatch.Metric
+=======
+		listMetricsOutput            []aws.MetricWithID
+		namespace                    string
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 		namespaceDetails             []namespaceDetail
 		filteredMetricWithStatsTotal []metricsWithStatistics
 	}{
 		{
 			"test filter cloudwatch metrics with dimension",
+<<<<<<< HEAD
 			[]cloudwatch.Metric{
 				{
 					Dimensions: []cloudwatch.Dimension{
@@ -1135,6 +1269,33 @@ func TestFilterListMetricsOutput(t *testing.T) {
 					}},
 					MetricName: awssdk.String("CPUUtilization"),
 					Namespace:  awssdk.String("AWS/EC2"),
+=======
+			[]aws.MetricWithID{
+				{
+					Metric: cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{
+							{
+								Name:  awssdk.String("DBClusterIdentifier"),
+								Value: awssdk.String("test1-cluster"),
+							},
+							{
+								Name:  awssdk.String("Role"),
+								Value: awssdk.String("READER"),
+							}},
+						MetricName: awssdk.String("CommitThroughput"),
+						Namespace:  awssdk.String("AWS/RDS"),
+					},
+				},
+				{
+					Metric: cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-1"),
+						}},
+						MetricName: awssdk.String("CPUUtilization"),
+						Namespace:  awssdk.String("AWS/EC2"),
+					},
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 				},
 			},
 			[]namespaceDetail{
@@ -1165,6 +1326,7 @@ func TestFilterListMetricsOutput(t *testing.T) {
 		},
 		{
 			"test filter cloudwatch metrics with name",
+<<<<<<< HEAD
 			[]cloudwatch.Metric{
 				{
 					Dimensions: []cloudwatch.Dimension{
@@ -1186,6 +1348,33 @@ func TestFilterListMetricsOutput(t *testing.T) {
 					}},
 					MetricName: awssdk.String("CPUUtilization"),
 					Namespace:  awssdk.String("AWS/EC2"),
+=======
+			[]aws.MetricWithID{
+				{
+					Metric: cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{
+							{
+								Name:  awssdk.String("DBClusterIdentifier"),
+								Value: awssdk.String("test1-cluster"),
+							},
+							{
+								Name:  awssdk.String("Role"),
+								Value: awssdk.String("READER"),
+							}},
+						MetricName: awssdk.String("CommitThroughput"),
+						Namespace:  awssdk.String("AWS/RDS"),
+					},
+				},
+				{
+					Metric: cloudwatchtypes.Metric{
+						Dimensions: []cloudwatchtypes.Dimension{{
+							Name:  awssdk.String("InstanceId"),
+							Value: awssdk.String("i-1"),
+						}},
+						MetricName: awssdk.String("CPUUtilization"),
+						Namespace:  awssdk.String("AWS/EC2"),
+					},
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 				},
 			},
 			[]namespaceDetail{
@@ -1493,17 +1682,75 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	mockCloudwatchSvc := &MockCloudWatchClientWithoutDim{}
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
+<<<<<<< HEAD
 			cloudwatch.Metric{
 				MetricName: awssdk.String("CPUUtilization"),
 				Namespace:  awssdk.String("AWS/EC2"),
+=======
+			cloudwatchMetric: aws.MetricWithID{
+				Metric: cloudwatchtypes.Metric{
+					MetricName: awssdk.String("CPUUtilization"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 			},
-			[]string{"Average"},
+			statistic: []string{"Average"},
 		},
 		{
+<<<<<<< HEAD
 			cloudwatch.Metric{
 				MetricName: awssdk.String("DiskReadOps"),
 				Namespace:  awssdk.String("AWS/EC2"),
+=======
+			cloudwatchMetric: aws.MetricWithID{
+				Metric: cloudwatchtypes.Metric{
+					MetricName: awssdk.String("DiskReadOps"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 			},
+			statistic: []string{"Average"},
+		},
+	}
+
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+
+<<<<<<< HEAD
+	expectedID := regionName + accountID + namespace
+	metricValue, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+=======
+	expectedID := " " + " " + regionName + accountID + namespace
+	metricValue, err := events[expectedID+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
+	assert.NoError(t, err)
+	assert.Equal(t, value1, metricValue)
+
+	dimension, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	assert.NoError(t, err)
+	assert.Equal(t, value2, dimension)
+}
+
+<<<<<<< HEAD
+=======
+func TestCreateEventsWithDataGranularity(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 10, AccountID: accountID, DataGranularity: 5}
+	m.logger = logp.NewLogger("test")
+
+	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockCloudwatchSvc := &MockCloudWatchClientWithDataGranularity{}
+	listMetricWithStatsTotal := []metricsWithStatistics{
+		{
+			listMetric1,
+			[]string{"Average"},
+		},
+		{
+			listMetric6,
 			[]string{"Average"},
 		},
 	}
@@ -1514,16 +1761,23 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
-	expectedID := regionName + accountID + namespace
-	metricValue, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	expectedID := "  " + regionName + accountID
+	metricValue, err := events[expectedID+namespace+"-0"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	assert.NoError(t, err)
+	metricValue1, err := events[expectedID+namespace+"-1"].RootFields.GetValue("aws.ec2.metrics.CPUUtilization.avg")
+	assert.NoError(t, err)
+	metricValue2, err := events[expectedID+namespace+"-0"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
+	assert.NoError(t, err)
+	metricValue3, err := events[expectedID+namespace+"-1"].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
 	assert.NoError(t, err)
 	assert.Equal(t, value1, metricValue)
-
-	dimension, err := events[expectedID].RootFields.GetValue("aws.ec2.metrics.DiskReadOps.avg")
-	assert.NoError(t, err)
-	assert.Equal(t, value2, dimension)
+	assert.Equal(t, value1, metricValue1)
+	assert.Equal(t, value2, metricValue2)
+	assert.Equal(t, value2, metricValue3)
+	assert.Equal(t, 2, len(events))
 }
 
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 func TestCreateEventsWithTagsFilter(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
@@ -1701,9 +1955,22 @@ func TestCreateEventsTimestamp(t *testing.T) {
 
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
+<<<<<<< HEAD
 			cloudwatch.Metric{
 				MetricName: awssdk.String("CPUUtilization"),
 				Namespace:  awssdk.String("AWS/EC2"),
+=======
+			listMetric1,
+			[]string{"Average"},
+		},
+		{
+			aws.MetricWithID{
+				Metric: cloudwatchtypes.Metric{
+
+					MetricName: awssdk.String("DiskReadOps"),
+					Namespace:  awssdk.String("AWS/EC2"),
+				},
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 			},
 			[]string{"Average"},
 		},
@@ -1714,7 +1981,11 @@ func TestCreateEventsTimestamp(t *testing.T) {
 
 	events, err := m.createEvents(&MockCloudWatchClientWithoutDim{}, &MockResourceGroupsTaggingClient{}, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
+<<<<<<< HEAD
 	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
+=======
+	assert.Equal(t, timestamp, events["  "+regionName+accountID+namespace+"-0"].Timestamp)
+>>>>>>> 217e658c8b ([AWS] Collect metrics from linked accounts (#35540))
 }
 
 func TestGetStartTimeEndTime(t *testing.T) {
