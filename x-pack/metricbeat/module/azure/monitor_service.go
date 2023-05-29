@@ -206,7 +206,7 @@ func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace
 	for pager.More() {
 		nextPage, err := pager.NextPage(service.context)
 		if err != nil {
-			return armmonitor.MetricDefinitionCollection{}, nil
+			return armmonitor.MetricDefinitionCollection{}, err
 		}
 
 		metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
