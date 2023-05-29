@@ -25,6 +25,8 @@ include::../include/config-option-intro.asciidoc[]
 When a webhook integration is created on Zoom, it will show a special token used to ensure that filebeat only handles HTTP requests from the correct source.
 This is configured with the `secret.header` and `secret.value` settings as shown below.
 
+On the other hand, Zoom also requires webhook validation for created or modified webhooks after October, 2022. This follows a challenge-response check (CRC) algorithm which is configured with the `crc.enabled` and `crc.secret` settings. Learn more about it at https://developers.zoom.us/docs/api/rest/webhook-reference/#validate-your-webhook-endpoint[Validate your webhook endpoint].
+
 Example config:
 
 [source,yaml]
@@ -37,6 +39,8 @@ Example config:
     var.listen_port: 8080
     var.secret.header: Authorization
     var.secret.value: ZOOMTOKEN
+    var.crc.enabled: true
+    var.crc.secret: ZOOMTOKEN
 ----
 
 include::../include/var-paths.asciidoc[]
