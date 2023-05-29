@@ -19,11 +19,10 @@ package add_cloud_metadata
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -66,6 +65,7 @@ var cloudMetaProviders = map[string]provider{
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
 	"huawei":        huaweiMetadataFetcher,
+	"hetzner":       hetznerMetadataFetcher,
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
@@ -114,7 +114,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 
 		fetcher, err := ff.Create(name, c)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to initialize the %v fetcher", name)
+			return nil, fmt.Errorf("failed to initialize the %v fetcher: %w", name, err)
 		}
 
 		mf = append(mf, fetcher)
