@@ -307,7 +307,7 @@ func (r *LineReader) decode(end int) (int, error) {
 		nDst, nSrc, err = r.decoder.Transform(r.tempBuffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
-			if !(err == transform.ErrShortDst) {
+			if !(errors.Is(err, transform.ErrShortDst)) {
 				_, _ = r.outBuffer.Write(inBytes[0:end])
 				start = end
 				break

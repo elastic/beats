@@ -489,7 +489,7 @@ func TestBufferSize(t *testing.T) {
 	for i := 0; i < len(lines); i++ {
 		b, n, err := reader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			} else {
 				t.Fatal("unexpected error:", err)
