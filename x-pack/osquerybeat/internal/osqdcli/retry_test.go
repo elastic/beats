@@ -16,11 +16,15 @@ import (
 )
 
 func TestRetryRun(t *testing.T) {
-	logp.Configure(logp.Config{
+	configErr := logp.Configure(logp.Config{
 		Level:     logp.DebugLevel,
 		ToStderr:  true,
 		Selectors: []string{"*"},
 	})
+
+	if configErr != nil {
+		t.Errorf("Error in configuring the test %v", configErr)
+	}
 
 	log := logp.NewLogger("retry_test").With("context", "osquery client connect")
 	ctx := context.Background()

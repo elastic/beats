@@ -23,7 +23,6 @@ package readfile
 import (
 	"bytes"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -120,7 +119,7 @@ func TestReaderEncodings(t *testing.T) {
 			bytes, sz, err := reader.Next()
 			if sz > 0 {
 				offset := len(bytes)
-				if offset > 0 && (!test.collectOnEOF || !errors.Is(err, io.EOF) || test.withEOL) {
+				if offset > 0 && (!test.collectOnEOF || !(err == io.EOF) || test.withEOL) {
 					offset -= len(nl)
 				}
 				readLines = append(readLines, string(bytes[:offset]))
@@ -435,7 +434,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	for i := 0; ; i++ {
 		b, n, err := reader.Next()
 		if err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF {
 				readLen += n
 				break
 			} else {
@@ -489,7 +488,7 @@ func TestBufferSize(t *testing.T) {
 	for i := 0; i < len(lines); i++ {
 		b, n, err := reader.Next()
 		if err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF {
 				break
 			} else {
 				t.Fatal("unexpected error:", err)

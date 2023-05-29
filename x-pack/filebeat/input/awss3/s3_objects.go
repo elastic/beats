@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -133,15 +132,15 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return errors.Wrapf(err, "failed to get s3 object (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed to get s3 object (elapsed_time_ns=%d): %w",
+			time.Since(start).Nanoseconds(), err)
 	}
 	defer body.Close()
 	p.s3Metadata = meta
 
 	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
 	if err != nil {
-		return errors.Wrap(err, "failed checking for gzip content")
+		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
@@ -157,8 +156,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
-			time.Since(start).Nanoseconds())
+		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
+			time.Since(start).Nanoseconds(), err)
 	}
 
 	return nil
@@ -174,7 +173,7 @@ func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]
 	}
 
 	if resp == nil {
-		return "", nil, nil, errors.New("empty response from s3 get object")
+		return "", nil, nil, fmt.Errorf("empty response from s3 get object")
 	}
 
 	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
@@ -218,7 +217,10 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+		evt, err := createEvent(string(data), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+		if err != nil {
+			return err
+		}
 		p.publish(p.acker, &evt)
 	}
 
@@ -257,7 +259,10 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset+arrayOffset, p.s3Obj, objHash, p.s3Metadata)
+		evt, err := createEvent(string(data), offset+arrayOffset, p.s3Obj, objHash, p.s3Metadata)
+		if err != nil {
+			return err
+		}
 		p.publish(p.acker, &evt)
 	}
 
@@ -305,7 +310,10 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 		}
 
 		if len(message.Content) > 0 {
-			event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+			event, err := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+			if err != nil {
+				return err
+			}
 			event.Fields.DeepUpdate(message.Fields)
 			offset += int64(message.Bytes)
 			p.publish(p.acker, &event)
@@ -322,7 +330,7 @@ func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.
 	p.publisher.Publish(*event)
 }
 
-func createEvent(message string, offset int64, obj s3EventV2, objectHash string, meta map[string]interface{}) beat.Event {
+func createEvent(message string, offset int64, obj s3EventV2, objectHash string, meta map[string]interface{}) (beat.Event, error) {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
@@ -352,10 +360,13 @@ func createEvent(message string, offset int64, obj s3EventV2, objectHash string,
 	event.SetID(objectID(objectHash, offset))
 
 	if len(meta) > 0 {
-		event.Fields.Put("aws.s3.metadata", meta)
+		_, err = event.Fields.Put("aws.s3.metadata", meta)
+		if err == nil {
+			return event, fmt.Errorf("error updating/adding AWS S3 metadata: %w", err)
+		}
 	}
 
-	return event
+	return event, nil
 }
 
 func objectID(objectHash string, offset int64) string {

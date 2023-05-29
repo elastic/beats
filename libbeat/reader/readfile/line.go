@@ -19,7 +19,6 @@ package readfile
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 
@@ -94,7 +93,7 @@ func (r *LineReader) Next() (b []byte, n int, err error) {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
-			if errors.Is(err, io.EOF) && r.collectOnEOF {
+			if (err == io.EOF) && r.collectOnEOF {
 				// Found EOF and collectOnEOF is true
 				// -> decode input sequence into outBuffer
 				// let's take whole buffer len without len(nl) if it ends with it
@@ -184,7 +183,7 @@ func (r *LineReader) advance() error {
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(r.tempBuffer)
 
-		if errors.Is(err, io.EOF) && n > 0 {
+		if (err == io.EOF) && n > 0 {
 			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
 			err = nil
 		}
@@ -307,7 +306,7 @@ func (r *LineReader) decode(end int) (int, error) {
 		nDst, nSrc, err = r.decoder.Transform(r.tempBuffer, inBytes[start:end], false)
 		if err != nil {
 			// Check if error is different from destination buffer too short
-			if !errors.Is(err, transform.ErrShortDst) {
+			if !(err == transform.ErrShortDst) {
 				_, _ = r.outBuffer.Write(inBytes[0:end])
 				start = end
 				break
