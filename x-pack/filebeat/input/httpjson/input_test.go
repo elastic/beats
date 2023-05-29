@@ -11,6 +11,8 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -21,15 +23,17 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestInput(t *testing.T) {
 	testCases := []struct {
-		name        string
-		setupServer func(*testing.T, http.HandlerFunc, map[string]interface{})
-		baseConfig  map[string]interface{}
-		handler     http.HandlerFunc
-		expected    []string
+		name         string
+		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
+		baseConfig   map[string]interface{}
+		handler      http.HandlerFunc
+		expected     []string
+		expectedFile string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -291,6 +295,49 @@ func TestInput(t *testing.T) {
 				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 			},
+		},
+		{
+			name: "Test tracer filename sanitization",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				// mock timeNow func to return a fixed value
+				timeNow = func() time.Time {
+					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+					return t
+				}
+
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+				t.Cleanup(func() { timeNow = time.Now })
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":  "url.params.$filter",
+							"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+							"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"timestamp": map[string]interface{}{
+						"value": `[[index .last_response.body "@timestamp"]]`,
+					},
+				},
+				"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			},
+			handler: dateCursorHandler(),
+			expected: []string{
+				`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+				`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+			},
+			expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 		},
 		{
 			name: "Test pagination",
@@ -730,8 +777,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -808,8 +856,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -844,8 +893,9 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
-				"request.method": http.MethodGet,
+				"interval":                     1,
+				"request.method":               http.MethodGet,
+				"response.save_first_response": true,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
@@ -1127,6 +1177,104 @@ func TestInput(t *testing.T) {
 				`{"space":{"world":"moon"}}`,
 			},
 		},
+		{
+			name: "Test simple XML decode",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerDecoders()
+				registerRequestTransforms()
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					const text = `<?xml version="1.0" encoding="UTF-8"?>
+<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
+  <sender>Ástríðr Ragnar</sender>
+  <address>
+    <name>Joord Lennart</name>
+    <company>Sydøstlige Gruppe</company>
+    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+    <city>Boekend</city>
+    <country>Netherlands</country>
+  </address>
+  <item>
+    <name>Egil's Saga</name>
+    <note>Free Sample</note>
+    <number>1</number>
+    <cost>99.95</cost>
+    <sent>FALSE</sent>
+  </item>
+</order>
+`
+					io.ReadAll(r.Body)
+					r.Body.Close()
+					w.Write([]byte(text))
+				})
+				server := httptest.NewServer(r)
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": http.MethodGet,
+				"response.xsd": `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sender" type="xs:string"/>
+        <xs:element name="address">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="company" type="xs:string"/>
+              <xs:element name="address" type="xs:string"/>
+              <xs:element name="city" type="xs:string"/>
+              <xs:element name="country" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="item" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+              <xs:element name="number" type="xs:positiveInteger"/>
+              <xs:element name="cost" type="xs:decimal"/>
+              <xs:element name="sent" type="xs:boolean"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+`,
+			},
+			handler: defaultHandler(http.MethodGet, "", ""),
+			expected: []string{mapstr.M{
+				"order": map[string]interface{}{
+					"address": map[string]interface{}{
+						"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
+						"city":    "Boekend",
+						"company": "Sydøstlige Gruppe",
+						"country": "Netherlands",
+						"name":    "Joord Lennart",
+					},
+					"item": []interface{}{
+						map[string]interface{}{
+							"cost":   99.95,
+							"name":   "Egil's Saga",
+							"note":   "Free Sample",
+							"number": 1,
+							"sent":   false,
+						},
+					},
+					"noNamespaceSchemaLocation": "sales.xsd",
+					"orderid":                   "56733",
+					"sender":                    "Ástríðr Ragnar",
+					"xsi":                       "http://www.w3.org/2001/XMLSchema-instance",
+				},
+			}.String()},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -1138,6 +1286,12 @@ func TestInput(t *testing.T) {
 
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
+
+			var tempDir string
+			if conf.Request.Tracer != nil {
+				tempDir = t.TempDir()
+				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
+			}
 
 			input := newStatelessInput(conf)
 
@@ -1186,6 +1340,13 @@ func TestInput(t *testing.T) {
 						cancel()
 						break wait
 					}
+				}
+			}
+			if tc.expectedFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, tc.expectedFile)); err == nil {
+					assert.NoError(t, g.Wait())
+				} else {
+					t.Errorf("Expected log filename not found")
 				}
 			}
 			assert.NoError(t, g.Wait())
@@ -1254,7 +1415,7 @@ func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "test_id",
+		ID:          "httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi",
 		Cancelation: ctx,
 	}, cancel
 }

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
@@ -139,6 +138,16 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLogExp) Name() string {
 	return l.id
+}
+
+// Channel returns the event log's channel name.
+func (l *winEventLogExp) Channel() string {
+	return l.channelName
+}
+
+// IsFile returns true if the event log is an evtx file.
+func (l *winEventLogExp) IsFile() bool {
+	return l.file
 }
 
 func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
@@ -333,6 +342,9 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 func (l *winEventLogExp) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
+	if l.iterator == nil {
+		return l.renderer.Close()
+	}
 	return multierr.Combine(
 		l.iterator.Close(),
 		l.renderer.Close(),

@@ -22,12 +22,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 )
+
+// The string used to specify this queue in beats configurations.
+const QueueType = "mem"
 
 const (
 	minInputQueueSize      = 20
@@ -63,14 +64,11 @@ type broker struct {
 	// chanList of all outstanding ACK channels.
 	scheduledACKs chan chanList
 
-	// A listener that should be notified when ACKs are processed.
-	// ackLoop calls this listener's OnACK function when it advances
-	// the consumer ACK position.
-	// Right now this listener always points at the Pipeline associated with
-	// this queue. Pipeline.OnACK then forwards the notification to
-	// Pipeline.observer.queueACKed(), which updates the beats registry
-	// if needed.
-	ackListener queue.ACKListener
+	// A callback that should be invoked when ACKs are processed.
+	// ackLoop calls this function when it advances the consumer ACK position.
+	// Right now this forwards the notification to queueACKed() in
+	// the pipeline observer, which updates the beats registry if needed.
+	ackCallback func(eventCount int)
 
 	// This channel is used to request/return metrics where such metrics require insight into
 	// the actual eventloop itself. This seems like it might be overkill, but it seems that
@@ -83,7 +81,6 @@ type broker struct {
 }
 
 type Settings struct {
-	ACKListener    queue.ACKListener
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
@@ -119,35 +116,16 @@ type chanList struct {
 	tail *batchACKState
 }
 
-func init() {
-	queue.RegisterQueueType(
-		"mem",
-		create,
-		feature.MakeDetails(
-			"Memory queue",
-			"Buffer events in memory before sending to the output.",
-			feature.Stable))
-}
-
-func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *c.C, inQueueSize int,
-) (queue.Queue, error) {
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		ackCallback func(eventCount int),
+	) (queue.Queue, error) {
+		return NewQueue(logger, ackCallback, settings), nil
 	}
-
-	if logger == nil {
-		logger = logp.L()
-	}
-
-	return NewQueue(logger, Settings{
-		ACKListener:    ackListener,
-		Events:         config.Events,
-		FlushMinEvents: config.FlushMinEvents,
-		FlushTimeout:   config.FlushTimeout,
-		InputQueueSize: inQueueSize,
-	}), nil
 }
 
 // NewQueue creates a new broker based in-memory queue holding up to sz number of events.
@@ -155,6 +133,7 @@ func create(
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
+	ackCallback func(eventCount int),
 	settings Settings,
 ) *broker {
 	var (
@@ -192,7 +171,7 @@ func NewQueue(
 		// internal broker and ACK handler channels
 		scheduledACKs: make(chan chanList),
 
-		ackListener: settings.ACKListener,
+		ackCallback: ackCallback,
 		metricChan:  make(chan metricsRequest),
 	}
 
@@ -228,6 +207,10 @@ func NewQueue(
 func (b *broker) Close() error {
 	close(b.done)
 	return nil
+}
+
+func (b *broker) QueueType() string {
+	return QueueType
 }
 
 func (b *broker) BufferConfig() queue.BufferConfig {
@@ -387,8 +370,9 @@ func (b *batch) Entry(i int) interface{} {
 	return b.entries[i].event
 }
 
-func (b *batch) ID(i int) queue.EntryID {
-	return b.entries[i].id
+func (b *batch) FreeEntries() {
+	// Memory queue can't release event references until they're fully acknowledged,
+	// so do nothing.
 }
 
 func (b *batch) Done() {

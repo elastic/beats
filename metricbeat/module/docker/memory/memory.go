@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package memory
 
@@ -81,7 +80,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
-//Close stops the metricset
+// Close stops the metricset
 func (m *MetricSet) Close() error {
 
 	return m.dockerClient.Close()

@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -253,14 +254,16 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 		"VIRTUAL_ENV": ve,
 	}
 
+	vePython := virtualenvPath(ve, pythonExe)
+	// Ensure we are using the latest pip version.
+	// use method described at https://pip.pypa.io/en/stable/installation/#upgrading-pip
+	if err = sh.RunWith(env, vePython, "-m", "pip", "install", "--upgrade", "pip"); err != nil {
+		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
+	}
+
 	pip := virtualenvPath(ve, "pip")
 	pipUpgrade := func(pkg string) error {
 		return sh.RunWith(env, pip, "install", "-U", pkg)
-	}
-
-	// Ensure we are using the latest pip version.
-	if err = pipUpgrade("pip"); err != nil {
-		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
 	}
 
 	// First ensure that wheel is installed so that bdists build cleanly.
@@ -338,7 +341,14 @@ func LookVirtualenvPath(ve, file string) (string, error) {
 	os.Setenv("PATH", virtualenvPath(ve)+string(filepath.ListSeparator)+path)
 	defer os.Setenv("PATH", path)
 
-	return exec.LookPath(file)
+	// See https://pkg.go.dev/os/exec#hdr-Executables_in_the_current_directory
+	// We explicitly want to find ./pytest in the virtualenv if it exists as of Go 1.19.
+	path, err := exec.LookPath(file)
+	if errors.Is(err, exec.ErrDot) {
+		return path, nil
+	}
+
+	return path, err
 }
 
 func expandVirtualenvReqs() []string {

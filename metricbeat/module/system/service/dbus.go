@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package service
 
@@ -124,7 +123,7 @@ func listUnitsByPatternWrapper(conn *dbus.Conn, states, patterns []string) ([]db
 	return conn.ListUnitsByPatterns(states, patterns)
 }
 
-//listUnitsFilteredWrapper wraps the dbus ListUnitsFiltered method
+// listUnitsFilteredWrapper wraps the dbus ListUnitsFiltered method
 func listUnitsFilteredWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
 	units, err := conn.ListUnitsFiltered(states)
 	if err != nil {

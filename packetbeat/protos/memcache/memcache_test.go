@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package memcache
 
@@ -39,7 +38,7 @@ type memcacheTest struct {
 func newMemcacheTest(config memcacheConfig) *memcacheTest {
 	mct := &memcacheTest{}
 	mc := &memcache{}
-	mc.init(nil, procs.ProcessesWatcher{}, &config)
+	mc.init(nil, &procs.ProcessesWatcher{}, &config)
 	mc.handler = mct
 	mct.mc = mc
 	return mct

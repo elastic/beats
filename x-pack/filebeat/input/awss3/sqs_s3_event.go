@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -105,9 +104,11 @@ func newSQSS3EventProcessor(
 	maxReceiveCount int,
 	pipeline beat.Pipeline,
 	s3 s3ObjectHandlerFactory,
+	maxWorkers int,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry())
+		// Metrics are optional. Initialize a stub.
+		metrics = newInputMetrics("", nil, 0)
 	}
 	return &sqsS3EventProcessor{
 		s3ObjectHandler:      s3,
@@ -308,7 +309,7 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 
 	// Create a pipeline client scoped to this goroutine.
 	client, err := p.pipeline.ConnectWith(beat.ClientConfig{
-		ACKHandler: awscommon.NewEventACKHandler(),
+		EventListener: awscommon.NewEventACKHandler(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.

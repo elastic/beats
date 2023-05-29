@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package icmp
 
@@ -62,7 +61,7 @@ func TestIcmpDirection(t *testing.T) {
 func BenchmarkIcmpProcessICMPv4(b *testing.B) {
 	logp.TestingSetup(logp.WithSelectors("icmp", "icmpdetailed"))
 
-	icmp, err := New(true, func(beat.Event) {}, procs.ProcessesWatcher{}, conf.NewConfig())
+	icmp, err := New(true, func(beat.Event) {}, &procs.ProcessesWatcher{}, conf.NewConfig())
 	if err != nil {
 		b.Error("Failed to create ICMP processor")
 		return

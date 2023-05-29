@@ -46,6 +46,13 @@ some extra setup. For more information, see
 {logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
 endif::[]
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 // end::shared-logstash-config[]
 
 ==== Accessing metadata fields
@@ -264,10 +271,22 @@ is best used with load balancing mode enabled. Example: If you have 2 hosts and
 [[loadbalance]]
 ===== `loadbalance`
 
-If set to true and multiple {ls} hosts are configured, the output plugin
-load balances published events onto all {ls} hosts. If set to false,
-the output plugin sends all events to only one host (determined at random) and
-will switch to another host if the selected one becomes unresponsive. The default value is false.
+When `loadbalance: true` is set, {beatname_uc} connects to all configured
+hosts and sends data through all connections in parallel. If a connection
+fails, data is sent to the remaining hosts until it can be reestablished.
+Data will still be sent as long as {beatname_uc} can connect to at least
+one of its configured hosts.
+
+When `loadbalance: false` is set, {beatname_uc} sends data to a single host
+at a time. The target host is chosen at random from the list of configured
+hosts, and all data is sent to that target until the connection fails, when
+a new target is selected. Data will still be sent as long as {beatname_uc}
+can connect to at least one of its configured hosts. To rotate through the
+list of configured hosts over time, use this option in conjunction with the
+`ttl` setting to close the connection at the configured interval and choose
+a new target host.
+
+The default value is `true`.
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------

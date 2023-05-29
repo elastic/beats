@@ -24,6 +24,13 @@ output.redis:
   timeout: 5
 ------------------------------------------------------------------------------
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 ==== Compatibility
 
 This output is expected to work with all Redis versions between 3.2.4 and 5.0.8. Other versions might work as well,
@@ -158,9 +165,19 @@ The number of workers to use for each host configured to publish events to Redis
 
 ===== `loadbalance`
 
-If set to true and multiple hosts or workers are configured, the output plugin load balances published events onto all
-Redis hosts. If set to false, the output plugin sends all events to only one host (determined at random) and will switch
-to another host if the currently selected one becomes unreachable. The default value is true.
+When `loadbalance: true` is set, {beatname_uc} connects to all configured
+hosts and sends data through all connections in parallel. If a connection
+fails, data is sent to the remaining hosts until it can be reestablished.
+Data will still be sent as long as {beatname_uc} can connect to at least
+one of its configured hosts.
+
+When `loadbalance: false` is set, {beatname_uc} sends data to a single host
+at a time. The target host is chosen at random from the list of configured
+hosts, and all data is sent to that target until the connection fails, when
+a new target is selected. Data will still be sent as long as {beatname_uc}
+can connect to at least one of its configured hosts.
+
+The default value is `true`.
 
 ===== `timeout`
 

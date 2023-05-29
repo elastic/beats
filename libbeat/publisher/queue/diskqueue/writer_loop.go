@@ -71,6 +71,10 @@ type writerLoop struct {
 	// The logger for the writer loop, assigned when the queue creates it.
 	logger *logp.Logger
 
+	// A callback that, if set, should be invoked with an event count when
+	// events are successfully written to disk.
+	writeToDiskCallback func(eventCount int)
+
 	// The writer loop listens on requestChan for frames to write, and
 	// writes them to disk immediately (all queue capacity checking etc. is
 	// done by the core loop before sending it to the writer).
@@ -96,11 +100,16 @@ type writerLoop struct {
 	buffer *bytes.Buffer
 }
 
-func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
+func newWriterLoop(
+	logger *logp.Logger,
+	writeToDiskCallback func(eventCount int),
+	settings Settings,
+) *writerLoop {
 	buffer := &bytes.Buffer{}
 	return &writerLoop{
-		logger:   logger,
-		settings: settings,
+		logger:              logger,
+		writeToDiskCallback: writeToDiskCallback,
+		settings:            settings,
 
 		requestChan:  make(chan writerLoopRequest, 1),
 		responseChan: make(chan writerLoopResponse),
@@ -235,8 +244,8 @@ outerLoop:
 	_ = wl.outputFile.Sync()
 
 	// If the queue has an ACK listener, notify it the frames were written.
-	if wl.settings.WriteToDiskListener != nil {
-		wl.settings.WriteToDiskListener.OnACK(totalACKCount)
+	if wl.writeToDiskCallback != nil {
+		wl.writeToDiskCallback(totalACKCount)
 	}
 
 	// Notify any producers with ACK listeners that their frames were written.

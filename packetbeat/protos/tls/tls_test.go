@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package tls
 
@@ -71,7 +70,7 @@ func testInit() (*eventStore, *tlsPlugin) {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
-	tls, err := New(true, results.publish, procs.ProcessesWatcher{}, nil)
+	tls, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		return nil, nil
 	}

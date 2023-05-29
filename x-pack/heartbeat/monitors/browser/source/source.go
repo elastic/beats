@@ -3,12 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux || darwin
-// +build linux darwin
 
 package source
 
 import (
 	"fmt"
+	"os"
 )
 
 type Source struct {
@@ -38,6 +38,8 @@ func (s *Source) Active() ISource {
 }
 
 var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor")
+
+var defaultMod = os.FileMode(0770)
 
 func (s *Source) Validate() error {
 	if s.Active() == nil {

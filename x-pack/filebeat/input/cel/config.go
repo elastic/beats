@@ -18,6 +18,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
+const defaultMaxExecutions = 1000
+
 // config is the top-level configuration for a cel input.
 type config struct {
 	// Interval is the period interval between runs of the input.
@@ -25,6 +27,11 @@ type config struct {
 
 	// Program is the CEL program to be run for each polling.
 	Program string `config:"program" validate:"required"`
+	// MaxExecutions is the maximum number of times a single
+	// periodic CEL execution loop may repeat due to a true
+	// "want_more" field. If it is nil a sensible default is
+	// used.
+	MaxExecutions *int `config:"max_executions"`
 	// Regexps is the set of regular expression to be made
 	// available to the program.
 	Regexps map[string]string `config:"regexp"`
@@ -58,6 +65,9 @@ func (c config) Validate() error {
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
+	if c.MaxExecutions != nil && *c.MaxExecutions <= 0 {
+		return fmt.Errorf("invalid maximum number of executions: %d <= 0", *c.MaxExecutions)
+	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
 		return fmt.Errorf("failed to check regular expressions: %w", err)
@@ -71,7 +81,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(context.Background(), c.Program, root, client, nil, patterns)
+	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -79,6 +89,7 @@ func (c config) Validate() error {
 }
 
 func defaultConfig() config {
+	maxExecutions := defaultMaxExecutions
 	maxAttempts := 5
 	waitMin := time.Second
 	waitMax := time.Minute
@@ -86,7 +97,8 @@ func defaultConfig() config {
 	transport.Timeout = 30 * time.Second
 
 	return config{
-		Interval: time.Minute,
+		MaxExecutions: &maxExecutions,
+		Interval:      time.Minute,
 		Resource: &ResourceConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,
@@ -149,7 +161,7 @@ func (c rateLimitConfig) Validate() error {
 		return errors.New("limit must be greater than zero")
 	}
 	if c.Limit == nil && c.Burst != nil && *c.Burst <= 0 {
-		return errors.New("limit must be greater than zero if limit is specified")
+		return errors.New("burst must be greater than zero if limit is not specified")
 	}
 	return nil
 }

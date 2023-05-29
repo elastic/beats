@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -77,7 +76,8 @@ func newS3Poller(log *logp.Logger,
 	bucketPollInterval time.Duration,
 ) *s3Poller {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry())
+		// Metrics are optional. Initialize a stub.
+		metrics = newInputMetrics("", nil, 0)
 	}
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,

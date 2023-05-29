@@ -13,6 +13,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/elastic/mito/lib/xml"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -101,6 +103,11 @@ func registerDecoders() {
 
 	log.Debugf("registering decoder 'application/zip': returned error: %#v",
 		registerDecoder("application/zip", decodeAsZip))
+
+	log.Debugf("registering decoder 'application/xml': returned error: %#v",
+		registerDecoder("application/xml", decodeAsXML))
+	log.Debugf("registering decoder 'text/xml': returned error: %#v",
+		registerDecoder("text/xml; charset=utf-8", decodeAsXML))
 }
 
 func encodeAsJSON(trReq transformable) ([]byte, error) {
@@ -210,10 +217,20 @@ func decodeAsZip(p []byte, dst *response) error {
 	}
 
 	dst.body = results
-	if dst.header == nil { //nolint:errorlint // golangci-lint-action #624
+	if dst.header == nil {
 		dst.header = http.Header{}
 	}
 	dst.header["X-Zip-Files"] = names
 
+	return nil
+}
+
+func decodeAsXML(p []byte, dst *response) error {
+	cdata, body, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
+	if err != nil {
+		return err
+	}
+	dst.body = body
+	dst.header["XML-CDATA"] = []string{cdata}
 	return nil
 }

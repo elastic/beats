@@ -44,6 +44,20 @@ packetbeat.interfaces.internal_networks:
 # The default is 30 MB.
 #packetbeat.interfaces.buffer_size_mb: 30
 
+# To scale processing across multiple Packetbeat processes, a fanout group
+# identifier can be specified. When `fanout_group` is used the Linux kernel splits
+# packets across Packetbeat instances in the same group by using a flow hash. It
+# computes the flow hash modulo with the number of Packetbeat processes in order
+# to consistently route flows to the same Packetbeat instance.
+#
+# The value must be between 0 and 65535. By default, no value is set.
+#
+# This is only available on Linux and requires using `type: af_packet`. Each process
+# must be running in same network namespace. All processes must use the same
+# interface settings. You must take responsibility for running multiple instances
+# of Packetbeat.
+#packetbeat.interfaces.fanout_group: ~
+
 # Packetbeat automatically generates a BPF for capturing only the traffic on
 # ports where it expects to find known protocols. Use this settings to tell
 # Packetbeat to generate a BPF filter that accepts VLAN tags.
@@ -69,7 +83,7 @@ packetbeat.flows:
   # timed out.
   timeout: 30s
 
-  # Configure reporting period. If set to -1, only killed flows will be reported
+  # Configure reporting period. If set to -1s, only killed flows will be reported
   period: 10s
 
   # Set to true to publish fields with null values in events.
@@ -919,6 +933,13 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
+  # If set to true and multiple hosts are configured, the output plugin load
+  # balances published events onto all Elasticsearch hosts. If set to false,
+  # the output plugin sends all events to only one host (determined at random)
+  # and will switch to another host if the currently selected one becomes
+  # unreachable. The default value is true.
+  #loadbalance: true
+
   # Optional data stream or index name. The default is "packetbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "packetbeat-%{[agent.version]}"
@@ -1027,6 +1048,15 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+
+  # Enables restarting packetbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -1166,6 +1196,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting packetbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -1371,6 +1409,14 @@ output.elasticsearch:
   # list is empty or not defined, the matching certificate will be the
   # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
+
+  # Enables restarting packetbeat if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -2161,4 +2207,11 @@ logging.files:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
+
+# =============================== Feature Flags ================================
+
+# Enable and configure feature flags.
+#features:
+#  fqdn:
+#    enabled: true
 

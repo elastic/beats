@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo && withjournald
-// +build linux,cgo,withjournald
 
 package journald
 
@@ -238,9 +237,9 @@ func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekM
 }
 
 // readerAdapter wraps journalread.Reader and adds two functionalities:
-// - Allows it to behave like a reader.Reader
-// - Translates the fields names from the journald format to something
-//   more human friendly
+//   - Allows it to behave like a reader.Reader
+//   - Translates the fields names from the journald format to something
+//     more human friendly
 type readerAdapter struct {
 	r                  *journalread.Reader
 	canceler           input.Canceler

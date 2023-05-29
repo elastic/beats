@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package sip
 
@@ -116,7 +115,7 @@ func TestParseUDP(t *testing.T) {
 		gotEvent = &evt
 	}
 	const data = "INVITE sip:test@10.0.2.15:5060 SIP/2.0\r\nVia: SIP/2.0/UDP 10.0.2.20:5060;branch=z9hG4bK-2187-1-0\r\nFrom: \"DVI4/8000\" <sip:sipp@10.0.2.20:5060>;tag=1\r\nTo: test <sip:test@10.0.2.15:5060>\r\nCall-ID: 1-2187@10.0.2.20\r\nCSeq: 1 INVITE\r\nContact: sip:sipp@10.0.2.20:5060\r\nMax-Forwards: 70\r\nContent-Type: application/sdp\r\nContent-Length:   123\r\n\r\nv=0\r\no=- 42 42 IN IP4 10.0.2.20\r\ns=-\r\nc=IN IP4 10.0.2.20\r\nt=0 0\r\nm=audio 6000 RTP/AVP 5\r\na=rtpmap:5 DVI4/8000\r\na=recvonly\r\n"
-	p, _ := New(true, reporter, procs.ProcessesWatcher{}, nil)
+	p, _ := New(true, reporter, &procs.ProcessesWatcher{}, nil)
 	plugin := p.(*plugin)
 	plugin.ParseUDP(&protos.Packet{
 		Ts:      time.Now(),

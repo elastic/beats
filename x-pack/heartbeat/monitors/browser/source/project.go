@@ -2,7 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 //go:build linux || darwin
-// +build linux darwin
 
 package source
 
@@ -59,6 +58,10 @@ func (p *ProjectSource) Fetch() error {
 	if err != nil {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
+	err = os.Chmod(p.TargetDirectory, defaultMod)
+	if err != nil {
+		return fmt.Errorf("failed assigning default mode %s to temp dir: %w", defaultMod, err)
+	}
 
 	err = unzip(tf, p.Workdir(), "")
 	if err != nil {
@@ -111,13 +114,25 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, 0755)
+	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, defaultMod)
 	if err != nil {
 		return err
 	}
+	err = os.Chmod(filepath.Join(workdir, "package.json"), defaultMod) // Double tap because of umask
+	if err != nil {
+		return fmt.Errorf("failed assigning default mode %s to package.json: %w", defaultMod, err)
+	}
 
 	// setup the project linking to the global synthetics library
-	return runSimpleCommand(exec.Command("npm", "install"), workdir)
+	return runSimpleCommand(
+		exec.Command(
+			"npm", "install",
+			"--no-audit",           // Prevent audit checks that require internet
+			"--no-update-notifier", // Prevent update checks that require internet
+			"--no-fund",            // No need for package funding messages here
+			"--package-lock=false", // no need to write package lock here
+			"--progress=false",     // no need to display progress
+		), workdir)
 }
 
 func (p *ProjectSource) Workdir() string {

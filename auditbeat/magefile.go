@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -25,6 +24,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"go.uber.org/multierr"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -59,7 +59,10 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	return multierr.Combine(
+		devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs()),
+		devtools.TestLinuxForCentosGLIBC(),
+	)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).

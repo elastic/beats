@@ -42,7 +42,8 @@ func (r *TransformRegister) SetTransform(transform func(*proto.UnitExpectedConfi
 }
 
 // Transform sets a transform function callback
-func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+func (r *TransformRegister) Transform(
+	cfg *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	// If no transform is registered, fallback to a basic setup
 	if r.transformFunc == nil {
 		streamList, err := CreateInputsFromStreams(cfg, "log", agentInfo)
@@ -67,7 +68,7 @@ func (r *TransformRegister) Transform(cfg *proto.UnitExpectedConfig, agentInfo *
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
-func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
+func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
 	// should this be an error?
 	if raw.GetStreams() == nil {
 		return []map[string]interface{}{}, nil
@@ -76,14 +77,24 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 
 	for iter, stream := range raw.GetStreams() {
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
+		streamSource, err := createStreamRules(raw, streamSource, stream, defaultDataStreamType, agentInfo, defaultProcessors...)
+		if err != nil {
+			return nil, fmt.Errorf("error creating stream rules: %w", err)
+		}
 
-		streamSource = injectIndexStream(inputType, raw, stream, streamSource)
+		inputs[iter] = streamSource
+	}
 
-		// the order of building the processors is important
-		// prepend is used to ensure that the processors defined directly on the stream
-		// come last in the order as they take priority over the others as they are the
-		// most specific to this one stream
+	return inputs, nil
+}
 
+// CreateShipperInput is a modified version of CreateInputsFromStreams made for forwarding input units to the shipper beat
+// this does not create separate inputs for each stream, and instead passes it along as a single input, with just the processors added
+func CreateShipperInput(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
+	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
+	for iter, stream := range raw.GetStreams() {
+		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
+		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
 		// 1. global processors
 		streamSource = injectGlobalProcesssors(raw, streamSource)
 
@@ -94,21 +105,16 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, inputType string, ag
 		}
 
 		// 3. stream processors
-		streamSource, err = injectStreamProcessors(raw, inputType, stream, streamSource, defaultProcessors)
+		streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
 		if err != nil {
 			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
 		}
-
-		// now the order of the processors on this input is as follows
-		// 1. stream processors
-		// 2. agentInfo processors
-		// 3. global processors
-		// 4. stream specific processors
-
 		inputs[iter] = streamSource
 	}
+	rawMap := raw.Source.AsMap()
+	rawMap["streams"] = inputs
 
-	return inputs, nil
+	return []map[string]interface{}{rawMap}, nil
 }
 
 // CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
@@ -129,6 +135,40 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 // ===========
 // config injection
 // ===========
+
+// convinence method for wrapping all the stream transformations needed by the shipper and other inputs
+func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
+
+	streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
+
+	// the order of building the processors is important
+	// prepend is used to ensure that the processors defined directly on the stream
+	// come last in the order as they take priority over the others as they are the
+	// most specific to this one stream
+
+	// 1. global processors
+	streamSource = injectGlobalProcesssors(raw, streamSource)
+
+	// 2. agentInfo
+	streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("Error injecting agent processors: %w", err)
+	}
+
+	// 3. stream processors
+	streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
+	if err != nil {
+		return nil, fmt.Errorf("Error injecting stream processors: %w", err)
+	}
+
+	// now the order of the processors on this input is as follows
+	// 1. stream processors
+	// 2. agentInfo processors
+	// 3. global processors
+	// 4. stream specific processors
+
+	return streamSource, nil
+}
 
 // Emulates the InjectAgentInfoRule and InjectHeadersRule ast rules
 // adds processors for agent-related metadata
@@ -172,19 +212,19 @@ func injectGlobalProcesssors(expected *proto.UnitExpectedConfig, stream map[stri
 
 // injectIndexStream is an emulation of the InjectIndexProcessor AST code
 // this adds the `index` field, based on the data_stream info we get from the config
-func injectIndexStream(dataStreamType string, expected *proto.UnitExpectedConfig, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
-	streamType, dataset, namespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
+func injectIndexStream(defaultDataStreamType string, expected *proto.UnitExpectedConfig, streamExpected *proto.Stream, stream map[string]interface{}) map[string]interface{} {
+	streamType, dataset, namespace := metadataFromDatastreamValues(defaultDataStreamType, expected, streamExpected)
 	index := fmt.Sprintf("%s-%s-%s", streamType, dataset, namespace)
 	stream["index"] = index
 	return stream
 }
 
-//injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
+// injectStreamProcessors is an emulation of the InjectStreamProcessorRule AST code
 // this adds a variety of processors for metadata related to the dataset and input config.
-func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
-	//1. start by "repairing" config to add any missing fields
+func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStreamType string, streamExpected *proto.Stream, stream map[string]interface{}, defaultProcessors []mapstr.M) (map[string]interface{}, error) {
+	// 1. start by "repairing" config to add any missing fields
 	// logic from datastreamTypeFromInputNode
-	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(dataStreamType, expected, streamExpected)
+	procInputType, procInputDataset, procInputNamespace := metadataFromDatastreamValues(defaultDataStreamType, expected, streamExpected)
 
 	var processors = []interface{}{}
 
@@ -203,7 +243,7 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, dataStreamType s
 		processors = append(processors, inputID)
 	}
 
-	//2. Actually add the processors
+	// 2. Actually add the processors
 	// namespace
 	datastream := generateAddFieldsProcessor(mapstr.M{"dataset": procInputDataset,
 		"namespace": procInputNamespace, "type": procInputType}, "data_stream")

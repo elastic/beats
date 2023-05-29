@@ -40,7 +40,10 @@ type mockClient struct {
 func (c *mockClient) String() string { return "mock_client" }
 func (c *mockClient) Close() error   { return nil }
 func (c *mockClient) Publish(_ context.Context, batch publisher.Batch) error {
-	return c.publishFn(batch)
+	if c.publishFn != nil {
+		return c.publishFn(batch)
+	}
+	return nil
 }
 
 func newMockNetworkClient(publishFn mockPublishFn) outputs.Client {
@@ -71,10 +74,12 @@ func (b *mockBatch) Events() []publisher.Event {
 	return b.events
 }
 
-func (b *mockBatch) ACK()       { signalFn(b.onACK) }
-func (b *mockBatch) Drop()      { signalFn(b.onDrop) }
-func (b *mockBatch) Retry()     { signalFn(b.onRetry) }
-func (b *mockBatch) Cancelled() { signalFn(b.onCancelled) }
+func (b *mockBatch) ACK()             { signalFn(b.onACK) }
+func (b *mockBatch) Drop()            { signalFn(b.onDrop) }
+func (b *mockBatch) Retry()           { signalFn(b.onRetry) }
+func (b *mockBatch) SplitRetry() bool { return false }
+func (b *mockBatch) Cancelled()       { signalFn(b.onCancelled) }
+func (b *mockBatch) FreeEntries()     {}
 
 func (b *mockBatch) RetryEvents(events []publisher.Event) {
 	b.updateEvents(events)

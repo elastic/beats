@@ -19,6 +19,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/mito/lib/xml"
 )
 
 const requestNamespace = "request"
@@ -106,6 +107,7 @@ type requestFactory struct {
 	until                  *valueTpl
 	chainHTTPClient        *httpClient
 	chainResponseProcessor *responseProcessor
+	saveFirstResponse      bool
 }
 
 func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]*requestFactory, error) {
@@ -114,16 +116,26 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
-		url:        *config.Request.URL.URL,
-		method:     config.Request.Method,
-		body:       config.Request.Body,
-		transforms: ts,
-		log:        log,
-		encoder:    registeredEncoders[config.Request.EncodeAs],
+		url:               *config.Request.URL.URL,
+		method:            config.Request.Method,
+		body:              config.Request.Body,
+		transforms:        ts,
+		log:               log,
+		encoder:           registeredEncoders[config.Request.EncodeAs],
+		saveFirstResponse: config.Response.SaveFirstResponse,
 	}
 	if config.Auth != nil && config.Auth.Basic.isEnabled() {
 		rf.user = config.Auth.Basic.User
 		rf.password = config.Auth.Basic.Password
+	}
+	var xmlDetails map[string]xml.Detail
+	if config.Response.XSD != "" {
+		var err error
+		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return nil, err
+		}
 	}
 	rfs = append(rfs, rf)
 	for _, ch := range config.Chain {
@@ -140,7 +152,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				rf.user = ch.Step.Auth.Basic.User
 				rf.password = ch.Step.Auth.Basic.Password
 			}
-			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
+			responseProcessor := newChainResponseProcessor(ch, httpClient, xmlDetails, log)
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -166,7 +178,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger) ([]
 				rf.user = ch.While.Auth.Basic.User
 				rf.password = ch.While.Auth.Basic.Password
 			}
-			responseProcessor := newChainResponseProcessor(ch, httpClient, log)
+			responseProcessor := newChainResponseProcessor(ch, httpClient, xmlDetails, log)
 			rf = &requestFactory{
 				url:                    *ch.While.Request.URL.URL,
 				method:                 ch.While.Request.Method,
@@ -292,6 +304,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		chainIndex              int
 	)
 
+	//nolint:bodyclose // response body is closed through drainBody method
 	for i, rf := range r.requestFactories {
 		finalResps = nil
 		intermediateResps = nil
@@ -302,23 +315,26 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
-			// store first response in transform context
-			var bodyMap map[string]interface{}
-			body, err := io.ReadAll(httpResp.Body)
-			if err != nil {
-				return fmt.Errorf("failed to read http response body: %w", err)
+
+			if rf.saveFirstResponse {
+				// store first response in transform context
+				var bodyMap map[string]interface{}
+				body, err := io.ReadAll(httpResp.Body)
+				if err != nil {
+					return fmt.Errorf("failed to read http response body: %w", err)
+				}
+				httpResp.Body = io.NopCloser(bytes.NewReader(body))
+				err = json.Unmarshal(body, &bodyMap)
+				if err != nil {
+					r.log.Errorf("unable to unmarshal first_response.body: %v", err)
+				}
+				firstResponse := response{
+					url:    *httpResp.Request.URL,
+					header: httpResp.Header.Clone(),
+					body:   bodyMap,
+				}
+				trCtx.updateFirstResponse(firstResponse)
 			}
-			httpResp.Body = io.NopCloser(bytes.NewReader(body))
-			err = json.Unmarshal(body, &bodyMap)
-			if err != nil {
-				r.log.Errorf("unable to unmarshal first_response.body: %v", err)
-			}
-			firstResponse := response{
-				url:    *httpResp.Request.URL,
-				header: httpResp.Header.Clone(),
-				body:   bodyMap,
-			}
-			trCtx.updateFirstResponse(firstResponse)
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
@@ -577,6 +593,8 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
+//
+//nolint:bodyclose // response body is closed through drainBody method
 func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, response *http.Response, chainIndex int, log *logp.Logger) (int, error) {
 	var (
 		n                 int

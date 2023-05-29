@@ -103,7 +103,7 @@ func TestQueueMetricsBuffer(t *testing.T) {
 }
 
 func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, testName string) {
-	testQueue := NewQueue(nil, settings)
+	testQueue := NewQueue(nil, nil, settings)
 	defer testQueue.Close()
 
 	// Send events to queue
@@ -143,7 +143,7 @@ func TestProducerCancelRemovesEvents(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
-		return NewQueue(nil, Settings{
+		return NewQueue(nil, nil, Settings{
 			Events:         sz,
 			FlushMinEvents: minEvents,
 			FlushTimeout:   flushTimeout,
@@ -193,7 +193,6 @@ func TestEntryIDs(t *testing.T) {
 			batch, err := q.Get(1)
 			assert.NilError(t, err, "Queue read should succeed")
 			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-			assert.Equal(t, batch.ID(0), queue.EntryID(i), "Consumed entry IDs should be ordered the same as when they were produced")
 
 			metrics, err := q.Metrics()
 			assert.NilError(t, err, "Queue metrics call should succeed")
@@ -225,7 +224,6 @@ func TestEntryIDs(t *testing.T) {
 			batch, err := q.Get(1)
 			assert.NilError(t, err, "Queue read should succeed")
 			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-			assert.Equal(t, batch.ID(0), queue.EntryID(i), "Consumed entry IDs should be ordered the same as when they were produced")
 			batches = append(batches, batch)
 		}
 
@@ -260,22 +258,22 @@ func TestEntryIDs(t *testing.T) {
 	}
 
 	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, Settings{Events: 1000})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000})
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, Settings{Events: 1000})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000})
 		testBackward(testQueue)
 	})
 
 	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
 		testBackward(testQueue)
 	})
 }

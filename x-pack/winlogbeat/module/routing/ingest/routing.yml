@@ -16,6 +16,15 @@ processors:
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
       if: ctx?.winlog?.channel == 'Microsoft-Windows-PowerShell/Operational'
+  - set:
+      field: host.os.type
+      value: windows
+      override: false
+  - set:
+      field: host.os.family
+      value: windows
+      override: false
+
 on_failure:
   - set:
       field: error.message

@@ -173,7 +173,9 @@
     },
     "message": "AppControl detectOnly",
     "observer": {
-      "ip": "192.168.33.128",
+      "ip": [
+        "192.168.33.128"
+      ],
       "product": "Deep Security Agent",
       "vendor": "Trend Micro",
       "version": "10.2.229"
@@ -1028,7 +1030,9 @@
     },
     "observer": {
       "hostname": "super",
-      "ip": "111.111.111.99",
+      "ip": [
+        "111.111.111.99"
+      ],
       "product": "ASA",
       "vendor": "CISCO"
     },
@@ -1106,7 +1110,9 @@
     "message": "File Opened",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.131.65",
+      "ip": [
+        "192.168.131.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"
@@ -1174,7 +1180,9 @@
     "message": "Agent [NAT] type [sdkrfilereader] started",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.0.65",
+      "ip": [
+        "192.168.0.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"
@@ -1235,7 +1243,9 @@
     "message": "File processing started",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.131.65",
+      "ip": [
+        "192.168.131.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"
@@ -1304,7 +1314,9 @@
     "message": "Process Stopped by User",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.131.65",
+      "ip": [
+        "192.168.131.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"

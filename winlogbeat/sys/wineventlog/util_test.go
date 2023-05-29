@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
@@ -43,6 +42,7 @@ const (
 
 // createLog creates a new event log and returns a handle for writing events
 // to the log.
+//
 //nolint:errcheck // Errors are not checked since they always precede termination.
 func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	t.Helper()

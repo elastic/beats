@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package pkg
 
@@ -43,7 +42,7 @@ func TestHomebrew(t *testing.T) {
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
 		f := mbtest.NewReportingMetricSetV2(t, getConfig())
-		defer f.(*MetricSet).bucket.DeleteBucket()
+		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
 		if len(errs) > 0 {
@@ -97,7 +96,7 @@ func TestHomebrewNotExist(t *testing.T) {
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
 		f := mbtest.NewReportingMetricSetV2(t, getConfig())
-		defer f.(*MetricSet).bucket.DeleteBucket()
+		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
 		if len(errs) > 0 {

@@ -22,7 +22,6 @@ import "github.com/elastic/elastic-agent-libs/monitoring"
 type observer interface {
 	pipelineObserver
 	clientObserver
-	queueObserver
 	outputObserver
 
 	cleanup()
@@ -40,14 +39,11 @@ type clientObserver interface {
 	failedPublishEvent()
 }
 
-type queueObserver interface {
-	queueACKed(n int)
-	queueMaxEvents(n int)
-}
-
 type outputObserver interface {
 	eventsDropped(int)
 	eventsRetry(int)
+	queueACKed(n int)
+	queueMaxEvents(n int)
 }
 
 // metricsObserver is used by many component in the publisher pipeline, to report

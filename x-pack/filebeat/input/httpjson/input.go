@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -18,6 +19,8 @@ import (
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/mito/lib/xml"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -112,6 +115,11 @@ func run(
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
+	if config.Request.Tracer != nil {
+		id := sanitizeFileName(ctx.ID)
+		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
+	}
+
 	httpClient, err := newHTTPClient(stdCtx, config, log)
 	if err != nil {
 		return err
@@ -122,8 +130,16 @@ func run(
 		log.Errorf("Error while creating requestFactory: %v", err)
 		return err
 	}
+	var xmlDetails map[string]xml.Detail
+	if config.Response.XSD != "" {
+		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return err
+		}
+	}
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config, pagination, log)
+	responseProcessor := newResponseProcessor(config, pagination, xmlDetails, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
@@ -155,6 +171,15 @@ func run(
 	return nil
 }
 
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
 	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.settings())...)
@@ -164,6 +189,11 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 
 	if config.Request.Tracer != nil {
 		w := zapcore.AddSync(config.Request.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			config.Request.Tracer.Close()
+		}()
 		core := ecszap.NewCore(
 			ecszap.NewDefaultEncoderConfig(),
 			w,

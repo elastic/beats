@@ -33,7 +33,29 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 )
+
+func TestGenerateProcessorList(t *testing.T) {
+	inputCfg := []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
+	}
+
+	plugins, err := processors.NewPluginConfigFromList(inputCfg)
+	require.NoError(t, err)
+
+	processors, err := processors.New(plugins)
+	require.NoError(t, err)
+	// make sure the processor init got the config formatted in a way it expected
+	require.Equal(t, 4, len(processors.List))
+}
 
 func TestProcessorsConfigs(t *testing.T) {
 	defaultInfo := beat.Info{
@@ -258,7 +280,7 @@ func TestProcessorsConfigs(t *testing.T) {
 
 			factory := test.factory
 			if factory == nil {
-				factory = MakeDefaultSupport(true)
+				factory = MakeDefaultSupport(true, nil)
 			}
 
 			support, err := factory(info, logp.L(), cfg)
@@ -343,7 +365,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := MakeDefaultSupport(test.normalize)(beat.Info{}, logp.L(), config.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logp.L(), config.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -364,7 +386,7 @@ func TestNormalization(t *testing.T) {
 }
 
 func BenchmarkNormalization(b *testing.B) {
-	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(b, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -378,7 +400,7 @@ func BenchmarkNormalization(b *testing.B) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true)
@@ -393,7 +415,7 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	dynFields := mapstr.NewPointer(mapstr.M{})
@@ -416,7 +438,7 @@ func TestDynamicFields(t *testing.T) {
 }
 
 func TestProcessingClose(t *testing.T) {
-	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	// Inject a processor in the builder that we can check if has been closed.

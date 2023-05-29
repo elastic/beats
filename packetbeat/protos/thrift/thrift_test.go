@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package thrift
 
@@ -34,7 +33,7 @@ import (
 func thriftForTests() *thriftPlugin {
 	t := &thriftPlugin{}
 	config := defaultConfig
-	t.init(true, nil, procs.ProcessesWatcher{}, &config)
+	t.init(true, nil, &procs.ProcessesWatcher{}, &config)
 	return t
 }
 

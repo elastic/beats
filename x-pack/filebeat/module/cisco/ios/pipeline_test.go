@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -177,7 +176,7 @@ var testCases = []testCase{
 }
 
 func TestFilebeatSyslogCisco(t *testing.T) {
-	logp.TestingSetup()
+	_ = logp.TestingSetup()
 
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
@@ -191,7 +190,7 @@ func TestFilebeatSyslogCisco(t *testing.T) {
 	testInput(t, "log", p)
 }
 
-func testInput(t *testing.T, input string, p processors.Processor) {
+func testInput(t *testing.T, input string, p beat.Processor) {
 	for i, tc := range testCases {
 		tc := tc
 		t.Run(fmt.Sprintf("%s/%d", input, i), func(t *testing.T) {

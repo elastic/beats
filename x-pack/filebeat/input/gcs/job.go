@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 	"unicode"
 
@@ -27,6 +28,8 @@ import (
 )
 
 type job struct {
+	// Mutex lock for concurrent publishes
+	mu sync.Mutex
 	// gcs bucket handle
 	bucket *storage.BucketHandle
 	// gcs object attribute struct
@@ -79,8 +82,6 @@ func gcsObjectHash(src *Source, object *storage.ObjectAttrs) string {
 	return hex.EncodeToString(h.Sum(nil)[:5])
 }
 
-const jobErrString = "job with jobId %s encountered an error : %w"
-
 func (j *job) do(ctx context.Context, id string) {
 	var fields mapstr.M
 
@@ -94,7 +95,7 @@ func (j *job) do(ctx context.Context, id string) {
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.state.updateFailedJobs(j.object.Name)
-			j.log.Errorf(jobErrString, id, err)
+			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 			return
 		}
 
@@ -109,9 +110,12 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		event.SetID(objectID(j.hash, 0))
 		j.state.save(j.object.Name, j.object.Updated)
+		// locks while data is being published to avoid concurrent map read/writes
+		j.mu.Lock()
 		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
-			j.log.Errorf(jobErrString, id, err)
+			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		j.mu.Unlock()
 	}
 }
 
@@ -145,7 +149,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	defer func() {
 		err = reader.Close()
 		if err != nil {
-			j.log.Errorf("failed to close reader for object: %s, with error: %w", j.object.Name, err)
+			j.log.Errorw("failed to close reader for object", "objectName", j.object.Name, "error", err)
 		}
 	}()
 
@@ -205,7 +209,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		if j.src.ParseJSON {
 			parsedData, err = decodeJSON(bytes.NewReader(item))
 			if err != nil {
-				j.log.Errorf(jobErrString, id, err)
+				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 			}
 		}
 		evt := j.createEvent(item, parsedData, offset+relativeOffset)
@@ -219,9 +223,12 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			// partially saves read state using offset
 			j.state.savePartial(j.object.Name, offset+relativeOffset)
 		}
+		// locks while data is being published to avoid concurrent map read/writes
+		j.mu.Lock()
 		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
-			j.log.Errorf(jobErrString, id, err)
+			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		j.mu.Unlock()
 	}
 	return nil
 }

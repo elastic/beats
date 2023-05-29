@@ -18,11 +18,13 @@
 package monitorstate
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 )
 
@@ -93,4 +95,48 @@ func TestTransitionTo(t *testing.T) {
 	require.Equal(t, second.Down, s.Ends.Down)
 	// Ensure No infinite storage of states
 	require.Nil(t, s.Ends.Ends)
+}
+
+func TestLoaderDBKey(t *testing.T) {
+	tests := []struct {
+		name      string
+		runFromID string
+		at        time.Time
+		ctr       int
+		expected  string
+	}{
+		{
+			"simple - no rfid",
+			"",
+			time.Unix(0, 0),
+			0,
+			"default-0-0",
+		},
+		{
+			"simple - other time / count",
+			"",
+			time.Unix(12345, 0),
+			98765,
+			fmt.Sprintf("default-%x-%x", 12345000, 98765),
+		},
+		{
+			"Service location, weird chars",
+			"Asia/Pacific - Japan",
+			time.Unix(0, 0),
+			0,
+			"Asia_Pacific_-_Japan-0-0",
+		},
+	}
+
+	for _, tt := range tests {
+		sf := stdfields.StdMonitorFields{}
+		if tt.runFromID != "" {
+			sf.RunFrom = &config.LocationWithID{
+				ID: tt.runFromID,
+			}
+		}
+
+		key := LoaderDBKey(sf, tt.at, tt.ctr)
+		require.Equal(t, tt.expected, key)
+	}
 }
