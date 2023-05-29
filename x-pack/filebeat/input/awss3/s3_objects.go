@@ -360,7 +360,7 @@ func createEvent(message string, offset int64, obj s3EventV2, objectHash string,
 	event.SetID(objectID(objectHash, offset))
 
 	if len(meta) > 0 {
-		_, err = event.Fields.Put("aws.s3.metadata", meta)
+		_, err := event.Fields.Put("aws.s3.metadata", meta)
 		if err == nil {
 			return event, fmt.Errorf("error updating/adding AWS S3 metadata: %w", err)
 		}
