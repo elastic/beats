@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- [Gcs Input] - Enhancement and bugfix for concurrency issues, flakey tests and context timing out. {pull}35605[35605]
 
 *Heartbeat*
 
