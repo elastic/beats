@@ -123,3 +123,12 @@ func (s *state) setCheckpoint(chkpt *Checkpoint) {
 func (s *state) checkpoint() *Checkpoint {
 	return s.cp
 }
+
+// checkpointTxn, returns the current state checkpoint, locks the state
+// and returns an unlock function, done. The caller must call done when
+// cp is no longer needed in a locked state. done may not be called
+// more than once.
+func (s *state) checkpointTxn() (cp *Checkpoint, done func()) {
+	s.mu.Lock()
+	return s.cp, func() { s.mu.Unlock() }
+}

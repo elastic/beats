@@ -109,12 +109,14 @@ func (j *job) do(ctx context.Context, id string) {
 			Fields:    fields,
 		}
 		event.SetID(objectID(j.hash, 0))
-		j.state.save(j.object.Name, j.object.Updated)
-		// locks while data is being published to avoid concurrent map read/writes
+		// locks while data is being saved and published to avoid concurrent map read/writes
 		j.mu.Lock()
-		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+		j.state.save(j.object.Name, j.object.Updated)
+		cp, done := j.state.checkpointTxn()
+		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		done()
 		j.mu.Unlock()
 	}
 }
@@ -216,6 +218,8 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
+		// locks while data is being saved and published to avoid concurrent map read/writes
+		j.mu.Lock()
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
 			j.state.save(j.object.Name, j.object.Updated)
@@ -223,11 +227,11 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			// partially saves read state using offset
 			j.state.savePartial(j.object.Name, offset+relativeOffset)
 		}
-		// locks while data is being published to avoid concurrent map read/writes
-		j.mu.Lock()
-		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
+		cp, done := j.state.checkpointTxn()
+		if err := j.publisher.Publish(evt, cp); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		done()
 		j.mu.Unlock()
 	}
 	return nil
