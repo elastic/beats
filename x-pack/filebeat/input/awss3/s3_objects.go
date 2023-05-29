@@ -300,7 +300,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	for {
 		message, err := reader.Next()
 
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			// No more lines
 			break
 		}
