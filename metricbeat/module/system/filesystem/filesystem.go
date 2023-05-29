@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows
-// +build darwin freebsd linux openbsd windows
 
 package filesystem
 

@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -108,7 +107,8 @@ func newSQSS3EventProcessor(
 	maxWorkers int,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry(), maxWorkers)
+		// Metrics are optional. Initialize a stub.
+		metrics = newInputMetrics("", nil, 0)
 	}
 	return &sqsS3EventProcessor{
 		s3ObjectHandler:      s3,

@@ -121,7 +121,13 @@ pipeline {
             expression { return env.IS_BRANCH_AVAILABLE == "true" }
           }
           steps {
-            runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
+            // retryWithSleep and withNode can be remove once https://github.com/elastic/release-eng/issues/456
+            // (internal only) is fixed.
+            retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+              withNode(labels: 'ubuntu-22 && immutable', forceWorkspace: true) {
+                runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
+              }
+            }
           }
           post {
             failure {
@@ -144,7 +150,13 @@ pipeline {
             }
           }
           steps {
-            runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
+            // retryWithSleep and withNode can be remove once https://github.com/elastic/release-eng/issues/456
+            // (internal only) is fixed.
+            retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+              withNode(labels: 'ubuntu-22 && immutable', forceWorkspace: true) {
+                runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
+              }
+            }
           }
           post {
             failure {
@@ -193,15 +205,11 @@ def runReleaseManager(def args = [:]) {
     }
     sh(label: "prepare-release-manager-artifacts ${type}", script: ".ci/scripts/prepare-release-manager.sh ${type}")
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
-    // This can be remove once https://github.com/elastic/release-eng/issues/456 (internal only) is fixed.
-    def notifyRetry = { log(level: 'WARN', text: 'releaseManager failed, retry again') }
-    retryWithSleep(retries: 3, seconds: 60, backoff: true, sideEffect: notifyRetry) {
-      releaseManager(project: 'beats',
-                     version: env.BEAT_VERSION,
-                     type: type,
-                     artifactsFolder: 'build/distributions',
-                     outputFile: args.outputFile)
-    }
+    releaseManager(project: 'beats',
+                   version: env.BEAT_VERSION,
+                   type: type,
+                   artifactsFolder: 'build/distributions',
+                   outputFile: args.outputFile)
   }
 }
 
