@@ -44,22 +44,6 @@ ARG ELASTIC_PRODUCT=heartbeat
 
 COPY LICENSE /licenses/elastic-${ELASTIC_PRODUCT}
 
-# Install synthetics dependencies.
-COPY signatures/* *.rpm /
-RUN rpm --import linux_signing_key.pub RPM-GPG-KEY-CentOS-Official RPM-GPG-KEY-rockyofficial \
-  && yum -y --allowerasing --nodocs --nobest --setopt=install_weak_deps=False install *.rpm \
-  && rm -r *.rpm RPM-GPG-KEY-CentOS-Official linux_signing_key.pub RPM-GPG-KEY-rockyofficial \
-  && yum clean all && rm -rf /var/cache/yum
-
-ENV NODE_PATH=/usr/share/${ELASTIC_PRODUCT}/.node
-RUN echo \
-    $NODE_PATH \
-    /usr/share/${ELASTIC_PRODUCT}/.config \
-    /usr/share/${ELASTIC_PRODUCT}/.synthetics \
-    /usr/share/${ELASTIC_PRODUCT}/.npm \
-    /usr/share/${ELASTIC_PRODUCT}/.cache \
-    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
-
 # Add a dumb init process
 COPY tinit /tinit
 RUN chmod +x /tinit
@@ -87,27 +71,8 @@ RUN find / -xdev -perm -4000 -exec chmod u-s {} +
 # Provide a non-root user to run the process.
 RUN groupadd --gid 1000 ${ELASTIC_PRODUCT} && useradd --uid 1000 --gid 1000 --groups 0 --home-dir /usr/share/${ELASTIC_PRODUCT} --no-create-home ${ELASTIC_PRODUCT}
 
-RUN chown -R ${ELASTIC_PRODUCT} $NODE_PATH
-
 USER ${ELASTIC_PRODUCT}
 ENV ELASTIC_PRODUCT=${ELASTIC_PRODUCT}
-
-# Setup synthetics env vars
-ENV ELASTIC_SYNTHETICS_CAPABLE=true
-ENV SUITES_DIR=/usr/share/${ELASTIC_PRODUCT}/suites
-ENV PATH="$NODE_PATH/node/bin:$PATH"
-# Install the latest version of @elastic/synthetics forcefully ignoring the previously
-# cached node_modules, heartbeat then calls the global executable to run test suites
-# Setup node
-COPY node.tar.gz /usr/share/heartbeat/.node
-COPY elastic-synthetics.tar.gz /usr/share/heartbeat/.node
-RUN cd /usr/share/heartbeat/.node \
-  && mkdir -p node \
-  && tar -xzf "node.tar.gz" --strip 1 -C node \
-  && rm "node.tar.gz" \
-  && npm i -g --offline -f "elastic-synthetics.tar.gz" \
-  && rm "elastic-synthetics.tar.gz" \
-  && chmod ug+rwX -R $NODE_PATH
 
 ENTRYPOINT ["/tinit", "--", "/usr/share/heartbeat/heartbeat", "-E", "http.enabled=true", "-E", "http.host=unix:///usr/share/heartbeat/data/heartbeat.sock"]
 CMD ["-environment", "container"]

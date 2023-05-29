@@ -123,6 +123,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
+- [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 
 *Heartbeat*
 
@@ -188,6 +189,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
 - Add context with timeout in AWS API calls {pull}35425[35425]
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
+- Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
+- Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
 
 *Osquerybeat*
 
@@ -197,6 +200,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Fix double channel close panic when reloading. {pull}35324[35324]
 - Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
+- Fix handling of Npcap installation options from Fleet. {pull}35541[35541]
 
 *Winlogbeat*
 
@@ -221,6 +225,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
+- Add Hetzner Cloud as a provider for `add_cloud_metadata`. {pull}35456[35456]
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
 
 
@@ -284,12 +289,16 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
 - Add execution budget to CEL input. {pull}35409[35409]
+- Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
+- Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
 
 *Filebeat*
 
+*Libbeat*
+- Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
 
 *Heartbeat*
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
@@ -311,6 +320,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 
 *Osquerybeat*
 
@@ -326,6 +336,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 *Winlogbeat*
+
+- Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
 
 
 *Elastic Log Driver*
@@ -362,15 +374,3 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
