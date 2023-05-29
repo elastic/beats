@@ -147,7 +147,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	// GetPodMetaGen requires cfg of type Config
+	// GetPodMetaGen requires cfg of type Config test
 	commonMetaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
