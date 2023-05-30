@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sync"
 	"time"
 	"unicode"
 
@@ -28,8 +27,6 @@ import (
 )
 
 type job struct {
-	// Mutex lock for concurrent publishes
-	mu sync.Mutex
 	// gcs bucket handle
 	bucket *storage.BucketHandle
 	// gcs object attribute struct
@@ -110,14 +107,12 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		event.SetID(objectID(j.hash, 0))
 		// locks while data is being saved and published to avoid concurrent map read/writes
-		j.mu.Lock()
-		j.state.save(j.object.Name, j.object.Updated)
-		cp, done := j.state.checkpointTxn()
+		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
 		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		// unlocks after data is saved and published
 		done()
-		j.mu.Unlock()
 	}
 }
 
@@ -219,20 +214,20 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
 		// locks while data is being saved and published to avoid concurrent map read/writes
-		j.mu.Lock()
+		var done func()
+		var cp *Checkpoint
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
-			j.state.save(j.object.Name, j.object.Updated)
+			cp, done = j.state.saveForTx(j.object.Name, j.object.Updated)
 		} else {
 			// partially saves read state using offset
-			j.state.savePartial(j.object.Name, offset+relativeOffset)
+			cp, done = j.state.savePartialForTx(j.object.Name, offset+relativeOffset)
 		}
-		cp, done := j.state.checkpointTxn()
 		if err := j.publisher.Publish(evt, cp); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
+		// unlocks after data is saved and published
 		done()
-		j.mu.Unlock()
 	}
 	return nil
 }
