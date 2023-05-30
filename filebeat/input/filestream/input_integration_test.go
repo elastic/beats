@@ -637,7 +637,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second, 100*time.Microsecond)
 
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
@@ -704,7 +704,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second, 100*time.Microsecond)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -718,11 +718,11 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                 "fake-ID",
 		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "1ms",
+		"prospector.scanner.check_interval":  "100ms",
 		"prospector.scanner.resend_on_touch": "true",
 	})
 
-	testlines := []byte("first line\nsecond line\n")
+	testlines := []byte("1\n2\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
@@ -739,11 +739,14 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	// extra lines are appended after first line is processed
 	// so it can interfere with the truncation of the file
-	env.mustAppendToFile(testlogName, []byte("third line\n"))
+	appendLines := []byte("3\n")
+	env.mustAppendToFile(testlogName, appendLines)
+
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(appendLines), 10*time.Second, 100*time.Microsecond)
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second, 100*time.Microsecond)
 
 	// all newly started client has to be cancelled so events can be processed
 	env.pipeline.cancelAllClients()
@@ -753,8 +756,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	truncatedTestLines := []byte("truncated line\n")
 	env.mustWriteToFile(testlogName, truncatedTestLines)
 
-	env.waitUntilEventCount(3)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines))
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines), 10*time.Second, 100*time.Microsecond)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -914,7 +916,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second, 100*time.Microsecond)
 
 	// recreate symlink
 	env.mustSymlink(testlogName, symlinkName)
@@ -922,7 +924,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines))
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines), 10*time.Second, 100*time.Microsecond)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -937,10 +939,14 @@ func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
 		path  string
 		lines []string
 	}{
-		{path: "log-a.log",
-			lines: []string{"1-aaaaaaaaaa", "2-aaaaaaaaaa"}},
-		{path: "log-b.log",
-			lines: []string{"1-bbbbbbbbbb", "2-bbbbbbbbbb"}},
+		{
+			path:  "log-a.log",
+			lines: []string{"1-aaaaaaaaaa", "2-aaaaaaaaaa"},
+		},
+		{
+			path:  "log-b.log",
+			lines: []string{"1-bbbbbbbbbb", "2-bbbbbbbbbb"},
+		},
 	}
 	for _, lf := range logFiles {
 		env.mustWriteToFile(
@@ -953,7 +959,8 @@ func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
 		"close.reader.on_eof": true,
 		"paths": []string{
 			env.abspath(logFiles[0].path),
-			env.abspath(logFiles[1].path)},
+			env.abspath(logFiles[1].path),
+		},
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)

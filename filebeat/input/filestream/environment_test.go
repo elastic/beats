@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -64,6 +65,19 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
+	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
+		t.Fatalf("error setting up dev logging: %s", err)
+	}
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
+		}
+		t.Logf("Debug Logs:\n")
+		for _, log := range logp.ObserverLogs().TakeAll() {
+			t.Logf("%v\n", log)
+		}
+		return
+	})
 	return &inputTestingEnvironment{
 		t:          t,
 		workingDir: t.TempDir(),
@@ -136,9 +150,12 @@ func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte)
 	}
 	defer f.Close()
 
-	_, err = f.Write(data)
+	n, err := f.Write(data)
 	if err != nil {
 		e.t.Fatalf("append data to file '%s': %+v", path, err)
+	}
+	if n != len(data) {
+		e.t.Fatalf("append only wrote %d out of %d bytes to '%s'", n, len(data), path)
 	}
 }
 
@@ -251,20 +268,39 @@ func requireMetadataEquals(one, other fileMeta) bool {
 }
 
 // waitUntilOffsetInRegistry waits for the expected offset is set for a file.
-func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int) {
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int, waitFor time.Duration, tick time.Duration) {
+	var errString strings.Builder
+	var cursorString strings.Builder
+	var fileSizeString strings.Builder
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, inputID, fi)
-	entry, err := e.getRegistryState(id)
-	for err != nil || entry.Cursor.Offset != expectedOffset {
-		entry, err = e.getRegistryState(id)
-	}
-
-	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+	require.Eventuallyf(e.t,
+		func() bool {
+			errString.Reset()
+			cursorString.Reset()
+			fileSizeString.Reset()
+			id := getIDFromPath(filepath, inputID, fi)
+			entry, err := e.getRegistryState(id)
+			if err != nil {
+				errString.WriteString(err.Error())
+				return false
+			}
+			cursorString.WriteString(fmt.Sprint(entry.Cursor.Offset))
+			fi2, err := os.Stat(filepath)
+			if err != nil {
+				errString.WriteString(err.Error())
+				return false
+			}
+			fileSizeString.WriteString(fmt.Sprint(fi2.Size()))
+			return expectedOffset == entry.Cursor.Offset
+		},
+		waitFor,
+		tick,
+		"expected offset: '%d', cursor offset: '%s', err: '%s', filesize: '%s'", expectedOffset, &cursorString, &errString, &fileSizeString)
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID string) {
