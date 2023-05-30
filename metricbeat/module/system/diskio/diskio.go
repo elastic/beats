@@ -22,10 +22,12 @@ package diskio
 import (
 	"runtime"
 
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 
 	"github.com/pkg/errors"
 )
@@ -141,4 +143,22 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	m.prevCounters.prevDiskWriteBytes = diskWriteBytes
 
 	return nil
+}
+
+// DiagnosticSetup implmements the DiagnosticSet interface
+func (m *MetricSet) DiagnosticSetup() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/memory")
+	return []diagnostics.DiagnosticSetup{
+		{
+			Name:        "diskio-diskstats",
+			Description: "Contents of /proc/diskstats",
+			Filename:    "diskstats",
+			Callback:    m.diagDiskstats,
+		},
+	}
+}
+
+func (m *MetricSet) diagDiskstats() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/diskstats")
 }

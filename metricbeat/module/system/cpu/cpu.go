@@ -20,8 +20,11 @@
 package cpu
 
 import (
+	"runtime"
+
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -96,6 +99,39 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	})
 
 	return nil
+}
+
+// DiagnosticSetup implmements the DiagnosticSet interface
+func (m *MetricSet) DiagnosticSetup() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/cpu")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{
+			{
+				Name:        "cpu-stat",
+				Description: "/proc/stat file",
+				Filename:    "stat",
+				Callback:    m.fetchRawCPU,
+			},
+			{
+				Name:        "cpu-cpuinfo",
+				Description: "/proc/cpuinfo file",
+				Filename:    "cpuinfo",
+				Callback:    m.fetchCPUInfo,
+			},
+		}
+	}
+	return nil
+
+}
+
+func (m *MetricSet) fetchRawCPU() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/stat")
+}
+
+func (m *MetricSet) fetchCPUInfo() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/cpuinfo")
 }
 
 // copyFieldsOrDefault copies the field specified by key to the given map. It will

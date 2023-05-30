@@ -44,9 +44,9 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}   // Channel used to initiate shutdown.
-	stopOnce     sync.Once       // wraps the Stop() method
-	runners      []module.Runner // Active list of module runners.
+	done         chan struct{}    // Channel used to initiate shutdown.
+	stopOnce     sync.Once        // wraps the Stop() method
+	runners      []cfgfile.Runner // Active list of module runners.
 	config       Config
 	autodiscover *autodiscover.Autodiscover
 

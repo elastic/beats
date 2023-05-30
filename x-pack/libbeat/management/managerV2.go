@@ -30,6 +30,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
+// diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
+// since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
+type diagnosticHandler struct {
+	log    *logp.Logger
+	client *client.Unit
+}
+
+func (handler diagnosticHandler) Register(name string, description string, filename string, contentType string, callback func() []byte) {
+	handler.log.Infof("registering callback with %s", name)
+	handler.client.RegisterDiagnosticHook(name, description, filename, contentType, callback)
+}
+
 // unitKey is used to identify a unique unit in a map
 // the `ID` of a unit in itself is not unique without its type, only `Type` + `ID` is unique
 type unitKey struct {
@@ -219,6 +231,7 @@ func (cm *BeatV2Manager) Start() error {
 
 	go cm.unitListen()
 	cm.isRunning = true
+	//cm.registry.RegisterDiagnosticCallbackForInput(diagnosticHandler{client: cm.client, log: cm.logger.Named("diagnostic-manager")})
 	return nil
 }
 
@@ -637,6 +650,10 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
 		if err != nil {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
+		}
+		// add diag callbacks for unit
+		for _, in := range inputCfg {
+			in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
 		}
 		inputCfgs[unit.ID()] = expected.Config
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)

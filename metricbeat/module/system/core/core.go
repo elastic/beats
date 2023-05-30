@@ -20,8 +20,11 @@
 package core
 
 import (
+	"runtime"
+
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
@@ -88,4 +91,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+// DiagnosticSetup implmements the DiagnosticSet interface
+func (m *MetricSet) DiagnosticSetup() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/core")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{{
+			Name:        "core-stat",
+			Description: "/proc/stat file",
+			Filename:    "stat",
+			Callback:    m.getDiagData,
+		}}
+	} else {
+		return nil
+	}
+
+}
+
+func (m *MetricSet) getDiagData() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/stat")
 }
