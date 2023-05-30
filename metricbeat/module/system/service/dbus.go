@@ -20,6 +20,7 @@
 package service
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"os"
@@ -120,12 +121,12 @@ func parseXMLAndReturnMethods(str string) (map[string]bool, error) {
 
 // listUnitsByPatternWrapper is a bare wrapper for the unitFetcher type
 func listUnitsByPatternWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
-	return conn.ListUnitsByPatterns(states, patterns)
+	return conn.ListUnitsByPatternsContext(context.Background(), states, patterns)
 }
 
 // listUnitsFilteredWrapper wraps the dbus ListUnitsFiltered method
 func listUnitsFilteredWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
-	units, err := conn.ListUnitsFiltered(states)
+	units, err := conn.ListUnitsFilteredContext(context.Background(), states)
 	if err != nil {
 		return nil, errors.Wrap(err, "ListUnitsFiltered error")
 	}
@@ -135,7 +136,7 @@ func listUnitsFilteredWrapper(conn *dbus.Conn, states, patterns []string) ([]dbu
 
 // listUnitsWrapper wraps the dbus ListUnits method
 func listUnitsWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
-	units, err := conn.ListUnits()
+	units, err := conn.ListUnitsContext(context.Background())
 	if err != nil {
 		return nil, errors.Wrap(err, "ListUnits error")
 	}
