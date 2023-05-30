@@ -56,10 +56,6 @@ func (m *Metrics) Close() {
 }
 
 func NewMetrics(id string) *Metrics {
-	if id == "" {
-		return nil
-	}
-
 	reg, unreg := inputmon.NewInputRegistry("filestream", id, nil)
 	m := Metrics{
 		unregister:       unreg,
