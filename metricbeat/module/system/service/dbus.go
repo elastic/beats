@@ -28,7 +28,7 @@ import (
 	"strings"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	dbusRaw "github.com/godbus/dbus"
+	dbusRaw "github.com/godbus/dbus/v5"
 	"github.com/pkg/errors"
 )
 
