@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -63,16 +62,12 @@ type pubsubInput struct {
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on pubsub worker goroutine.
 
-	ackedCount *atomic.Uint32 // Total number of successfully ACKed pubsub messages.
+	metrics *inputMetrics
 }
 
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
 // a topic subscription.
-func NewInput(
-	cfg *conf.C,
-	connector channel.Connector,
-	inputContext input.Context,
-) (inp input.Input, err error) {
+func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
 	if err = cfg.Unpack(&conf); err != nil {
@@ -99,6 +94,9 @@ func NewInput(
 		}
 	}()
 
+	metrics := newInputMetrics(conf.ProjectID, nil)
+	defer metrics.Close()
+
 	// If the input ever needs to be made restartable, then context would need
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
@@ -109,7 +107,7 @@ func NewInput(
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
-		ackedCount:   atomic.NewUint32(0),
+		metrics:      metrics,
 	}
 
 	// Build outlet for events.
@@ -119,8 +117,14 @@ func NewInput(
 				for _, priv := range privates {
 					if msg, ok := priv.(*pubsub.Message); ok {
 						msg.Ack()
-						in.ackedCount.Inc()
+
+						now := time.Now()
+						in.metrics.ackedMessageCount.Inc()
+						in.metrics.bytesProcessedTotal.Add(uint64(len(msg.Data)))
+						in.metrics.processingTime.Update(now.Sub(msg.PublishTime).Nanoseconds())
+						in.log.Error("ACKing pub/sub event")
 					} else {
+						in.metrics.failedAckedMessageCount.Inc()
 						in.log.Error("Failed ACKing pub/sub event")
 					}
 				}
@@ -194,6 +198,7 @@ func (in *pubsubInput) run() error {
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
 			msg.Nack()
+			in.metrics.nackedMessageCount.Inc()
 			in.log.Debug("OnEvent returned false. Stopping input worker.")
 			cancel()
 		}
