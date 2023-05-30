@@ -353,7 +353,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Heartbeat*
 
-- Removed zip_url and local brwoser sources. {pull}35429[35429]
+- Removed zip_url and local browser sources. {pull}35429[35429]
 
 *Metricbeat*
 
