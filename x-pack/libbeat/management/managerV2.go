@@ -39,7 +39,12 @@ type diagnosticHandler struct {
 
 func (handler diagnosticHandler) Register(name string, description string, filename string, contentType string, callback func() []byte) {
 	handler.log.Infof("registering callback with %s", name)
-	handler.client.RegisterDiagnosticHook(name, description, filename, contentType, callback)
+	// paranoid checking
+	if handler.client != nil {
+		handler.client.RegisterDiagnosticHook(name, description, filename, contentType, callback)
+	} else {
+		handler.log.Warnf("client handler for diag callback %s is nil", name)
+	}
 }
 
 // unitKey is used to identify a unique unit in a map
@@ -231,7 +236,6 @@ func (cm *BeatV2Manager) Start() error {
 
 	go cm.unitListen()
 	cm.isRunning = true
-	//cm.registry.RegisterDiagnosticCallbackForInput(diagnosticHandler{client: cm.client, log: cm.logger.Named("diagnostic-manager")})
 	return nil
 }
 
