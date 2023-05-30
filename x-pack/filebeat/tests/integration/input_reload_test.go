@@ -339,7 +339,17 @@ func ensureESIsRunning(t *testing.T) {
 		t.Fatalf("cannot create request to ensure ES is running: %s", err)
 	}
 
-	req.SetBasicAuth("admin", "testing")
+	user := os.Getenv("ES_USER")
+	if user == "" {
+		user = "admin"
+	}
+
+	pass := os.Getenv("ES_PASS")
+	if pass == "" {
+		pass = "testing"
+	}
+
+	req.SetBasicAuth(user, pass)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
