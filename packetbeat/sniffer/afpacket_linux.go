@@ -70,11 +70,6 @@ func (m *metrics) close() {
 }
 
 func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPacket, log *logp.Logger) *metrics {
-	if id == "" || interval == 0 {
-		// An empty id or zero interval signals to not record metrics.
-		return nil
-	}
-
 	devID := fmt.Sprintf("%s-af_packet::%s", id, device)
 	reg, unreg := inputmon.NewInputRegistry("af_packet", devID, nil)
 	out := &metrics{
