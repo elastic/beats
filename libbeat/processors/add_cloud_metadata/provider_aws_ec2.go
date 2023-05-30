@@ -80,7 +80,7 @@ func fetchRawProviderMetadata(
 	// LoadDefaultConfig loads the EC2 role credentials
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
-		logger.Debugf("error loading AWS default configuration: %s.", err)
+		logger.Warnf("error loading AWS default configuration: %s.", err)
 		result.err = fmt.Errorf("failed loading AWS default configuration: %w", err)
 		return
 	}
@@ -88,7 +88,7 @@ func fetchRawProviderMetadata(
 
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
-		logger.Debugf("error fetching EC2 Identity Document: %s.", err)
+		logger.Warnf("error fetching EC2 Identity Document: %s.", err)
 		result.err = fmt.Errorf("failed fetching EC2 Identity Document: %w", err)
 		return
 	}
