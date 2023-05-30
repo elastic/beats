@@ -18,11 +18,11 @@
 package cfgfile
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -68,7 +68,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, errors.Wrap(err, "Unable to hash given config"))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
 			continue
 		}
 
@@ -102,13 +102,13 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			if _, ok := err.(*common.ErrInputNotFinished); ok {
+			if _, ok := err.(*common.ErrInputNotFinished); ok { //nolint: errorlint: ErrInputNotFinished is a type, not an expression
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
-			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
+			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 
