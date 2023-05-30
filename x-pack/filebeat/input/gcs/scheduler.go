@@ -121,11 +121,9 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			}()
 		}
 
-		s.log.Debugf("scheduler: total objects read till now: %d", numObs)
-		s.log.Debugf("scheduler: total jobs scheduled till now: %d", numJobs)
+		s.log.Debugf("scheduler: total objects read till now: %d\nscheduler: total jobs scheduled till now: %d", numObs, numJobs)
 		if len(jobs) > 0 {
-			s.log.Debugf("scheduler: first job in current batch: %s", jobs[0].Name())
-			s.log.Debugf("scheduler: last job in current batch: %s", jobs[len(jobs)-1].Name())
+			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].Name(), jobs[len(jobs)-1].Name())
 		}
 
 		if nextPageToken == "" {
@@ -223,9 +221,10 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		jobMap[j.Name()] = true
 	}
 
-	s.log.Debugf("scheduler: %d failed jobs found", len(s.state.checkpoint().FailedJobs))
+	failedJobs := s.state.checkpoint().FailedJobs
+	s.log.Debugf("scheduler: %d failed jobs found", len(failedJobs))
 	fj := 0
-	for name := range s.state.checkpoint().FailedJobs {
+	for name := range failedJobs {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {

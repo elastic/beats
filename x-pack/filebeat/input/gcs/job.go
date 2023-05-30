@@ -214,8 +214,10 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
 		// locks while data is being saved and published to avoid concurrent map read/writes
-		var done func()
-		var cp *Checkpoint
+		var (
+			done func()
+			cp   *Checkpoint
+		)
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
 			cp, done = j.state.saveForTx(j.object.Name, j.object.Updated)
