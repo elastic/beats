@@ -55,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	client, err := mongodb.NewClient(m.Metricset.Config, m.Module().Config().Timeout, readpref.PrimaryMode)
+	client, err := mongodb.NewClient(m.Metricset.Config, m.HostData().URI, m.Module().Config().Timeout, readpref.PrimaryMode)
 	if err != nil {
 		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
