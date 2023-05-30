@@ -34,10 +34,10 @@ func TestInputReload(t *testing.T) {
 		ReloadImpl: func(configs []*reload.ConfigWithMeta) error {
 			reloadCallCount++
 			if reloadCallCount == 1 {
-				e1 := multierror.Errors{withCause{&common.ErrInputNotFinished{
+				e1 := multierror.Errors{fmt.Errorf("%w", &common.ErrInputNotFinished{
 					State: "<state string goes here>",
 					File:  "/tmp/foo.log",
-				}}}
+				})}
 				return e1.Err()
 			}
 
@@ -204,16 +204,4 @@ func (r *reloadableListMock) Configs() []*reload.ConfigWithMeta {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	return r.configs
-}
-
-type withCause struct {
-	Err error
-}
-
-func (w withCause) Cause() error {
-	return w.Err
-}
-
-func (w withCause) Error() string {
-	return w.Err.Error()
 }

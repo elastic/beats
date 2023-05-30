@@ -716,7 +716,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		// the standard library errors package.
 		if errors.As(err, &merror) {
 			for _, err := range merror.Errors {
-				causeErr := cause(err)
+				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produceds are acked by the acker so when we see this error,
 				// we just retry until the new input can be started.
@@ -870,33 +870,4 @@ func didChange(previous map[string]*proto.UnitExpectedConfig, latest map[string]
 		}
 	}
 	return false
-}
-
-// cause returns the underlying cause of the error, if possible.
-// An error value has a cause if it implements the following
-// interface:
-//
-//	type causer interface {
-//	       Cause() error
-//	}
-//
-// If the error does not implement Cause, the original error will
-// be returned. If the error is nil, nil will be returned without further
-// investigation.
-// Source: https://github.com/pkg/errors/blob/614d223910a179a466c1767a985424175c39b465/errors.go#L264-L288
-func cause(err error) error {
-	type causer interface {
-		Cause() error
-	}
-
-	for err != nil {
-		//nolint: errorlint // This is the original github.com/pkg/errors
-		// implementation.
-		cause, ok := err.(causer)
-		if !ok {
-			break
-		}
-		err = cause.Cause()
-	}
-	return err
 }
