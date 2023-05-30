@@ -54,16 +54,12 @@ func installNpcap(b *beat.Beat) error {
 		return nil
 	}
 
-	log := logp.NewLogger("npcap_install")
-
-	var cfg struct {
-		NeverInstall bool `config:"npcap.never_install"`
-	}
-	err := b.BeatConfig.Unpack(&cfg)
+	canInstall, err := canInstallNpcap(b)
 	if err != nil {
-		return fmt.Errorf("failed to unpack npcap config: %w", err)
+		return err
 	}
-	if cfg.NeverInstall {
+	log := logp.NewLogger("npcap_install")
+	if !canInstall {
 		log.Warn("npcap installation/upgrade disabled by user")
 		return nil
 	}
@@ -92,4 +88,40 @@ func installNpcap(b *beat.Beat) error {
 		return fmt.Errorf("could not create installation temporary file: %w", err)
 	}
 	return npcap.Install(ctx, log, installerPath, "", false)
+}
+
+// canInstallNpcap returns whether the Npcap DLL installation can proceed or has been
+// blocked by the user. This needs special consideration because we have not yet had
+// configurations from agent normalised to the internal packetbeat format by this point.
+// In the case that the beat is managed, any data stream that has npcap.never_install
+// set to true will result in a block on the installation.
+func canInstallNpcap(b *beat.Beat) (bool, error) {
+	type npcapInstallCfg struct {
+		NeverInstall bool `config:"npcap.never_install"`
+	}
+
+	// Agent managed case.
+	if b.Manager.Enabled() {
+		var cfg struct {
+			Streams []npcapInstallCfg `config:"streams"`
+		}
+		err := b.BeatConfig.Unpack(&cfg)
+		if err != nil {
+			return false, fmt.Errorf("failed to unpack npcap config from agent configuration: %w", err)
+		}
+		for _, c := range cfg.Streams {
+			if c.NeverInstall {
+				return false, nil
+			}
+		}
+		return true, nil
+	}
+
+	// Packetbeat case.
+	var cfg npcapInstallCfg
+	err := b.BeatConfig.Unpack(&cfg)
+	if err != nil {
+		return false, fmt.Errorf("failed to unpack npcap config from packetbeat configuration: %w", err)
+	}
+	return !cfg.NeverInstall, err
 }

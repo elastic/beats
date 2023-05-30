@@ -1,5 +1,5 @@
 # Module: proofpoint
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-proofpoint.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-proofpoint.html
 
 - module: proofpoint
   emailsecurity:
