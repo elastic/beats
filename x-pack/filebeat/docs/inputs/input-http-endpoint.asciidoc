@@ -271,7 +271,7 @@ This option copies the raw unmodified body of the incoming request to the event.
 [float]
 ==== `crc.provider`
 
-This option defines the provider of the webhook that uses CRC (Challenge-Response Check) for validating the endpoint. The HTTP endpoint input is responsible for ensuring the authenticity of incoming webhook requests by generating and verifying a unique token. By specifying the `crc.provider`, you ensure that the system correctly handles the specific CRC validation process required by the chosen provider.
+This option defines the provider of the webhook that uses CRC (Challenge-Response Check) for validating the endpoint. The HTTP endpoint input is responsible for ensuring the authenticity of incoming webhook requests by generating and verifying a unique token. By specifying the `crc.provider`, you ensure that the system correctly handles the specific CRC validation process required by the chosen provider. When using `crc.provider`, `secret.value` must be set.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
