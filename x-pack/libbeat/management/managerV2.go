@@ -652,6 +652,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
 		}
 		// add diag callbacks for unit
+		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
 		for _, in := range inputCfg {
 			in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
 		}
