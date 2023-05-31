@@ -1935,7 +1935,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, addResourceMetadata)
+			metaGen := metadata.NewPodMetadataGenerator(conf.NewConfig(), nil, client, nil, nil, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
