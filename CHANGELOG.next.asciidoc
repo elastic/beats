@@ -127,8 +127,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual 
    bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. 
    Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
-- [GCS Input] - Enhanced the input by adding debug logs and improved the context passing mechanism by removing them from struct params 
-   and passing them as function arguments. {pull}35605[35605]
 
 *Heartbeat*
 
