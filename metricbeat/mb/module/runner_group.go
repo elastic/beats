@@ -71,9 +71,7 @@ func (rg *runnerGroup) ModuleDiagnostics() []diagnostics.DiagnosticSetup {
 	for _, runner := range rg.runners {
 		if diagHandler, ok := runner.(diagnostics.DiagnosticRunner); ok {
 			diags := diagHandler.ModuleDiagnostics()
-			for _, diag := range diags {
-				results = append(results, diag)
-			}
+			results = append(results, diag)
 		}
 
 	}

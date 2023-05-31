@@ -20,6 +20,7 @@
 package diskio
 
 import (
+	"fmt"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
@@ -28,8 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -74,11 +73,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := diskio.IOCounters(m.includeDevices...)
 	if err != nil {
-		return errors.Wrap(err, "disk io counters")
+		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter
-	m.statistics.OpenSampling()
+	err = m.statistics.OpenSampling()
+	if err != nil {
+		return fmt.Errorf("error in OpenSampling: %w", err)
+	}
 
 	// Store the last cpu counter when finished
 	defer m.statistics.CloseSampling()
