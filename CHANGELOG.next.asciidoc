@@ -259,6 +259,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Removed zip_url and local browser sources. {pull}35429[35429]
 
 *Metricbeat*
 
