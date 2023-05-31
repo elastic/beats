@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-
 *Auditbeat*
 
 
@@ -227,7 +226,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 - Add Hetzner Cloud as a provider for `add_cloud_metadata`. {pull}35456[35456]
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
-
+- Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
+- Added `orchestrator.cluster.id` and `orchestrator.cluster.name` fields to the add_cloud_metadata processor, AWS cloud provider. {pull}35182[35182]
 
 *Auditbeat*
 
@@ -286,10 +286,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
 - Add oracle authentication messages parsing {pull}35127[35127]
+- Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -320,6 +322,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 
 *Osquerybeat*
 
@@ -346,57 +349,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 ==== Deprecated
 
 *Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-- Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
-
-- Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
-
-*Metricbeat*
-
-- Add Data Granularity option to AWS module to allow for for fewer API calls of longer periods and keep small intervals. {issue}33133[33133] {pull}33166[33166]
-- Update README file on how to run Metricbeat on Kubernetes. {pull}33308[33308]
-- Add per-thread metrics to system_summary {pull}33614[33614]
-- Add GCP CloudSQL metadata {pull}33066[33066]
-- Remove GCP Compute metadata cache {pull}33655[33655]
-- Add support for multiple regions in GCP {pull}32964[32964]
-- Add GCP Redis regions support {pull}33728[33728]
-- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
-- Add namespace metadata to all namespaced kubernetes resources. {pull}33763[33763]
-- Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
-- Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
-- Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
-
-*Packetbeat*
-
-- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
-- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
-- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
-- Add fragmented IPv4 packet reassembly. {issue}33012[33012] {pull}33296[33296]
-- Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
-- Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
-- Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-- Add metrics for log event processing. {pull}33922[33922]
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
 
 
 *Filebeat*
