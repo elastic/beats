@@ -26,6 +26,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -54,6 +55,7 @@ func (m *mockRunner) Stop() {
 	m.stopped = true
 	m.started = false
 }
+
 func (m *mockRunner) Clone() *mockRunner {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -149,6 +151,8 @@ func TestNilAutodiscover(t *testing.T) {
 func TestAutodiscover(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
+	// If this test fails, uncomment the following line to enable debug logs
+	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
 
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
@@ -188,6 +192,8 @@ func TestAutodiscover(t *testing.T) {
 	eventBus := <-busChan
 
 	// Test start event
+	// This start event will trigger an input reload
+	t.Log("Seding first start event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
@@ -196,15 +202,26 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "bar",
 		},
 	})
-	wait(t, func() bool { return len(adapter.Runners()) == 1 })
+
+	nRunners := 1
+	require.Eventuallyf(t,
+		func() bool {
+			return len(autodiscover.runners.Runners()) == nRunners
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"expecting %d runners", nRunners)
 
 	runners := adapter.Runners()
-	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.True(t, runners[0].started)
-	assert.False(t, runners[0].stopped)
+	require.Equal(t, len(runners), 1)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.True(t, runners[0].started)
+	require.False(t, runners[0].stopped)
 
 	// Test update
+	// Autodiscover will not call "Reload" because the input
+	// is already running. This will not trigger an input reload
+	t.Log("Seeding first 'update' event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
@@ -214,13 +231,24 @@ func TestAutodiscover(t *testing.T) {
 		},
 	})
 
+	nRunners = 1
+	require.Eventuallyf(t,
+		func() bool {
+			return len(autodiscover.runners.Runners()) == nRunners
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"expecting %d runners", nRunners)
+
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.True(t, runners[0].started)
-	assert.False(t, runners[0].stopped)
+	require.Equal(t, len(runners), 1)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.True(t, runners[0].started)
+	require.False(t, runners[0].stopped)
 
 	// Test stop/start
+	// This stop event will trigger an input Reload
+	t.Log("Seeding first stop event, there will be 0 runners running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
@@ -229,6 +257,18 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
+
+	nRunners = 0
+	require.Eventuallyf(t,
+		func() bool {
+			return len(autodiscover.runners.Runners()) == nRunners
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"expecting %d runners", nRunners)
+
+	// This stop event will trigger an input reload
+	t.Log("Sending second start event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
@@ -237,16 +277,26 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
-	wait(t, func() bool { return len(adapter.Runners()) == 2 })
+
+	nRunners = 1
+	require.Eventuallyf(t,
+		func() bool {
+			return len(autodiscover.runners.Runners()) == nRunners
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"expecting %d runners", nRunners)
 
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.True(t, runners[0].stopped)
-	assert.True(t, runners[1].started)
-	assert.False(t, runners[1].stopped)
+	require.Equal(t, len(runners), 2)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.True(t, runners[0].stopped)
+	require.True(t, runners[1].started)
+	require.False(t, runners[1].stopped)
 
 	// Test stop event
+	// This stop event will trigger an input reload
+	t.Log("sending second stop event, there will be 0 runners running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
@@ -255,13 +305,22 @@ func TestAutodiscover(t *testing.T) {
 			"foo": "baz",
 		},
 	})
-	wait(t, func() bool { return adapter.Runners()[1].stopped })
+
+	// Instead of ensuring the number of running runners, ensure
+	// that the second started runner has stopped
+	require.Eventually(t,
+		func() bool {
+			return adapter.Runners()[1].stopped
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"adapter.Runners()[1] has not stopped")
 
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
-	assert.False(t, runners[1].started)
-	assert.True(t, runners[1].stopped)
+	require.Equal(t, len(runners), 2)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
+	require.False(t, runners[1].started)
+	require.True(t, runners[1].stopped)
 }
 
 func TestAutodiscoverHash(t *testing.T) {
@@ -366,8 +425,6 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	autodiscover.workDone = make(chan struct{})
-
 	// Start it
 	autodiscover.Start()
 	defer autodiscover.Stop()
@@ -383,9 +440,14 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 				"foo": "bar",
 			},
 		})
-		<-autodiscover.workDone
-		assert.Equal(t, 1, len(adapter.Runners()), "Only one runner should be started")
-		assert.Equal(t, 1, adapter.CheckConfigCallCount, "Check config should have been called only once")
+
+		assert.Eventually(t, func() bool {
+			return len(adapter.Runners()) == 1
+		}, 10*time.Second, 100*time.Millisecond, "Only one runner should be started")
+
+		assert.Eventually(t, func() bool {
+			return adapter.CheckConfigCallCount == 1
+		}, 10*time.Second, 100*time.Millisecond, "Check config should have been called only once")
 	}
 }
 

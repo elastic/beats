@@ -36,7 +36,7 @@ import (
 
 const (
 	// If a config reload fails after a new event, a new reload will be run after this period
-	retryPeriod = 10 * time.Second
+	retryPeriod = time.Second
 )
 
 // EventConfigurer is used to configure the creation of configuration objects
@@ -65,10 +65,6 @@ type Autodiscover struct {
 	meta            *meta.Map
 	listener        bus.Listener
 	logger          *logp.Logger
-
-	// workDone is a channel used for testing purpouses, to know when the worker has
-	// done some work.
-	workDone chan struct{}
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -102,7 +98,7 @@ func NewAutodiscover(
 		factory:         factory,
 		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover", factory, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
@@ -132,6 +128,8 @@ func (a *Autodiscover) Start() {
 
 func (a *Autodiscover) worker() {
 	var updated, retry bool
+	var kind string = "first run"
+	t := time.NewTimer(retryPeriod)
 
 	for {
 		select {
@@ -143,37 +141,38 @@ func (a *Autodiscover) worker() {
 
 			if _, ok := event["start"]; ok {
 				updated = a.handleStart(event)
+				kind = "start"
 			}
 			if _, ok := event["stop"]; ok {
 				updated = a.handleStop(event)
+				kind = "stop"
 			}
 
-		case <-time.After(retryPeriod):
-		}
+		case <-t.C:
+			if updated || retry { // here it seems to work o.O
+				a.logger.Debugf("Reloading autodiscover configs reason: updated: %t, retry: %t, kind: %s", updated, retry, kind)
 
-		if updated || retry {
-			if retry {
-				a.logger.Debug("Reloading existing autodiscover configs after error")
-			}
-
-			configs := []*reload.ConfigWithMeta{}
-			for _, list := range a.configs {
-				for _, c := range list {
-					configs = append(configs, c)
+				configs := []*reload.ConfigWithMeta{}
+				for _, list := range a.configs {
+					for _, c := range list {
+						configs = append(configs, c)
+					}
 				}
+
+				a.logger.Debugf("calling reload with %d config(s)", len(configs))
+				err := a.runners.Reload(configs)
+
+				// On error, make sure the next run also updates because some runners were not properly loaded
+				retry = err != nil
+				if retry {
+					t.Reset(10 * retryPeriod)
+					continue
+				}
+				// reset updated status
+				updated = false
 			}
 
-			err := a.runners.Reload(configs)
-
-			// On error, make sure the next run also updates because some runners were not properly loaded
-			retry = err != nil
-			// reset updated status
-			updated = false
-		}
-
-		// For testing purpouses.
-		if a.workDone != nil {
-			a.workDone <- struct{}{}
+			t.Reset(retryPeriod)
 		}
 	}
 }
