@@ -718,7 +718,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 			for _, err := range merror.Errors {
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
-				// produceds are acked by the acker so when we see this error,
+				// produced are acked by the acker so when we see this error,
 				// we just retry until the new input can be started.
 				// This is the same logic used by the standalone configuration file
 				// reloader implemented on libbeat/cfgfile/reload.go
