@@ -152,7 +152,7 @@ require (
 	go.uber.org/atomic v1.10.0
 	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.24.0
-	golang.org/x/crypto v0.1.0
+	golang.org/x/crypto v0.6.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.9.0
 	golang.org/x/net v0.9.0

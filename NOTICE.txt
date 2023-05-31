@@ -1498,12 +1498,12 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/azure-sdk-for-go
-Version: v59.0.0-elastic-1+incompatible
+Dependency : github.com/Azure/azure-sdk-for-go
+Version: v59.0.0+incompatible
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/azure-sdk-for-go@v59.0.0-elastic-1+incompatible/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go@v59.0.0+incompatible/LICENSE.txt:
 
 The MIT License (MIT)
 
@@ -24498,11 +24498,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.1.0
+Version: v0.6.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.6.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
