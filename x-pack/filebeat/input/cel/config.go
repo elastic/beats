@@ -35,6 +35,9 @@ type config struct {
 	// Regexps is the set of regular expression to be made
 	// available to the program.
 	Regexps map[string]string `config:"regexp"`
+	// XSDs is the set of XSD type hint definitions to be
+	// made available for XML parsing.
+	XSDs map[string]string `config:"xsd"`
 	// State is the initial state to be provided to the
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
@@ -81,7 +84,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns)
+	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns, c.XSDs)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
