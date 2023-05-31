@@ -10,7 +10,7 @@ processors:
 - kv:
     field: syslog5424_sd
     field_split: \s+(?=(?:[^"]*"[^"]*")*[^"]*$)
-    value_split: =(?=(?:[^"]*"[^"]*")*[^"]*$)
+    value_split: '='
     prefix: "fortinet.firewall."
     ignore_missing: true
     ignore_failure: false
