@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-
 *Auditbeat*
 
 
@@ -124,6 +123,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
+- [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 
 *Heartbeat*
 
@@ -227,7 +227,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 - Add Hetzner Cloud as a provider for `add_cloud_metadata`. {pull}35456[35456]
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
-
+- Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
+- Added `orchestrator.cluster.id` and `orchestrator.cluster.name` fields to the add_cloud_metadata processor, AWS cloud provider. {pull}35182[35182]
 
 *Auditbeat*
 
@@ -286,10 +287,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
 - Add oracle authentication messages parsing {pull}35127[35127]
+- Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
