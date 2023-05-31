@@ -18,15 +18,14 @@
 package cfgfile
 
 import (
+	"fmt"
 	"sync"
 
-	"github.com/hashicorp/go-multierror"
+	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -57,7 +56,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var errs error
+	var errs multierror.Errors
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
@@ -69,7 +68,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = multierror.Append(errs, errors.Wrap(err, "Unable to hash given config"))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
 			continue
 		}
 
@@ -89,8 +88,6 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
 		go func(runner Runner) {
-			// I don't think we need to somehow un-enroll diagnostic callbacks here.
-			// If the unit is removed, the diagnostics are de-facto un-enrolled
 			defer wg.Done()
 			runner.Stop()
 			r.logger.Debugf("Runner: '%s' has stopped", runner)
@@ -105,13 +102,13 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			if _, ok := err.(*common.ErrInputNotFinished); ok {
+			if _, ok := err.(*common.ErrInputNotFinished); ok { //nolint: errorlint: ErrInputNotFinished is a type, not an expression
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
-			errs = multierror.Append(errs, errors.Wrap(err, "Error creating runner from config"))
+			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 
@@ -119,18 +116,6 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.runners[hash] = runner
 		runner.Start()
 		moduleStarts.Add(1)
-		// register diagnostics for starting runners
-		if config.DiagCallback != nil {
-			if diag, ok := runner.(diagnostics.DiagnosticRunner); ok {
-				r.logger.Debugf("Runner '%s' has diagnostics, attempting to register", runner)
-				for _, dc := range diag.ModuleDiagnostics() {
-					config.DiagCallback.Register(dc.Name, dc.Description, dc.Filename, dc.ContentType, dc.Callback)
-				}
-			} else {
-				r.logger.Debugf("Runner %s does not implement DiagnosticRunner, skipping", runner)
-			}
-		}
-
 	}
 
 	// NOTE: This metric tracks the number of modules in the list. The true
@@ -139,7 +124,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// above it is done asynchronously.
 	moduleRunning.Set(int64(len(r.runners)))
 
-	return errs
+	return errs.Err()
 }
 
 // Stop all runners
