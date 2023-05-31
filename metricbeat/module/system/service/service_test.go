@@ -20,6 +20,7 @@
 package service
 
 import (
+	"context"
 	"os"
 	"runtime"
 	"testing"
@@ -65,7 +66,7 @@ func TestDbusEnvConnection(t *testing.T) {
 	require.NotNil(t, conn)
 
 	// test the higher-level systemd library
-	_, err = dbus.New()
+	_, err = dbus.NewWithContext(context.Background())
 	require.NoError(t, err)
 
 }
