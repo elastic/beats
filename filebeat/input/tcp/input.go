@@ -251,7 +251,7 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv4 addrs for metric collection %q", badAddr)
 	}
-	hasUnspecified6, addrIsUnspecified6, badAddr := containsUnspecifiedAddr(addr)
+	hasUnspecified6, addrIsUnspecified6, badAddr := containsUnspecifiedAddr(addr6)
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
 	}
