@@ -368,19 +368,19 @@ func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 
 func (rt *MetricsRoundTripper) monitorByMethod(method string) {
 	switch method {
-	case "DELETE":
+	case http.MethodDelete:
 		rt.metrics.reqDelete.Add(1)
-	case "GET":
+	case http.MethodGet:
 		rt.metrics.reqGet.Add(1)
-	case "HEAD":
+	case http.MethodHead:
 		rt.metrics.reqHead.Add(1)
-	case "OPTIONS":
+	case http.MethodOptions:
 		rt.metrics.reqOptions.Add(1)
-	case "PATCH":
+	case http.MethodPatch:
 		rt.metrics.reqPatch.Add(1)
-	case "POST":
+	case http.MethodPost:
 		rt.metrics.reqPost.Add(1)
-	case "PUT":
+	case http.MethodPut:
 		rt.metrics.reqPut.Add(1)
 	}
 }
