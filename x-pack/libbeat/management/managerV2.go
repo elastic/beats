@@ -6,6 +6,7 @@ package management
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -15,9 +16,12 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	gproto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -49,9 +53,10 @@ type BeatV2Manager struct {
 	errCanceller context.CancelFunc
 
 	// track individual units given to us by the V2 API
-	mx      sync.Mutex
-	units   map[unitKey]*client.Unit
-	actions []client.Action
+	mx          sync.Mutex
+	units       map[unitKey]*client.Unit
+	actions     []client.Action
+	forceReload bool
 
 	// status is reported as a whole for every unit sent to this component
 	// hopefully this can be improved in the future to be separated per unit
@@ -84,6 +89,13 @@ type BeatV2Manager struct {
 	lastBeatOutputCfg   *reload.ConfigWithMeta
 	lastBeatInputCfgs   []*reload.ConfigWithMeta
 	lastBeatFeaturesCfg *conf.C
+
+	// changeDebounce is the debounce time for a configuration change
+	changeDebounce time.Duration
+	// forceReloadDebounce is the time the manager will wait before
+	// trying to reload the configuration after an input not finished error
+	// happens
+	forceReloadDebounce time.Duration
 }
 
 // ================================
@@ -93,6 +105,20 @@ type BeatV2Manager struct {
 // WithStopOnEmptyUnits enables stopping the beat when agent sends no units.
 func WithStopOnEmptyUnits(m *BeatV2Manager) {
 	m.stopOnEmptyUnits = true
+}
+
+// WithChangeDebounce sets the changeDeboung value
+func WithChangeDebounce(d time.Duration) func(b *BeatV2Manager) {
+	return func(b *BeatV2Manager) {
+		b.changeDebounce = d
+	}
+}
+
+// WithForceReloadDebounce sets the forceReloadDebounce value
+func WithForceReloadDebounce(d time.Duration) func(b *BeatV2Manager) {
+	return func(b *BeatV2Manager) {
+		b.forceReloadDebounce = d
+	}
 }
 
 // ================================
@@ -109,22 +135,38 @@ func init() {
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
 func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, fmt.Errorf("parsing fleet management settings: %w", err)
 		}
 	}
-	agentClient, _, err := client.NewV2FromReader(os.Stdin, client.VersionInfo{
-		Name:    "beat-v2-client",
-		Version: version.GetDefaultVersion(),
-		Meta: map[string]string{
-			"commit":     version.Commit(),
-			"build_time": version.BuildTime().String(),
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error reading control config from agent: %w", err)
+
+	var agentClient client.V2
+	var err error
+	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
+		// Insecure for testing Elastic-Agent-Client initialisation
+		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
+		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
+			"", // Insecure connection for test, no token needed
+			client.VersionInfo{
+				Name:    "beat-v2-client-for-testing",
+				Version: version.GetDefaultVersion(),
+			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else {
+		// Normal Elastic-Agent-Client initialisation
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
+			Name:    "beat-v2-client",
+			Version: version.GetDefaultVersion(),
+			Meta: map[string]string{
+				"commit":     version.Commit(),
+				"build_time": version.BuildTime().String(),
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error reading control config from agent: %w", err)
+		}
 	}
 
 	// officially running under the elastic-agent; we set the publisher pipeline
@@ -150,6 +192,12 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		status:             lbmanagement.Running,
 		message:            "Healthy",
 		stopChan:           make(chan struct{}, 1),
+		changeDebounce:     time.Second,
+		// forceReloadDebounce is greater than changeDebounce because it is only
+		// used when an input has not reached its finished state, this means some events
+		// still need to be acked by the acker, hence the longer we wait the more likely
+		// for the input to have reached its finished state.
+		forceReloadDebounce: time.Second * 10,
 	}
 
 	if config.Enabled {
@@ -378,15 +426,13 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 }
 
 func (cm *BeatV2Manager) unitListen() {
-	const changeDebounce = 100 * time.Millisecond
-
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	// timer is used to provide debounce on unit changes
 	// this allows multiple changes to come in and only a single reload be performed
-	t := time.NewTimer(changeDebounce)
+	t := time.NewTimer(cm.changeDebounce)
 	t.Stop() // starts stopped, until a change occurs
 
 	cm.logger.Debug("Listening for agent unit changes")
@@ -411,7 +457,8 @@ func (cm *BeatV2Manager) unitListen() {
 			return
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
-				"BeatV2Manager.unitListen UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				change.Unit.ID(),
 				change.Type, int64(change.Triggers), change.Type, change.Triggers)
 
 			switch change.Type {
@@ -420,11 +467,11 @@ func (cm *BeatV2Manager) unitListen() {
 			case client.UnitChangedAdded:
 				cm.addUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
-				t.Reset(changeDebounce)
+				t.Reset(cm.changeDebounce)
 			case client.UnitChangedModified:
 				cm.modifyUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
-				t.Reset(changeDebounce)
+				t.Reset(cm.changeDebounce)
 			case client.UnitChangedRemoved:
 				cm.deleteUnit(change.Unit)
 			}
@@ -439,6 +486,10 @@ func (cm *BeatV2Manager) unitListen() {
 			}
 			cm.mx.Unlock()
 			cm.reload(units)
+			if cm.forceReload {
+				// Restart the debounce timer so we try to reload the inputs.
+				t.Reset(cm.forceReloadDebounce)
+			}
 		}
 	}
 }
@@ -642,15 +693,62 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	if !didChange(cm.lastInputCfgs, inputCfgs) {
+	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
 
-	err := obj.Reload(inputBeatCfgs)
-	if err != nil {
-		return fmt.Errorf("failed to reloading inputs: %w", err)
+	if cm.forceReload {
+		cm.logger.Info("Reloading Beats inputs because forceReload is true. " +
+			"Set log level to debug to get more information about which " +
+			"inputs are causing this.")
 	}
+
+	if err := obj.Reload(inputBeatCfgs); err != nil {
+		merror := &multierror.MultiError{}
+		realErrors := multierror.Errors{}
+
+		// At the moment this logic is tightly bound to the current RunnerList
+		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
+		// filebeat/input/log/input.go.
+		// If they change the way they report errors, this will break.
+		// TODO (Tiago): update all layers to use the most recent features from
+		// the standard library errors package.
+		if errors.As(err, &merror) {
+			for _, err := range merror.Errors {
+				causeErr := errors.Unwrap(err)
+				// A Log input is only marked as finished when all events it
+				// produced are acked by the acker so when we see this error,
+				// we just retry until the new input can be started.
+				// This is the same logic used by the standalone configuration file
+				// reloader implemented on libbeat/cfgfile/reload.go
+				inputNotFinishedErr := &common.ErrInputNotFinished{}
+				if ok := errors.As(causeErr, &inputNotFinishedErr); ok {
+					cm.logger.Debugf("file '%s' is not finished, will retry starting the input soon", inputNotFinishedErr.File)
+					cm.forceReload = true
+					cm.logger.Debug("ForceReload set to TRUE")
+					continue
+				}
+
+				// This is an error that cannot be ignored, so we report it
+				realErrors = append(realErrors, err)
+			}
+		}
+
+		if len(realErrors) != 0 {
+			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
+		}
+	} else {
+		// If there was no error reloading input and forceReload was
+		// true, then set it to false. This prevents unnecessary logging
+		// and makes it clear this was the moment when the input reload
+		// finally worked.
+		if cm.forceReload {
+			cm.forceReload = false
+			cm.logger.Debug("ForceReload set to FALSE")
+		}
+	}
+
 	cm.lastInputCfgs = inputCfgs
 	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil
