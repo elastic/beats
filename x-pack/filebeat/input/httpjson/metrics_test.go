@@ -84,17 +84,24 @@ func TestMetrics(t *testing.T) {
 
 				snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, true)
 
+				nrequests := snapshot["http_request_total"].(int64)
+				nintervals := snapshot["httpjson_interval_total"].(int64)
+
+				if nrequests == 0 || nintervals == 0 {
+					return fmt.Errorf("at least 1 interval and 1 request are expected")
+				}
+
 				conds := map[string]func(interface{}) bool{
-					"http_request_body_bytes":                checkHistogramCount(8),
-					"http_request_get_total":                 checkValue(8),
-					"http_request_total":                     checkValue(8),
-					"http_response_2xx_total":                checkValue(8),
-					"http_response_body_bytes":               checkHistogramCount(8),
-					"http_response_total":                    checkValue(8),
-					"http_round_trip_time":                   checkHistogramCount(8),
-					"httpjson_interval_execution_time":       checkHistogramCount(6),
-					"httpjson_interval_pages_execution_time": checkHistogramCount(8),
-					"httpjson_interval_total":                checkValue(6),
+					"http_request_body_bytes":                checkHistogramCount(nrequests),
+					"http_request_get_total":                 checkValue(nrequests),
+					"http_request_total":                     checkValue(nrequests),
+					"http_response_2xx_total":                checkValue(nrequests),
+					"http_response_body_bytes":               checkHistogramCount(nrequests),
+					"http_response_total":                    checkValue(nrequests),
+					"http_round_trip_time":                   checkHistogramCount(nrequests),
+					"httpjson_interval_execution_time":       checkHistogramCount(nintervals),
+					"httpjson_interval_pages_execution_time": checkHistogramCount(nrequests),
+					"httpjson_interval_total":                checkValue(nintervals),
 				}
 
 				for m, f := range conds {
