@@ -2561,6 +2561,12 @@ filebeat.modules:
     # The secret token value created by Zoom
     #secret.value: ZOOMTOKEN
 
+    # Enable the CRC webhook validation
+    #crc.enabled: false
+
+    # The secret token value provided by Zoom for CRC validation
+    #crc.secret: ZOOMTOKEN
+
 #----------------------------- Zscaler NSS Module -----------------------------
 - module: zscaler
   zia:

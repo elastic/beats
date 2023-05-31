@@ -259,7 +259,7 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.Handle
 		responseBody:          c.ResponseBody,
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
-		crc:                   newCRC(c.CRCProvider, c.SecretValue),
+		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
 
 	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
