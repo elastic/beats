@@ -36,7 +36,7 @@ import (
 // In case of a test failure the directory with Filebeat logs and
 // all other supporting files will be kept on build/integration-tests.
 //
-// Run the tests wit -v flag to print the temporary folder used.
+// Run the tests with -v flag to print the temporary folder used.
 func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
