@@ -230,6 +230,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 - Add Hetzner Cloud as a provider for `add_cloud_metadata`. {pull}35456[35456]
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
+- Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
 
 
 *Auditbeat*
