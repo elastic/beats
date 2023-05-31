@@ -17,7 +17,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.1
-	github.com/PaesslerAG/gval v1.0.0
+	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v1.2.1
@@ -137,6 +137,7 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
+	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
