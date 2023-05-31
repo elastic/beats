@@ -141,6 +141,8 @@ func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig,
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
+		var replicaSetWatcher, jobWatcher kubernetes.Watcher
+
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -208,8 +210,30 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
+
+		// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+		// Deployment -> Replicaset -> Pod
+		// CronJob -> job -> Pod
+		if metaConf.Deployment {
+			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+			}
+		}
+		if metaConf.CronJob {
+			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			}
+		}
+
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
@@ -244,6 +268,18 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if namespaceWatcher != nil {
 			if err := namespaceWatcher.Start(); err != nil {
 				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+				return
+			}
+		}
+		if replicaSetWatcher != nil {
+			if err := replicaSetWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start replicaSet watcher: %v", err)
+				return
+			}
+		}
+		if jobWatcher != nil {
+			if err := jobWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start job watcher: %v", err)
 				return
 			}
 		}
