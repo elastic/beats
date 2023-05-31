@@ -56324,7 +56324,7 @@ type: long
 *`postgresql.replication.state`*::
 +
 --
-Current WAL sender state
+Current WAL sender state.
 
 
 type: keyword
