@@ -83,6 +83,7 @@ CHANGELOG*
 /x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-external-integrations
+/x-pack/filebeat/input/azureeventhub/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/cel/ @elastic/security-external-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-external-integrations
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
