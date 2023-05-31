@@ -20,6 +20,7 @@
 package cpu
 
 import (
+	"fmt"
 	"runtime"
 
 	"github.com/pkg/errors"
@@ -55,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	opts, err := config.Validate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+		return nil, fmt.Errorf("error validating config: %w", err)
 	}
 
 	if config.CPUTicks != nil && *config.CPUTicks {
@@ -73,24 +74,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	sample, err := m.cpu.Fetch()
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch CPU times")
+		return fmt.Errorf("failed to fetch CPU times: %w", err)
 	}
 
 	event, err := sample.Format(m.opts)
 	if err != nil {
-		return errors.Wrap(err, "error formatting metrics")
+		return fmt.Errorf("error formatting metrics: %w", err)
 	}
 	event.Put("cores", sample.CPUCount())
 
 	//generate the host fields here, since we don't want users disabling it.
 	hostEvent, err := sample.Format(metrics.MetricOpts{NormalizedPercentages: true})
 	if err != nil {
-		return errors.Wrap(err, "error creating host fields")
+		return fmt.Errorf("error creating host fields: %w", err)
 	}
 	hostFields := mapstr.M{}
 	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
 	if err != nil {
-		return errors.Wrap(err, "error fetching normalized CPU percent")
+		return fmt.Errorf("error fetching normalized CPU percent: %w", err)
 	}
 
 	r.Event(mb.Event{
