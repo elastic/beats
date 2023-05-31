@@ -24,7 +24,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 )
 
-// Based on https://www.postgresql.org/docs/9.2/static/monitoring-stats.html#PG-STAT-DATABASE-VIEW
+// Based on https://www.postgresql.org/docs/9.5/monitoring-stats.html#PG-STAT-REPLICATION-VIEW
 var schema = s.Schema{
 	"pid": c.Int("pid"),
 	"user": s.Object{
@@ -33,12 +33,12 @@ var schema = s.Schema{
 	},
 	"application_name": c.Str("application_name"),
 	"client": s.Object{
-		"address":  c.Str("client_addr"),
-		"hostname": c.Str("client_hostname"),
+		"address":  c.Str("client_addr", s.Optional),
+		"hostname": c.Str("client_hostname", s.Optional),
 		"port":     c.Int("client_port", s.Optional),
 	},
 	"backend_start": c.Time(time.RFC3339Nano, "backend_start"),
-	"backend_xmin":  c.Time(time.RFC3339Nano, "backend_xmin", s.Optional),
+	"backend_xmin":  c.Int("backend_xmin", s.Optional),
 	"state":         c.Str("state"),
 	"sent_lsn":      c.Str("sent_lsn"),
 	"write_lsn":     c.Str("write_lsn"),
@@ -47,7 +47,6 @@ var schema = s.Schema{
 	"write_lag":     c.Str("write_lag"),
 	"flush_lag":     c.Str("flush_lag"),
 	"replay_lag":    c.Str("replay_lag"),
-	"sync_priority": c.Int("sync_priority"),
+	"sync_priority": c.Int("sync_priority", s.Optional),
 	"sync_state":    c.Str("sync_state"),
-	"reply_time":    c.Str("reply_time"),
 }

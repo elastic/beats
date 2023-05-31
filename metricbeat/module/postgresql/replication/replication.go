@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 
-	// Register postgresql replication/sql driver
+	// Register postgresql as the sql driver
 	_ "github.com/lib/pq"
 )
 
@@ -37,7 +37,7 @@ func init() {
 	)
 }
 
-// MetricSet type defines all fields of the MetricSet
+// MetricSet type defines all fields of the MetricSet.
 type MetricSet struct {
 	*postgresql.MetricSet
 }
@@ -51,14 +51,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{MetricSet: ms}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right
+// Fetch method implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
 	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_replication")
 	if err != nil {
-		return fmt.Errorf("error in QueryStats %w\n", err)
+		return fmt.Errorf("error in QueryStats %w", err)
 	}
 
 	for _, result := range results {

@@ -2,8 +2,8 @@
   type: group
   description: >
     One row per replication, showing database replication statistics. Collected by querying
-    pg_stat_database
-  release: ga
+    pg_stat_replication.
+  release: beta
   fields:
     - name: write_lag
       type: long
@@ -12,72 +12,79 @@
     - name: state
       type: keyword
       description: >
-        WAL sender state.
+        Current WAL sender state.
     - name: sync_priority
       type: long
       description: >
-        Priority of replica server being chosen as synchronous replica.
+        Priority of this standby server for being chosen as the synchronous standby.
     - name: backend_start
       type: long
       description: >
-        Start time when replica connected to primary.
+        Time when this process was started, i.e., when the client connected to this WAL sender.
+    - name: backend_xmin
+      type: long
+      description: >
+        This standby's xmin horizon reported by hot_standby_feedback.
     - name: replay_lag
       type: long
       description: >
         Elapsed time during committed WALs from primary to the replica.
-        Fully committed in replica node
+        Fully committed to replica node.
     - name: flush_lag
       type: long
       description: >
-        Elapsed time during committed WALs from primary to the replica.
-        WAL's has already been flushed but not yet applied.
+        The elapsed time during committed WALs from primary to the replica.
+        WALs have already been flushed but have not yet been applied.
     - name: pid
       type: long
       description: >
-        Process id of walsender process
+        Process ID of a WAL sender process.
     - name: client.address
       type: long
       description: >
-        Address of replica/streaming replication
+        IP address of the client connected to this WAL sender.
+        If this field is null, it indicates that the client is
+        connected via a Unix socket on the server machine.
     - name: client.port
       type: long
       description: >
-        Port of replica/streaming replication
+        TCP port number that the client is using for communication
+        with this WAL sender, or -1 if a Unix socket is used.
     - name: client.hostname
       type: long
       description: >
-        Hostname of replica/streaming replication
+        Host name of the connected client, as reported by a reverse
+        DNS lookup of client_addr. This field will only be non-null
+        for IP connections, and only when log_hostname is enabled.
     - name: replay_lsn
       type: long
       description: >
-        Last transaction flush on disk at replica.
+        Last transaction log position replayed into the database on this standby server.
     - name: user.name
-      type: long
+      type: keyword
       description: >
-        Name of user which is used for Streaming replication
+        Name of the user logged into this WAL sender process.
     - name: user.id
       type: long
       description: >
-        ID of user which is used for Streaming replication
+        OID of the user logged into this WAL sender process.
     - name: sync_state
-      type: long
+      type: keyword
       description: >
-        Sync State of replica.
+        Synchronous state of this standby server.
     - name: flush_lsn
       type: long
       description: >
-        Last transaction flush on disk at replica.
+        Last transaction log position flushed to disk by this standby server.
     - name: application_name
-      type: long
+      type: keyword
       description: >
-        Number of queries canceled due to conflicts with recovery in this
-        database.
+        Name of the application that is connected to this WAL sender.
     - name: write_lsn
       type: long
       description: >
-        Last transaction written on disk at replica.
+        Last transaction log position written to disk by this standby server.
     - name: sent_lsn
       type: long
       description: >
-        Last transaction location sent to replica
-
+        Last transaction log position sent on this connection.
