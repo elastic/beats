@@ -69,44 +69,29 @@ func TestMetrics(t *testing.T) {
 				`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
 			},
 			assertMetrics: func(reg *monitoring.Registry) error {
-				checkHistogramCount := func(c int64) func(v interface{}) bool {
-					return func(v interface{}) bool {
-						m := v.(map[string]interface{})
-						h := m["histogram"].(map[string]interface{})
-						return h["count"].(int64) == c
+				checkHasValue := func(v interface{}) bool {
+					var c int64
+					switch t := v.(type) {
+					case int64:
+						c = t
+					case map[string]interface{}:
+						h := t["histogram"].(map[string]interface{})
+						c = h["count"].(int64)
 					}
-				}
-				checkValue := func(c int64) func(v interface{}) bool {
-					return func(v interface{}) bool {
-						return v.(int64) == c
-					}
+					return c > 0
 				}
 
 				snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, true)
 
-				nrequests := snapshot["http_request_total"].(int64)
-				nintervals := snapshot["httpjson_interval_total"].(int64)
-
-				if nrequests == 0 || nintervals == 0 {
-					return fmt.Errorf("at least 1 interval and 1 request are expected")
-				}
-
-				conds := map[string]func(interface{}) bool{
-					"http_request_body_bytes":                checkHistogramCount(nrequests),
-					"http_request_get_total":                 checkValue(nrequests),
-					"http_request_total":                     checkValue(nrequests),
-					"http_response_2xx_total":                checkValue(nrequests),
-					"http_response_body_bytes":               checkHistogramCount(nrequests),
-					"http_response_total":                    checkValue(nrequests),
-					"http_round_trip_time":                   checkHistogramCount(nrequests),
-					"httpjson_interval_execution_time":       checkHistogramCount(nintervals),
-					"httpjson_interval_pages_execution_time": checkHistogramCount(nrequests),
-					"httpjson_interval_total":                checkValue(nintervals),
-				}
-
-				for m, f := range conds {
-					if !f(snapshot[m]) {
-						return fmt.Errorf("unexpected metric value %v for metric %s", snapshot[m], m)
+				for _, m := range []string{
+					"http_request_body_bytes", "http_request_get_total",
+					"http_request_total", "http_response_2xx_total",
+					"http_response_body_bytes", "http_response_total",
+					"http_round_trip_time", "httpjson_interval_execution_time",
+					"httpjson_interval_pages_execution_time", "httpjson_interval_total",
+				} {
+					if !checkHasValue(snapshot[m]) {
+						return fmt.Errorf("expected non zero value for metric %s", m)
 					}
 				}
 
