@@ -53,7 +53,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
-
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
@@ -118,11 +117,13 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
+- Fixes "Can only start an input when all related states are finished" error when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
 - Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 
 *Heartbeat*
 
