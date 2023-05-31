@@ -178,9 +178,16 @@ As noted above the `cel` input provides function, macro and global variables to 
 ** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Format_Query[Format Query]
 
 * https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#File[File] — the file extension is initialized with MIME handlers for "application/gzip", https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#NDJSON["application/x-ndjson"], https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#Zip["application/zip"], https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#CSVNoHeader["text/csv; header=absent"], and https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#CSVHeader["text/csv; header=present"].
+** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Dir[Dir]
+** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-File[File]
+
+* https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#JSON[JSON]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Encode_JSON[Encode JSON]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Decode_JSON[Decode JSON]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Decode_JSON_Stream[Decode JSON Stream]
+
+* https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#XML[XML] — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
+** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Decode_XML[Decode JSON]
 
 * https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#Limit[Limit] — the rate limit extension is initialized with https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#OktaRateLimit[Okta (as "okta")] and the https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#DraftRateLimit[Draft Rate Limit (as "draft")] policies.
 ** https://pkg.go.dev/github.com/elastic/mito@v1.2.0/lib#hdr-Rate_Limit[Rate Limit]
@@ -327,6 +334,31 @@ filebeat.inputs:
   regexp:
     products: '(?i)(Elasticsearch|Beats|Logstash|Kibana)'
     solutions: '(?i)(Search|Observability|Security)'
+----
+
+[[xsd-cel]]
+[float]
+==== `xsd`
+
+XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  # Provide an XSD, 'order', for use during CEL execution (truncated for example).
+  regexp:
+    order: |
+       <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+         <xs:element name="order">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="sender" type="xs:string"/>
+               <xs:element name="address">
+                 <xs:complexType>
+                   <xs:sequence>
+                     <xs:element name="name" type="xs:string"/>
+                     <xs:element name="company" type="xs:string"/>
 ----
 
 [float]
