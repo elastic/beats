@@ -20,10 +20,9 @@
 package cpu
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
