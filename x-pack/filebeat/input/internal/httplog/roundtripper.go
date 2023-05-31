@@ -262,23 +262,23 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 
 	out := &httpMetrics{
 		reqs:          monitoring.NewUint(reg, "http_request_total"),
-		reqErrs:       monitoring.NewUint(reg, "http_request_errors"),
-		reqDelete:     monitoring.NewUint(reg, "http_request_delete"),
-		reqGet:        monitoring.NewUint(reg, "http_request_get"),
-		reqHead:       monitoring.NewUint(reg, "http_request_head"),
-		reqOptions:    monitoring.NewUint(reg, "http_request_options"),
-		reqPatch:      monitoring.NewUint(reg, "http_request_patch"),
-		reqPost:       monitoring.NewUint(reg, "http_request_post"),
-		reqPut:        monitoring.NewUint(reg, "http_request_put"),
+		reqErrs:       monitoring.NewUint(reg, "http_request_errors_total"),
+		reqDelete:     monitoring.NewUint(reg, "http_request_delete_total"),
+		reqGet:        monitoring.NewUint(reg, "http_request_get_total"),
+		reqHead:       monitoring.NewUint(reg, "http_request_head_total"),
+		reqOptions:    monitoring.NewUint(reg, "http_request_options_total"),
+		reqPatch:      monitoring.NewUint(reg, "http_request_patch_total"),
+		reqPost:       monitoring.NewUint(reg, "http_request_post_total"),
+		reqPut:        monitoring.NewUint(reg, "http_request_put_total"),
 		reqsAccSize:   monitoring.NewUint(reg, "http_request_body_bytes_total"),
 		reqsSize:      metrics.NewUniformSample(1024),
 		resps:         monitoring.NewUint(reg, "http_response_total"),
-		respErrs:      monitoring.NewUint(reg, "http_response_errors"),
-		resp1xx:       monitoring.NewUint(reg, "http_response_1xx"),
-		resp2xx:       monitoring.NewUint(reg, "http_response_2xx"),
-		resp3xx:       monitoring.NewUint(reg, "http_response_3xx"),
-		resp4xx:       monitoring.NewUint(reg, "http_response_4xx"),
-		resp5xx:       monitoring.NewUint(reg, "http_response_5xx"),
+		respErrs:      monitoring.NewUint(reg, "http_response_errors_total"),
+		resp1xx:       monitoring.NewUint(reg, "http_response_1xx_total"),
+		resp2xx:       monitoring.NewUint(reg, "http_response_2xx_total"),
+		resp3xx:       monitoring.NewUint(reg, "http_response_3xx_total"),
+		resp4xx:       monitoring.NewUint(reg, "http_response_4xx_total"),
+		resp5xx:       monitoring.NewUint(reg, "http_response_5xx_total"),
 		respsAccSize:  monitoring.NewUint(reg, "http_response_body_bytes_total"),
 		respsSize:     metrics.NewUniformSample(1024),
 		roundTripTime: metrics.NewUniformSample(1024),
@@ -298,23 +298,23 @@ func newHTTPMetrics(reg *monitoring.Registry) *httpMetrics {
 // request and response metrics to the underlying registry.
 //
 //	http_request_total
-//	http_request_errors
-//	http_request_delete
-//	http_request_get
-//	http_request_head
-//	http_request_options
-//	http_request_patch
-//	http_request_post
-//	http_request_put
+//	http_request_errors_total
+//	http_request_delete_total
+//	http_request_get_total
+//	http_request_head_total
+//	http_request_options_total
+//	http_request_patch_total
+//	http_request_post_total
+//	http_request_put_total
 //	http_request_body_bytes_total
 //	http_request_body_bytes
 //	http_response_total
-//	http_response_errors
-//	http_response_1xx
-//	http_response_2xx
-//	http_response_3xx
-//	http_response_4xx
-//	http_response_5xx
+//	http_response_errors_total
+//	http_response_1xx_total
+//	http_response_2xx_total
+//	http_response_3xx_total
+//	http_response_4xx_total
+//	http_response_5xx_total
 //	http_response_body_bytes_total
 //	http_response_body_bytes
 //	http_round_trip_time

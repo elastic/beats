@@ -86,9 +86,9 @@ func TestMetrics(t *testing.T) {
 
 				conds := map[string]func(interface{}) bool{
 					"http_request_body_bytes":                checkHistogramCount(8),
-					"http_request_get":                       checkValue(8),
+					"http_request_get_total":                 checkValue(8),
 					"http_request_total":                     checkValue(8),
-					"http_response_2xx":                      checkValue(8),
+					"http_response_2xx_total":                checkValue(8),
 					"http_response_body_bytes":               checkHistogramCount(8),
 					"http_response_total":                    checkValue(8),
 					"http_round_trip_time":                   checkHistogramCount(8),
