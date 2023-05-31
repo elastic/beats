@@ -102,7 +102,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			if _, ok := err.(*common.ErrInputNotFinished); ok { //nolint: errorlint: ErrInputNotFinished is a type, not an expression
+			if _, ok := err.(*common.ErrInputNotFinished); ok { //nolint:errorlint // ErrInputNotFinished is a struct type, not an expression/error value
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {
