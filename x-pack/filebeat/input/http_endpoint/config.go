@@ -40,6 +40,7 @@ type config struct {
 	HMACType              string                  `config:"hmac.type"`
 	HMACPrefix            string                  `config:"hmac.prefix"`
 	CRCProvider           string                  `config:"crc.provider"`
+	CRCSecret             string                  `config:"crc.secret"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
 }
@@ -63,6 +64,7 @@ func defaultConfig() config {
 		HMACType:      "",
 		HMACPrefix:    "",
 		CRCProvider:   "",
+		CRCSecret:     "",
 	}
 }
 
@@ -92,9 +94,11 @@ func (c *config) Validate() error {
 	if c.CRCProvider != "" {
 		if !isValidCRCProvider(c.CRCProvider) {
 			return fmt.Errorf("not a valid CRC provider: %q", c.CRCProvider)
-		} else if c.SecretValue == "" {
-			return errors.New("secret.value is required when crc.provider is defined")
+		} else if c.CRCSecret == "" {
+			return errors.New("crc.secret is required when crc.provider is defined")
 		}
+	} else if c.CRCSecret != "" {
+		return errors.New("crc.provider is required when crc.secret is defined")
 	}
 
 	return nil

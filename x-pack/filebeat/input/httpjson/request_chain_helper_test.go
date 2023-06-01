@@ -45,7 +45,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newChainHTTPClient(tt.args.ctx, tt.args.authCfg, tt.args.requestCfg, tt.args.log, tt.args.p...)
+			got, err := newChainHTTPClient(tt.args.ctx, tt.args.authCfg, tt.args.requestCfg, tt.args.log, nil, tt.args.p...)
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 		})

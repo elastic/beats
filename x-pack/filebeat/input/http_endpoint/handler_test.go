@@ -245,9 +245,8 @@ func Test_apiResponse(t *testing.T) {
 		{
 			name: "validate CRC request",
 			conf: config{
-				SecretHeader: "secretHeaderTest",
-				SecretValue:  "secretValueTest",
-				CRCProvider:  "Zoom",
+				CRCProvider: "Zoom",
+				CRCSecret:   "secretValueTest",
 			},
 			request: func() *http.Request {
 				buf := bytes.NewBufferString(
@@ -261,7 +260,6 @@ func Test_apiResponse(t *testing.T) {
 				)
 				req := httptest.NewRequest(http.MethodPost, "/", buf)
 				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("secretHeaderTest", "secretValueTest")
 				return req
 			}(),
 			events:       nil,
@@ -271,9 +269,8 @@ func Test_apiResponse(t *testing.T) {
 		{
 			name: "malformed CRC request",
 			conf: config{
-				SecretHeader: "secretHeaderTest",
-				SecretValue:  "secretValueTest",
-				CRCProvider:  "Zoom",
+				CRCProvider: "Zoom",
+				CRCSecret:   "secretValueTest",
 			},
 			request: func() *http.Request {
 				buf := bytes.NewBufferString(
@@ -287,7 +284,6 @@ func Test_apiResponse(t *testing.T) {
 				)
 				req := httptest.NewRequest(http.MethodPost, "/", buf)
 				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("secretHeaderTest", "secretValueTest")
 				return req
 			}(),
 			events:       nil,
@@ -297,9 +293,8 @@ func Test_apiResponse(t *testing.T) {
 		{
 			name: "empty CRC challenge",
 			conf: config{
-				SecretHeader: "secretHeaderTest",
-				SecretValue:  "secretValueTest",
-				CRCProvider:  "Zoom",
+				CRCProvider: "Zoom",
+				CRCSecret:   "secretValueTest",
 			},
 			request: func() *http.Request {
 				buf := bytes.NewBufferString(
@@ -313,7 +308,6 @@ func Test_apiResponse(t *testing.T) {
 				)
 				req := httptest.NewRequest(http.MethodPost, "/", buf)
 				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("secretHeaderTest", "secretValueTest")
 				return req
 			}(),
 			events:       nil,
