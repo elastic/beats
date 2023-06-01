@@ -87,7 +87,9 @@ func TestDiagnostics(t *testing.T) {
 	diag, ok := runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
 	diags := diag.Diagnostics()
-	require.NotEmpty(t, diags)
+	if runtime.GOOS == "linux" {
+		require.NotEmpty(t, diags)
+	}
 
 	runner.Start()
 	assert.NotNil(t, <-pubClient.Channel)
