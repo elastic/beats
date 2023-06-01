@@ -84,30 +84,29 @@ func TestDiagnostics(t *testing.T) {
 	runner := module.NewRunner(factory(), m)
 
 	// First test, run before start. Shouldn't cause panics or other undefined behavior
-	diag, ok := runner.(diagnostics.DiagnosticRunner)
+	diag, ok := runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
-	diags := diag.ModuleDiagnostics()
+	diags := diag.Diagnostics()
 	require.NotEmpty(t, diags)
 
 	runner.Start()
 	assert.NotNil(t, <-pubClient.Channel)
 
-	diag, ok = runner.(diagnostics.DiagnosticRunner)
+	diag, ok = runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
-	diags = diag.ModuleDiagnostics()
+	diags = diag.Diagnostics()
 	require.NotEmpty(t, diags)
 	// diagnostics are only available on linux
 	if runtime.GOOS == "linux" {
 		res := diags[0].Callback()
-		t.Logf("Got results for CPU diagnostics: %s", res)
 		require.NotEmpty(t, res)
 	}
 
 	runner.Stop()
 	// stop, test again.
-	diag, ok = runner.(diagnostics.DiagnosticRunner)
+	diag, ok = runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
-	diags = diag.ModuleDiagnostics()
+	diags = diag.Diagnostics()
 	require.NotEmpty(t, diags)
 }
 

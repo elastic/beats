@@ -96,18 +96,18 @@ func (mr *runner) Stop() {
 	})
 }
 
-// ModuleDiagnostics implements the DiagnosticRunner for the mb/module/runner.
-func (mr *runner) ModuleDiagnostics() []diagnostics.DiagnosticSetup {
+// Diagnostics implements the DiagnosticRunner for the mb/module/runner.
+func (mr *runner) Diagnostics() []diagnostics.DiagnosticSetup {
 	msList := mr.mod.MetricSets()
 	responses := []diagnostics.DiagnosticSetup{}
 	for _, ms := range msList {
-		diagHandler, ok := ms.MetricSet.(diagnostics.DiagnosticSet)
+		diagHandler, ok := ms.MetricSet.(diagnostics.DiagnosticReporter)
 		if !ok {
 			continue
 		}
 		// create and append a filepath specific to the module/metricset combination
 		// This keeps diagnostic dumps cleaner and easier to parse.
-		diags := diagHandler.DiagnosticSetup()
+		diags := diagHandler.Diagnostics()
 		pathPrefix := fmt.Sprintf("%s-%s", mr.mod.Name(), ms.MetricSet.Name())
 		for _, diag := range diags {
 			fullpath := filepath.Join(pathPrefix, diag.Filename)

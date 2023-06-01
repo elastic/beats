@@ -43,7 +43,7 @@ func (fr *fakeRunnerDiag) Stop()  {}
 func (fr *fakeRunnerDiag) String() string {
 	return fmt.Sprintf("%s-%d", fakeRunnerName, fr.id)
 }
-func (fr *fakeRunnerDiag) DiagnosticSetup() []diagnostics.DiagnosticSetup {
+func (fr *fakeRunnerDiag) Diagnostics() []diagnostics.DiagnosticSetup {
 	return []diagnostics.DiagnosticSetup{
 		{
 			Name:     "test-diagnostic",
@@ -111,10 +111,10 @@ func TestDiagnosticsUnsupported(t *testing.T) {
 	runnerGroup.Start()
 
 	// fakeRunner doesn't support diagnostics, make sure nothing panics/returns invalid values
-	diags, ok := runnerGroup.(diagnostics.DiagnosticRunner)
+	diags, ok := runnerGroup.(diagnostics.DiagnosticReporter)
 	// the runner group does implement the interface, but should return nothing
 	require.True(t, ok)
-	res := diags.ModuleDiagnostics()
+	res := diags.Diagnostics()
 	require.Empty(t, res)
 }
 
@@ -127,9 +127,9 @@ func TestDiagosticsSupported(t *testing.T) {
 	}
 	runnerGroup := newRunnerGroup(runners)
 	runnerGroup.Start()
-	diags, ok := runnerGroup.(diagnostics.DiagnosticRunner)
+	diags, ok := runnerGroup.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
-	res := diags.ModuleDiagnostics()
+	res := diags.Diagnostics()
 	require.NotEmpty(t, res)
 }
 

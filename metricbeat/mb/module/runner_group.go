@@ -64,13 +64,13 @@ func (rg *runnerGroup) String() string {
 	return "RunnerGroup{" + strings.Join(entries, ", ") + "}"
 }
 
-// ModuleDiagnostics, like the rest of the runner group methods, merely
+// Diagnostics, like the rest of the runner group methods, merely
 // calls all the "client" runners and combines the results
-func (rg *runnerGroup) ModuleDiagnostics() []diagnostics.DiagnosticSetup {
+func (rg *runnerGroup) Diagnostics() []diagnostics.DiagnosticSetup {
 	results := []diagnostics.DiagnosticSetup{}
 	for _, runner := range rg.runners {
-		if diagHandler, ok := runner.(diagnostics.DiagnosticRunner); ok {
-			diags := diagHandler.ModuleDiagnostics()
+		if diagHandler, ok := runner.(diagnostics.DiagnosticReporter); ok {
+			diags := diagHandler.Diagnostics()
 			results = append(results, diags...)
 		}
 

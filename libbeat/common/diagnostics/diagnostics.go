@@ -17,19 +17,13 @@
 
 package diagnostics
 
-// DiagnosticRunner is a sub-type of the runner interface found as cfgfile.Runner
-// Runners can implement this if they want their client filesets/metricsets to expose the underlying DiagnosticSet interface
-type DiagnosticRunner interface {
-	ModuleDiagnostics() []DiagnosticSetup
-}
-
-// DiagnosticSet is an interface that a metricset/fileset can implement to provide additional Diagnostic data.
-// A metricset can provide any number of diagnostic responses when requested.
-type DiagnosticSet interface {
-	// DiagnosticSetup returns metadata and a callback halder.
+// DiagnosticReporter is an interface that a metricset, fileset, or runner should implement to provide additional Diagnostic data.
+// A DiagnosticReporter can provide any number of diagnostic responses when requested.
+type DiagnosticReporter interface {
+	// Diagnostics returns metadata and a callback handler.
 	// note that this can be called any time after a metricset has started, so implementors should not assume
 	// the state of a metricset/fileset when this method is called.
-	DiagnosticSetup() []DiagnosticSetup
+	Diagnostics() []DiagnosticSetup
 }
 
 // DiagnosticSetup contains the data needed to register a callback.

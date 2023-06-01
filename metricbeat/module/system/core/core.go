@@ -92,8 +92,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-// DiagnosticSetup implmements the DiagnosticSet interface
-func (m *MetricSet) DiagnosticSetup() []diagnostics.DiagnosticSetup {
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 	m.Logger().Infof("got DiagnosticSetup request for system/core")
 	if runtime.GOOS == "linux" {
 		return []diagnostics.DiagnosticSetup{{
