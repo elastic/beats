@@ -31,9 +31,7 @@ CHANGELOG*
 /filebeat/module/icinga @elastic/integrations
 /filebeat/module/iis @elastic/obs-infraobs-integrations
 /filebeat/module/kafka @elastic/obs-infraobs-integrations
-/filebeat/module/kibana @elastic/integrations
 /filebeat/module/kibana/ @elastic/infra-monitoring-ui
-/filebeat/module/logstash @elastic/integrations
 /filebeat/module/logstash/ @elastic/infra-monitoring-ui
 /filebeat/module/mongodb @elastic/obs-infraobs-integrations
 /filebeat/module/mysql @elastic/security-external-integrations
