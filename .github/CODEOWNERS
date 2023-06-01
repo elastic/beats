@@ -141,6 +141,7 @@ CHANGELOG*
 /x-pack/filebeat/module/zookeeper @elastic/integrations
 /x-pack/filebeat/module/zoom @elastic/security-external-integrations
 /x-pack/filebeat/module/zscaler @elastic/security-external-integrations
+/x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-external-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
 /x-pack/heartbeat/ @elastic/uptime
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
