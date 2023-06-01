@@ -28,9 +28,8 @@ import (
 )
 
 var (
-	metricsetName  = "billing"
-	regionName     = "us-east-1"
-	labelSeparator = "|"
+	metricsetName = "billing"
+	regionName    = "us-east-1"
 
 	// This list is from https://github.com/aws/aws-sdk-go-v2/blob/master/service/costexplorer/api_enums.go#L60-L90
 	supportedDimensionKeys = []string{
@@ -42,11 +41,7 @@ var (
 		"RESERVATION_ID",
 	}
 
-	dateLayout         = "2006-01-02"
-	accountIdIdx       = 0
-	accountLabelIdx    = 1
-	metricDataValueIdx = 2
-	dimensionStartIdx  = 3
+	dateLayout = "2006-01-02"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -175,7 +170,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil
@@ -198,17 +193,17 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 			continue
 		}
 		for valI, metricDataResultValue := range output.Values {
-			labels := strings.Split(*output.Label, labelSeparator)
+			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
 			event := mb.Event{}
-			if labels[accountIdIdx] != "" {
-				event = aws.InitEvent("", labels[accountLabelIdx], labels[accountIdIdx], output.Timestamps[valI])
+			if labels[aws.LabelConst.AccountIdIdx] != "" {
+				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI])
 			} else {
 				event = aws.InitEvent("", m.AccountName, m.AccountID, output.Timestamps[valI])
 			}
 
-			_, _ = event.MetricSetFields.Put(labels[metricDataValueIdx], metricDataResultValue)
+			_, _ = event.MetricSetFields.Put(labels[aws.LabelConst.MetricNameIdx], metricDataResultValue)
 
-			i := dimensionStartIdx
+			i := aws.LabelConst.BillingDimensionStartIdx
 			for i < len(labels)-1 {
 				_, _ = event.MetricSetFields.Put(labels[i], labels[i+1])
 				i += 2
@@ -367,9 +362,9 @@ func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity t
 	metricDims := metric.Metric.Dimensions
 	metricName := *metric.Metric.MetricName
 
-	label := metric.AccountID + labelSeparator + "${PROP('AccountLabel')}" + labelSeparator + metricName + labelSeparator
+	label := strings.Join([]string{metric.AccountID, aws.LabelConst.AccountLabel, metricName}, aws.LabelConst.LabelSeparator)
 	for _, dim := range metricDims {
-		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
+		label += *dim.Name + aws.LabelConst.LabelSeparator + *dim.Value + aws.LabelConst.LabelSeparator
 	}
 
 	metricDataQuery := types.MetricDataQuery{

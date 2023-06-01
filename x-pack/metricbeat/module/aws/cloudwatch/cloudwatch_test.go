@@ -775,7 +775,7 @@ func TestGenerateFieldName(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			fieldName := generateFieldName(c.label[namespaceIdx], c.label)
+			fieldName := generateFieldName(c.label[aws.LabelConst.NamespaceIdx], c.label)
 			assert.Equal(t, c.expectedFieldName, fieldName)
 		})
 	}
