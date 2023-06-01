@@ -52,5 +52,5 @@ func (in *cursorInput) Run(
 	publisher inputcursor.Publisher,
 ) error {
 	s := src.(*source)
-	return run(ctx, s.config, publisher, &cursor)
+	return runWithMetrics(ctx, s.config, publisher, &cursor)
 }

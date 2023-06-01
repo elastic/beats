@@ -292,13 +292,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add support for collecting `httpjson` metrics. {pull}35392[35392]
 - Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 - Mark CEL input as GA. {pull}35559[35559]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
-
-*Filebeat*
 
 *Libbeat*
 - Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
