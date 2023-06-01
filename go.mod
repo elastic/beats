@@ -187,7 +187,6 @@ require (
 	cloud.google.com/go/redis v1.10.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
 	github.com/Azure/go-autorest/autorest/adal v0.9.14
-	github.com/apache/arrow/go/v11 v11.0.0
 	github.com/apache/arrow/go/v12 v12.0.0
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.7
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
