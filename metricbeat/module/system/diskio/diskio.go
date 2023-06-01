@@ -78,8 +78,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	// Sample the current cpu counter
 	err = m.statistics.OpenSampling()
+	// CPU sampling does not seem to be used by any of the diskio metrics we're using. Mostly used by iostat.
 	if err != nil {
-		return fmt.Errorf("error in OpenSampling: %w", err)
+		m.Logger().Warnf("Error in CPU sampling for diskio: %w", err)
 	}
 
 	// Store the last cpu counter when finished
