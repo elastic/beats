@@ -166,6 +166,15 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
+
+	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
+	// Sanitization occurs if options are available and the message contains an invalid JSON.
+	//
+	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
+	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
+		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+	}
+
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
 	if err == nil {
