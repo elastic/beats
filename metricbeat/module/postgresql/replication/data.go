@@ -38,7 +38,7 @@ var schema = s.Schema{
 		"port":     c.Int("client_port", s.Optional),
 	},
 	"backend_start": c.Time(time.RFC3339Nano, "backend_start"),
-	"backend_xmin":  c.Int("backend_xmin", s.Optional),
+	"backend_xmin":  c.Uint("backend_xmin", s.Optional),
 	"state":         c.Str("state"),
 	"sent_lsn":      c.Str("sent_lsn"),
 	"write_lsn":     c.Str("write_lsn"),

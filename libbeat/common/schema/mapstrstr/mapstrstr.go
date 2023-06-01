@@ -129,6 +129,27 @@ func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toInt}, opts)
 }
 
+// toInt converts value to uint. In case of error, returns 0
+func toUint(key string, data map[string]interface{}) (interface{}, error) {
+	str, err := getString(key, data)
+	if err != nil {
+		return false, err
+	}
+
+	value, err := strconv.ParseUint(str, 10, 32)
+	if err != nil {
+		msg := fmt.Sprintf("error converting param to uint: `%s`", str)
+		return 0, schema.NewWrongFormatError(key, msg)
+	}
+
+	return value, nil
+}
+
+// Uint creates a Conv object for parsing integers
+func Uint(key string, opts ...schema.SchemaOption) schema.Conv {
+	return schema.SetOptions(schema.Conv{Key: key, Func: toUint}, opts)
+}
+
 // toStr converts value to str. In case of error, returns ""
 func toStr(key string, data map[string]interface{}) (interface{}, error) {
 	return getString(key, data)
