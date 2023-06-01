@@ -696,14 +696,10 @@ func TestProjectBrowserJob(t *testing.T) {
 
 	expectedLegacyMonFields := lookslike.MustCompile(map[string]interface{}{
 		"monitor": map[string]interface{}{
-			"type":     "browser",
-			"id":       fmt.Sprintf("%s-%s", legacyProjectMonitorValues.legacyProjectId, legacyProjectMonitorValues.id),
-			"name":     fmt.Sprintf("%s - %s", legacyProjectMonitorValues.legacyProjectName, legacyProjectMonitorValues.name),
-			"duration": mapstr.M{"us": int64(0)},
-			"project": mapstr.M{
-				"id":   legacyProjectMonitorValues.legacyProjectId,
-				"name": legacyProjectMonitorValues.legacyProjectName,
-			},
+			"type":        "browser",
+			"id":          legacyProjectMonitorValues.legacyProjectId,
+			"name":        legacyProjectMonitorValues.legacyProjectName,
+			"duration":    mapstr.M{"us": int64(0)},
 			"check_group": legacyProjectMonitorValues.checkGroup,
 			"timespan": mapstr.M{
 				"gte": hbtestllext.IsTime,
