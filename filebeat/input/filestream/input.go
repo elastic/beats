@@ -347,14 +347,12 @@ func (inp *filestream) readFromSource(
 		}
 
 		inp.metrics.BytesProcessed.Add(uint64(message.Bytes))
-		inp.metrics.EventsInFlight.Inc()
 
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			inp.metrics.ProcessingErrors.Inc()
 			return err
 		}
 
-		inp.metrics.EventsInFlight.Dec()
 		inp.metrics.EventsProcessed.Inc()
 		inp.metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}

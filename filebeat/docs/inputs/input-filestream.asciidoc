@@ -171,7 +171,6 @@ observe the activity of the input.
 | `files_deleted_total`     | Total number of file deleted events detected.
 | `files_renamed_total`     | Total number of file renamed events detected.
 | `files_active`            | Number of files currently open (gauge).
-| `events_in_flight`        | Number of events currently in flight (gauge).
 | `messages_read_total`     | Total number of messages read.
 | `bytes_processed_total`   | Total number of bytes processed.
 | `events_processed_total`  | Total number of events processed.

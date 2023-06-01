@@ -39,7 +39,6 @@ type Metrics struct {
 	FilesDeleted     *monitoring.Uint // Number of deleted file events detected by the prospector.
 	FilesRenamed     *monitoring.Uint // Number of renamed file events detected by the prospector.
 	FilesActive      *monitoring.Uint // Number of files currently open (gauge).
-	EventsInFlight   *monitoring.Uint // Number of events in-flight (gauge).
 	MessagesRead     *monitoring.Uint // Number of messages read.
 	BytesProcessed   *monitoring.Uint // Number of bytes processed.
 	EventsProcessed  *monitoring.Uint // Number of events processed.
@@ -68,7 +67,6 @@ func NewMetrics(id string) *Metrics {
 		FilesDeleted:     monitoring.NewUint(reg, "files_deleted_total"),
 		FilesRenamed:     monitoring.NewUint(reg, "files_renamed_total"),
 		FilesActive:      monitoring.NewUint(reg, "files_active"),
-		EventsInFlight:   monitoring.NewUint(reg, "events_in_flight"),
 		MessagesRead:     monitoring.NewUint(reg, "messages_read_total"),
 		BytesProcessed:   monitoring.NewUint(reg, "bytes_processed_total"),
 		EventsProcessed:  monitoring.NewUint(reg, "events_processed_total"),
