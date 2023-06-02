@@ -47,8 +47,8 @@ type MetricSet struct {
 	DataGranularity       time.Duration
 	Latency               time.Duration
 	AwsConfig             *awssdk.Config
-	AccountName           string
-	AccountID             string
+	MonitoringAccountName string
+	MonitoringAccountID   string
 	TagsFilter            []Tag
 	IncludeLinkedAccounts bool
 }
@@ -175,8 +175,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	if err != nil {
 		base.Logger().Warn("failed to get caller identity, please check permission setting: ", err)
 	} else {
-		metricSet.AccountID = *outputIdentity.Account
-		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
+		metricSet.MonitoringAccountID = *outputIdentity.Account
+		base.Logger().Debug("AWS Credentials belong to monitoring account ID: ", metricSet.MonitoringAccountID)
 	}
 	// Get account name/alias
 	svcIam := iam.NewFromConfig(awsConfig, func(o *iam.Options) {
@@ -185,7 +185,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		}
 
 	})
-	metricSet.AccountName = getAccountName(svcIam, base, metricSet)
+	metricSet.MonitoringAccountName = getAccountName(svcIam, base, metricSet)
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
@@ -229,7 +229,7 @@ func getAccountName(svc *iam.Client, base mb.BaseMetricSet, metricSet MetricSet)
 	defer cancel()
 	output, err := svc.ListAccountAliases(ctx, &iam.ListAccountAliasesInput{})
 
-	accountName := metricSet.AccountID
+	accountName := metricSet.MonitoringAccountID
 	if err != nil {
 		base.Logger().Warn("failed to list account aliases, please check permission setting: ", err)
 		return accountName
@@ -237,15 +237,15 @@ func getAccountName(svc *iam.Client, base mb.BaseMetricSet, metricSet MetricSet)
 
 	// When there is no account alias, account ID will be used as cloud.account.name
 	if len(output.AccountAliases) == 0 {
-		accountName = metricSet.AccountID
-		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.AccountID)
+		accountName = metricSet.MonitoringAccountID
+		base.Logger().Debug("AWS Credentials belong to account ID: ", metricSet.MonitoringAccountID)
 		return accountName
 	}
 
 	// There can be more than one aliases for each account, for now we are only
 	// collecting the first one.
 	accountName = output.AccountAliases[0]
-	base.Logger().Debug("AWS Credentials belong to account name: ", metricSet.AccountName)
+	base.Logger().Debug("AWS Credentials belong to account name: ", metricSet.MonitoringAccountName)
 	return accountName
 }
 

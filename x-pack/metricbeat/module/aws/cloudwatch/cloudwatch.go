@@ -177,7 +177,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, svcCloudwatch)
+		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, svcCloudwatch)
 		if err != nil {
 			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
 		}
@@ -482,12 +482,12 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 			for valI, metricDataResultValue := range metricDataResult.Values {
 				if len(labels) != aws.LabelConst.LabelLengthTotal {
 					// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
-					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.AccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
+					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.MonitoringAccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
 						if labels[aws.LabelConst.AccountIdIdx] != "" {
 							events[identifier] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI])
 						} else {
-							events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
+							events[identifier] = aws.InitEvent(regionName, m.MonitoringAccountName, m.MonitoringAccountID, metricDataResult.Timestamps[valI])
 						}
 					}
 					events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
@@ -542,12 +542,12 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					}
 
 					// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
-					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.AccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
+					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.MonitoringAccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
 						if labels[aws.LabelConst.AccountIdIdx] != "" {
 							events[identifier] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI])
 						} else {
-							events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
+							events[identifier] = aws.InitEvent(regionName, m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI])
 						}
 					}
 					events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
