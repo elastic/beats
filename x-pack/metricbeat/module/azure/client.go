@@ -9,9 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -27,7 +26,7 @@ type Client struct {
 }
 
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
-type mapResourceMetrics func(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
+type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
 // NewClient instantiates the Azure monitoring client
 func NewClient(config Config) (*Client, error) {
@@ -35,12 +34,15 @@ func NewClient(config Config) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	client := &Client{
 		AzureMonitorService: azureMonitorService,
 		Config:              config,
 		Log:                 logp.NewLogger("azure monitor client"),
 	}
+
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
+
 	return client, nil
 }
 
@@ -167,13 +169,15 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 }
 
 // MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
-func (client *Client) MapMetricByPrimaryAggregation(metrics []insights.MetricDefinition, resourceId string, subResourceId string, namespace string, dim []Dimension, timegrain string) []Metric {
+func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, subResourceId string, namespace string, dim []Dimension, timegrain string) []Metric {
 	var clientMetrics []Metric
-	metricGroups := make(map[string][]insights.MetricDefinition)
+
+	metricGroups := make(map[string][]armmonitor.MetricDefinition)
 
 	for _, met := range metrics {
-		metricGroups[string(met.PrimaryAggregationType)] = append(metricGroups[string(met.PrimaryAggregationType)], met)
+		metricGroups[string(*met.PrimaryAggregationType)] = append(metricGroups[string(*met.PrimaryAggregationType)], met)
 	}
+
 	for key, metricGroup := range metricGroups {
 		var metricNames []string
 		for _, metricName := range metricGroup {
@@ -186,9 +190,12 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []insights.MetricDef
 
 // GetVMForMetaData func will retrieve the vm details in order to fill in the cloud metadata and also update the client resources
 func (client *Client) GetVMForMetaData(resource *Resource, metricValues []MetricValue) VmResource {
-	var vm VmResource
-	resourceName := resource.Name
-	resourceId := resource.Id
+	var (
+		vm           VmResource
+		resourceName = resource.Name
+		resourceId   = resource.Id
+	)
+
 	// check first if this is a vm scaleset and the instance name is stored in the dimension value
 	if dimension, ok := getDimension("VMName", metricValues[0].dimensions); ok {
 		instanceId := getInstanceId(dimension.Value)
@@ -197,17 +204,21 @@ func (client *Client) GetVMForMetaData(resource *Resource, metricValues []Metric
 			resourceName = dimension.Value
 		}
 	}
+
 	// if vm has been already added to the resource then it should be returned
 	if existingVM, ok := getVM(resourceName, resource.Vms); ok {
 		return existingVM
 	}
+
 	// an additional call is necessary in order to retrieve the vm specific details
 	expandedResource, err := client.AzureMonitorService.GetResourceDefinitionById(resourceId)
 	if err != nil {
 		client.Log.Error(err, "could not retrieve the resource details by resource ID %s", resourceId)
 		return VmResource{}
 	}
+
 	vm.Name = *expandedResource.Name
+
 	if expandedResource.Properties != nil {
 		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
 			if hardware, ok := properties["hardwareProfile"]; ok {
@@ -220,12 +231,16 @@ func (client *Client) GetVMForMetaData(resource *Resource, metricValues []Metric
 			}
 		}
 	}
-	if len(vm.Size) == 0 && expandedResource.Sku != nil && expandedResource.Sku.Name != nil {
-		vm.Size = *expandedResource.Sku.Name
+
+	if len(vm.Size) == 0 && expandedResource.SKU != nil && expandedResource.SKU.Name != nil {
+		vm.Size = *expandedResource.SKU.Name
 	}
+
 	// the client resource and selected resources are being updated in order to avoid additional calls
 	client.AddVmToResource(resource.Id, vm)
+
 	resource.Vms = append(resource.Vms, vm)
+
 	return vm
 }
 
