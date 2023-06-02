@@ -149,6 +149,14 @@ runLoop:
 				continue runLoop
 			}
 
+			if !api.IsFile() && errors.Is(err, io.EOF) {
+				log.Errorw("Encountered EOF error when reading from Windows Event Log", "error", err)
+				if closeErr := api.Close(); closeErr != nil {
+					log.Errorw("Error closing Windows Event Log handle", "error", closeErr)
+				}
+				continue runLoop
+			}
+
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					log.Debugw("End of Winlog event stream reached", "error", err)
