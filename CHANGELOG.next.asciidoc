@@ -231,6 +231,11 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
 - Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
+
+*Osquerybeat*
+
 
 *Packetbeat*
 
