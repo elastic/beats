@@ -113,7 +113,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 - Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
-- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 
 *Osquerybeat*
 
