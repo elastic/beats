@@ -62,7 +62,7 @@ type Tag struct {
 // ModuleName is the name of this module.
 const ModuleName = "aws"
 
-// IncludeLinkedAccountsDefault defines if we should include metrics related to linked AWS accounts or not, by default
+// IncludeLinkedAccountsDefault defines if we should include metrics from linked AWS accounts or not. Default is false.
 // More information about cross-account Cloudwatch monitoring can be found at
 // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html
 const IncludeLinkedAccountsDefault = false
