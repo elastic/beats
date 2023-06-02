@@ -19,6 +19,7 @@ package channel
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -61,7 +62,10 @@ type commonInputConfig struct {
 	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
 	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
 
-	Dataset string `config:"dataset"`
+	// DataStream Settings
+	DataStreamType      string `config:"data_stream.type"`
+	DataStreamDataset   string `config:"data_stream.dataset"`
+	DataStreamNamespace string `config:"data_stream.namespace"`
 }
 
 func (f *onCreateFactory) CheckConfig(cfg *conf.C) error {
@@ -137,14 +141,46 @@ func newCommonConfigEditor(
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		if config.Dataset != "" {
-			index, err := fmtstr.CompileEvent(fmt.Sprintf("logs-%s-default", config.Dataset))
+
+		// Check if any of the data_stream.* values are set. If one of the values is set
+		// it is assumed the user wants to use the data stream naming scheme and index settings
+		// will be overwritten
+		if config.DataStreamType != "" || config.DataStreamDataset != "" || config.DataStreamNamespace != "" {
+			// Set default value for type to logs as this in filebeat
+			if config.DataStreamType == "" {
+				config.DataStreamType = "logs"
+			}
+
+			// Set default value for type to logs as this in filebeat
+			if config.DataStreamDataset == "" {
+				config.DataStreamDataset = "generic"
+			}
+
+			// Set default value for type to logs as this in filebeat
+			if config.DataStreamNamespace == "" {
+				config.DataStreamNamespace = "default"
+			}
+
+			if !validateDataStreamType(config.DataStreamType) {
+				return clientCfg, fmt.Errorf("invalid data_stream.type value: %s", config.DataStreamType)
+			}
+
+			if !validateDataStreamType(config.DataStreamDataset) {
+				return clientCfg, fmt.Errorf("invalid data_stream.dataset value: %s", config.DataStreamDataset)
+			}
+
+			if !validateDataStreamType(config.DataStreamNamespace) {
+				return clientCfg, fmt.Errorf("invalid data_stream.namespace value: %s", config.DataStreamNamespace)
+			}
+
+			index, err := fmtstr.CompileEvent(fmt.Sprintf("%s-%s-%s", config.DataStreamType, config.DataStreamDataset, config.DataStreamNamespace))
 			if err != nil {
 				return clientCfg, err
 			}
 
 			config.Index = *index
 		}
+
 		var indexProcessor beat.Processor
 		if !config.Index.IsEmpty() {
 			staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
@@ -205,4 +241,23 @@ func setOptional(to mapstr.M, key string, value string) {
 	if value != "" {
 		_, _ = to.Put(key, value)
 	}
+}
+
+func validateDataStreamType(dataStreamType string) bool {
+	validTypes := map[string]bool{"logs": true, "metrics": true, "traces": true}
+	_, exists := validTypes[dataStreamType]
+	return exists
+}
+
+// DISCUSS: What should happen to invalid characters
+// In https://github.com/elastic/elasticsearch/pull/76511 these are rewritten but it is slightly different there
+// as it is more dynamic.
+func validateDataStreamDataset(dataset string) bool {
+	// Check if only containing valid variables
+	return true
+}
+
+func validateDataStreamNamespace(namespace string) bool {
+	// Check if it contains all valid variables
+	return true
 }
