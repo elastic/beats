@@ -70,7 +70,7 @@ func (m *mockRunner) String() string {
 	defer m.mutex.Unlock()
 
 	out := mapstr.M{}
-	m.config.Unpack(&out)
+	m.config.Unpack(&out) //nolint:errcheck // This is a test file
 	return fmt.Sprintf("config: %v, started=%v, stopped=%v", out.String(), m.started, m.stopped)
 }
 
@@ -97,7 +97,9 @@ func (m *mockAdapter) CheckConfig(c *conf.C) error {
 	config := struct {
 		Broken bool `config:"broken"`
 	}{}
-	c.Unpack(&config)
+	if err := c.Unpack(&config); err != nil {
+		return fmt.Errorf("cannot unpack config: %w", err)
+	}
 
 	if config.Broken {
 		return fmt.Errorf("Broken config")
@@ -157,12 +159,15 @@ func TestAutodiscover(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
 	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
@@ -331,12 +336,15 @@ func TestAutodiscoverHash(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
 	runnerConfig1, _ := conf.NewConfigFrom(map[string]string{
@@ -396,13 +404,15 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
-
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 	// Create a mock adapter that returns a duplicated config
 	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"id": "foo",
@@ -458,12 +468,15 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
 	runnerConfig1, _ := conf.NewConfigFrom(map[string]string{
@@ -517,12 +530,15 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
 	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
@@ -662,6 +678,8 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 
 	// Fail the test case if the check fails
 	out := mapstr.M{}
-	expected.Unpack(&out)
+	if err := expected.Unpack(&out); err != nil {
+		t.Fatalf("cannot unpack 'out' as 'mapstr.M', err: %s", err)
+	}
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }
