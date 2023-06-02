@@ -776,7 +776,7 @@ func TestGenerateFieldName(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			fieldName := generateFieldName(c.label[namespaceIdx], c.label)
+			fieldName := generateFieldName(c.label[aws.LabelConst.NamespaceIdx], c.label)
 			assert.Equal(t, c.expectedFieldName, fieldName)
 		})
 	}
@@ -1288,7 +1288,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 5, AccountID: accountID}
+	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: accountID}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1333,7 +1333,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 func TestCreateEventsWithDataGranularity(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 10, AccountID: accountID, DataGranularity: 5}
+	m.MetricSet = &aws.MetricSet{Period: 10, MonitoringAccountID: accountID, DataGranularity: 5}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1374,7 +1374,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 func TestCreateEventsWithTagsFilter(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 5, AccountID: accountID}
+	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: accountID}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1535,7 +1535,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	m := MetricSet{
 		logger:            logp.NewLogger("test"),
 		CloudwatchConfigs: []Config{{Statistic: []string{"Average"}}},
-		MetricSet:         &aws.MetricSet{Period: 5, AccountID: accountID},
+		MetricSet:         &aws.MetricSet{Period: 5, MonitoringAccountID: accountID},
 	}
 
 	listMetricWithStatsTotal := []metricsWithStatistics{
