@@ -26,7 +26,7 @@ the <<{beatname_lc}-input-{type}-common-options>> described later.
 [float]
 ==== `provider`
 
-The identity provider. Must be one of: `azure-ad`.
+The identity provider. Must be one of: `azure-ad` or `okta`.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
@@ -225,6 +225,171 @@ so. Altering this value will also require a change to `login_scopes`.
 ===== `login_scopes`
 
 Override the default authentication scopes. Only change if directed to do so.
+
+
+[id="provider-okta"]
+==== Okta User Identities (`okta`)
+
+The `okta` provider allows the input to retrieve users from the Okta user
+API.
+
+[float]
+==== Setup
+
+The necessary API permissions need to be granted in Okta in order for the
+provider to function properly. In the administration dashboard for your
+Okta account, navigate to Security>API and in the Tokens tab click the
+"Create token" button to create a new token. Copy the token value and retain
+this to configure the provider. Note that the token will not be presented
+again, so it must be copied now. This value will use given to the provider
+via the `okta_token` configuration field.
+
+[float]
+==== How It Works
+
+[float]
+===== Overview
+
+The Okta provider periodically contacts the Okta API, retrieving updates for
+users, updates its internal cache of user metadata, and ships updated user
+metadata to Elasticsearch.
+
+Fetching and shipping updates occurs in one of two processes: **full
+synchronizations** and *incremental updates*. Full synchronizations will send the
+entire list of users in state, along with write markers to indicate the start
+and end of the synchronization event. Incremental updates will only send data
+for changed users during that event. Changes on a user can come in many forms,
+whether it be a change to the user's metadata, or a user was added or deleted.
+
+[float]
+===== API Interactions
+
+The provider periodically retrieves changes to user and group metadata from the
+Okta User API. This is done through calls to:
+
+- https://developer.okta.com/docs/reference/api/users/#list-users[/api/v1/users]
+
+Updates are tracked by the provider by retaining a record of the time of the last
+noted update in the returned user list. During provider updates the Okta provider
+makes use of the Okta API's query filtering to only request records updated at or
+since the provider's recorded last update.
+
+[float]
+===== Sending User Metadata to Elasticsearch
+
+During a full synchronization, all users stored in state will be sent to the
+output, while incremental updates will only send users which have been updated.
+Full synchronizations will be bounded on either side by write marker documents,
+which will look something like this:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "started",
+        "start": "2022-11-04T09:57:19.786056-05:00"
+    },
+    "labels": {
+        "identity_source": "okta-1"
+    }
+}
+----
+
+User documents will show the current state of the user.
+
+Example user document:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2023-07-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "okta": {
+        "id": "userid",
+        "status": "RECOVERY",
+        "created": "2023-06-02T09:33:00.189752+09:30",
+        "activated": "0001-01-01T00:00:00Z",
+        "statusChanged": "2023-06-02T09:33:00.189752+09:30",
+        "lastLogin": "2023-06-02T09:33:00.189752+09:30",
+        "lastUpdated": "2023-06-02T09:33:00.189753+09:30",
+        "passwordChanged": "2023-06-02T09:33:00.189753+09:30",
+        "type": {
+            "id": "typeid"
+        },
+        "profile": {
+            "login": "name.surname@example.com",
+            "email": "name.surname@example.com",
+            "firstName": "name",
+            "lastName": "surname"
+        },
+        "credentials": {
+            "password": {},
+            "provider": {
+                "type": "OKTA",
+                "name": "OKTA"
+            }
+        },
+        "_links": {
+            "self": {
+                "href": "https://localhost/api/v1/users/userid"
+            }
+        }
+    },
+    "user": {
+        "id": "userid",
+    },
+    "labels": {
+        "identity_source": "okta-1"
+    }
+}
+----
+
+[float]
+==== Configuration
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: entity-analytics
+  enabled: true
+  id: okta-1
+  provider: okta
+  sync_interval: "12h"
+  update_interval: "30m"
+  okta_domain: "OKTA_DOMAIN"
+  okta_token: "OKTA_TOKEN"
+----
+
+The `okta` provider supports the following configuration:
+
+[float]
+===== `okta_domain`
+
+The Okta domain. Field is required.
+
+[float]
+===== `okta_token`
+
+The Okta secret token, used for authentication. Field is required.
+
+[float]
+===== `sync_interval`
+
+The interval in which full synchronizations should occur. The interval must be
+longer than the update interval (`update_interval`) Expressed as a duration
+string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
+
+[float]
+===== `update_interval`
+
+The interval in which incremental updates should occur. The interval must be
+shorter than the full synchronization interval (`sync_interval`). Expressed as a
+duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
 [float]
 ==== Metrics
