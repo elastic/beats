@@ -97,9 +97,9 @@ func TestDiagnostics(t *testing.T) {
 	diag, ok = runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
 	diags = diag.Diagnostics()
-	require.NotEmpty(t, diags)
 	// diagnostics are only available on linux
 	if runtime.GOOS == "linux" {
+		require.NotEmpty(t, diags)
 		res := diags[0].Callback()
 		require.NotEmpty(t, res)
 	}
@@ -109,7 +109,10 @@ func TestDiagnostics(t *testing.T) {
 	diag, ok = runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
 	diags = diag.Diagnostics()
-	require.NotEmpty(t, diags)
+	if runtime.GOOS == "linux" {
+		require.NotEmpty(t, diags)
+	}
+
 }
 
 // newPubClientFactory returns a new ChanClient and a function that returns
