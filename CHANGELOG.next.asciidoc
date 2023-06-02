@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
 - 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+- Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
 
 
 *Auditbeat*
@@ -290,15 +291,16 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
+- Add support for CRC validation in Zoom module. {pull}35604[35604]
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add support for collecting `httpjson` metrics. {pull}35392[35392]
 - Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
+- Mark CEL input as GA. {pull}35559[35559]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
-
-*Filebeat*
 
 *Libbeat*
 - Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
@@ -324,6 +326,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 
 *Osquerybeat*
 

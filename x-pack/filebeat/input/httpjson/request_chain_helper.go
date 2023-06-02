@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -30,14 +31,12 @@ const (
 	parentLastResponse = "parent_last_response"
 )
 
-func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, p ...*Policy) (*httpClient, error) {
+func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := requestCfg.Transport.Client(clientOptions(requestCfg.URL.URL, requestCfg.KeepAlive.settings())...)
+	netHTTPClient, err := newNetHTTPClient(ctx, requestCfg, log, reg)
 	if err != nil {
 		return nil, err
 	}
-
-	netHTTPClient.CheckRedirect = checkRedirect(requestCfg, log)
 
 	var retryPolicyFunc retryablehttp.CheckRetry
 	if len(p) != 0 {
