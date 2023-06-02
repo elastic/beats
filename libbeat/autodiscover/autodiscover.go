@@ -33,8 +33,8 @@ import (
 )
 
 const (
-	// If a config reload fails after a new event, a new reload will be run after this period
-	retryPeriod = time.Second
+	// debouncePeriod is the time autodiscover will wait before reloading inputsp
+	debouncePeriod = time.Second
 )
 
 // EventConfigurer is used to configure the creation of configuration objects
@@ -126,8 +126,8 @@ func (a *Autodiscover) Start() {
 
 func (a *Autodiscover) worker() {
 	var updated, retry bool
-	var kind string = "first run"
-	t := time.NewTimer(retryPeriod)
+	kind := "first run"
+	t := time.NewTimer(debouncePeriod)
 
 	for {
 		select {
@@ -147,7 +147,7 @@ func (a *Autodiscover) worker() {
 			}
 
 		case <-t.C:
-			if updated || retry { // here it seems to work o.O
+			if updated || retry {
 				a.logger.Debugf("Reloading autodiscover configs reason: updated: %t, retry: %t, kind: %s", updated, retry, kind)
 
 				configs := []*reload.ConfigWithMeta{}
@@ -160,17 +160,18 @@ func (a *Autodiscover) worker() {
 				a.logger.Debugf("calling reload with %d config(s)", len(configs))
 				err := a.runners.Reload(configs)
 
+				// reset updated status
+				updated = false
+
 				// On error, make sure the next run also updates because some runners were not properly loaded
 				retry = err != nil
 				if retry {
-					t.Reset(10 * retryPeriod)
+					t.Reset(10 * debouncePeriod)
 					continue
 				}
-				// reset updated status
-				updated = false
 			}
 
-			t.Reset(retryPeriod)
+			t.Reset(debouncePeriod)
 		}
 	}
 }
