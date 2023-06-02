@@ -62,6 +62,11 @@ type Tag struct {
 // ModuleName is the name of this module.
 const ModuleName = "aws"
 
+// IncludeLinkedAccountsDefault defines if we should include metrics related to linked AWS accounts or not, by default
+// More information about cross-account Cloudwatch monitoring can be found at
+// https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html
+const IncludeLinkedAccountsDefault = false
+
 type LabelConstants struct {
 	AccountIdIdx             int
 	AccountLabelIdx          int
@@ -142,10 +147,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Endpoint:        config.AWSConfig.Endpoint,
 	}
 
-	// Set default include_linked_accounts to True
-	if config.IncludeLinkedAccounts == nil {
-		metricSet.IncludeLinkedAccounts = true
-	} else {
+	metricSet.IncludeLinkedAccounts = IncludeLinkedAccountsDefault
+	if config.IncludeLinkedAccounts != nil {
 		metricSet.IncludeLinkedAccounts = *config.IncludeLinkedAccounts
 	}
 
