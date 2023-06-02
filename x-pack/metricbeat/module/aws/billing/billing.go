@@ -364,7 +364,7 @@ func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity t
 
 	label := strings.Join([]string{metric.AccountID, aws.LabelConst.AccountLabel, metricName}, aws.LabelConst.LabelSeparator)
 	for _, dim := range metricDims {
-		label += *dim.Name + aws.LabelConst.LabelSeparator + *dim.Value + aws.LabelConst.LabelSeparator
+		label += aws.LabelConst.LabelSeparator + *dim.Name + aws.LabelConst.LabelSeparator + *dim.Value
 	}
 
 	metricDataQuery := types.MetricDataQuery{
