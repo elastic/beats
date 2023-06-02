@@ -66,7 +66,7 @@ func TestRunner(t *testing.T) {
 	runner.Stop()
 }
 
-func TestDiagnostics(t *testing.T) {
+func TestCPUDiagnostics(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{
@@ -87,8 +87,12 @@ func TestDiagnostics(t *testing.T) {
 	diag, ok := runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
 	diags := diag.Diagnostics()
+	// This diagnostic set is only available on linux.
+	// On other OSes, the list should be empty
 	if runtime.GOOS == "linux" {
 		require.NotEmpty(t, diags)
+	} else {
+		require.Empty(t, diags)
 	}
 
 	runner.Start()
@@ -97,11 +101,12 @@ func TestDiagnostics(t *testing.T) {
 	diag, ok = runner.(diagnostics.DiagnosticReporter)
 	require.True(t, ok)
 	diags = diag.Diagnostics()
-	// diagnostics are only available on linux
 	if runtime.GOOS == "linux" {
 		require.NotEmpty(t, diags)
 		res := diags[0].Callback()
 		require.NotEmpty(t, res)
+	} else {
+		require.Empty(t, diags)
 	}
 
 	runner.Stop()
@@ -111,6 +116,8 @@ func TestDiagnostics(t *testing.T) {
 	diags = diag.Diagnostics()
 	if runtime.GOOS == "linux" {
 		require.NotEmpty(t, diags)
+	} else {
+		require.Empty(t, diags)
 	}
 
 }
