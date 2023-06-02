@@ -178,14 +178,22 @@ runLoop:
 			if eventlog.IsRecoverable(err) {
 				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err, "channel", api.Channel())
 				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+					e.log.Warnw("Close() error for channel %q.", "error", closeErr, "channel", api.Channel())
 				}
 				continue runLoop
 			}
 			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
 				e.log.Warnw("Read() encountered channel not found error for channel %q. Reopening handle...", "error", err, "channel", api.Channel())
 				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+					e.log.Warnw("Close() error for channel %q.", "error", closeErr, "channel", api.Channel())
+				}
+				continue runLoop
+			}
+
+			if !api.IsFile() && errors.Is(err, io.EOF) {
+				e.log.Warnw("Read() encountered EOF for channel %q.  Reopening handle...", "error", err, "channel", api.Channel())
+				if closeErr := api.Close(); closeErr != nil {
+					e.log.Warnw("Close() error for channel %q.", "error", closeErr, "channel", api.Channel())
 				}
 				continue runLoop
 			}
