@@ -201,7 +201,7 @@ func (m *MockResourceGroupsTaggingClient) GetResources(_ context.Context, _ *res
 
 func TestGetListMetricsOutput(t *testing.T) {
 	svcCloudwatch := &MockCloudWatchClient{}
-	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, true, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
 	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
@@ -213,7 +213,7 @@ func TestGetListMetricsOutput(t *testing.T) {
 
 func TestGetListMetricsCrossAccountsOutput(t *testing.T) {
 	svcCloudwatch := &MockCloudwatchClientCrossAccounts{}
-	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, true, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(listMetricsOutput))
 	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
@@ -226,7 +226,7 @@ func TestGetListMetricsCrossAccountsOutput(t *testing.T) {
 
 func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 	svcCloudwatch := &MockCloudWatchClient{}
-	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", time.Minute*5, svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", time.Minute*5, true, svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
 	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
