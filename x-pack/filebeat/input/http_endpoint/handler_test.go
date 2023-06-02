@@ -159,12 +159,16 @@ func (p *publisher) Publish(e beat.Event) {
 
 func Test_apiResponse(t *testing.T) {
 	testCases := []struct {
-		name    string        // Sub-test name.
-		request *http.Request // Input request.
-		events  []mapstr.M    // Expected output events.
+		name         string        // Sub-test name.
+		conf         config        // Load configuration.
+		request      *http.Request // Input request.
+		events       []mapstr.M    // Expected output events.
+		wantStatus   int           // Expected response code.
+		wantResponse string        // Expected response message.
 	}{
 		{
 			name: "single event",
+			conf: defaultConfig(),
 			request: func() *http.Request {
 				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
 				req.Header.Set("Content-Type", "application/json")
@@ -177,9 +181,12 @@ func Test_apiResponse(t *testing.T) {
 					},
 				},
 			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
 		},
 		{
 			name: "single event gzip",
+			conf: defaultConfig(),
 			request: func() *http.Request {
 				buf := new(bytes.Buffer)
 				b := gzip.NewWriter(buf)
@@ -198,9 +205,12 @@ func Test_apiResponse(t *testing.T) {
 					},
 				},
 			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
 		},
 		{
 			name: "multiple events gzip",
+			conf: defaultConfig(),
 			request: func() *http.Request {
 				events := []string{
 					`{"id":0}`,
@@ -229,6 +239,80 @@ func Test_apiResponse(t *testing.T) {
 					},
 				},
 			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "validate CRC request",
+			conf: config{
+				CRCProvider: "Zoom",
+				CRCSecret:   "secretValueTest",
+			},
+			request: func() *http.Request {
+				buf := bytes.NewBufferString(
+					`{
+						"event_ts":1654503849680,
+						"event":"endpoint.url_validation",
+						"payload": {
+							"plainToken":"qgg8vlvZRS6UYooatFL8Aw"
+						}
+					}`,
+				)
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"encryptedToken":"70c1f2e2e6ca2d39297490d1f9142c7d701415ea8e6151f6562a08fa657a40ff","plainToken":"qgg8vlvZRS6UYooatFL8Aw"}`,
+		},
+		{
+			name: "malformed CRC request",
+			conf: config{
+				CRCProvider: "Zoom",
+				CRCSecret:   "secretValueTest",
+			},
+			request: func() *http.Request {
+				buf := bytes.NewBufferString(
+					`{
+						"event_ts":1654503849680,
+						"event":"endpoint.url_validation",
+						"payload": {
+							"plainToken":"qgg8vlvZRS6UYooatFL8Aw
+						}
+					}`,
+				)
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"malformed JSON object at stream position 0: invalid character '\\n' in string literal"}`,
+		},
+		{
+			name: "empty CRC challenge",
+			conf: config{
+				CRCProvider: "Zoom",
+				CRCSecret:   "secretValueTest",
+			},
+			request: func() *http.Request {
+				buf := bytes.NewBufferString(
+					`{
+						"event_ts":1654503849680,
+						"event":"endpoint.url_validation",
+						"payload": {
+							"plainToken":""
+						}
+					}`,
+				)
+				req := httptest.NewRequest(http.MethodPost, "/", buf)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       nil,
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"failed decoding \"payload.plainToken\" from CRC request"}`,
 		},
 	}
 
@@ -236,16 +320,15 @@ func Test_apiResponse(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
 			pub := new(publisher)
-			conf := defaultConfig()
-			apiHandler := newHandler(conf, pub, logp.NewLogger("http_endpoint.test"))
+			apiHandler := newHandler(tc.conf, pub, logp.NewLogger("http_endpoint.test"))
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()
 			apiHandler.ServeHTTP(respRec, tc.request)
 
 			// Validate responses.
-			assert.Equal(t, http.StatusOK, respRec.Code)
-			assert.Equal(t, conf.ResponseBody, respRec.Body.String())
+			assert.Equal(t, tc.wantStatus, respRec.Code)
+			assert.Equal(t, tc.wantResponse, strings.TrimSuffix(respRec.Body.String(), "\n"))
 			require.Len(t, pub.events, len(tc.events))
 
 			for i, evt := range pub.events {

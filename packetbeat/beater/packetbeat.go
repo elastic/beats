@@ -154,7 +154,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	select {
 	case <-pb.done:
 	case err := <-factory.err:
-		close(pb.done)
+		pb.stopOnce.Do(func() { close(pb.done) })
 		return err
 	}
 	return nil
@@ -187,7 +187,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 			// to stop if the sniffer(s) exited without an error
 			// this would happen during a configuration reload
 			if err != nil {
-				close(pb.done)
+				pb.stopOnce.Do(func() { close(pb.done) })
 				return err
 			}
 		}

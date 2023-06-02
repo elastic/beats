@@ -344,6 +344,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -392,6 +393,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -457,6 +459,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -511,6 +514,7 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},

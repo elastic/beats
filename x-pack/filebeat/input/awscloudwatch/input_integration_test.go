@@ -5,7 +5,6 @@
 // See _meta/terraform/README.md for integration test usage instructions.
 
 //go:build integration && aws
-// +build integration,aws
 
 package awscloudwatch
 
