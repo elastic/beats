@@ -686,6 +686,40 @@ func TestContainerParser(t *testing.T) {
 	}
 }
 
+func TestParserIncludeMessages(t *testing.T) {
+	parserConfig := map[string]interface{}{
+		"parsers": []map[string]interface{}{
+			{
+				"include_message": map[string]interface{}{
+					"patterns": []string{"^INCLUDE"},
+				},
+			},
+		},
+	}
+
+	lines := "INCLUDE - FOO\ndo not include this line\n\nINCLUDE BAR\n"
+	expectedMessages := []string{
+		"INCLUDE - FOO\n",
+		"INCLUDE BAR\n",
+	}
+
+	cfg := config.MustNewConfigFrom(parserConfig)
+	var c inputParsersConfig
+	err := cfg.Unpack(&c)
+	require.NoError(t, err)
+
+	p := c.Parsers.Create(testReader(lines))
+
+	readMsgs := []string{}
+	msg, err := p.Next()
+	for err == nil {
+		readMsgs = append(readMsgs, string(msg.Content))
+		msg, err = p.Next()
+	}
+
+	require.Equal(t, expectedMessages, readMsgs, "fii")
+}
+
 type testParsersConfig struct {
 	Parsers []config.Namespace `struct:"parsers"`
 }
