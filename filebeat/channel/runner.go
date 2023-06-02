@@ -243,6 +243,7 @@ func setOptional(to mapstr.M, key string, value string) {
 	}
 }
 
+// TODO: add tests
 func validateDataStreamType(dataStreamType string) bool {
 	validTypes := map[string]bool{"logs": true, "metrics": true, "traces": true}
 	_, exists := validTypes[dataStreamType]
