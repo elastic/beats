@@ -15,7 +15,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Improve tests/open-file-handlers/log_file.py with a shorter statement.
+- Improve tests files with  shorter statements.
 
 *Heartbeat*
 
