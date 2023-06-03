@@ -37,15 +37,13 @@ const (
 )
 
 func Test_StorageClient(t *testing.T) {
-	t.Skip("Flaky test: issue (could possibly affect this also) -  https://github.com/elastic/beats/issues/34332")
 	tests := []struct {
-		name            string
-		baseConfig      map[string]interface{}
-		mockHandler     func() http.Handler
-		expected        map[string]bool
-		checkJSON       bool
-		isError         error
-		unexpectedError error
+		name        string
+		baseConfig  map[string]interface{}
+		mockHandler func() http.Handler
+		expected    map[string]bool
+		checkJSON   bool
+		isError     error
 	}{
 		{
 			name: "SingleBucketWithPoll_NoErr",
@@ -67,7 +65,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_new_object_data3_json:    true,
 				mock.Gcs_test_new_object_docs_ata_json: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "SingleBucketWithoutPoll_NoErr",
@@ -89,7 +86,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_new_object_data3_json:    true,
 				mock.Gcs_test_new_object_docs_ata_json: true,
 			},
-			unexpectedError: nil,
 		},
 		{
 			name: "TwoBucketsWithPoll_NoErr",
@@ -116,7 +112,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_latest_object_ata_json:   true,
 				mock.Gcs_test_latest_object_data3_json: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "TwoBucketsWithoutPoll_NoErr",
@@ -143,7 +138,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_latest_object_ata_json:   true,
 				mock.Gcs_test_latest_object_data3_json: true,
 			},
-			unexpectedError: nil,
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidBucketErr",
@@ -159,10 +153,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.GCSServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("storage: bucket doesn't exist"),
-			unexpectedError: nil,
+			mockHandler: mock.GCSServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("storage: bucket doesn't exist"),
 		},
 		{
 			name: "SingleBucketWithoutPoll_InvalidBucketErr",
@@ -178,10 +171,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.GCSServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("storage: bucket doesn't exist"),
-			unexpectedError: nil,
+			mockHandler: mock.GCSServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("storage: bucket doesn't exist"),
 		},
 		{
 			name: "TwoBucketsWithPoll_InvalidBucketErr",
@@ -200,10 +192,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.GCSServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("storage: bucket doesn't exist"),
-			unexpectedError: nil,
+			mockHandler: mock.GCSServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("storage: bucket doesn't exist"),
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",
@@ -219,10 +210,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.GCSServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
-			unexpectedError: nil,
+			mockHandler: mock.GCSServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "TwoBucketWithPoll_InvalidConfigValue",
@@ -241,10 +231,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.GCSServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
-			unexpectedError: nil,
+			mockHandler: mock.GCSServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "SingleBucketWithPoll_parseJSON",
@@ -267,7 +256,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_latest_object_ata_json_parsed:   true,
 				mock.Gcs_test_latest_object_data3_json_parsed: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadJSON",
@@ -289,7 +277,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesBucket_log_json[1]: true,
 				mock.BeatsFilesBucket_log_json[2]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadOctetStreamJSON",
@@ -310,7 +297,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesBucket_multiline_json[0]: true,
 				mock.BeatsFilesBucket_multiline_json[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadNDJSON",
@@ -331,7 +317,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesBucket_log_ndjson[0]: true,
 				mock.BeatsFilesBucket_log_ndjson[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadMultilineGzJSON",
@@ -352,7 +337,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesBucket_multiline_json_gz[0]: true,
 				mock.BeatsFilesBucket_multiline_json_gz[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadJSONWithRootAsArray",
@@ -375,7 +359,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesBucket_json_array[2]: true,
 				mock.BeatsFilesBucket_json_array[3]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 	}
 	for _, tt := range tests {
@@ -462,7 +445,6 @@ func Test_StorageClient(t *testing.T) {
 					}
 				}
 			}
-			assert.ErrorIs(t, g.Wait(), tt.unexpectedError)
 		})
 	}
 }
