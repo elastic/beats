@@ -55,16 +55,11 @@ func newScheduler(ctx context.Context, publisher cursor.Publisher, bucket *stora
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) schedule() error {
 	if !s.src.Poll {
-		ctxWithTimeout, cancel := context.WithTimeout(s.parentCtx, s.src.BucketTimeOut)
-		defer cancel()
-		return s.scheduleOnce(ctxWithTimeout)
+		return s.scheduleOnce(s.parentCtx)
 	}
 
 	for {
-		ctxWithTimeout, cancel := context.WithTimeout(s.parentCtx, s.src.BucketTimeOut)
-		defer cancel()
-
-		err := s.scheduleOnce(ctxWithTimeout)
+		err := s.scheduleOnce(s.parentCtx)
 		if err != nil {
 			return err
 		}
@@ -92,9 +87,9 @@ func (l *limiter) release() {
 	l.wg.Done()
 }
 
-func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
+func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
-	pager := s.fetchObjectPager(ctxWithTimeout, s.src.MaxWorkers)
+	pager := s.fetchObjectPager(ctx, *s.cfg.MaxWorkers)
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
@@ -107,7 +102,7 @@ func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 		if !s.state.checkpoint().LatestEntryTime.IsZero() {
 			jobs = s.moveToLastSeenJob(jobs)
 			if len(s.state.checkpoint().FailedJobs) > 0 {
-				jobs = s.addFailedJobs(ctxWithTimeout, jobs)
+				jobs = s.addFailedJobs(ctx, jobs)
 			}
 		}
 
@@ -118,7 +113,7 @@ func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 			s.limiter.acquire()
 			go func() {
 				defer s.limiter.release()
-				job.do(s.parentCtx, id)
+				job.do(ctx, id)
 			}()
 		}
 
@@ -126,6 +121,7 @@ func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 			break
 		}
 	}
+
 	return nil
 }
 
