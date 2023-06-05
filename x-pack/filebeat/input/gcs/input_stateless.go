@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"github.com/googleapis/gax-go/v2"
+	gax "github.com/googleapis/gax-go/v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -79,9 +79,9 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			storage.WithPolicy(storage.RetryAlways),
 		)
 
-		scheduler := newScheduler(ctx, pub, bkt, currentSource, &in.config, st, log)
+		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, log)
 
-		return scheduler.schedule()
+		return scheduler.schedule(ctx)
 	}
 	return nil
 }
