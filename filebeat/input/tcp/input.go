@@ -251,10 +251,26 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv4 addrs for metric collection %q", badAddr)
 	}
-	hasUnspecified6, addrIsUnspecified6, badAddr := containsUnspecifiedAddr(addr)
+	hasUnspecified6, addrIsUnspecified6, badAddr := containsUnspecifiedAddr(addr6)
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
 	}
+
+	// Do an initial check for access to the filesystem and of the
+	// value constructed by containsUnspecifiedAddr. This gives a
+	// base level for the rx_queue values and ensures that if the
+	// constructed address values are malformed we panic early
+	// within the period of system testing.
+	rx, err := procNetTCP("/proc/net/tcp", addr, hasUnspecified, addrIsUnspecified)
+	if err != nil {
+		log.Warnf("failed to get initial tcp stats from /proc: %v", err)
+	}
+	rx6, err := procNetTCP("/proc/net/tcp6", addr6, hasUnspecified6, addrIsUnspecified6)
+	if err != nil {
+		log.Warnf("failed to get initial tcp6 stats from /proc: %v", err)
+	}
+	m.rxQueue.Set(uint64(rx + rx6))
+
 	t := time.NewTicker(each)
 	for {
 		select {
