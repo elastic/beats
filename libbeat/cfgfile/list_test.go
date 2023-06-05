@@ -145,16 +145,17 @@ func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
 	})
+	require.NoError(t, err)
 
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 3)
 
-	err := list.Reload([]*reload.ConfigWithMeta{
+	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
@@ -169,16 +170,17 @@ func TestReloadDuplicateConfig(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 	})
+	require.NoError(t, err)
 
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 1)
 
 	// This can happen in Autodiscover when a container if getting restarted
 	// but the previous one is not cleaned yet.
-	err := list.Reload([]*reload.ConfigWithMeta{
+	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(1),
 	})
@@ -214,16 +216,17 @@ func TestReloadStartStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
 	})
+	require.NoError(t, err)
 
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 3)
 
-	err := list.Reload([]*reload.ConfigWithMeta{
+	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(3),
 		createConfig(4),
