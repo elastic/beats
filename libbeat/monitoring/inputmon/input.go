@@ -20,6 +20,9 @@ package inputmon
 import (
 	"strings"
 
+	"github.com/google/uuid"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -40,11 +43,31 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 	// the monitoring registry, and we want a consistent flat level of nesting
 	key := sanitizeID(id)
 
+<<<<<<< HEAD
 	reg = rootRegistry.NewRegistry(key)
 	monitoring.NewString(reg, "input").Set(inputType)
 	monitoring.NewString(reg, "id").Set(id)
 
 	return reg, func() { rootRegistry.Remove(key) }
+=======
+	// Log the registration to ease tracking down duplicate ID registrations.
+	// Logged at INFO rather than DEBUG since it is not in a hot path and having
+	// the information available by default can short-circuit requests for debug
+	// logs during support interactions.
+	log := logp.NewLogger("metric_registry")
+	// Make an orthogonal ID to allow tracking register/deregister pairs.
+	uuid := uuid.New().String()
+	log.Infow("registering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
+
+	reg = parentRegistry.NewRegistry(key)
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, "id").Set(id)
+
+	return reg, func() {
+		log.Infow("unregistering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
+		parentRegistry.Remove(key)
+	}
+>>>>>>> 8abdf326f8 (libbeat/monitoring/inputmon: log key, id and input type when registering/deregistering metrics (#35647))
 }
 
 func sanitizeID(id string) string {
