@@ -73,7 +73,14 @@ services do not include a region. In `aws` module, `endpoint` config is to set
 the `endpoint-code` part, such as `amazonaws.com`, `amazonaws.com.cn`, `c2s.ic.gov`,
 `sc2s.sgov.gov`.
 
-If endpoint is specified, `regions` config becomes required. For example:
+If endpoint is specified, `regions` config becomes required.
+
+* *include_linked_accounts*
+
+The `include_linked_accounts` parameter is used to enable the inclusion of metrics from different accounts linked to a main monitoring account. By setting this parameter to true, users can gather metrics from multiple AWS accounts that are linked through the https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html[Cross-Account Cross-Region feature in Amazon CloudWatch].
+By default, the `include_linked_accounts` parameter is set to false, meaning that only metrics from the main monitoring account are collected. When set to true, the parameter allows the CloudWatch service to access and retrieve metrics from the linked accounts, providing a comprehensive view of metrics across multiple accounts.
+
+*_Note_:* Enabling the include_linked_accounts parameter requires appropriate permissions and authentication credentials for the linked accounts. Users should ensure that the necessary IAM roles and policies are properly set up to establish the necessary trust and access between accounts.
 
 * *tags_filter*
 
@@ -413,6 +420,12 @@ metricbeat.modules:
     - transitgateway
     - usage
     - vpn
+- module: aws
+  period: 1m
+  latency: 5m
+  include_linked_accounts: false
+  metricsets:
+    - s3_request
 ----
 
 [float]
