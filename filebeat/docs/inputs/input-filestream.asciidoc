@@ -162,7 +162,7 @@ observe the activity of the input.
 [options="header"]
 |=======
 | Metric                    | Description
-| `files_read_total`        | Total number of files read.
+| `files_opened_total`      | Total number of files opened.
 | `files_closed_total`      | Total number of files closed.
 | `files_created_total`     | Total number of file created events detected.
 | `files_updated_total`     | Total number of file updated events detected.
@@ -178,6 +178,7 @@ observe the activity of the input.
 | `processing_time`         | Histogram of the elapsed time to process messages (expressed in nanoseconds).
 |=======
 
+Note:
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

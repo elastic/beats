@@ -319,7 +319,8 @@ func (inp *filestream) readFromSource(
 	s state,
 	p loginp.Publisher,
 ) error {
-	inp.metrics.FilesRead.Inc()
+	inp.metrics.FilesOpened.Inc()
+	defer inp.metrics.FilesClosed.Inc()
 
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
@@ -334,7 +335,6 @@ func (inp *filestream) readFromSource(
 				log.Errorf("Read line error: %v", err)
 				inp.metrics.ProcessingErrors.Inc()
 			}
-			inp.metrics.FilesClosed.Inc()
 
 			return nil
 		}

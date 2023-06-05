@@ -30,7 +30,7 @@ import (
 type Metrics struct {
 	unregister func()
 
-	FilesRead        *monitoring.Uint // Number of files that have been read from.
+	FilesOpened      *monitoring.Uint // Number of files that have been opened.
 	FilesClosed      *monitoring.Uint // Number of files closed.
 	FilesCreated     *monitoring.Uint // Number of new file events found by the prospector.
 	FilesUpdated     *monitoring.Uint // Number of file update events detected by the prospector.
@@ -58,7 +58,7 @@ func NewMetrics(id string) *Metrics {
 	reg, unreg := inputmon.NewInputRegistry("filestream", id, nil)
 	m := Metrics{
 		unregister:       unreg,
-		FilesRead:        monitoring.NewUint(reg, "files_read_total"),
+		FilesOpened:      monitoring.NewUint(reg, "files_opened_total"),
 		FilesClosed:      monitoring.NewUint(reg, "files_closed_total"),
 		FilesCreated:     monitoring.NewUint(reg, "files_created_total"),
 		FilesUpdated:     monitoring.NewUint(reg, "files_updated_total"),
