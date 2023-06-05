@@ -71,7 +71,7 @@ var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), ver
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
-		Stability: feature.Experimental,
+		Stability: feature.Stable,
 		Manager:   NewInputManager(log, store),
 	}
 }

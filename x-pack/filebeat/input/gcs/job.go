@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sync"
 	"time"
 	"unicode"
 
@@ -28,8 +27,6 @@ import (
 )
 
 type job struct {
-	// Mutex lock for concurrent publishes
-	mu sync.Mutex
 	// gcs bucket handle
 	bucket *storage.BucketHandle
 	// gcs object attribute struct
@@ -109,13 +106,13 @@ func (j *job) do(ctx context.Context, id string) {
 			Fields:    fields,
 		}
 		event.SetID(objectID(j.hash, 0))
-		j.state.save(j.object.Name, j.object.Updated)
-		// locks while data is being published to avoid concurrent map read/writes
-		j.mu.Lock()
-		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+		// locks while data is being saved and published to avoid concurrent map read/writes
+		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
+		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
-		j.mu.Unlock()
+		// unlocks after data is saved and published
+		done()
 	}
 }
 
@@ -216,19 +213,23 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
+		// locks while data is being saved and published to avoid concurrent map read/writes
+		var (
+			done func()
+			cp   *Checkpoint
+		)
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
-			j.state.save(j.object.Name, j.object.Updated)
+			cp, done = j.state.saveForTx(j.object.Name, j.object.Updated)
 		} else {
 			// partially saves read state using offset
-			j.state.savePartial(j.object.Name, offset+relativeOffset)
+			cp, done = j.state.savePartialForTx(j.object.Name, offset+relativeOffset)
 		}
-		// locks while data is being published to avoid concurrent map read/writes
-		j.mu.Lock()
-		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
+		if err := j.publisher.Publish(evt, cp); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
-		j.mu.Unlock()
+		// unlocks after data is saved and published
+		done()
 	}
 	return nil
 }
