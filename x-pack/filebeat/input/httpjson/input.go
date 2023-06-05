@@ -20,14 +20,18 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/mito/lib/xml"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -103,11 +107,23 @@ func test(url *url.URL) error {
 	return nil
 }
 
+func runWithMetrics(
+	ctx v2.Context,
+	config config,
+	publisher inputcursor.Publisher,
+	cursor *inputcursor.Cursor,
+) error {
+	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
+	defer unreg()
+	return run(ctx, config, publisher, cursor, reg)
+}
+
 func run(
 	ctx v2.Context,
 	config config,
 	publisher inputcursor.Publisher,
 	cursor *inputcursor.Cursor,
+	reg *monitoring.Registry,
 ) error {
 	log := ctx.Logger.With("input_url", config.Request.URL)
 
@@ -118,18 +134,28 @@ func run(
 		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
 	}
 
-	httpClient, err := newHTTPClient(stdCtx, config, log)
+	metrics := newInputMetrics(reg)
+
+	httpClient, err := newHTTPClient(stdCtx, config, log, reg)
 	if err != nil {
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, config, log)
+	requestFactory, err := newRequestFactory(stdCtx, config, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		return err
 	}
+	var xmlDetails map[string]xml.Detail
+	if config.Response.XSD != "" {
+		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return err
+		}
+	}
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config, pagination, log)
+	responseProcessor := newResponseProcessor(config, pagination, xmlDetails, metrics, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
@@ -139,11 +165,16 @@ func run(
 	doFunc := func() error {
 		log.Info("Process another repeated request.")
 
-		if err := requester.doRequest(stdCtx, trCtx, publisher); err != nil {
+		startTime := time.Now()
+
+		var err error
+		if err = requester.doRequest(stdCtx, trCtx, publisher); err != nil {
 			log.Errorf("Error while processing http request: %v", err)
 		}
 
-		if stdCtx.Err() != nil {
+		metrics.updateIntervalMetrics(err, startTime)
+
+		if err := stdCtx.Err(); err != nil {
 			return err
 		}
 
@@ -170,31 +201,12 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
+func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
 	// Make retryable HTTP client
-	netHTTPClient, err := config.Request.Transport.Client(clientOptions(config.Request.URL.URL, config.Request.KeepAlive.settings())...)
+	netHTTPClient, err := newNetHTTPClient(ctx, config.Request, log, reg)
 	if err != nil {
 		return nil, err
 	}
-
-	if config.Request.Tracer != nil {
-		w := zapcore.AddSync(config.Request.Tracer)
-		go func() {
-			// Close the logger when we are done.
-			<-ctx.Done()
-			config.Request.Tracer.Close()
-		}()
-		core := ecszap.NewCore(
-			ecszap.NewDefaultEncoderConfig(),
-			w,
-			zap.DebugLevel,
-		)
-		traceLogger := zap.New(core)
-
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
-	}
-
-	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
 
 	client := &retryablehttp.Client{
 		HTTPClient:   netHTTPClient,
@@ -217,6 +229,39 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpC
 	}
 
 	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+}
+
+func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
+	// Make retryable HTTP client
+	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.Tracer != nil {
+		w := zapcore.AddSync(cfg.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			cfg.Tracer.Close()
+		}()
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		traceLogger := zap.New(core)
+
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+	}
+
+	if reg != nil {
+		netHTTPClient.Transport = httplog.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
+	}
+
+	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)
+
+	return netHTTPClient, nil
 }
 
 // clientOption returns constructed client configuration options, including

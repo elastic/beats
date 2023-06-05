@@ -3,12 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux || darwin
-// +build linux darwin
 
 package source
 
 import (
 	"fmt"
+	"os"
 )
 
 type Source struct {
@@ -18,6 +18,8 @@ type Source struct {
 	Project    *ProjectSource `config:"project" json:"project"`
 	ActiveMemo ISource        // cache for selected source
 }
+
+var ErrUnsupportedSource = fmt.Errorf("browser monitors are now removed! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
 
 func (s *Source) Active() ISource {
 	if s.ActiveMemo != nil {
@@ -38,6 +40,8 @@ func (s *Source) Active() ISource {
 }
 
 var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor")
+
+var defaultMod = os.FileMode(0770)
 
 func (s *Source) Validate() error {
 	if s.Active() == nil {

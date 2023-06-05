@@ -4,8 +4,7 @@
 
 // Package cel implements an input that uses the Common Expression Language to
 // perform requests and do endpoint processing of events. The cel package exposes
-// the github.com/elastic/mito/lib and github.com/google/cel-go/ext CEL extension
-// libraries.
+// the github.com/elastic/mito/lib CEL extension library.
 package cel
 
 import (
@@ -72,7 +71,7 @@ var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), ver
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
-		Stability: feature.Experimental,
+		Stability: feature.Stable,
 		Manager:   NewInputManager(log, store),
 	}
 }
@@ -144,7 +143,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs)
 	if err != nil {
 		return err
 	}
@@ -197,7 +196,10 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Info("process repeated request")
-		var waitUntil time.Time
+		var (
+			budget    = *cfg.MaxExecutions
+			waitUntil time.Time
+		)
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
@@ -448,6 +450,13 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			state["cursor"] = goodCursor
 
 			if more, _ := state["want_more"].(bool); !more {
+				return nil
+			}
+
+			// Check we have a remaining execution budget.
+			budget--
+			if budget <= 0 {
+				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
 				return nil
 			}
 		}
@@ -828,6 +837,14 @@ var (
 		"application/zip":          lib.Zip,
 		"text/csv; header=absent":  lib.CSVNoHeader,
 		"text/csv; header=present": lib.CSVHeader,
+
+		// Include the undocumented space-less syntax to head off typo-related
+		// user issues.
+		//
+		// TODO: Consider changing the MIME type look-ups to a formal parser
+		// rather than a simple map look-up.
+		"text/csv;header=absent":  lib.CSVNoHeader,
+		"text/csv;header=present": lib.CSVHeader,
 	}
 
 	// limitPolicies are the provided rate limit policy helpers.
@@ -837,12 +854,17 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string) (cel.Program, error) {
+	xml, err := lib.XML(nil, xsd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
+	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
+		xml,
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),

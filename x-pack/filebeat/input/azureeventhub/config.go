@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -26,6 +25,8 @@ type azureInputConfig struct {
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
+	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
+	SanitizeOptions []string `config:"sanitize_options"`
 }
 
 const ephContainerName = "filebeat"
@@ -62,6 +63,14 @@ func (conf *azureInputConfig) Validate() error {
 	err := storageContainerValidate(conf.SAContainer)
 	if err != nil {
 		return err
+	}
+
+	// log a warning for each sanitization option not supported
+	for _, opt := range conf.SanitizeOptions {
+		err := sanitizeOptionsValidate(opt)
+		if err != nil {
+			logger.Warnf("%s: %v", opt, err)
+		}
 	}
 
 	return nil

@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
 jobs:
   bump:
     runs-on: ubuntu-latest

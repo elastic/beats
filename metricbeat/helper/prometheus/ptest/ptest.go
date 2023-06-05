@@ -35,14 +35,17 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
 
-// TestCases holds the list of test cases to test a metricset
-type TestCases []struct {
+// TestCase represents a single test case for testing a metricset
+type TestCase struct {
 	// MetricsFile containing Prometheus outputted metrics
 	MetricsFile string
 
 	// ExpectedFile containing resulting documents
 	ExpectedFile string
 }
+
+// TestCases holds the list of test cases to test a metricset
+type TestCases []TestCase
 
 // TestMetricSet goes over the given TestCases and ensures that source Prometheus metrics gets converted into the expected
 // events when passed by the given metricset.
