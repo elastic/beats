@@ -12,6 +12,12 @@
 # https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
 CHANGELOG*
 
+# The tech leads of the teams working in Beats share ownership of the Go module dependencies and related files.
+/.github/CODEOWNERS/ @elastic/beats-tech-leads
+/.go.mod/ @elastic/beats-tech-leads
+/.go.sum/ @elastic/beats-tech-leads
+/NOTICE.txt/ @elastic/beats-tech-leads
+
 /.ci/ @elastic/elastic-agent-data-plane
 /.github/ @elastic/elastic-agent-data-plane
 /auditbeat/ @elastic/security-external-integrations
