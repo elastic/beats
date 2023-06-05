@@ -88,8 +88,7 @@ func (l *limiter) release() {
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
 	pager := s.fetchObjectPager(ctx, *s.cfg.MaxWorkers)
-	numObs := 0
-	numJobs := 0
+	var numObs, numJobs int
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
@@ -122,7 +121,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		}
 
 		s.log.Debugf("scheduler: total objects read till now: %d\nscheduler: total jobs scheduled till now: %d", numObs, numJobs)
-		if len(jobs) > 0 {
+		if len(jobs) != 0 {
 			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].Name(), jobs[len(jobs)-1].Name())
 		}
 
