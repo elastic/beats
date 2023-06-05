@@ -22,8 +22,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -54,6 +56,15 @@ func (r *runner) Stop() {
 		r.OnStop()
 	}
 	r.stopped = true
+}
+
+func (r *runner) Diagnostics() []diagnostics.DiagnosticSetup {
+	return []diagnostics.DiagnosticSetup{
+		{
+			Name:     "test-callback",
+			Callback: func() []byte { return []byte("test") },
+		},
+	}
 }
 
 type runnerFactory struct {
@@ -90,8 +101,29 @@ func (r *runnerFactory) Create(x beat.PipelineConnector, c *conf.C) (Runner, err
 	return runner, err
 }
 
-func (r *runnerFactory) CheckConfig(config *conf.C) error {
+func (r *runnerFactory) CheckConfig(_ *conf.C) error {
 	return nil
+}
+
+type testDiagHandler struct {
+	gotResp string
+}
+
+func (r *testDiagHandler) Register(_ string, _ string, _ string, _ string, callback func() []byte) {
+	r.gotResp = string(callback())
+}
+
+func TestDiagnostics(t *testing.T) {
+	factory := &runnerFactory{}
+	list := NewRunnerList("", factory, nil)
+	cfg := createConfig(1)
+	callback := &testDiagHandler{}
+	cfg.DiagCallback = callback
+	list.Reload([]*reload.ConfigWithMeta{
+		cfg,
+	})
+
+	require.Equal(t, "test", callback.gotResp)
 }
 
 func TestNewConfigs(t *testing.T) {
