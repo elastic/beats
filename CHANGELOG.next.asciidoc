@@ -23,7 +23,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-
 *Functionbeat*
 
 ==== Bugfixes
@@ -33,6 +32,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
 
 
+
+*Filebeat*
+
+- Fix EOF on single line not producing any event. {issue}30436[30436] {pull}33568[33568]
 
 *Auditbeat*
 
