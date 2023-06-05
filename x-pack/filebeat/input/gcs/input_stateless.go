@@ -79,9 +79,9 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			storage.WithPolicy(storage.RetryAlways),
 		)
 
-		scheduler := newScheduler(ctx, pub, bkt, currentSource, &in.config, st, log)
+		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, log)
 
-		return scheduler.schedule()
+		return scheduler.schedule(ctx)
 	}
 	return nil
 }
