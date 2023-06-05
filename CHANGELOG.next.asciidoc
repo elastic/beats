@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
+- Fix error when trying to use `include_message` parser {issue}35440[35440]
 
 *Heartbeat*
 
