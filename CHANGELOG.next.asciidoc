@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 
 *Heartbeat*
@@ -291,6 +292,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
+- Add support for CRC validation in Zoom module. {pull}35604[35604]
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
@@ -325,6 +327,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 
 *Osquerybeat*
 
