@@ -123,9 +123,6 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			metrics := loginp.NewMetrics("TEST-" + name)
-			defer metrics.Close()
-
 			p := copyTruncateFileProspector{
 				fileProspector{
 					filewatcher: newMockFileWatcher(test.events, len(test.events)),
@@ -137,7 +134,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
-			p.Run(ctx, newMockMetadataUpdater(), hg, metrics)
+			p.Run(ctx, newMockMetadataUpdater(), hg)
 
 			require.Equal(t, len(test.expectedEvents), len(hg.events))
 			for i := 0; i < len(test.expectedEvents); i++ {
