@@ -89,10 +89,8 @@ By default, no files are excluded. See <<regexp-support>>
 for a list of supported regexp patterns. It is recommended to wrap regular
 expressions in single quotation marks to avoid issues with YAML escaping
 rules.
-If recursive is set to true, sub directories can also be excluded here by
-specifying them. This is an exclusion example for Windows, where the expression 
-should always be forged to be case insensitive:
-`- '(?i)\\temp\\'`
+If recursive is set to true, subdirectories can also be excluded here by
+specifying them.
 
 *`include_files`*:: A list of regular expressions used to specify which files to
 select. When configured, only files matching the pattern will be monitored.
