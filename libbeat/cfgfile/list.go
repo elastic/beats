@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -118,6 +119,16 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.runners[hash] = runner
 		runner.Start()
 		moduleStarts.Add(1)
+		if config.DiagCallback != nil {
+			if diag, ok := runner.(diagnostics.DiagnosticReporter); ok {
+				r.logger.Debugf("Runner '%s' has diagnostics, attempting to register", runner)
+				for _, dc := range diag.Diagnostics() {
+					config.DiagCallback.Register(dc.Name, dc.Description, dc.Filename, dc.ContentType, dc.Callback)
+				}
+			} else {
+				r.logger.Debugf("Runner %s does not implement DiagnosticRunner, skipping", runner)
+			}
+		}
 	}
 
 	// NOTE: This metric tracks the number of modules in the list. The true
