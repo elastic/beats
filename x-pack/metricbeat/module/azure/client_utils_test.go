@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,8 +22,8 @@ func TestMetricExists(t *testing.T) {
 		Time: date1,
 	}
 	var name = "Requests"
-	insightValue := insights.MetricValue{
-		TimeStamp: &stamp,
+	insightValue := armmonitor.MetricValue{
+		TimeStamp: &stamp.Time,
 		Average:   &fl,
 		Minimum:   &fl1,
 		Maximum:   nil,
@@ -90,8 +90,8 @@ func TestMetricIsEmpty(t *testing.T) {
 	stamp := date.Time{
 		Time: time.Date(2019, 12, 12, 12, 12, 12, 12, &location),
 	}
-	insightValue := insights.MetricValue{
-		TimeStamp: &stamp,
+	insightValue := armmonitor.MetricValue{
+		TimeStamp: &stamp.Time,
 		Average:   &fl,
 		Minimum:   nil,
 		Maximum:   nil,
