@@ -18,9 +18,9 @@
 package cfgfile
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -84,7 +84,7 @@ func (r *runnerFactory) Create(x beat.PipelineConnector, c *conf.C) (Runner, err
 
 	// id < 0 is an invalid config
 	if config.ID < 0 {
-		return nil, errors.New("Invalid config")
+		return nil, fmt.Errorf("Invalid config")
 	}
 
 	if r.CreateRunner != nil {
@@ -119,10 +119,11 @@ func TestDiagnostics(t *testing.T) {
 	cfg := createConfig(1)
 	callback := &testDiagHandler{}
 	cfg.DiagCallback = callback
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		cfg,
 	})
 
+	require.NoError(t, err)
 	require.Equal(t, "test", callback.gotResp)
 }
 
@@ -130,12 +131,13 @@ func TestNewConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
 	})
 
+	require.NoError(t, err)
 	assert.Equal(t, len(list.copyRunnerList()), 3)
 }
 
@@ -152,13 +154,14 @@ func TestReloadSameConfigs(t *testing.T) {
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 3)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
 	})
 
 	// nothing changed
+	require.NoError(t, err)
 	assert.Equal(t, state, list.copyRunnerList())
 }
 
@@ -175,12 +178,13 @@ func TestReloadDuplicateConfig(t *testing.T) {
 
 	// This can happen in Autodiscover when a container if getting restarted
 	// but the previous one is not cleaned yet.
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(1),
 	})
 
 	// nothing changed
+	require.NoError(t, err)
 	assert.Equal(t, state, list.copyRunnerList())
 }
 
@@ -188,19 +192,21 @@ func TestReloadStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
 	})
 
+	require.NoError(t, err)
 	assert.Equal(t, len(list.copyRunnerList()), 3)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(3),
 	})
 
+	require.NoError(t, err)
 	assert.Equal(t, len(list.copyRunnerList()), 2)
 }
 
@@ -217,12 +223,13 @@ func TestReloadStartStopConfigs(t *testing.T) {
 	state := list.copyRunnerList()
 	assert.Equal(t, len(state), 3)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(3),
 		createConfig(4),
 	})
 
+	require.NoError(t, err)
 	assert.Equal(t, len(list.copyRunnerList()), 3)
 	assert.NotEqual(t, state, list.copyRunnerList())
 }
@@ -231,12 +238,13 @@ func TestStopAll(t *testing.T) {
 	factory := &runnerFactory{}
 	list := NewRunnerList("", factory, nil)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(2),
 		createConfig(3),
 	})
 
+	require.NoError(t, err)
 	assert.Equal(t, len(list.copyRunnerList()), 3)
 	list.Stop()
 	assert.Equal(t, len(list.copyRunnerList()), 0)
@@ -252,14 +260,13 @@ func TestHas(t *testing.T) {
 	config := createConfig(1)
 
 	hash, err := HashConfig(config.Config)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	list.Reload([]*reload.ConfigWithMeta{
+	err = list.Reload([]*reload.ConfigWithMeta{
 		config,
 	})
 
+	require.NoError(t, err)
 	assert.True(t, list.Has(hash))
 	assert.False(t, list.Has(0))
 }
@@ -315,7 +322,7 @@ func TestCreateRunnerAddsDynamicMeta(t *testing.T) {
 
 func createConfig(id int64) *reload.ConfigWithMeta {
 	c := conf.NewConfig()
-	c.SetInt("id", -1, id)
+	_ = c.SetInt("id", -1, id)
 	return &reload.ConfigWithMeta{
 		Config: c,
 	}
