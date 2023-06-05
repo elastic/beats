@@ -1,10 +1,6 @@
 import subprocess
-<<<<<<< HEAD
-
 import jinja2
-=======
 import random
->>>>>>> 85693bd00f (unique working dir for python system_tests (#32601))
 import unittest
 import os
 import shutil
@@ -351,20 +347,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # update the last_run link
             if os.path.islink(self.build_path + "last_run"):
                 os.unlink(self.build_path + "last_run")
-<<<<<<< HEAD
-            os.symlink(self.build_path + "run/{}".format(self.id()),
-=======
             os.symlink(self.working_dir,
->>>>>>> 85693bd00f (unique working dir for python system_tests (#32601))
                        self.build_path + "last_run")
         except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
 
-<<<<<<< HEAD
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond", err_msg=""):
-=======
         # Keep last 5 runs
         candidates = []
         to_keep = 5
@@ -378,7 +367,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 shutil.rmtree(os.path.join(self.build_path, "run", d))
 
     def wait_until(self, cond, max_timeout=20, poll_interval=0.1, name="cond", err_msg=""):
->>>>>>> 85693bd00f (unique working dir for python system_tests (#32601))
         """
         Waits until the cond function returns true,
         or until the max_timeout is reached. Calls the cond
