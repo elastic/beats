@@ -26,7 +26,6 @@ type limiter struct {
 	limit chan struct{}
 }
 type scheduler struct {
-	parentCtx context.Context
 	publisher cursor.Publisher
 	bucket    *storage.BucketHandle
 	src       *Source
@@ -37,11 +36,10 @@ type scheduler struct {
 }
 
 // newScheduler, returns a new scheduler instance
-func newScheduler(ctx context.Context, publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
+func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
 	state *state, log *logp.Logger,
 ) *scheduler {
 	return &scheduler{
-		parentCtx: ctx,
 		publisher: publisher,
 		bucket:    bucket,
 		src:       src,
@@ -53,8 +51,9 @@ func newScheduler(ctx context.Context, publisher cursor.Publisher, bucket *stora
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
-func (s *scheduler) schedule() error {
+func (s *scheduler) schedule(ctx context.Context) error {
 	if !s.src.Poll {
+<<<<<<< HEAD
 		ctxWithTimeout, cancel := context.WithTimeout(s.parentCtx, s.src.BucketTimeOut)
 		defer cancel()
 		return s.scheduleOnce(ctxWithTimeout)
@@ -65,11 +64,18 @@ func (s *scheduler) schedule() error {
 		defer cancel()
 
 		err := s.scheduleOnce(ctxWithTimeout)
+=======
+		return s.scheduleOnce(ctx)
+	}
+
+	for {
+		err := s.scheduleOnce(ctx)
+>>>>>>> 54d1514376 ([filebeat][gcs] - Enhanced context passing and added scheduler debug logs (#35674))
 		if err != nil {
 			return err
 		}
 
-		err = timed.Wait(s.parentCtx, s.src.PollInterval)
+		err = timed.Wait(ctx, s.src.PollInterval)
 		if err != nil {
 			return err
 		}
@@ -94,14 +100,21 @@ func (l *limiter) release() {
 
 func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 	defer s.limiter.wait()
+<<<<<<< HEAD
 	pager := s.fetchObjectPager(ctxWithTimeout, s.src.MaxWorkers)
+=======
+	pager := s.fetchObjectPager(ctx, *s.cfg.MaxWorkers)
+	var numObs, numJobs int
+>>>>>>> 54d1514376 ([filebeat][gcs] - Enhanced context passing and added scheduler debug logs (#35674))
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
 			return err
 		}
+		numObs += len(objects)
 		jobs := s.createJobs(objects, s.log)
+		s.log.Debugf("scheduler: %d objects fetched for current batch", len(objects))
 
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if !s.state.checkpoint().LatestEntryTime.IsZero() {
@@ -110,9 +123,11 @@ func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 				jobs = s.addFailedJobs(ctxWithTimeout, jobs)
 			}
 		}
+		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
+			numJobs++
 			id := fetchJobID(i, s.src.BucketName, job.Name())
 			job := job
 			s.limiter.acquire()
@@ -120,6 +135,11 @@ func (s *scheduler) scheduleOnce(ctxWithTimeout context.Context) error {
 				defer s.limiter.release()
 				job.do(s.parentCtx, id)
 			}()
+		}
+
+		s.log.Debugf("scheduler: total objects read till now: %d\nscheduler: total jobs scheduled till now: %d", numObs, numJobs)
+		if len(jobs) != 0 {
+			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].Name(), jobs[len(jobs)-1].Name())
 		}
 
 		if nextPageToken == "" {
@@ -216,7 +236,10 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		jobMap[j.Name()] = true
 	}
 
-	for name := range s.state.checkpoint().FailedJobs {
+	failedJobs := s.state.checkpoint().FailedJobs
+	s.log.Debugf("scheduler: %d failed jobs found", len(failedJobs))
+	fj := 0
+	for name := range failedJobs {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
@@ -226,6 +249,8 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
 			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
 			jobs = append(jobs, job)
+			s.log.Debugf("scheduler: adding failed job number %d with name %s to job current list", fj, job.Name())
+			fj++
 		}
 	}
 	return jobs
