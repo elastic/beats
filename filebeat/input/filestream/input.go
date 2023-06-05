@@ -62,7 +62,6 @@ type filestream struct {
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
 	parsers         parser.Config
-	metrics         *loginp.Metrics
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -144,9 +143,8 @@ func (inp *filestream) Run(
 		return err
 	}
 
-	inp.metrics = metrics
-	inp.metrics.FilesActive.Inc()
-	defer inp.metrics.FilesActive.Dec()
+	metrics.FilesActive.Inc()
+	defer metrics.FilesActive.Dec()
 
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
@@ -157,7 +155,7 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher)
+	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -318,9 +316,10 @@ func (inp *filestream) readFromSource(
 	path string,
 	s state,
 	p loginp.Publisher,
+	metrics *loginp.Metrics,
 ) error {
-	inp.metrics.FilesOpened.Inc()
-	defer inp.metrics.FilesClosed.Inc()
+	metrics.FilesOpened.Inc()
+	defer metrics.FilesClosed.Inc()
 
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
@@ -333,7 +332,7 @@ func (inp *filestream) readFromSource(
 				log.Debugf("EOF has been reached. Closing.")
 			} else {
 				log.Errorf("Read line error: %v", err)
-				inp.metrics.ProcessingErrors.Inc()
+				metrics.ProcessingErrors.Inc()
 			}
 
 			return nil
@@ -341,20 +340,20 @@ func (inp *filestream) readFromSource(
 
 		s.Offset += int64(message.Bytes)
 
-		inp.metrics.MessagesRead.Inc()
+		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
-		inp.metrics.BytesProcessed.Add(uint64(message.Bytes))
+		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
 		if err := p.Publish(message.ToEvent(), s); err != nil {
-			inp.metrics.ProcessingErrors.Inc()
+			metrics.ProcessingErrors.Inc()
 			return err
 		}
 
-		inp.metrics.EventsProcessed.Inc()
-		inp.metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
+		metrics.EventsProcessed.Inc()
+		metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}
 	return nil
 }

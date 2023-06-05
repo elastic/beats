@@ -29,7 +29,7 @@ type Prospector interface {
 	Init(c, g ProspectorCleaner, newID func(Source) string) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
-	Run(input.Context, StateMetadataUpdater, HarvesterGroup, *Metrics)
+	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
 	// Test checks if the Prospector is able to run the configuration
 	// specified by the user.
 	Test() error

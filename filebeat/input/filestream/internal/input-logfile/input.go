@@ -84,7 +84,7 @@ func (inp *managedInput) Run(
 	defer prospectorStore.Release()
 	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
 
-	inp.prospector.Run(ctx, sourceStore, hg, metrics)
+	inp.prospector.Run(ctx, sourceStore, hg)
 
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs

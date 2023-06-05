@@ -32,12 +32,6 @@ type Metrics struct {
 
 	FilesOpened      *monitoring.Uint // Number of files that have been opened.
 	FilesClosed      *monitoring.Uint // Number of files closed.
-	FilesCreated     *monitoring.Uint // Number of new file events found by the prospector.
-	FilesUpdated     *monitoring.Uint // Number of file update events detected by the prospector.
-	FilesIgnored     *monitoring.Uint // Number of ignored file events detected by the prospector.
-	FilesTruncated   *monitoring.Uint // Number of truncated file events detected by the prospector.
-	FilesDeleted     *monitoring.Uint // Number of deleted file events detected by the prospector.
-	FilesRenamed     *monitoring.Uint // Number of renamed file events detected by the prospector.
 	FilesActive      *monitoring.Uint // Number of files currently open (gauge).
 	MessagesRead     *monitoring.Uint // Number of messages read.
 	BytesProcessed   *monitoring.Uint // Number of bytes processed.
@@ -60,12 +54,6 @@ func NewMetrics(id string) *Metrics {
 		unregister:       unreg,
 		FilesOpened:      monitoring.NewUint(reg, "files_opened_total"),
 		FilesClosed:      monitoring.NewUint(reg, "files_closed_total"),
-		FilesCreated:     monitoring.NewUint(reg, "files_created_total"),
-		FilesUpdated:     monitoring.NewUint(reg, "files_updated_total"),
-		FilesIgnored:     monitoring.NewUint(reg, "files_ignored_total"),
-		FilesTruncated:   monitoring.NewUint(reg, "files_truncated_total"),
-		FilesDeleted:     monitoring.NewUint(reg, "files_deleted_total"),
-		FilesRenamed:     monitoring.NewUint(reg, "files_renamed_total"),
 		FilesActive:      monitoring.NewUint(reg, "files_active"),
 		MessagesRead:     monitoring.NewUint(reg, "messages_read_total"),
 		BytesProcessed:   monitoring.NewUint(reg, "bytes_processed_total"),

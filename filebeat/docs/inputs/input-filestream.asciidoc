@@ -164,12 +164,6 @@ observe the activity of the input.
 | Metric                    | Description
 | `files_opened_total`      | Total number of files opened.
 | `files_closed_total`      | Total number of files closed.
-| `files_created_total`     | Total number of file created events detected.
-| `files_updated_total`     | Total number of file updated events detected.
-| `files_ignored_total`     | Total number of file events ignored.
-| `files_truncated_total`   | Total number of file truncated events detected.
-| `files_deleted_total`     | Total number of file deleted events detected.
-| `files_renamed_total`     | Total number of file renamed events detected.
 | `files_active`            | Number of files currently open (gauge).
 | `messages_read_total`     | Total number of messages read.
 | `bytes_processed_total`   | Total number of bytes processed.

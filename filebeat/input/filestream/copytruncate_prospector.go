@@ -196,7 +196,7 @@ type copyTruncateFileProspector struct {
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup, metrics *loginp.Metrics) {
+func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", copyTruncateProspectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
@@ -221,7 +221,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince, metrics)
+			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 
 		}
 		return nil
@@ -241,20 +241,16 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	updater loginp.StateMetadataUpdater,
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
-	metrics *loginp.Metrics,
 ) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
-			metrics.FilesCreated.Inc()
 			log.Debugf("A new file %s has been found", event.NewPath)
 		} else if event.Op == loginp.OpWrite {
-			metrics.FilesUpdated.Inc()
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
 
 		if p.fileProspector.isFileIgnored(log, event, ignoreSince) {
-			metrics.FilesIgnored.Inc()
 			return
 		}
 
@@ -280,7 +276,6 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		}
 
 	case loginp.OpTruncate:
-		metrics.FilesTruncated.Inc()
 		log.Debugf("File %s has been truncated", event.NewPath)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
@@ -290,13 +285,11 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
-		metrics.FilesDeleted.Inc()
 		log.Debugf("File %s has been removed", event.OldPath)
 
 		p.fileProspector.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
-		metrics.FilesRenamed.Inc()
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 
 		// check if the event belongs to a rotated file
