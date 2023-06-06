@@ -1290,9 +1290,9 @@ func TestInput(t *testing.T) {
   </item>
 </order>
 `
-					io.ReadAll(r.Body)
+					io.ReadAll(r.Body) //nolint:errcheck // not expecting any error here
 					r.Body.Close()
-					w.Write([]byte(text))
+					w.Write([]byte(text)) //nolint:errcheck  // not expecting any error here
 				})
 				server := httptest.NewServer(r)
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
