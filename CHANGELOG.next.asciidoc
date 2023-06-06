@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
+- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 
 *Heartbeat*
 
@@ -338,6 +339,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Packetbeat*
 
 - Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
 
 *Winlogbeat*
 

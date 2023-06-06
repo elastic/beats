@@ -44,6 +44,11 @@ packetbeat.interfaces.internal_networks:
 # The default is 30 MB.
 #packetbeat.interfaces.buffer_size_mb: 30
 
+# Set the polling frequency for interface metrics. This currently only applies
+# to the "afpacket" interface type.
+# The default is 5s (seconds).
+#packetbeat.interfaces.metrics_interval: 5s
+
 # To scale processing across multiple Packetbeat processes, a fanout group
 # identifier can be specified. When `fanout_group` is used the Linux kernel splits
 # packets across Packetbeat instances in the same group by using a flow hash. It
