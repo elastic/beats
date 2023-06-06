@@ -11,12 +11,12 @@
     },
     "postgresql": {
         "replication": {
-            "write_lag": "",
+            "write_lag": "0",
             "state": "streaming",
             "sync_priority": 0,
             "backend_start": "2023-05-23T17:01:53.697Z",
-            "replay_lag": "",
-            "flush_lag": "",
+            "replay_lag": "0",
+            "flush_lag": "0",
             "pid": 2516780,
             "client": {
                 "address": "192.168.128.2",

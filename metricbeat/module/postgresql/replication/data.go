@@ -44,9 +44,9 @@ var schema = s.Schema{
 	"write_lsn":     c.Str("write_lsn"),
 	"flush_lsn":     c.Str("flush_lsn"),
 	"replay_lsn":    c.Str("replay_lsn"),
-	"write_lag":     c.Str("write_lag"),
-	"flush_lag":     c.Str("flush_lag"),
-	"replay_lag":    c.Str("replay_lag"),
+	"write_lag":     c.Uint("write_lag", s.Optional),
+	"flush_lag":     c.Uint("flush_lag", s.Optional),
+	"replay_lag":    c.Uint("replay_lag", s.Optional),
 	"sync_priority": c.Int("sync_priority", s.Optional),
 	"sync_state":    c.Str("sync_state"),
 }

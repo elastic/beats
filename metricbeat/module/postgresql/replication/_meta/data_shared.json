@@ -11,12 +11,12 @@
     },
     "postgresql": {
         "replication": {
-            "write_lag": "",
+            "write_lag": "0",
             "state": "",
             "sync_priority": 0,
             "backend_start": "",
-            "replay_lag": "",
-            "flush_lag": "",
+            "replay_lag": "0",
+            "flush_lag": "0",
             "pid": 0,
             "client": {
                 "address": "",
