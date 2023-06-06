@@ -228,18 +228,10 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 				return err
 			}
 		} else {
-			// process json assuming it's an array of objects
-			var jsonObject []json.RawMessage
-			if err := json.Unmarshal(item, &jsonObject); err == nil {
-				if err := p.processList(item, offset, p.s3ObjHash); err != nil {
-					return err
-				}
-			} else {
-				// process json as a single object
-				data, _ := item.MarshalJSON()
-				evt := p.createEvent(string(data), offset)
-				p.publish(p.acker, &evt)
-			}
+			// process json as a single object
+			data, _ := item.MarshalJSON()
+			evt := p.createEvent(string(data), offset)
+			p.publish(p.acker, &evt)
 		}
 	}
 
@@ -247,14 +239,22 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 }
 
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage) (json.RawMessage, error) {
-	var jsonObject map[string]json.RawMessage
-	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return nil, err
-	}
-
-	raw, found := jsonObject[key]
-	if !found {
-		return nil, fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+	// .[] signifies the root object is an array, and it should be split.
+	if key == ".[]" {
+		var jsonObject []json.RawMessage
+		if err := json.Unmarshal(raw, &jsonObject); err != nil {
+			return nil, err
+		}
+	} else {
+		var jsonObject map[string]json.RawMessage
+		if err := json.Unmarshal(raw, &jsonObject); err != nil {
+			return nil, err
+		}
+		var found bool
+		raw, found = jsonObject[key]
+		if !found {
+			return nil, fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		}
 	}
 	return raw, nil
 }
