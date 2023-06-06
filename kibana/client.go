@@ -82,14 +82,18 @@ func extractError(result []byte) error {
 		}
 	}
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return err
+		return fmt.Errorf("error extracting JSON for error response: %w", err)
 	}
 	var errs multierror.Errors
 	if kibanaResult.Message != "" {
 		for _, err := range kibanaResult.Attributes.Objects {
 			errs = append(errs, fmt.Errorf("id: %s, message: %s", err.ID, err.Error.Message))
 		}
+		if errs == nil {
+			return fmt.Errorf("%s", kibanaResult.Message)
+		}
 		return fmt.Errorf("%s: %w", kibanaResult.Message, errs.Err())
+
 	}
 	return nil
 }
@@ -139,7 +143,7 @@ func NewClientWithConfig(config *ClientConfig, binaryName, version, commit, buil
 	return NewClientWithConfigDefault(config, 5601, binaryName, version, commit, buildtime)
 }
 
-// NewClientWithConfig creates and returns a kibana client using the given config
+// NewClientWithConfigDefault creates and returns a kibana client using the given config
 func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, binaryName, version, commit, buildtime string) (*Client, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
@@ -237,7 +241,7 @@ func (conn *Connection) Request(method, extraPath string,
 	return resp.StatusCode, result, retError
 }
 
-// Sends an application/json request to Kibana with appropriate kbn headers
+// Send an application/json request to Kibana with appropriate kbn headers
 func (conn *Connection) Send(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
 

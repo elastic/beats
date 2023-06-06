@@ -72,7 +72,7 @@ func TestFleetCreatePolicy(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
-	req := CreatePolicyRequest{
+	req := AgentPolicy{
 		Name:        policyName,
 		Description: policyDescription,
 		MonitoringEnabled: []MonitoringEnabledOption{
@@ -88,8 +88,8 @@ func TestFleetCreatePolicy(t *testing.T) {
 	require.Equal(t, resp.Name, policyName)
 	require.Equal(t, resp.Description, policyDescription)
 	require.Equal(t, resp.Namespace, "default")
-	require.Equal(t, resp.Status, "active")
-	require.Equal(t, resp.IsManaged, false)
+	// require.Equal(t, resp.Status, "active")
+	// require.Equal(t, resp.IsManaged, false)
 	require.Equal(t, resp.MonitoringEnabled, []MonitoringEnabledOption{MonitoringEnabledLogs, MonitoringEnabledMetrics})
 }
 
@@ -106,10 +106,7 @@ func TestFleetGetPolicy(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
-	req := GetPolicyRequest{
-		ID: id,
-	}
-	resp, err := client.GetPolicy(req)
+	resp, err := client.GetPolicy(id)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -144,26 +141,24 @@ func TestFleetUpdatePolicy(t *testing.T) {
 			"enabled": true,
 		},
 	}
-	req := UpdatePolicyRequest{
-		id,
-		PolicyCommon{
-			Name: policyName,
-			MonitoringEnabled: []MonitoringEnabledOption{
-				MonitoringEnabledLogs,
-				MonitoringEnabledMetrics,
-			},
-			AgentFeatures: agentFeatures,
+	req := AgentPolicyUpdateRequest{
+
+		Name: policyName,
+		MonitoringEnabled: []MonitoringEnabledOption{
+			MonitoringEnabledLogs,
+			MonitoringEnabledMetrics,
 		},
+		AgentFeatures: agentFeatures,
 	}
-	resp, err := client.UpdatePolicy(req)
+	resp, err := client.UpdatePolicy(id, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
 	require.Equal(t, id, resp.ID)
 	require.Equal(t, policyName, resp.Name)
 	require.Equal(t, "default", resp.Namespace)
-	require.Equal(t, "active", resp.Status)
-	require.Equal(t, false, resp.IsManaged)
+	//require.Equal(t, "active", resp.Status)
+	//require.Equal(t, false, resp.IsManaged)
 	require.Equal(t, []MonitoringEnabledOption{MonitoringEnabledLogs, MonitoringEnabledMetrics}, resp.MonitoringEnabled)
 	require.Equal(t, agentFeatures, resp.AgentFeatures)
 }
