@@ -43,14 +43,11 @@ type afpacketHandle struct {
 	promiscPreviousState         bool
 	promiscPreviousStateDetected bool
 	device                       string
-<<<<<<< HEAD
-=======
 	log                          *logp.Logger
 	metrics                      *metrics
->>>>>>> 8d98060e95 ([Packetbeat] Add af_packet metrics (#35489))
 }
 
-func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
+func newAfpacketHandle(id, device string, snaplen, block_size, num_blocks int, metricsInterval, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
 
@@ -88,7 +85,7 @@ func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeo
 			afpacket.OptNumBlocks(num_blocks),
 			afpacket.OptPollTimeout(timeout))
 	}
-	h.metrics = newMetrics(c.ID, c.Device, c.MetricsInterval, h.TPacket, log)
+	h.metrics = newMetrics(id, device, metricsInterval, h.TPacket)
 
 	return h, err
 }
@@ -199,7 +196,7 @@ func (m *metrics) close() {
 	}
 }
 
-func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPacket, log *logp.Logger) *metrics {
+func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPacket) *metrics {
 	devID := fmt.Sprintf("%s-af_packet::%s", id, device)
 	reg, unreg := inputmon.NewInputRegistry("af_packet", devID, nil)
 	out := &metrics{
@@ -216,24 +213,24 @@ func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPac
 	out.device.Set(device)
 
 	go func() {
-		log.Debug("Starting stats collection goroutine, collection interval: %v", interval)
+		logp.Debug("afpacket", "Starting stats collection goroutine, collection interval: %v", interval)
 
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
 		if err := handle.InitSocketStats(); err != nil {
-			log.Errorw("Failed to init socket stats", "error", err)
+			logp.Err("Failed to init socket stats: %v", err)
 		}
 
 		for {
 			select {
 			case <-out.done:
-				log.Debug("Shutting down stats collection goroutine")
+				logp.Debug("afpacket", "Shutting down stats collection goroutine")
 				return
 			case <-ticker.C:
 				_, sockStats, err := handle.SocketStats()
 				if err != nil {
-					log.Debugw("Error getting socket stats", "error", err)
+					logp.Debug("afpacket", "Error getting socket stats: %v", err)
 				} else {
 					out.socketPackets.Set(uint64(sockStats.Packets()))
 					out.socketDrops.Set(uint64(sockStats.Drops()))
@@ -242,7 +239,7 @@ func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPac
 
 				stats, err := handle.Stats()
 				if err != nil {
-					log.Debugw("Error getting packetbeat stats", "error", err)
+					logp.Debug("afpacket", "Error getting packetbeat stats: %v", err)
 				} else {
 					out.packets.Set(uint64(stats.Packets))
 					out.polls.Set(uint64(stats.Polls))

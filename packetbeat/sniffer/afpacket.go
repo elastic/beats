@@ -17,14 +17,11 @@
 
 package sniffer
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-<<<<<<< HEAD
-// Computes the block_size and the num_blocks in such a way that the
-// allocated mmap buffer is close to but smaller than target_size_mb.
-// The restriction is that the block_size must be divisible by both the
-// frame size and page size.
-=======
 type afPacketConfig struct {
 	// ID is the AF_PACKET identifier for metric collection.
 	ID string
@@ -37,7 +34,6 @@ type afPacketConfig struct {
 	NumBlocks       int           // Number of blocks.
 	MetricsInterval time.Duration // Metrics polling interval.
 	PollTimeout     time.Duration // Duration that poll() should block waiting for data.
-	FanoutGroupID   *uint16       // Optional fanout group identifier.
 	Promiscuous     bool          // Put device into promiscuous mode. Ignored when using 'any' device.
 }
 
@@ -45,7 +41,6 @@ type afPacketConfig struct {
 // that the allocated mmap buffer is close to but smaller than target_size_mb.
 // The restriction is that the block_size must be divisible by both the frame
 // size and page size.
->>>>>>> 8d98060e95 ([Packetbeat] Add af_packet metrics (#35489))
 func afpacketComputeSize(targetSizeMb, snaplen, pageSize int) (frameSize, blockSize, numBlocks int, err error) {
 	if snaplen < pageSize {
 		frameSize = pageSize / (pageSize / snaplen)
