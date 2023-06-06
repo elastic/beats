@@ -119,6 +119,21 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
 - Update Go version to 1.17.1. {pull}27543[27543]
 - Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+- Add support for `credentials_json` in `gcp` module, all metricsets {pull}29584[29584]
+- Add gcp firestore metricset. {pull}29918[29918]
+- Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
+- Improve tests files with shorter statements. {pull}35667[35667]
+- Add gcp dataproc metricset. {pull}30008[30008]
+- Add Github action for linting
+- Add regex support for drop_fields processor.
+- Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
+- Added `.python-version` file {pull}32323[32323]
+- Use `T.TempDir` to create temporary test directory {pull}33082[33082]
+- Add an option to disable event normalization when creating a `beat.Client`. {pull}33657[33657]
+- Add the file path of the instance lock on the error when it's is already locked {pull}33788[33788]
+- Add DropFields processor to js API {pull}33458[33458]
+- Add support for different folders when testing data {pull}34467[34467]
+- Add logging of metric registration in inputmon. {pull}35647[35647]
 
 ==== Deprecated
 
