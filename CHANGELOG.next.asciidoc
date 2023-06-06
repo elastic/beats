@@ -240,6 +240,8 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
 - Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
 - Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
+- Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
 
 *Packetbeat*
 

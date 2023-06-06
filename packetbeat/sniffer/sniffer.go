@@ -63,6 +63,9 @@ type sniffer struct {
 	// filter is the bpf filter program used by the sniffer.
 	filter string
 
+	// id identifies the sniffer for metric collection.
+	id string
+
 	decoders Decoders
 }
 
@@ -81,14 +84,25 @@ const (
 
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
+<<<<<<< HEAD
 // is done by the Run method.
 func New(testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
 	s := &Sniffer{sniffers: make([]sniffer, len(interfaces))}
+=======
+// is done by the Run method. The id parameter is used to specify the metric
+// collection ID for AF_PACKET sniffers on Linux.
+func New(id string, testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+	s := &Sniffer{
+		sniffers: make([]sniffer, len(interfaces)),
+		log:      logp.NewLogger("sniffer"),
+	}
+>>>>>>> 8d98060e95 ([Packetbeat] Add af_packet metrics (#35489))
 
 	for i, iface := range interfaces {
 		child := sniffer{
 			state:         atomic.MakeInt32(snifferInactive),
 			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
+			id:            id,
 			decoders:      decoders,
 		}
 
@@ -125,6 +139,9 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 				}
 				if iface.BufferSizeMb <= 0 {
 					iface.BufferSizeMb = 24
+				}
+				if iface.MetricsInterval <= 0 {
+					iface.MetricsInterval = 5 * time.Second
 				}
 
 				if t := iface.Type; t == "autodetect" || t == "" {
@@ -453,7 +470,7 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 	case "pcap":
 		return openPcap(device, s.filter, &s.config)
 	case "af_packet":
-		return openAFPacket(device, s.filter, &s.config)
+		return openAFPacket(s.id, device, s.filter, &s.config)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
 	}
@@ -490,14 +507,28 @@ func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle
 	return h, nil
 }
 
-func openAFPacket(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
 	szFrame, szBlock, numBlocks, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	if err != nil {
 		return nil, err
 	}
 
 	timeout := 500 * time.Millisecond
+<<<<<<< HEAD
 	h, err := newAfpacketHandle(device, szFrame, szBlock, numBlocks, timeout, cfg.EnableAutoPromiscMode)
+=======
+	h, err := newAfpacketHandle(afPacketConfig{
+		ID:              id,
+		Device:          device,
+		FrameSize:       szFrame,
+		BlockSize:       szBlock,
+		NumBlocks:       numBlocks,
+		PollTimeout:     timeout,
+		MetricsInterval: cfg.MetricsInterval,
+		FanoutGroupID:   cfg.FanoutGroup,
+		Promiscuous:     cfg.EnableAutoPromiscMode,
+	})
+>>>>>>> 8d98060e95 ([Packetbeat] Add af_packet metrics (#35489))
 	if err != nil {
 		return nil, err
 	}
