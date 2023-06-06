@@ -106,7 +106,7 @@ func TestFetchMultipleKeyspaces(t *testing.T) {
 }
 
 // addEntry adds an entry to redis
-func addEntry(t *testing.T, host, key string, keyspace uint) {
+func addEntry(t *testing.T, host string, key string, keyspace uint) {
 	// Insert at least one event to make sure db exists
 	c, err := rd.Dial("tcp", host)
 	if err != nil {
