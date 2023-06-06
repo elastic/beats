@@ -6,6 +6,21 @@ These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of Packetbeat for the monitored protocol.
 
 [float]
+==== AF_PACKET Metrics
+
+[options="header"]
+|=======
+| Metric                 | Description
+| `device`               | Name of the device being monitored.
+| `socket_packets`       | Number of packets delivered by the kernel to the shared buffer.
+| `socket_drops`         | Number of packets dropped by the kernel on the socket.
+| `socket_queue_freezes` | Number of kernel queue freezes on the socket.
+| `packets`              | Number of packets handled by Packetbeat.
+| `polls`                | Number of blocking syscalls made waiting for packets.
+|=======
+
+
+[float]
 ==== TCP Metrics
 
 [options="header"]
