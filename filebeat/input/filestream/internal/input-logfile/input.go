@@ -24,7 +24,6 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
@@ -81,14 +80,14 @@ func (inp *managedInput) Run(
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 
-	// Notify the manager the input  has stopped, currently that is used to
+	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs
 	inp.manager.StopInput(inp.userID)
 
 	return nil
 }
 
-func newInputACKHandler(ch *updateChan, log *logp.Logger) beat.ACKer {
+func newInputACKHandler(ch *updateChan) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int

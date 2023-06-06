@@ -45,13 +45,13 @@ import (
 // input, and without any pending update operations for the persistent store.
 //
 // The Type field is used to create the key name in the persistent store. Users
-// are allowed to add a custome per input configuration ID using the `id`
+// are allowed to add a custom type per input configuration ID using the `id`
 // setting, to collect the same source multiple times, but with different
 // state. The key name in the persistent store becomes <Type>-[<ID>]-<Source Name>
 type InputManager struct {
 	Logger *logp.Logger
 
-	// StateStore gives the InputManager access to the persitent key value store.
+	// StateStore gives the InputManager access to the persistent key value store.
 	StateStore StateStore
 
 	// Type must contain the name of the input type. It is used to create the key name
@@ -86,7 +86,7 @@ var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
 // globalInputID is a default ID for inputs created without an ID
-// Deprecated: Inputs without an ID are not supported any more.
+// Deprecated: Inputs without an ID are not supported anymore.
 const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
@@ -184,6 +184,8 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 			"will lead to data duplication, please use a different ID", settings.ID)
 	}
 
+	// TODO: improve how inputs with empty IDs are tracked.
+	// https://github.com/elastic/beats/issues/35202
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
 
@@ -230,7 +232,19 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 	}, nil
 }
 
-// StopInput peforms all necessary clean up when an input finishes.
+func (cim *InputManager) Delete(cfg *conf.C) error {
+	settings := struct {
+		ID string `config:"id"`
+	}{}
+	if err := cfg.Unpack(&settings); err != nil {
+		return fmt.Errorf("could not unpack config to get the input ID: %w", err)
+	}
+
+	cim.StopInput(settings.ID)
+	return nil
+}
+
+// StopInput performs all necessary clean up when an input finishes.
 func (cim *InputManager) StopInput(id string) {
 	cim.idsMux.Lock()
 	delete(cim.ids, id)
