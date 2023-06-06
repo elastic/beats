@@ -38,17 +38,26 @@ func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Durat
 	return startTime, endTime
 }
 
+// MetricWithID contains a specific metric, and its account ID information.
+type MetricWithID struct {
+	Metric    types.Metric
+	AccountID string
+}
+
 // GetListMetricsOutput function gets listMetrics results from cloudwatch ~~per namespace~~ for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
 // Note: We are not using Dimensions and MetricName in ListMetricsInput because with that we will have to make one ListMetrics
 // API call per metric name and set of dimensions. This will increase API cost.
-func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]types.Metric, error) {
-	var metricsTotal []types.Metric
+// IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
+// monitoring account.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+	var metricWithAccountID []MetricWithID
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
-		NextToken: nextToken,
+		NextToken:             nextToken,
+		IncludeLinkedAccounts: includeLinkedAccounts,
 	}
 
 	// To filter the results to show only metrics that have had data points published
@@ -68,12 +77,22 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.TODO())
 		if err != nil {
-			return metricsTotal, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
+			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
 
-		metricsTotal = append(metricsTotal, page.Metrics...)
+		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
+		if page.OwningAccounts == nil {
+			for _, metric := range page.Metrics {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+			}
+			return metricWithAccountID, nil
+		}
+
+		for i, metric := range page.Metrics {
+			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
+		}
 	}
-	return metricsTotal, nil
+	return metricWithAccountID, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.

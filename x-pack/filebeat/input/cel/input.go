@@ -4,8 +4,7 @@
 
 // Package cel implements an input that uses the Common Expression Language to
 // perform requests and do endpoint processing of events. The cel package exposes
-// the github.com/elastic/mito/lib and github.com/google/cel-go/ext CEL extension
-// libraries.
+// the github.com/elastic/mito/lib CEL extension library.
 package cel
 
 import (
@@ -72,7 +71,7 @@ var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), ver
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
-		Stability: feature.Experimental,
+		Stability: feature.Stable,
 		Manager:   NewInputManager(log, store),
 	}
 }
@@ -144,7 +143,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs)
 	if err != nil {
 		return err
 	}
@@ -855,12 +854,17 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string) (cel.Program, error) {
+	xml, err := lib.XML(nil, xsd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
+	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
+		xml,
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
