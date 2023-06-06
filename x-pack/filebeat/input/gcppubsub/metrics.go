@@ -20,7 +20,7 @@ type inputMetrics struct {
 	failedAckedMessageCount *monitoring.Uint // Number of failed ACKed messages.
 	nackedMessageCount      *monitoring.Uint // Number of NACKed messages.
 	bytesProcessedTotal     *monitoring.Uint // Number of bytes processed.
-	processingTime          metrics.Sample   // Histogram of the elapsed time for processing an event.
+	processingTime          metrics.Sample   // Histogram of the elapsed time for processing an event in nanoseconds.
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
