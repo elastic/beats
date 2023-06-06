@@ -121,6 +121,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
+- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 
 *Heartbeat*
 
