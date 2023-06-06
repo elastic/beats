@@ -227,6 +227,23 @@ packetbeat.interfaces.fanout_group: 1
 ------------------------------------------------------------------------------
 
 [float]
+==== `metrics_interval`
+
+Configure the metrics polling interval for supported interface types. Currently,
+only `af_packet` is supported.
+
+The value must be a duration string. The default is `5s` (5 seconds). A value
+less than or equal to zero will be set to the default value.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.metrics_interval: 5s
+------------------------------------------------------------------------------
+
+[float]
 ==== `auto_promisc_mode`
 
 With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
