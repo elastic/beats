@@ -46,45 +46,45 @@ type afpacketHandle struct {
 	metrics                      *metrics
 }
 
-func newAfpacketHandle(id, device string, snaplen, block_size, num_blocks int, metricsInterval, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
+func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
 
-	if autoPromiscMode {
-		promiscEnabled, err = isPromiscEnabled(device)
+	if c.Promiscuous {
+		promiscEnabled, err = isPromiscEnabled(c.Device)
 		if err != nil {
-			logp.Err("Failed to get promiscuous mode for device '%s': %v", device, err)
+			logp.Err("Failed to get promiscuous mode for device '%s': %v", c.Device, err)
 		}
 
 		if !promiscEnabled {
-			if setPromiscErr := setPromiscMode(device, true); setPromiscErr != nil {
-				logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", device, err)
+			if setPromiscErr := setPromiscMode(c.Device, true); setPromiscErr != nil {
+				logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", c.Device, err)
 			}
 		}
 	}
 
 	h := &afpacketHandle{
 		promiscPreviousState:         promiscEnabled,
-		frameSize:                    snaplen,
-		device:                       device,
-		promiscPreviousStateDetected: autoPromiscMode && err == nil,
+		frameSize:                    c.FrameSize,
+		device:                       c.Device,
+		promiscPreviousStateDetected: c.Promiscuous && err == nil,
 	}
 
-	if device == "any" {
+	if c.Device == "any" {
 		h.TPacket, err = afpacket.NewTPacket(
-			afpacket.OptFrameSize(snaplen),
-			afpacket.OptBlockSize(block_size),
-			afpacket.OptNumBlocks(num_blocks),
-			afpacket.OptPollTimeout(timeout))
+			afpacket.OptFrameSize(c.FrameSize),
+			afpacket.OptBlockSize(c.BlockSize),
+			afpacket.OptNumBlocks(c.NumBlocks),
+			afpacket.OptPollTimeout(c.PollTimeout))
 	} else {
 		h.TPacket, err = afpacket.NewTPacket(
-			afpacket.OptInterface(device),
-			afpacket.OptFrameSize(snaplen),
-			afpacket.OptBlockSize(block_size),
-			afpacket.OptNumBlocks(num_blocks),
-			afpacket.OptPollTimeout(timeout))
+			afpacket.OptInterface(c.Device),
+			afpacket.OptFrameSize(c.FrameSize),
+			afpacket.OptBlockSize(c.BlockSize),
+			afpacket.OptNumBlocks(c.NumBlocks),
+			afpacket.OptPollTimeout(c.PollTimeout))
 	}
-	h.metrics = newMetrics(id, device, metricsInterval, h.TPacket)
+	h.metrics = newMetrics(c.ID, c.Device, c.MetricsInterval, h.TPacket)
 
 	return h, err
 }

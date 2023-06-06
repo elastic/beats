@@ -507,7 +507,16 @@ func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (sniff
 	}
 
 	timeout := 500 * time.Millisecond
-	h, err := newAfpacketHandle(id, device, szFrame, szBlock, numBlocks, cfg.MetricsInterval, timeout, cfg.EnableAutoPromiscMode)
+	h, err := newAfpacketHandle(afPacketConfig{
+		ID:              id,
+		Device:          device,
+		FrameSize:       szFrame,
+		BlockSize:       szBlock,
+		NumBlocks:       numBlocks,
+		PollTimeout:     timeout,
+		MetricsInterval: cfg.MetricsInterval,
+		Promiscuous:     cfg.EnableAutoPromiscMode,
+	})
 	if err != nil {
 		return nil, err
 	}
