@@ -18,8 +18,9 @@
 package info
 
 import (
-	"fmt"
 	"strconv"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -44,7 +45,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := redis.NewMetricSet(base)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create 'info' metricset: %w", err)
+		return nil, errors.Wrap(err, "failed to create 'info' metricset")
 	}
 	return &MetricSet{ms}, nil
 }
@@ -54,14 +55,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			m.Logger().Debug("Failed to release connection")
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
 		}
 	}()
 
 	// Fetch all INFO.
 	info, err := redis.FetchRedisInfo("all", conn)
 	if err != nil {
-		return fmt.Errorf("failed to fetch redis info: %w", err)
+		return errors.Wrap(err, "failed to fetch redis info")
 	}
 
 	// In 5.0 some fields are renamed, maintain both names, old ones will be deprecated
@@ -80,7 +81,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	slowLogLength, err := redis.FetchSlowLogLength(conn)
 	if err != nil {
-		return fmt.Errorf("failed to fetch slow log length: %w", err)
+		return errors.Wrap(err, "failed to fetch slow log length")
+
 	}
 	info["slowlog_len"] = strconv.FormatInt(slowLogLength, 10)
 

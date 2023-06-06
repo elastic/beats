@@ -18,7 +18,7 @@
 package keyspace
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -43,7 +43,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := redis.NewMetricSet(base)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create 'keyspace' metricset: %w", err)
+		return nil, errors.Wrap(err, "failed to create 'keyspace' metricset")
 	}
 	return &MetricSet{ms}, nil
 }
@@ -53,14 +53,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	conn := m.Connection()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			m.Logger().Debug("failed to release connection")
+			m.Logger().Debug(errors.Wrapf(err, "failed to release connection"))
 		}
 	}()
 
 	// Fetch default INFO.
 	info, err := redis.FetchRedisInfo("keyspace", conn)
 	if err != nil {
-		return fmt.Errorf("failed to fetch redis info for keyspaces: %w", err)
+		return errors.Wrap(err, "Failed to fetch redis info for keyspaces")
 	}
 
 	m.Logger().Debugf("Redis INFO from %s: %+v", m.Host(), info)
