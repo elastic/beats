@@ -89,6 +89,7 @@ type Runner interface {
 	// in a struct, which could cause a race that would cause the race detector to fail.
 	// This is something that could be anticipated for the Runner interface specifically, because
 	// most runners will use a goroutine that modifies internal state.
+
 	fmt.Stringer
 	Start()
 	Stop()
@@ -104,7 +105,7 @@ type Reloader struct {
 }
 
 // NewReloader creates new Reloader instance for the given config
-func NewReloader(pipeline beat.PipelineConnector, cfg *config.C) *Reloader {
+func NewReloader(pipeline beat.PipelineConnector, cfg *common.Config) *Reloader {
 	conf := DefaultDynamicConfig
 	_ = cfg.Unpack(&conf)
 
