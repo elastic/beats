@@ -43,7 +43,6 @@ type afpacketHandle struct {
 	promiscPreviousState         bool
 	promiscPreviousStateDetected bool
 	device                       string
-	log                          *logp.Logger
 	metrics                      *metrics
 }
 
