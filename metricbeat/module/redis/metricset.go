@@ -18,12 +18,10 @@
 package redis
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	rd "github.com/gomodule/redigo/redis"
 
@@ -37,20 +35,10 @@ type MetricSet struct {
 	pool *Pool
 }
 
-type ModuleConfig struct {
-	IdleTimeout time.Duration     `config:"idle_timeout"`
-	Network     string            `config:"network"`
-	MaxConn     int               `config:"maxconn" validate:"min=1"`
-	TLS         *tlscommon.Config `config:"ssl"`
-
-	UseTLS       bool
-	UseTLSConfig *tls.Config
-}
-
-// NewMetricSet creates the base for Redis metricsets
+// NewMetricSet creates the base for Redis metricsets.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Unpack additional configuration options.
-	config := ModuleConfig{Network: "tcp", MaxConn: 10}
+	config := DefaultConfig()
 
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
@@ -67,7 +55,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
-		config.UseTLS = true
 		config.UseTLSConfig = tlsConfig.ToConfig()
 	}
 
