@@ -277,7 +277,7 @@ This option defines the provider of the webhook that uses CRC (Challenge-Respons
 [float]
 ==== `crc.secret`
 
-The secret token provided by the webhook owner for the CRC validation.
+The secret token provided by the webhook owner for the CRC validation. It is required when a `crc.provider` is set.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
