@@ -302,6 +302,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for collecting `httpjson` metrics. {pull}35392[35392]
 - Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 - Mark CEL input as GA. {pull}35559[35559]
+- Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 
 *Auditbeat*
