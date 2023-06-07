@@ -79,7 +79,7 @@ func (l *Loader) Init(group unison.Group, mode Mode) error {
 // Returns a LoadError if the input name can not be read from the config or if
 // the type does not exist. Error values for Configuration errors do depend on
 // the InputManager.
-func (l *Loader) Configure(cfg *conf.C) (Input, error) {
+func (l *Loader) Configure(cfg *common.Config) (Input, error) {
 	name, p, input, err := l.loadFromCfg(cfg)
 	if err != nil {
 		return input, err
@@ -99,7 +99,7 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 	return p.Manager.Create(cfg)
 }
 
-func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
+func (l *Loader) loadFromCfg(cfg *common.Config) (string, Plugin, Input, error) {
 	name, err := cfg.String(l.typeField, -1)
 	if err != nil {
 		if l.defaultType == "" {
@@ -118,13 +118,15 @@ func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
 	return name, p, nil, nil
 }
 
-func (l *Loader) Delete(cfg *conf.C) error {
+func (l *Loader) Delete(cfg *common.Config) error {
 	_, p, _, err := l.loadFromCfg(cfg)
 	if err != nil {
 		return err
 	}
 
-	pp, ok := p.Manager.(interface{ Delete(cfg *conf.C) error })
+	pp, ok := p.Manager.(interface {
+		Delete(cfg *common.Config) error
+	})
 	if ok {
 		return pp.Delete(cfg)
 	}

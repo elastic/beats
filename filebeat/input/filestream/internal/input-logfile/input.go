@@ -87,7 +87,7 @@ func (inp *managedInput) Run(
 	return nil
 }
 
-func newInputACKHandler(ch *updateChan) beat.EventListener {
+func newInputACKHandler(ch *updateChan) beat.ACKer {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int
