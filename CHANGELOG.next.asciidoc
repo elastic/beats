@@ -65,7 +65,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
 - Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
-- Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12 in order to fix cross-compilation issues {pull}35640[35640]
+- Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v13 in order to fix cross-compilation issues {pull}35640[35640]
 
 *Auditbeat*
 
