@@ -150,6 +150,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix project monitor temp directories permission to include group access. {pull}35398[35398]
 - Fix output pipeline exit on run_once. {pull}35376[35376]
 - Fix formatting issue with socket trace timeout. {pull}35434[35434]
+- Fix serialization of processors when running diagnostics. {pull}35698[35698]
 
 *Heartbeat*
 
@@ -234,6 +235,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
 - Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
 - Added `orchestrator.cluster.id` and `orchestrator.cluster.name` fields to the add_cloud_metadata processor, AWS cloud provider. {pull}35182[35182]
+- Lowercase reported hostnames per Elastic Common Schema (ECS) guidelines for the host.name field. Upgraded github.com/elastic/go-sysinfo to 1.11.0. {pull}35652[35652]
 
 *Auditbeat*
 
@@ -301,6 +303,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for collecting `httpjson` metrics. {pull}35392[35392]
 - Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 - Mark CEL input as GA. {pull}35559[35559]
+- Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 
 *Auditbeat*
