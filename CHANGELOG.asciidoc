@@ -11,13 +11,13 @@ https://github.com/elastic/beats/compare/v8.8.0\...v8.8.1[View commits]
 
 *Affecting all Beats*
 
-- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
-- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+- 'add_cloud_metadata' processor: add `cloud.region` field for GCE cloud provider
+- 'add_cloud_metadata' processor: update Azure metadata API version to get missing `cloud.account.id` field
 
 *Filebeat*
 
-- Fixes "Can only start an input when all related states are finished" error when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
-- [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- Fix "Can only start an input when all related states are finished" error when running under Elastic Agent {pull}35250[35250] {issue}33653[33653]
+- [system] Sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
 
@@ -175,6 +175,7 @@ https://github.com/elastic/beats/compare/v8.6.2\...v8.7.0[View commits]
 - Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
 
 *Filebeat*
+
 - [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
 with the ecs field name `container`. {pull}34403[34403]
 automatic splitting at root level, if root level element is an array. {pull}34155[34155]
@@ -241,6 +242,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
 
 *Heartbeat*
+
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
 
 - Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
