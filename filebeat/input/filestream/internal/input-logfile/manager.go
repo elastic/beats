@@ -232,7 +232,7 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 	}, nil
 }
 
-func (cim *InputManager) Delete(cfg *conf.C) error {
+func (cim *InputManager) Delete(cfg *common.Config) error {
 	settings := struct {
 		ID string `config:"id"`
 	}{}
