@@ -72,24 +72,32 @@ func NewSockTracer(path string, wait time.Duration) (st SockTracer, err error) {
 
 func (st SockTracer) Start() {
 	err := st.write(MSG_START)
-	logp.L().Errorf("could not write start trace message: %s", err)
+	if err != nil {
+		logp.L().Errorf("could not write start trace message: %s", err)
+	}
 }
 
 func (st SockTracer) Abort() {
 	err := st.write(MSG_ABORT)
-	logp.L().Errorf("could not write abort trace message: %s", err)
+	if err != nil {
+		logp.L().Errorf("could not write abort trace message: %s", err)
+	}
 	st.closeSock()
 }
 
 func (st SockTracer) Close() {
 	err := st.write(MSG_STOP)
-	logp.L().Errorf("could not write stop trace message: %s", err)
+	if err != nil {
+		logp.L().Errorf("could not write stop trace message: %s", err)
+	}
 	st.closeSock()
 }
 
 func (st SockTracer) closeSock() {
 	err := st.sock.Close()
-	logp.L().Errorf("could not close trace sock: %s", err)
+	if err != nil {
+		logp.L().Errorf("could not close trace sock: %s", err)
+	}
 }
 
 func (st SockTracer) write(message string) error {
