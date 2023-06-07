@@ -22,6 +22,7 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 // LogOption configures a Logger.
@@ -44,10 +45,23 @@ func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *L
 // NewLogger returns a new Logger labeled with the name of the selector. This
 // should never be used from any global contexts, otherwise you will receive a
 // no-op Logger. This is because the logp package needs to be initialized first.
-// Instead create new Logger instance that your object reuses. Or if you need to
+// Instead, create new Logger instance that your object reuses. Or if you need to
 // log from a static context then you may use logp.L().Infow(), for example.
 func NewLogger(selector string, options ...LogOption) *Logger {
 	return newLogger(loadLogger().rootLogger, selector, options...)
+}
+
+// NewTesting creates a testing logger that buffers the logs in memory and
+// logs in debug level. Check observer.ObservedLogs for more details.
+func NewTesting(name string) (*Logger, *observer.ObservedLogs) {
+	core, obs := observer.New(zapcore.DebugLevel)
+
+	logger := NewLogger(
+		name,
+		zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+			return zapcore.NewTee(in, core)
+		}))
+	return logger, obs
 }
 
 // WithOptions returns a clone of l with options applied.
