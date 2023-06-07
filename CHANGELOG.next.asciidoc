@@ -339,6 +339,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Packetbeat*
 
 - Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
 
 *Winlogbeat*
 
