@@ -2757,12 +2757,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/apache/arrow/go/v13
-Version: v13.0.0-20230607082151-dd267572a652
+Dependency : github.com/apache/arrow/go/v12
+Version: v12.0.1-0.20230605094802-c153c6d36ccf
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v13@v13.0.0-20230607082151-dd267572a652/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v12@v12.0.1-0.20230605094802-c153c6d36ccf/LICENSE.txt:
 
 
                                  Apache License
