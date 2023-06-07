@@ -3,9 +3,49 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-8.7.1]]
 === Beats version 8.7.1
 https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
+=======
+[[release-notes-8.8.1]]
+=== Beats version 8.8.1
+https://github.com/elastic/beats/compare/v8.8.0\...v8.8.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- 'add_cloud_metadata' processor: add `cloud.region` field for GCE cloud provider
+- 'add_cloud_metadata' processor: update Azure metadata API version to get missing `cloud.account.id` field
+
+*Filebeat*
+
+- Fix "Can only start an input when all related states are finished" error when running under Elastic Agent {pull}35250[35250] {issue}33653[33653]
+- [system] Sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
+- Fix error when trying to use `include_message` parser {issue}35440[35440]
+
+==== Added
+
+*Filebeat*
+
+- Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
+
+*Auditbeat*
+- Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
+
+*Metricbeat*
+
+- Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
+
+
+[[release-notes-8.8.0]]
+=== Beats version 8.8.0
+https://github.com/elastic/beats/compare/v8.7.1...v8.8.0[View commits]
+
+>>>>>>> fa8a2949ba ([Release] Prepare Changelog for 8.8.1 (#35695))
 
 ==== Bugfixes
 
@@ -144,6 +184,154 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Winlogbeat*
 
+<<<<<<< HEAD
+=======
+- Add `event.category` and `event.type` to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255. {pull}35193[35193]
+
+[[release-notes-8.7.1]]
+=== Beats version 8.7.1
+https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix Beats started by agent not respecting the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Beats started by agent now configure one global instance of each default add_x_metadata processor instead of creating one processor per input. Fixes a significant performance degradation for the aws-s3 input. {issue}35000[35000] {pull}35031[35031]
+
+*Filebeat*
+
+- [GCS Input] Added missing locks for safe concurrency {pull}34914[34914]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35037[35037]
+- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
+- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
+- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
+- Sanitize filenames for request tracer in httpjson and cel inputs. {pull}35143[35143]
+- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
+- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
+- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
+
+*Heartbeat*
+
+- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
+
+*Packetbeat*
+
+- Fix documentation for `flows.period` related to flow reporting. {pull}35009[35009]
+
+==== Added
+
+*Affecting all Beats*
+
+- Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
+
+*Winlogbeat*
+
+- Add note in documentation about 21 event ID clause limit {issue}35048[35048] {pull}35049[35049]
+
+[[release-notes-8.7.0]]
+=== Beats version 8.7.0
+https://github.com/elastic/beats/compare/v8.6.2\...v8.7.0[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
+- Fix panics when a processor is closed twice {pull}34647[34647]
+- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+
+*Filebeat*
+
+- [Auditbeat System Package] Added support for Apple Silicon chips. {pull}34433[34433]
+with the ecs field name `container`. {pull}34403[34403]
+automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Prevent Elasticsearch from spewing log warnings about redundant wildcard when setting up ingest pipelines. {issue}34249[34249] {pull}34550[34550]
+- Gracefully handle Windows event channel not found errors in winlog input. {issue}30201[30201] {pull}34605[34605]
+- Fix the issue of `cometd` input worker getting closed in case of a network connection issue and an EOF error. {issue}34326[34326] {pull}34327[34327]
+- Fix for httpjson first_response object throwing false positive errors by making it a flag based object {issue}34747[34747] {pull}34748[34748]
+- Fix errors and panics due to re-used processors {pull}34761[34761]
+- Add missing Basic Authentication support to CEL input {issue}34609[34609] {pull}34689[34689]
+
+*Heartbeat*
+
+- Fix integration hashing to prevent reloading all when updated. {pull}34697[34697]
+- Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
+with the ecs field name `container`. {pull}34403[34403]
+automatic splitting at root level, if root level element is an array. {pull}34155[34155]
+- Fix broken mapping for state.ends field. {pull}34891[34891]
+
+*Filebeat*
+
+- Allow the `misp` fileset in the Filebeat `threatintel` module to ignore CIDR ranges for an IP field. {issue}29949[29949] {pull}34195[34195]
+- Remove incorrect reference to CEL ext extensions package. {issue}34610[34610] {pull}34620[34620]
+- Fix handling of RFC5988 links' relation parameters by `getRFC5988Link` in HTTPJSON. {issue}34603[34603] {pull}34622[34622]
+- Drop empty API response events for Microsoft module. {issue}34786[34786] {pull}34893[34893]
+
+*Metricbeat*
+
+- Fix kafka dashboard field names {pull}33555[33555]
+
+*Winlogbeat*
+
+- Fix handling of event data with keys containing dots. {issue}34345[34345] {pull}34549[34549]
+- Gracefully handle channel not found errors. {issue}30201[30201] {pull}34605[34605]
+- Clarify query term limits warning and remove link to missing Microsoft doc page. {pull}34715[34715]
+- Improve documentation for event_logs.name configuration. {pull}34931[34931]
+
+*Functionbeat*
+
+- Fix Kinesis events timestamp to use timestamp of the event record instead of when the record was processed {pull}33593[33593]
+
+==== Added
+
+*Filebeat*
+
+- Add backup to bucket and delete functionality for the `aws-s3` input. {issue}30696[30696] {pull}33559[33559]
+- Add support for polling system UDP stats for UDP input metrics. {pull}34070[34070]
+- Add support for recognizing the log level in Elasticsearch JVM logs {pull}34159[34159]
+- Add new Entity Analytics input with Azure Active Directory support. {pull}34305[34305]
+- Added metric `sqs_lag_time` for aws-s3 input. {pull}34306[34306]
+- Add metrics for TCP packet processing. {pull}34333[34333]
+- Add metrics for unix socket packet processing. {pull}34335[34335]
+- Add beta `take over` mode for `filestream` for simple migration from `log` inputs {pull}34292[34292]
+- Add pagination support for Salesforce module. {issue}34057[34057] {pull}34065[34065]
+- Allow users to redact sensitive data from CEL input debug logs. {pull}34302[34302]
+- Add support for new Rabbitmq timestamp format for logs {pull}34211[34211]
+- Allow user configuration of timezone offset in Cisco ASA and FTD modules. {pull}34436[34436]
+- Allow user configuration of timezone offset in Checkpoint module. {pull}34472[34472]
+- Fill okta.request.ip_chain.* as a flattened object in Okta module. {pull}34621[34621]
+- Fixed GCS log format issues. {pull}34659[34659]
+- Add Basic Authentication support on constructed requests to CEL input {issue}34609[34609] {pull}34689[34689]
+- Add string manipulation extensions to CEL input {issue}34610[34610] {pull}34689[34689]
+- Improve CEL input documentation {pull}34831[34831]
+- Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
+- Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
+
+*Heartbeat*
+
+- Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
+
+- Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
+
+*Metricbeat*
+
+- Remove GCP Compute metadata cache {pull}33655[33655]
+- Add GCP Redis regions support {pull}33728[33728]
+- Changed cloudwatch module to call ListMetrics API only once per region, instead of per AWS namespace {pull}34055[34055]
+- Add beta ingest_pipeline metricset to Elasticsearch module for ingest pipeline monitoring {pull}34012[34012]
+- Handle duplicated TYPE line for prometheus metrics {issue}18813[18813] {pull}33865[33865]
+
+*Packetbeat*
+
+- Reduce logging level for ENOENT to WARN when mapping sockets to processes. {issue}33793[33793] {pull}33854[33854]
+- Add metrics for TCP and UDP packet processing. {pull}33833[33833] {pull}34353[34353]
+- Allow user to prevent Npcap library installation on Windows. {issue}34420[34420] {pull}34428[34428]
+- Add metrics documentation for TCP and UDP protocols. {issue}34887[34887] {pull}34889[34889]
+
+*Winlogbeat*
+
+>>>>>>> fa8a2949ba ([Release] Prepare Changelog for 8.8.1 (#35695))
 - Add metrics for log event processing. {pull}33922[33922]
 - Add metrics documentation for event processing. {issue}34887[34887] {pull}34889[34889]
 - Added processing for Windows Event ID's 4797, 5379, 5380, 5381, and 5382 for the Security Ingest Pipeline {issue}34293[34293] {pull}34294[34294]
