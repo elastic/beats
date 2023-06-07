@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-
 *Auditbeat*
 
 
@@ -54,7 +53,6 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
 - Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
-
 - Fix namespacing on self-monitoring {pull}32336[32336]
 - Fix race condition when stopping runners {pull}32433[32433]
 - Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
@@ -66,6 +64,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
 - 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+- Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
 
 
 *Auditbeat*
@@ -119,11 +118,16 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Sanitize filenames for request tracer in cel input. {pull}35154[35154]
 - Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
+- Fixes "Can only start an input when all related states are finished" error when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
 - Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
+- Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
+- Fix error when trying to use `include_message` parser {issue}35440[35440]
+- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 
 *Heartbeat*
 
@@ -145,6 +149,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix project monitor temp directories permission to include group access. {pull}35398[35398]
 - Fix output pipeline exit on run_once. {pull}35376[35376]
 - Fix formatting issue with socket trace timeout. {pull}35434[35434]
+- Fix serialization of processors when running diagnostics. {pull}35698[35698]
 
 *Heartbeat*
 
@@ -228,7 +233,9 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow users to enable features via configuration, starting with the FQDN reporting feature. {issue}1070[1070] {pull}34456[34456]
 - Add Hetzner Cloud as a provider for `add_cloud_metadata`. {pull}35456[35456]
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
-
+- Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
+- Added `orchestrator.cluster.id` and `orchestrator.cluster.name` fields to the add_cloud_metadata processor, AWS cloud provider. {pull}35182[35182]
+- Lowercase reported hostnames per Elastic Common Schema (ECS) guidelines for the host.name field. Upgraded github.com/elastic/go-sysinfo to 1.11.0. {pull}35652[35652]
 
 *Auditbeat*
 
@@ -287,15 +294,20 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
 - Add oracle authentication messages parsing {pull}35127[35127]
+- Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
+- Add support for CRC validation in Zoom module. {pull}35604[35604]
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add support for collecting `httpjson` metrics. {pull}35392[35392]
+- Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
+- Mark CEL input as GA. {pull}35559[35559]
+- Add metrics for gcp-pubsub input. {pull}35614[35614]
+- [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
-
-*Filebeat*
 
 *Libbeat*
 - Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
@@ -321,6 +333,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 
 *Osquerybeat*
 
@@ -328,6 +342,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Packetbeat*
 
 - Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
 
 *Winlogbeat*
 
@@ -354,6 +369,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Heartbeat*
 
+- Removed zip_url and local browser sources. {pull}35429[35429]
 
 *Metricbeat*
 
