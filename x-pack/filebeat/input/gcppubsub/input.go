@@ -51,6 +51,27 @@ func init() {
 	}
 }
 
+func configID(config *conf.C) (string, error) {
+	var tmp struct {
+		ID string `config:"id"`
+	}
+	if err := config.Unpack(&tmp); err != nil {
+		return "", fmt.Errorf("error extracting ID: %w", err)
+	}
+	if tmp.ID != "" {
+		return tmp.ID, nil
+	}
+
+	var h map[string]interface{}
+	_ = config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute ID from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%16X", id), nil
+}
+
 type pubsubInput struct {
 	config
 
@@ -300,25 +321,4 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 	}
 
 	return pubsub.NewClient(ctx, in.ProjectID, opts...)
-}
-
-func configID(config *conf.C) (string, error) {
-	var tmp struct {
-		ID string `config:"id"`
-	}
-	if err := config.Unpack(&tmp); err != nil {
-		return "", fmt.Errorf("error extracting ID: %w", err)
-	}
-	if tmp.ID != "" {
-		return tmp.ID, nil
-	}
-
-	var h map[string]interface{}
-	_ = config.Unpack(&h)
-	id, err := hashstructure.Hash(h, nil)
-	if err != nil {
-		return "", fmt.Errorf("can not compute ID from configuration: %w", err)
-	}
-
-	return fmt.Sprintf("%16X", id), nil
 }
