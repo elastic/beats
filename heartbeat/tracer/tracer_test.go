@@ -59,8 +59,10 @@ func TestSockTracer(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			sockName, err := uuid.NewRandom()
 			require.NoError(t, err)
 			sockPath := filepath.Join(os.TempDir(), sockName.String())
