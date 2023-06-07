@@ -5,7 +5,6 @@
 package parquet
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -175,16 +174,16 @@ func TestParquetWithFiles(t *testing.T) {
 		jsonFile    string
 	}{
 		{
-			parquetFile: "vpc_flow.gz.parquet",
-			jsonFile:    "vpc_flow.ndjson",
-		},
-		{
 			parquetFile: "cloudtrail.parquet",
-			jsonFile:    "cloudtrail.ndjson",
+			jsonFile:    "cloudtrail.json",
 		},
 		{
 			parquetFile: "route53.parquet",
-			jsonFile:    "route53.ndjson",
+			jsonFile:    "route53.json",
+		},
+		{
+			parquetFile: "vpc_flow.gz.parquet",
+			jsonFile:    "vpc_flow.json",
 		},
 	}
 
@@ -198,13 +197,7 @@ func TestParquetWithFiles(t *testing.T) {
 			}
 			defer parquetFile.Close()
 
-			jsonFile, err := os.Open(filepath.Join(testDataPath, tc.jsonFile))
-			if err != nil {
-				t.Fatalf("Failed to open json test file: %v", err)
-			}
-			defer jsonFile.Close()
-
-			orderedJSON, rows := readJSONFromFile(t, jsonFile)
+			orderedJSON, rows := readJSONFromFile(t, filepath.Join(testDataPath, tc.jsonFile))
 			cfg := &Config{
 				// we set ProcessParallel to true as this always has the best performance
 				ProcessParallel: true,
@@ -218,16 +211,17 @@ func TestParquetWithFiles(t *testing.T) {
 
 // readJSONFromFile reads the json file and returns the data as an ordered map (row number -> json string)
 // along with the number of rows in the file
-func readJSONFromFile(t *testing.T, file *os.File) (map[int]string, int) {
+func readJSONFromFile(t *testing.T, filepath string) (map[int]string, int) {
+	fileBytes, err := os.ReadFile(filepath)
+	assert.NoError(t, err)
+	var rawMessages []json.RawMessage
+	err = json.Unmarshal(fileBytes, &rawMessages)
+	assert.NoError(t, err)
 	data := make(map[int]string)
-	scanner := bufio.NewScanner(file)
-	row := 0
-	for scanner.Scan() {
-		data[row] = scanner.Text()
+	var row int
+	for _, rawMsg := range rawMessages {
+		data[row] = string(rawMsg)
 		row++
-	}
-	if err := scanner.Err(); err != nil {
-		t.Fatalf("failed to read ndjson file: %v", err)
 	}
 
 	return data, row
