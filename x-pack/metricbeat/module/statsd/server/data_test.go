@@ -839,9 +839,8 @@ func TestBuildMappings(t *testing.T) {
 	} {
 		t.Run(test.title, func(t *testing.T) {
 			var mappings []StatsdMapping
-			if err := yaml.Unmarshal([]byte(test.input), &mappings); err != nil {
-				t.Error(err)
-			}
+			err := yaml.Unmarshal([]byte(test.input), &mappings)
+			require.NoError(t, err)
 			actual, err := buildMappings(mappings)
 			for k, v := range actual {
 				v.regex = nil
