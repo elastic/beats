@@ -32,7 +32,9 @@ import (
 	"github.com/google/gopacket/pcap"
 	"golang.org/x/net/bpf"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type afpacketHandle struct {
@@ -41,46 +43,48 @@ type afpacketHandle struct {
 	promiscPreviousState         bool
 	promiscPreviousStateDetected bool
 	device                       string
+	metrics                      *metrics
 }
 
-func newAfpacketHandle(device string, snaplen, block_size, num_blocks int, timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
+func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
 
-	if autoPromiscMode {
-		promiscEnabled, err = isPromiscEnabled(device)
+	if c.Promiscuous {
+		promiscEnabled, err = isPromiscEnabled(c.Device)
 		if err != nil {
-			logp.Err("Failed to get promiscuous mode for device '%s': %v", device, err)
+			logp.Err("Failed to get promiscuous mode for device '%s': %v", c.Device, err)
 		}
 
 		if !promiscEnabled {
-			if setPromiscErr := setPromiscMode(device, true); setPromiscErr != nil {
-				logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", device, err)
+			if setPromiscErr := setPromiscMode(c.Device, true); setPromiscErr != nil {
+				logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", c.Device, err)
 			}
 		}
 	}
 
 	h := &afpacketHandle{
 		promiscPreviousState:         promiscEnabled,
-		frameSize:                    snaplen,
-		device:                       device,
-		promiscPreviousStateDetected: autoPromiscMode && err == nil,
+		frameSize:                    c.FrameSize,
+		device:                       c.Device,
+		promiscPreviousStateDetected: c.Promiscuous && err == nil,
 	}
 
-	if device == "any" {
+	if c.Device == "any" {
 		h.TPacket, err = afpacket.NewTPacket(
-			afpacket.OptFrameSize(snaplen),
-			afpacket.OptBlockSize(block_size),
-			afpacket.OptNumBlocks(num_blocks),
-			afpacket.OptPollTimeout(timeout))
+			afpacket.OptFrameSize(c.FrameSize),
+			afpacket.OptBlockSize(c.BlockSize),
+			afpacket.OptNumBlocks(c.NumBlocks),
+			afpacket.OptPollTimeout(c.PollTimeout))
 	} else {
 		h.TPacket, err = afpacket.NewTPacket(
-			afpacket.OptInterface(device),
-			afpacket.OptFrameSize(snaplen),
-			afpacket.OptBlockSize(block_size),
-			afpacket.OptNumBlocks(num_blocks),
-			afpacket.OptPollTimeout(timeout))
+			afpacket.OptInterface(c.Device),
+			afpacket.OptFrameSize(c.FrameSize),
+			afpacket.OptBlockSize(c.BlockSize),
+			afpacket.OptNumBlocks(c.NumBlocks),
+			afpacket.OptPollTimeout(c.PollTimeout))
 	}
+	h.metrics = newMetrics(c.ID, c.Device, c.MetricsInterval, h.TPacket)
 
 	return h, err
 }
@@ -111,6 +115,8 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 }
 
 func (h *afpacketHandle) Close() {
+	h.metrics.close()
+
 	h.TPacket.Close()
 	// previous state detected only if auto mode was on
 	if h.promiscPreviousStateDetected {
@@ -164,4 +170,82 @@ func setPromiscMode(device string, enabled bool) error {
 // isAfpacketErrTimeout returns whether err is afpacket.ErrTimeout.
 func isAfpacketErrTimeout(err error) bool {
 	return err == afpacket.ErrTimeout
+}
+
+type metrics struct {
+	unregister func()
+	done       chan struct{} // used to signal to polling goroutine to stop
+
+	device             *monitoring.String // name of the device being monitored
+	socketPackets      *monitoring.Uint   // number of packets delivered by kernel
+	socketDrops        *monitoring.Uint   // number of packets dropped by kernel (i.e., buffer full)
+	socketQueueFreezes *monitoring.Uint   // number of queue freezes
+	packets            *monitoring.Uint   // number of packets read off buffer by packetbeat
+	polls              *monitoring.Uint   // number of blocking syscalls made by packetbeat waiting for packets
+}
+
+func (m *metrics) close() {
+	if m == nil {
+		return
+	}
+	m.unregister()
+	if m.done != nil {
+		close(m.done)
+		m.done = nil
+	}
+}
+
+func newMetrics(id, device string, interval time.Duration, handle *afpacket.TPacket) *metrics {
+	devID := fmt.Sprintf("%s-af_packet::%s", id, device)
+	reg, unreg := inputmon.NewInputRegistry("af_packet", devID, nil)
+	out := &metrics{
+		unregister:         unreg,
+		device:             monitoring.NewString(reg, "device"),
+		socketPackets:      monitoring.NewUint(reg, "socket_packets"),
+		socketDrops:        monitoring.NewUint(reg, "socket_drops"),
+		socketQueueFreezes: monitoring.NewUint(reg, "socket_queue_freezes"),
+		packets:            monitoring.NewUint(reg, "packets"),
+		polls:              monitoring.NewUint(reg, "polls"),
+		done:               make(chan struct{}),
+	}
+
+	out.device.Set(device)
+
+	go func() {
+		logp.Debug("afpacket", "Starting stats collection goroutine, collection interval: %v", interval)
+
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		if err := handle.InitSocketStats(); err != nil {
+			logp.Err("Failed to init socket stats: %v", err)
+		}
+
+		for {
+			select {
+			case <-out.done:
+				logp.Debug("afpacket", "Shutting down stats collection goroutine")
+				return
+			case <-ticker.C:
+				_, sockStats, err := handle.SocketStats()
+				if err != nil {
+					logp.Debug("afpacket", "Error getting socket stats: %v", err)
+				} else {
+					out.socketPackets.Set(uint64(sockStats.Packets()))
+					out.socketDrops.Set(uint64(sockStats.Drops()))
+					out.socketQueueFreezes.Set(uint64(sockStats.QueueFreezes()))
+				}
+
+				stats, err := handle.Stats()
+				if err != nil {
+					logp.Debug("afpacket", "Error getting packetbeat stats: %v", err)
+				} else {
+					out.packets.Set(uint64(stats.Packets))
+					out.polls.Set(uint64(stats.Polls))
+				}
+			}
+		}
+	}()
+
+	return out
 }
