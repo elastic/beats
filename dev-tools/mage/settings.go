@@ -386,11 +386,11 @@ func beatVersion() (string, error) {
 }
 
 var (
-	beatDocBranchRegex = regexp.MustCompile(`(?m)doc-branch:\s*([^\s]+)\r?$`)
+	beatDocBranchRegex     = regexp.MustCompile(`(?m)doc-branch:\s*([^\s]+)\r?$`)
 	beatDocSiteBranchRegex = regexp.MustCompile(`(?m)doc-site-branch:\s*([^\s]+)\r?$`)
-	beatDocBranchValue string
-	beatDocBranchErr   error
-	beatDocBranchOnce  sync.Once
+	beatDocBranchValue     string
+	beatDocBranchErr       error
+	beatDocBranchOnce      sync.Once
 )
 
 // BeatDocBranch returns the documentation branch name associated with the
