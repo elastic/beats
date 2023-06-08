@@ -20,14 +20,48 @@
 package filestream
 
 import (
+	"context"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/stretchr/testify/require"
 )
 
-const testID = "fake-ID"
+func TestFilestreamMetrics(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                   "fake-ID",
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "100ms",
+		"close.on_state_change.inactive":       "2s",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	checkMetrics(t, "fake-ID", expectedMetrics{
+		FilesOpened:      1,
+		FilesClosed:      1,
+		FilesActive:      0,
+		MessagesRead:     3,
+		BytesProcessed:   34,
+		EventsProcessed:  3,
+		ProcessingErrors: 0,
+	})
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
 
 type expectedMetrics struct {
 	FilesOpened      uint64

@@ -105,12 +105,12 @@ func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	return e.plugin.Manager
 }
 
-func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input, id string) {
+func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer grp.Stop()
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx, ID: id}
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
 		inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }
