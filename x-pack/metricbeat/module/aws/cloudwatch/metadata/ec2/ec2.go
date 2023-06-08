@@ -17,7 +17,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const metadataPrefix = "aws.ec2.instance."
+const (
+	metadataPrefix       = "aws.ec2.instance."
+	cloudWatchPeriodName = "aws.cloudwatch.period"
+)
 
 // AddMetadata adds metadata for EC2 instances from a specific region
 func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
@@ -33,29 +36,35 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 		return events, fmt.Errorf("aws.ec2.instance fields are not available, skipping region %s: %w", regionName, err)
 	}
 
-	// collect monitoring state for each instance
-	monitoringStates := map[string]string{}
-	for instanceID, output := range instancesOutputs {
-		for eventIdentifier := range events {
-			// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
-			// account and linked source accounts if include_linked_accounts is set to true
-			addHostFields(events[eventIdentifier], instanceID)
-			calculateRate(events[eventIdentifier], monitoringStates[instanceID])
+	for eventIdentifier := range events {
+		eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+		potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
 
-			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
-			potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+		// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
+		// account and linked source accounts if include_linked_accounts is set to true
+		addHostFields(events[eventIdentifier], potentialInstanceID)
+		period, err := events[eventIdentifier].RootFields.GetValue(cloudWatchPeriodName)
+		if err != nil {
+			logger.Warnf("can't get period information for instance %s, skipping rate calculation", eventIdentifier)
+		} else {
+			calculateRate(events[eventIdentifier], period.(int))
+			_ = events[eventIdentifier].RootFields.Delete(cloudWatchPeriodName)
+		}
+
+		// add instance ID from dimension value
+		dimInstanceID, _ := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId")
+		_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+
+		for instanceID, output := range instancesOutputs {
 			if instanceID != potentialInstanceID {
 				continue
 			}
-
 			for _, tag := range output.Tags {
 				if *tag.Key == "Name" {
 					_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.name", *tag.Value)
 					_, _ = events[eventIdentifier].RootFields.Put("host.name", *tag.Value)
 				}
 			}
-
-			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", instanceID)
 
 			if output.InstanceType != "" {
 				_, _ = events[eventIdentifier].RootFields.Put("cloud.machine.type", output.InstanceType)
@@ -75,7 +84,6 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 			}
 
 			if output.Monitoring.State != "" {
-				monitoringStates[eventIdentifier] = string(output.Monitoring.State)
 				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
 			} else {
 				logger.Error("Monitoring.State is empty")
@@ -166,12 +174,7 @@ func addHostFields(event mb.Event, instanceID string) {
 	}
 }
 
-func calculateRate(event mb.Event, monitoringState string) {
-	var period = 300.0
-	if monitoringState != "disabled" {
-		period = 60.0
-	}
-
+func calculateRate(event mb.Event, period int) {
 	metricList := []string{
 		"aws.ec2.metrics.NetworkIn.sum",
 		"aws.ec2.metrics.NetworkOut.sum",
@@ -185,7 +188,7 @@ func calculateRate(event mb.Event, monitoringState string) {
 	for _, metricName := range metricList {
 		metricValue, err := event.RootFields.GetValue(metricName)
 		if err == nil && metricValue != nil {
-			rateValue := metricValue.(float64) / period
+			rateValue := metricValue.(float64) / float64(period)
 			_, _ = event.RootFields.Put(strings.Replace(metricName, ".sum", ".rate", -1), rateValue)
 		}
 	}

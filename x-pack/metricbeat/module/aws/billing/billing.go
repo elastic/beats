@@ -196,9 +196,9 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
 			event := mb.Event{}
 			if labels[aws.LabelConst.AccountIdIdx] != "" {
-				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI])
+				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 			} else {
-				event = aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI])
+				event = aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 			}
 
 			_, _ = event.MetricSetFields.Put(labels[aws.LabelConst.MetricNameIdx], metricDataResultValue)
@@ -313,7 +313,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 }
 
 func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricValue, groupDefinition costexplorertypes.GroupDefinition, startDate string, endDate string) mb.Event {
-	event := aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, time.Now())
+	event := aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, time.Now(), "")
 
 	// add group definition
 	_, _ = event.MetricSetFields.Put("group_definition", mapstr.M{
