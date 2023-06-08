@@ -115,16 +115,15 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	defer cancelInputCtx()
 
 	if in.config.QueueURL != "" {
-		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint, in.config.RegionName)
 		if err != nil && in.config.RegionName == "" {
 			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
 		}
-		if in.config.RegionName != "" && regionName != "" && regionName != in.config.RegionName {
+		if regionName != in.config.RegionName {
 			inputContext.Logger.Warnf("configured region disagrees with queue_url region: %q != %q: using %[1]q",
 				in.config.RegionName, regionName)
 			regionName = in.config.RegionName
 		}
-
 		in.awsConfig.Region = regionName
 
 		// Create SQS receiver and S3 notification processor.
@@ -307,19 +306,21 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 
 var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 
-func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
+func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (string, error) {
 	// get region from queueURL
 	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
-	url, err := url.Parse(queueURL)
+	u, err := url.Parse(queueURL)
 	if err != nil {
 		return "", fmt.Errorf(queueURL + " is not a valid URL")
 	}
-	if url.Scheme == "https" && url.Host != "" {
-		queueHostSplit := strings.SplitN(url.Host, ".", 3)
+	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
+		queueHostSplit := strings.SplitN(u.Host, ".", 3)
 		if len(queueHostSplit) == 3 {
 			if queueHostSplit[2] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
 				return queueHostSplit[1], nil
 			}
+		} else if defaultRegion != "" {
+			return defaultRegion, nil
 		}
 	}
 	return "", errBadQueueURL

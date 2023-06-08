@@ -55,6 +55,7 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 		name     string
 		queueURL string
 		endpoint string
+		deflt    string
 		want     string
 		wantErr  error
 	}{
@@ -81,6 +82,18 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			wantErr:  errBadQueueURL,
 		},
 		{
+			name:     "localstack",
+			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-d9clk9",
+			deflt:    "localstack",
+			want:     "localstack",
+		},
+		{
+			name:     "localstack_sns",
+			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-sns-d9clk9",
+			deflt:    "localstack_sns",
+			want:     "localstack_sns",
+		},
+		{
 			name:     "invalid_queue_url",
 			queueURL: ":foo",
 			wantErr:  errors.New(":foo is not a valid URL"),
@@ -89,7 +102,7 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint)
+			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint, test.deflt)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}
