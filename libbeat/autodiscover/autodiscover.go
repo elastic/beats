@@ -33,7 +33,7 @@ import (
 )
 
 const (
-	// debouncePeriod is the time autodiscover will wait before reloading inputsp
+	// debouncePeriod is the time autodiscover will wait before reloading inputs
 	debouncePeriod = time.Second
 )
 
@@ -166,6 +166,10 @@ func (a *Autodiscover) worker() {
 				// On error, make sure the next run also updates because some runners were not properly loaded
 				retry = err != nil
 				if retry {
+					// The recoverable errors that can lead to retry are related
+					// to the harvester state, so we need to give the publishing
+					// pipeline some time to finish flushing the events from that
+					// file. Hence we wait for 10x the normal debounce period.
 					t.Reset(10 * debouncePeriod)
 					continue
 				}

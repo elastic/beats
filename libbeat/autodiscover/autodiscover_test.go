@@ -198,7 +198,7 @@ func TestAutodiscover(t *testing.T) {
 
 	// Test start event
 	// This start event will trigger an input reload
-	t.Log("Seding first start event, there will be 1 runner running")
+	t.Log("Sending first start event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
