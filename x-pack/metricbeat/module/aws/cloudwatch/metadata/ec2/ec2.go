@@ -159,7 +159,7 @@ func addHostFields(event mb.Event, instanceID string) {
 		}
 
 		if value, ok := metricValue.(float64); ok {
-			if ec2MetricName == "cpu.total.pct" {
+			if ec2MetricName == "aws.ec2.metrics.CPUUtilization.avg" {
 				value = value / 100
 			}
 			_, _ = event.RootFields.Put(hostMetricName, value)
