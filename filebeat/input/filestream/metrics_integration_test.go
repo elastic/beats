@@ -23,8 +23,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestFilestreamMetrics(t *testing.T) {
