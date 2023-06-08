@@ -113,6 +113,16 @@ func TestS3ObjectProcessor(t *testing.T) {
 		testProcessS3ObjectError(t, "testdata/events-array.json", "application/json", 0, sel)
 	})
 
+	t.Run("split array with expand_event_list_from_field equals .[]", func(t *testing.T) {
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ".[]"}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 2, sel)
+	})
+
+	t.Run("split array without expand_event_list_from_field", func(t *testing.T) {
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ""}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 1, sel)
+	})
+
 	t.Run("events have a unique repeatable _id", func(t *testing.T) {
 		// Hash of bucket ARN, object key, object versionId, and log offset.
 		events := testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
