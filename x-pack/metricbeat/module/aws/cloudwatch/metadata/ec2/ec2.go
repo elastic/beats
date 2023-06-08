@@ -37,6 +37,12 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 	monitoringStates := map[string]string{}
 	for instanceID, output := range instancesOutputs {
 		for eventIdentifier := range events {
+			// add host cpu/network/disk fields and host.id
+			addHostFields(events[eventIdentifier], instanceID)
+
+			// add rate metrics
+			calculateRate(events[eventIdentifier], monitoringStates[instanceID])
+			
 			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
 			potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
 			if instanceID != potentialInstanceID {
@@ -96,12 +102,6 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
 			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
 			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
-
-			// add host cpu/network/disk fields and host.id
-			addHostFields(events[eventIdentifier], instanceID)
-
-			// add rate metrics
-			calculateRate(events[eventIdentifier], monitoringStates[instanceID])
 		}
 	}
 
