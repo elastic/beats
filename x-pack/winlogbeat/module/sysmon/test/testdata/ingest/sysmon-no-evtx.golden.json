@@ -3,11 +3,9 @@
     "dns": {
       "answers": [
         {
-          "data": "",
           "type": "SRV"
         },
         {
-          "data": "",
           "type": "SRV"
         },
         {
