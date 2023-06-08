@@ -248,6 +248,23 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
 	}
+
+	// Do an initial check for access to the filesystem and of the
+	// value constructed by containsUnspecifiedAddr. This gives a
+	// base level for the rx_queue and drops values and ensures that
+	// if the constructed address values are malformed we panic early
+	// within the period of system testing.
+	rx, drops, err := procNetUDP("/proc/net/udp", addr, hasUnspecified, addrIsUnspecified)
+	if err != nil {
+		log.Warnf("failed to get initial udp stats from /proc: %v", err)
+	}
+	rx6, drops6, err := procNetUDP("/proc/net/udp6", addr, hasUnspecified6, addrIsUnspecified6)
+	if err != nil {
+		log.Warnf("failed to get initial udp6 stats from /proc: %v", err)
+	}
+	m.rxQueue.Set(uint64(rx + rx6))
+	m.drops.Set(uint64(drops + drops6))
+
 	t := time.NewTicker(each)
 	for {
 		select {
