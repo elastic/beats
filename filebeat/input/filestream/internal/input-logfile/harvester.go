@@ -192,7 +192,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
 			CloseRef:   ctx.Cancelation,
-			ACKHandler: newInputACKHandler(hg.ackCH, ctx.Logger),
+			ACKHandler: newInputACKHandler(hg.ackCH),
 		})
 		if err != nil {
 			hg.readers.remove(srcID)

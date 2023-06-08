@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -204,7 +204,7 @@ func (c *Config) Arch() string {
 }
 
 // Unpack reads a config object into the settings.
-func (c *Config) Unpack(cfg *c.C) error {
+func (c *Config) Unpack(cfg *common.Config) error {
 	tmp := struct {
 		OperatingSystem string `json:"-" config:",ignore"`
 		Architecture    string `json:"-" config:",ignore"`
