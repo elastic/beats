@@ -782,21 +782,19 @@ processors:
 
           if (answer.startsWith("type:")) {
             def parts = /\s+/.split(answer);
-
+            if (parts.length < 2) {
+              throw new Exception("unexpected QueryResult format");
+            }
             if (parts.length == 3) {
               answers.add([
                 "type": params[parts[1]],
                 "data": parts[2]
               ]);
               relatedHosts.add(parts[2]);
-            } else if (parts.length == 2) {
-              // Missing data, for example with "type:  33 ;"
-              answers.add([
-                "type": params[parts[1]],
-                "data": ""
-              ]);
             } else {
-              throw new Exception("unexpected QueryResult format");
+              answers.add([
+                "type": params[parts[1]]
+              ]);
             }
           } else {
             answer = answer.replace("::ffff:", "");
