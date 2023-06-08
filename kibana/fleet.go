@@ -344,7 +344,7 @@ func (client *Client) GetAgent(request GetAgentRequest) (*GetAgentResponse, erro
 
 // UnEnrollAgentRequest is the JSON request for unenrolling an agent
 type UnEnrollAgentRequest struct {
-	ID     string `json:"id"`
+	ID     string `json:"-"` // ID is not part of the request body send to the Fleet API
 	Revoke bool   `json:"revoke"`
 }
 
@@ -384,7 +384,7 @@ func (client *Client) UnEnrollAgent(request UnEnrollAgentRequest) (*UnEnrollAgen
 
 // UpgradeAgentRequest is the JSON request for an agent upgrade
 type UpgradeAgentRequest struct {
-	ID      string `json:"id"`
+	ID      string `json:"-"` // ID is not part of the request body send to the Fleet API
 	Version string `json:"version"`
 }
 
