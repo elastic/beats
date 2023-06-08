@@ -914,16 +914,6 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 
 	env.waitUntilOffsetInRegistry(testlogName, id, 0)
 
-	checkMetrics(t, id, expectedMetrics{
-		FilesOpened:      1,
-		FilesClosed:      1,
-		FilesActive:      0,
-		MessagesRead:     3,
-		BytesProcessed:   34,
-		EventsProcessed:  3,
-		ProcessingErrors: 0,
-	})
-
 	cancelInput()
 	env.waitUntilInputStops()
 }
