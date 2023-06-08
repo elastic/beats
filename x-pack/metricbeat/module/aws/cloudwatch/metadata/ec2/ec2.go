@@ -37,12 +37,11 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 	monitoringStates := map[string]string{}
 	for instanceID, output := range instancesOutputs {
 		for eventIdentifier := range events {
-			// add host cpu/network/disk fields and host.id
+			// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
+			// account and linked source accounts if include_linked_accounts is set to true
 			addHostFields(events[eventIdentifier], instanceID)
-
-			// add rate metrics
 			calculateRate(events[eventIdentifier], monitoringStates[instanceID])
-			
+
 			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
 			potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
 			if instanceID != potentialInstanceID {
