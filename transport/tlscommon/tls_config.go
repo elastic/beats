@@ -169,18 +169,23 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 		// Compute digest for each certificate.
 		digest := sha256.Sum256(cert.Raw)
 
-		if bytes.Equal(digest[0:], fingerprint) {
-			logger.Info("CA certificate matching 'ca_trusted_fingerprint' found, adding it to 'certificate_authorities'")
-			// Make sure the fingerprint matches a CA certificate
-			if cert.IsCA {
-				if cfg.RootCAs == nil {
-					cfg.RootCAs = x509.NewCertPool()
-				}
-
-				cfg.RootCAs.AddCert(cert)
-				return nil
-			}
+		if !bytes.Equal(digest[0:], fingerprint) {
+			continue
 		}
+
+		// Make sure the fingerprint matches a CA certificate
+		if !cert.IsCA {
+			logger.Info("Certificate matching 'ca_trusted_fingerprint' found, but is not a CA certificate")
+			continue
+		}
+
+		logger.Info("CA certificate matching 'ca_trusted_fingerprint' found, adding it to 'certificate_authorities'")
+		if cfg.RootCAs == nil {
+			cfg.RootCAs = x509.NewCertPool()
+		}
+
+		cfg.RootCAs.AddCert(cert)
+		return nil
 	}
 
 	logger.Warn("no CA certificate matching the fingerprint")
