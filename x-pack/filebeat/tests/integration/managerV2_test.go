@@ -278,6 +278,109 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	testSucceeded = true
 }
 
+// TestFailedOutputReportsUnhealthy ensures that if an output
+// fails to start and returns an error, the manager will set it
+// as failed and the inputs will not be started, which means
+// staying on the started state.
+func TestFailedOutputReportsUnhealthy(t *testing.T) {
+	// First things first, ensure ES is running and we can connect to it.
+	// If ES is not running, the test will timeout and the only way to know
+	// what caused it is going through Filebeat's logs.
+	ensureESIsRunning(t)
+
+	tempDir, cleanup := createTempDir(t)
+	finalStateReached := false
+	testSucceeded := false
+
+	t.Cleanup(func() {
+		if testSucceeded {
+			cleanup()
+		}
+	})
+
+	var units = []*proto.UnitExpected{
+		{
+			Id:             "output-unit-borken",
+			Type:           proto.UnitType_OUTPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_FAILED,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "logstash",
+				Name: "logstash",
+				Source: requireNewStruct(t,
+					map[string]interface{}{
+						"type":    "logstash",
+						"invalid": "configuration",
+					}),
+			},
+		},
+		// Also add an input unit to make sure it never leaves the
+		// starting state
+		{
+			Id:             "input-unit",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_STARTING,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "log-input",
+				Type: "log",
+				Name: "log",
+				Streams: []*proto.Stream{
+					{
+						Id: "log-input",
+						Source: requireNewStruct(t, map[string]interface{}{
+							"enabled": true,
+							"type":    "log",
+							"paths":   "/tmp/foo",
+						}),
+					},
+				},
+			},
+		},
+	}
+
+	server := &mock.StubServerV2{
+		// The Beat will call the check-in function multiple times:
+		// - At least once at startup
+		// - At every state change (starting, configuring, healthy, etc)
+		// for every Unit.
+		//
+		// So we wait until the state matches the desired state
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if management.DoesStateMatch(observed, units, 0) {
+				finalStateReached = true
+			}
+
+			return &proto.CheckinExpected{
+				Units: units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	require.NoError(t, server.Start())
+
+	filebeat := NewBeat(
+		t,
+		"../../filebeat.test",
+		tempDir,
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
+	)
+
+	filebeat.Start()
+
+	require.Eventually(t, func() bool {
+		return finalStateReached
+	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+
+	t.Cleanup(server.Stop)
+	testSucceeded = true
+}
+
 func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {
