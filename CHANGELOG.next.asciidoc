@@ -150,6 +150,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix project monitor temp directories permission to include group access. {pull}35398[35398]
 - Fix output pipeline exit on run_once. {pull}35376[35376]
 - Fix formatting issue with socket trace timeout. {pull}35434[35434]
+- Update gval version. {pull}35636[35636]
 - Fix serialization of processors when running diagnostics. {pull}35698[35698]
 
 *Heartbeat*
