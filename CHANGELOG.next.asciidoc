@@ -304,6 +304,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Mark CEL input as GA. {pull}35559[35559]
 - Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
+- Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
