@@ -50,22 +50,11 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// testSucceeded will be set to 'true' as the very last thing on this test,
 	// it allows us to use t.CleanUp to remove the temporary files
 	testSucceeded := false
-	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
-		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
-	if err != nil {
-		t.Fatal(err)
-	}
+	tempDir, cleanup := createTempDir(t)
 
-	if err := os.MkdirAll(tempDir, 0766); err != nil {
-		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
-	}
-	t.Logf("Temporary directory: %s", tempDir)
 	t.Cleanup(func() {
 		if testSucceeded {
-			if err := os.RemoveAll(tempDir); err != nil {
-				t.Fatalf("could not remove temp dir '%s': %s", tempDir, err)
-			}
-			t.Logf("Temporary directory '%s' removed", tempDir)
+			cleanup()
 		}
 	})
 
