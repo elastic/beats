@@ -59,6 +59,7 @@ type Heartbeat struct {
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
+	pipeline           beat.Pipeline
 }
 
 // New creates a new heartbeat.
@@ -118,16 +119,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
 	pipelineClientFactory := func(p beat.Pipeline) (pipeline.ISyncClient, error) {
-		if parsedConfig.RunOnce {
-			client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
-			if err != nil {
-				return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
-			}
-			return client, nil
-		} else {
-			client, err := p.Connect()
-			return monitors.SyncPipelineClientAdaptor{C: client}, err
-		}
+		client, err := p.Connect()
+		return monitors.SyncPipelineClientAdaptor{C: client}, err
 	}
 
 	bt := &Heartbeat{
@@ -145,7 +138,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
-		trace: trace,
+		trace:    trace,
+		pipeline: b.Publisher,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
@@ -159,6 +153,15 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.trace.Start()
 	defer bt.trace.Close()
+
+	waitMonitors := newSignalWait()
+	waitPublished := newSignalWait()
+	defer waitPublished.Wait()
+
+	pipelineWrapper := &PipelineClientWrapper{log: logp.L().Named("run_once pipeline wrapper")}
+	if bt.config.RunOnce {
+		bt.pipeline = withPipelineWrapper(bt.pipeline, pipelineWrapper)
+	}
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
@@ -174,9 +177,11 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		bt.scheduler.WaitForRunOnce()
-		logp.L().Info("Ending run_once run")
-		return nil
+		runOnce := func() {
+			bt.scheduler.WaitForRunOnce()
+			logp.L().Info("Ending run_once run")
+		}
+		waitMonitors.Add(runOnce)
 	}
 
 	if b.Manager.Enabled() {
@@ -211,11 +216,24 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	defer bt.scheduler.Stop()
 
-	<-bt.done
+	// Wait until run_once ends or bt is being shutdown
+	waitMonitors.AddChan(bt.done)
+	waitMonitors.Wait()
 
-	if err != nil {
-		logp.L().Errorf("could not write trace stop event: %s", err)
+	// Checks if on shutdown it should wait for all events to be published
+	if bt.config.RunOnce {
+		waitPublished.Add(withLog(pipelineWrapper.Wait,
+			// Wait for either timeout or all events having been ACKed by outputs.
+			"Continue shutdown: All enqueued events being published."))
+		if bt.config.RunOnceTimeout > 0 {
+			logp.Info("Shutdown output timer started. Waiting for max %v.", bt.config.RunOnceTimeout)
+			waitPublished.Add(withLog(waitDuration(bt.config.RunOnceTimeout),
+				"Continue shutdown: Time out waiting for events being published."))
+		}
+	} else {
+		waitPublished.AddChan(bt.done)
 	}
+
 	logp.L().Info("Shutting down.")
 	return nil
 }
@@ -224,7 +242,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.monitorFactory.Create(b.Publisher, cfg)
+		created, err := bt.monitorFactory.Create(bt.pipeline, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				logp.L().Info("skipping disabled monitor: %s", err)
