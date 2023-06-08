@@ -54,6 +54,9 @@ provider to function properly:
 
 |User.Read.All
 |Application
+
+|Device.Read.All
+|Application
 |===
 
 For a full guide on how to set up the necessary App Registration, permission
@@ -66,33 +69,36 @@ granting, and secret configuration, follow this https://learn.microsoft.com/en-u
 ===== Overview
 
 The Azure AD provider periodically contacts Azure Active Directory, retrieving
-updates for users and groups, updates its internal cache of user metadata and
-group membership information, and ships updated user metadata to Elasticsearch.
+updates for users, devices and groups, updates its internal cache of user and
+device metadata and group membership information, and ships updated user metadata
+to Elasticsearch.
 
-Fetching and shipping updates occurs in one of two processes: **full
-synchronizations** and *incremental updates*. Full synchronizations will send the
-entire list of users in state, along with write markers to indicate the start
-and end of the synchronization event. Incremental updates will only send data
-for changed users during that event. Changes on a user can come in many forms,
-whether it be a change to the user's metadata, a user was added or deleted, or
-group membership was changed (either direct or transitive).
+Fetching and shipping updates occurs in one of two processes: *full
+synchronizations* and *incremental updates*. Full synchronizations will send the
+entire list of users and devices in state, along with write markers to indicate
+the start and end of the synchronization event. Incremental updates will only
+send data for changed users and devices during that event. Changes on a user or
+device can come in many forms, whether it be a change to the user or device
+metadata, a user/device was added or deleted, or group membership was changed
+(either direct or transitive).
 
 [float]
 ===== API Interactions
 
-The provider periodically retrieves changes to user and group metadata from the
-Microsoft Graph API for Azure Active Directory. This is done through calls to
-two API endpoints:
+The provider periodically retrieves changes to user, device and group metadata
+from the Microsoft Graph API for Azure Active Directory. This is done through
+calls to three API endpoints:
 
 - https://learn.microsoft.com/en-us/graph/api/user-delta?view=graph-rest-1.0&tabs=http[/users/delta]
+- https://learn.microsoft.com/en-us/graph/api/device-delta?view=graph-rest-1.0&tabs=http[/devices/delta]
 - https://learn.microsoft.com/en-us/graph/api/group-delta?view=graph-rest-1.0&tabs=http[/groups/delta]
 
 The `/delta` endpoint will provide changes that have occurred since the last
 call, with state being tracked through a delta token. If the /delta endpoint is
-called without a delta token, it will provide a full listing of users or groups,
-similar to the non-delta endpoint. Since many results may be returned, there is
-a paging mechanism that is used. In the response body, there are two fields that
-may appear, `@odata.nextLink` and `@odata.deltaLink`.
+called without a delta token, it will provide a full listing of users, devices
+or groups, similar to the non-delta endpoint. Since many results may be returned,
+there is a paging mechanism that is used. In the response body, there are two
+fields that may appear, `@odata.nextLink` and `@odata.deltaLink`.
 
 - If a `@odata.nextLink` is returned, then there are more results to fetch, and
 the value of this field will contain the URL which should be immediately fetched.
@@ -100,16 +106,17 @@ the value of this field will contain the URL which should be immediately fetched
 and the value of this field (a URL) should be saved for the next time updates
 need to be fetched (the delta token).
 
-The group metadata will be used to enrich users with group membership information.
-Direct memberships, along with transitive memberships, will provided on users.
+The group metadata will be used to enrich users and devices with group membership
+information. Direct memberships, along with transitive memberships, will be provided
+for users and devices.
 
 [float]
-===== Sending User Metadata to Elasticsearch
+===== Sending User and Device Metadata to Elasticsearch
 
-During a full synchronization, all users stored in state will be sent to the
-output, while incremental updates will only send users which have been updated.
-Full synchronizations will be bounded on either side by write marker documents,
-which will look something like this:
+During a full synchronization, all users and devices stored in state will be sent
+to the output, while incremental updates will only send users which have been
+updated. Full synchronizations will be bounded on either side by write marker
+documents, which will look something like this:
 
 ["source","json",subs="attributes"]
 ----
@@ -128,6 +135,46 @@ which will look something like this:
 User documents will show the current state of the user.
 
 Example user document:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"]
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
+            },
+            {
+                "id": "d140978f-d641-4f01-802f-4ecc1acf8935",
+                "name": "group2"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+----
+
+Device documents will show the current state of the device.
+
+Example device document:
 
 ["source","json",subs="attributes"]
 ----
