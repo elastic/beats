@@ -96,6 +96,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
+- Add support in s3 input for JSON with array of objects. {pull}35475[35475]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
@@ -123,6 +124,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix project monitor temp directories permission to include group access. {pull}35398[35398]
 - Fix output pipeline exit on run_once. {pull}35376[35376]
 - Fix formatting issue with socket trace timeout. {pull}35434[35434]
+- Update gval version. {pull}35636[35636]
 - Fix serialization of processors when running diagnostics. {pull}35698[35698]
 
 *Heartbeat*
@@ -278,6 +280,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Mark CEL input as GA. {pull}35559[35559]
 - Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
+- Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
