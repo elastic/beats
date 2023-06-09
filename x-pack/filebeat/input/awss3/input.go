@@ -189,6 +189,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+				o.UsePathStyle = in.config.PathStyle
 			}
 		}),
 	}
@@ -247,29 +248,34 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 		if in.config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
-		o.UsePathStyle = in.config.PathStyle
+		o.UsePathStyle = true
 	})
-	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
-	}
 
-	originalAwsConfigRegion := in.awsConfig.Region
+	// regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
+	// }
 
-	in.awsConfig.Region = regionName
+	// originalAwsConfigRegion := in.awsConfig.Region
 
-	if regionName != originalAwsConfigRegion {
-		s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
-			if in.config.NonAWSBucketName != "" {
-				o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
-			}
+	// ctx.Logger.Errorf("**ORIGINAL*** %s", originalAwsConfigRegion)
 
-			if in.config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-			o.UsePathStyle = in.config.PathStyle
-		})
-	}
+	// in.awsConfig.Region = regionName
+
+	// ctx.Logger.Errorf("***** %s", regionName)
+
+	// if regionName != originalAwsConfigRegion {
+	// 	s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+	// 		if in.config.NonAWSBucketName != "" {
+	// 			o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+	// 		}
+
+	// 		if in.config.AWSConfig.FIPSEnabled {
+	// 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	// 		}
+	// 		o.UsePathStyle = true
+	// 	})
+	// }
 
 	s3API := &awsS3API{
 		client: s3Client,
