@@ -220,7 +220,12 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 				return nil
 			}
 
-			src := p.identifier.GetSource(fe)
+			src, err := p.identifier.GetSource(fe)
+			if err != nil {
+				log.Debugf("cannot create identity for %q: %v", fe.OldPath, err)
+				continue
+			}
+
 			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 
 		}
@@ -329,7 +334,12 @@ func (p *copyTruncateFileProspector) onRotatedFile(
 			hg.Start(ctx, src)
 			return
 		}
-		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		originalSrc, err := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		if err != nil {
+			log.Debugf("cannot create identity for %q: %v", fe.OldPath, err)
+			return
+		}
+
 		p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 		p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 		hg.Start(ctx, src)

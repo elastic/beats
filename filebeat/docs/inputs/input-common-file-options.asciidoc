@@ -77,10 +77,10 @@ certain criteria or time. Closing the harvester means closing the file handler.
 If a file is updated after the harvester is closed, the file will be picked up
 again after `scan_frequency` has elapsed. However, if the file is moved or
 deleted while the harvester is closed, {beatname_uc} will not be able to pick up
-the file again, and any data that the harvester hasn't read will be lost. 
-The `close_*` settings are applied synchronously when {beatname_uc} attempts 
+the file again, and any data that the harvester hasn't read will be lost.
+The `close_*` settings are applied synchronously when {beatname_uc} attempts
 to read from a file, meaning that if {beatname_uc} is in a blocked state
-due to blocked output, full queue or other issue, a file that would 
+due to blocked output, full queue or other issue, a file that would
 otherwise be closed remains open until {beatname_uc} once again attempts to read from the file.
 
 
@@ -240,7 +240,7 @@ that should be removed based on the `clean_inactive` setting. This happens
 because {beatname_uc} doesn't remove the entries until it opens the registry
 again to read a different file. If you are testing the `clean_inactive` setting,
 make sure {beatname_uc} is configured to read from more than one file, or the
-file state will never be removed from the registry. 
+file state will never be removed from the registry.
 
 [float]
 [id="{beatname_lc}-input-{type}-clean-removed"]
@@ -442,3 +442,23 @@ Set the location of the marker file the following way:
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
 
+*`fingerprint`*:: To identify files based on their first bytes of content.
+
+This option is the most stable file identity, however it's slower than the rest of the options
+and requires files to have different content in the given range of bytes.
+
+Normally, log lines contain timestamps and other unique fields that should let to use this option
+but in every use-case users should inspect their logs and determine what are appropriate values for
+the `offset` and `length` parameters. Default `offset` is 0 and default `length` is `1024` or 1 KB.
+
+WARNING: This strategy delays ingesting new files until they grow to `offset`+`length` bytes and can be
+fingerprinted.
+
+WARNING: Changing either the `length` or `offset` parameter will lead to re-ingesting all the existing files and data duplication.
+
+[source,yaml]
+----
+file_identity.fingerprint:
+	offset: 0
+  length: 1024
+----

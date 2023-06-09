@@ -18,10 +18,12 @@
 package filestream
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/urso/sderr"
+	"gotest.tools/gotestsum/log"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -83,7 +85,13 @@ func (p *fileProspector) Init(
 			return "", fm
 		}
 
-		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
+		src, err := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi})
+		if err != nil {
+			log.Debugf("cannot create identity for %q: %v", fm.Source, err)
+			return "", fm
+		}
+
+		newKey := newID(src)
 		return newKey, fm
 	})
 
@@ -115,7 +123,13 @@ func (p *fileProspector) Init(
 		}
 
 		if fm.IdentifierName != identifierName {
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
+			src, _ := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi})
+			if err != nil {
+				log.Debugf("cannot create identity for %q: %v", fm.Source, err)
+				return "", fm
+			}
+
+			newKey := src.Name()
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
@@ -152,7 +166,14 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 				return nil
 			}
 
-			src := p.identifier.GetSource(fe)
+			src, err := p.identifier.GetSource(fe)
+			if errors.Is(err, ErrFileSizeTooSmall) {
+				log.Debugf("cannot create identity for %q: %v", fe.NewPath, err)
+				continue
+			}
+			if err != nil {
+				return err
+			}
 			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
@@ -256,11 +277,16 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 	// if file_identity is based on path, the current reader has to be cancelled
 	// and a new one has to start.
 	if !p.identifier.Supports(trackRename) {
-		prevSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
+		prevSrc, err := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
+		if err != nil {
+			log.Debugf("cannot create identity for %q: %v", fe.OldPath, err)
+			return
+		}
+
 		hg.Stop(prevSrc)
 
 		log.Debugf("Remove state for file as file renamed and path file_identity is configured: %s", fe.OldPath)
-		err := s.Remove(prevSrc)
+		err = s.Remove(prevSrc)
 		if err != nil {
 			log.Errorf("Error while removing old state of renamed file (%s): %v", fe.OldPath, err)
 		}
@@ -285,7 +311,12 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 			log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
 
 			fe.Op = loginp.OpDelete
-			srcToClose := p.identifier.GetSource(fe)
+			srcToClose, err := p.identifier.GetSource(fe)
+			if err != nil {
+				log.Debugf("cannot create identity for %q: %v", fe.OldPath, err)
+				return
+			}
+
 			hg.Stop(srcToClose)
 		}
 	}

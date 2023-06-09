@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -36,21 +37,27 @@ const (
 	nativeName      = "native"
 	pathName        = "path"
 	inodeMarkerName = "inode_marker"
+	fingerprintName = "fingerprint"
 
 	DefaultIdentifierName = nativeName
 	identitySep           = "::"
+)
+
+var (
+	ErrFileSizeTooSmall = errors.New("file size is too small to compute the configured file identity")
 )
 
 var identifierFactories = map[string]identifierFactory{
 	nativeName:      newINodeDeviceIdentifier,
 	pathName:        newPathIdentifier,
 	inodeMarkerName: newINodeMarkerIdentifier,
+	fingerprintName: newFingerprintIdentifier,
 }
 
 type identifierFactory func(*conf.C) (fileIdentifier, error)
 
 type fileIdentifier interface {
-	GetSource(loginp.FSEvent) fileSource
+	GetSource(loginp.FSEvent) (fileSource, error)
 	Name() string
 	Supports(identifierFeature) bool
 }
@@ -64,13 +71,13 @@ type fileSource struct {
 	truncated bool
 	archived  bool
 
-	name                string
+	fileID              string
 	identifierGenerator string
 }
 
 // Name returns the registry identifier of the file.
 func (f fileSource) Name() string {
-	return f.name
+	return f.fileID
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
@@ -106,16 +113,16 @@ func newINodeDeviceIdentifier(_ *conf.C) (fileIdentifier, error) {
 	}, nil
 }
 
-func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
+func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) (fileSource, error) {
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
+		fileID:              i.name + identitySep + file.GetOSState(e.Info).String(),
 		identifierGenerator: i.name,
-	}
+	}, nil
 }
 
 func (i *inodeDeviceIdentifier) Name() string {
@@ -141,7 +148,7 @@ func newPathIdentifier(_ *conf.C) (fileIdentifier, error) {
 	}, nil
 }
 
-func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
+func (p *pathIdentifier) GetSource(e loginp.FSEvent) (fileSource, error) {
 	path := e.NewPath
 	if e.Op == loginp.OpDelete {
 		path = e.OldPath
@@ -152,9 +159,9 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                p.name + identitySep + path,
+		fileID:              p.name + identitySep + path,
 		identifierGenerator: p.name,
-	}
+	}, nil
 }
 
 func (p *pathIdentifier) Name() string {
@@ -177,10 +184,10 @@ func withSuffix(inner fileIdentifier, suffix string) fileIdentifier {
 	return &suffixIdentifier{i: inner, suffix: suffix}
 }
 
-func (s *suffixIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	fs := s.i.GetSource(e)
-	fs.name += "-" + s.suffix
-	return fs
+func (s *suffixIdentifier) GetSource(e loginp.FSEvent) (fileSource, error) {
+	fs, err := s.i.GetSource(e)
+	fs.fileID += "-" + s.suffix
+	return fs, err
 }
 
 func (s *suffixIdentifier) Name() string {

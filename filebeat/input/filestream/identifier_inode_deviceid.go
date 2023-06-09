@@ -92,7 +92,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 	return i.markerTxt
 }
 
-func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
+func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) (fileSource, error) {
 	osstate := file.GetOSState(e.Info)
 	return fileSource{
 		info:                e.Info,
@@ -100,9 +100,9 @@ func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
+		fileID:              i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
 		identifierGenerator: i.name,
-	}
+	}, nil
 }
 
 func (i *inodeMarkerIdentifier) Name() string {
