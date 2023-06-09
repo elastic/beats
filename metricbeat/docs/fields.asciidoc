@@ -1738,6 +1738,15 @@ type: keyword
 
 --
 
+*`aws.cloudwatch.period`*::
++
+--
+The period of the metric collected from CloudWatch dynamic label ${PROP('Period')}, in seconds.
+
+type: integer
+
+--
+
 [float]
 === dynamodb
 

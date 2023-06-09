@@ -8,3 +8,6 @@
       type: keyword
       description: >
         The namespace specified when query cloudwatch api.
+    - name: period
+      type: integer
+      description: The period of the metric collected from CloudWatch dynamic label ${PROP('Period')}, in seconds.

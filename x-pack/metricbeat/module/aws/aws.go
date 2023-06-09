@@ -99,6 +99,8 @@ var LabelConst = LabelConstants{
 	BillingDimensionStartIdx: 3,
 }
 
+const CloudWatchPeriodName = "aws.cloudwatch.period"
+
 func init() {
 	if err := mb.Registry.AddModule(ModuleName, newModule); err != nil {
 		panic(err)
@@ -275,7 +277,7 @@ func InitEvent(regionName string, accountName string, accountID string, timestam
 
 	period, err := strconv.Atoi(periodLabel)
 	if err == nil {
-		_, _ = event.RootFields.Put("aws.cloudwatch.period", period)
+		_, _ = event.RootFields.Put(CloudWatchPeriodName, period)
 	}
 	_, _ = event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {

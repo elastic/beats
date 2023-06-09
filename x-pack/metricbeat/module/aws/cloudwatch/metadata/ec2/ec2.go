@@ -14,13 +14,11 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const (
-	metadataPrefix       = "aws.ec2.instance."
-	cloudWatchPeriodName = "aws.cloudwatch.period"
-)
+const metadataPrefix = "aws.ec2.instance."
 
 // AddMetadata adds metadata for EC2 instances from a specific region
 func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
@@ -43,12 +41,11 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 		// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
 		// account and linked source accounts if include_linked_accounts is set to true
 		addHostFields(events[eventIdentifier], potentialInstanceID)
-		period, err := events[eventIdentifier].RootFields.GetValue(cloudWatchPeriodName)
+		period, err := events[eventIdentifier].RootFields.GetValue(aws.CloudWatchPeriodName)
 		if err != nil {
 			logger.Warnf("can't get period information for instance %s, skipping rate calculation", eventIdentifier)
 		} else {
 			calculateRate(events[eventIdentifier], period.(int))
-			_ = events[eventIdentifier].RootFields.Delete(cloudWatchPeriodName)
 		}
 
 		// add instance ID from dimension value
