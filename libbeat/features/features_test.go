@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
-	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/require"
 )
@@ -195,7 +194,7 @@ func TestFQDNWHileCallbackBlocked(t *testing.T) {
 	err := AddFQDNOnChangeCallback(func(new, old bool) {
 		willBlockChan <- struct{}{}
 		t.Logf("callback is currently blocked.")
-		_ = <-blockChan
+		<-blockChan
 		t.Logf("callback is unblocked.")
 
 	}, "test-TestFQDNWHileCallbackBlocked")
@@ -203,7 +202,7 @@ func TestFQDNWHileCallbackBlocked(t *testing.T) {
 
 	// Start with FQDN off
 	go func() {
-		err = UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		err = UpdateFromConfig(config.MustNewConfigFrom(map[string]interface{}{
 			"features.fqdn.enabled": true,
 		}))
 		unblockedChan <- struct{}{}
@@ -211,14 +210,14 @@ func TestFQDNWHileCallbackBlocked(t *testing.T) {
 
 	// callback should be blocking at this point
 	t.Logf("Waiting for callback to block...")
-	_ = <-willBlockChan
+	<-willBlockChan
 	whileBlocked := FQDN()
 	require.True(t, whileBlocked)
 
 	//now unblock
 	blockChan <- struct{}{}
 	t.Logf("Waiting for callback to unblock...")
-	_ = <-unblockedChan
+	<-unblockedChan
 	unblocked := FQDN()
 	require.True(t, unblocked)
 

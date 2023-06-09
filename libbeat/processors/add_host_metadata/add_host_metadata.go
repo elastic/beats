@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
@@ -93,7 +94,17 @@ func New(cfg *config.C) (beat.Processor, error) {
 		p.geoData = mapstr.M{"host": mapstr.M{"geo": geoFields}}
 	}
 
-	err := features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, processorName)
+	// create a unique ID for this instance of the processor
+	cbIDStr := ""
+	cbID, err := uuid.NewV4()
+	// if we fail, fall back to the processor name, hope for the best.
+	if err != nil {
+		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %w", err)
+		cbIDStr = processorName
+	} else {
+		cbIDStr = cbID.String()
+	}
+	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, cbIDStr)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"could not register callback for FQDN reporting onChange from %s processor: %w",
