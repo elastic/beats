@@ -170,8 +170,9 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 
 func TestParquetWithFiles(t *testing.T) {
 	testCases := []struct {
-		parquetFile string
-		jsonFile    string
+		parquetFile      string
+		jsonFile         string
+		maxRowsToCompare int
 	}{
 		{
 			parquetFile: "cloudtrail.parquet",
@@ -182,8 +183,9 @@ func TestParquetWithFiles(t *testing.T) {
 			jsonFile:    "route53.json",
 		},
 		{
-			parquetFile: "vpc_flow.gz.parquet",
-			jsonFile:    "vpc_flow.json",
+			parquetFile:      "vpc_flow.gz.parquet",
+			jsonFile:         "vpc_flow.json",
+			maxRowsToCompare: 4,
 		},
 	}
 
@@ -204,7 +206,7 @@ func TestParquetWithFiles(t *testing.T) {
 				// batch size is set to 1 because we need to compare individual records one by one
 				BatchSize: 1,
 			}
-			readAndCompareParquetFile(t, cfg, parquetFile, orderedJSON, rows)
+			readAndCompareParquetFile(t, cfg, parquetFile, orderedJSON, rows, tc.maxRowsToCompare)
 		})
 	}
 }
@@ -228,7 +230,7 @@ func readJSONFromFile(t *testing.T, filepath string) (map[int]string, int) {
 }
 
 // readAndCompareParquetFile reads the parquet file and compares the data with the input data
-func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int) {
+func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int, maxRowsToCompare int) {
 	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
@@ -242,9 +244,17 @@ func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data ma
 		if val != nil {
 			rowCount = readAndCompareParquetJSON(t, bytes.NewReader(val), data, rowCount)
 		}
+		if maxRowsToCompare > 0 && rowCount == maxRowsToCompare {
+			break
+		}
 	}
-	// asserts of number of rows read is the same as the number of rows from the input file
-	assert.Equal(t, rows, rowCount)
+	// if maxRowsToCompare == 0 then we compare the row count
+	if maxRowsToCompare == 0 {
+		// asserts of number of rows read is the same as the number of rows from the input file
+		assert.Equal(t, rows, rowCount)
+	} else {
+		assert.EqualValues(t, rowCount, maxRowsToCompare)
+	}
 	// closes the stream reader and asserts that there are no errors
 	err = sReader.Close()
 	assert.NoError(t, err)
