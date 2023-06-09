@@ -234,14 +234,18 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 }
 
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
-	var jsonObject map[string]json.RawMessage
-	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return err
-	}
+	// .[] signifies the root object is an array, and it should be split.
+	if key != ".[]" {
+		var jsonObject map[string]json.RawMessage
+		if err := json.Unmarshal(raw, &jsonObject); err != nil {
+			return err
+		}
 
-	raw, found := jsonObject[key]
-	if !found {
-		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		var found bool
+		raw, found = jsonObject[key]
+		if !found {
+			return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		}
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))

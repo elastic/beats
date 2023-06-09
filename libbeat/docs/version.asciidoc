@@ -1,5 +1,8 @@
 :stack-version: 8.9.0
 :doc-branch: main
+// FIXME: once elastic.co docs have been switched over to use `main`, remove
+// the `doc-site-branch` line below as well as any references to it in the code.
+:doc-site-branch: master
 :go-version: 1.19.9
 :release-state: unreleased
 :python: 3.7

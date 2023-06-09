@@ -156,7 +156,7 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 // addStaticCredentialsProviderToAwsConfig adds a static credentials provider to the current AWS config by using the keys stored in Beats config
 func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *awssdk.Config) {
 	logger := logp.NewLogger("addStaticCredentialsProviderToAwsConfig")
-	logger.Debug("Switching credentials provider to AssumeRoleProvider")
+	logger.Debug("Switching credentials provider to StaticCredentialsProvider")
 	staticCredentialsProvider := credentials.NewStaticCredentialsProvider(
 		beatsConfig.AccessKeyID,
 		beatsConfig.SecretAccessKey,
