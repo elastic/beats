@@ -44,6 +44,11 @@ packetbeat.interfaces.internal_networks:
 # The default is 30 MB.
 #packetbeat.interfaces.buffer_size_mb: 30
 
+# Set the polling frequency for interface metrics. This currently only applies
+# to the "afpacket" interface type.
+# The default is 5s (seconds).
+#packetbeat.interfaces.metrics_interval: 5s
+
 # Packetbeat automatically generates a BPF for capturing only the traffic on
 # ports where it expects to find known protocols. Use this settings to tell
 # Packetbeat to generate a BPF filter that accepts VLAN tags.
