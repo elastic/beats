@@ -591,7 +591,11 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	// reload the output configuration
 	if err := cm.reloadOutput(outputUnit); err != nil {
 		// Output creation failed, there is no point in going any further
-		// because there is no output to send data
+		// because there is no output read the events.
+		//
+		// Trying to start inputs will eventually lead them to deadlock
+		// waiting for the output. Log input will deadlock when starting,
+		// effectively blocking this manager.
 		err = fmt.Errorf("could not start output: %w", err)
 		outputUnit.UpdateState(client.UnitStateFailed, err.Error(), nil)
 		cm.status = lbmanagement.Failed
