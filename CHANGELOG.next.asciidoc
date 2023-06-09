@@ -220,7 +220,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix panic due to misrepresented buffer use. {pull}35437[35437]
 - Prevent panic on closing iterators on empty channels in experimental API. {issue}33966[33966] {pull}35423[35423]
 - Allow program termination when attempting to open an absent channel. {pull}35474[35474]
-- Close and Re-open EventLog if error EOF is encountered. {pull}XXXXX[XXXXX]
+- Close and reopen EventLog if error EOF is encountered. {pull}35662[35662]
 
 *Functionbeat*
 
