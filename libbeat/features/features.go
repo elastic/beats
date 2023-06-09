@@ -32,7 +32,11 @@ var (
 type boolValueOnChangeCallback func(new, old bool)
 
 type fflags struct {
-	mu sync.RWMutex
+	// controlls access to the callback hashmap
+	callbackMut sync.RWMutex
+
+	// controlls access to the fqdnEnabled var
+	stateMut sync.RWMutex
 
 	// TODO: Refactor to generalize for other feature flags
 	fqdnEnabled   bool
@@ -88,21 +92,25 @@ func UpdateFromConfig(c *conf.C) error {
 }
 
 func (f *fflags) SetFQDNEnabled(newValue bool) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
+	f.callbackMut.Lock()
+	defer f.callbackMut.Unlock()
 
+	f.stateMut.Lock()
 	oldValue := f.fqdnEnabled
 	f.fqdnEnabled = newValue
+	f.stateMut.Unlock()
+
 	for _, cb := range f.fqdnCallbacks {
 		cb(newValue, oldValue)
 	}
+
 }
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
 // If it hasn't been set by UpdateFromConfig or UpdateFromProto, it returns false.
 func FQDN() bool {
-	flags.mu.RLock()
-	defer flags.mu.RUnlock()
+	flags.stateMut.RLock()
+	defer flags.stateMut.RUnlock()
 	return flags.fqdnEnabled
 }
 
@@ -110,8 +118,8 @@ func FQDN() bool {
 // of `flags.fqdnEnabled` whenever it changes. It also takes a string ID - this is useful
 // in calling `RemoveFQDNOnChangeCallback` to de-register the callback.
 func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string) error {
-	flags.mu.Lock()
-	defer flags.mu.Unlock()
+	flags.callbackMut.Lock()
+	defer flags.callbackMut.Unlock()
 
 	// Initialize callbacks map if necessary.
 	if flags.fqdnCallbacks == nil {
@@ -126,8 +134,8 @@ func AddFQDNOnChangeCallback(cb boolValueOnChangeCallback, id string) error {
 // returned by `AddFQDNOnChangeCallback` so that function will be no longer be called when
 // `flags.fqdnEnabled` changes.
 func RemoveFQDNOnChangeCallback(id string) {
-	flags.mu.Lock()
-	defer flags.mu.Unlock()
+	flags.callbackMut.Lock()
+	defer flags.callbackMut.Unlock()
 
 	delete(flags.fqdnCallbacks, id)
 }
