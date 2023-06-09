@@ -177,11 +177,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		runOnce := func() {
-			bt.scheduler.WaitForRunOnce()
-			logp.L().Info("Ending run_once run")
-		}
-		waitMonitors.Add(runOnce)
+		waitMonitors.Add(withLog(bt.scheduler.WaitForRunOnce, "Ending run_once run."))
 	}
 
 	if b.Manager.Enabled() {
