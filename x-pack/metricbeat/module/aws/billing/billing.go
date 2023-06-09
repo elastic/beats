@@ -196,9 +196,9 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
 			event := mb.Event{}
 			if labels[aws.LabelConst.AccountIdIdx] != "" {
-				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], "")
 			} else {
-				event = aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+				event = aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], "")
 			}
 
 			_, _ = event.MetricSetFields.Put(labels[aws.LabelConst.MetricNameIdx], metricDataResultValue)
