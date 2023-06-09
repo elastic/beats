@@ -26,17 +26,33 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type PipelineClientWrapper struct {
+// Defines a synchronous pipeline wrapper interface
+type PipelineWrapper interface {
+	Wait()
+}
+
+type NoopPipelineWrapper struct {
+}
+
+// Noop
+func (n *NoopPipelineWrapper) Wait() {
+}
+
+// Pipeline wrapper that implements synchronous op. Calling Wait() on this client will block until all
+// events passed through this pipeline (and any of the linked clients) are ACKed, safe to use concurrently.
+type SyncPipelineWrapper struct {
 	wg  sync.WaitGroup
 	log *logp.Logger
 }
 
+// Used to wrap every client and track emmitted vs acked events.
 type wrappedClient struct {
 	wg     *sync.WaitGroup
 	client beat.Client
 }
 
-func withPipelineWrapper(pipeline beat.Pipeline, pw *PipelineClientWrapper) beat.Pipeline {
+// returns a new pipeline with the provided SyncPipelineClientWrapper.
+func withSyncPipelineWrapper(pipeline beat.Pipeline, pw *SyncPipelineWrapper) beat.Pipeline {
 	pipeline = pipetool.WithACKer(pipeline, acker.TrackingCounter(func(_, total int) {
 		pw.log.Debugf("ack callback receives with events count of %d", total)
 		pw.onACK(total)
@@ -66,11 +82,11 @@ func (c *wrappedClient) Close() error {
 	return c.client.Close()
 }
 
-// Wait waits until we received a ACK for every events that were sent
-func (s *PipelineClientWrapper) Wait() {
+// waits until ACK is received for every event that was sent
+func (s *SyncPipelineWrapper) Wait() {
 	s.wg.Wait()
 }
 
-func (s *PipelineClientWrapper) onACK(n int) {
+func (s *SyncPipelineWrapper) onACK(n int) {
 	s.wg.Add(-1 * n)
 }

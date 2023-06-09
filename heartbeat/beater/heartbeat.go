@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -59,7 +58,6 @@ type Heartbeat struct {
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
-	pipeline           beat.Pipeline
 }
 
 // New creates a new heartbeat.
@@ -118,9 +116,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
-	pipelineClientFactory := func(p beat.Pipeline) (pipeline.ISyncClient, error) {
-		client, err := p.Connect()
-		return monitors.SyncPipelineClientAdaptor{C: client}, err
+	pipelineClientFactory := func(p beat.Pipeline) (beat.Client, error) {
+		return p.Connect()
 	}
 
 	bt := &Heartbeat{
@@ -138,8 +135,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
-		trace:    trace,
-		pipeline: b.Publisher,
+		trace: trace,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
@@ -154,23 +150,27 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.trace.Start()
 	defer bt.trace.Close()
 
-	waitMonitors := newSignalWait()
-	waitPublished := newSignalWait()
-	defer waitPublished.Wait()
-
-	pipelineWrapper := &PipelineClientWrapper{log: logp.L().Named("run_once pipeline wrapper")}
+	// Adapt local pipeline to synchronized mode if run_once is enabled,
+	// Otherwise, pipeline is unchange
+	pipeline := b.Publisher
+	var pipelineWrapper PipelineWrapper = &NoopPipelineWrapper{}
 	if bt.config.RunOnce {
-		bt.pipeline = withPipelineWrapper(bt.pipeline, pipelineWrapper)
+		sync := &SyncPipelineWrapper{log: logp.L().Named("run_once pipeline wrapper")}
+
+		pipeline = withSyncPipelineWrapper(pipeline, sync)
+		pipelineWrapper = sync
 	}
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
+	waitMonitors := newSignalWait()
+
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
 	// dynamic types.
-	stopStaticMonitors, err := bt.RunStaticMonitors(b)
+	stopStaticMonitors, err := bt.RunStaticMonitors(b, pipeline)
 	if err != nil {
 		return err
 	}
@@ -220,29 +220,30 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	waitMonitors.AddChan(bt.done)
 	waitMonitors.Wait()
 
-	// Checks if on shutdown it should wait for all events to be published
-	if bt.config.RunOnce {
-		waitPublished.Add(withLog(pipelineWrapper.Wait,
-			// Wait for either timeout or all events having been ACKed by outputs.
-			"Continue shutdown: All enqueued events being published."))
-		if bt.config.RunOnceTimeout > 0 {
-			logp.Info("Shutdown output timer started. Waiting for max %v.", bt.config.RunOnceTimeout)
-			waitPublished.Add(withLog(waitDuration(bt.config.RunOnceTimeout),
-				"Continue shutdown: Time out waiting for events being published."))
-		}
-	} else {
-		waitPublished.AddChan(bt.done)
+	logp.L().Info("Shutting down, waiting for output to complete")
+
+	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
+	// located _after_ b.Manager.Stop() or else it will exit early
+	waitPublished := newSignalWait()
+	defer waitPublished.Wait()
+
+	// Three possible events: global beat, run_once pipeline done and publish timeout
+	waitPublished.AddChan(bt.done)
+	waitPublished.Add(withLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
+	if bt.config.PublishTimeout > 0 {
+		logp.Info("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
+		waitPublished.Add(withLog(waitDuration(bt.config.PublishTimeout),
+			"shutdown: time out waiting for pipeline to publish events."))
 	}
 
-	logp.L().Info("Shutting down.")
 	return nil
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
+func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.monitorFactory.Create(bt.pipeline, cfg)
+		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				logp.L().Info("skipping disabled monitor: %s", err)

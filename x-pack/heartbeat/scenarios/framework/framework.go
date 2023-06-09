@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -271,9 +270,8 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 			AddTask:     sched.Add,
 			StateLoader: stateLoader,
 			PluginsReg:  plugin.GlobalPluginsReg,
-			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-				c, _ := pipeline.Connect()
-				return monitors.SyncPipelineClientAdaptor{C: c}, nil
+			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
+				return pipeline.Connect()
 			},
 			BeatRunFrom: location,
 		}),
