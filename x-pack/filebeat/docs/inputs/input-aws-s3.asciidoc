@@ -120,8 +120,8 @@ characters. This only applies to non-JSON logs. See <<_encoding_3>>.
 ==== `expand_event_list_from_field`
 
 If the fileset using this input expects to receive multiple messages bundled
-under a specific field then the config option `expand_event_list_from_field`
-value can be assigned the name of the field. This setting will be able to split
+under a specific field or an array of objects then the config option `expand_event_list_from_field`
+value can be assigned the name of the field or `.[]`. This setting will be able to split
 the messages under the group value into separate events. For example, CloudTrail
 logs are in JSON format and events are found under the JSON object "Records".
 
@@ -143,6 +143,23 @@ logs are in JSON format and events are found under the JSON object "Records".
         }
     ]
 }
+----
+
+Or when `expand_event_list_from_field` is set to `.[]`, an array of objects will be split
+into separate events.
+
+["source","json"]
+----
+[
+   {
+      "id":"1234",
+      "message":"success"
+   },
+   {
+      "id":"5678",
+      "message":"failure"
+   }
+]
 ----
 
 Note: When `expand_event_list_from_field` parameter is given in the config,
@@ -256,6 +273,12 @@ configuring multiline options.
 ==== `queue_url`
 
 URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `non_aws_bucket_name` are not set).
+
+[float]
+==== `region`
+
+The name of the AWS region of the end point. If this option is given it
+takes precedence over the region name obtained from the `queue_url` value.
 
 [float]
 ==== `visibility_timeout`

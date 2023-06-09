@@ -159,6 +159,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add logging of metric registration in inputmon. {pull}35647[35647]
 - Add Okta API package for entity analytics. {pull}35478[35478]
 - Add benchmarking to HTTPJSON input testing. {pull}35138[35138]
+- Allow non-AWS endpoints for testing Filebeat awss3 input. {issue}35496[35496] {pull}35520[35520]
 
 ==== Deprecated
 
