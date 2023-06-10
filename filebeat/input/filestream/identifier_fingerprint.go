@@ -69,6 +69,7 @@ func (i *fingerprintIdentifier) getFingerprint(filename string) (fingerprint str
 	if err != nil {
 		return "", fmt.Errorf("failed to open %q for fingerprinting: %w", filename, err)
 	}
+	defer file.Close()
 
 	if i.cfg.Offset != 0 {
 		_, err = file.Seek(i.cfg.Offset, io.SeekStart)
