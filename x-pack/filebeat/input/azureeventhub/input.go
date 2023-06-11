@@ -28,22 +28,7 @@ import (
 const (
 	eventHubConnector        = ";EntityPath="
 	expandEventListFromField = "records"
-)
-
-// azureInput struct for the azure-eventhub input
-type azureInput struct {
-	config       azureInputConfig // azure-eventhub configuration
-	context      input.Context
-	outlet       channel.Outleter
-	log          *logp.Logger            // logging info and error messages
-	workerCtx    context.Context         // worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc      // used to signal that the worker should stop.
-	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
-	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
-}
-
-const (
-	inputName = "azure-eventhub"
+	inputName                = "azure-eventhub"
 )
 
 func init() {
@@ -51,6 +36,19 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
+}
+
+// azureInput struct for the azure-eventhub input
+type azureInput struct {
+	config       azureInputConfig // azure-eventhub configuration
+	metrics      *inputMetrics    // metrics for the input
+	context      input.Context
+	outlet       channel.Outleter
+	log          *logp.Logger            // logging info and error messages
+	workerCtx    context.Context         // worker goroutine context. It's cancelled when the input stops or the worker exits.
+	workerCancel context.CancelFunc      // used to signal that the worker should stop.
+	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
+	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 }
 
 // NewInput creates a new azure-eventhub input
@@ -77,8 +75,12 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	in := &azureInput{
+	// Create the input metrics
+	inputMetrics := newInputMetrics("") // TODO: learn how to set the ID on a v1 input
+
+	in := azureInput{
 		config:       config,
+		metrics:      inputMetrics,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", stripConnectionString(config.ConnectionString)),
 		context:      inputContext,
 		workerCtx:    workerCtx,
@@ -90,7 +92,8 @@ func NewInput(
 	}
 	in.outlet = out
 	in.log.Infof("Initialized %s input.", inputName)
-	return in, nil
+
+	return &in, nil
 }
 
 // Run starts the `azure-eventhub` input and then returns.
@@ -126,6 +129,9 @@ func (a *azureInput) Stop() {
 		}
 	}
 
+	// When the input stops we should unregister the metrics.
+	a.metrics.unregister()
+
 	a.workerCancel()
 }
 
@@ -135,35 +141,48 @@ func (a *azureInput) Wait() {
 }
 
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
-	timestamp := time.Now()
+	processingStartTime := time.Now()
 	azure := mapstr.M{
 		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
 		//"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
-	messages := a.parseMultipleMessages(event.Data)
-	for _, msg := range messages {
+
+	// update the input metrics
+	a.metrics.eventsReceived.Inc()
+
+	records := a.parseMultipleRecords(event.Data)
+
+	for _, record := range records {
 		_, _ = azure.Put("offset", event.SystemProperties.Offset)
 		_, _ = azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
 		_, _ = azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		ok := a.outlet.OnEvent(beat.Event{
-			Timestamp: timestamp,
+			// this is the default value for the @timestamp field; usually the ingest
+			// pipeline replaces it with a value in the payload.
+			Timestamp: processingStartTime,
 			Fields: mapstr.M{
-				"message": msg,
+				"message": record,
 				"azure":   azure,
 			},
 			Private: event.Data,
 		})
 		if !ok {
+			a.metrics.eventsProcessingTime.Update(time.Since(processingStartTime).Nanoseconds())
 			return ok
 		}
+
+		a.metrics.recordsProcessed.Inc()
 	}
+
+	a.metrics.eventsProcessed.Inc()
+	a.metrics.eventsProcessingTime.Update(time.Since(processingStartTime).Nanoseconds())
 	return true
 }
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
+func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
 
@@ -173,6 +192,7 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
 	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
 		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+		a.metrics.eventsSanitized.Inc()
 	}
 
 	// check if the message is a "records" object containing a list of events
@@ -183,8 +203,10 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 				js, err := json.Marshal(ms)
 				if err == nil {
 					messages = append(messages, string(js))
+					a.metrics.recordsReceived.Inc()
 				} else {
 					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+					a.metrics.recordsSerializationFailed.Inc()
 				}
 			}
 		}
@@ -196,17 +218,22 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 		if err != nil {
 			// return entire message
 			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			a.metrics.eventsDeserializationFailed.Inc()
 			return []string{string(bMessage)}
 		}
+
 		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))
+				a.metrics.recordsReceived.Inc()
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+				a.metrics.recordsSerializationFailed.Inc()
 			}
 		}
 	}
+
 	return messages
 }
 
