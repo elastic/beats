@@ -8,10 +8,11 @@
 package azureeventhub
 
 import (
+	"github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/rcrowley/go-metrics"
 )
 
 // newInputMetrics creates a new `*inputMetrics` to track metrics for this input.
@@ -38,7 +39,6 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 
 // inputMetrics tracks metrics for this input.
 type inputMetrics struct {
-	registry *monitoring.Registry
 	// unregister is the cancel function to call when the input is
 	// stopped.
 	unregister func()

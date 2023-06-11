@@ -194,4 +194,3 @@ func (o *stubOutleter) OnEvent(event beat.Event) bool {
 	o.cond.Broadcast()
 	return o.done
 }
-
