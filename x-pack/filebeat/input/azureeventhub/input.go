@@ -76,7 +76,7 @@ func NewInput(
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
 	// Create the input metrics
-	inputMetrics := newInputMetrics("") // TODO: learn how to set the ID on a v1 input
+	inputMetrics := newInputMetrics("", nil) // TODO: learn how to set the ID on a v1 input
 
 	in := azureInput{
 		config:       config,
@@ -129,8 +129,8 @@ func (a *azureInput) Stop() {
 		}
 	}
 
-	// When the input stops we should unregister the metrics.
-	a.metrics.unregister()
+	// When the input stops we should tear down the metrics machinery.
+	a.metrics.Close()
 
 	a.workerCancel()
 }
@@ -169,6 +169,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 			Private: event.Data,
 		})
 		if !ok {
+			a.metrics.recordsDispatchFailed.Inc()
 			a.metrics.eventsProcessingTime.Update(time.Since(processingStartTime).Nanoseconds())
 			return ok
 		}

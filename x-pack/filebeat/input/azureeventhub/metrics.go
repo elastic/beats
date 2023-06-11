@@ -15,8 +15,8 @@ import (
 )
 
 // newInputMetrics creates a new `*inputMetrics` to track metrics for this input.
-func newInputMetrics(id string) *inputMetrics {
-	reg, unregister := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
+	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
 	inputMetrics := inputMetrics{
 		unregister:                  unregister,
 		eventsReceived:              monitoring.NewUint(reg, "events_received_total"),
@@ -26,6 +26,7 @@ func newInputMetrics(id string) *inputMetrics {
 		eventsProcessingTime:        metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
 		recordsReceived:             monitoring.NewUint(reg, "records_received_total"),
 		recordsSerializationFailed:  monitoring.NewUint(reg, "records_serializaion_failed_total"),
+		recordsDispatchFailed:       monitoring.NewUint(reg, "records_dispatch_failed_total"),
 		recordsProcessed:            monitoring.NewUint(reg, "records_processed_total"),
 	}
 	_ = adapter.
@@ -37,6 +38,7 @@ func newInputMetrics(id string) *inputMetrics {
 
 // inputMetrics tracks metrics for this input.
 type inputMetrics struct {
+	registry *monitoring.Registry
 	// unregister is the cancel function to call when the input is
 	// stopped.
 	unregister func()
@@ -48,5 +50,11 @@ type inputMetrics struct {
 	eventsProcessingTime        metrics.Sample   // eventsProcessingTime tracks the time it takes to process an event.
 	recordsReceived             *monitoring.Uint // recordsReceived tracks the number of records received (events successfully deserialized into records).
 	recordsSerializationFailed  *monitoring.Uint // recordsSerializationFailed tracks the number of records that failed to serialize.
+	recordsDispatchFailed       *monitoring.Uint // recordsDispatchFailed tracks the number of records that failed to dispatch.
 	recordsProcessed            *monitoring.Uint // recordsProcessed tracks the number of records that were processed successfully.
+}
+
+// Close removes the metrics from the registry.
+func (m *inputMetrics) Close() {
+	m.unregister()
 }
