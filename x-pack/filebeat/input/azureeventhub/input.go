@@ -182,7 +182,7 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 	return true
 }
 
-// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
+// parseMultipleRecords will try to split the message into multiple ones based on the group field provided by the configuration
 func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string

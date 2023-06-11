@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
-// newInputMetrics creates a new `*inputMetrics` to track metrics for this input.
+// newInputMetrics creates a new `*inputMetrics` to track metrics.
 func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
 	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
 	inputMetrics := inputMetrics{
@@ -26,7 +26,7 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 		eventsProcessed:             monitoring.NewUint(reg, "events_processed_failed_total"),
 		eventsProcessingTime:        metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
 		recordsReceived:             monitoring.NewUint(reg, "records_received_total"),
-		recordsSerializationFailed:  monitoring.NewUint(reg, "records_serializaion_failed_total"),
+		recordsSerializationFailed:  monitoring.NewUint(reg, "records_serialization_failed_total"),
 		recordsDispatchFailed:       monitoring.NewUint(reg, "records_dispatch_failed_total"),
 		recordsProcessed:            monitoring.NewUint(reg, "records_processed_total"),
 	}
