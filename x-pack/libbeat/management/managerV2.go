@@ -602,6 +602,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 		cm.message = err.Error()
 
 		// If there are any other errors, set the status accordingly.
+		// If len(errs), then the there were no previous and the only
+		// error has been reported already.
 		if len(errs) > 0 {
 			errs = append(errs, err)
 			cm.message = fmt.Sprintf("%s", errs)

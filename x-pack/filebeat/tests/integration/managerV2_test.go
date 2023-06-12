@@ -46,17 +46,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// We create our own temp dir so the files can be persisted
 	// in case the test fails. This will help debugging issues
 	// locally and on CI.
-	//
-	// testSucceeded will be set to 'true' as the very last thing on this test,
-	// it allows us to use t.CleanUp to remove the temporary files
-	testSucceeded := false
-	tempDir, cleanup := createTempDir(t)
-
-	t.Cleanup(func() {
-		if testSucceeded {
-			cleanup()
-		}
-	})
+	tempDir := createTempDir(t)
 
 	logFilePath := filepath.Join(tempDir, "flog.log")
 	generateLogFile(t, logFilePath)
@@ -262,9 +252,6 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		return filebeat.LogContains("ForceReload set to FALSE")
 	}, waitDeadlineOr5Min(), 100*time.Millisecond,
 		"String 'ForceReload set to FALSE' not found on Filebeat logs")
-
-	// Set it to true, so the temporary directory is removed
-	testSucceeded = true
 }
 
 // TestFailedOutputReportsUnhealthy ensures that if an output
@@ -277,15 +264,8 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	// what caused it is going through Filebeat's logs.
 	ensureESIsRunning(t)
 
-	tempDir, cleanup := createTempDir(t)
+	tempDir := createTempDir(t)
 	finalStateReached := false
-	testSucceeded := false
-
-	t.Cleanup(func() {
-		if testSucceeded {
-			cleanup()
-		}
-	})
 
 	var units = []*proto.UnitExpected{
 		{
@@ -367,7 +347,6 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
 
 	t.Cleanup(server.Stop)
-	testSucceeded = true
 }
 
 func requireNewStruct(t *testing.T, v map[string]interface{}) *structpb.Struct {

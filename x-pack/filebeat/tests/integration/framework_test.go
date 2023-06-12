@@ -135,16 +135,14 @@ func (b *BeatProc) openLogFile() *os.File {
 	return f
 }
 
-// createTempDir creates a temporary directory that can persist
-// after the test finishes.
+// createTempDir creates a temporary directory that will be
+// removed after the tests passes.
+//
+// If the test fails, the temporary directory is not removed.
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-//
-// Call the returned cleanup function to remove
-// the temporary directory. If there are any errors
-// cleanup will call t.Error
-func createTempDir(t *testing.T) (string, func()) {
+func createTempDir(t *testing.T) string {
 	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
 		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
 	if err != nil {
@@ -157,11 +155,14 @@ func createTempDir(t *testing.T) (string, func()) {
 	t.Logf("Temporary directory: %s", tempDir)
 
 	cleanup := func() {
-		if err := os.RemoveAll(tempDir); err != nil {
-			t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+		if !t.Failed() {
+			if err := os.RemoveAll(tempDir); err != nil {
+				t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+			}
+			t.Logf("Temporary directory '%s' removed", tempDir)
 		}
-		t.Logf("Temporary directory '%s' removed", tempDir)
 	}
+	t.Cleanup(cleanup)
 
-	return tempDir, cleanup
+	return tempDir
 }
