@@ -94,8 +94,28 @@ func (p *Project) Close() error {
 	return nil
 }
 
+var blocklist = map[string]interface{}{
+	"--pause-on-error":  0,
+	"--quiet-exit-code": 0,
+	"--dry-run":         0,
+	"--outfd":           1,
+	"--sandbox":         0,
+	"--reporter":        1,
+	"-V":                0,
+	"--version":         0,
+	"-h":                0,
+	"--help":            0,
+}
+
 func (p *Project) extraArgs() []string {
-	extraArgs := p.projectCfg.SyntheticsArgs
+	extraArgs := []string{}
+
+	for _, arg := range p.projectCfg.SyntheticsArgs {
+		if _, ok := blocklist[arg]; ok {
+			extraArgs = append(extraArgs, arg)
+		}
+	}
+
 	if len(p.projectCfg.PlaywrightOpts) > 0 {
 		s, err := json.Marshal(p.projectCfg.PlaywrightOpts)
 		if err != nil {
