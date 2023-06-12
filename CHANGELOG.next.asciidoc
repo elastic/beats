@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
+- Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 
