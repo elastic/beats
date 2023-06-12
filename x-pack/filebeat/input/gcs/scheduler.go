@@ -87,7 +87,7 @@ func (l *limiter) release() {
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
-	pager := s.fetchObjectPager(ctx, *s.cfg.MaxWorkers)
+	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
 	var numObs, numJobs int
 	for {
 		var objects []*storage.ObjectAttrs
