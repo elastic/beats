@@ -933,7 +933,7 @@ filebeat.inputs:
   # List of hosts to pool to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
-  # How often do the input checks for redis slow log.
+  # How often the input checks for redis slow log.
   #scan_frequency: 10s
 
   # Timeout after which time the input should return an error
