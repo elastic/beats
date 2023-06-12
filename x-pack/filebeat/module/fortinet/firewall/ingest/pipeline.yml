@@ -7,14 +7,51 @@ processors:
     field: message
     patterns:
     - '%{SYSLOG5424PRI}%{GREEDYDATA:syslog5424_sd}$'
-- kv:
-    field: syslog5424_sd
-    field_split: \s+(?=(?:[^"]*"[^"]*")*[^"]*$)
-    value_split: '='
-    prefix: "fortinet.firewall."
-    ignore_missing: true
-    ignore_failure: false
-    trim_value: "\""
+- script:
+    lang: painless
+    if: ctx.syslog5424_sd != null
+    description: |
+      Splits syslog5424_sd KV list by space and then each by "=" taking into account quoted values.
+    source:
+      def splitUnquoted(String input, String sep) {
+        def tokens = [];
+        def startPosition = 0;
+        def isInQuotes = false;
+        char quote = (char)"\"";
+        for (def currentPosition = 0; currentPosition < input.length(); currentPosition++) {
+            if (input.charAt(currentPosition) == quote) {
+                isInQuotes = !isInQuotes;
+            }
+            else if (input.charAt(currentPosition) == (char)sep && !isInQuotes) {
+                def token = input.substring(startPosition, currentPosition).trim();
+                if (!token.equals("")) {
+                  tokens.add(token);
+                }
+                startPosition = currentPosition + 1;
+            }
+        }
+
+        def lastToken = input.substring(startPosition);
+        if (!lastToken.equals(sep) && !lastToken.equals("")) {
+            tokens.add(lastToken.trim());
+        }
+        return tokens;
+      }
+
+      def arr = splitUnquoted(ctx.syslog5424_sd, " ");
+
+      Map map = new HashMap();
+      Pattern pattern = /^\"|\"$/;
+      for (def i = 0; i < arr?.length; i++) {
+        def kv = splitUnquoted(arr[i], "=");
+        if (kv.length == 2) {
+          map[kv[0]] = pattern.matcher(kv[1]).replaceAll("");
+        }
+      }
+      if (ctx.fortinet == null) {
+        ctx.fortinet = new HashMap();
+      }
+      ctx.fortinet.firewall = map;
 - script:
     lang: painless
     source: |
