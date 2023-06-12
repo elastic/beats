@@ -21,6 +21,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
 const testPluginName = "my_test_plugin"
@@ -70,7 +76,7 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}
 }
 
-func TestSourceIdentifier_MachesInput(t *testing.T) {
+func TestSourceIdentifier_MatchesInput(t *testing.T) {
 	testCases := map[string]struct {
 		userID      string
 		matchingIDs []string
@@ -108,8 +114,7 @@ func TestSourceIdentifier_MachesInput(t *testing.T) {
 	}
 }
 
-func TestSourceIdentifier_NotMachesInput(t *testing.T) {
-
+func TestSourceIdentifier_NotMatchesInput(t *testing.T) {
 	testCases := map[string]struct {
 		userID         string
 		notMatchingIDs []string
@@ -159,4 +164,41 @@ func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
 	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
 	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
 	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
+}
+
+func TestInputManager_Create(t *testing.T) {
+	t.Run("Checking config does not print duplicated id warning",
+		func(t *testing.T) {
+			storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+			testStore, err := storeReg.Get("test")
+			require.NoError(t, err)
+
+			log, obs := logp.NewTesting("TestInputManager_Create")
+
+			cim := &InputManager{
+				Logger:     log,
+				StateStore: testStateStore{Store: testStore},
+				Configure: func(_ *common.Config) (Prospector, Harvester, error) {
+					return nil, nil, nil
+				}}
+			cfg, err := common.NewConfigFrom("id: my-id")
+			require.NoError(t, err)
+
+			_, err = cim.Create(cfg)
+			require.ErrorIs(t, err, errNoInputRunner)
+			err = cim.Delete(cfg)
+			require.NoError(t, err)
+
+			// Create again to ensure now warning regarding duplicated ID will
+			// be logged.
+			_, err = cim.Create(cfg)
+			require.ErrorIs(t, err, errNoInputRunner)
+			err = cim.Delete(cfg)
+			require.NoError(t, err)
+
+			for _, l := range obs.All() {
+				assert.NotContains(t, l.Message, "filestream input with ID")
+				assert.NotContains(t, l.Message, "already exists")
+			}
+		})
 }
