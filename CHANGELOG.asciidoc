@@ -3,6 +3,124 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.8.1]]
+=== Beats version 8.8.1
+https://github.com/elastic/beats/compare/v8.8.0\...v8.8.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- 'add_cloud_metadata' processor: add `cloud.region` field for GCE cloud provider
+- 'add_cloud_metadata' processor: update Azure metadata API version to get missing `cloud.account.id` field
+
+*Filebeat*
+
+- Fix "Can only start an input when all related states are finished" error when running under Elastic Agent {pull}35250[35250] {issue}33653[33653]
+- [system] Sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
+- Fix error when trying to use `include_message` parser {issue}35440[35440]
+
+==== Added
+
+*Filebeat*
+
+- Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
+
+*Auditbeat*
+- Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
+
+*Metricbeat*
+
+- Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
+- Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
+
+
+[[release-notes-8.8.0]]
+=== Beats version 8.8.0
+https://github.com/elastic/beats/compare/v8.7.1...v8.8.0[View commits]
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
+- `add_cloud_metadata` processor: Add `cloud.region` field for GCE cloud provider.
+- `add_cloud_metadata` processor: Update Azure metadata API version to get missing `cloud.account.id` field.
+
+*Filebeat*
+- [GCS Input] Added missing locks for safe concurrency. {pull}34914[34914]
+- Fix the `ignore_inactive` option being ignored in Filebeat's filestream input. {pull}34770[34770]
+- Add input instance ID to request trace filename for httpjson and cel inputs. {pull}35024[35024]
+- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
+- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
+- Fix the grok expression outputs of log files. {pull}35221[35221]
+- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
+- Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
+
+*Heartbeat*
+
+- Fix panics when parsing when HTTP URL is not parseable. {pull}34702[34702]
+- Fix broken state ID location naming. {pull}35336[35336]
+- Fix project monitor temp directories permission to include group access. {pull}35398[35398]
+- Fix output pipeline exit on `run_once`. {pull}35376[35376]
+- Fix formatting issue with socket trace timeout. {pull}35434[35434]
+
+*Metricbeat*
+
+- Make generic SQL GA. {pull}34637[34637]
+- Collect missing `remote_cluster` in Elasticsearch CCR metricset. {pull}34957[34957]
+- Add context with timeout in AWS API calls. {pull}35425[35425]
+
+*Osquerybeat*
+
+- Adds the `elastic_file_analysis` table to the Osquery extension for macOS builds. {pull}35056[35056]
+
+*Packetbeat*
+
+- Fix BPF filter setting not being applied to sniffers. {issue}35363[35363] {pull}35484[35484]
+
+*Winlogbeat*
+
+- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
+- Fix panic due to misrepresented buffer use. {pull}35437[35437]
+- Allow program termination when attempting to open an absent channel. {pull}35474[35474]
+
+==== Added
+
+*Filebeat*
+
+- Add metric `sqs_messages_waiting_gauge` for aws-s3 input. {pull}34488[34488]
+- Add support for Okta debug attributes, `risk_reasons`, `risk_behaviors` and `factor`. {issue}33677[33677] {pull}34508[34508]
+- Add `nginx.ingress_controller.upstream.ip` to `related.ip` {issue}34645[34645] {pull}34672[34672]
+- Include NAT and firewall IPs in `related.ip` in Fortinet Firewall module. {issue}34640[34640] {pull}34673[34673]
+- Add UNIX socket log parsing for NGINX `ingress_controller`. {pull}34732[34732]
+- Add metric `sqs_worker_utilization` for aws-s3 input. {pull}34793[34793]
+- Register MIME handlers for CSV types in CEL input. {pull}34934[34934]
+- Add MySQL authentication message parsing and `related.ip` and `related.user` fields. {pull}34810[34810]
+- Mention `mito` CEL tool in CEL input docs. {pull}34959[34959]
+- Add nginx ingress_controller parsing if one of upstreams fails to return response. {pull}34787[34787]
+- Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
+- Add support for collecting IPv6 metrics. {pull}35123[35123]
+- Add Oracle authentication messages parsing {pull}35127[35127]
+
+*Heartbeat*
+- Add status to monitor run log report.
+- Remov Beta label for browser monitors. {pull}35424[35424].
+
+*Metricbeat*
+
+- Add GCP Carbon Footprint metricbeat data. {pull}34820[34820]
+- Add event loop utilization metric to Kibana module. {pull}35020[35020]
+
+*Winlogbeat*
+
+- Add `event.category` and `event.type` to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255. {pull}35193[35193]
+
 [[release-notes-8.7.1]]
 === Beats version 8.7.1
 https://github.com/elastic/beats/compare/v8.7.0\...v8.7.1[View commits]
@@ -123,6 +241,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
 
 *Heartbeat*
+
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
 
 - Remove host and port matching restrictions on hint-generated monitors. {pull}34376[34376]
@@ -152,6 +271,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 [[release-notes-8.6.2]]
 === Beats version 8.6.2
 https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
+
 
 ==== Bugfixes
 
@@ -199,9 +319,11 @@ https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
 
 ==== Added
 
+
 *Filebeat*
 
 - Added support for HTTP destination override to Google Cloud Storage input. {pull}34413[34413]
+
 
 [[release-notes-8.6.1]]
 === Beats version 8.6.1
@@ -9537,7 +9659,7 @@ https://github.com/elastic/beats/compare/1.0.0-beta3\...1.0.0-beta4[Check
 - Add tls configuration support to elasticsearch and logstash outputers #139
 - All external dependencies were updated to the latest version. Update to Golang 1.5.1 #162
 - Guarantee ES index is based in UTC time zone #164
-- Cache: optional per element timeout #144
+- Cache: optional per element timeout #144
 - Make it possible to set hosts in different ways. #135
 - Expose more TLS config options #124
 - Use the Beat name in the default configuration file path #99
@@ -9577,3 +9699,4 @@ https://github.com/elastic/beats/compare/1.0.0-beta3\...1.0.0-beta4[Check
 - Redis output was deprecated #169 #145
 - Host and port configuration options are deprecated. They are replaced by the hosts
  configuration option. #141
+

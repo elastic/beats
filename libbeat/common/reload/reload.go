@@ -41,6 +41,9 @@ type ConfigWithMeta struct {
 
 	// Meta data related to this config
 	Meta *mapstr.Pointer
+
+	// DiagCallback is a diagnostic handler associated with the underlying unit that maps to the config
+	DiagCallback DiagnosticHandler
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities
@@ -55,6 +58,12 @@ type Reloadable interface {
 
 // ReloadableFunc wraps a custom function in order to implement the Reloadable interface.
 type ReloadableFunc func(config *ConfigWithMeta) error
+
+// DiagnosticHandler is an interface used to register diagnostic callbacks with the central management system
+// This mostly exists to wrap the unit RegisterDiagnostic method
+type DiagnosticHandler interface {
+	Register(name string, description string, filename string, contentType string, callback func() []byte)
+}
 
 // Registry of reloadable objects and lists
 type Registry struct {
