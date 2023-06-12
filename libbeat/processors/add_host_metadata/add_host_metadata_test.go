@@ -540,8 +540,8 @@ func TestFQDNLookup(t *testing.T) {
 		expectedFQDNLookupFailedCount int64
 	}{
 		"lookup_succeeds": {
-			cnameLookupResult:             "foo.bar.baz.",
-			expectedHostName:              "foo.bar.baz",
+			cnameLookupResult:             "example.com.",
+			expectedHostName:              "example.com",
 			expectedFQDNLookupFailedCount: 0,
 		},
 		"lookup_fails": {
@@ -585,6 +585,8 @@ func TestFQDNLookup(t *testing.T) {
 			addHostMetadataP, ok := p.(*addHostMetadata)
 			require.True(t, ok)
 			require.Equal(t, test.expectedFQDNLookupFailedCount, addHostMetadataP.metrics.FQDNLookupFailed.Get())
+			// reset so next run is correct, registry is global
+			addHostMetadataP.metrics.FQDNLookupFailed.Set(0)
 
 			// Run event through processor and check that hostname reported
 			// by processor is same as OS-reported hostname

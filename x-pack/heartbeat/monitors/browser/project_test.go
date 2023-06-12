@@ -44,19 +44,8 @@ func TestValidLocal(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewProject(cfg)
-	require.NoError(t, e)
-	require.NotNil(t, s)
-
-	source.GoOffline()
-	defer source.GoOnline()
-	require.NoError(t, s.Fetch())
-	defer require.NoError(t, s.Close())
-	require.Regexp(t, "\\w{1,}", s.Workdir())
-	require.Equal(t, testParams, s.Params())
-
-	e = s.Close()
-	require.NoError(t, e)
+	_, e := NewProject(cfg)
+	require.Error(t, e)
 }
 
 func TestValidInline(t *testing.T) {

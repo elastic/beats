@@ -1,4 +1,4 @@
-BEAT_VERSION ?= 8.5.0
+BEAT_VERSION ?= 8.9.0
 LOCATION := ../build/heartbeat-ironbank-$(BEAT_VERSION)-docker-build-context
 
 YQ_VERSION ?= v4.13.2

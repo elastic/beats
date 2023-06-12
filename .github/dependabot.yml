@@ -1,0 +1,64 @@
+---
+version: 2
+# This section is segmented by the responsible GitHub teams in order
+# to make it clear who is responsible for reviewing.
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - automation
+      - dependabot
+      - Team:Elastic-Agent-Data-Plane
+    allow:
+      - dependency-name: github.com/elastic/elastic-agent-autodiscover
+      - dependency-name: github.com/elastic/elastic-agent-client/*
+      - dependency-name: github.com/elastic/elastic-agent-libs
+      - dependency-name: github.com/elastic/elastic-agent-shipper-client
+      - dependency-name: github.com/elastic/elastic-agent-system-metrics
+      - dependency-name: github.com/elastic/go-concert
+      - dependency-name: github.com/elastic/go-elasticsearch/*
+      - dependency-name: github.com/elastic/go-licenser
+      - dependency-name: github.com/elastic/go-lookslike
+      - dependency-name: github.com/elastic/go-lumber
+      - dependency-name: github.com/elastic/go-structform
+      - dependency-name: github.com/elastic/go-sysinfo
+      - dependency-name: github.com/elastic/go-ucfg
+      - dependency-name: github.com/elastic/gosigar
+      - dependency-name: go.elastic.co/apm/*
+      - dependency-name: go.elastic.co/ecszap
+      - dependency-name: go.elastic.co/go-licence-detector
+    reviewers:
+      - elastic/elastic-agent-data-plane
+    open-pull-requests-limit: 2
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - automation
+      - dependabot
+      - Team:Security-External Integrations
+    allow:
+      # Skip github.com/elastic/mito because it requires documentation updates.
+      - dependency-name: github.com/elastic/go-libaudit/*
+      - dependency-name: github.com/elastic/go-perf
+      - dependency-name: github.com/elastic/go-seccomp-bpf
+      - dependency-name: github.com/elastic/toutoumomoma
+    reviewers:
+      - elastic/security-external-integrations
+    open-pull-requests-limit: 2
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - automation
+      - dependabot
+      - Team:Service-Integrations
+    allow:
+      - dependency-name: github.com/elastic/bayeux
+    reviewers:
+      - elastic/obs-infraobs-integrations
+    open-pull-requests-limit: 2

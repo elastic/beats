@@ -8,8 +8,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -36,7 +36,7 @@ var (
 	}
 )
 
-func mockMapResourceMetrics(client *Client, resources []resources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
+func mockMapResourceMetrics(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
 	return nil, nil
 }
 
@@ -50,7 +50,7 @@ func TestInitResources(t *testing.T) {
 		client := NewMockClient()
 		client.Config = resourceQueryConfig
 		m := &MockService{}
-		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]resources.GenericResourceExpanded{}, errors.New("invalid resource query"))
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, errors.New("invalid resource query"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
@@ -78,7 +78,7 @@ func TestGetMetricValues(t *testing.T) {
 		}
 		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Once().
-			Return([]insights.Metric{}, "", errors.New("invalid parameters or no metrics found"))
+			Return([]armmonitor.Metric{}, "", errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
@@ -100,7 +100,7 @@ func TestGetMetricValues(t *testing.T) {
 		}
 		m := &MockService{}
 		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return([]insights.Metric{}, "", errors.New("invalid parameters or no metrics found"))
+			Return([]armmonitor.Metric{}, "", errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
