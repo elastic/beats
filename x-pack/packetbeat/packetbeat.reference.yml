@@ -162,7 +162,7 @@ packetbeat.protocols:
   #send_request: true
 
   # If this option is enabled, the raw message of the response (`cassandra_request.request_headers` field)
-  # is included in published events. The default is true. Enable `send_request` first before enabling this option.
+  # is included in published events. The default is true. enable `send_request` first before enabling this option.
   #send_request_header: true
 
   # If this option is enabled, the raw message of the response (`cassandra_response` field)
@@ -170,7 +170,7 @@ packetbeat.protocols:
   #send_response: true
 
   # If this option is enabled, the raw message of the response (`cassandra_response.response_headers` field)
-  # is included in published events. The default is true. Enable `send_response` first before enabling this option.
+  # is included in published events. The default is true. enable `send_response` first before enabling this option.
   #send_response_header: true
 
   # Set to true to publish fields with null values in events.
@@ -1939,7 +1939,7 @@ logging.files:
   # The name of the files where the logs are written to.
   #name: packetbeat
 
-  # Configure log file size limit. If the limit is reached, the log file will be
+  # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.
   #rotateeverybytes: 10485760 # = 10MB
 
