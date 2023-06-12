@@ -394,7 +394,7 @@ func (p *oktaInput) doFetch(ctx context.Context, state *stateStore, fullSync boo
 	// rather than gt since timestamps are second resolution, so we may not
 	// have a complete set from that timestamp.
 	query = url.Values{}
-	query.Add("search", fmt.Sprintf("lastUpdated ge %s and status pr", lastUpdated.Format(okta.ISO8601)))
+	query.Add("search", fmt.Sprintf(`lastUpdated ge "%s" and status pr`, lastUpdated.Format(okta.ISO8601)))
 	state.next = query.Encode()
 
 	p.logger.Debugf("received %d users from API", len(users))
