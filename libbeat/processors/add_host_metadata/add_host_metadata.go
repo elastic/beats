@@ -105,6 +105,10 @@ func New(cfg *config.C) (beat.Processor, error) {
 	} else {
 		cbIDStr = cbID.String()
 	}
+
+	// this is safe as New() returns a pointer, not the actual object.
+	// This matters as other pieces of code in libbeat, like libbeat/processors/processor.go,
+	// will do weird stuff like copy the entire list of global processors.
 	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, cbIDStr)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -268,10 +272,12 @@ func (p *addHostMetadata) updateOrExpire(useFQDN bool) {
 	case <-timeout:
 		p.logger.Errorf("got timeout while trying to update metadata")
 		p.lastUpdate.Time = time.Time{}
-	case shouldNotExpire := <-updateChanSuccess:
+	case success := <-updateChanSuccess:
 		// only expire the cache if update was failed
-		if !shouldNotExpire {
+		if !success {
 			p.lastUpdate.Time = time.Time{}
+		} else {
+			p.lastUpdate.Time = time.Now()
 		}
 	}
 
