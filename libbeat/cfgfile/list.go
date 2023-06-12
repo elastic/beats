@@ -18,14 +18,16 @@
 package cfgfile
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -68,7 +70,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, errors.Wrap(err, "Unable to hash given config"))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
 			continue
 		}
 
@@ -102,13 +104,14 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			if _, ok := err.(*common.ErrInputNotFinished); ok {
+			errors.Is(err, &common.ErrInputNotFinished{})
+			if _, ok := err.(*common.ErrInputNotFinished); ok { //nolint:errorlint // ErrInputNotFinished is a struct type, not an expression/error value
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
-			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
+			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 
@@ -116,6 +119,16 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.runners[hash] = runner
 		runner.Start()
 		moduleStarts.Add(1)
+		if config.DiagCallback != nil {
+			if diag, ok := runner.(diagnostics.DiagnosticReporter); ok {
+				r.logger.Debugf("Runner '%s' has diagnostics, attempting to register", runner)
+				for _, dc := range diag.Diagnostics() {
+					config.DiagCallback.Register(dc.Name, dc.Description, dc.Filename, dc.ContentType, dc.Callback)
+				}
+			} else {
+				r.logger.Debugf("Runner %s does not implement DiagnosticRunner, skipping", runner)
+			}
+		}
 	}
 
 	// NOTE: This metric tracks the number of modules in the list. The true

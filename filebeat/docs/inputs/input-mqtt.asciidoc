@@ -50,7 +50,7 @@ A list of topics to subscribe to and read from.
 
 An agreement level between the sender of a message and the receiver of a message that defines the guarantee of delivery.
 
-There are 3 QoS levels in MQTT:
+There are 3 QoS levels in MQTT. Defaults to `0`:
 
 * At most once (`0`),
 * At least once (`1`),

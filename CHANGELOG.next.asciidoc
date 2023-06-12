@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -65,7 +65,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
 - Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
-
+- Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 
 *Auditbeat*
 
@@ -122,11 +122,15 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 - Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
+- Add support in s3 input for JSON with array of objects. {pull}35475[35475]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
+- Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
+- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
+- Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
 
 *Heartbeat*
 
@@ -148,6 +152,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix project monitor temp directories permission to include group access. {pull}35398[35398]
 - Fix output pipeline exit on run_once. {pull}35376[35376]
 - Fix formatting issue with socket trace timeout. {pull}35434[35434]
+- Update gval version. {pull}35636[35636]
+- Fix serialization of processors when running diagnostics. {pull}35698[35698]
 
 *Heartbeat*
 
@@ -232,6 +238,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Reload Beat when TLS certificates or key files are modified. {issue}34408[34408] {pull}34416[34416]
 - Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
 - Added `orchestrator.cluster.id` and `orchestrator.cluster.name` fields to the add_cloud_metadata processor, AWS cloud provider. {pull}35182[35182]
+- Lowercase reported hostnames per Elastic Common Schema (ECS) guidelines for the host.name field. Upgraded github.com/elastic/go-sysinfo to 1.11.0. {pull}35652[35652]
 
 *Auditbeat*
 
@@ -299,7 +306,9 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for collecting `httpjson` metrics. {pull}35392[35392]
 - Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 - Mark CEL input as GA. {pull}35559[35559]
+- Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
+- Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -337,6 +346,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Packetbeat*
 
 - Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
 
 *Winlogbeat*
 
