@@ -280,7 +280,7 @@ filebeat.inputs:
 
   ### Prospector options
 
-  # How often do the input checks for new files in the paths that are specified
+  # How often the input checks for new files in the paths that are specified
   # for harvesting. Specify 1s to scan the directory as frequently as possible
   # without causing Filebeat to scan too frequently. Default: 10s.
   #prospector.scanner.check_interval: 10s
@@ -526,7 +526,7 @@ filebeat.inputs:
   # List of hosts to pool to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
-  # How often do the input checks for redis slow log.
+  # How often the input checks for redis slow log.
   #scan_frequency: 10s
 
   # Timeout after which time the input should return an error

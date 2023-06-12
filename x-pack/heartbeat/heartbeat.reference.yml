@@ -10,7 +10,7 @@
 ############################# Heartbeat ######################################
 
 
-# Define a directory to load monitor definitions. Definitions take the form
+# Define a directory from which to load monitor definitions. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
@@ -1565,7 +1565,7 @@ logging.files:
   # The name of the files where the logs are written to.
   #name: heartbeat
 
-  # Configure log file size limit. If the limit is reached, log file will be
+  # Configure log file size limit. If the limit is reached, the log file will be
   # automatically rotated.
   #rotateeverybytes: 10485760 # = 10MB
 

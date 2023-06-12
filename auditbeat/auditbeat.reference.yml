@@ -1473,7 +1473,7 @@ logging.files:
   # The name of the files where the logs are written to.
   #name: auditbeat
 
-  # Configure log file size limit. If the limit is reached, log file will be
+  # Configure log file size limit. If the limit is reached, the log file will be
   # automatically rotated.
   #rotateeverybytes: 10485760 # = 10MB
 

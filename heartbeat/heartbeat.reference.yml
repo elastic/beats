@@ -10,7 +10,7 @@
 ############################# Heartbeat ######################################
 
 
-# Define a directory to load monitor definitions. Definitions take the form
+# Define a directory from which to load monitor definitions. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
