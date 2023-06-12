@@ -20,6 +20,8 @@ type Source struct {
 	ActiveMemo ISource        // cache for selected source
 }
 
+var ErrUnsupportedSource = fmt.Errorf("browser monitors are now removed! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
+
 func (s *Source) Active() ISource {
 	if s.ActiveMemo != nil {
 		return s.ActiveMemo
