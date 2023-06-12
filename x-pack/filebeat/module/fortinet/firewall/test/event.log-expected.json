@@ -1190,7 +1190,7 @@
         "fileset.name": "firewall",
         "fortinet.firewall.desc": "Object update request from device of FortiClient received",
         "input.type": "log",
-        "log.offset": 11198,
+        "log.offset": 11179,
         "message": "Send new version object to device (sn:FSAxxxxxxxxx, ip=127.0.0.1): objid=0000000000, curr_ver=00091.03310",
         "observer.product": "Fortigate",
         "observer.type": "firewall",
