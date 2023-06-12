@@ -105,9 +105,8 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	// Allow a single fetch operation to obtain limits from the API.
 	p.lim = rate.NewLimiter(1, 1)
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	var err error
-	p.client, err = newClient(ctx, p.cfg, p.logger)
+	p.client, err = newClient(p.cfg, p.logger)
 	if err != nil {
 		return err
 	}
@@ -153,7 +152,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 }
 
-func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
+func newClient(cfg conf, log *logp.Logger) (*http.Client, error) {
 	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
