@@ -72,9 +72,9 @@ By default, the `include_linked_accounts` parameter is set to false, meaning tha
 account are collected. When set to true, the parameter allows the CloudWatch ListMetrics API to include metrics from
 the monitoring account and all linked accounts in the returned data, providing a comprehensive cross-account view.
 
-*_Note_:* Enabling the include_linked_accounts parameter requires appropriate permissions and authentication credentials
-for the linked accounts. Users should ensure that the necessary IAM roles and policies are properly set up to establish
-the necessary trust and access between accounts.
+*_Note_:* Users should ensure that the necessary IAM roles and policies are properly set up in order to link the monitoring
+account and source accounts together.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account-Setup.html#CloudWatch-Unified-Cross-Account-Setup-permissions[Link monitoring accounts with source accounts] for more details.
 
 * *tags_filter*
 
