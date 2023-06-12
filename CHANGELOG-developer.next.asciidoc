@@ -81,6 +81,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix the integration testcase docker port mapping for sql and oracle modules {pull}34221[34221]
 - Fix the ingest pipeline for mysql slowlog to parse schema name with dash {pull}34371[34372]
 - Fix the multiple host support for mongodb module {pull}34624[34624]
+- Skip HTTPJSON flakey test. {issue}34929[34929] {pull}35138[35138]
 
 ==== Added
 
@@ -157,6 +158,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add support for different folders when testing data {pull}34467[34467]
 - Add logging of metric registration in inputmon. {pull}35647[35647]
 - Add Okta API package for entity analytics. {pull}35478[35478]
+- Add benchmarking to HTTPJSON input testing. {pull}35138[35138]
+- Allow non-AWS endpoints for testing Filebeat awss3 input. {issue}35496[35496] {pull}35520[35520]
 
 ==== Deprecated
 
