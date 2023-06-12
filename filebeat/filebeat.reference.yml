@@ -687,7 +687,7 @@ filebeat.inputs:
 
   ### Prospector options
 
-  # How often do the input checks for new files in the paths that are specified
+  # How often the input checks for new files in the paths that are specified
   # for harvesting. Specify 1s to scan the directory as frequently as possible
   # without causing Filebeat to scan too frequently. Default: 10s.
   #prospector.scanner.check_interval: 10s
