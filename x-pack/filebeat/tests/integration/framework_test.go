@@ -134,3 +134,35 @@ func (b *BeatProc) openLogFile() *os.File {
 
 	return f
 }
+
+// createTempDir creates a temporary directory that will be
+// removed after the tests passes.
+//
+// If the test fails, the temporary directory is not removed.
+//
+// If the tests are run with -v, the temporary directory will
+// be logged.
+func createTempDir(t *testing.T) string {
+	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
+		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.MkdirAll(tempDir, 0766); err != nil {
+		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
+	}
+	t.Logf("Temporary directory: %s", tempDir)
+
+	cleanup := func() {
+		if !t.Failed() {
+			if err := os.RemoveAll(tempDir); err != nil {
+				t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+			}
+			t.Logf("Temporary directory '%s' removed", tempDir)
+		}
+	}
+	t.Cleanup(cleanup)
+
+	return tempDir
+}
