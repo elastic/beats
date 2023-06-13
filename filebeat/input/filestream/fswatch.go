@@ -392,7 +392,7 @@ func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, uniqFileID map
 		}
 		fileID := file_helper.GetOSState(fileInfo).String()
 		if finfo, exists := uniqFileID[fileID]; exists {
-			s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
+			s.log.Infof("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
 			return true
 		}
 		uniqFileID[fileID] = fileInfo
