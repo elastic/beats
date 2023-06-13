@@ -5,7 +5,7 @@
 package awss3
 
 import (
-	"bufio"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -73,7 +73,7 @@ func TestParquetDecoding(t *testing.T) {
 			name:          "test decoding of a parquet file and compare the number of events along with the content",
 			file:          "cloudtrail.parquet",
 			numEvents:     1,
-			assertAgainst: "cloudtrail.ndjson",
+			assertAgainst: "cloudtrail.json",
 			config: &readerConfig{
 				Decoding: decoderConfig{
 					Codec: &codecConfig{
@@ -101,10 +101,7 @@ func TestParquetDecoding(t *testing.T) {
 			// there is a chance for this comparison to become flaky if number of events > 1 as
 			// the order of events are not guaranteed by beats
 			if tc.assertAgainst != "" {
-				targetFile, err := os.Open(filepath.Join(testDataPath, tc.assertAgainst))
-				assert.NoError(t, err)
-				defer targetFile.Close()
-				targetData := readJSONFromFile(t, targetFile)
+				targetData := readJSONFromFile(t, filepath.Join(testDataPath, tc.assertAgainst))
 				assert.Equal(t, len(targetData), len(events))
 
 				for i, event := range events {
@@ -118,15 +115,16 @@ func TestParquetDecoding(t *testing.T) {
 }
 
 // readJSONFromFile reads the json file and returns the data as a slice of strings
-func readJSONFromFile(t *testing.T, file *os.File) []string {
+func readJSONFromFile(t *testing.T, filepath string) []string {
+	fileBytes, err := os.ReadFile(filepath)
+	assert.NoError(t, err)
+	var rawMessages []json.RawMessage
+	err = json.Unmarshal(fileBytes, &rawMessages)
+	assert.NoError(t, err)
 	var data []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		data = append(data, scanner.Text())
-	}
-	if err := scanner.Err(); err != nil {
-		t.Fatalf("failed to read ndjson file: %v", err)
-	}
 
+	for _, rawMsg := range rawMessages {
+		data = append(data, string(rawMsg))
+	}
 	return data
 }
