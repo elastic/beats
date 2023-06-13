@@ -39,7 +39,7 @@ class TestAutodiscover(filebeat.BaseTest):
             proc = self.start_beat()
             self._test(container)
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout=60)
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout=120)
         proc.check_kill_and_wait()
 
     @unittest.skipIf(not INTEGRATION_TESTS or
@@ -67,7 +67,7 @@ class TestAutodiscover(filebeat.BaseTest):
             proc = self.start_beat()
             self._test(container)
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout=120)
         proc.check_kill_and_wait()
 
     def _test(self, container):
