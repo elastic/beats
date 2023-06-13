@@ -29,23 +29,21 @@ import (
 
 const dummyText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
 
-func TestInput(t *testing.T) {
-	var expectedBulkData []string
-	for i := 0; i < 2; i++ {
-		for j := 0; j < 2500; j++ {
-			expectedBulkData = append(expectedBulkData, fmt.Sprintf(`{ "text%d":%q }`, i+1, strings.Repeat(dummyText, 17)))
-		}
-	}
-	testCases := []struct {
+var (
+	expectedBulkData []string
+
+	testCases = []struct {
 		name         string
-		setupServer  func(*testing.T, http.HandlerFunc, map[string]interface{})
+		setupServer  func(testing.TB, http.HandlerFunc, map[string]interface{})
 		baseConfig   map[string]interface{}
 		handler      http.HandlerFunc
 		expected     []string
 		expectedFile string
+
+		skipReason string
 	}{
 		{
-			name:        "Test simple GET request",
+			name:        "simple_GET_request",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -55,7 +53,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name:        "Test simple HTTPS GET request",
+			name:        "simple_HTTPS_GET_request",
 			setupServer: newTestServer(httptest.NewTLSServer),
 			baseConfig: map[string]interface{}{
 				"interval":                      1,
@@ -66,7 +64,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name:        "Test request honors rate limit",
+			name:        "request_honors_rate_limit",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":                     1,
@@ -79,7 +77,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":"world"}`},
 		},
 		{
-			name:        "Test request retries when failed",
+			name:        "request_retries_when_failed",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -89,7 +87,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":"world"}`},
 		},
 		{
-			name:        "Test POST request with body",
+			name:        "POST_request_with_body",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -102,7 +100,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name:        "Test repeated POST requests",
+			name:        "repeated_POST_requests",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       "100ms",
@@ -115,7 +113,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test split by json objects array",
+			name:        "split_by_json_objects_array",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -128,7 +126,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
-			name:        "Test split by json objects array with keep parent",
+			name:        "split_by_json_objects_array_with_keep_parent",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -145,7 +143,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test split on empty array without ignore_empty_value",
+			name:        "split_on_empty_array_without_ignore_empty_value",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -158,7 +156,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"response":{"empty":[]}}`},
 		},
 		{
-			name:        "Test split on empty array with ignore_empty_value",
+			name:        "split_on_empty_array_with_ignore_empty_value",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -172,7 +170,7 @@ func TestInput(t *testing.T) {
 			expected: nil,
 		},
 		{
-			name:        "Test split on null field with ignore_empty_value keeping parent",
+			name:        "split_on_null_field_with_ignore_empty_value_keeping_parent",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -187,7 +185,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"response":{"empty":null}}`},
 		},
 		{
-			name:        "Test split on empty array with ignore_empty_value keeping parent",
+			name:        "split_on_empty_array_with_ignore_empty_value_keeping_parent",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -202,7 +200,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"response":{"empty":[]}}`},
 		},
 		{
-			name:        "Test split on null field at root with ignore_empty_value keeping parent",
+			name:        "split_on_null_field_at_root_with_ignore_empty_value_keeping_parent",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -217,7 +215,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"other":"data","response":null}`},
 		},
 		{
-			name:        "Test split on empty array at root with ignore_empty_value keeping parent",
+			name:        "split_on_empty_array_at_root_with_ignore_empty_value_keeping_parent",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -232,7 +230,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"other":"data","response":[]}`},
 		},
 		{
-			name:        "Test nested split",
+			name:        "nested_split",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -252,7 +250,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test split events by not found",
+			name:        "split_events_by_not_found",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -265,8 +263,8 @@ func TestInput(t *testing.T) {
 			expected: []string{},
 		},
 		{
-			name: "Test date cursor",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "date_cursor",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				// mock timeNow func to return a fixed value
@@ -306,8 +304,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test tracer filename sanitization",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "tracer_filename_sanitization",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				// mock timeNow func to return a fixed value
@@ -349,8 +347,8 @@ func TestInput(t *testing.T) {
 			expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 		},
 		{
-			name: "Test pagination",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "pagination",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
 				registerResponseTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
@@ -389,8 +387,10 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test first event",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			skipReason: "flakey test - see https://github.com/elastic/beats/issues/34929",
+
+			name: "first_event",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
 				registerResponseTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
@@ -432,8 +432,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"first":"none", "foo":"a"}`, `{"first":"a", "foo":"b"}`, `{"first":"a", "foo":"c"}`, `{"first":"c", "foo":"d"}`},
 		},
 		{
-			name: "Test pagination with array response",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "pagination_with_array_response",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
@@ -456,8 +456,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"nextPageToken":"bar","foo":"bar"}`, `{"foo":"bar"}`, `{"foo":"bar"}`},
 		},
 		{
-			name: "Test oauth2",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "oauth2",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				config["auth.oauth2.token_url"] = server.URL + "/token"
@@ -477,8 +477,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello": "world"}`},
 		},
 		{
-			name: "Test request transforms can access state from previous transforms",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "request_transforms_can_access_state_from_previous_transforms",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
@@ -513,8 +513,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test response transforms can't access request state from previous transforms",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "response_transforms_can't_access_request_state_from_previous_transforms",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				registerResponseTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
@@ -546,7 +546,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name:        "Test simple Chain GET request",
+			name:        "simple_Chain_GET_request",
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       10,
@@ -564,8 +564,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test multiple Chain GET request",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "multiple_Chain_GET_request",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
 					case "/":
@@ -604,8 +604,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test date cursor while using chain",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "date_cursor_while_using_chain",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerRequestTransforms()
 				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				// mock timeNow func to return a fixed value
@@ -658,7 +658,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name:        "Test split by json objects array in chain",
+			name:        "split_by_json_objects_array_in_chain",
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -679,7 +679,7 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
-			name:        "Test split by json objects array with keep parent in chain",
+			name:        "split_by_json_objects_array_with_keep_parent_in_chain",
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -704,7 +704,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test nested split in chain",
+			name:        "nested_split_in_chain",
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -735,7 +735,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test pagination with end condition",
+			name:        "pagination_with_end_condition",
 			setupServer: newPaginationTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -760,7 +760,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test pagination when used with chaining",
+			name:        "pagination_when_used_with_chaining",
 			setupServer: newChainPaginationTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -790,7 +790,7 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name:        "Test pagination when used with chaining Unable to get id from response",
+			name:        "pagination_when_used_with_chaining_Unable_to_get_id_from_response",
 			setupServer: newChainPaginationTestServerWithInvalidJSON(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -817,7 +817,7 @@ func TestInput(t *testing.T) {
 			expected: []string{},
 		},
 		{
-			name:        "Test pagination when used with chaining with bulk data",
+			name:        "pagination_when_used_with_chaining_with_bulk_data",
 			setupServer: newChainPaginationLoadTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
@@ -840,12 +840,11 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler(http.MethodGet, "", ""),
-			expected: expectedBulkData,
+			handler: defaultHandler(http.MethodGet, "", ""),
 		},
 		{
-			name: "Test replace_with clause and first_response object",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "replace_with_clause_and_first_response_object",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
 					case "/":
@@ -890,8 +889,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test replace_with clause with hardcoded value_1",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "replace_with_clause_with_hardcoded_value_1",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
 					case "/":
@@ -926,8 +925,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test replace_with clause with hardcoded value (no dot prefix)",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "replace_with_clause_with_hardcoded_value_(no_dot_prefix)",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
 					case "/":
@@ -963,8 +962,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test replace_with clause with hardcoded value (more than one dot prefix)",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "replace_with_clause_with_hardcoded_value_(more_than_one_dot_prefix)",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
 					case "/":
@@ -1000,8 +999,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test replace_with clause with hardcoded value containing '.' (dots)",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "replace_with_clause_with_hardcoded_value_containing_'.'_(dots)",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					switch r.URL.Path {
 					case "/":
@@ -1036,8 +1035,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test global transform context separation with parent_last_response object",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "global_transform_context_separation_with_parent_last_response_object",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				var serverURL string
 				registerPaginationTransforms()
 				registerRequestTransforms()
@@ -1103,8 +1102,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test if cursor value is updated for root response with chaining & pagination",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "cursor_value_is_updated_for_root_response_with_chaining_&_pagination",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				var serverURL string
 				registerPaginationTransforms()
 				registerRequestTransforms()
@@ -1182,8 +1181,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test if cursor value is updated for root response with chaining & pagination along with split operator",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "cursor_value_is_updated_for_root_response_with_chaining_&_pagination_along_with_split_operator",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				var serverURL string
 				registerPaginationTransforms()
 				registerRequestTransforms()
@@ -1266,8 +1265,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test simple XML decode",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			name: "simple_XML_decode",
+			setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 				registerDecoders()
 				registerRequestTransforms()
 				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1364,13 +1363,25 @@ func TestInput(t *testing.T) {
 			}.String()},
 		},
 	}
+)
 
-	for _, testCase := range testCases {
-		tc := testCase
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setupServer(t, tc.handler, tc.baseConfig)
+func TestInput(t *testing.T) {
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 2500; j++ {
+			expectedBulkData = append(expectedBulkData, fmt.Sprintf(`{ "text%d":%q }`, i+1, strings.Repeat(dummyText, 17)))
+		}
+	}
+	fmt.Printf("len(expectedBulkData): %v\n", len(expectedBulkData))
 
-			cfg := conf.MustNewConfigFrom(tc.baseConfig)
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			if test.skipReason != "" {
+				t.Skipf("skip: %s", test.skipReason)
+			}
+
+			test.setupServer(t, test.handler, test.baseConfig)
+
+			cfg := conf.MustNewConfigFrom(test.baseConfig)
 
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
@@ -1386,10 +1397,10 @@ func TestInput(t *testing.T) {
 			assert.Equal(t, "httpjson-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
 
-			chanClient := beattest.NewChanClient(len(tc.expected))
+			chanClient := beattest.NewChanClient(len(test.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
 
 			var g errgroup.Group
@@ -1397,15 +1408,16 @@ func TestInput(t *testing.T) {
 				return input.Run(ctx, chanClient)
 			})
 			var timeoutDuration time.Duration
-			if testCase.name == "Test pagination when used with chaining with bulk data" {
+			if test.name == "pagination_when_used_with_chaining_with_bulk_data" {
 				timeoutDuration = 2 * time.Minute
+				test.expected = expectedBulkData
 			} else {
 				timeoutDuration = 10 * time.Second
 			}
 			timeout := time.NewTimer(timeoutDuration)
 			t.Cleanup(func() { _ = timeout.Stop() })
 
-			if len(tc.expected) == 0 {
+			if len(test.expected) == 0 {
 				select {
 				case <-timeout.C:
 				case got := <-chanClient.Channel:
@@ -1421,22 +1433,22 @@ func TestInput(t *testing.T) {
 			for {
 				select {
 				case <-timeout.C:
-					t.Errorf("timed out waiting for %d events", len(tc.expected))
+					t.Errorf("timed out waiting for %d events", len(test.expected))
 					cancel()
 					return
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, tc.expected[receivedCount], val.(string))
+					assert.JSONEq(t, test.expected[receivedCount], val.(string))
 					receivedCount += 1
-					if receivedCount == len(tc.expected) {
+					if receivedCount == len(test.expected) {
 						cancel()
 						break wait
 					}
 				}
 			}
-			if tc.expectedFile != "" {
-				if _, err := os.Stat(filepath.Join(tempDir, tc.expectedFile)); err == nil {
+			if test.expectedFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.expectedFile)); err == nil {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
@@ -1447,10 +1459,70 @@ func TestInput(t *testing.T) {
 	}
 }
 
+func BenchmarkInput(b *testing.B) {
+	for _, test := range testCases {
+		b.Run(test.name, func(b *testing.B) {
+			test.setupServer(b, test.handler, test.baseConfig)
+
+			cfg := conf.MustNewConfigFrom(test.baseConfig)
+
+			conf := defaultConfig()
+			assert.NoError(b, cfg.Unpack(&conf))
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				input := newStatelessInput(conf)
+
+				chanClient := beattest.NewChanClient(len(test.expected))
+				b.Cleanup(func() { _ = chanClient.Close() })
+
+				ctx, cancel := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
+				b.Cleanup(cancel)
+
+				var g errgroup.Group
+				g.Go(func() error {
+					return input.Run(ctx, chanClient)
+				})
+
+				timeout := time.NewTimer(5 * time.Second)
+				b.Cleanup(func() { _ = timeout.Stop() })
+
+				if len(test.expected) == 0 {
+					select {
+					case <-timeout.C:
+					case got := <-chanClient.Channel:
+						b.Errorf("unexpected event: %v", got)
+					}
+					cancel()
+					assert.NoError(b, g.Wait())
+					return
+				}
+
+				var receivedCount int
+			wait:
+				for {
+					select {
+					case <-timeout.C:
+						b.Errorf("timed out waiting for %d events", len(test.expected))
+						cancel()
+						return
+					case <-chanClient.Channel:
+						receivedCount += 1
+						if receivedCount == len(test.expected) {
+							cancel()
+							break wait
+						}
+					}
+				}
+			}
+		})
+	}
+}
+
 func newTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
 		config["request.url"] = server.URL
 		t.Cleanup(server.Close)
@@ -1459,8 +1531,8 @@ func newTestServer(
 
 func newChainTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.URL.Path {
 			case "/":
@@ -1478,8 +1550,8 @@ func newChainTestServer(
 
 func newChainPaginationTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		registerPaginationTransforms()
 		var serverURL string
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1506,8 +1578,8 @@ func newChainPaginationTestServer(
 
 func newChainPaginationTestServerWithInvalidJSON(
 	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		registerPaginationTransforms()
 		var serverURL string
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1516,7 +1588,9 @@ func newChainPaginationTestServerWithInvalidJSON(
 				link := serverURL + "/link2"
 				value := fmt.Sprintf(`"records":[{"id":1}], "nextLink":"%s"}`, link)
 				fmt.Fprintln(w, value)
+				fmt.Println("/link2")
 			case "/1":
+				fmt.Println("/1")
 				fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
 			}
 		})
@@ -1530,8 +1604,8 @@ func newChainPaginationTestServerWithInvalidJSON(
 
 func newPaginationTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		registerPaginationTransforms()
 		registerResponseTransforms()
 		var serverURL string
@@ -1556,11 +1630,11 @@ func newPaginationTestServer(
 
 func newChainPaginationLoadTestServer(
 	newServer func(http.Handler) *httptest.Server,
-) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
 	records1 := strings.Repeat(`{"id":1},`, 2499) + `{"id":1}`
 	records2 := strings.Repeat(`{"id":2},`, 2499) + `{"id":2}`
 
-	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		registerPaginationTransforms()
 		var serverURL string
 		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1585,11 +1659,11 @@ func newChainPaginationLoadTestServer(
 	}
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi",
+		ID:          id,
 		Cancelation: ctx,
 	}, cancel
 }

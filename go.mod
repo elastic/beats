@@ -17,7 +17,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.1
-	github.com/PaesslerAG/gval v1.0.0
+	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v1.2.1
@@ -89,7 +89,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-test/deep v1.0.7
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
-	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
+	github.com/godbus/dbus/v5 v5.0.6
 	github.com/godror/godror v0.33.2
 	github.com/gofrs/flock v0.8.1
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -137,6 +137,7 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
@@ -200,10 +201,10 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.1
-	github.com/elastic/elastic-agent-libs v0.3.8
+	github.com/elastic/elastic-agent-libs v0.3.9
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
-	github.com/elastic/go-elasticsearch/v8 v8.8.0
+	github.com/elastic/go-elasticsearch/v8 v8.8.1
 	github.com/elastic/mito v1.3.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -262,7 +263,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.2.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.3.0 // indirect
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
@@ -366,7 +367,6 @@ require (
 	cloud.google.com/go/storage v1.27.0
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
-	github.com/godbus/dbus/v5 v5.0.6 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/moby/term v0.0.0-20221205130635-1aeaba878587 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect

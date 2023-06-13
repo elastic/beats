@@ -109,6 +109,7 @@ CHANGELOG*
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-external-integrations
 /x-pack/filebeat/input/azureeventhub/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/cel/ @elastic/security-external-integrations
+/x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-external-integrations
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
 /x-pack/filebeat/input/gcs/ @elastic/security-external-integrations
