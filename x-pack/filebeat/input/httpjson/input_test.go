@@ -1308,7 +1308,7 @@ func TestInput(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(test.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
 
 			var g errgroup.Group
@@ -1378,7 +1378,7 @@ func BenchmarkInput(b *testing.B) {
 				chanClient := beattest.NewChanClient(len(test.expected))
 				b.Cleanup(func() { _ = chanClient.Close() })
 
-				ctx, cancel := newV2Context()
+				ctx, cancel := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
 				b.Cleanup(cancel)
 
 				var g errgroup.Group
@@ -1478,11 +1478,11 @@ func newChainPaginationTestServer(
 	}
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          "httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi",
+		ID:          id,
 		Cancelation: ctx,
 	}, cancel
 }
