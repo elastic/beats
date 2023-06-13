@@ -251,7 +251,13 @@ func requireMetadataEquals(one, other fileMeta) bool {
 }
 
 // waitUntilOffsetInRegistry waits for the expected offset is set for a file.
-func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int) {
+// If timeout is reached or there is an error getting the state from the
+// registry, the test fails
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(
+	filename, inputID string,
+	expectedOffset int,
+	timeout time.Duration) {
+
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -259,12 +265,21 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID st
 	}
 
 	id := getIDFromPath(filepath, inputID, fi)
-	entry, err := e.getRegistryState(id)
-	for err != nil || entry.Cursor.Offset != expectedOffset {
-		entry, err = e.getRegistryState(id)
-	}
 
-	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+	require.Eventuallyf(e.t, func() bool {
+		entry, err := e.getRegistryState(id)
+		if err != nil {
+			e.t.Fatalf(
+				"error getting state for ID '%s' from the registry, err: %s",
+				id, err)
+		}
+		return entry.Cursor.Offset == expectedOffset
+	},
+		timeout,
+		100*time.Millisecond,
+		"expecting registry offset for '%s' to be: %d",
+		filename,
+		expectedOffset)
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID string) {

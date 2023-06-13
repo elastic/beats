@@ -637,7 +637,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 30*time.Second)
 
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
@@ -704,7 +704,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 30*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -716,10 +716,9 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 "fake-ID",
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
+		"id":                                "fake-ID",
+		"paths":                             []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval": "100ms",
 	})
 
 	testlines := []byte("first line\nsecond line\n")
@@ -741,9 +740,14 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	// so it can interfere with the truncation of the file
 	env.mustAppendToFile(testlogName, []byte("third line\n"))
 
+	// Sleep for a second before modifying the file again
+	// this ensures the modification time of the file will
+	// be different between the last write and the truncation.
+	time.Sleep(time.Second)
+
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 30*time.Second)
 
 	// all newly started client has to be cancelled so events can be processed
 	env.pipeline.cancelAllClients()
@@ -754,7 +758,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.mustWriteToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines))
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines), 30*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -914,7 +918,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 30*time.Second)
 
 	// recreate symlink
 	env.mustSymlink(testlogName, symlinkName)
@@ -922,7 +926,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines))
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines), 30*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
