@@ -33,7 +33,7 @@ func newDecoder(config decoderConfig, r io.Reader) (decoder, error) {
 	case config.Codec.Parquet != nil:
 		return newParquetDecoder(config, r)
 	default:
-		return nil, fmt.Errorf("unsupported codec type: %s", config)
+		return nil, fmt.Errorf("unsupported config value: %v", config)
 	}
 }
 

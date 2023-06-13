@@ -125,7 +125,7 @@ An example config is shown below:
 
 [source,yaml]
 ----
-  decoding.codec: "parquet"
+  decoding.codec.parquet: enabled
 ----
 
 Currently supported codecs are given below:-
@@ -136,7 +136,7 @@ Currently supported codecs are given below:-
 [float]
 ==== `the parquet codec`
 The `parquet` codec is used to decode parquet compressed data streams.
-Only specifying the codec name will use the default codec options. The parquet codec supports
+Only enabling the codec will use the default codec options. The parquet codec supports
 two sub attributes which can make parquet decoding more efficient. The `batch_size` attribute and 
 the `process_parallel` attribute. The `batch_size` attribute can be used to specify the number of
 records to read from the parquet stream at a time. By default the `batch size` is set to `1` and 
@@ -148,7 +148,7 @@ also helps to increase the rate of processing. An example config is shown below:
 
 [source,yaml]
 ----
-  decoding.codec: "parquet"
+  decoding.codec.parquet: enabled
   decoding.codec.parquet.process_parallel = true
   decoding.codec.parquet.batch_size = 1000
 ----
