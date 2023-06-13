@@ -264,7 +264,7 @@ whether it be a change to the user's metadata, or a user was added or deleted.
 [float]
 ===== API Interactions
 
-The provider periodically retrieves changes to user and group metadata from the
+The provider periodically retrieves changes to user metadata from the
 Okta User API. This is done through calls to:
 
 - https://developer.okta.com/docs/reference/api/users/#list-users[/api/v1/users]
