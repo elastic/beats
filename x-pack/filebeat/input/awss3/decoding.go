@@ -5,81 +5,74 @@
 package awss3
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 	"io"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/parquet"
 )
 
-const (
-	codecParquet = "parquet"
-)
-
 // decoder is an interface for decoding data from an io reader.
 type decoder interface {
 	// decode reads and decodes data from an io reader based on the codec type.
-	decode() error
+	// It returns the decoded data and an error if the data cannot be decoded.
+	decode() ([]byte, error)
+	// next advances the decoder to the next data item and returns true if there is more data to be decoded.
+	next() bool
+	// close closes the decoder and releases any resources associated with it.
+	// It returns an error if the decoder cannot be closed.
+	close() error
 }
 
 // newDecoder creates a new decoder based on the codec type.
 // It returns a decoder type and an error if the codec type is not supported.
 // If the reader config codec option is not set, it returns a nil decoder and nil error.
-func newDecoder(p *s3ObjectProcessor, r io.Reader) (decoder, error) {
-	switch p.readerConfig.Decoding.Codec {
-	case "":
+func newDecoder(config decoderConfig, r io.Reader) (decoder, error) {
+	switch {
+	case config.Codec == nil:
 		return nil, nil
-	case codecParquet:
-		return newParquetDecoder(p, r)
+	case config.Codec.Parquet != nil:
+		return newParquetDecoder(config, r)
 	default:
-		return nil, fmt.Errorf("unsupported codec type: %s", p.readerConfig.Decoding.Codec)
+		return nil, fmt.Errorf("unsupported codec type: %s", config)
 	}
 }
 
 // parquetDecoder is a decoder for parquet data.
 type parquetDecoder struct {
-	p      *s3ObjectProcessor
 	reader *parquet.BufferedReader
 }
 
 // newParquetDecoder creates a new parquet decoder. It uses the libbeat parquet reader under the hood.
 // It returns an error if the parquet reader cannot be created.
-func newParquetDecoder(p *s3ObjectProcessor, r io.Reader) (decoder, error) {
+func newParquetDecoder(config decoderConfig, r io.Reader) (decoder, error) {
 	reader, err := parquet.NewBufferedReader(r, &parquet.Config{
-		ProcessParallel: p.readerConfig.Decoding.Parquet.ProcessParallel,
-		BatchSize:       p.readerConfig.Decoding.Parquet.BatchSize,
+		ProcessParallel: config.Codec.Parquet.ProcessParallel,
+		BatchSize:       config.Codec.Parquet.BatchSize,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet decoder: %w", err)
 	}
 	return &parquetDecoder{
-		p:      p,
 		reader: reader,
 	}, nil
 }
 
+// next advances the parquet decoder to the next data item and returns true if there is more data to be decoded.
+func (pd *parquetDecoder) next() bool {
+	return pd.reader.Next()
+}
+
 // decode reads and decodes a parquet data stream. After reading the parquet data it decodes
-// the output to JSON and sends the decoded data to the readJSONSlice method to
-// process further as individual JSON objects.
-func (pd *parquetDecoder) decode() error {
-	// releases the reader resources once processing is done
-	defer pd.reader.Close()
-
-	for pd.reader.Next() {
-		data, err := pd.reader.Record()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				return nil
-			}
-			return fmt.Errorf("failed to read records from parquet record reader: %w", err)
-		}
-
-		err = pd.p.readJSONSlice(bytes.NewReader(data))
-		if err != nil {
-			return fmt.Errorf("failed to read JSON data from arrow record: %w", err)
-		}
+// the output to JSON and returns it as a byte slice. It returns an error if the data cannot be decoded.
+func (pd *parquetDecoder) decode() ([]byte, error) {
+	data, err := pd.reader.Record()
+	if err != nil {
+		return nil, err
 	}
+	return data, nil
+}
 
-	return nil
+// close closes the parquet decoder and releases the resources.
+func (pd *parquetDecoder) close() error {
+	return pd.reader.Close()
 }

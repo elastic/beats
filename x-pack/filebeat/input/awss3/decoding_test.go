@@ -31,10 +31,11 @@ func TestParquetDecoding(t *testing.T) {
 			numEvents: 1304,
 			config: &readerConfig{
 				Decoding: decoderConfig{
-					Codec: "parquet",
-					Parquet: parquetCodecConfig{
-						ProcessParallel: true,
-						BatchSize:       1,
+					Codec: &codecConfig{
+						Parquet: &parquetCodecConfig{
+							ProcessParallel: true,
+							BatchSize:       1,
+						},
 					},
 				},
 			},
@@ -45,10 +46,11 @@ func TestParquetDecoding(t *testing.T) {
 			numEvents: 1304,
 			config: &readerConfig{
 				Decoding: decoderConfig{
-					Codec: "parquet",
-					Parquet: parquetCodecConfig{
-						ProcessParallel: true,
-						BatchSize:       100,
+					Codec: &codecConfig{
+						Parquet: &parquetCodecConfig{
+							ProcessParallel: true,
+							BatchSize:       100,
+						},
 					},
 				},
 			},
@@ -59,7 +61,11 @@ func TestParquetDecoding(t *testing.T) {
 			numEvents: 1304,
 			config: &readerConfig{
 				Decoding: decoderConfig{
-					Codec: "parquet",
+					Codec: &codecConfig{
+						Parquet: &parquetCodecConfig{
+							Enabled: true,
+						},
+					},
 				},
 			},
 		},
@@ -70,10 +76,12 @@ func TestParquetDecoding(t *testing.T) {
 			assertAgainst: "cloudtrail.ndjson",
 			config: &readerConfig{
 				Decoding: decoderConfig{
-					Codec: "parquet",
-					Parquet: parquetCodecConfig{
-						ProcessParallel: true,
-						BatchSize:       1,
+					Codec: &codecConfig{
+						Parquet: &parquetCodecConfig{
+							Enabled:         true,
+							ProcessParallel: true,
+							BatchSize:       1,
+						},
 					},
 				},
 			},

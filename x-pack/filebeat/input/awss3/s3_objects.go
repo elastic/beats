@@ -152,12 +152,26 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	}
 
 	// try to create a decoder from the using the codec config
-	decoder, err := newDecoder(p, reader)
+	decoder, err := newDecoder(p.readerConfig.Decoding, reader)
 	if err != nil {
 		return err
 	}
 	if decoder != nil {
-		err = decoder.decode()
+		defer decoder.close()
+
+		for decoder.next() {
+			data, err := decoder.decode()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+				break
+			}
+			err = p.readJSONSlice(bytes.NewReader(data))
+			if err != nil {
+				break
+			}
+		}
 	} else {
 		// This is the legacy path. It will be removed in future and clubbed together with the decoder.
 		// Process object content stream.

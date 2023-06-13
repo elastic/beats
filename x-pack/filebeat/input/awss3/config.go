@@ -165,14 +165,6 @@ type readerConfig struct {
 	Parsers                  parser.Config           `config:",inline"`
 	Decoding                 decoderConfig           `config:"decoding"`
 }
-type decoderConfig struct {
-	Codec   string             `config:"codec"`
-	Parquet parquetCodecConfig `config:"codec.parquet"`
-}
-type parquetCodecConfig struct {
-	ProcessParallel bool `config:"process_parallel"`
-	BatchSize       int  `config:"batch_size" default:"1"`
-}
 
 func (rc *readerConfig) Validate() error {
 	if rc.BufferSize <= 0 {
