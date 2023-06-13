@@ -1371,7 +1371,6 @@ func TestInput(t *testing.T) {
 			expectedBulkData = append(expectedBulkData, fmt.Sprintf(`{ "text%d":%q }`, i+1, strings.Repeat(dummyText, 17)))
 		}
 	}
-	fmt.Printf("len(expectedBulkData): %v\n", len(expectedBulkData))
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -1588,9 +1587,7 @@ func newChainPaginationTestServerWithInvalidJSON(
 				link := serverURL + "/link2"
 				value := fmt.Sprintf(`"records":[{"id":1}], "nextLink":"%s"}`, link)
 				fmt.Fprintln(w, value)
-				fmt.Println("/link2")
 			case "/1":
-				fmt.Println("/1")
 				fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
 			}
 		})
