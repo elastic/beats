@@ -9,6 +9,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 
 *Auditbeat*
 
@@ -357,6 +358,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
+- Handle empty DNS answer data in QueryResults for the Sysmon Pipeline {pull}35207[35207]
 
 
 *Elastic Log Driver*
