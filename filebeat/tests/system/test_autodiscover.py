@@ -74,6 +74,25 @@ class TestAutodiscover(filebeat.BaseTest):
         with open(os.path.join(self.working_dir, f'{container.name}.log'), 'wb') as f:
             f.write(b'Busybox output 1\n')
 
+        docker_client = docker.from_env()
+        print("\nRunning containers:") # make the output nicer
+        for i, c in enumerate(docker_client.containers.list()):
+            print("[%d].name='%s'" % (i, c.name))
+        print("waiting for '%s' to be running..." % (container.name))
+
+        def wait_container_start():
+            for i, c in enumerate(docker_client.containers.list()):
+                print("[%d].name='%s', looking for '%s'" % (i, c.name, container.name))
+                if c.name == container.name:
+                    return True
+
+        self.wait_until(
+            wait_container_start,
+            max_timeout=120,
+            poll_interval=0.1,
+            name="wait busybox container running",
+            err_msg="busybox container is not running")
+
         self.wait_until(lambda: self.log_contains('Starting runner: input'))
         self.wait_until(lambda: self.output_has(lines=1))
 
