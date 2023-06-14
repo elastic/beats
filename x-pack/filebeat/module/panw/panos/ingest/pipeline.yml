@@ -437,7 +437,7 @@ processors:
   - grok:
       field: url.original
       patterns:
-        - '(%{ANY:url.scheme}\:\/\/)?(%{USERNAME:url.username}(\:%{PASSWORD:url.password})?\@)?%{DOMAIN:url.domain}(\:%{POSINT:url.port})?(%{PATH:url.path})?(\?%{QUERY:url.query})?(\#%{ANY:url.fragment})?'
+        - '(%{URIPROTO:url.scheme}\:\/\/)?(%{USERNAME:url.username}(\:%{PASSWORD:url.password})?\@)?%{DOMAIN:url.domain}(\:%{POSINT:url.port})?(%{PATH:url.path})?(\?%{QUERY:url.query})?(\#%{ANY:url.fragment})?'
       ignore_missing: true
       pattern_definitions:
         USERNAME: '[^\:]*'
