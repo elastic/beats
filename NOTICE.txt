@@ -2757,12 +2757,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/apache/arrow/go/v12
-Version: v12.0.1-0.20230605094802-c153c6d36ccf
+Dependency : github.com/apache/arrow/go/v11
+Version: v11.0.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v12@v12.0.1-0.20230605094802-c153c6d36ccf/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v11@v11.0.0/LICENSE.txt:
 
 
                                  Apache License
@@ -2966,6 +2966,77 @@ Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v12@v12
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+--------------------------------------------------------------------------------
+
+src/plasma/fling.cc and src/plasma/fling.h: Apache 2.0
+
+Copyright 2013 Sharvil Nanavati
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+--------------------------------------------------------------------------------
+
+src/plasma/thirdparty/ae: Modified / 3-Clause BSD
+
+Copyright (c) 2006-2010, Salvatore Sanfilippo <antirez at gmail dot com>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+ * Neither the name of Redis nor the names of its contributors may be used
+   to endorse or promote products derived from this software without
+   specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+src/plasma/thirdparty/dlmalloc.c: CC0
+
+This is a version (aka dlmalloc) of malloc/free/realloc written by
+Doug Lea and released to the public domain, as explained at
+http://creativecommons.org/publicdomain/zero/1.0/ Send questions,
+comments, complaints, performance data, etc to dl@cs.oswego.edu
+
+--------------------------------------------------------------------------------
+
+src/plasma/common.cc (some portions)
+
+Copyright (c) Austin Appleby (aappleby (AT) gmail)
+
+Some portions of this file are derived from code in the MurmurHash project
+
+All code is released to the public domain. For business purposes, Murmurhash is
+under the MIT license.
+
+https://sites.google.com/site/murmurhash/
 
 --------------------------------------------------------------------------------
 
@@ -11932,11 +12003,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 --------------------------------------------------------------------------------
 Dependency : github.com/dustin/go-humanize
-Version: v1.0.1
+Version: v1.0.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dustin/go-humanize@v1.0.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dustin/go-humanize@v1.0.0/LICENSE:
 
 Copyright (c) 2005-2008  Dustin Sallings <dustin@spy.net>
 
@@ -43282,11 +43353,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mattn/go-isatty
-Version: v0.0.17
+Version: v0.0.16
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mattn/go-isatty@v0.0.17/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/mattn/go-isatty@v0.0.16/LICENSE:
 
 Copyright (c) Yasuhiro MATSUMOTO <mattn.jp@gmail.com>
 
