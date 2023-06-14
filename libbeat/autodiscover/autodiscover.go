@@ -126,7 +126,6 @@ func (a *Autodiscover) Start() {
 
 func (a *Autodiscover) worker() {
 	var updated, retry bool
-	kind := "first run"
 	t := time.NewTimer(debouncePeriod)
 
 	for {
@@ -138,17 +137,21 @@ func (a *Autodiscover) worker() {
 			}
 
 			if _, ok := event["start"]; ok {
-				updated = a.handleStart(event)
-				kind = "start"
+				// if updated is true, we don't want to set it back to false
+				if a.handleStart(event) {
+					updated = true
+				}
 			}
 			if _, ok := event["stop"]; ok {
-				updated = a.handleStop(event)
-				kind = "stop"
+				// if updated is true, we don't want to set it back to false
+				if a.handleStop(event) {
+					updated = true
+				}
 			}
 
 		case <-t.C:
 			if updated || retry {
-				a.logger.Debugf("Reloading autodiscover configs reason: updated: %t, retry: %t, kind: %s", updated, retry, kind)
+				a.logger.Debugf("Reloading autodiscover configs reason: updated: %t, retry: %t", updated, retry)
 
 				configs := []*reload.ConfigWithMeta{}
 				for _, list := range a.configs {
