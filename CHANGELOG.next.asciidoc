@@ -9,6 +9,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Increase Go version to 1.19.10 {pull}35751[35751]
+- Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 
 *Auditbeat*
 
@@ -124,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
 - Add support in s3 input for JSON with array of objects. {pull}35475[35475]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
+- Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
@@ -199,6 +202,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 - Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 
 *Osquerybeat*
 
@@ -356,6 +360,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
+- Handle empty DNS answer data in QueryResults for the Sysmon Pipeline {pull}35207[35207]
 
 
 *Elastic Log Driver*
