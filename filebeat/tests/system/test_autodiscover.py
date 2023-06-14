@@ -39,7 +39,7 @@ class TestAutodiscover(filebeat.BaseTest):
             proc = self.start_beat()
             self._test(container)
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout=120)
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
         proc.check_kill_and_wait()
 
     @unittest.skipIf(not INTEGRATION_TESTS or
@@ -67,7 +67,7 @@ class TestAutodiscover(filebeat.BaseTest):
             proc = self.start_beat()
             self._test(container)
 
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'), max_timeout=120)
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
         proc.check_kill_and_wait()
 
     def _test(self, container):
@@ -75,19 +75,16 @@ class TestAutodiscover(filebeat.BaseTest):
             f.write(b'Busybox output 1\n')
 
         docker_client = docker.from_env()
-        print("\nRunning containers:") # make the output nicer
-        for i, c in enumerate(docker_client.containers.list()):
-            print("[%d].name='%s'" % (i, c.name))
-        print("waiting for '%s' to be running..." % (container.name))
 
         def wait_container_start():
             for i, c in enumerate(docker_client.containers.list()):
                 if c.name == container.name:
                     return True
 
+        # Ensure the container is running before checkginf
+        # for the input
         self.wait_until(
             wait_container_start,
-            poll_interval=0.1,
             name="wait for test container",
             err_msg="the test container is not running yet")
 
