@@ -49,8 +49,9 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 		}
 
 		// add instance ID from dimension value
-		dimInstanceID, _ := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId")
-		_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+		if dimInstanceID, err := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId"); err == nil {
+			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+		}
 
 		for instanceID, output := range instancesOutputs {
 			if instanceID != potentialInstanceID {
@@ -171,7 +172,7 @@ func addHostFields(event mb.Event, instanceID string) {
 	}
 }
 
-func calculateRate(event mb.Event, period int) {
+func calculateRate(event mb.Event, periodInSeconds int) {
 	metricList := []string{
 		"aws.ec2.metrics.NetworkIn.sum",
 		"aws.ec2.metrics.NetworkOut.sum",
@@ -185,7 +186,7 @@ func calculateRate(event mb.Event, period int) {
 	for _, metricName := range metricList {
 		metricValue, err := event.RootFields.GetValue(metricName)
 		if err == nil && metricValue != nil {
-			rateValue := metricValue.(float64) / float64(period)
+			rateValue := metricValue.(float64) / float64(periodInSeconds)
 			_, _ = event.RootFields.Put(strings.Replace(metricName, ".sum", ".rate", -1), rateValue)
 		}
 	}

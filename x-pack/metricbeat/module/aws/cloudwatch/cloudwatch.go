@@ -159,6 +159,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
 
 			for _, event := range eventsWithIdentifier {
+				_ = event.RootFields.Delete(aws.CloudWatchPeriodName)
 				report.Event(event)
 			}
 		}
@@ -209,6 +210,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			for _, event := range events {
+				_ = event.RootFields.Delete(aws.CloudWatchPeriodName)
 				report.Event(event)
 			}
 		}
