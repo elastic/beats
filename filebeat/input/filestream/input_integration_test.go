@@ -740,11 +740,6 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	// so it can interfere with the truncation of the file
 	env.mustAppendToFile(testlogName, []byte("third line\n"))
 
-	// Sleep for a second before modifying the file again
-	// this ensures the modification time of the file will
-	// be different between the last write and the truncation.
-	time.Sleep(time.Second)
-
 	env.mustTruncateFile(testlogName, 0)
 
 	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
