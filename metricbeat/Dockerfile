@@ -12,6 +12,12 @@ RUN \
          unzip \
       && rm -rf /var/lib/apt/lists/*
 
+# Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts
+# with the system Python installation.
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
 RUN pip3 install --upgrade pip==20.1.1
 RUN pip3 install --upgrade setuptools==47.3.2
 RUN pip3 install --upgrade docker-compose==1.23.2
@@ -22,8 +28,6 @@ RUN cd /usr/lib \
   && unzip instantclient-basic-linux.zip \
   && rm instantclient-basic-linux.zip
 ENV LD_LIBRARY_PATH=/usr/lib/instantclient_19_6
-
-ENV PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/oracle/12.2/client64/bin
 
 # Add healthcheck for the docker/healthcheck metricset to check during testing.
 HEALTHCHECK CMD exit 0
