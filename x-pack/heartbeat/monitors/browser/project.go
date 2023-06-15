@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -94,12 +95,11 @@ func (p *Project) Close() error {
 	return nil
 }
 
-var blocklist = map[string]interface{}{
+var filterMap = map[string]int{
 	"--pause-on-error":  0,
 	"--quiet-exit-code": 0,
 	"--dry-run":         0,
 	"--outfd":           1,
-	"--sandbox":         0,
 	"--reporter":        1,
 	"-V":                0,
 	"--version":         0,
@@ -107,13 +107,13 @@ var blocklist = map[string]interface{}{
 	"--help":            0,
 }
 
-func (p *Project) extraArgs() []string {
+func (p *Project) extraArgs(uiOrigin bool) []string {
 	extraArgs := []string{}
 
-	for _, arg := range p.projectCfg.SyntheticsArgs {
-		if _, ok := blocklist[arg]; ok {
-			extraArgs = append(extraArgs, arg)
-		}
+	if uiOrigin {
+		extraArgs = filterDevFlags(p.projectCfg.SyntheticsArgs, filterMap)
+	} else {
+		extraArgs = append(extraArgs, p.projectCfg.SyntheticsArgs...)
 	}
 
 	if len(p.projectCfg.PlaywrightOpts) > 0 {
@@ -160,17 +160,19 @@ func (p *Project) jobs() []jobs.Job {
 
 	isScript := p.projectCfg.Source.Inline != nil
 	ctx := context.WithValue(p.ctx, synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
+	sFields := p.StdFields()
 
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)
+		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), sFields, p.extraArgs(sFields.Origin != "")...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
+
+			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), sFields, p.extraArgs(sFields.Origin != "")...)
 			if err != nil {
 				return nil, err
 			}
@@ -186,4 +188,64 @@ func (p *Project) plugin() plugin.Plugin {
 		DoClose:   p.Close,
 		Endpoints: 1,
 	}
+}
+
+type argsIterator struct {
+	i    int
+	args []string
+	val  string
+}
+
+func (a *argsIterator) Next() bool {
+	if a.i >= len(a.args) {
+		return false
+	}
+	a.val = a.args[a.i]
+	a.i++
+	return true
+}
+
+func (a *argsIterator) Val() string {
+	return a.val
+}
+
+func (a *argsIterator) Peek() (val string, ok bool) {
+	if a.i >= len(a.args) {
+		return "", false
+	}
+
+	val = a.args[a.i]
+	ok = true
+
+	return val, ok
+}
+
+// Iterate through list and filter dev flags + potential params
+func filterDevFlags(args []string, filter map[string]int) []string {
+	result := []string{}
+
+	iter := argsIterator{i: 0, args: args}
+	for {
+		next := iter.Next()
+
+		if !next {
+			break
+		}
+
+		if pCount, ok := filter[iter.Val()]; ok {
+		ParamsIter:
+			for i := 0; i < pCount; i++ {
+				// Found filtered flag, check if it has associated params
+				if param, ok := iter.Peek(); ok && !strings.HasPrefix(param, "-") {
+					iter.Next()
+				} else {
+					break ParamsIter
+				}
+			}
+		} else {
+			result = append(result, iter.Val())
+		}
+	}
+
+	return result
 }
