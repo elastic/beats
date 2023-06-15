@@ -32,7 +32,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"android/amd64", CGOSupported},
 	{"android/arm", CGOSupported},
 	{"android/arm64", CGOSupported},
-	{"darwin/386", CGOSupported | CrossBuildSupported},
+	{"darwin/386", 0},
 	{"darwin/amd64", CGOSupported | CrossBuildSupported | Default},
 	{"darwin/arm", CGOSupported},
 	{"darwin/arm64", CGOSupported | CrossBuildSupported | Default},
@@ -40,7 +40,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"freebsd/386", CGOSupported},
 	{"freebsd/amd64", CGOSupported},
 	{"freebsd/arm", 0},
-	{"linux/386", CGOSupported | CrossBuildSupported | Default},
+	{"linux/386", 0},
 	{"linux/amd64", CGOSupported | CrossBuildSupported | Default},
 	{"linux/armv5", CGOSupported | CrossBuildSupported},
 	{"linux/armv6", CGOSupported | CrossBuildSupported},
@@ -66,7 +66,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"plan9/amd64", 0},
 	{"plan9/arm", 0},
 	{"solaris/amd64", CGOSupported},
-	{"windows/386", CGOSupported | CrossBuildSupported | Default},
+	{"windows/386", 0},
 	{"windows/amd64", CGOSupported | CrossBuildSupported | Default},
 }
 

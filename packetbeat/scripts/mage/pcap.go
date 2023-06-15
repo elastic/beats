@@ -54,7 +54,6 @@ const (
 )
 
 var libpcapLDFLAGS = map[string]string{
-	"linux/386":      "-L/libpcap/libpcap-1.8.1-i386 -lpcap",
 	"linux/amd64":    "-L/libpcap/libpcap-1.8.1-amd64 -lpcap",
 	"linux/arm64":    linuxPcapLDFLAGS,
 	"linux/armv5":    linuxPcapLDFLAGS,
@@ -68,11 +67,9 @@ var libpcapLDFLAGS = map[string]string{
 	"linux/s390x":    linuxPcapLDFLAGS,
 	"darwin/amd64":   "-lpcap",
 	"windows/amd64":  "-L /libpcap/win/WpdPack/Lib/x64 -lwpcap",
-	"windows/386":    "-L /libpcap/win/WpdPack/Lib -lwpcap",
 }
 
 var libpcapCFLAGS = map[string]string{
-	"linux/386":      linuxPcapCFLAGS,
 	"linux/amd64":    linuxPcapCFLAGS,
 	"linux/arm64":    linuxPcapCFLAGS,
 	"linux/armv5":    linuxPcapCFLAGS,
@@ -85,5 +82,4 @@ var libpcapCFLAGS = map[string]string{
 	"linux/ppc64le":  linuxPcapCFLAGS,
 	"linux/s390x":    linuxPcapCFLAGS,
 	"windows/amd64":  "-I /libpcap/win/WpdPack/Include",
-	"windows/386":    "-I /libpcap/win/WpdPack/Include",
 }
