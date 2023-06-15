@@ -19,12 +19,13 @@ package common
 
 import (
 	"encoding"
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/pkg/errors"
 

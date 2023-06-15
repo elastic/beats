@@ -18,7 +18,9 @@
 package processing
 
 import (
+	"bytes"
 	"encoding/json"
+	"strconv"
 	"testing"
 	"time"
 
@@ -302,6 +304,77 @@ func TestProcessorsConfigs(t *testing.T) {
 	}
 }
 
+func BenchmarkTestProcessorsConfigs(b *testing.B) {
+	defaultInfo := beat.Info{
+		Beat:        "test",
+		EphemeralID: uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440000")),
+		Hostname:    "test.host.name",
+		ID:          uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440001")),
+		Name:        "test.host.name",
+		Version:     "0.1",
+	}
+
+	const META_KEYS_AND_LAYERS = 1000
+	mMeta := generateMeta(META_KEYS_AND_LAYERS, META_KEYS_AND_LAYERS)
+	cases := map[string]struct {
+		factory  SupportFactory
+		global   string
+		local    beat.ProcessingConfig
+		drop     bool
+		event    string
+		want     mapstr.M
+		wantMeta mapstr.M
+		infoMod  func(beat.Info) beat.Info
+	}{
+		"with client metadata": {
+			local: beat.ProcessingConfig{
+				Meta: mMeta,
+			},
+			event:    `{"value": "abc"}`,
+			want:     mapstr.M{"value": "abc"},
+			wantMeta: mMeta,
+		},
+	}
+
+	for name, test := range cases {
+		test := test
+		b.Run(name, func(b *testing.B) {
+			cfg, err := config.NewConfigWithYAML([]byte(test.global), "test")
+			require.NoError(b, err)
+
+			info := defaultInfo
+			if test.infoMod != nil {
+				info = test.infoMod(info)
+			}
+
+			factory := test.factory
+			if factory == nil {
+				factory = MakeDefaultSupport(true, nil)
+			}
+
+			support, err := factory(info, logp.L(), cfg)
+			require.NoError(b, err)
+
+			prog, err := support.Create(test.local, test.drop)
+			require.NoError(b, err)
+
+			e := &beat.Event{
+				Timestamp: time.Now(),
+				Fields:    fromJSON(test.event),
+			}
+			if test.wantMeta != nil {
+				e.Meta = mMeta
+			}
+			actual, err := prog.Run(e)
+			require.NoError(b, err)
+
+			// validate
+			assert.Equal(b, test.want, actual.Fields)
+			assert.Equal(b, test.wantMeta, actual.Meta)
+		})
+	}
+}
+
 // TestEventNormalizationOverride verifies that the EventNormalization option
 // in beat.ProcessingConfig overrides the "skipNormalize" setting that is
 // specified in the builder (this is the default value set by the Beat).
@@ -514,4 +587,21 @@ func (p *processorWithClose) Close() error {
 
 func (p *processorWithClose) String() string {
 	return "processorWithClose"
+}
+
+func generateMeta(layers int, layerKeys int) mapstr.M {
+	m := mapstr.M{}
+	p := m
+	for l := 0; l < layers; l++ {
+		layer := uuid.Must(uuid.NewV4()).String()
+		p[layer] = mapstr.M{}
+		for k := 0; k < layerKeys; k++ {
+			var b bytes.Buffer
+			b.WriteString(layer)
+			b.WriteString(strconv.Itoa(k))
+			p[layer].(mapstr.M)[layer] = b.String()
+		}
+		p = p[layer].(mapstr.M)
+	}
+	return m
 }

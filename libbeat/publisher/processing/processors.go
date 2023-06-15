@@ -170,7 +170,6 @@ func addMeta(event *beat.Event, meta mapstr.M) {
 	if event.Meta == nil {
 		event.Meta = meta
 	} else {
-		event.Meta.Clone()
 		event.Meta.DeepUpdate(meta)
 	}
 }
