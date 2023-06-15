@@ -133,6 +133,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
+- Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
 
 *Heartbeat*
 
