@@ -5,7 +5,12 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: beats
-  description: :tropical_fish: Beats - Lightweight shippers for Elasticsearch & Logstash 
+  description: :tropical_fish: Beats - Lightweight shippers for Elasticsearch & Logstash
+  links:
+    - title: Beats Documentation
+      icon: file-doc
+      url: https://www.elastic.co/products/beats
+
 spec:
   type: library
   owner: group:ingest-fp
