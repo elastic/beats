@@ -328,7 +328,6 @@ def linuxPlatforms() {
   return [
             '+all',
             'linux/amd64',
-            'linux/386',
             'linux/arm64',
             // armv7 packaging isn't working, and we don't currently
             // need it for release. Do not re-enable it without
@@ -341,7 +340,6 @@ def linuxPlatforms() {
             //'linux/mips64',
             //'linux/s390x',
             'windows/amd64',
-            'windows/386',
             'darwin/amd64',
             'darwin/arm64'
           ].join(' ')
