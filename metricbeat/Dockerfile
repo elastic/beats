@@ -3,7 +3,7 @@ FROM golang:1.19.10
 RUN \
     apt update \
       && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends \
-         netcat \
+         netcat-openbsd \
          python3 \
          python3-dev \
          python3-pip \

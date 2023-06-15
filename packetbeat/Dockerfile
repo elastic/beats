@@ -7,7 +7,7 @@ RUN \
          python3-pip \
          python3-venv \
          librpm-dev \
-         netcat \
+         netcat-openbsd \
          libpcap-dev \
       && rm -rf /var/lib/apt/lists/*
 
