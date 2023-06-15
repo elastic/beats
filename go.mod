@@ -17,7 +17,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.1
-	github.com/PaesslerAG/gval v1.0.0
+	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v1.2.1
@@ -66,7 +66,7 @@ require (
 	github.com/dolmen-go/contextio v0.0.0-20200217195037-68fc5150bcd5
 	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
-	github.com/dustin/go-humanize v1.0.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.1.2
@@ -137,6 +137,7 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.2
@@ -191,7 +192,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
 	github.com/Azure/go-autorest/autorest/adal v0.9.14
-	github.com/apache/arrow/go/v11 v11.0.0
+	github.com/apache/arrow/go/v12 v12.0.1-0.20230605094802-c153c6d36ccf
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.7
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
@@ -200,10 +201,10 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.1
-	github.com/elastic/elastic-agent-libs v0.3.8
+	github.com/elastic/elastic-agent-libs v0.3.9
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
-	github.com/elastic/go-elasticsearch/v8 v8.8.0
+	github.com/elastic/go-elasticsearch/v8 v8.8.1
 	github.com/elastic/mito v1.3.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -262,7 +263,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.2.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.3.0 // indirect
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
@@ -310,7 +311,7 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/markbates/pkger v0.17.1 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
