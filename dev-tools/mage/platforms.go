@@ -18,10 +18,9 @@
 package mage
 
 import (
+	"fmt"
 	"sort"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // BuildPlatforms is a list of GOOS/GOARCH pairs supported by Go.
@@ -317,7 +316,7 @@ func newPlatformExpression(expr string) (*platformExpression, error) {
 		}
 
 		if !valid {
-			return nil, errors.Errorf("invalid platform in expression: %v", name)
+			return nil, fmt.Errorf("invalid platform in expression: %v", name)
 		}
 	}
 
@@ -413,7 +412,7 @@ func (list BuildPlatformList) Filter(expr string) BuildPlatformList {
 		return list
 	}
 	if len(pe.Add) > 0 {
-		panic(errors.Errorf("adds (%v) cannot be used in filter expressions",
+		panic(fmt.Errorf("adds (%v) cannot be used in filter expressions",
 			strings.Join(pe.Add, ", ")))
 	}
 
@@ -449,8 +448,7 @@ func (list BuildPlatformList) Filter(expr string) BuildPlatformList {
 
 // Merge creates a new list with the two list merged.
 func (list BuildPlatformList) Merge(with BuildPlatformList) BuildPlatformList {
-	out := make(BuildPlatformList, 0, len(list)+len(with))
-	out = append(list, with...)
+	out := append(list, with...)
 	out = append(out, with...)
 	return out.deduplicate()
 }
