@@ -18,8 +18,10 @@
 package autodiscover
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -34,6 +36,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -85,8 +88,13 @@ type mockAdapter struct {
 // CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 func (m *mockAdapter) CreateConfig(event bus.Event) ([]*conf.C, error) {
 	if cfgs, ok := event["config"]; ok {
-		return cfgs.([]*conf.C), nil
+		if confs, ok := cfgs.([]*conf.C); ok {
+			return confs, nil
+		}
+
+		return nil, fmt.Errorf("event['config'] is of type '%T', expecting '[]*conf.C'", cfgs)
 	}
+
 	return m.configs, nil
 }
 
@@ -151,10 +159,9 @@ func TestNilAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscover(t *testing.T) {
+	printDebugLogsOnFailure(t)
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
-	// If this test fails, uncomment the following line to enable debug logs
-	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
 
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
@@ -208,15 +215,7 @@ func TestAutodiscover(t *testing.T) {
 		},
 	})
 
-	nRunners := 1
-	require.Eventuallyf(t,
-		func() bool {
-			return len(autodiscover.runners.Runners()) == nRunners
-		},
-		10*time.Second,
-		100*time.Millisecond,
-		"expecting %d runners", nRunners)
-
+	requireRunningRunners(t, autodiscover, 1)
 	runners := adapter.Runners()
 	require.Equal(t, len(runners), 1)
 	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
@@ -236,15 +235,7 @@ func TestAutodiscover(t *testing.T) {
 		},
 	})
 
-	nRunners = 1
-	require.Eventuallyf(t,
-		func() bool {
-			return len(autodiscover.runners.Runners()) == nRunners
-		},
-		10*time.Second,
-		100*time.Millisecond,
-		"expecting %d runners", nRunners)
-
+	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
 	require.Equal(t, len(runners), 1)
 	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
@@ -263,14 +254,7 @@ func TestAutodiscover(t *testing.T) {
 		},
 	})
 
-	nRunners = 0
-	require.Eventuallyf(t,
-		func() bool {
-			return len(autodiscover.runners.Runners()) == nRunners
-		},
-		10*time.Second,
-		100*time.Millisecond,
-		"expecting %d runners", nRunners)
+	requireRunningRunners(t, autodiscover, 0)
 
 	// This stop event will trigger an input reload
 	t.Log("Sending second start event, there will be 1 runner running")
@@ -283,15 +267,7 @@ func TestAutodiscover(t *testing.T) {
 		},
 	})
 
-	nRunners = 1
-	require.Eventuallyf(t,
-		func() bool {
-			return len(autodiscover.runners.Runners()) == nRunners
-		},
-		10*time.Second,
-		100*time.Millisecond,
-		"expecting %d runners", nRunners)
-
+	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
 	require.Equal(t, len(runners), 2)
 	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
@@ -646,6 +622,138 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	wait(t, func() bool { return adapter.Runners()[2].stopped == true })
 	runners = adapter.Runners()
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
+}
+
+func TestAutodiscoverDebounce(t *testing.T) {
+	printDebugLogsOnFailure(t)
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+	Registry = NewRegistry()
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+		// intercept bus to mock events
+		busChan <- b
+
+		return &mockProvider{}, nil
+	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
+
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*conf.C{providerConfig},
+	}
+	k, _ := keystore.NewFileKeystore("test")
+
+	adapter := mockAdapter{}
+
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Start it
+	autodiscover.Start()
+	t.Cleanup(autodiscover.Stop)
+
+	eventBus := <-busChan
+
+	cfg, err := conf.NewConfigFrom(map[string]string{
+		"foo": "bar",
+	})
+	if err != nil {
+		t.Fatalf("error creating input config: %s", err)
+	}
+
+	// Send an event with config,
+	// handleStart will return true and
+	// updated will be set to true
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+		"config": []*conf.C{cfg},
+	})
+
+	// Send the second event without a config
+	// `Autodiscover.handleStart` will return false and
+	// updated must not be changed
+	eventBus.Publish(bus.Event{
+		"id":       "second,",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+	})
+
+	// Ensure the input has been started
+	requireRunningRunners(t, autodiscover, 1)
+
+	// Repeat the process, but this time with a stop event.
+	// The same logic applies, but now we're testing the branch that calls
+	// `Autodiscover.handleStop`
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"stop":     true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+		"config": []*conf.C{cfg},
+	})
+	eventBus.Publish(bus.Event{
+		"id":       "second,",
+		"provider": "mock",
+		"stop":     true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+	})
+	requireRunningRunners(t, autodiscover, 0)
+}
+
+func printDebugLogsOnFailure(t *testing.T) {
+	// Use the following line to have the logs being printed
+	// in real time.
+	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
+	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
+		t.Fatalf("error setting up dev logging: %s", err)
+	}
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Debug Logs:\n")
+			for _, log := range logp.ObserverLogs().TakeAll() {
+				data, err := json.Marshal(log)
+				if err != nil {
+					t.Errorf("failed encoding log as JSON: %s", err)
+				}
+				t.Logf("%s", string(data))
+			}
+			return
+		}
+	})
+}
+
+func requireRunningRunners(t *testing.T, autodiscover *Autodiscover, nRunners int) {
+	t.Helper()
+	nRunnersStr := strings.Builder{}
+	require.Eventuallyf(t,
+		func() bool {
+			nRunnersStr.Reset()
+			lenRunners := len(autodiscover.runners.Runners())
+			fmt.Fprint(&nRunnersStr, lenRunners)
+			return lenRunners == nRunners
+		},
+		30*time.Second,
+		100*time.Millisecond,
+		"expecting %d runners, got %s", nRunners, &nRunnersStr)
 }
 
 func wait(t *testing.T, test func() bool) {

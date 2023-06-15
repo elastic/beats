@@ -33,8 +33,8 @@ import (
 )
 
 const (
-	// debouncePeriod is the time autodiscover will wait before reloading inputs
-	debouncePeriod = time.Second
+	// defaultDebouncePeriod is the time autodiscover will wait before reloading inputs
+	defaultDebouncePeriod = time.Second
 )
 
 // EventConfigurer is used to configure the creation of configuration objects
@@ -63,6 +63,7 @@ type Autodiscover struct {
 	meta            *meta.Map
 	listener        bus.Listener
 	logger          *logp.Logger
+	debouncePeriod  time.Duration
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -100,6 +101,7 @@ func NewAutodiscover(
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
+		debouncePeriod:  defaultDebouncePeriod,
 	}, nil
 }
 
@@ -126,7 +128,7 @@ func (a *Autodiscover) Start() {
 
 func (a *Autodiscover) worker() {
 	var updated, retry bool
-	t := time.NewTimer(debouncePeriod)
+	t := time.NewTimer(defaultDebouncePeriod)
 
 	for {
 		select {
@@ -173,12 +175,12 @@ func (a *Autodiscover) worker() {
 					// to the harvester state, so we need to give the publishing
 					// pipeline some time to finish flushing the events from that
 					// file. Hence we wait for 10x the normal debounce period.
-					t.Reset(10 * debouncePeriod)
+					t.Reset(10 * a.debouncePeriod)
 					continue
 				}
 			}
 
-			t.Reset(debouncePeriod)
+			t.Reset(a.debouncePeriod)
 		}
 	}
 }
