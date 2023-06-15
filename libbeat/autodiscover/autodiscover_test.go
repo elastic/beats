@@ -256,7 +256,7 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 0)
 
-	// This stop event will trigger an input reload
+	// This start event will trigger an input reload
 	t.Log("Sending second start event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
@@ -668,7 +668,7 @@ func TestAutodiscoverDebounce(t *testing.T) {
 	}
 
 	// Send an event with config,
-	// handleStart will return true and
+	// `Autodiscover.handleStart` will return true and
 	// updated will be set to true
 	eventBus.Publish(bus.Event{
 		"id":       "foo",

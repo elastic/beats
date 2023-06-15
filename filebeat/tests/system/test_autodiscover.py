@@ -81,8 +81,8 @@ class TestAutodiscover(filebeat.BaseTest):
                 if c.name == container.name:
                     return True
 
-        # Ensure the container is running before checkginf
-        # for the input
+        # Ensure the container is running before checkging
+        # if the input is running
         self.wait_until(
             wait_container_start,
             name="wait for test container",
