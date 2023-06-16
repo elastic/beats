@@ -255,32 +255,36 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	return nil
 }
 
-// readJSONSlice uses a slice of json.RawMessage to process JSON slice data
-// as individual JSON objects.
+// readJSONSlice uses a json.RawMessage to process JSON slice data as individual JSON objects.
+// It reads the opening token separately and then iterates over the slice, decoding each object and publishing it.
 func (p *s3ObjectProcessor) readJSONSlice(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
+	// reads starting token separately since this is always a slice.
+	_, err := dec.Token()
+	if err != nil {
+		return fmt.Errorf("failed to read JSON slice token for object key: %s, with error: %w", p.s3Obj.S3.Object.Key, err)
+	}
+
 	for dec.More() && p.ctx.Err() == nil {
 		offset := dec.InputOffset()
 
-		var items []json.RawMessage
-		if err := dec.Decode(&items); err != nil {
+		var item json.RawMessage
+		if err := dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
 
-		for _, item := range items {
-			if p.readerConfig.ExpandEventListFromField != "" {
-				if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
-					return err
-				}
-				continue
+		if p.readerConfig.ExpandEventListFromField != "" {
+			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
+				return err
 			}
-
-			data, _ := item.MarshalJSON()
-			evt := p.createEvent(string(data), offset)
-			p.publish(p.acker, &evt)
+			continue
 		}
+
+		data, _ := item.MarshalJSON()
+		evt := p.createEvent(string(data), offset)
+		p.publish(p.acker, &evt)
 	}
 
 	return nil
