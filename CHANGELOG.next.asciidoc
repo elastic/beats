@@ -9,7 +9,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Increase Go version to 1.19.10 {pull}35751[35751]
 - Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 
 *Auditbeat*
@@ -202,6 +201,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 - Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 
 *Osquerybeat*
 
