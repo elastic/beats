@@ -19,7 +19,6 @@ package udp
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -199,20 +198,19 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 			log.Warnf("failed to get address for %s: %v", device, err)
 			return out
 		}
-		p, err := strconv.ParseInt(port, 10, 16)
+		pn, err := strconv.ParseInt(port, 10, 16)
 		if err != nil {
 			log.Warnf("failed to get port for %s: %v", device, err)
 			return out
 		}
-		ph := strconv.FormatInt(p, 16)
 		addr := make([]string, 0, len(ip))
 		addr6 := make([]string, 0, len(ip))
 		for _, p := range ip {
 			switch len(p) {
 			case net.IPv4len:
-				addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To4()), ph))
+				addr = append(addr, ipv4KernelAddr(p, int(pn)))
 			case net.IPv6len:
-				addr6 = append(addr6, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To16()), ph))
+				addr6 = append(addr6, ipv6KernelAddr(p, int(pn)))
 			default:
 				log.Warnf("unexpected addr length %d for %s", len(p), p)
 			}
@@ -222,6 +220,22 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 	}
 
 	return out
+}
+
+func ipv4KernelAddr(ip net.IP, port int) string {
+	return fmt.Sprintf("%08X:%04X", reverse(ip.To4()), port)
+}
+
+func ipv6KernelAddr(ip net.IP, port int) string {
+	return fmt.Sprintf("%032X:%04X", reverse(ip.To16()), port)
+}
+
+func reverse(b []byte) []byte {
+	c := make([]byte, len(b))
+	for i, e := range b {
+		c[len(b)-1-i] = e
+	}
+	return c
 }
 
 // log logs metric for the given packet.
