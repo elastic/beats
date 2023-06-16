@@ -311,6 +311,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 - Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -349,6 +350,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
 - Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 
 *Winlogbeat*
 
@@ -360,6 +362,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
 - Handle empty DNS answer data in QueryResults for the Sysmon Pipeline {pull}35207[35207]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 
 
 *Elastic Log Driver*
