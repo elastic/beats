@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/filebeat/harvester"
+	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
 )
 
@@ -162,6 +163,12 @@ func (h *Harvester) Run() error {
 			},
 		}
 
+		// 设置为完成状态，避免进度文件回写报错
+		data.SetState(file.State{
+			Type: "redis",
+			Finished: true,
+		})
+
 		h.forwarder.Send(data)
 	}
 	return nil
@@ -176,3 +183,4 @@ func (h *Harvester) Stop() {
 func (h *Harvester) ID() uuid.UUID {
 	return h.id
 }
+

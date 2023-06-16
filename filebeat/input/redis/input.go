@@ -18,7 +18,9 @@
 package redis
 
 import (
+	"encoding/json"
 	"os"
+	"strings"
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -41,11 +43,37 @@ func init() {
 
 // Input is a input for redis
 type Input struct {
-	started  bool
-	outlet   channel.Outleter
-	config   config
-	cfg      *common.Config
-	registry *harvester.Registry
+	started     bool
+	outlet      channel.Outleter
+	config      config
+	cfg         *common.Config
+	registry    *harvester.Registry
+	passwordMap map[string]string
+}
+
+// loadPwdFile reads the redis password file and returns the password map
+// sample file: https://github.com/oliver006/redis_exporter/blob/master/contrib/sample-pwd-file.json
+func loadPwdFile(passwordFile string) (map[string]string, error) {
+	res := make(map[string]string)
+
+	logp.Debug("start load password file: %s", passwordFile)
+	bytes, err := os.ReadFile(passwordFile)
+	if err != nil {
+		logp.Warn("load password file failed: %s", err)
+		return nil, err
+	}
+	err = json.Unmarshal(bytes, &res)
+	if err != nil {
+		logp.Warn("password file format error: %s", err)
+		return nil, err
+	}
+
+	logp.Info("Loaded %d entries from %s", len(res), passwordFile)
+	for k := range res {
+		logp.Debug("%s", k)
+	}
+
+	return res, nil
 }
 
 // NewInput creates a new redis input
@@ -60,19 +88,12 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	}
 
 	// 读取文件内容
-	var content = ""
+	passwordMap := make(map[string]string)
 	if config.PasswordFile != "" {
-		info, err := os.ReadFile(config.PasswordFile)
+		passwordMap, err = loadPwdFile(config.PasswordFile)
 		if err != nil {
-			logp.Err("Read Password File Error: %s", err)
-		} else {
-			content = string(info)
+			logp.Err("Error loading redis passwords from file %s, err: %s", config.PasswordFile, err)
 		}
-	}
-
-	// 将文件内容赋值给 config.Password
-	if content != "" {
-		config.Password = content
 	}
 
 	outlet, err := outletFactory(cfg, context.DynamicFields)
@@ -81,11 +102,12 @@ func NewInput(cfg *common.Config, outletFactory channel.Connector, context input
 	}
 
 	p := &Input{
-		started:  false,
-		outlet:   outlet,
-		config:   config,
-		cfg:      cfg,
-		registry: harvester.NewRegistry(),
+		started:     false,
+		outlet:      outlet,
+		config:      config,
+		cfg:         cfg,
+		registry:    harvester.NewRegistry(),
+		passwordMap: passwordMap,
 	}
 
 	return p, nil
@@ -107,7 +129,18 @@ func (p *Input) Run() {
 
 	forwarder := harvester.NewForwarder(p.outlet)
 	for _, host := range p.config.Hosts {
-		pool := CreatePool(host, p.config.Password, p.config.Network,
+		uri := host
+		if !strings.Contains(uri, "://") {
+			uri = "redis://" + uri
+		}
+
+		// 判断 password file 中是否存在该域名的密码配置，如果不存在，则使用默认密码
+		password, ok := p.passwordMap[uri]
+		if !ok {
+			password = p.config.Password
+		}
+
+		pool := CreatePool(host, password, p.config.Network,
 			p.config.MaxConn, p.config.IdleTimeout, p.config.IdleTimeout)
 
 		h, err := NewHarvester(pool.Get())
