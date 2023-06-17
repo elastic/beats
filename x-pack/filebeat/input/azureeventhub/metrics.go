@@ -21,39 +21,68 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 	inputMetrics := inputMetrics{
 		unregister: unregister,
 
-		eventsReceived:              monitoring.NewUint(reg, "events_received_total"),
-		eventsSanitized:             monitoring.NewUint(reg, "events_sanitized_total"),
-		eventsDeserializationFailed: monitoring.NewUint(reg, "events_deserialization_failed_total"),
-		eventsProcessed:             monitoring.NewUint(reg, "events_processed_failed_total"),
-		eventsProcessingTime:        metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
+		// Messages
+		receivedMessages:  monitoring.NewUint(reg, "received_messages_total"),
+		receivedBytes:     monitoring.NewUint(reg, "received_bytes_total"),
+		sanitizedMessages: monitoring.NewUint(reg, "sanitized_messages_total"),
+		processedMessages: monitoring.NewUint(reg, "processed_messages_total"),
 
-		recordsReceived:            monitoring.NewUint(reg, "records_received_total"),
-		recordsSerializationFailed: monitoring.NewUint(reg, "records_serialization_failed_total"),
-		recordsDispatchFailed:      monitoring.NewUint(reg, "records_dispatch_failed_total"),
-		recordsProcessed:           monitoring.NewUint(reg, "records_processed_total"),
+		// Events
+		receivedEvents: monitoring.NewUint(reg, "received_events_total"),
+		sentEvents:     monitoring.NewUint(reg, "sent_events_total"),
+
+		// General
+		processingTime: metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
+		decodeErrors:   monitoring.NewUint(reg, "decode_errors_total"),
 	}
 	_ = adapter.
-		NewGoMetrics(reg, "events_processing_time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(inputMetrics.eventsProcessingTime))
+		NewGoMetrics(reg, "processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(inputMetrics.processingTime))
 
 	return &inputMetrics
 }
 
 // inputMetrics tracks metrics for this input.
+//
+// # Messages vs Events
+//
+// Messages are the raw data received from the eventhub. Here's an example of a
+// message:
+//
+//	{
+//	  "records": [
+//	    {
+//	      "time": "2019-12-17T13:43:44.4946995Z",
+//	      "test": "this is some message"
+//	    }
+//	  ]
+//	}
+//
+// Events are the objects inside the `records` array. Here's an example of an event
+// from the above message:
+//
+//	{
+//	  "time": "2019-12-17T13:43:44.4946995Z",
+//	  "test": "this is some message"
+//	}
 type inputMetrics struct {
 	// unregister is the cancel function to call when the input is
-	// stopped.
+	// stopping.
 	unregister func()
 
-	eventsReceived              *monitoring.Uint // eventsReceived tracks the number of eventhub events received.
-	eventsSanitized             *monitoring.Uint // eventsSanitized tracks the number of eventhub events that were sanitized.
-	eventsDeserializationFailed *monitoring.Uint // eventsDeserializationFailed tracks the number of eventhub events that failed to deserialize.
-	eventsProcessed             *monitoring.Uint // eventsProcessed tracks the number of eventhub events that were processed.
-	eventsProcessingTime        metrics.Sample   // eventsProcessingTime tracks the time it takes to process an event.
-	recordsReceived             *monitoring.Uint // recordsReceived tracks the number of records received (events successfully deserialized into records).
-	recordsSerializationFailed  *monitoring.Uint // recordsSerializationFailed tracks the number of records that failed to serialize.
-	recordsDispatchFailed       *monitoring.Uint // recordsDispatchFailed tracks the number of records that failed to dispatch.
-	recordsProcessed            *monitoring.Uint // recordsProcessed tracks the number of records that were processed successfully.
+	// Messages
+	receivedMessages  *monitoring.Uint // receivedMessages tracks the number of messages received from eventhub.
+	receivedBytes     *monitoring.Uint // receivedBytes tracks the number of bytes received from eventhub.
+	sanitizedMessages *monitoring.Uint // sanitizedMessages tracks the number of messages that were sanitized successfully.
+	processedMessages *monitoring.Uint // processedMessages tracks the number of messages that were processed successfully.
+
+	// Events
+	receivedEvents *monitoring.Uint // receivedEvents tracks the number of events received decoding messages.
+	sentEvents     *monitoring.Uint // sentEvents tracks the number of events that were sent successfully.
+
+	// General
+	processingTime metrics.Sample   // processingTime tracks the time it takes to process a message.
+	decodeErrors   *monitoring.Uint // decodeErrors tracks the number of errors that occurred while decoding a message.
 }
 
 // Close unregisters the metrics from the registry.

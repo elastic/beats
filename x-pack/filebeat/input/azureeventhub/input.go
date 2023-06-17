@@ -108,9 +108,7 @@ func NewInput(
 		defer cancelInputCtx()
 		select {
 		case <-inputContext.Done:
-			fmt.Println("inputContext.Done")
 		case <-inputCtx.Done():
-			fmt.Println("inputCtx.Done")
 		}
 	}()
 
@@ -203,7 +201,8 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 	}
 
 	// update the input metrics
-	a.metrics.eventsReceived.Inc()
+	a.metrics.receivedMessages.Inc()
+	a.metrics.receivedBytes.Add(uint64(len(event.Data)))
 
 	records := a.parseMultipleRecords(event.Data)
 
@@ -222,16 +221,17 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 			Private: event.Data,
 		})
 		if !ok {
-			a.metrics.recordsDispatchFailed.Inc()
-			a.metrics.eventsProcessingTime.Update(time.Since(processingStartTime).Nanoseconds())
+			// a.metrics.publishingErrors.Inc()
+			a.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 			return ok
 		}
 
-		a.metrics.recordsProcessed.Inc()
+		a.metrics.sentEvents.Inc()
 	}
 
-	a.metrics.eventsProcessed.Inc()
-	a.metrics.eventsProcessingTime.Update(time.Since(processingStartTime).Nanoseconds())
+	a.metrics.processedMessages.Inc()
+	a.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
+
 	return true
 }
 
@@ -246,7 +246,7 @@ func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
 	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
 		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
-		a.metrics.eventsSanitized.Inc()
+		a.metrics.sanitizedMessages.Inc()
 	}
 
 	// check if the message is a "records" object containing a list of events
@@ -257,10 +257,10 @@ func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 				js, err := json.Marshal(ms)
 				if err == nil {
 					messages = append(messages, string(js))
-					a.metrics.recordsReceived.Inc()
+					a.metrics.receivedEvents.Inc()
 				} else {
 					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-					a.metrics.recordsSerializationFailed.Inc()
+					// a.metrics.recordsSerializationFailed.Inc()
 				}
 			}
 		}
@@ -272,7 +272,7 @@ func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 		if err != nil {
 			// return entire message
 			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			a.metrics.eventsDeserializationFailed.Inc()
+			a.metrics.decodeErrors.Inc()
 			return []string{string(bMessage)}
 		}
 
@@ -280,10 +280,10 @@ func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 			js, err := json.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))
-				a.metrics.recordsReceived.Inc()
+				a.metrics.receivedEvents.Inc()
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-				a.metrics.recordsSerializationFailed.Inc()
+				// a.metrics.recordsSerializationFailed.Inc()
 			}
 		}
 	}

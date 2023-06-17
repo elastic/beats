@@ -39,75 +39,67 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 	//
 
 	cases := []struct {
-		event                       string
-		expectedRecords             []string
-		sanitizationOption          []string
-		eventsReceived              uint64
-		eventsSanitized             uint64
-		eventsDeserializationFailed uint64
-		eventsProcessed             uint64
-		eventsProcessingTime        uint64
-		recordsReceived             uint64
-		recordsSerializationFailed  uint64
-		recordsDispatchFailed       uint64
-		recordsProcessed            uint64
+		// Use case definition
+		event              []byte
+		expectedRecords    []string
+		sanitizationOption []string
+		// Expected results
+		receivedMessages  uint64
+		sanitizedMessages uint64
+		processedMessages uint64
+		receivedEvents    uint64
+		sentEvents        uint64
+		processingTime    uint64
+		decodeErrors      uint64
 	}{
 		{
-			event:                       "{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}",
-			expectedRecords:             []string{"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"},
-			eventsReceived:              1,
-			eventsSanitized:             0,
-			eventsDeserializationFailed: 0,
-			eventsProcessed:             1,
-			recordsReceived:             1,
-			recordsSerializationFailed:  0,
-			recordsDispatchFailed:       0,
-			recordsProcessed:            1,
+			event:             []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
+			expectedRecords:   []string{"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"},
+			receivedMessages:  1,
+			sanitizedMessages: 0,
+			processedMessages: 1,
+			receivedEvents:    1,
+			sentEvents:        1,
+			decodeErrors:      0,
 		},
 		{
-			event: "{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}, {\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}",
+			event: []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}, {\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
 			expectedRecords: []string{
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 			},
-			eventsReceived:              1,
-			eventsSanitized:             0,
-			eventsDeserializationFailed: 0,
-			eventsProcessed:             1,
-			recordsReceived:             2,
-			recordsSerializationFailed:  0,
-			recordsDispatchFailed:       0,
-			recordsProcessed:            2,
+			receivedMessages:  1,
+			sanitizedMessages: 0,
+			processedMessages: 1,
+			receivedEvents:    2,
+			sentEvents:        2,
+			decodeErrors:      0,
 		},
 		{
-			event: "{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}", // Thank you, Azure Functions logs.
+			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"), // Thank you, Azure Functions logs.
 			expectedRecords: []string{
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 			},
-			sanitizationOption:          []string{"SINGLE_QUOTES"},
-			eventsReceived:              1,
-			eventsSanitized:             1,
-			eventsDeserializationFailed: 0,
-			eventsProcessed:             1,
-			recordsReceived:             1,
-			recordsSerializationFailed:  0,
-			recordsDispatchFailed:       0,
-			recordsProcessed:            1,
+			sanitizationOption: []string{"SINGLE_QUOTES"},
+			receivedMessages:   1,
+			sanitizedMessages:  1,
+			processedMessages:  1,
+			receivedEvents:     1,
+			sentEvents:         1,
+			decodeErrors:       0,
 		},
 		{
-			event: "{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}",
+			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"),
 			expectedRecords: []string{
 				"{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}",
 			},
-			sanitizationOption:          []string{}, // no sanitization options
-			eventsReceived:              1,
-			eventsSanitized:             0, // Because we have no sanitization options.
-			eventsDeserializationFailed: 1,
-			eventsProcessed:             1,
-			recordsReceived:             0,
-			recordsSerializationFailed:  0,
-			recordsDispatchFailed:       0,
-			recordsProcessed:            1,
+			sanitizationOption: []string{}, // no sanitization options
+			receivedMessages:   1,
+			sanitizedMessages:  0, // Since we have no sanitization options, we don't try to sanitize.
+			processedMessages:  1,
+			decodeErrors:       1,
+			receivedEvents:     0, // If we can't decode the message, we can't count the events in it.
+			sentEvents:         1, // The input sends the unmodified message as a string to the outlet.
 		},
 	}
 
@@ -140,7 +132,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		}
 
 		ev := eventhub.Event{
-			Data:             []byte(tc.event),
+			Data:             tc.event,
 			SystemProperties: &properties,
 		}
 
@@ -159,18 +151,21 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			}
 		}
 
-		assert.True(t, metrics.eventsProcessingTime.Size() > 0) // TODO: is this the right way of checking if we collected some processing time?
+		assert.True(t, metrics.processingTime.Size() > 0) // TODO: is this the right way of checking if we collected some processing time?
 
-		assert.Equal(t, tc.eventsReceived, metrics.eventsReceived.Get())
-		assert.Equal(t, tc.eventsSanitized, metrics.eventsSanitized.Get())
-		assert.Equal(t, tc.eventsDeserializationFailed, metrics.eventsDeserializationFailed.Get())
-		assert.Equal(t, tc.eventsProcessed, metrics.eventsProcessed.Get())
+		// Messages
+		assert.Equal(t, tc.receivedMessages, metrics.receivedMessages.Get())
+		assert.Equal(t, uint64(len(tc.event)), metrics.receivedBytes.Get())
+		assert.Equal(t, tc.sanitizedMessages, metrics.sanitizedMessages.Get())
+		assert.Equal(t, tc.processedMessages, metrics.processedMessages.Get())
 
-		assert.Equal(t, tc.recordsReceived, metrics.recordsReceived.Get())
-		assert.Equal(t, tc.recordsSerializationFailed, metrics.recordsSerializationFailed.Get())
-		assert.Equal(t, tc.recordsDispatchFailed, metrics.recordsDispatchFailed.Get())
-		assert.Equal(t, tc.recordsProcessed, metrics.recordsProcessed.Get())
+		// General
+		assert.Equal(t, tc.decodeErrors, metrics.decodeErrors.Get())
 
-		metrics.Close()
+		// Events
+		assert.Equal(t, tc.receivedEvents, metrics.receivedEvents.Get())
+		assert.Equal(t, tc.sentEvents, metrics.sentEvents.Get())
+
+		metrics.Close() // Stop the metrics collection.
 	}
 }
