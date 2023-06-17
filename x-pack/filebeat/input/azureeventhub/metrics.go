@@ -19,16 +19,18 @@ import (
 func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
 	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
 	inputMetrics := inputMetrics{
-		unregister:                  unregister,
+		unregister: unregister,
+
 		eventsReceived:              monitoring.NewUint(reg, "events_received_total"),
 		eventsSanitized:             monitoring.NewUint(reg, "events_sanitized_total"),
 		eventsDeserializationFailed: monitoring.NewUint(reg, "events_deserialization_failed_total"),
 		eventsProcessed:             monitoring.NewUint(reg, "events_processed_failed_total"),
 		eventsProcessingTime:        metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
-		recordsReceived:             monitoring.NewUint(reg, "records_received_total"),
-		recordsSerializationFailed:  monitoring.NewUint(reg, "records_serialization_failed_total"),
-		recordsDispatchFailed:       monitoring.NewUint(reg, "records_dispatch_failed_total"),
-		recordsProcessed:            monitoring.NewUint(reg, "records_processed_total"),
+
+		recordsReceived:            monitoring.NewUint(reg, "records_received_total"),
+		recordsSerializationFailed: monitoring.NewUint(reg, "records_serialization_failed_total"),
+		recordsDispatchFailed:      monitoring.NewUint(reg, "records_dispatch_failed_total"),
+		recordsProcessed:           monitoring.NewUint(reg, "records_processed_total"),
 	}
 	_ = adapter.
 		NewGoMetrics(reg, "events_processing_time", adapter.Accept).
@@ -54,7 +56,7 @@ type inputMetrics struct {
 	recordsProcessed            *monitoring.Uint // recordsProcessed tracks the number of records that were processed successfully.
 }
 
-// Close removes the metrics from the registry.
+// Close unregisters the metrics from the registry.
 func (m *inputMetrics) Close() {
 	m.unregister()
 }

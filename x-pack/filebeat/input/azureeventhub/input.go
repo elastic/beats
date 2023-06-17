@@ -14,15 +14,16 @@ import (
 	"sync"
 	"time"
 
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-event-hubs-go/v3/eph"
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
-	"github.com/Azure/azure-event-hubs-go/v3/eph"
 )
 
 const (
@@ -38,8 +39,37 @@ func init() {
 	}
 }
 
+// configID computes a unique ID for the input configuration.
+//
+// It is used to identify the input in the registry and to detect
+// changes in the configuration.
+//
+// We will remove this function as we upgrade the input to the
+// v2 API (there is an ID in the v2 context).
+func configID(config *conf.C) (string, error) {
+	var tmp struct {
+		ID string `config:"id"`
+	}
+	if err := config.Unpack(&tmp); err != nil {
+		return "", fmt.Errorf("error extracting ID: %w", err)
+	}
+	if tmp.ID != "" {
+		return tmp.ID, nil
+	}
+
+	var h map[string]interface{}
+	_ = config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute ID from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%16X", id), nil
+}
+
 // azureInput struct for the azure-eventhub input
 type azureInput struct {
+	id           string           // id of the input
 	config       azureInputConfig // azure-eventhub configuration
 	metrics      *inputMetrics    // metrics for the input
 	context      input.Context
@@ -62,12 +92,25 @@ func NewInput(
 		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
+	// Since this is a v1 input, we need to set the ID manually.
+	//
+	// We need an ID to identify the input in the input metrics
+	// registry.
+	//
+	// This is a temporary workaround until we migrate the input to v2.
+	inputId, err := configID(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
 	go func() {
 		defer cancelInputCtx()
 		select {
 		case <-inputContext.Done:
+			fmt.Println("inputContext.Done")
 		case <-inputCtx.Done():
+			fmt.Println("inputCtx.Done")
 		}
 	}()
 
@@ -75,12 +118,9 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	// Create the input metrics
-	inputMetrics := newInputMetrics("", nil) // TODO: learn how to set the ID on a v1 input
-
 	in := azureInput{
+		id:           inputId,
 		config:       config,
-		metrics:      inputMetrics,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", stripConnectionString(config.ConnectionString)),
 		context:      inputContext,
 		workerCtx:    workerCtx,
@@ -109,6 +149,17 @@ func (a *azureInput) Run() {
 	// invocation.
 	a.workerOnce.Do(func() {
 		a.log.Infof("%s input worker is starting.", inputName)
+
+		// We set up the metrics in the `Run()` method and tear them down
+		// in the `Stop()` method.
+		//
+		// The factory method `NewInput` is not a viable solution because
+		// the Runner invokes it during the configuration check without
+		// calling the `Stop()` function; this causes panics
+		// due to multiple metrics registrations.
+		a.log.Debugf("%s registering input metrics for input with ID %s", inputName, a.id)
+		a.metrics = newInputMetrics(a.id, nil)
+
 		err := a.runWithEPH()
 		if err != nil {
 			a.log.Errorw("error starting the input worker", "error", err)
@@ -129,8 +180,10 @@ func (a *azureInput) Stop() {
 		}
 	}
 
-	// When the input stops we should tear down the metrics machinery.
-	a.metrics.Close()
+	if a.metrics != nil {
+		a.log.Debugf("%s deregistering input metrics for input with ID %s", inputName, a.id)
+		a.metrics.Close()
+	}
 
 	a.workerCancel()
 }
