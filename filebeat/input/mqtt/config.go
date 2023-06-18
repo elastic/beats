@@ -41,6 +41,7 @@ func defaultConfig() mqttInputConfig {
 	return mqttInputConfig{
 		ClientID: "filebeat",
 		Topics:   []string{"#"},
+		CleanSession: true,
 	}
 }
 
