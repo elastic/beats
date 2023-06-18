@@ -31,7 +31,6 @@ type mqttInputConfig struct {
 	ClientID string `config:"client_id" validate:"nonzero"`
 	Username string `config:"username"`
 	Password string `config:"password"`
-	Password string `config:"password"` 
 	CleanSession bool `config:"cleansession"`
 
 	TLS *tlscommon.Config `config:"ssl"`

@@ -28,7 +28,7 @@ func createClientOptions(config mqttInputConfig, onConnectHandler func(client li
 		SetClientID(config.ClientID).
 		SetUsername(config.Username).
 		SetPassword(config.Password).
-		SetCleanSession(config.CleanSession)
+		SetCleanSession(config.CleanSession).
 		SetConnectRetry(true).
 		SetOnConnectHandler(onConnectHandler)
 
