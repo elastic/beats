@@ -35,14 +35,14 @@ var (
 
 	id1    = "cpu"
 	value1 = 0.25
-	label1 = " | |CPUUtilization|AWS/EC2|Average|InstanceId|i-1"
+	label1 = " | |CPUUtilization|AWS/EC2|Average|300|InstanceId|i-1"
 
 	id2    = "disk"
 	value2 = 5.0
-	label2 = " | |DiskReadOps|AWS/EC2|Average|InstanceId|i-1"
+	label2 = " | |DiskReadOps|AWS/EC2|Average|300|InstanceId|i-1"
 
-	label3 = " | |CPUUtilization|AWS/EC2|Average"
-	label4 = " | |DiskReadOps|AWS/EC2|Average"
+	label3 = " | |CPUUtilization|AWS/EC2|Average|300"
+	label4 = " | |DiskReadOps|AWS/EC2|Average|300"
 
 	instanceID1     = "i-1"
 	instanceID2     = "i-2"
@@ -194,32 +194,32 @@ func TestConstructLabel(t *testing.T) {
 		{
 			listMetric1,
 			"Average",
-			"|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|Average|InstanceId|i-1",
+			"|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|Average|${PROP('Period')}|InstanceId|i-1",
 		},
 		{
 			listMetric2,
 			"Maximum",
-			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed|AWS/EC2|Maximum|InstanceId|i-1",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed|AWS/EC2|Maximum|${PROP('Period')}|InstanceId|i-1",
 		},
 		{
 			listMetric3,
 			"Minimum",
-			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_System|AWS/EC2|Minimum|InstanceId|i-2",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_System|AWS/EC2|Minimum|${PROP('Period')}|InstanceId|i-2",
 		},
 		{
 			listMetric4,
 			"Sum",
-			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_Instance|AWS/EC2|Sum|InstanceId|i-2",
+			"123456789012|${PROP('AccountLabel')}|StatusCheckFailed_Instance|AWS/EC2|Sum|${PROP('Period')}|InstanceId|i-2",
 		},
 		{
 			listMetric5,
 			"SampleCount",
-			"123456789012|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|SampleCount",
+			"123456789012|${PROP('AccountLabel')}|CPUUtilization|AWS/EC2|SampleCount|${PROP('Period')}",
 		},
 		{
 			listMetric8,
 			"SampleCount",
-			"123456789012|${PROP('AccountLabel')}|MemoryUsed|AWS/Kafka|SampleCount",
+			"123456789012|${PROP('AccountLabel')}|MemoryUsed|AWS/Kafka|SampleCount|${PROP('Period')}",
 		},
 	}
 
@@ -775,7 +775,7 @@ func TestGenerateFieldName(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			fieldName := generateFieldName(c.label[namespaceIdx], c.label)
+			fieldName := generateFieldName(c.label[aws.LabelConst.NamespaceIdx], c.label)
 			assert.Equal(t, c.expectedFieldName, fieldName)
 		})
 	}
@@ -1287,7 +1287,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 5, AccountID: accountID}
+	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: accountID}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1332,7 +1332,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 func TestCreateEventsWithDataGranularity(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 10, AccountID: accountID, DataGranularity: 5}
+	m.MetricSet = &aws.MetricSet{Period: 10, MonitoringAccountID: accountID, DataGranularity: 5}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1373,7 +1373,7 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 func TestCreateEventsWithTagsFilter(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
-	m.MetricSet = &aws.MetricSet{Period: 5, AccountID: accountID}
+	m.MetricSet = &aws.MetricSet{Period: 5, MonitoringAccountID: accountID}
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
@@ -1421,11 +1421,12 @@ func TestInsertTags(t *testing.T) {
 	identifierContainsArn := "arn:aws:ec2:ap-northeast-1:111111111111:eip-allocation/eipalloc-0123456789abcdef,SYNFlood"
 	tagKey3 := "env"
 	tagValue3 := "dev"
+	cloudwatchPeriod := "300"
 
 	events := map[string]mb.Event{}
-	events[identifier1] = aws.InitEvent(regionName, accountName, accountID, timestamp)
-	events[identifier2] = aws.InitEvent(regionName, accountName, accountID, timestamp)
-	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifier1] = aws.InitEvent(regionName, accountName, accountID, timestamp, cloudwatchPeriod)
+	events[identifier2] = aws.InitEvent(regionName, accountName, accountID, timestamp, cloudwatchPeriod)
+	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID, timestamp, cloudwatchPeriod)
 
 	resourceTagMap := map[string][]resourcegroupstaggingapitypes.Tag{}
 	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapitypes.Tag{
@@ -1534,7 +1535,7 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	m := MetricSet{
 		logger:            logp.NewLogger("test"),
 		CloudwatchConfigs: []Config{{Statistic: []string{"Average"}}},
-		MetricSet:         &aws.MetricSet{Period: 5, AccountID: accountID},
+		MetricSet:         &aws.MetricSet{Period: 5, MonitoringAccountID: accountID},
 	}
 
 	listMetricWithStatsTotal := []metricsWithStatistics{

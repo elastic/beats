@@ -460,6 +460,9 @@ func TestEndToEndACK(t *testing.T) {
 			_, exists := got[id]
 			assert.True(t, exists)
 		}
+
+		assert.EqualValues(t, input.metrics.ackedMessageCount.Get(), len(seen))
+
 		input.Stop()
 		out.Close()
 		if err := group.Wait(); err != nil {

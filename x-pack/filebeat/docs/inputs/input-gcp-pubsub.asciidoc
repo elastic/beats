@@ -96,3 +96,20 @@ Default Credentials] (ADC).
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 :type!:
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                    | Description
+| `acked_message_total`                     | Number of successfully ACKed messages.
+| `failed_acked_message_total`              | Number of failed ACKed messages.
+| `nacked_message_total`                    | Number of NACKed messages.
+| `bytes_processed_total`                   | Number of bytes processed.
+| `processing_time`                         | Histogram of the elapsed time for processing an event in nanoseconds.
+|=======
