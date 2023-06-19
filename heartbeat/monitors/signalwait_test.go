@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beater
+package monitors
 
 import (
 	"sync"
@@ -54,7 +54,7 @@ func TestSimpleWait(t *testing.T) {
 				})
 			}
 
-			signalWait := newSignalWait()
+			signalWait := NewSignalWait()
 
 			for i := 0; i < tt.number; i++ {
 				addFn(signalWait)
@@ -103,7 +103,7 @@ func TestChannelWait(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			done := make(chan bool)
 			gl := make(chan struct{})
-			signalWait := newSignalWait()
+			signalWait := NewSignalWait()
 
 			for i := 0; i < tt.number; i++ {
 				signalWait.AddChan(gl)
@@ -155,7 +155,7 @@ func TestTimeoutWait(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			done := make(chan bool)
 
-			signalWait := newSignalWait()
+			signalWait := NewSignalWait()
 
 			for i := 0; i < tt.number; i++ {
 				signalWait.AddTimer(time.NewTimer(time.Hour))
@@ -204,7 +204,7 @@ func TestDurationWait(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			done := make(chan bool)
 
-			signalWait := newSignalWait()
+			signalWait := NewSignalWait()
 
 			for i := 0; i < tt.number; i++ {
 				signalWait.AddTimeout(time.Hour)

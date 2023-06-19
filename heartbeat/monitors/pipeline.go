@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beater
+package monitors
 
 import (
 	"sync"
@@ -41,8 +41,7 @@ func (n *NoopPipelineWrapper) Wait() {
 // Pipeline wrapper that implements synchronous op. Calling Wait() on this client will block until all
 // events passed through this pipeline (and any of the linked clients) are ACKed, safe to use concurrently.
 type SyncPipelineWrapper struct {
-	wg  sync.WaitGroup
-	log *logp.Logger
+	wg sync.WaitGroup
 }
 
 // Used to wrap every client and track emmitted vs acked events.
@@ -52,9 +51,9 @@ type wrappedClient struct {
 }
 
 // returns a new pipeline with the provided SyncPipelineClientWrapper.
-func withSyncPipelineWrapper(pipeline beat.Pipeline, pw *SyncPipelineWrapper) beat.Pipeline {
+func WithSyncPipelineWrapper(pipeline beat.Pipeline, pw *SyncPipelineWrapper) beat.Pipeline {
 	pipeline = pipetool.WithACKer(pipeline, acker.TrackingCounter(func(_, total int) {
-		pw.log.Debugf("ack callback receives with events count of %d", total)
+		logp.L().Debugf("ack callback receives with events count of %d", total)
 		pw.onACK(total)
 	}))
 

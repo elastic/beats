@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beater
+package monitors
 
 import (
 	"time"
@@ -30,7 +30,7 @@ type signalWait struct {
 
 type signaler func()
 
-func newSignalWait() *signalWait {
+func NewSignalWait() *signalWait {
 	return &signalWait{
 		signals: make(chan struct{}, 1),
 	}
@@ -55,36 +55,36 @@ func (s *signalWait) Add(fn signaler) {
 }
 
 func (s *signalWait) AddChan(c <-chan struct{}) {
-	s.Add(waitChannel(c))
+	s.Add(WaitChannel(c))
 }
 
 func (s *signalWait) AddTimer(t *time.Timer) {
-	s.Add(waitTimer(t))
+	s.Add(WaitTimer(t))
 }
 
 func (s *signalWait) AddTimeout(d time.Duration) {
-	s.Add(waitDuration(d))
+	s.Add(WaitDuration(d))
 }
 
 func (s *signalWait) Signal() {
 	s.Add(func() {})
 }
 
-func waitChannel(c <-chan struct{}) signaler {
+func WaitChannel(c <-chan struct{}) signaler {
 	return func() { <-c }
 }
 
-func waitTimer(t *time.Timer) signaler {
+func WaitTimer(t *time.Timer) signaler {
 	return func() { <-t.C }
 }
 
-func waitDuration(d time.Duration) signaler {
-	return waitTimer(time.NewTimer(d))
+func WaitDuration(d time.Duration) signaler {
+	return WaitTimer(time.NewTimer(d))
 }
 
-func withLog(s signaler, msg string) signaler {
+func WithLog(s signaler, msg string) signaler {
 	return func() {
 		s()
-		logp.Info("%v", msg)
+		logp.L().Info("%v", msg)
 	}
 }

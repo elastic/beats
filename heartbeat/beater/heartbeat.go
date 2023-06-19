@@ -153,11 +153,11 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	// Adapt local pipeline to synchronized mode if run_once is enabled,
 	// Otherwise, pipeline is unchange
 	pipeline := b.Publisher
-	var pipelineWrapper PipelineWrapper = &NoopPipelineWrapper{}
+	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 	if bt.config.RunOnce {
-		sync := &SyncPipelineWrapper{log: logp.L().Named("run_once pipeline wrapper")}
+		sync := &monitors.SyncPipelineWrapper{}
 
-		pipeline = withSyncPipelineWrapper(pipeline, sync)
+		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
 		pipelineWrapper = sync
 	}
 
@@ -165,7 +165,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
-	waitMonitors := newSignalWait()
+	waitMonitors := monitors.NewSignalWait()
 
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
@@ -177,7 +177,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		waitMonitors.Add(withLog(bt.scheduler.WaitForRunOnce, "Ending run_once run."))
+		waitMonitors.Add(monitors.WithLog(bt.scheduler.WaitForRunOnce, "Ending run_once run."))
 	}
 
 	if b.Manager.Enabled() {
@@ -220,15 +220,15 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
 	// located _after_ b.Manager.Stop() or else it will exit early
-	waitPublished := newSignalWait()
+	waitPublished := monitors.NewSignalWait()
 	defer waitPublished.Wait()
 
 	// Three possible events: global beat, run_once pipeline done and publish timeout
 	waitPublished.AddChan(bt.done)
-	waitPublished.Add(withLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
+	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
 		logp.Info("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
-		waitPublished.Add(withLog(waitDuration(bt.config.PublishTimeout),
+		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
 			"shutdown: time out waiting for pipeline to publish events."))
 	}
 
