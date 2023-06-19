@@ -128,13 +128,16 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 	}
 
 	metadata := instance.GetMetadata()
-	metadataItems := instance.GetMetadata().GetItems()
 
-	if metadata != nil && metadataItems != nil {
-		computeMetadata.Metadata = make(map[string]string)
+	if metadata != nil {
+		metadataItems := metadata.GetItems()
 
-		for _, item := range metadataItems {
-			computeMetadata.Metadata[item.GetKey()] = item.GetValue()
+		if metadataItems != nil {
+			computeMetadata.Metadata = make(map[string]string)
+
+			for _, item := range metadataItems {
+				computeMetadata.Metadata[item.GetKey()] = item.GetValue()
+			}
 		}
 	}
 
@@ -178,7 +181,7 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 		return
 	}
 
-	s.logger.Debugf("Compute API Instances.AggregatedList")
+	s.logger.Debug("Compute API Instances.AggregatedList")
 
 	instancesClient, err := compute.NewInstancesRESTClient(ctx, s.opt...)
 	if err != nil {
