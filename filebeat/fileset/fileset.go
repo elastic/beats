@@ -143,11 +143,11 @@ type ProcessorRequirement struct {
 func (fs *Fileset) readManifest() (*manifest, error) {
 	cfg, err := common.LoadFile(filepath.Join(fs.modulePath, fs.name, "manifest.yml"))
 	if err != nil {
-		return nil, fmt.Errorf("Error reading manifest file: %v", err)
+		return nil, fmt.Errorf("Error reading manifest file: %w", err)
 	}
 	manifest, err := newManifest(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("Error unpacking manifest: %v", err)
+		return nil, fmt.Errorf("Error unpacking manifest: %w", err)
 	}
 	return manifest, nil
 }
@@ -183,7 +183,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 
 		vars[name], err = resolveVariable(vars, value)
 		if err != nil {
-			return nil, fmt.Errorf("Error resolving variables on %s: %v", name, err)
+			return nil, fmt.Errorf("Error resolving variables on %s: %w", name, err)
 		}
 	}
 

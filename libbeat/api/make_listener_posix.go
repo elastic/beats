@@ -24,18 +24,16 @@ import (
 	"net"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 )
 
 func makeListener(cfg Config) (net.Listener, error) {
 	if len(cfg.User) > 0 {
-		return nil, errors.New("specifying a user is not supported under this platform")
+		return nil, fmt.Errorf("specifying a user is not supported under this platform")
 	}
 
 	if len(cfg.SecurityDescriptor) > 0 {
-		return nil, errors.New("security_descriptor option for the HTTP endpoint only work on Windows")
+		return nil, fmt.Errorf("security_descriptor option for the HTTP endpoint only work on Windows")
 	}
 
 	if npipe.IsNPipe(cfg.Host) {
@@ -53,10 +51,10 @@ func makeListener(cfg Config) (net.Listener, error) {
 	if network == "unix" {
 		if _, err := os.Stat(path); !os.IsNotExist(err) {
 			if err := os.Remove(path); err != nil {
-				return nil, errors.Wrapf(
-					err,
-					"cannot remove existing unix socket file at location %s",
+				return nil, fmt.Errorf(
+					"cannot remove existing unix socket file at location %s: %w",
 					path,
+					err,
 				)
 			}
 		}
@@ -70,11 +68,11 @@ func makeListener(cfg Config) (net.Listener, error) {
 	// Ensure file mode
 	if network == "unix" {
 		if err := os.Chmod(path, socketFileMode); err != nil {
-			return nil, errors.Wrapf(
-				err,
-				"could not set mode %d for unix socket file at location %s",
+			return nil, fmt.Errorf(
+				"could not set mode %d for unix socket file at location %s: %w",
 				socketFileMode,
 				path,
+				err,
 			)
 		}
 	}

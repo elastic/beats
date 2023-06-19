@@ -23,8 +23,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Confirm shows the confirmation text and ask the user to answer (y/n)
@@ -60,5 +58,5 @@ func confirm(r io.Reader, out io.Writer, prompt string, def bool) (bool, error) 
 		}
 	}
 
-	return false, errors.New("error reading user input")
+	return false, fmt.Errorf("error reading user input")
 }

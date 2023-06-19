@@ -18,6 +18,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -31,7 +32,7 @@ func buildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
 
 	glob, err := config.String("config.modules.path", -1)
 	if err != nil {
-		return nil, fmt.Errorf("modules management requires 'filebeat.config.modules.path' setting")
+		return nil, errors.New("modules management requires 'filebeat.config.modules.path' setting")
 	}
 
 	if !strings.HasSuffix(glob, "*.yml") {

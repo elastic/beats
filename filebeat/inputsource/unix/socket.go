@@ -18,6 +18,7 @@
 package unix
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -87,7 +88,7 @@ func parseFileMode(mode string) (os.FileMode, error) {
 		return 0, err
 	}
 	if parsed > 0o777 {
-		return 0, fmt.Errorf("invalid file mode")
+		return 0, errors.New("invalid file mode")
 	}
 	return os.FileMode(parsed), nil
 }

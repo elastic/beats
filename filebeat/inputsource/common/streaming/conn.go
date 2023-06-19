@@ -18,14 +18,14 @@
 package streaming
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"net"
 	"time"
 )
 
 // ErrMaxReadBuffer returns when too many bytes was read on the io.Reader
-var ErrMaxReadBuffer = fmt.Errorf("max read buffer reached")
+var ErrMaxReadBuffer = errors.New("max read buffer reached")
 
 // ResetableLimitedReader is based on LimitedReader but allow to reset the byte read and return a specific
 // error when we reach the limit.
@@ -50,7 +50,7 @@ func (m *ResetableLimitedReader) Read(p []byte) (n int, err error) {
 	}
 	n, err = m.reader.Read(p)
 	m.byteRead += uint64(n)
-	return
+	return n, err
 }
 
 // Reset resets the number of byte read

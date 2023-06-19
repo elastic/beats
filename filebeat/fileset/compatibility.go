@@ -19,6 +19,7 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -80,7 +81,7 @@ var processorCompatibilityChecks = []processorCompatibility{
 			return esVersion.LessThan(version.MustNew("6.7.0"))
 		},
 		adaptConfig: func(_ Processor, _ *logp.Logger) (Processor, error) {
-			return Processor{}, fmt.Errorf("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
+			return Processor{}, errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
 		},
 	},
 	{
@@ -159,19 +160,19 @@ func (p *Processor) Config() map[string]interface{} {
 // GetBool returns a boolean flag from the processor's configuration.
 func (p *Processor) GetBool(key string) (value, ok bool) {
 	value, ok = p.config[key].(bool)
-	return
+	return value, ok
 }
 
 // GetString returns a string flag from the processor's configuration.
 func (p *Processor) GetString(key string) (value string, ok bool) {
 	value, ok = p.config[key].(string)
-	return
+	return value, ok
 }
 
 // GetList returns an array from the processor's configuration.
 func (p *Processor) GetList(key string) (value []interface{}, ok bool) {
 	value, ok = p.config[key].([]interface{})
-	return
+	return value, ok
 }
 
 // Set a flag in the processor's configuration.
@@ -182,7 +183,7 @@ func (p *Processor) Set(key string, value interface{}) {
 // Get a flag from the processor's configuration.
 func (p *Processor) Get(key string) (value interface{}, ok bool) {
 	value, ok = p.config[key]
-	return
+	return value, ok
 }
 
 // Delete a configuration flag.
@@ -399,7 +400,7 @@ func replaceConvertIP(processor Processor, log *logp.Logger) (Processor, error) 
 	var srcIf, dstIf interface{}
 	var found bool
 	if srcIf, found = processor.Get("field"); !found {
-		return Processor{}, fmt.Errorf("field option is required for convert processor")
+		return Processor{}, errors.New("field option is required for convert processor")
 	}
 	if dstIf, found = processor.Get("target_field"); found {
 		processor.Delete("target_field")
