@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -82,7 +80,7 @@ var processorCompatibilityChecks = []processorCompatibility{
 			return esVersion.LessThan(version.MustNew("6.7.0"))
 		},
 		adaptConfig: func(_ Processor, _ *logp.Logger) (Processor, error) {
-			return Processor{}, errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
+			return Processor{}, fmt.Errorf("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
 		},
 	},
 	{
@@ -242,14 +240,14 @@ nextProcessor:
 	for i, obj := range processors {
 		processor, err := NewProcessor(obj)
 		if err != nil {
-			return errors.Wrapf(err, "cannot parse processor in section '%s' index %d body=%+v", section, i, obj)
+			return fmt.Errorf("cannot parse processor in section '%s' index %d body=%+v: %w", section, i, obj, err)
 		}
 
 		// Adapt any on_failure processors for this processor.
 		prevOnFailure, _ := processor.GetList("on_failure")
 		if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "on_failure", true,
 			log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
-			return errors.Wrapf(err, "cannot parse on_failure for processor in section '%s' index %d body=%+v", section, i, obj)
+			return fmt.Errorf("cannot parse on_failure for processor in section '%s' index %d body=%+v: %w", section, i, obj, err)
 		}
 		if onFailure, _ := processor.GetList("on_failure"); len(prevOnFailure) > 0 && len(onFailure) == 0 {
 			processor.Delete("on_failure")
@@ -260,7 +258,7 @@ nextProcessor:
 			processor.Set("processor", []interface{}{inner})
 			if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "processor", false,
 				log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
-				return errors.Wrapf(err, "cannot parse inner processor for foreach in section '%s' index %d", section, i)
+				return fmt.Errorf("cannot parse inner processor for foreach in section '%s' index %d: %w", section, i, err)
 			}
 			newList, _ := processor.GetList("processor")
 			switch len(newList) {
@@ -401,7 +399,7 @@ func replaceConvertIP(processor Processor, log *logp.Logger) (Processor, error) 
 	var srcIf, dstIf interface{}
 	var found bool
 	if srcIf, found = processor.Get("field"); !found {
-		return Processor{}, errors.New("field option is required for convert processor")
+		return Processor{}, fmt.Errorf("field option is required for convert processor")
 	}
 	if dstIf, found = processor.Get("target_field"); found {
 		processor.Delete("target_field")
