@@ -78,8 +78,8 @@ start up this will not be picked up by the file system watches.
 *`recursive`*:: By default, the watches set to the paths specified in
 `paths` are not recursive. This means that only changes to the contents
 of this directories are watched. If `recursive` is set to `true`, the
-`file_integrity` module will watch for changes on this directories and all
-their subdirectories.
+`file_integrity` module will watch for changes on this directory and all
+its subdirectories.
 
 *`exclude_files`*:: A list of regular expressions used to filter out events
 for unwanted files. The expressions are matched against the full path of every
