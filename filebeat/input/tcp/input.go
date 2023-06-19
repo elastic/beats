@@ -230,11 +230,11 @@ func newInputMetrics(id, device string, poll time.Duration, log *logp.Logger) *i
 }
 
 func ipv4KernelAddr(ip net.IP, port int) string {
-	return fmt.Sprintf("%08X:%04X", reverse(ip.To4()), port)
+	return fmt.Sprintf("%X:%04X", reverse(ip.To4()), port)
 }
 
 func ipv6KernelAddr(ip net.IP, port int) string {
-	return fmt.Sprintf("%032X:%04X", reverse(ip.To16()), port)
+	return fmt.Sprintf("%X:%04X", reverse(ip.To16()), port)
 }
 
 func reverse(b []byte) []byte {
