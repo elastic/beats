@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -87,12 +88,12 @@ func loadSources(files ...string) (string, []byte, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return errors.Wrapf(err, "failed to open file %v", path)
+			return fmt.Errorf("failed to open file %v: %w", path, err)
 		}
 		defer f.Close()
 
 		if _, err = io.Copy(buf, f); err != nil {
-			return errors.Wrapf(err, "failed to read file %v", path)
+			return fmt.Errorf("failed to read file %v: %w", path, err)
 		}
 		return nil
 	}
