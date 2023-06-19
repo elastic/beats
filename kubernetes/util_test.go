@@ -175,7 +175,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			namespace:   "",
 		},
 		{
-			name:        "test value without inCluster, machine-ID set wrongly, node not found and env var set",
+			name:        "test value without inCluster, machine-ID set, node not found and env var set: priority given to the env var as more accurate",
 			host:        "",
 			isInCluster: false,
 			node:        "worker-2",
