@@ -229,7 +229,7 @@ func TestSchedTaskLimits(t *testing.T) {
 			numJobs: 50,
 			limit:   math.MaxInt64,
 			expect: func(events []int) {
-				require.GreaterOrEqual(t, len(events), 50)
+				require.GreaterOrEqual(t, len(events), 250)
 			},
 		},
 		{
@@ -237,7 +237,7 @@ func TestSchedTaskLimits(t *testing.T) {
 			numJobs: 100,
 			limit:   0,
 			expect: func(events []int) {
-				require.GreaterOrEqual(t, len(events), 100)
+				require.GreaterOrEqual(t, len(events), 500)
 			},
 		},
 	}
@@ -252,11 +252,15 @@ func TestSchedTaskLimits(t *testing.T) {
 			}
 			s := Create(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false)
 			var taskArr []int
+			mtx := sync.Mutex{}
 			wg := sync.WaitGroup{}
 			wg.Add(tt.numJobs)
 			for i := 0; i < tt.numJobs; i++ {
 				num := i
 				tf := makeTasks(4, func() {
+					mtx.Lock()
+					defer mtx.Unlock() // taskArr is shared across goroutines
+
 					taskArr = append(taskArr, num)
 				})
 				go func(tff TaskFunc) {

@@ -15,25 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mage
+package redis
 
 import (
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"crypto/tls"
+	"time"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// CrossBuild cross-builds the beat for all target platforms.
-func CrossBuild() error {
-	return devtools.CrossBuild(
-		// Run all builds serially to try to address failures that might be caused
-		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
-		devtools.Serially(),
+type Config struct {
+	IdleTimeout time.Duration     `config:"idle_timeout"`
+	Network     string            `config:"network"`
+	MaxConn     int               `config:"maxconn" validate:"min=1"`
+	TLS         *tlscommon.Config `config:"ssl"`
 
-		devtools.ImageSelector(func(platform string) (string, error) {
-			image, err := devtools.CrossBuildImage(platform)
-			if err != nil {
-				return "", err
-			}
-			return image, nil
-		}),
-	)
+	UseTLSConfig *tls.Config
+}
+
+// DefaultConfig return default config for the redis module.
+func DefaultConfig() Config {
+	return Config{Network: "tcp", MaxConn: 10}
 }

@@ -9,7 +9,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Increase Go version to 1.19.10 {pull}35751[35751]
 - Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 
 *Auditbeat*
@@ -133,6 +132,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
 - Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
+- Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
 
 *Heartbeat*
 
@@ -342,6 +343,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 - Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
+- Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
 
 *Osquerybeat*
 

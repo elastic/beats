@@ -173,7 +173,11 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewCounter(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return fmt.Errorf("failed to process counter `%s` with value `%s`: %w", m.name, m.value, err)
+			v1, err := strconv.ParseFloat(m.value, 64)
+			if err != nil {
+				return fmt.Errorf("failed to process counter `%s` with value `%s`: %w", m.name, m.value, err)
+			}
+			v = int64(v1) // cast to int64
 		}
 		// apply sample rate
 		v = int64(float64(v) * (1.0 / sampleRate))
