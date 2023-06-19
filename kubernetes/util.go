@@ -115,6 +115,7 @@ func IsInCluster(kubeconfig string) bool {
 // 1. If beat is deployed in k8s cluster, use hostname of pod as the pod name to query pod metadata for node name.
 // 2. If step 1 fails or beat is deployed outside k8s cluster, use NODE_NAME env var.
 // 3. If node cannot be discovered with step 1,2, use machine-id to match against k8s nodes for node name. In case it is not set return error.
+// Note: There have been cases where machine-id reported by compute instances of some cloud providers where k8s nodes run on, has the wrong value.
 func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) (string, error) {
 	ctx := context.TODO()
 	// Discover node by configuration file (NODE) if set
