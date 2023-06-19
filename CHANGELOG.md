@@ -24,3 +24,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.0.0...v0.1.0
+
+
+## [0.6.2]
+
+### Changed
+
+- Usage of env var `NODE_NAME` precedes `machine-id` for kubernetes node discovery.
+
+
+[0.6.2]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.6.1...v0.6.2
