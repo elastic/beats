@@ -309,6 +309,13 @@ func pythonVirtualenvPath() (string, error) {
 
 		pythonVirtualenvDir = info.RootDir
 	}
+
+	// If VIRTUAL_ENV is set we are already in a virtual environment.
+	virtualEnvVar := os.Getenv("VIRTUAL_ENV")
+	if virtualEnvVar != "" {
+		return virtualEnvVar, nil
+	}
+
 	pythonVirtualenvDir = filepath.Join(pythonVirtualenvDir, "build/ve")
 
 	// Use OS and docker specific virtualenv's because the interpreter in
