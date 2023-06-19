@@ -129,19 +129,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Fix kafka dashboard field names {pull}33555[33555]
-- Add tags to events based on parsed identifier. {pull}33472[33472]
-- Support Oracle-specific connection strings in SQL module {issue}32089[32089] {pull}32293[32293]
-- Remove deprecated metrics from controller manager, scheduler and proxy {pull}34161[34161]
-- Fix metrics split through different events and metadata not matching for aws cloudwatch. {pull}34483[34483]
-- Fix metadata enricher with correct container ids for pods with multiple containers in container metricset. Align `kubernetes.container.id` and `container.id` fields for state_container metricset. {pull}34516[34516]
-- Make generic SQL GA {pull}34637[34637]
-- Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-- Add context with timeout in AWS API calls {pull}35425[35425]
-- Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
-- Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
-- Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
 - Fix EC2 host.cpu.usage {pull}35717[35717]
-- Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 
 *Osquerybeat*
 
