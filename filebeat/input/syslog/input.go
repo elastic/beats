@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -30,7 +31,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/pkg/errors"
 )
 
 // Parser is generated from a ragel state machine using the following command:
@@ -318,7 +318,7 @@ func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fie
 
 func mapValueToName(v int, m mapper) (string, error) {
 	if v < 0 || v >= len(m) {
-		return "", errors.Errorf("value out of bound: %d", v)
+		return "", fmt.Errorf("value out of bound: %d", v)
 	}
 	return m[v], nil
 }

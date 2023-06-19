@@ -24,8 +24,6 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -36,7 +34,7 @@ func cleanupStaleSocket(path string) error {
 		if os.IsNotExist(err) {
 			return nil
 		}
-		return errors.Wrapf(err, "cannot lstat unix socket file at location %s", path)
+		return fmt.Errorf("cannot lstat unix socket file at location %s: %w", path, err)
 	}
 
 	if runtime.GOOS != "windows" {
@@ -47,7 +45,7 @@ func cleanupStaleSocket(path string) error {
 	}
 
 	if err := os.Remove(path); err != nil {
-		return errors.Wrapf(err, "cannot remove existing unix socket file at location %s", path)
+		return fmt.Errorf("cannot remove existing unix socket file at location %s: %w", path, err)
 	}
 
 	return nil
@@ -89,7 +87,7 @@ func parseFileMode(mode string) (os.FileMode, error) {
 		return 0, err
 	}
 	if parsed > 0o777 {
-		return 0, errors.New("invalid file mode")
+		return 0, fmt.Errorf("invalid file mode")
 	}
 	return os.FileMode(parsed), nil
 }

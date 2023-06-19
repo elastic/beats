@@ -18,15 +18,14 @@
 package streaming
 
 import (
+	"fmt"
 	"io"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // ErrMaxReadBuffer returns when too many bytes was read on the io.Reader
-var ErrMaxReadBuffer = errors.New("max read buffer reached")
+var ErrMaxReadBuffer = fmt.Errorf("max read buffer reached")
 
 // ResetableLimitedReader is based on LimitedReader but allow to reset the byte read and return a specific
 // error when we reach the limit.
