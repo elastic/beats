@@ -209,19 +209,13 @@ func TestExtraArgs(t *testing.T) {
 		{
 			"does not filter dev flags on non-ui origin",
 			&Config{SyntheticsArgs: []string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd"}, Sandbox: true},
-			[]string{"--sandbox"},
-			false,
-		},
-		{
-			"does not filter dev flags on non-ui origin",
-			&Config{Sandbox: true},
-			[]string{"--sandbox"},
+			[]string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd", "--sandbox"},
 			false,
 		},
 		{
 			"filters dev flags on ui origin",
 			&Config{SyntheticsArgs: []string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd"}, Sandbox: true},
-			[]string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd", "--sandbox"},
+			[]string{"--sandbox"},
 			true,
 		},
 	}
