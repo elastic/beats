@@ -87,5 +87,7 @@ type inputMetrics struct {
 
 // Close unregisters the metrics from the registry.
 func (m *inputMetrics) Close() {
-	m.unregister()
+	if m.unregister != nil {
+		m.unregister()
+	}
 }
