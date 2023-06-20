@@ -318,6 +318,7 @@ func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Cancele
 	if !resource.lock.TryLock() {
 		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
 		err := resource.lock.LockContext(canceler)
+		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
 		if err != nil {
 			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
 			return err

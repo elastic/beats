@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/elastic/go-concert/timed"
@@ -48,8 +50,8 @@ func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Dura
 		gcStore(c.log, started, store)
 		return nil
 	})
-	if err != nil {
-		c.log.Errorf("failed to start the registry cleaning routine: %w", err)
+	if err != nil && !errors.Is(err, context.Canceled) {
+		c.log.Errorf("failed to start the registry cleaning routine: %s", err)
 	}
 }
 
