@@ -18,6 +18,7 @@
 package helper
 
 import (
+	"fmt"
 	"sync"
 	"syscall"
 
@@ -102,7 +103,7 @@ func checkAndEnableSeDebugPrivilege() error {
 	}
 
 	if !seDebug.Enabled {
-		return errors.Errorf("Metricbeat failed to enable the "+
+		return fmt.Errorf("Metricbeat failed to enable the "+
 			"SeDebugPrivilege, a Windows privilege that allows it to collect "+
 			"metrics from other processes. %v", seDebug)
 	}
