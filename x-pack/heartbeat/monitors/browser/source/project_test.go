@@ -44,6 +44,7 @@ func TestProjectSource(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			psrc, err := dummyPSource(tc.cfg)
+			defer psrc.Close()
 			if tc.wantErr {
 				err = psrc.Fetch()
 				require.Error(t, err)
@@ -53,6 +54,17 @@ func TestProjectSource(t *testing.T) {
 			fetchAndValidate(t, psrc)
 		})
 	}
+}
+
+func TestFetchCaching(*testing.T) {
+	psrc, err := dummyPSource(tc.cfg)
+	defer psrc.Close()
+
+	psrc.Fetch()
+	wdir := psrc.Workdir()
+	psrc.Fetch()
+	wdirNext := psrc.Workdir()
+	require.Equal(t, wdir, wdirNext)
 }
 
 func validateFileContents(t *testing.T, dir string) {

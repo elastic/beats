@@ -46,11 +46,10 @@ func (p *ProjectSource) Fetch() error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 	if p.fetched {
-		logp.L().Debug("browser project: re-use already unpacked source: %s", p.Workdir())
+		logp.L().Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
 		return nil
 	}
 
-	logp.L().Debug("browser project: unpack source: %s", p.Workdir())
 	p.fetched = true
 
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
@@ -74,6 +73,9 @@ func (p *ProjectSource) Fetch() error {
 	if err != nil {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
+
+	logp.L().Debugf("browser project: unpack source: %s", p.Workdir())
+
 	err = os.Chmod(p.TargetDirectory, defaultMod)
 	if err != nil {
 		return fmt.Errorf("failed assigning default mode %s to temp dir: %w", defaultMod, err)
