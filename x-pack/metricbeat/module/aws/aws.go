@@ -7,7 +7,7 @@ package aws
 import (
 	"context"
 	"fmt"
-
+	"strconv"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -73,11 +73,13 @@ type LabelConstants struct {
 	MetricNameIdx            int
 	NamespaceIdx             int
 	StatisticIdx             int
+	PeriodLabelIdx           int
 	IdentifierNameIdx        int
 	IdentifierValueIdx       int
 	LabelLengthTotal         int
 	LabelSeparator           string
 	AccountLabel             string
+	PeriodLabel              string
 	BillingDimensionStartIdx int
 }
 
@@ -87,13 +89,17 @@ var LabelConst = LabelConstants{
 	MetricNameIdx:            2,
 	NamespaceIdx:             3,
 	StatisticIdx:             4,
-	IdentifierNameIdx:        5,
-	IdentifierValueIdx:       6,
-	LabelLengthTotal:         7,
+	PeriodLabelIdx:           5,
+	IdentifierNameIdx:        6,
+	IdentifierValueIdx:       7,
+	LabelLengthTotal:         8,
 	LabelSeparator:           "|",
 	AccountLabel:             "${PROP('AccountLabel')}",
+	PeriodLabel:              "${PROP('Period')}",
 	BillingDimensionStartIdx: 3,
 }
+
+const CloudWatchPeriodName = "aws.cloudwatch.period"
 
 func init() {
 	if err := mb.Registry.AddModule(ModuleName, newModule); err != nil {
@@ -261,7 +267,7 @@ func StringInSlice(str string, list []string) (bool, int) {
 }
 
 // InitEvent initialize mb.Event with basic information like service.name, cloud.provider
-func InitEvent(regionName string, accountName string, accountID string, timestamp time.Time) mb.Event {
+func InitEvent(regionName string, accountName string, accountID string, timestamp time.Time, periodLabel string) mb.Event {
 	event := mb.Event{
 		Timestamp:       timestamp,
 		MetricSetFields: mapstr.M{},
@@ -269,6 +275,10 @@ func InitEvent(regionName string, accountName string, accountID string, timestam
 		RootFields:      mapstr.M{},
 	}
 
+	period, err := strconv.Atoi(periodLabel)
+	if err == nil {
+		_, _ = event.RootFields.Put(CloudWatchPeriodName, period)
+	}
 	_, _ = event.RootFields.Put("cloud.provider", "aws")
 	if regionName != "" {
 		_, _ = event.RootFields.Put("cloud.region", regionName)
