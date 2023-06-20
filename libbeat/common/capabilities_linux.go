@@ -51,16 +51,16 @@ func (c Capabilities) Check(set []string) bool {
 func GetCapabilities() (Capabilities, error) {
 	p, err := sysinfo.Self()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read self process information: %w", err)
+		return Capabilities{}, fmt.Errorf("failed to read self process information: %w", err)
 	}
 
 	if c, ok := p.(types.Capabilities); ok {
 		capabilities, err := c.Capabilities()
 		if err != nil {
-			return nil, fmt.Errorf("failed to read process capabilities: %w", err)
+			return Capabilities{}, fmt.Errorf("failed to read process capabilities: %w", err)
 		}
 		return Capabilities(*capabilities), nil
 	}
 
-	return nil, errors.New("capabilities not available")
+	return Capabilities{}, errors.New("capabilities not available")
 }
