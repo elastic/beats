@@ -30,8 +30,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
@@ -205,14 +203,14 @@ func createIndex(host string, isHidden bool) (string, error) {
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%v/%v", host, indexName), strings.NewReader(reqBody))
 	if err != nil {
-		return "", errors.Wrap(err, "could not build create index request")
+		return "", fmt.Errorf("could not build create index request: %w", err)
 	}
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", errors.Wrap(err, "could not send create index request")
+		return "", fmt.Errorf("could not send create index request: %w", err)
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
@@ -321,7 +319,7 @@ func createMLJob(host string, version *version.V) error {
 
 	body, resp, err := httpPutJSON(host, jobURL, mlJob)
 	if err != nil {
-		return errors.Wrap(err, "error doing PUT request when creating ML job")
+		return fmt.Errorf("error doing PUT request when creating ML job: %w", err)
 	}
 
 	if resp.StatusCode != 200 {
@@ -334,17 +332,17 @@ func createMLJob(host string, version *version.V) error {
 func createCCRStats(host string) error {
 	err := setupCCRRemote(host)
 	if err != nil {
-		return errors.Wrap(err, "error setup CCR remote settings")
+		return errors.New("error setup CCR remote settings")
 	}
 
 	err = createCCRLeaderIndex(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating CCR leader index")
+		return errors.New("error creating CCR leader index")
 	}
 
 	err = createCCRFollowerIndex(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating CCR follower index")
+		return errors.New("error creating CCR follower index")
 	}
 
 	// Give ES sufficient time to do the replication and produce stats
@@ -354,7 +352,7 @@ func createCCRStats(host string) error {
 
 	exists, err := waitForSuccess(checkCCRStats, 500*time.Millisecond, 10)
 	if err != nil {
-		return errors.Wrap(err, "error checking if CCR stats exist")
+		return fmt.Errorf("error checking if CCR stats exist: %w", err)
 	}
 
 	if !exists {
@@ -439,27 +437,27 @@ func checkExists(url string) bool {
 func createEnrichStats(host string) error {
 	err := createEnrichSourceIndex(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating enrich source index")
+		return fmt.Errorf("error creating enrich source index: %w", err)
 	}
 
 	err = createEnrichPolicy(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating enrich policy")
+		return fmt.Errorf("error creating enrich policy: %w", err)
 	}
 
 	err = executeEnrichPolicy(host)
 	if err != nil {
-		return errors.Wrap(err, "error executing enrich policy")
+		return fmt.Errorf("error executing enrich policy: %w", err)
 	}
 
 	err = createEnrichIngestPipeline(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating ingest pipeline with enrich processor")
+		return fmt.Errorf("error creating ingest pipeline with enrich processor: %w", err)
 	}
 
 	err = ingestAndEnrichDoc(host)
 	if err != nil {
-		return errors.Wrap(err, "error ingesting doc for enrichment")
+		return fmt.Errorf("error ingesting doc for enrichment: %w", err)
 	}
 
 	return nil

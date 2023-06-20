@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/gosigar/sys/windows"
 
+	"errors"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -53,7 +54,7 @@ func enableSeDebugPrivilege() error {
 	}
 
 	if err = windows.EnableTokenPrivileges(token, windows.SeDebugPrivilege); err != nil {
-		return errors.Wrap(err, "EnableTokenPrivileges failed")
+		return fmt.Errorf("EnableTokenPrivileges failed: %w", err)
 	}
 
 	return nil
@@ -72,7 +73,7 @@ func CheckAndEnableSeDebugPrivilege() error {
 func checkAndEnableSeDebugPrivilege() error {
 	info, err := windows.GetDebugInfo()
 	if err != nil {
-		return errors.Wrap(err, "GetDebugInfo failed")
+		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
 	logp.Info("Metricbeat process and system info: %v", info)
 
@@ -92,7 +93,7 @@ func checkAndEnableSeDebugPrivilege() error {
 
 	info, err = windows.GetDebugInfo()
 	if err != nil {
-		return errors.Wrap(err, "GetDebugInfo failed")
+		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
 
 	seDebug, found = info.ProcessPrivs[windows.SeDebugPrivilege]
