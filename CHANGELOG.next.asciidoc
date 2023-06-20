@@ -132,6 +132,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
 - Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
+- Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
 
 *Heartbeat*
 
@@ -201,6 +203,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 - Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Fix EC2 host.cpu.usage {pull}35717[35717]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 
 *Osquerybeat*
@@ -342,6 +345,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
 - Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
+- Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
 
 *Osquerybeat*
 
