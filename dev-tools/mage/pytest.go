@@ -86,6 +86,7 @@ type PythonTestArgs struct {
 	Files               []string          // Globs used to find tests.
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
+	ForceCreateVenv     bool              // Set to true to always install required dependencies in the test virtual environment.
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
@@ -126,7 +127,7 @@ func PythonTest(params PythonTestArgs) error {
 	fmt.Println(">> python test:", params.TestName, "Testing")
 
 	// Only activate the virtualenv if necessary.
-	ve, err := PythonVirtualenv(false)
+	ve, err := PythonVirtualenv(params.ForceCreateVenv)
 	if err != nil {
 		return err
 	}
