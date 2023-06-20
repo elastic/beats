@@ -302,6 +302,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
+- Added support for decoding apache parquet files in awss3 input. {issue}34662[34662] {pull}35578[35578]
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]

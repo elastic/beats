@@ -325,11 +325,11 @@ func (inp *filestream) readFromSource(
 		message, err := r.Next()
 		if err != nil {
 			if errors.Is(err, ErrFileTruncate) {
-				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
+				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {
-				log.Info("Reader was closed. Closing.")
+				log.Infof("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
-				log.Debugf("EOF has been reached. Closing.")
+				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
 			} else {
 				log.Errorf("Read line error: %v", err)
 				metrics.ProcessingErrors.Inc()

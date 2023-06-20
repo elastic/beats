@@ -221,6 +221,77 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 	}
 }
 
+func TestFileWatcherTruncate(t *testing.T) {
+	oldTs := time.Now()
+	newTs := oldTs.Add(time.Second)
+	testCases := map[string]struct {
+		prevFiles      map[string]os.FileInfo
+		nextFiles      map[string]os.FileInfo
+		expectedEvents []loginp.FSEvent
+	}{
+		"truncated file, only size changes": {
+			prevFiles: map[string]os.FileInfo{
+				"path": testFileInfo{"path", 42, oldTs, nil},
+			},
+			nextFiles: map[string]os.FileInfo{
+				"path": testFileInfo{"path", 0, oldTs, nil},
+			},
+			expectedEvents: []loginp.FSEvent{
+				{Op: loginp.OpTruncate, OldPath: "path", NewPath: "path", Info: testFileInfo{"path", 0, oldTs, nil}},
+			},
+		},
+		"truncated file, mod time and size changes": {
+			prevFiles: map[string]os.FileInfo{
+				"path": testFileInfo{"path", 42, oldTs, nil},
+			},
+			nextFiles: map[string]os.FileInfo{
+				"path": testFileInfo{"path", 0, newTs, nil},
+			},
+			expectedEvents: []loginp.FSEvent{
+				{Op: loginp.OpTruncate, OldPath: "path", NewPath: "path", Info: testFileInfo{"path", 0, newTs, nil}},
+			},
+		},
+		"no file change": {
+			prevFiles: map[string]os.FileInfo{
+				"path": testFileInfo{"path", 42, oldTs, nil},
+			},
+			nextFiles: map[string]os.FileInfo{
+				"path": testFileInfo{"path", 42, oldTs, nil},
+			},
+			expectedEvents: []loginp.FSEvent{},
+		},
+	}
+
+	for name, test := range testCases {
+		t.Run(name, func(t *testing.T) {
+			w := fileWatcher{
+				log:          logp.L(),
+				prev:         test.prevFiles,
+				scanner:      &mockScanner{test.nextFiles},
+				events:       make(chan loginp.FSEvent, len(test.expectedEvents)),
+				sameFileFunc: testSameFile,
+			}
+
+			w.watch(context.Background())
+			close(w.events)
+
+			actual := []loginp.FSEvent{}
+			for evt := range w.events {
+				actual = append(actual, evt)
+			}
+
+			if len(actual) != len(test.expectedEvents) {
+				t.Fatalf("expecting %d elements, got %d", len(test.expectedEvents), len(actual))
+			}
+			for i := range test.expectedEvents {
+				if test.expectedEvents[i] != actual[i] {
+					t.Errorf("element [%d] differ. Expecting:\n%#v\nGot:\n%#v\n", i, test.expectedEvents[i], actual[i])
+				}
+			}
+		})
+	}
+}
+
 type mockScanner struct {
 	files map[string]os.FileInfo
 }
