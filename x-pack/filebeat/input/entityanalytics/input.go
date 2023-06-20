@@ -14,7 +14,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 
+	// For provider registration.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta"
 )
 
 // Name of this input.
