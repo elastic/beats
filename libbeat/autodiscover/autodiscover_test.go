@@ -198,6 +198,11 @@ func TestAutodiscover(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// set the debounce period to something small in order to
+	// speed up the tests. This seems to be the sweet stop
+	// for the fastest test run
+	autodiscover.debouncePeriod = 99 * time.Millisecond
+
 	// Start it
 	autodiscover.Start()
 	defer autodiscover.Stop()
@@ -654,6 +659,12 @@ func TestAutodiscoverDebounce(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// set the debounce period to something small in order to
+	// speed up the tests. This seems to be the sweet stop
+	// for the fastest test run
+	autodiscover.debouncePeriod = 99 * time.Millisecond
+
 	// Start it
 	autodiscover.Start()
 	t.Cleanup(autodiscover.Stop)
