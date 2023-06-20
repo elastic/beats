@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -26,6 +27,8 @@ import (
 type ProjectSource struct {
 	Content         string `config:"content" json:"content"`
 	TargetDirectory string
+	fetched         bool
+	mtx             sync.Mutex
 }
 
 var ErrNoContent = fmt.Errorf("no 'content' value specified for project monitor source")
@@ -39,6 +42,14 @@ func (p *ProjectSource) Validate() error {
 }
 
 func (p *ProjectSource) Fetch() error {
+	// We only need to unzip the source exactly once
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
+	if p.fetched {
+		return nil
+	}
+	p.fetched = true
+
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
 	if err != nil {
 		return err
