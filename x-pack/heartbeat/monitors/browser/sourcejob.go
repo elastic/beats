@@ -23,19 +23,19 @@ import (
 
 type JourneyLister func(ctx context.Context, projectPath string, params mapstr.M) (journeyNames []string, err error)
 
-type Project struct {
+type SourceJob struct {
 	rawCfg     *config.C
 	projectCfg *Config
 	ctx        context.Context
 	cancel     context.CancelFunc
 }
 
-func NewProject(rawCfg *config.C) (*Project, error) {
+func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 	// Global project context to cancel all jobs
 	// on close
 	ctx, cancel := context.WithCancel(context.Background())
 
-	s := &Project{
+	s := &SourceJob{
 		rawCfg:     rawCfg,
 		projectCfg: DefaultConfig(),
 		ctx:        ctx,
@@ -53,28 +53,28 @@ func ErrBadConfig(err error) error {
 	return fmt.Errorf("could not parse project config: %w", err)
 }
 
-func (p *Project) String() string {
+func (sj *SourceJob) String() string {
 	panic("implement me")
 }
 
-func (p *Project) Fetch() error {
-	return p.projectCfg.Source.Active().Fetch()
+func (sj *SourceJob) Fetch() error {
+	return sj.projectCfg.Source.Active().Fetch()
 }
 
-func (p *Project) Workdir() string {
-	return p.projectCfg.Source.Active().Workdir()
+func (sj *SourceJob) Workdir() string {
+	return sj.projectCfg.Source.Active().Workdir()
 }
 
-func (p *Project) Params() map[string]interface{} {
-	return p.projectCfg.Params
+func (sj *SourceJob) Params() map[string]interface{} {
+	return sj.projectCfg.Params
 }
 
-func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
-	return p.projectCfg.FilterJourneys
+func (sj *SourceJob) FilterJourneys() synthexec.FilterJourneyConfig {
+	return sj.projectCfg.FilterJourneys
 }
 
-func (p *Project) StdFields() stdfields.StdMonitorFields {
-	sFields, err := stdfields.ConfigToStdMonitorFields(p.rawCfg)
+func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
+	sFields, err := stdfields.ConfigToStdMonitorFields(sj.rawCfg)
 	// Should be impossible since outer monitor.go should run this same code elsewhere
 	// TODO: Just pass stdfields in to remove second deserialize
 	if err != nil {
@@ -83,45 +83,45 @@ func (p *Project) StdFields() stdfields.StdMonitorFields {
 	return sFields
 }
 
-func (p *Project) Close() error {
-	if p.projectCfg.Source.ActiveMemo != nil {
-		p.projectCfg.Source.ActiveMemo.Close()
+func (sj *SourceJob) Close() error {
+	if sj.projectCfg.Source.ActiveMemo != nil {
+		sj.projectCfg.Source.ActiveMemo.Close()
 	}
 
 	// Cancel running jobs ctxs
-	p.cancel()
+	sj.cancel()
 
 	return nil
 }
 
-func (p *Project) extraArgs() []string {
-	extraArgs := p.projectCfg.SyntheticsArgs
-	if len(p.projectCfg.PlaywrightOpts) > 0 {
-		s, err := json.Marshal(p.projectCfg.PlaywrightOpts)
+func (sj *SourceJob) extraArgs() []string {
+	extraArgs := sj.projectCfg.SyntheticsArgs
+	if len(sj.projectCfg.PlaywrightOpts) > 0 {
+		s, err := json.Marshal(sj.projectCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			logp.L().Warn("could not serialize playwright options '%v': %w", p.projectCfg.PlaywrightOpts, err)
+			logp.L().Warn("could not serialize playwright options '%v': %w", sj.projectCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
 	}
-	if p.projectCfg.IgnoreHTTPSErrors {
+	if sj.projectCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
-	if p.projectCfg.Sandbox {
+	if sj.projectCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
-	if p.projectCfg.Screenshots != "" {
-		extraArgs = append(extraArgs, "--screenshots", p.projectCfg.Screenshots)
+	if sj.projectCfg.Screenshots != "" {
+		extraArgs = append(extraArgs, "--screenshots", sj.projectCfg.Screenshots)
 	}
-	if p.projectCfg.Throttling != nil {
-		switch t := p.projectCfg.Throttling.(type) {
+	if sj.projectCfg.Throttling != nil {
+		switch t := sj.projectCfg.Throttling.(type) {
 		case bool:
 			if !t {
 				extraArgs = append(extraArgs, "--no-throttling")
 			}
 		case string:
-			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", p.projectCfg.Throttling))
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.projectCfg.Throttling))
 		case map[string]interface{}:
 			j, err := json.Marshal(t)
 			if err != nil {
@@ -135,22 +135,22 @@ func (p *Project) extraArgs() []string {
 	return extraArgs
 }
 
-func (p *Project) jobs() []jobs.Job {
+func (sj *SourceJob) jobs() []jobs.Job {
 	var j jobs.Job
 
-	isScript := p.projectCfg.Source.Inline != nil
-	ctx := context.WithValue(p.ctx, synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
+	isScript := sj.projectCfg.Source.Inline != nil
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.projectCfg.Timeout+30*time.Second)
 
 	if isScript {
-		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)
+		src := sj.projectCfg.Source.Inline.Script
+		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sj.StdFields(), sj.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
-			err := p.Fetch()
+			err := sj.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
-			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
+			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sj.StdFields(), sj.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}
@@ -160,10 +160,10 @@ func (p *Project) jobs() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func (p *Project) plugin() plugin.Plugin {
+func (sj *SourceJob) plugin() plugin.Plugin {
 	return plugin.Plugin{
-		Jobs:      p.jobs(),
-		DoClose:   p.Close,
+		Jobs:      sj.jobs(),
+		DoClose:   sj.Close,
 		Endpoints: 1,
 	}
 }
