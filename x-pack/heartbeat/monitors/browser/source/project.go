@@ -46,8 +46,11 @@ func (p *ProjectSource) Fetch() error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 	if p.fetched {
+		logp.L().Debug("browser project: re-use already unpacked source: %s", p.Workdir())
 		return nil
 	}
+
+	logp.L().Debug("browser project: unpack source: %s", p.Workdir())
 	p.fetched = true
 
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
@@ -153,6 +156,8 @@ func (p *ProjectSource) Workdir() string {
 }
 
 func (p *ProjectSource) Close() error {
+	logp.L().Debugf("browser project: close project source: %s", p.Workdir())
+
 	if p.TargetDirectory != "" {
 		return os.RemoveAll(p.TargetDirectory)
 	}

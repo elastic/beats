@@ -18,30 +18,27 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
-
-type JourneyLister func(ctx context.Context, projectPath string, params mapstr.M) (journeyNames []string, err error)
 
 type SourceJob struct {
 	rawCfg     *config.C
-	projectCfg *Config
+	browserCfg *Config
 	ctx        context.Context
 	cancel     context.CancelFunc
 }
 
 func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
-	// Global project context to cancel all jobs
+	// Global browser context to cancel all jobs
 	// on close
 	ctx, cancel := context.WithCancel(context.Background())
 
 	s := &SourceJob{
 		rawCfg:     rawCfg,
-		projectCfg: DefaultConfig(),
+		browserCfg: DefaultConfig(),
 		ctx:        ctx,
 		cancel:     cancel,
 	}
-	err := rawCfg.Unpack(s.projectCfg)
+	err := rawCfg.Unpack(s.browserCfg)
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
@@ -50,7 +47,7 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 }
 
 func ErrBadConfig(err error) error {
-	return fmt.Errorf("could not parse project config: %w", err)
+	return fmt.Errorf("could not parse browser config: %w", err)
 }
 
 func (sj *SourceJob) String() string {
@@ -58,19 +55,19 @@ func (sj *SourceJob) String() string {
 }
 
 func (sj *SourceJob) Fetch() error {
-	return sj.projectCfg.Source.Active().Fetch()
+	return sj.browserCfg.Source.Active().Fetch()
 }
 
 func (sj *SourceJob) Workdir() string {
-	return sj.projectCfg.Source.Active().Workdir()
+	return sj.browserCfg.Source.Active().Workdir()
 }
 
 func (sj *SourceJob) Params() map[string]interface{} {
-	return sj.projectCfg.Params
+	return sj.browserCfg.Params
 }
 
 func (sj *SourceJob) FilterJourneys() synthexec.FilterJourneyConfig {
-	return sj.projectCfg.FilterJourneys
+	return sj.browserCfg.FilterJourneys
 }
 
 func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
@@ -84,8 +81,8 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 }
 
 func (sj *SourceJob) Close() error {
-	if sj.projectCfg.Source.ActiveMemo != nil {
-		sj.projectCfg.Source.ActiveMemo.Close()
+	if sj.browserCfg.Source.ActiveMemo != nil {
+		sj.browserCfg.Source.ActiveMemo.Close()
 	}
 
 	// Cancel running jobs ctxs
@@ -95,33 +92,33 @@ func (sj *SourceJob) Close() error {
 }
 
 func (sj *SourceJob) extraArgs() []string {
-	extraArgs := sj.projectCfg.SyntheticsArgs
-	if len(sj.projectCfg.PlaywrightOpts) > 0 {
-		s, err := json.Marshal(sj.projectCfg.PlaywrightOpts)
+	extraArgs := sj.browserCfg.SyntheticsArgs
+	if len(sj.browserCfg.PlaywrightOpts) > 0 {
+		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			logp.L().Warn("could not serialize playwright options '%v': %w", sj.projectCfg.PlaywrightOpts, err)
+			logp.L().Warn("could not serialize playwright options '%v': %w", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
 	}
-	if sj.projectCfg.IgnoreHTTPSErrors {
+	if sj.browserCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
-	if sj.projectCfg.Sandbox {
+	if sj.browserCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
-	if sj.projectCfg.Screenshots != "" {
-		extraArgs = append(extraArgs, "--screenshots", sj.projectCfg.Screenshots)
+	if sj.browserCfg.Screenshots != "" {
+		extraArgs = append(extraArgs, "--screenshots", sj.browserCfg.Screenshots)
 	}
-	if sj.projectCfg.Throttling != nil {
-		switch t := sj.projectCfg.Throttling.(type) {
+	if sj.browserCfg.Throttling != nil {
+		switch t := sj.browserCfg.Throttling.(type) {
 		case bool:
 			if !t {
 				extraArgs = append(extraArgs, "--no-throttling")
 			}
 		case string:
-			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.projectCfg.Throttling))
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.browserCfg.Throttling))
 		case map[string]interface{}:
 			j, err := json.Marshal(t)
 			if err != nil {
@@ -138,17 +135,17 @@ func (sj *SourceJob) extraArgs() []string {
 func (sj *SourceJob) jobs() []jobs.Job {
 	var j jobs.Job
 
-	isScript := sj.projectCfg.Source.Inline != nil
-	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.projectCfg.Timeout+30*time.Second)
+	isScript := sj.browserCfg.Source.Inline != nil
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
 
 	if isScript {
-		src := sj.projectCfg.Source.Inline.Script
+		src := sj.browserCfg.Source.Inline.Script
 		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sj.StdFields(), sj.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := sj.Fetch()
 			if err != nil {
-				return nil, fmt.Errorf("could not fetch for project job: %w", err)
+				return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
 			}
 			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sj.StdFields(), sj.extraArgs()...)
 			if err != nil {
