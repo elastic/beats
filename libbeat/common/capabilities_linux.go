@@ -48,7 +48,7 @@ func (c Capabilities) Check(set []string) bool {
 }
 
 // GetCapabilities gets the capabilities of this process
-func GetCapabilities() (Capabilities, error) {
+func GetCapabilities() (*Capabilities, error) {
 	p, err := sysinfo.Self()
 	if err != nil {
 		return Capabilities{}, fmt.Errorf("failed to read self process information: %w", err)
@@ -56,7 +56,7 @@ func GetCapabilities() (Capabilities, error) {
 
 	if c, ok := p.(types.Capabilities); ok {
 		capabilities, err := c.Capabilities()
-		return Capabilities(*capabilities), fmt.Errorf("failed to read process capabilities: %w", err)
+		return *capabilities, nil
 	}
 
 	return Capabilities{}, errors.New("capabilities not available")

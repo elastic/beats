@@ -231,9 +231,9 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.factory.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(fmt.Errorf(fmt.Sprintf(
+			a.logger.Error(fmt.Errorf(
 				"Auto discover config check failed for config '%s', won't start runner: %s",
-				conf.DebugString(config, true), err)))
+				conf.DebugString(config, true), err))
 			continue
 		}
 		newCfg[hash] = &reload.ConfigWithMeta{
