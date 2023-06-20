@@ -155,7 +155,6 @@ func (a *azureInput) Run() {
 		// the Runner invokes it during the configuration check without
 		// calling the `Stop()` function; this causes panics
 		// due to multiple metrics registrations.
-		a.log.Debugf("%s registering input metrics for input with ID %s", inputName, a.id)
 		a.metrics = newInputMetrics(a.id, nil)
 
 		err := a.runWithEPH()
@@ -179,7 +178,6 @@ func (a *azureInput) Stop() {
 	}
 
 	if a.metrics != nil {
-		a.log.Debugf("%s deregistering input metrics for input with ID %s", inputName, a.id)
 		a.metrics.Close()
 	}
 
@@ -221,7 +219,6 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 			Private: event.Data,
 		})
 		if !ok {
-			// a.metrics.publishingErrors.Inc()
 			a.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 			return ok
 		}
@@ -260,7 +257,6 @@ func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 					a.metrics.receivedEvents.Inc()
 				} else {
 					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-					// a.metrics.recordsSerializationFailed.Inc()
 				}
 			}
 		}
@@ -283,7 +279,6 @@ func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 				a.metrics.receivedEvents.Inc()
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-				// a.metrics.recordsSerializationFailed.Inc()
 			}
 		}
 	}
