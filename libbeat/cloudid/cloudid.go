@@ -165,7 +165,7 @@ func OverwriteSettings(cfg *config.C) error {
 	// cloudID overwrites
 	cid, err := NewCloudID(cloudID, cloudAuth)
 	if err != nil {
-		return fmt.Errorf("Error decoding cloud.id: %v", err)
+		return fmt.Errorf("Error decoding cloud.id: %w", err)
 	}
 
 	logger.Infof("Setting Elasticsearch and Kibana URLs based on the cloud id: output.elasticsearch.hosts=%s and setup.kibana.host=%s", cid.esURL, cid.kibURL)
