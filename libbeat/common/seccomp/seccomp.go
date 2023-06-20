@@ -18,9 +18,10 @@
 package seccomp
 
 import (
+	"fmt"
 	"runtime"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -56,7 +57,7 @@ func MustRegisterPolicy(p *seccomp.Policy) {
 
 	// Ensure that the policy is valid and usable.
 	if _, err := p.Assemble(); err != nil {
-		panic(errors.Wrap(err, "failed to register seccomp policy"))
+		panic(fmt.Errorf("failed to register seccomp policy: %w", err))
 	}
 	registeredPolicy = p
 }
