@@ -48,7 +48,7 @@ func (c Capabilities) Check(set []string) bool {
 }
 
 // GetCapabilities gets the capabilities of this process
-func GetCapabilities() (*Capabilities, error) {
+func GetCapabilities() (Capabilities, error) {
 	p, err := sysinfo.Self()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read self process information: %w", err)
