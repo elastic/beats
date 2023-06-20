@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
 - Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
+- Fix metric collection in GCPPubSub input. {pull}35773[35773]
 
 *Heartbeat*
 
@@ -314,6 +315,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 - Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
+- Add Okta input package for entity analytics. {pull}35611[35611]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
