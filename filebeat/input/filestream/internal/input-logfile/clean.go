@@ -50,12 +50,9 @@ func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Dura
 		gcStore(c.log, started, store)
 		return nil
 	})
-<<<<<<< HEAD
-=======
 	if err != nil && !errors.Is(err, context.Canceled) {
 		c.log.Errorf("failed to start the registry cleaning routine: %s", err)
 	}
->>>>>>> bdb67bc10d (fswatcher: use mod time + file size to detect changes (#35759))
 }
 
 // gcStore looks for resources to remove and deletes these. `gcStore` receives
