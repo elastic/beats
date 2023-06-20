@@ -21,15 +21,5 @@ RUN pip3 install --upgrade docker-compose==1.23.2
 RUN pip3 install --upgrade setuptools==47.3.2
 RUN pip3 install --upgrade PyYAML==6.0.0
 
-<<<<<<< HEAD
-=======
-# Oracle instant client
-RUN cd /usr/lib \
-  && curl -sLo instantclient-basic-linux.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basic-linux.x64-19.6.0.0.0dbru.zip \
-  && unzip instantclient-basic-linux.zip \
-  && rm instantclient-basic-linux.zip
-ENV LD_LIBRARY_PATH=/usr/lib/instantclient_19_6
-
->>>>>>> 62374dd251 (Upgrade to Go 1.19.10 and handle changes in golang Debian base image (#35780))
 # Add healthcheck for the docker/healthcheck metricset to check during testing.
 HEALTHCHECK CMD exit 0
