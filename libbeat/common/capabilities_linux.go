@@ -21,6 +21,7 @@ package common
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
