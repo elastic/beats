@@ -21,8 +21,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/gosigar/sys/windows"
 
 	"github.com/elastic/elastic-agent-libs/logp"
