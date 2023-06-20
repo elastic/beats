@@ -125,7 +125,7 @@ An example config is shown below:
 
 [source,yaml]
 ----
-  decoding.codec.parquet: enabled
+  decoding.codec.parquet.enabled: true
 ----
 
 Currently supported codecs are given below:-
@@ -148,9 +148,9 @@ also helps to increase the rate of processing. An example config is shown below:
 
 [source,yaml]
 ----
-  decoding.codec.parquet: enabled
-  decoding.codec.parquet.process_parallel = true
-  decoding.codec.parquet.batch_size = 1000
+  decoding.codec.parquet.enabled: true
+  decoding.codec.parquet.process_parallel: true
+  decoding.codec.parquet.batch_size: 1000
 ----
 
 [float]
