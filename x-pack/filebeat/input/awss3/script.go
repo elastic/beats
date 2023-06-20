@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -113,7 +112,7 @@ func loadSources(files ...string) (string, []byte, error) {
 	}
 
 	if len(sources) == 0 {
-		return "", nil, errors.Errorf("no sources were found in %v",
+		return "", nil, fmt.Errorf("no sources were found in %v",
 			strings.Join(files, ", "))
 	}
 

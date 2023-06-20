@@ -137,7 +137,7 @@ func NewInput(
 
 func (p *netflowInput) Publish(events []beat.Event) error {
 	for _, evt := range events {
-		p.forwarder.Send(evt)
+		_ = p.forwarder.Send(evt)
 	}
 	return nil
 }
@@ -161,7 +161,7 @@ func (p *netflowInput) Run() {
 		if err != nil {
 			logger.Errorf("Error running harvester: %v", err)
 			p.outlet.Close()
-			p.decoder.Stop()
+			_ = p.decoder.Stop()
 			close(p.queueC)
 			return
 		}
@@ -247,7 +247,7 @@ func (p *netflowInput) recvRoutine() {
 			for i, flow := range flows {
 				evs[i] = toBeatEvent(flow, p.internalNetworks)
 			}
-			p.Publish(evs)
+			_ = p.Publish(evs)
 		}
 	}
 }

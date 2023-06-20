@@ -113,7 +113,7 @@ func (r *Registrar) Start() error {
 	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
-		return fmt.Errorf("error loading state: %v", err)
+		return fmt.Errorf("error loading state: %w", err)
 	}
 
 	r.wg.Add(1)
@@ -280,7 +280,7 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 			// XXX: Do we want to log here? In case we start to store other
 			// state types in the registry, then this operation will likely fail
 			// quite often, producing some false-positives in the logs...
-			return true, nil
+			return true, err
 		}
 
 		st.Id = key[len(fileStatePrefix):]
