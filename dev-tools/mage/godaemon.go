@@ -71,8 +71,6 @@ func BuildGoDaemon() error {
 	switch Platform.Name {
 	case "linux/amd64":
 		compileCmd = append(compileCmd, "-m64")
-	case "linux/386":
-		compileCmd = append(compileCmd, "-m32")
 	}
 
 	defer DockerChown(output)
