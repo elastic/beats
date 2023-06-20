@@ -60,7 +60,7 @@ func (m *ResetableLimitedReader) Reset() {
 
 // IsMaxReadBufferErr returns true when the error is ErrMaxReadBuffer
 func IsMaxReadBufferErr(err error) bool {
-	return err == ErrMaxReadBuffer
+	return errors.Is(err, ErrMaxReadBuffer)
 }
 
 // DeadlineReader allow read to a io.Reader to timeout, the timeout is refreshed on every read.
@@ -84,5 +84,5 @@ func (d *DeadlineReader) Read(p []byte) (n int, err error) {
 }
 
 func (d *DeadlineReader) refresh() {
-	d.conn.SetDeadline(time.Now().Add(d.timeout))
+	_ = d.conn.SetDeadline(time.Now().Add(d.timeout))
 }

@@ -218,7 +218,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 		if ok {
 			minVersion, err := version.New(minESVersion["version"].(string))
 			if err != nil {
-				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
+				return vars, fmt.Errorf("Error parsing version %s: %w", minESVersion["version"].(string), err)
 			}
 
 			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
@@ -246,7 +246,7 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 			if ok {
 				transf, err := ApplyTemplate(vars, s, false)
 				if err != nil {
-					return nil, fmt.Errorf("array: %v", err)
+					return nil, fmt.Errorf("array: %w", err)
 				}
 				transformed = append(transformed, transf)
 			} else {
@@ -275,7 +275,7 @@ func ApplyTemplate(vars map[string]interface{}, templateString string, specialDe
 
 	tpl, err = tpl.Parse(templateString)
 	if err != nil {
-		return "", fmt.Errorf("Error parsing template %s: %v", templateString, err)
+		return "", fmt.Errorf("Error parsing template %s: %w", templateString, err)
 	}
 	buf := bytes.NewBufferString("")
 	err = tpl.Execute(buf, vars)

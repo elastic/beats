@@ -141,7 +141,7 @@ func (r *Registrar) Run() {
 	defer r.store.Close()
 
 	defer func() {
-		writeStates(r.store, r.states.GetStates())
+		_ = writeStates(r.store, r.states.GetStates())
 	}()
 
 	var (
@@ -243,7 +243,7 @@ func (r *Registrar) gcStates() {
 	beforeCount := r.states.Count()
 	cleanedStates, pendingClean := r.states.CleanupWith(func(id string) {
 		// TODO: report error
-		r.store.Remove(fileStatePrefix + id)
+		_ = r.store.Remove(fileStatePrefix + id)
 	})
 	statesCleanup.Add(int64(cleanedStates))
 
