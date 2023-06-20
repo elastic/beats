@@ -115,12 +115,8 @@ func DefaultPythonTestIntegrationArgs() PythonTestArgs { return makePythonTestAr
 func PythonTest(params PythonTestArgs) error {
 	fmt.Println(">> python test:", params.TestName, "Testing")
 
-<<<<<<< HEAD
-	ve, err := PythonVirtualenv()
-=======
 	// Only activate the virtualenv if necessary.
 	ve, err := PythonVirtualenv(params.ForceCreateVenv)
->>>>>>> 62374dd251 (Upgrade to Go 1.19.10 and handle changes in golang Debian base image (#35780))
 	if err != nil {
 		return err
 	}
