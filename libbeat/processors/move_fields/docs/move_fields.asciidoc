@@ -30,7 +30,7 @@ To move `method` and `elapsed_time` into another object, use this configuration:
 processors:
   - move_fields:
       from: "app"
-      fields: ["method", "elapsed_time"],
+      fields: ["method", "elapsed_time"]
       to: "rpc."
 ----
 
