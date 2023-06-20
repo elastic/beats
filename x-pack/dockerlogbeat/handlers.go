@@ -42,7 +42,7 @@ type logsRequest struct {
 
 func reportCaps() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(&capabilitiesResponse{
+		_ = json.NewEncoder(w).Encode(&capabilitiesResponse{
 			Cap: logger.Capability{ReadLogs: true},
 		})
 	}
@@ -122,7 +122,7 @@ func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWri
 		w.Header().Set("Content-Type", "application/x-json-stream")
 		wf := ioutils.NewWriteFlusher(w)
 		defer wf.Close()
-		io.Copy(wf, stream)
+		_, _ = io.Copy(wf, stream)
 
 	} //end func
 }
@@ -135,5 +135,5 @@ func respondOK(w http.ResponseWriter) {
 		"",
 	}
 
-	json.NewEncoder(w).Encode(&res)
+	_ = json.NewEncoder(w).Encode(&res)
 }

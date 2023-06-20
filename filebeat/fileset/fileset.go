@@ -360,7 +360,7 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 
 	cfg, err := conf.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
-		return nil, fmt.Errorf("Error reading input config: %v", err)
+		return nil, fmt.Errorf("Error reading input config: %w", err)
 	}
 
 	cfg, err = mergePathDefaults(cfg)
@@ -436,7 +436,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 
 		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 		if err != nil {
-			return nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
+			return nil, fmt.Errorf("Error reading pipeline file %s: %w", path, err)
 		}
 
 		encodedString, err := ApplyTemplate(vars, string(strContents), true)
