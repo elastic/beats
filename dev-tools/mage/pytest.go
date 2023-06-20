@@ -198,7 +198,7 @@ func PythonTestForModule(params PythonTestArgs) error {
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
 // defined in the requirements file pointed to by requirementsTxt. It returns
 // the path to the virtualenv.
-func PythonVirtualenv() (string, error) {
+func PythonVirtualenv(forceCreate bool) (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
 
@@ -219,7 +219,7 @@ func PythonVirtualenv() (string, error) {
 	// Only execute if requirements.txt is newer than the virtualenv activate
 	// script.
 	activate := virtualenvPath(ve, "activate")
-	if IsUpToDate(activate, reqs...) {
+	if !forceCreate && IsUpToDate(activate, reqs...) {
 		return pythonVirtualenvDir, nil
 	}
 
