@@ -43,7 +43,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 		addHostFields(events[eventIdentifier], potentialInstanceID)
 		period, err := events[eventIdentifier].RootFields.GetValue(aws.CloudWatchPeriodName)
 		if err != nil {
-			logger.Warnf("can't get period information for instance %s, skipping rate calculation", eventIdentifier)
+			logp.Warn("can't get period information for instance %s, skipping rate calculatio", eventIdentifier)
 		} else {
 			calculateRate(events[eventIdentifier], period.(int))
 		}
