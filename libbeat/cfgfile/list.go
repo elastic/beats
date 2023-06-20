@@ -51,7 +51,33 @@ func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineCon
 	}
 }
 
+// Runners returns a slice containing all
+// currently running runners
+func (r *RunnerList) Runners() []Runner {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	runners := make([]Runner, 0, len(r.runners))
+	for _, r := range r.runners {
+		runners = append(runners, r)
+	}
+	return runners
+}
+
 // Reload the list of runners to match the given state
+//
+// Runners might fail to start, it's the callers responsibility to
+// handle any error. During execution, any encountered errors are
+// accumulated in a `multierror.Errors` and returned as
+// a `multierror.MultiError` upon completion.
+//
+// While the stopping of runners occurs on separate goroutines,
+// Reload will wait for all runners to finish before starting any new runners.
+//
+// The starting of runners occurs synchronously, one after the other.
+//
+// It is recommended not to call this method more than once per second to avoid
+// unnecessary starting and stopping of runners.
 func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
