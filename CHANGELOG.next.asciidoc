@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Filebeat*
+- Fix input reload on autodiscover {issue}34388[34388] {pull}35645[35645]
 
 
 *Heartbeat*
@@ -134,6 +135,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
 - Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
+- Fix metric collection in GCPPubSub input. {pull}35773[35773]
 
 *Heartbeat*
 
@@ -203,6 +205,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 - Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Fix EC2 host.cpu.usage {pull}35717[35717]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 
 *Osquerybeat*
@@ -300,6 +303,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Allow neflow v9 and ipfix templates to be shared between source addresses. {pull}35036[35036]
 - Add support for collecting IPv6 metrics. {pull}35123[35123]
+- Added support for decoding apache parquet files in awss3 input. {issue}34662[34662] {pull}35578[35578]
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
@@ -307,12 +311,14 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add execution budget to CEL input. {pull}35409[35409]
 - Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
 - Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add metrics for filestream input. {pull}35529[35529]
 - Add support for collecting `httpjson` metrics. {pull}35392[35392]
 - Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
 - Mark CEL input as GA. {pull}35559[35559]
 - Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 - Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
+- Add Okta input package for entity analytics. {pull}35611[35611]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
