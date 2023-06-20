@@ -153,8 +153,12 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		}
 
 		// if the two infos belong to the same file and it has been modified
-		// if the size is smaller than before, it is truncated, if bigger, it is a write event
-		if prevInfo.ModTime() != info.ModTime() {
+		// if the size is smaller than before, it is truncated, if bigger, it is a write event.
+		// It might happen that a file is truncated and then more data is added, both
+		// within the same second, this will make the reader stop, but a new one will not
+		// start because the modification data is the same, to avoid this situation,
+		// we also check for size changes here.
+		if prevInfo.ModTime() != info.ModTime() || prevInfo.Size() != info.Size() {
 			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
 				select {
 				case <-ctx.Done():
@@ -392,7 +396,7 @@ func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, uniqFileID map
 		}
 		fileID := file_helper.GetOSState(fileInfo).String()
 		if finfo, exists := uniqFileID[fileID]; exists {
-			s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
+			s.log.Infof("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
 			return true
 		}
 		uniqFileID[fileID] = fileInfo
