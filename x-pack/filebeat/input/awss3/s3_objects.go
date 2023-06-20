@@ -159,6 +159,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	if decoder != nil {
 		defer decoder.close()
 
+		var evtOffset int64
 		for decoder.next() {
 			data, err := decoder.decode()
 			if err != nil {
@@ -167,7 +168,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 				}
 				break
 			}
-			err = p.readJSONSlice(bytes.NewReader(data))
+			evtOffset, err = p.readJSONSlice(bytes.NewReader(data), evtOffset)
 			if err != nil {
 				break
 			}
@@ -256,38 +257,39 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 }
 
 // readJSONSlice uses a json.RawMessage to process JSON slice data as individual JSON objects.
+// It accepts a reader and a starting offset, it returns an updated offset and an error if any.
 // It reads the opening token separately and then iterates over the slice, decoding each object and publishing it.
-func (p *s3ObjectProcessor) readJSONSlice(r io.Reader) error {
+func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, error) {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
 	// reads starting token separately since this is always a slice.
 	_, err := dec.Token()
 	if err != nil {
-		return fmt.Errorf("failed to read JSON slice token for object key: %s, with error: %w", p.s3Obj.S3.Object.Key, err)
+		return -1, fmt.Errorf("failed to read JSON slice token for object key: %s, with error: %w", p.s3Obj.S3.Object.Key, err)
 	}
 
+	// we track each event offset separately since we are reading a slice.
 	for dec.More() && p.ctx.Err() == nil {
-		offset := dec.InputOffset()
-
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
+			return -1, fmt.Errorf("failed to decode json: %w", err)
 		}
 
 		if p.readerConfig.ExpandEventListFromField != "" {
-			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
-				return err
+			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, evtOffset, p.s3ObjHash); err != nil {
+				return -1, err
 			}
 			continue
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := p.createEvent(string(data), offset)
+		evt := p.createEvent(string(data), evtOffset)
 		p.publish(p.acker, &evt)
+		evtOffset++
 	}
 
-	return nil
+	return evtOffset, nil
 }
 
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
