@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/gosigar/sys/windows"
 
 	"errors"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
