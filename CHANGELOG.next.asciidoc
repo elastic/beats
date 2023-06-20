@@ -203,6 +203,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
 - Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Fix EC2 host.cpu.usage {pull}35717[35717]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 
 *Osquerybeat*
