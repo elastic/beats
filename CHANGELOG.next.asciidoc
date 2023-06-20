@@ -129,6 +129,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix logstash cgroup mappings {pull}33131[33131]
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Fix kafka dashboard field names {pull}33555[33555]
+- Fix EC2 host.cpu.usage {pull}35717[35717]
 
 *Osquerybeat*
 
