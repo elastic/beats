@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"golang.org/x/text/transform"
 
@@ -126,6 +127,7 @@ func (inp *filestream) Run(
 	src loginp.Source,
 	cursor loginp.Cursor,
 	publisher loginp.Publisher,
+	metrics *loginp.Metrics,
 ) error {
 	fs, ok := src.(fileSource)
 	if !ok {
@@ -141,6 +143,9 @@ func (inp *filestream) Run(
 		return err
 	}
 
+	metrics.FilesActive.Inc()
+	defer metrics.FilesActive.Dec()
+
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
@@ -150,7 +155,7 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher)
+	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -311,7 +316,11 @@ func (inp *filestream) readFromSource(
 	path string,
 	s state,
 	p loginp.Publisher,
+	metrics *loginp.Metrics,
 ) error {
+	metrics.FilesOpened.Inc()
+	defer metrics.FilesClosed.Inc()
+
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
 		if err != nil {
@@ -323,19 +332,28 @@ func (inp *filestream) readFromSource(
 				log.Debugf("EOF has been reached. Closing.")
 			} else {
 				log.Errorf("Read line error: %v", err)
+				metrics.ProcessingErrors.Inc()
 			}
+
 			return nil
 		}
 
 		s.Offset += int64(message.Bytes)
 
+		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
+		metrics.BytesProcessed.Add(uint64(message.Bytes))
+
 		if err := p.Publish(message.ToEvent(), s); err != nil {
+			metrics.ProcessingErrors.Inc()
 			return err
 		}
+
+		metrics.EventsProcessed.Inc()
+		metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}
 	return nil
 }
