@@ -196,7 +196,7 @@ func (p *fileProspector) onFSEvent(
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debugf("File %s has been truncated", event.NewPath)
+		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
 		if err != nil {

@@ -164,6 +164,14 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 		}
 		return nil
 	})
+<<<<<<< HEAD
+=======
+	if err != nil {
+		if !errors.Is(err, context.Canceled) {
+			f.log.Errorf("failed to schedule a periodic state check: %s", err)
+		}
+	}
+>>>>>>> bdb67bc10d (fswatcher: use mod time + file size to detect changes (#35759))
 }
 
 func (f *logFile) shouldBeClosed() bool {
