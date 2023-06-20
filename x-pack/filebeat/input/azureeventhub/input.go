@@ -69,9 +69,7 @@ func configID(config *conf.C) (string, error) {
 
 // azureInput struct for the azure-eventhub input
 type azureInput struct {
-	id           string           // id of the input
 	config       azureInputConfig // azure-eventhub configuration
-	metrics      *inputMetrics    // metrics for the input
 	context      input.Context
 	outlet       channel.Outleter
 	log          *logp.Logger            // logging info and error messages
@@ -79,6 +77,8 @@ type azureInput struct {
 	workerCancel context.CancelFunc      // used to signal that the worker should stop.
 	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
+	id           string                  // ID of the input; used to identify the input in the input metrics registry only, and will be removed once the input is migrated to v2.
+	metrics      *inputMetrics           // Metrics for the input.
 }
 
 // NewInput creates a new azure-eventhub input
