@@ -59,7 +59,7 @@ func GetCapabilities() (*Capabilities, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to read process capabilities: %w", err)
 		}
-		return &Capabilities(*capabilities), nil
+		return Capabilities(*capabilities), nil
 	}
 
 	return nil, errors.New("capabilities not available")
