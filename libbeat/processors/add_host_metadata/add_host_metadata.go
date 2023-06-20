@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -81,7 +83,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 			FQDNLookupFailed: monitoring.NewInt(reg, "fqdn_lookup_failed"),
 		},
 	}
-	if err := p.loadData(); err != nil {
+	if err := p.loadData(true, features.FQDN()); err != nil {
 		return nil, fmt.Errorf("failed to load data: %w", err)
 	}
 
@@ -93,7 +95,21 @@ func New(cfg *config.C) (beat.Processor, error) {
 		p.geoData = mapstr.M{"host": mapstr.M{"geo": geoFields}}
 	}
 
-	err := features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, processorName)
+	// create a unique ID for this instance of the processor
+	cbIDStr := ""
+	cbID, err := uuid.NewV4()
+	// if we fail, fall back to the processor name, hope for the best.
+	if err != nil {
+		p.logger.Errorf("error generating ID for FQDN callback, reverting to processor name: %w", err)
+		cbIDStr = processorName
+	} else {
+		cbIDStr = cbID.String()
+	}
+
+	// this is safe as New() returns a pointer, not the actual object.
+	// This matters as other pieces of code in libbeat, like libbeat/processors/processor.go,
+	// will do weird stuff like copy the entire list of global processors.
+	err = features.AddFQDNOnChangeCallback(p.handleFQDNReportingChange, cbIDStr)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"could not register callback for FQDN reporting onChange from %s processor: %w",
@@ -111,9 +127,9 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	err := p.loadData()
+	err := p.loadData(true, features.FQDN())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error loading data during event update: %w", err)
 	}
 
 	event.Fields.DeepUpdate(p.data.Get().Clone())
@@ -134,12 +150,13 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 //}
 
 func (p *addHostMetadata) expired() bool {
-	if p.config.CacheTTL <= 0 {
-		return true
-	}
 
 	p.lastUpdate.Lock()
 	defer p.lastUpdate.Unlock()
+
+	if p.config.CacheTTL <= 0 {
+		return true
+	}
 
 	if p.lastUpdate.Add(p.config.CacheTTL).After(time.Now()) {
 		return false
@@ -148,24 +165,25 @@ func (p *addHostMetadata) expired() bool {
 	return true
 }
 
-func (p *addHostMetadata) loadData() error {
-	if !p.expired() {
+// loadData update's the processor's associated host metadata
+func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
+	if checkCache && !p.expired() {
 		return nil
 	}
 
 	h, err := sysinfo.Host()
 	if err != nil {
-		return err
+		return fmt.Errorf("error collecting host info: %w", err)
 	}
 
 	hostname := h.Info().Hostname
-	if features.FQDN() {
+	if useFQDN {
 		fqdn, err := h.FQDN()
 		if err != nil {
 			// FQDN lookup is "best effort". If it fails, we monitor the failure, fallback to
 			// the OS-reported hostname, and move on.
 			p.metrics.FQDNLookupFailed.Inc()
-			p.logger.Debugf(
+			p.logger.Warnf(
 				"unable to lookup FQDN (failed attempt counter: %d): %s, using hostname = %s as FQDN",
 				p.metrics.FQDNLookupFailed.Get(),
 				err.Error(),
@@ -217,12 +235,13 @@ func (p *addHostMetadata) handleFQDNReportingChange(new, old bool) {
 		return
 	}
 
-	// Whether we should report the FQDN or not has changed.  Expire cache
-	// so we start report the desired hostname value immediately.
-	p.expireCache()
+	// update the data for the processor
+	p.updateOrExpire(new)
 }
 
-func (p *addHostMetadata) expireCache() {
+// updateOrExpire will attempt to update the data for the processor, or expire the cache
+// if the config update fails, or times out
+func (p *addHostMetadata) updateOrExpire(useFQDN bool) {
 	if p.config.CacheTTL <= 0 {
 		return
 	}
@@ -230,9 +249,38 @@ func (p *addHostMetadata) expireCache() {
 	p.lastUpdate.Lock()
 	defer p.lastUpdate.Unlock()
 
-	// Update cache's last updated timestamp to be zero,
-	// effectively expiring the cache immediately.
-	p.lastUpdate.Time = time.Time{}
+	// while holding the mutex, attempt to update loadData()
+	// doing this with the mutex means other events must wait until we have the correct host data, as we assume that
+	// a call to this function means something else wants to force an update, and thus all events must sync.
+
+	updateChanSuccess := make(chan bool)
+	timeout := time.After(p.config.ExpireUpdateTimeout)
+	go func() {
+		err := p.loadData(false, useFQDN)
+		if err != nil {
+			p.logger.Errorf("error updating data for processor: %w")
+			updateChanSuccess <- false
+			return
+		}
+		updateChanSuccess <- true
+	}()
+
+	// this additional timeout check is paranoid, but when it's method is called from handleFQDNReportingChange(),
+	// it's blocking, which means we can hold a mutex in features. In addition, we don't want to break the processor by
+	// having all the events wait for too long.
+	select {
+	case <-timeout:
+		p.logger.Errorf("got timeout while trying to update metadata")
+		p.lastUpdate.Time = time.Time{}
+	case success := <-updateChanSuccess:
+		// only expire the cache if update was failed
+		if !success {
+			p.lastUpdate.Time = time.Time{}
+		} else {
+			p.lastUpdate.Time = time.Now()
+		}
+	}
+
 }
 
 func skipAddingHostMetadata(event *beat.Event) bool {

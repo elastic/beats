@@ -50,7 +50,7 @@ func WithFieldFilter(filter []string) Option {
 }
 
 // TestIngestPipeline tests the partial pipeline by reading events from the .json files
-// and processing them the ingest pipeline. Then it compares the results against
+// and processing them through the ingest pipeline. Then it compares the results against
 // a saved golden file. Use -update to regenerate the golden files.
 func TestIngestPipeline(t *testing.T, pipeline, json string, opts ...Option) {
 	var p params
