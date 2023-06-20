@@ -68,7 +68,7 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([][]byte, ListYML,
 	var list ListYML
 	err = yaml.Unmarshal(b, &list)
 	if err != nil {
-		return nil, ListYML{}, fmt.Errorf("error reading the list of dashboards", err)
+		return nil, ListYML{}, fmt.Errorf("error reading the list of dashboards: %w", err)
 	}
 	if len(list.Dashboards) == 0 {
 		return nil, ListYML{}, fmt.Errorf("dashboards list is empty in file %v", ymlPath)
