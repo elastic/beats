@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v8.7.1\...main[Check the HEAD diff]
 - Make generic SQL GA {pull}34637[34637]
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
 - Add context with timeout in AWS API calls {pull}35425[35425]
+- Fix EC2 host.cpu.usage {pull}35717[35717]
 
 *Osquerybeat*
 
