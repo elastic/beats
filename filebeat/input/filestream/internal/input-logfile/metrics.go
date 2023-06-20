@@ -20,10 +20,9 @@ package input_logfile
 import (
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 )
 
 // Metrics defines a set of metrics for the filestream input.
@@ -38,6 +37,12 @@ type Metrics struct {
 	EventsProcessed  *monitoring.Uint // Number of events processed.
 	ProcessingErrors *monitoring.Uint // Number of processing errors.
 	ProcessingTime   metrics.Sample   // Histogram of the elapsed time for processing an event.
+
+	// Those metrics use the same registry/keys as the log input uses
+	HarvesterStarted   *monitoring.Int
+	HarvesterClosed    *monitoring.Int
+	HarvesterRunning   *monitoring.Int
+	HarvesterOpenFiles *monitoring.Int
 }
 
 func (m *Metrics) Close() {
@@ -49,6 +54,15 @@ func (m *Metrics) Close() {
 }
 
 func NewMetrics(id string) *Metrics {
+	// The log input creates the `filebeat.harvester` registry as a package
+	// variable, so it should always exist before this function runs.
+	// However at least on testing scenarios this does not hold true, so
+	// if needed, we create the registry ourselves.
+	harvesterMetrics := monitoring.Default.GetRegistry("filebeat.harvester")
+	if harvesterMetrics == nil {
+		harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
+	}
+
 	reg, unreg := inputmon.NewInputRegistry("filestream", id, nil)
 	m := Metrics{
 		unregister:       unreg,
@@ -60,6 +74,11 @@ func NewMetrics(id string) *Metrics {
 		EventsProcessed:  monitoring.NewUint(reg, "events_processed_total"),
 		ProcessingErrors: monitoring.NewUint(reg, "processing_errors_total"),
 		ProcessingTime:   metrics.NewUniformSample(1024),
+
+		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
+		HarvesterClosed:    monitoring.NewInt(harvesterMetrics, "closed"),
+		HarvesterRunning:   monitoring.NewInt(harvesterMetrics, "running"),
+		HarvesterOpenFiles: monitoring.NewInt(harvesterMetrics, "open_files"),
 	}
 	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))

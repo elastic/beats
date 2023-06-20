@@ -144,7 +144,9 @@ func (inp *filestream) Run(
 	}
 
 	metrics.FilesActive.Inc()
+	metrics.HarvesterRunning.Inc()
 	defer metrics.FilesActive.Dec()
+	defer metrics.HarvesterRunning.Dec()
 
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
@@ -319,7 +321,11 @@ func (inp *filestream) readFromSource(
 	metrics *loginp.Metrics,
 ) error {
 	metrics.FilesOpened.Inc()
+	metrics.HarvesterOpenFiles.Inc()
+	metrics.HarvesterStarted.Inc()
 	defer metrics.FilesClosed.Inc()
+	defer metrics.HarvesterOpenFiles.Dec()
+	defer metrics.HarvesterClosed.Inc()
 
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
