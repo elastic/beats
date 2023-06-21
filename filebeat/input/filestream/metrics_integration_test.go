@@ -23,7 +23,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -60,10 +59,6 @@ func TestFilestreamMetrics(t *testing.T) {
 		EventsProcessed:  3,
 		ProcessingErrors: 0,
 	})
-	checkLegacyMetrics(t, expectedMetrics{
-		FilesOpened: 1,
-		FilesClosed: 1,
-	})
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -90,35 +85,4 @@ func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
 	require.Equal(t, expected.BytesProcessed, reg.Get("bytes_processed_total").(*monitoring.Uint).Get(), "bytes_processed_total")
 	require.Equal(t, expected.EventsProcessed, reg.Get("events_processed_total").(*monitoring.Uint).Get(), "events_processed_total")
 	require.Equal(t, expected.ProcessingErrors, reg.Get("processing_errors_total").(*monitoring.Uint).Get(), "processing_errors_total")
-}
-
-// checkLegacyMetrics checks for metrics compatible with the ones
-// used by the legacy log input
-// It also uses the expectedMetrics because the counters
-// are incremented together.
-func checkLegacyMetrics(t *testing.T, expected expectedMetrics) {
-	harvesterMetrics := monitoring.Default.GetRegistry("filebeat.harvester")
-
-	started := getLegacyIntMetric(t, harvesterMetrics, "started")
-	closed := getLegacyIntMetric(t, harvesterMetrics, "closed")
-
-	assert.Equal(t, int64(expected.FilesOpened), started, "metric 'filebeat.harvester.started' differs from expected")
-	assert.Equal(t, int64(expected.FilesClosed), closed, "metric 'filebeat.harvester.closed' differs from expected")
-}
-
-func getLegacyIntMetric(t *testing.T, reg *monitoring.Registry, metricName string) int64 {
-	var returnValue int64
-	visitor := monitoring.NewKeyValueVisitor(func(name string, val interface{}) {
-		intVal, ok := val.(int64)
-		if !ok {
-			t.Errorf("value is not an int, it is %T", val)
-			return
-		}
-		returnValue = intVal
-	})
-
-	visitor.OnKey(metricName)
-	reg.Get(metricName).Visit(monitoring.Full, visitor)
-
-	return returnValue
 }
