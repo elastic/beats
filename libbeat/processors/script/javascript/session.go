@@ -18,11 +18,12 @@
 package javascript
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -145,7 +146,7 @@ func (s *session) setProcessFunction() error {
 		return errors.New("process is not a function")
 	}
 	if err := s.vm.ExportTo(processFunc, &s.processFunc); err != nil {
-		return errors.Wrap(err, "failed to export process function")
+		return fmt.Errorf("failed to export process function: %w", err)
 	}
 	return nil
 }
@@ -161,10 +162,10 @@ func (s *session) registerScriptParams(params map[string]interface{}) error {
 	}
 	var register goja.Callable
 	if err := s.vm.ExportTo(registerFunc, &register); err != nil {
-		return errors.Wrap(err, "failed to export register function")
+		return fmt.Errorf("failed to export register function: %w", err)
 	}
 	if _, err := register(goja.Undefined(), s.Runtime().ToValue(params)); err != nil {
-		return errors.Wrap(err, "failed to register script_params")
+		return fmt.Errorf("failed to register script_params: %w", err)
 	}
 	s.log.Debug("Registered params with processor")
 	return nil
@@ -179,11 +180,11 @@ func (s *session) executeTestFunction() error {
 		}
 		var test goja.Callable
 		if err := s.vm.ExportTo(testFunc, &test); err != nil {
-			return errors.Wrap(err, "failed to export test function")
+			return fmt.Errorf("failed to export test function: %w", err)
 		}
 		_, err := test(goja.Undefined(), nil)
 		if err != nil {
-			return errors.Wrap(err, "failed in test() function")
+			return fmt.Errorf("failed in test() function: %w", err)
 		}
 		s.log.Debugf("Successful test() execution for processor.")
 	}
@@ -215,7 +216,7 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 			if !s.evt.IsCancelled() {
 				out = b
 			}
-			err = errors.Errorf("unexpected panic in javascript processor: %v", r)
+			err = fmt.Errorf("unexpected panic in javascript processor: %v", r)
 			if s.tagOnException != "" {
 				mapstr.AddTags(b.Fields, []string{s.tagOnException})
 			}
@@ -241,7 +242,7 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 			mapstr.AddTags(b.Fields, []string{s.tagOnException})
 		}
 		appendString(b.Fields, "error.message", err.Error(), false)
-		return b, errors.Wrap(err, "failed in process function")
+		return b, fmt.Errorf("failed in process function: %w", err)
 	}
 
 	if s.evt.IsCancelled() {
