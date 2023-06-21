@@ -102,8 +102,14 @@ class Proc(object):
         return actual_exit_code
 
     def kill_and_wait(self):
-        self.kill()
-        os.close(self.stdin_write)
+        """
+        kill_and_wait will kill the process and wait for it to return
+        """
+        # If the process is running, kill it and close self.stdin_write
+        # this is done so this method can safely be called multiple times
+        if self.proc.poll() is None:
+            self.kill()
+            os.close(self.stdin_write)
         return self.wait()
 
     def check_kill_and_wait(self, exit_code=0):
@@ -113,6 +119,8 @@ class Proc(object):
 
     def __del__(self):
         # Ensure the process is stopped.
+        # For some reason when some tests error/timeout this
+        # method is not called in a timely manner.
         try:
             self.proc.terminate()
             self.proc.kill()
