@@ -18,11 +18,10 @@
 package dns
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -71,7 +70,7 @@ func (fa *FieldAction) Unpack(v string) error {
 	case "replace":
 		*fa = ActionReplace
 	default:
-		return errors.Errorf("invalid dns field action value '%v'", v)
+		return fmt.Errorf("invalid dns field action value '%v'", v)
 	}
 	return nil
 }
@@ -106,7 +105,7 @@ func (c *Config) Validate() error {
 	switch c.Type {
 	case "reverse":
 	default:
-		return errors.Errorf("invalid dns lookup type '%v' specified in "+
+		return fmt.Errorf("invalid dns lookup type '%v' specified in "+
 			"config (valid values are: reverse)", c.Type)
 	}
 
@@ -115,7 +114,7 @@ func (c *Config) Validate() error {
 	for k, v := range c.Fields.Flatten() {
 		target, ok := v.(string)
 		if !ok {
-			return errors.Errorf("target field for dns lookup of %v "+
+			return fmt.Errorf("target field for dns lookup of %v "+
 				"must be a string but got %T", k, v)
 		}
 		c.reverseFlat[k] = target
@@ -126,7 +125,7 @@ func (c *Config) Validate() error {
 	case "tls":
 	case "udp":
 	default:
-		return errors.Errorf("invalid transport method type '%v' specified in "+
+		return fmt.Errorf("invalid transport method type '%v' specified in "+
 			"config (valid value is: tls or udp)", c.Transport)
 	}
 	return nil
@@ -135,24 +134,24 @@ func (c *Config) Validate() error {
 // Validate validates the data contained in the CacheConfig.
 func (c *CacheConfig) Validate() error {
 	if c.SuccessCache.MinTTL <= 0 {
-		return errors.Errorf("success_cache.min_ttl must be > 0")
+		return fmt.Errorf("success_cache.min_ttl must be > 0")
 	}
 	if c.FailureCache.TTL <= 0 {
-		return errors.Errorf("failure_cache.ttl must be > 0")
+		return fmt.Errorf("failure_cache.ttl must be > 0")
 	}
 
 	if c.SuccessCache.MaxCapacity <= 0 {
-		return errors.Errorf("success_cache.capacity.max must be > 0")
+		return fmt.Errorf("success_cache.capacity.max must be > 0")
 	}
 	if c.FailureCache.MaxCapacity <= 0 {
-		return errors.Errorf("failure_cache.capacity.max must be > 0")
+		return fmt.Errorf("failure_cache.capacity.max must be > 0")
 	}
 
 	if c.SuccessCache.MaxCapacity < c.SuccessCache.InitialCapacity {
-		return errors.Errorf("success_cache.capacity.max must be >= success_cache.capacity.initial")
+		return fmt.Errorf("success_cache.capacity.max must be >= success_cache.capacity.initial")
 	}
 	if c.FailureCache.MaxCapacity < c.FailureCache.InitialCapacity {
-		return errors.Errorf("failure_cache.capacity.max must be >= failure_cache.capacity.initial")
+		return fmt.Errorf("failure_cache.capacity.max must be >= failure_cache.capacity.initial")
 	}
 
 	return nil
