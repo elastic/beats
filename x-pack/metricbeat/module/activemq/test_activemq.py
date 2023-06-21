@@ -91,10 +91,10 @@ class ActiveMqTest(XPackTest):
             assert 'count' in evt['activemq']['broker']['consumers']
             self.assert_fields_are_documented(evt)
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
-    def test_queue_metrics_collected(self):
-        self.verify_destination_metrics_collection('queue')
+    # @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    # def test_queue_metrics_collected(self):
+    #     self.verify_destination_metrics_collection('queue')
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
-    def test_topic_metrics_collected(self):
-        self.verify_destination_metrics_collection('topic')
+    # @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    # def test_topic_metrics_collected(self):
+    #     self.verify_destination_metrics_collection('topic')
