@@ -29,6 +29,10 @@ var GroupResponse = []*fetcher.Group{
 				ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
 				Type: fetcher.MemberUser,
 			},
+			{
+				ID:   uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+				Type: fetcher.MemberDevice,
+			},
 		},
 	},
 	{
@@ -42,6 +46,10 @@ var GroupResponse = []*fetcher.Group{
 			{
 				ID:   uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
 				Type: fetcher.MemberUser,
+			},
+			{
+				ID:   uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+				Type: fetcher.MemberDevice,
 			},
 		},
 	},
