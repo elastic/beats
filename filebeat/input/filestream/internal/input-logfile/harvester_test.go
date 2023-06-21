@@ -104,6 +104,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
+
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
@@ -408,7 +409,7 @@ type mockHarvester struct {
 	onRun func(input.Context, Source, Cursor, Publisher) error
 }
 
-func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher) error {
+func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher, metrics *Metrics) error {
 	if m.wg != nil {
 		defer m.wg.Done()
 	}

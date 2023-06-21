@@ -19,10 +19,10 @@ package ilm
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -98,7 +98,7 @@ func StdSupport(log *logp.Logger, info beat.Info, c *config.C) (Supporter, error
 
 	name, err := applyStaticFmtstr(info, &cfg.PolicyName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read ilm policy name")
+		return nil, errors.New("failed to read ilm policy name")
 	}
 
 	policy := Policy{
@@ -108,12 +108,12 @@ func StdSupport(log *logp.Logger, info beat.Info, c *config.C) (Supporter, error
 	if path := cfg.PolicyFile; path != "" {
 		contents, err := ioutil.ReadFile(path)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read policy file '%v'", path)
+			return nil, fmt.Errorf("failed to read policy file '%v': %w", path, err)
 		}
 
 		var body map[string]interface{}
 		if err := json.Unmarshal(contents, &body); err != nil {
-			return nil, errors.Wrapf(err, "failed to decode policy file '%v'", path)
+			return nil, fmt.Errorf("failed to decode policy file '%v': %w", path, err)
 		}
 
 		policy.Body = body
