@@ -9,6 +9,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
+- Update Go version to 1.19.10 {pull}35751[35751]
 
 *Auditbeat*
 

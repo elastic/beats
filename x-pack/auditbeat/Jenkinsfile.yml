@@ -11,7 +11,7 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-auditbeat"
     tags: true                 ## for all the tags
-platform: "immutable && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-22" ## default label for all the stages
 stages:
     arm:
         mage: "mage build unitTest"

@@ -85,6 +85,7 @@ type PythonTestArgs struct {
 	Files               []string          // Globs used to find tests.
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
+	ForceCreateVenv     bool              // Set to true to always install required dependencies in the test virtual environment.
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
@@ -114,7 +115,8 @@ func DefaultPythonTestIntegrationArgs() PythonTestArgs { return makePythonTestAr
 func PythonTest(params PythonTestArgs) error {
 	fmt.Println(">> python test:", params.TestName, "Testing")
 
-	ve, err := PythonVirtualenv()
+	// Only activate the virtualenv if necessary.
+	ve, err := PythonVirtualenv(params.ForceCreateVenv)
 	if err != nil {
 		return err
 	}
@@ -196,7 +198,7 @@ func PythonTestForModule(params PythonTestArgs) error {
 // PythonVirtualenv constructs a virtualenv that contains the given modules as
 // defined in the requirements file pointed to by requirementsTxt. It returns
 // the path to the virtualenv.
-func PythonVirtualenv() (string, error) {
+func PythonVirtualenv(forceCreate bool) (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
 
@@ -217,7 +219,7 @@ func PythonVirtualenv() (string, error) {
 	// Only execute if requirements.txt is newer than the virtualenv activate
 	// script.
 	activate := virtualenvPath(ve, "activate")
-	if IsUpToDate(activate, reqs...) {
+	if !forceCreate && IsUpToDate(activate, reqs...) {
 		return pythonVirtualenvDir, nil
 	}
 
@@ -277,6 +279,12 @@ func pythonVirtualenvPath() (string, error) {
 		return pythonVirtualenvDir, nil
 	}
 
+	// If VIRTUAL_ENV is set we are already in a virtual environment.
+	pythonVirtualenvDir = os.Getenv("VIRTUAL_ENV")
+	if pythonVirtualenvDir != "" {
+		return pythonVirtualenvDir, nil
+	}
+
 	// PYTHON_ENV can override the default location. This is used by CI to
 	// shorten the overall shebang interpreter path below the path length limits.
 	pythonVirtualenvDir = os.Getenv("PYTHON_ENV")
@@ -288,6 +296,7 @@ func pythonVirtualenvPath() (string, error) {
 
 		pythonVirtualenvDir = info.RootDir
 	}
+
 	pythonVirtualenvDir = filepath.Join(pythonVirtualenvDir, "build/ve")
 
 	// Use OS and docker specific virtualenv's because the interpreter in
