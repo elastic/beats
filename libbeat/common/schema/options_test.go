@@ -20,8 +20,9 @@ package schema
 import (
 	"testing"
 
+	"errors"
+
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"

@@ -18,13 +18,13 @@
 package container
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -43,7 +43,7 @@ func NewInput(
 	// Wrap log input with custom docker settings
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading container input config")
+		return nil, fmt.Errorf("reading container input config: %w", err)
 	}
 
 	err := cfg.Merge(mapstr.M{
@@ -60,7 +60,7 @@ func NewInput(
 		"symlinks": true,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "update input config")
+		return nil, fmt.Errorf("update input config: %w", err)
 	}
 
 	// Add stream to meta to ensure different state per stream

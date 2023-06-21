@@ -19,12 +19,11 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Confirm shows the confirmation text and ask the user to answer (y/n)
