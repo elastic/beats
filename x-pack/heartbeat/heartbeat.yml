@@ -15,7 +15,7 @@ heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
   path: ${path.config}/monitors.d/*.yml
   # If enabled, heartbeat will periodically check the config.monitors path for changes
-  reload.enabled: false
+  reload.enabled: true
   # How often to check for changes
   reload.period: 5s
 
@@ -101,6 +101,7 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
+  allow_older_versions: true
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"

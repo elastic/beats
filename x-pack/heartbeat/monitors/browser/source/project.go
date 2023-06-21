@@ -50,8 +50,6 @@ func (p *ProjectSource) Fetch() error {
 		return nil
 	}
 
-	p.fetched = true
-
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
 	if err != nil {
 		return err
@@ -97,6 +95,8 @@ func (p *ProjectSource) Fetch() error {
 		}
 	}
 
+	// We've succeded, mark the fetch as a success
+	p.fetched = true
 	return nil
 }
 
