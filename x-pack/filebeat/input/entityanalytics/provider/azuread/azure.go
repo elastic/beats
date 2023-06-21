@@ -150,32 +150,25 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 		return err
 	}
 
-	if len(state.users) != 0 {
-		p.logger.Debugw("publishing users", "count", len(state.devices))
-
+	if len(state.users) != 0 || len(state.devices) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, u := range state.users {
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+
+		if len(state.users) != 0 {
+			p.logger.Debugw("publishing users", "count", len(state.devices))
+			for _, u := range state.users {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			}
+
 		}
 
-		end := time.Now()
-		p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
-
-		tracker.Wait()
-	}
-
-	if len(state.devices) != 0 {
-		p.logger.Debugw("publishing devices", "count", len(state.devices))
-
-		tracker := kvstore.NewTxTracker(ctx)
-
-		start := time.Now()
-		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, d := range state.devices {
-			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		if len(state.devices) != 0 {
+			p.logger.Debugw("publishing devices", "count", len(state.devices))
+			for _, d := range state.devices {
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			}
 		}
 
 		end := time.Now()
@@ -218,30 +211,32 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 		return err
 	}
 
-	if updatedUsers.Len() != 0 {
+	if updatedUsers.Len() != 0 || updatedDevices.Len() != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
-		updatedUsers.ForEach(func(id uuid.UUID) {
-			u, ok := state.users[id]
-			if !ok {
-				p.logger.Warnf("Unable to lookup user %q", id)
-				return
-			}
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
-		})
 
-		tracker.Wait()
-	}
+		if updatedUsers.Len() != 0 {
+			updatedUsers.ForEach(func(id uuid.UUID) {
+				u, ok := state.users[id]
+				if !ok {
+					p.logger.Warnf("Unable to lookup user %q", id)
+					return
+				}
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			})
 
-	if updatedDevices.Len() != 0 {
-		tracker := kvstore.NewTxTracker(ctx)
-		updatedDevices.ForEach(func(id uuid.UUID) {
-			d, ok := state.devices[id]
-			if !ok {
-				p.logger.Warnf("Unable to lookup device %q", id)
-				return
-			}
-			p.publishDevice(d, state, inputCtx.ID, client, tracker)
-		})
+		}
+
+		if updatedDevices.Len() != 0 {
+			updatedDevices.ForEach(func(id uuid.UUID) {
+				d, ok := state.devices[id]
+				if !ok {
+					p.logger.Warnf("Unable to lookup device %q", id)
+					return
+				}
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			})
+
+		}
 
 		tracker.Wait()
 	}
