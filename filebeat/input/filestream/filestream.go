@@ -158,12 +158,17 @@ func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
 }
 
 func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
-	timed.Periodic(ctx, f.checkInterval, func() error {
+	err := timed.Periodic(ctx, f.checkInterval, func() error {
 		if f.shouldBeClosed() {
 			f.readerCtx.Cancel()
 		}
 		return nil
 	})
+	if err != nil {
+		if !errors.Is(err, context.Canceled) {
+			f.log.Errorf("failed to schedule a periodic state check: %s", err)
+		}
+	}
 }
 
 func (f *logFile) shouldBeClosed() bool {
