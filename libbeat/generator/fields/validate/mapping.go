@@ -18,6 +18,7 @@
 package validate
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -75,7 +76,7 @@ func (m *Mapping) Validate(dict map[string]interface{}) error {
 	}
 	for _, required := range m.Required {
 		if _, found := docFields[required]; !found {
-			return errors.Errorf("required field '%s' not found", required)
+			return fmt.Errorf("required field '%s' not found", required)
 		}
 	}
 	return nil
