@@ -102,10 +102,6 @@ class Proc(object):
         return actual_exit_code
 
     def kill_and_wait(self):
-<<<<<<< HEAD
-        self.kill()
-        os.close(self.stdin_write)
-=======
         """
         kill_and_wait will kill the process and wait for it to return
         """
@@ -114,7 +110,6 @@ class Proc(object):
         if self.proc.poll() is None:
             self.kill()
             os.close(self.stdin_write)
->>>>>>> 682045a981 (python tests: compatibility and stability improvements (#31588))
         return self.wait()
 
     def check_kill_and_wait(self, exit_code=0):
