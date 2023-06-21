@@ -104,7 +104,7 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 
 		return nil
 	}); err != nil && !errIsItemNotFound(err) {
-		return nil, fmt.Errorf("unable to get users from state: %w", err)
+		return nil, fmt.Errorf("unable to get devices from state: %w", err)
 	}
 
 	if err = s.tx.ForEach(groupsBucket, func(key, value []byte) error {

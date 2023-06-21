@@ -151,6 +151,8 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 	}
 
 	if len(state.users) != 0 {
+		p.logger.Debugw("publishing users", "count", len(state.devices))
+
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
@@ -166,6 +168,8 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 	}
 
 	if len(state.devices) != 0 {
+		p.logger.Debugw("publishing devices", "count", len(state.devices))
+
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
@@ -361,6 +365,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		}
 		u.Modified = true
 		if u.Deleted {
+			p.logger.Debugw("not expanding membership for deleted user", "user", userID)
 			return
 		}
 
@@ -379,6 +384,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		}
 		d.Modified = true
 		if d.Deleted {
+			p.logger.Debugw("not expanding membership for deleted device", "device", devID)
 			return
 		}
 
@@ -461,7 +467,7 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	client.Publish(event)
 }
 
-// publishDevice will publish a user document using the given beat.Client.
+// publishDevice will publish a device document using the given beat.Client.
 func (p *azure) publishDevice(d *fetcher.Device, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
 	deviceDoc := mapstr.M{}
 
