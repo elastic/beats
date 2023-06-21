@@ -7,8 +7,8 @@ import unittest
 from xpack_metricbeat import XPackTest, metricbeat
 
 
-@unittest.skip("tests failing: https://github.com/elastic/beats/issues/35851")
 @metricbeat.parameterized_with_supported_versions
+@unittest.skip("tests failing: https://github.com/elastic/beats/issues/35851")
 class ActiveMqTest(XPackTest):
     COMPOSE_SERVICES = ['activemq']
 
