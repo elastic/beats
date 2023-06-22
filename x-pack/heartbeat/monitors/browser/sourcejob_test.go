@@ -44,7 +44,7 @@ func TestValidLocal(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	_, e := NewProject(cfg)
+	_, e := NewSourceJob(cfg)
 	require.Error(t, e)
 }
 
@@ -66,10 +66,10 @@ func TestValidInline(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewProject(cfg)
+	s, e := NewSourceJob(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	require.Equal(t, script, s.projectCfg.Source.Inline.Script)
+	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
 	require.Equal(t, "", s.Workdir())
 	require.Equal(t, testParams, s.Params())
 
@@ -86,7 +86,7 @@ func TestNameRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewProject(cfg)
+	_, e := NewSourceJob(cfg)
 	require.Regexp(t, ErrNameRequired, e)
 }
 
@@ -99,7 +99,7 @@ func TestIDRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewProject(cfg)
+	_, e := NewSourceJob(cfg)
 	require.Regexp(t, ErrIdRequired, e)
 }
 
@@ -107,7 +107,7 @@ func TestEmptySource(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
-	s, e := NewProject(cfg)
+	s, e := NewSourceJob(cfg)
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)
@@ -196,8 +196,8 @@ func TestExtraArgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &Project{
-				projectCfg: tt.cfg,
+			s := &SourceJob{
+				browserCfg: tt.cfg,
 			}
 			if got := s.extraArgs(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Project.extraArgs() = %v, want %v", got, tt.want)
@@ -217,9 +217,9 @@ func TestEmptyTimeout(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewProject(cfg)
+	s, e := NewSourceJob(cfg)
 
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	require.Equal(t, s.projectCfg.Timeout, defaults.Timeout)
+	require.Equal(t, s.browserCfg.Timeout, defaults.Timeout)
 }
