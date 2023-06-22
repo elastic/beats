@@ -34,7 +34,7 @@ func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root")
 	}
 
-	s, err := NewProject(cfg)
+	s, err := NewSourceJob(cfg)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
