@@ -7,6 +7,7 @@ package browser
 
 import (
 	"encoding/json"
+	"fmt"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -44,7 +45,7 @@ func TestValidLocal(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	_, e := NewProject(cfg)
+	_, e := NewSourceJob(cfg)
 	require.Error(t, e)
 }
 
@@ -66,10 +67,10 @@ func TestValidInline(t *testing.T) {
 		},
 		"timeout": timeout,
 	})
-	s, e := NewProject(cfg)
+	s, e := NewSourceJob(cfg)
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	require.Equal(t, script, s.projectCfg.Source.Inline.Script)
+	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
 	require.Equal(t, "", s.Workdir())
 	require.Equal(t, testParams, s.Params())
 
@@ -86,7 +87,7 @@ func TestNameRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewProject(cfg)
+	_, e := NewSourceJob(cfg)
 	require.Regexp(t, ErrNameRequired, e)
 }
 
@@ -99,7 +100,7 @@ func TestIDRequired(t *testing.T) {
 			},
 		},
 	})
-	_, e := NewProject(cfg)
+	_, e := NewSourceJob(cfg)
 	require.Regexp(t, ErrIdRequired, e)
 }
 
@@ -107,7 +108,7 @@ func TestEmptySource(t *testing.T) {
 	cfg := conf.MustNewConfigFrom(mapstr.M{
 		"source": mapstr.M{},
 	})
-	s, e := NewProject(cfg)
+	s, e := NewSourceJob(cfg)
 
 	require.Regexp(t, ErrBadConfig(source.ErrInvalidSource), e)
 	require.Nil(t, s)
@@ -227,8 +228,8 @@ func TestExtraArgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &Project{
-				projectCfg: tt.cfg,
+			s := &SourceJob{
+				browserCfg: tt.cfg,
 			}
 			if got := s.extraArgs(tt.ui); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Project.extraArgs() = %v, want %v", got, tt.want)
@@ -248,29 +249,27 @@ func TestEmptyTimeout(t *testing.T) {
 			},
 		},
 	})
-	s, e := NewProject(cfg)
+	s, e := NewSourceJob(cfg)
 
 	require.NoError(t, e)
 	require.NotNil(t, s)
-	require.Equal(t, s.projectCfg.Timeout, defaults.Timeout)
+	require.Equal(t, s.browserCfg.Timeout, defaults.Timeout)
 }
 
 func TestFilterDevFlags(t *testing.T) {
-	var filterMap = map[string]int{
-		"--pause-on-error":  0,
-		"--quiet-exit-code": 0,
-		"--dry-run":         0,
-		"--outfd":           1,
-		"--reporter":        1,
-		"-V":                0,
-		"--version":         0,
-		"-h":                0,
-		"--help":            0,
-	}
-
 	allFlags := []string{}
 	for k := range filterMap {
 		allFlags = append(allFlags, k)
+	}
+
+	variadicGen := func(flag string, n int) []string {
+		params := []string{"dummy"}
+		params = append(params, flag)
+		for i := 0; i < n; i++ {
+			params = append(params, fmt.Sprintf("flag-%d", i))
+		}
+
+		return params
 	}
 	tests := []struct {
 		name           string
@@ -294,13 +293,58 @@ func TestFilterDevFlags(t *testing.T) {
 		},
 		{
 			"keep unfiltered",
-			append(allFlags, "unfiltered"),
+			append([]string{"unfiltered"}, allFlags...),
 			[]string{"unfiltered"},
 		},
 		{
 			"filter associated params",
 			[]string{"--help", "malformed1", "--outfd", "param1", "malformed2", "--reporter", "-malformed3"},
 			[]string{"malformed1", "malformed2", "-malformed3"},
+		},
+		{
+			"filter variadic flags - tags - 10",
+			variadicGen("--tags", 10),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - tags - 50",
+			variadicGen("--tags", 50),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - tags - 100",
+			variadicGen("--tags", 100),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - require - 10",
+			variadicGen("--require", 10),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - require - 50",
+			variadicGen("--require", 50),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - require - 100",
+			variadicGen("-r", 100),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - match - 10",
+			variadicGen("--match", 10),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - match - 50",
+			variadicGen("--match", 50),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - match - 100",
+			variadicGen("--match", 100),
+			[]string{"dummy"},
 		},
 	}
 	for _, tt := range tests {

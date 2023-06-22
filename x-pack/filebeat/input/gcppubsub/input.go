@@ -85,6 +85,7 @@ type pubsubInput struct {
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on pubsub worker goroutine.
 
+	id      string // id is the ID for metrics registration.
 	metrics *inputMetrics
 }
 
@@ -122,9 +123,6 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		}
 	}()
 
-	metrics := newInputMetrics(id, nil)
-	defer metrics.Close()
-
 	// If the input ever needs to be made restartable, then context would need
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
@@ -135,7 +133,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
-		metrics:      metrics,
+		id:           id,
 	}
 
 	// Build outlet for events.
@@ -169,6 +167,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 // will ever start the pubsub worker.
 func (in *pubsubInput) Run() {
 	in.workerOnce.Do(func() {
+		in.metrics = newInputMetrics(in.id, nil)
 		in.workerWg.Add(1)
 		go func() {
 			in.log.Info("Pub/Sub input worker has started.")
@@ -236,6 +235,7 @@ func (in *pubsubInput) run() error {
 func (in *pubsubInput) Stop() {
 	in.workerCancel()
 	in.workerWg.Wait()
+	in.metrics.Close()
 }
 
 // Wait is an alias for Stop.

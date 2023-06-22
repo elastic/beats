@@ -20,30 +20,27 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type JourneyLister func(ctx context.Context, projectPath string, params mapstr.M) (journeyNames []string, err error)
-
-type Project struct {
+type SourceJob struct {
 	rawCfg     *config.C
-	projectCfg *Config
+	browserCfg *Config
 	ctx        context.Context
 	cancel     context.CancelFunc
 }
 
-func NewProject(rawCfg *config.C) (*Project, error) {
-	// Global project context to cancel all jobs
+func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
+	// Global browser context to cancel all jobs
 	// on close
 	ctx, cancel := context.WithCancel(context.Background())
 
-	s := &Project{
+	s := &SourceJob{
 		rawCfg:     rawCfg,
-		projectCfg: DefaultConfig(),
+		browserCfg: DefaultConfig(),
 		ctx:        ctx,
 		cancel:     cancel,
 	}
-	err := rawCfg.Unpack(s.projectCfg)
+	err := rawCfg.Unpack(s.browserCfg)
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
@@ -52,31 +49,31 @@ func NewProject(rawCfg *config.C) (*Project, error) {
 }
 
 func ErrBadConfig(err error) error {
-	return fmt.Errorf("could not parse project config: %w", err)
+	return fmt.Errorf("could not parse browser config: %w", err)
 }
 
-func (p *Project) String() string {
+func (sj *SourceJob) String() string {
 	panic("implement me")
 }
 
-func (p *Project) Fetch() error {
-	return p.projectCfg.Source.Active().Fetch()
+func (sj *SourceJob) Fetch() error {
+	return sj.browserCfg.Source.Active().Fetch()
 }
 
-func (p *Project) Workdir() string {
-	return p.projectCfg.Source.Active().Workdir()
+func (sj *SourceJob) Workdir() string {
+	return sj.browserCfg.Source.Active().Workdir()
 }
 
-func (p *Project) Params() map[string]interface{} {
-	return p.projectCfg.Params
+func (sj *SourceJob) Params() map[string]interface{} {
+	return sj.browserCfg.Params
 }
 
-func (p *Project) FilterJourneys() synthexec.FilterJourneyConfig {
-	return p.projectCfg.FilterJourneys
+func (sj *SourceJob) FilterJourneys() synthexec.FilterJourneyConfig {
+	return sj.browserCfg.FilterJourneys
 }
 
-func (p *Project) StdFields() stdfields.StdMonitorFields {
-	sFields, err := stdfields.ConfigToStdMonitorFields(p.rawCfg)
+func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
+	sFields, err := stdfields.ConfigToStdMonitorFields(sj.rawCfg)
 	// Should be impossible since outer monitor.go should run this same code elsewhere
 	// TODO: Just pass stdfields in to remove second deserialize
 	if err != nil {
@@ -85,13 +82,13 @@ func (p *Project) StdFields() stdfields.StdMonitorFields {
 	return sFields
 }
 
-func (p *Project) Close() error {
-	if p.projectCfg.Source.ActiveMemo != nil {
-		p.projectCfg.Source.ActiveMemo.Close()
+func (sj *SourceJob) Close() error {
+	if sj.browserCfg.Source.ActiveMemo != nil {
+		sj.browserCfg.Source.ActiveMemo.Close()
 	}
 
 	// Cancel running jobs ctxs
-	p.cancel()
+	sj.cancel()
 
 	return nil
 }
@@ -115,41 +112,41 @@ var filterMap = map[string]int{
 	"--ws-endpoint":     1,
 }
 
-func (p *Project) extraArgs(uiOrigin bool) []string {
+func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 	extraArgs := []string{}
 
 	if uiOrigin {
-		extraArgs = filterDevFlags(p.projectCfg.SyntheticsArgs, filterMap)
+		extraArgs = filterDevFlags(sj.browserCfg.SyntheticsArgs, filterMap)
 	} else {
-		extraArgs = append(extraArgs, p.projectCfg.SyntheticsArgs...)
+		extraArgs = append(extraArgs, sj.browserCfg.SyntheticsArgs...)
 	}
 
-	if len(p.projectCfg.PlaywrightOpts) > 0 {
-		s, err := json.Marshal(p.projectCfg.PlaywrightOpts)
+	if len(sj.browserCfg.PlaywrightOpts) > 0 {
+		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			logp.L().Warn("could not serialize playwright options '%v': %w", p.projectCfg.PlaywrightOpts, err)
+			logp.L().Warn("could not serialize playwright options '%v': %w", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
 	}
-	if p.projectCfg.IgnoreHTTPSErrors {
+	if sj.browserCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
-	if p.projectCfg.Sandbox {
+	if sj.browserCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
-	if p.projectCfg.Screenshots != "" {
-		extraArgs = append(extraArgs, "--screenshots", p.projectCfg.Screenshots)
+	if sj.browserCfg.Screenshots != "" {
+		extraArgs = append(extraArgs, "--screenshots", sj.browserCfg.Screenshots)
 	}
-	if p.projectCfg.Throttling != nil {
-		switch t := p.projectCfg.Throttling.(type) {
+	if sj.browserCfg.Throttling != nil {
+		switch t := sj.browserCfg.Throttling.(type) {
 		case bool:
 			if !t {
 				extraArgs = append(extraArgs, "--no-throttling")
 			}
 		case string:
-			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", p.projectCfg.Throttling))
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.browserCfg.Throttling))
 		case map[string]interface{}:
 			j, err := json.Marshal(t)
 			if err != nil {
@@ -163,24 +160,24 @@ func (p *Project) extraArgs(uiOrigin bool) []string {
 	return extraArgs
 }
 
-func (p *Project) jobs() []jobs.Job {
+func (sj *SourceJob) jobs() []jobs.Job {
 	var j jobs.Job
 
-	isScript := p.projectCfg.Source.Inline != nil
-	ctx := context.WithValue(p.ctx, synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
-	sFields := p.StdFields()
+	isScript := sj.browserCfg.Source.Inline != nil
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
+	sFields := sj.StdFields()
 
 	if isScript {
-		src := p.projectCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), sFields, p.extraArgs(sFields.Origin != "")...)
+		src := sj.browserCfg.Source.Inline.Script
+		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sFields, sj.extraArgs(sFields.Origin != "")...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
-			err := p.Fetch()
+			err := sj.Fetch()
 			if err != nil {
-				return nil, fmt.Errorf("could not fetch for project job: %w", err)
+				return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
 			}
 
-			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), sFields, p.extraArgs(sFields.Origin != "")...)
+			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
 			if err != nil {
 				return nil, err
 			}
@@ -190,10 +187,10 @@ func (p *Project) jobs() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func (p *Project) plugin() plugin.Plugin {
+func (sj *SourceJob) plugin() plugin.Plugin {
 	return plugin.Plugin{
-		Jobs:      p.jobs(),
-		DoClose:   p.Close,
+		Jobs:      sj.jobs(),
+		DoClose:   sj.Close,
 		Endpoints: 1,
 	}
 }

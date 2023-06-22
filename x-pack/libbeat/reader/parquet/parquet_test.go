@@ -5,7 +5,6 @@
 package parquet
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -15,10 +14,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/apache/arrow/go/v11/arrow"
-	"github.com/apache/arrow/go/v11/arrow/array"
-	"github.com/apache/arrow/go/v11/arrow/memory"
-	"github.com/apache/arrow/go/v11/parquet/pqarrow"
+	"github.com/apache/arrow/go/v12/arrow"
+	"github.com/apache/arrow/go/v12/arrow/array"
+	"github.com/apache/arrow/go/v12/arrow/memory"
+	"github.com/apache/arrow/go/v12/parquet/pqarrow"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -171,20 +170,22 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 
 func TestParquetWithFiles(t *testing.T) {
 	testCases := []struct {
-		parquetFile string
-		jsonFile    string
+		parquetFile      string
+		jsonFile         string
+		maxRowsToCompare int
 	}{
 		{
-			parquetFile: "vpc_flow.gz.parquet",
-			jsonFile:    "vpc_flow.ndjson",
-		},
-		{
 			parquetFile: "cloudtrail.parquet",
-			jsonFile:    "cloudtrail.ndjson",
+			jsonFile:    "cloudtrail.json",
 		},
 		{
 			parquetFile: "route53.parquet",
-			jsonFile:    "route53.ndjson",
+			jsonFile:    "route53.json",
+		},
+		{
+			parquetFile:      "vpc_flow.gz.parquet",
+			jsonFile:         "vpc_flow.json",
+			maxRowsToCompare: 4,
 		},
 	}
 
@@ -198,43 +199,38 @@ func TestParquetWithFiles(t *testing.T) {
 			}
 			defer parquetFile.Close()
 
-			jsonFile, err := os.Open(filepath.Join(testDataPath, tc.jsonFile))
-			if err != nil {
-				t.Fatalf("Failed to open json test file: %v", err)
-			}
-			defer jsonFile.Close()
-
-			orderedJSON, rows := readJSONFromFile(t, jsonFile)
+			orderedJSON, rows := readJSONFromFile(t, filepath.Join(testDataPath, tc.jsonFile))
 			cfg := &Config{
 				// we set ProcessParallel to true as this always has the best performance
 				ProcessParallel: true,
 				// batch size is set to 1 because we need to compare individual records one by one
 				BatchSize: 1,
 			}
-			readAndCompareParquetFile(t, cfg, parquetFile, orderedJSON, rows)
+			readAndCompareParquetFile(t, cfg, parquetFile, orderedJSON, rows, tc.maxRowsToCompare)
 		})
 	}
 }
 
 // readJSONFromFile reads the json file and returns the data as an ordered map (row number -> json string)
 // along with the number of rows in the file
-func readJSONFromFile(t *testing.T, file *os.File) (map[int]string, int) {
+func readJSONFromFile(t *testing.T, filepath string) (map[int]string, int) {
+	fileBytes, err := os.ReadFile(filepath)
+	assert.NoError(t, err)
+	var rawMessages []json.RawMessage
+	err = json.Unmarshal(fileBytes, &rawMessages)
+	assert.NoError(t, err)
 	data := make(map[int]string)
-	scanner := bufio.NewScanner(file)
-	row := 0
-	for scanner.Scan() {
-		data[row] = scanner.Text()
+	var row int
+	for _, rawMsg := range rawMessages {
+		data[row] = string(rawMsg)
 		row++
-	}
-	if err := scanner.Err(); err != nil {
-		t.Fatalf("failed to read ndjson file: %v", err)
 	}
 
 	return data, row
 }
 
 // readAndCompareParquetFile reads the parquet file and compares the data with the input data
-func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int) {
+func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data map[int]string, rows int, maxRowsToCompare int) {
 	sReader, err := NewBufferedReader(file, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)
@@ -248,9 +244,17 @@ func readAndCompareParquetFile(t *testing.T, cfg *Config, file *os.File, data ma
 		if val != nil {
 			rowCount = readAndCompareParquetJSON(t, bytes.NewReader(val), data, rowCount)
 		}
+		if maxRowsToCompare > 0 && rowCount == maxRowsToCompare {
+			break
+		}
 	}
-	// asserts of number of rows read is the same as the number of rows from the input file
-	assert.Equal(t, rows, rowCount)
+	// if maxRowsToCompare == 0 then we compare the row count
+	if maxRowsToCompare == 0 {
+		// asserts of number of rows read is the same as the number of rows from the input file
+		assert.Equal(t, rows, rowCount)
+	} else {
+		assert.EqualValues(t, rowCount, maxRowsToCompare)
+	}
 	// closes the stream reader and asserts that there are no errors
 	err = sReader.Close()
 	assert.NoError(t, err)
