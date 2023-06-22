@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -26,6 +27,8 @@ import (
 type ProjectSource struct {
 	Content         string `config:"content" json:"content"`
 	TargetDirectory string
+	fetched         bool
+	mtx             sync.Mutex
 }
 
 var ErrNoContent = fmt.Errorf("no 'content' value specified for project monitor source")
@@ -39,6 +42,14 @@ func (p *ProjectSource) Validate() error {
 }
 
 func (p *ProjectSource) Fetch() error {
+	// We only need to unzip the source exactly once
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
+	if p.fetched {
+		logp.L().Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
+		return nil
+	}
+
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
 	if err != nil {
 		return err
@@ -60,6 +71,9 @@ func (p *ProjectSource) Fetch() error {
 	if err != nil {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
+
+	logp.L().Debugf("browser project: unpack source: %s", p.Workdir())
+
 	err = os.Chmod(p.TargetDirectory, defaultMod)
 	if err != nil {
 		return fmt.Errorf("failed assigning default mode %s to temp dir: %w", defaultMod, err)
@@ -81,6 +95,8 @@ func (p *ProjectSource) Fetch() error {
 		}
 	}
 
+	// We've succeeded, mark the fetch as a success
+	p.fetched = true
 	return nil
 }
 
@@ -142,6 +158,8 @@ func (p *ProjectSource) Workdir() string {
 }
 
 func (p *ProjectSource) Close() error {
+	logp.L().Debugf("browser project: close project source: %s", p.Workdir())
+
 	if p.TargetDirectory != "" {
 		return os.RemoveAll(p.TargetDirectory)
 	}
