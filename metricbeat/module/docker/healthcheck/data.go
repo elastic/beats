@@ -42,7 +42,6 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		// errors.Wrapf(err, "Error inspecting container %v", cont.ID)
 		return
 	}
 
