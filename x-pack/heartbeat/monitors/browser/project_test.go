@@ -218,6 +218,12 @@ func TestExtraArgs(t *testing.T) {
 			[]string{"--sandbox"},
 			true,
 		},
+		{
+			"filters variadic dev flags on ui origin",
+			&Config{SyntheticsArgs: []string{"--tags", "tag1", "tag2", "tag3", "--match", "tag4", "tag5", "--sandbox", "-r", "require1", "require2", "--require", "require3", "require4", "require5"}},
+			[]string{"--sandbox"},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

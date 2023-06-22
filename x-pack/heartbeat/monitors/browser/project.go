@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -95,16 +96,23 @@ func (p *Project) Close() error {
 	return nil
 }
 
+// Dev flags + expected number of params, math.MaxInt32 for variadic flags
 var filterMap = map[string]int{
-	"--pause-on-error":  0,
-	"--quiet-exit-code": 0,
 	"--dry-run":         0,
-	"--outfd":           1,
-	"--reporter":        1,
-	"-V":                0,
-	"--version":         0,
 	"-h":                0,
 	"--help":            0,
+	"--inline":          1,
+	"--match":           math.MaxInt32,
+	"--outfd":           1,
+	"--pause-on-error":  0,
+	"--quiet-exit-code": 0,
+	"-r":                math.MaxInt32,
+	"--require":         math.MaxInt32,
+	"--reporter":        1,
+	"--tags":            math.MaxInt32,
+	"-V":                0,
+	"--version":         0,
+	"--ws-endpoint":     1,
 }
 
 func (p *Project) extraArgs(uiOrigin bool) []string {
