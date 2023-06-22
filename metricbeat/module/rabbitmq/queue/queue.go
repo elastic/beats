@@ -18,7 +18,7 @@
 package queue
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq"
@@ -50,7 +50,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	return eventsMapping(content, r)
