@@ -7,9 +7,7 @@
 package integration
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -41,14 +40,15 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
 	// what caused it is going through Filebeat's logs.
-	ensureESIsRunning(t)
+	integration.EnsureESIsRunning(t)
 
-	// We create our own temp dir so the files can be persisted
-	// in case the test fails. This will help debugging issues
-	// locally and on CI.
-	tempDir := createTempDir(t)
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
 
-	logFilePath := filepath.Join(tempDir, "flog.log")
+	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
 	generateLogFile(t, logFilePath)
 	var units = [][]*proto.UnitExpected{
 		{
@@ -200,15 +200,10 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	require.NoError(t, server.Start())
 	t.Cleanup(server.Stop)
 
-	filebeat := NewBeat(
-		t,
-		"../../filebeat.test",
-		tempDir,
+	filebeat.Start(
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 	)
-
-	filebeat.Start()
 
 	// waitDeadlineOr5Mins looks at the test deadline
 	// and returns a reasonable value of waiting for a
@@ -264,11 +259,14 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
 	// what caused it is going through Filebeat's logs.
-	ensureESIsRunning(t)
+	integration.EnsureESIsRunning(t)
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
 
-	tempDir := createTempDir(t)
 	finalStateReached := false
-
 	var units = []*proto.UnitExpected{
 		{
 			Id:             "output-unit-borken",
@@ -334,15 +332,10 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 
 	require.NoError(t, server.Start())
 
-	filebeat := NewBeat(
-		t,
-		"../../filebeat.test",
-		tempDir,
+	filebeat.Start(
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 	)
-
-	filebeat.Start()
 
 	require.Eventually(t, func() bool {
 		return finalStateReached
@@ -401,37 +394,4 @@ func generateLogFile(t *testing.T, fullPath string) {
 			}
 		}
 	}()
-}
-
-func ensureESIsRunning(t *testing.T) {
-	t.Helper()
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:9200", nil)
-	if err != nil {
-		t.Fatalf("cannot create request to ensure ES is running: %s", err)
-	}
-
-	user := os.Getenv("ES_USER")
-	if user == "" {
-		user = "admin"
-	}
-
-	pass := os.Getenv("ES_PASS")
-	if pass == "" {
-		pass = "testing"
-	}
-
-	req.SetBasicAuth(user, pass)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		// If you're reading this message, you probably forgot to start ES
-		// run `mage compose:Up` from Filebeat's folder to start all
-		// containers required for integration tests
-		t.Fatalf("cannot execute HTTP request to ES: %s", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
-	}
 }
