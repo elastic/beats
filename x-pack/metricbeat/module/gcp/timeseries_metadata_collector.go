@@ -135,9 +135,14 @@ func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *Met
 	}
 
 	if s.timeSeries.Metric != nil {
-		if s.timeSeries.Metric.Type != "" {
-			_, _ = m.Put("metric.type", s.timeSeries.Metric.Type)
-		}
+		//
+		// TEMP NOTE: If we exclude the metric type for the ID it can be used
+		// to group together metrics that belong to the same resource.
+		//
+
+		//if s.timeSeries.Metric.Type != "" {
+		//	_, _ = m.Put("metric.type", s.timeSeries.Metric.Type)
+		//}
 
 		if s.timeSeries.Metric.Labels != nil {
 			_, _ = m.Put("metric.labels", s.timeSeries.Metric.Labels)
