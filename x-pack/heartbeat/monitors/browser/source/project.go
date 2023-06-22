@@ -95,7 +95,7 @@ func (p *ProjectSource) Fetch() error {
 		}
 	}
 
-	// We've succeded, mark the fetch as a success
+	// We've succeeded, mark the fetch as a success
 	p.fetched = true
 	return nil
 }
