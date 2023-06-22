@@ -157,7 +157,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(config, protocols, sniffer.DecodersFor(id, publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(id, config, protocols, sniffer.DecodersFor(id, publisher, protocols, watcher, flows, config))
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func setupFlows(pipeline beat.Pipeline, watcher *procs.ProcessesWatcher, cfg con
 	return flows.NewFlows(client.PublishAll, watcher, cfg.Flows)
 }
 
-func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, decoders sniffer.Decoders) (*sniffer.Sniffer, error) {
+func setupSniffer(id string, cfg config.Config, protocols *protos.ProtocolsStruct, decoders sniffer.Decoders) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, decoders
 		cfg.Interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(false, "", decoders, cfg.Interfaces)
+	return sniffer.New(id, false, "", decoders, cfg.Interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based

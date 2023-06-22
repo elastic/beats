@@ -27,6 +27,7 @@ type config struct {
 	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
+	RegionName          string               `config:"region"`
 	BucketARN           string               `config:"bucket_arn"`
 	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
@@ -162,6 +163,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
+	Decoding                 decoderConfig           `config:"decoding"`
 }
 
 func (rc *readerConfig) Validate() error {

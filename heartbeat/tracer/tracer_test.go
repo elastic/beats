@@ -32,25 +32,51 @@ import (
 )
 
 func TestSockTracer(t *testing.T) {
-	sockName, err := uuid.NewRandom()
-	require.NoError(t, err)
-	sockPath := filepath.Join(os.TempDir(), sockName.String())
+	t.Parallel()
+	tests := []struct {
+		name  string
+		testF func(t *testing.T, st SockTracer, listenRes chan []string)
+	}{
+		{
+			"start/stop",
+			func(t *testing.T, st SockTracer, listenRes chan []string) {
+				st.Start()
+				st.Close()
 
-	listenRes := make(chan []string)
-	go func() {
-		listenRes <- listenTilClosed(t, sockPath)
-	}()
+				got := <-listenRes
+				require.Equal(t, []string{MSG_START, MSG_STOP}, got)
+			},
+		},
+		{
+			"abort",
+			func(t *testing.T, st SockTracer, listenRes chan []string) {
+				st.Abort()
 
-	st, err := NewSockTracer(sockPath, time.Second)
-	require.NoError(t, err)
+				got := <-listenRes
+				require.Equal(t, []string{MSG_ABORT}, got)
+			},
+		},
+	}
 
-	err = st.Write("start")
-	require.NoError(t, err)
-	err = st.Close()
-	require.NoError(t, err)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	got := <-listenRes
-	require.Equal(t, got, []string{"start", "stop"})
+			sockName, err := uuid.NewRandom()
+			require.NoError(t, err)
+			sockPath := filepath.Join(os.TempDir(), sockName.String())
+
+			listenRes := make(chan []string)
+			go func() {
+				listenRes <- listenTilClosed(t, sockPath)
+			}()
+
+			st, err := NewSockTracer(sockPath, time.Second)
+			require.NoError(t, err)
+			tt.testF(t, st, listenRes)
+		})
+	}
 }
 
 func TestSockTracerWaitFail(t *testing.T) {

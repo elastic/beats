@@ -22,7 +22,7 @@ package users
 import (
 	"testing"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,24 +53,4 @@ func TestFormatSession(t *testing.T) {
 	output, err := formatSessionProps(testIn)
 	assert.NoError(t, err)
 	assert.Equal(t, goodOut, output)
-}
-
-func TestFormatSessionList(t *testing.T) {
-	testIn := [][]dbus.Variant{
-		{dbus.MakeVariant("6"), dbus.MakeVariant(uint32(1000)), dbus.MakeVariant("user"), dbus.MakeVariant(""), dbus.MakeVariant(dbus.ObjectPath("/path/to/object"))},
-	}
-
-	goodOut := []loginSession{{
-		ID:   "6",
-		UID:  uint32(1000),
-		User: "user",
-		Seat: "",
-		Path: dbus.ObjectPath("/path/to/object"),
-	},
-	}
-
-	output, err := formatSessionList(testIn)
-	assert.NoError(t, err)
-	assert.Equal(t, goodOut, output)
-
 }

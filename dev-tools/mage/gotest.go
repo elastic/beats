@@ -357,6 +357,12 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
 	}
+
+	if DevBuild {
+		// Disable optimizations (-N) and inlining (-l) for debugging.
+		args = append(args, `-gcflags=all=-N -l`)
+	}
+
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
 	}

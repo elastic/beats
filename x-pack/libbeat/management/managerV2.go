@@ -34,6 +34,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
+// diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
+// since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
+type diagnosticHandler struct {
+	log    *logp.Logger
+	client *client.Unit
+}
+
+func (handler diagnosticHandler) Register(name string, description string, filename string, contentType string, callback func() []byte) {
+	handler.log.Infof("registering callback with %s", name)
+	// paranoid checking
+	if handler.client != nil {
+		handler.client.RegisterDiagnosticHook(name, description, filename, contentType, callback)
+	} else {
+		handler.log.Warnf("client handler for diag callback %s is nil", name)
+	}
+}
+
 // unitKey is used to identify a unique unit in a map
 // the `ID` of a unit in itself is not unique without its type, only `Type` + `ID` is unique
 type unitKey struct {
@@ -573,7 +590,25 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 
 	// reload the output configuration
 	if err := cm.reloadOutput(outputUnit); err != nil {
-		errs = append(errs, err)
+		// Output creation failed, there is no point in going any further
+		// because there is no output read the events.
+		//
+		// Trying to start inputs will eventually lead them to deadlock
+		// waiting for the output. Log input will deadlock when starting,
+		// effectively blocking this manager.
+		err = fmt.Errorf("could not start output: %w", err)
+		outputUnit.UpdateState(client.UnitStateFailed, err.Error(), nil)
+		cm.status = lbmanagement.Failed
+		cm.message = err.Error()
+
+		// If there are any other errors, set the status accordingly.
+		// If len(errs), then the there were no previous and the only
+		// error has been reported already.
+		if len(errs) > 0 {
+			errs = append(errs, err)
+			cm.message = fmt.Sprintf("%s", errs)
+		}
+		return
 	}
 
 	// compute the input configuration
@@ -688,6 +723,11 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		inputCfg, err := generateBeatConfig(expected.Config, agentInfo)
 		if err != nil {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
+		}
+		// add diag callbacks for unit
+		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
+		for _, in := range inputCfg {
+			in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
 		}
 		inputCfgs[unit.ID()] = expected.Config
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)

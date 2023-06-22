@@ -92,6 +92,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		esClient, err := makeESClient(b.Config.Output.Config(), 3, 2*time.Second)
 		if err != nil {
 			if parsedConfig.RunOnce {
+				trace.Abort()
 				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
 			} else {
 				logp.L().Warnf("skipping monitor state management: %w", err)
@@ -156,16 +157,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
-	err := bt.trace.Write("start")
-	if err != nil {
-		logp.L().Errorf("could not start trace: %s", err)
-	}
-	defer func() {
-		err := bt.trace.Close()
-		if err != nil {
-			logp.L().Errorf("could not close trace: %s", err)
-		}
-	}()
+	bt.trace.Start()
+	defer bt.trace.Close()
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
