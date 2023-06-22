@@ -34,6 +34,7 @@ spec:
       name: elastic-agent-system-metrics
       description: Buildkite pipeline for the elastic-agent-system-metrics project
     spec:
+      branch_configuration: "main v0.*"
       repository: elastic/elastic-agent-system-metrics
       pipeline_file: ".buildkite/pipeline.yml"
       provider_settings:
