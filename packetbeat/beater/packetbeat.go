@@ -96,7 +96,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	// Install Npcap if needed. This need to happen before any other
 	// work on Windows, including config checking, because that involves
 	// probing interfaces.
-	err := installNpcap(b)
+	err := installNpcap(b, rawConfig)
 	if err != nil {
 		return nil, err
 	}
