@@ -5,11 +5,11 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 )

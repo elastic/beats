@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -88,12 +87,12 @@ func loadSources(files ...string) (string, []byte, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return errors.Wrapf(err, "failed to open file %v", path)
+			return fmt.Errorf("failed to open file %v: %w", path, err)
 		}
 		defer f.Close()
 
 		if _, err = io.Copy(buf, f); err != nil {
-			return errors.Wrapf(err, "failed to read file %v", path)
+			return fmt.Errorf("failed to read file %v: %w", path, err)
 		}
 		return nil
 	}

@@ -20,7 +20,7 @@ package publish
 import (
 	"net"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
