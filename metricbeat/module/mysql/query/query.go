@@ -25,8 +25,7 @@ package query
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
@@ -82,7 +81,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var err error
 		m.db, err = sql.NewDBClient("mysql", m.HostData().URI, m.Logger())
 		if err != nil {
-			return errors.Wrap(err, "mysql-status fetch failed")
+			return fmt.Errorf("mysql-status fetch failed: %w", err)
 		}
 	}
 
@@ -142,5 +141,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
+	return fmt.Errorf("failed to close mysql database client: %w", m.db.Close())
 }

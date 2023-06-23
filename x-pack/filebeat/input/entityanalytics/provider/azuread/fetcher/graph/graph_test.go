@@ -59,6 +59,60 @@ var usersResponse2 = apiUserResponse{
 	},
 }
 
+var devicesResponse1 = apiDeviceResponse{
+	Devices: []deviceAPI{
+		{
+			"id":                     "6a59ea83-02bd-468f-a40b-f2c3d1821983",
+			"accountEnabled":         true,
+			"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
+			"displayName":            "DESKTOP-LK3PESR",
+			"operatingSystem":        "Windows",
+			"operatingSystemVersion": "10.0.19043.1237",
+			"physicalIds":            []interface{}{},
+			"extensionAttributes": map[string]interface{}{
+				"extensionAttribute1": "BYOD-Device",
+				"extensionAttribute2": nil,
+				"extensionAttribute3": nil,
+				"extensionAttribute4": nil,
+			},
+			"alternativeSecurityIds": []interface{}{
+				map[string]interface{}{
+					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
+					"identityProvider": nil,
+					"key":              "WAA1ADAAOQA6AD...QBnAD0A",
+				},
+			},
+		},
+	},
+}
+
+var devicesResponse2 = apiDeviceResponse{
+	Devices: []deviceAPI{
+		{
+			"id":                     "adbbe40a-0627-4328-89f1-88cac84dbc7f",
+			"accountEnabled":         true,
+			"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
+			"displayName":            "DESKTOP-LETW452G",
+			"operatingSystem":        "Windows",
+			"operatingSystemVersion": "10.0.19043.1337",
+			"physicalIds":            []interface{}{},
+			"extensionAttributes": map[string]interface{}{
+				"extensionAttribute1": "BYOD-Device",
+				"extensionAttribute2": nil,
+				"extensionAttribute3": nil,
+				"extensionAttribute4": nil,
+			},
+			"alternativeSecurityIds": []interface{}{
+				map[string]interface{}{
+					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
+					"identityProvider": nil,
+					"key":              "DGFSGHSGGTH345A...35DSFH0A",
+				},
+			},
+		},
+	},
+}
+
 var groupsResponse1 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
@@ -116,6 +170,29 @@ func (s *testServer) setup(t *testing.T) {
 		case "test":
 			usersResponse2.DeltaLink = "http://" + s.addr + "/users/delta?$deltatoken=test"
 			data, err = json.Marshal(&usersResponse2)
+		default:
+			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
+		}
+		require.NoError(t, err)
+
+		_, err = w.Write(data)
+		require.NoError(t, err)
+	})
+
+	mux.HandleFunc("/devices/delta", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		var data []byte
+		var err error
+
+		skipToken := r.URL.Query().Get("$skiptoken")
+		switch skipToken {
+		case "":
+			devicesResponse1.NextLink = "http://" + s.addr + "/devices/delta?$skiptoken=test"
+			data, err = json.Marshal(&devicesResponse1)
+		case "test":
+			devicesResponse2.DeltaLink = "http://" + s.addr + "/devices/delta?$deltatoken=test"
+			data, err = json.Marshal(&devicesResponse2)
 		default:
 			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
 		}
@@ -265,5 +342,81 @@ func TestGraph_Users(t *testing.T) {
 
 	require.NoError(t, gotErr)
 	require.EqualValues(t, wantUsers, gotUsers)
+	require.Equal(t, wantDeltaLink, gotDeltaLink)
+}
+
+func TestGraph_Devices(t *testing.T) {
+	var testSrv testServer
+	testSrv.setup(t)
+	defer testSrv.srv.Close()
+
+	wantDeltaLink := "http://" + testSrv.addr + "/devices/delta?$deltatoken=test"
+	wantDevices := []*fetcher.Device{
+		{
+			ID: uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+			Fields: map[string]interface{}{
+				"accountEnabled":         true,
+				"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
+				"displayName":            "DESKTOP-LK3PESR",
+				"operatingSystem":        "Windows",
+				"operatingSystemVersion": "10.0.19043.1237",
+				"physicalIds":            []interface{}{},
+				"extensionAttributes": map[string]interface{}{
+					"extensionAttribute1": "BYOD-Device",
+					"extensionAttribute2": nil,
+					"extensionAttribute3": nil,
+					"extensionAttribute4": nil,
+				},
+				"alternativeSecurityIds": []interface{}{
+					map[string]interface{}{
+						"type":             "2", // Rendered as string to avoid in-flight conversion to float.
+						"identityProvider": nil,
+						"key":              "WAA1ADAAOQA6AD...QBnAD0A",
+					},
+				},
+			},
+		},
+		{
+			ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+			Fields: map[string]interface{}{
+				"accountEnabled":         true,
+				"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
+				"displayName":            "DESKTOP-LETW452G",
+				"operatingSystem":        "Windows",
+				"operatingSystemVersion": "10.0.19043.1337",
+				"physicalIds":            []interface{}{},
+				"extensionAttributes": map[string]interface{}{
+					"extensionAttribute1": "BYOD-Device",
+					"extensionAttribute2": nil,
+					"extensionAttribute3": nil,
+					"extensionAttribute4": nil,
+				},
+				"alternativeSecurityIds": []interface{}{
+					map[string]interface{}{
+						"type":             "2", // Rendered as string to avoid in-flight conversion to float.
+						"identityProvider": nil,
+						"key":              "DGFSGHSGGTH345A...35DSFH0A",
+					},
+				},
+			},
+		},
+	}
+
+	rawConf := graphConf{
+		APIEndpoint: "http://" + testSrv.addr,
+	}
+	c, err := config.NewConfigFrom(&rawConf)
+	require.NoError(t, err)
+	auth := mock.New(mock.DefaultTokenValue)
+
+	f, err := New(c, logp.L(), auth)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	gotDevices, gotDeltaLink, gotErr := f.Devices(ctx, "")
+
+	require.NoError(t, gotErr)
+	require.EqualValues(t, wantDevices, gotDevices)
 	require.Equal(t, wantDeltaLink, gotDeltaLink)
 }

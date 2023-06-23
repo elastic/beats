@@ -18,7 +18,7 @@
 package module
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -80,8 +80,8 @@ func NewConnector(
 func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metricSetName string) error {
 	metricSetProcessors, err := r.ProcessorsForMetricSet(moduleName, metricSetName)
 	if err != nil {
-		return errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
-			moduleName, metricSetName)
+		return fmt.Errorf("reading metricset processors failed (module: %s, metricset: %s): %w",
+			moduleName, metricSetName, err)
 	}
 
 	if metricSetProcessors == nil || len(metricSetProcessors.List) == 0 {
