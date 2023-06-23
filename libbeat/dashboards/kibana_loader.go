@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -136,11 +135,11 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	params.Set("overwrite", "true")
 
 	if err := ReplaceIndexInIndexPattern(loader.config.Index, pattern); err != nil {
-		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
+		errs = append(errs, fmt.Errorf("error setting index '%s' in index pattern: %w", loader.config.Index, err))
 	}
 
 	if err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
-		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
+		errs = append(errs, fmt.Errorf("error loading index pattern: %w", err))
 	}
 	return errs.Err()
 }

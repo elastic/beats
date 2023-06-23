@@ -19,10 +19,9 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/version"
@@ -242,14 +241,14 @@ nextProcessor:
 	for i, obj := range processors {
 		processor, err := NewProcessor(obj)
 		if err != nil {
-			return errors.Wrapf(err, "cannot parse processor in section '%s' index %d body=%+v", section, i, obj)
+			return fmt.Errorf("cannot parse processor in section '%s' index %d body=%+v: %w", section, i, obj, err)
 		}
 
 		// Adapt any on_failure processors for this processor.
 		prevOnFailure, _ := processor.GetList("on_failure")
 		if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "on_failure", true,
 			log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
-			return errors.Wrapf(err, "cannot parse on_failure for processor in section '%s' index %d body=%+v", section, i, obj)
+			return fmt.Errorf("cannot parse on_failure for processor in section '%s' index %d body=%+v: %w", section, i, obj, err)
 		}
 		if onFailure, _ := processor.GetList("on_failure"); len(prevOnFailure) > 0 && len(onFailure) == 0 {
 			processor.Delete("on_failure")
@@ -260,7 +259,7 @@ nextProcessor:
 			processor.Set("processor", []interface{}{inner})
 			if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "processor", false,
 				log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
-				return errors.Wrapf(err, "cannot parse inner processor for foreach in section '%s' index %d", section, i)
+				return fmt.Errorf("cannot parse inner processor for foreach in section '%s' index %d: %w", section, i, err)
 			}
 			newList, _ := processor.GetList("processor")
 			switch len(newList) {

@@ -443,6 +443,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
+                print("Test has failed, here are the Beat logs")
+                for l in self.get_log_lines():
+                    print(l)
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)

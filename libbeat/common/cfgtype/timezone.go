@@ -19,9 +19,8 @@ package cfgtype
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	// Embed the timezone database so this code works across platforms.
 	_ "time/tzdata"
@@ -39,7 +38,7 @@ type Timezone time.Location
 func NewTimezone(tz string) (*Timezone, error) {
 	loc, err := loadLocation(tz)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse timezone %q", tz)
+		return nil, fmt.Errorf("failed to parse timezone %q: %w", tz, err)
 	}
 	return (*Timezone)(loc), nil
 }
