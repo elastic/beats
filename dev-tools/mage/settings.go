@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
 	"io/ioutil"
@@ -31,7 +32,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 	"golang.org/x/tools/go/vcs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
@@ -108,22 +108,22 @@ func init() {
 	var err error
 	RaceDetector, err = strconv.ParseBool(EnvOr("RACE_DETECTOR", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse RACE_DETECTOR env value"))
+		panic(fmt.Errorf("failed to parse RACE_DETECTOR env value"+": %w", err))
 	}
 
 	TestCoverage, err = strconv.ParseBool(EnvOr("TEST_COVERAGE", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
+		panic(fmt.Errorf("failed to parse TEST_COVERAGE env value"+": %w", err))
 	}
 
 	Snapshot, err = strconv.ParseBool(EnvOr("SNAPSHOT", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse SNAPSHOT env value"))
+		panic(fmt.Errorf("failed to parse SNAPSHOT env value"+": %w", err))
 	}
 
 	DevBuild, err = strconv.ParseBool(EnvOr("DEV", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse DEV env value"))
+		panic(fmt.Errorf("failed to parse DEV env value"+": %w", err))
 	}
 
 	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
@@ -493,7 +493,7 @@ func (s *BuildVariableSources) GetBeatVersion() (string, error) {
 
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read beat version file=%v", file)
+		return "", fmt.Errorf("failed to read beat version file=%v"+": %w", file, err)
 	}
 
 	if s.BeatVersionParser == nil {
@@ -511,7 +511,7 @@ func (s *BuildVariableSources) GetGoVersion() (string, error) {
 
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read go version file=%v", file)
+		return "", fmt.Errorf("failed to read go version file=%v"+": %w", file, err)
 	}
 
 	if s.GoVersionParser == nil {
@@ -529,7 +529,7 @@ func (s *BuildVariableSources) GetDocBranch() (string, error) {
 
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read doc branch file=%v", file)
+		return "", fmt.Errorf("failed to read doc branch file=%v"+": %w", file, err)
 	}
 
 	if s.DocBranchParser == nil {
@@ -704,7 +704,7 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 
 	subDir, err := filepath.Rel(rootDir, cwd)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get relative path to repo root")
+		return nil, fmt.Errorf("failed to get relative path to repo root"+": %w", err)
 	}
 
 	rootImportPath, err := gotool.GetModuleName()

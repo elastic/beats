@@ -20,7 +20,7 @@
 package iostat
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -71,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	IOstats, err := diskio.IOCounters(m.includeDevices...)
 	if err != nil {
-		return errors.Wrap(err, "disk io counters")
+		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter

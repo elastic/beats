@@ -20,6 +20,7 @@
 package pdh
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"runtime"
@@ -28,8 +29,6 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -196,7 +195,7 @@ func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, error) {
 	counters, instances, err := PdhEnumObjectItems(objectName)
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "Unable to retrieve counter and instance list for %s", objectName)
+		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s: %w", objectName, err)
 	}
 	if len(counters) == 0 && len(instances) == 0 {
 		return nil, nil, fmt.Errorf("Unable to retrieve counter and instance list for %s", objectName)
