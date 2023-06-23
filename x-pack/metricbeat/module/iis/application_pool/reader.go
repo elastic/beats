@@ -7,6 +7,7 @@
 package application_pool
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
