@@ -18,12 +18,11 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 const kibanaBuildDir = "build/kibana"

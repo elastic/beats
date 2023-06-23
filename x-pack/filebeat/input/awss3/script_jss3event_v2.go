@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/dop251/goja"

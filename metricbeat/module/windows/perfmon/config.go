@@ -20,6 +20,7 @@
 package perfmon
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"

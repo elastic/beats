@@ -6,6 +6,7 @@ package awss3
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
