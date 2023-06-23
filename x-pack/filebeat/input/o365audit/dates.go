@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
