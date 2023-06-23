@@ -15,6 +15,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/spf13/cobra v1.3.0
 	github.com/stretchr/testify v1.8.2
+	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
 	go.elastic.co/ecszap v1.0.1
 	go.elastic.co/go-licence-detector v0.5.0

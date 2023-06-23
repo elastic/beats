@@ -19,6 +19,8 @@ package tlscommon
 
 import (
 	"bytes"
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
@@ -28,6 +30,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/youmark/pkcs8"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -113,29 +117,24 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 			break
 		}
 
-		if x509.IsEncryptedPEMBlock(block) { //nolint: staticcheck // deprecated, we have to get rid of it
-			var buffer []byte
-			var err error
-			if len(pass) == 0 {
-				err = errors.New("no passphrase available")
-			} else {
-				// Note, decrypting pem might succeed even with wrong password, but
-				// only noise will be stored in buffer in this case.
-				buffer, err = x509.DecryptPEMBlock(block, pass) //nolint: staticcheck // deprecated, we have to get rid of it
-			}
-
+		switch {
+		case x509.IsEncryptedPEMBlock(block): //nolint: staticcheck // deprecated, we have to get rid of it
+			block, err := decryptPKCS1Key(*block, pass)
 			if err != nil {
-				log.Errorf("Dropping encrypted pem '%v' block read from %v. %+v",
-					block.Type, r, err)
+				log.Errorf("Dropping encrypted pem block with private key, block type '%s': %s", block.Type, err)
 				continue
 			}
-
-			// DEK-Info contains encryption info. Remove header to mark block as
-			// unencrypted.
-			delete(block.Headers, "DEK-Info")
-			block.Bytes = buffer
+			blocks = append(blocks, &block)
+		case block.Type == "ENCRYPTED PRIVATE KEY":
+			block, err := decryptPKCS8Key(*block, pass)
+			if err != nil {
+				log.Errorf("Dropping encrypted pem block with private key, block type '%s', could not decypt as PKCS8: %s", block.Type, err)
+				continue
+			}
+			blocks = append(blocks, &block)
+		default:
+			blocks = append(blocks, block)
 		}
-		blocks = append(blocks, block)
 	}
 
 	if len(blocks) == 0 {
@@ -151,6 +150,54 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 		}
 	}
 	return buffer.Bytes(), nil
+}
+
+func decryptPKCS1Key(block pem.Block, passphrase []byte) (pem.Block, error) {
+	if len(passphrase) == 0 {
+		return block, errors.New("no passphrase available")
+	}
+
+	// Note, decrypting pem might succeed even with wrong password, but
+	// only noise will be stored in buffer in this case.
+	buffer, err := x509.DecryptPEMBlock(&block, passphrase) //nolint: staticcheck // deprecated, we have to get rid of it
+	if err != nil {
+		return block, fmt.Errorf("failed to decrypt pem: %w", err)
+	}
+
+	// DEK-Info contains encryption info. Remove header to mark block as
+	// unencrypted.
+	delete(block.Headers, "DEK-Info")
+	block.Bytes = buffer
+
+	return block, nil
+}
+
+func decryptPKCS8Key(block pem.Block, passphrase []byte) (pem.Block, error) {
+	if len(passphrase) == 0 {
+		return block, errors.New("no passphrase available")
+	}
+
+	key, err := pkcs8.ParsePKCS8PrivateKey(block.Bytes, passphrase)
+	if err != nil {
+		return block, fmt.Errorf("failed to parse key: %w", err)
+	}
+
+	switch key.(type) {
+	case *rsa.PrivateKey:
+		block.Type = "RSA PRIVATE KEY"
+	case *ecdsa.PrivateKey:
+		block.Type = "ECDSA PRIVATE KEY"
+	default:
+		return block, fmt.Errorf("unknown key type %T", key)
+	}
+
+	buffer, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		return block, fmt.Errorf("failed to marshal decrypted private key: %w", err)
+	}
+	block.Bytes = buffer
+
+	return block, nil
 }
 
 // LoadCertificateAuthorities read the slice of CAcert and return a Certpool.
