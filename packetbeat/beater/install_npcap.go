@@ -29,15 +29,13 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/npcap"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const installTimeout = 120 * time.Second
 
 func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	if !b.Info.ElasticLicensed {
-		return nil
-	}
-	if runtime.GOOS != "windows" {
 		return nil
 	}
 
@@ -50,18 +48,37 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 			log.Infof("npcap version: %s", npcapVersion)
 		}
 	}()
-	if !npcap.Upgradeable() {
-		npcap.Installer = nil
-		return nil
+
+	log := logp.NewLogger("npcap_install")
+
+	// Get a complete diagnostic config from the *beat.Beat.
+	// Move this before calling canInstallNpcap and don't
+	// do more than log the error. We are not here to disrupt,
+	// but to observe.
+	rawConfig := make(mapstr.M)
+	err := b.BeatConfig.Unpack(&rawConfig)
+	if err != nil {
+		log.Errorf("failed to unpack complete beat config from *config.C: %v", err)
 	}
+	log.Infow("complete config", "beat config", rawConfig)
+
+	rawConfig = make(mapstr.M)
+	err = cfg.Unpack(&rawConfig)
+	if err != nil {
+		log.Errorf("failed to unpack complete raw config from *config.C: %v", err)
+	}
+	log.Infow("complete config", "raw config", rawConfig)
 
 	canInstall, err := canInstallNpcap(b, cfg)
 	if err != nil {
 		return err
 	}
-	log := logp.NewLogger("npcap_install")
 	if !canInstall {
 		log.Warn("npcap installation/upgrade disabled by user")
+		return nil
+	}
+
+	if runtime.GOOS != "windows" {
 		return nil
 	}
 
