@@ -24,8 +24,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -205,12 +203,12 @@ func getClusterMetadataSettings(httpClient *helper.HTTP) (mapstr.M, error) {
 	filterPaths := []string{"*.cluster.metadata.display_name"}
 	clusterSettings, err := elasticsearch.GetClusterSettingsWithDefaults(httpClient, httpClient.GetURI(), filterPaths)
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to get cluster settings")
+		return nil, fmt.Errorf("failure to get cluster settings: %w", err)
 	}
 
 	clusterSettings, err = elasticsearch.MergeClusterSettings(clusterSettings)
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to merge cluster settings")
+		return nil, fmt.Errorf("failure to merge cluster settings: %w", err)
 	}
 
 	return clusterSettings, nil
@@ -220,7 +218,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Cluster Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Cluster Stats API response: %w", err)
 	}
 
 	clusterStats := mapstr.M(data)
@@ -228,48 +226,48 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 
 	license, err := elasticsearch.GetLicense(httpClient, httpClient.GetURI())
 	if err != nil {
-		return errors.Wrap(err, "failed to get license from Elasticsearch")
+		return fmt.Errorf("failed to get license from Elasticsearch: %w", err)
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
-		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
+		return fmt.Errorf("failed to get cluster state from Elasticsearch: %w", err)
 	}
 	clusterState.Delete("cluster_name")
 
 	clusterStateReduced := mapstr.M{}
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterStateReduced); err != nil {
-		return errors.Wrap(err, "failed to pass through status field")
+		return fmt.Errorf("failed to pass through status field: %w", err)
 	}
 	clusterStateReduced.Delete("status")
 
 	if err = elasticsearch.PassThruField("master_node", clusterState, clusterStateReduced); err != nil {
-		return errors.Wrap(err, "failed to pass through master_node field")
+		return fmt.Errorf("failed to pass through master_node field: %w", err)
 	}
 
 	if err = elasticsearch.PassThruField("state_uuid", clusterState, clusterStateReduced); err != nil {
-		return errors.Wrap(err, "failed to pass through state_uuid field")
+		return fmt.Errorf("failed to pass through state_uuid field: %w", err)
 	}
 
 	if err = elasticsearch.PassThruField("nodes", clusterState, clusterStateReduced); err != nil {
-		return errors.Wrap(err, "failed to pass through nodes field")
+		return fmt.Errorf("failed to pass through nodes field: %w", err)
 	}
 
 	nodesHash, err := computeNodesHash(clusterState)
 	if err != nil {
-		return errors.Wrap(err, "failed to compute nodes hash")
+		return fmt.Errorf("failed to compute nodes hash: %w", err)
 	}
 	clusterStateReduced.Put("nodes_hash", nodesHash)
 
 	usage, err := elasticsearch.GetStackUsage(httpClient, httpClient.GetURI())
 	if err != nil {
-		return errors.Wrap(err, "failed to get stack usage from Elasticsearch")
+		return fmt.Errorf("failed to get stack usage from Elasticsearch: %w", err)
 	}
 
 	clusterNeedsTLS, err := clusterNeedsTLSEnabled(license, usage)
 	if err != nil {
-		return errors.Wrap(err, "failed to determine if cluster needs TLS enabled")
+		return fmt.Errorf("failed to determine if cluster needs TLS enabled: %w", err)
 	}
 
 	l := license.ToMapStr()
@@ -277,7 +275,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 
 	isAPMFound, err := apmIndicesExist(clusterState)
 	if err != nil {
-		return errors.Wrap(err, "failed to determine if APM indices exist")
+		return fmt.Errorf("failed to determine if APM indices exist: %w", err)
 	}
 	delete(clusterState, "routing_table") // We don't want to index the routing table in monitoring indices
 
@@ -311,7 +309,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	metricSetFields.Put("state", clusterStateReduced)
 
 	if err = elasticsearch.PassThruField("version", clusterState, event.ModuleFields); err != nil {
-		return errors.Wrap(err, "failed to pass through version field")
+		return fmt.Errorf("failed to pass through version field: %w", err)
 	}
 
 	event.MetricSetFields = metricSetFields

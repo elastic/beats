@@ -19,9 +19,8 @@ package elasticsearch
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -134,7 +133,7 @@ func (m *MetricSet) ShouldSkipFetch() (bool, error) {
 	if m.Scope == ScopeNode {
 		isMaster, err := isMaster(m.HTTP, m.GetServiceURI())
 		if err != nil {
-			return false, errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+			return false, fmt.Errorf("error determining if connected Elasticsearch node is master: %w", err)
 		}
 
 		// Not master, no event sent

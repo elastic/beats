@@ -18,12 +18,11 @@
 package dissect
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

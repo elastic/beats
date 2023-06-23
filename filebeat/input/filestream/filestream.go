@@ -171,7 +171,9 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 		return nil
 	})
 	if err != nil {
-		f.log.Errorf("failed to schedule a periodic state check: %w", err)
+		if !errors.Is(err, context.Canceled) {
+			f.log.Errorf("failed to schedule a periodic state check: %s", err)
+		}
 	}
 }
 

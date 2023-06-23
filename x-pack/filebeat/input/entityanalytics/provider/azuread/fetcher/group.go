@@ -11,9 +11,11 @@ type MemberType int
 
 const (
 	// MemberUser is a user.
-	MemberUser MemberType = iota
+	MemberUser MemberType = iota + 1
 	// MemberGroup is a group.
 	MemberGroup
+	// MemberDevice is a device.
+	MemberDevice
 )
 
 // Group represents a group identity asset.

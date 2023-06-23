@@ -19,14 +19,13 @@ package fmtstr
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -420,7 +419,7 @@ func fieldString(event *beat.Event, field string) (string, error) {
 
 	s, err := tryConvString(v)
 	if err != nil {
-		return s, errors.Wrapf(err, "can not convert key '%v' value to string", v)
+		return s, fmt.Errorf("can not convert key '%v' value to string: %w", v, err)
 	}
 	return s, nil
 }
