@@ -18,6 +18,7 @@
 package cpu
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -59,7 +60,7 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 		case ticks:
 			opts.Ticks = true
 		default:
-			return opts, errors.Errorf("invalid cpu.metrics value '%v' (valid "+
+			return opts, fmt.Errorf("invalid cpu.metrics value '%v' (valid "+
 				"options are %v, %v, and %v)", metric, percentages,
 				normalizedPercentages, ticks)
 		}

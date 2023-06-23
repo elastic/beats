@@ -18,6 +18,7 @@
 package dommemstat
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 	"time"
@@ -134,7 +135,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		if len(gotDomainMemoryStats) == 0 {
-			msg := errors.Errorf("no memory stats for domain %s", d.Name)
+			msg := fmt.Errorf("no memory stats for domain %s", d.Name)
 			report.Error(msg)
 			m.Logger().Error(msg)
 			continue

@@ -49,13 +49,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	case nativeMetricset:
 		// resources must be configured for the monitor metricset
 		if len(config.Resources) == 0 {
-			return nil, errors.Errorf("no resource options defined: module azure - %s metricset", metricsetName)
+			return nil, fmt.Errorf("no resource options defined: module azure - %s metricset", metricsetName)
 		}
 	default:
 		// validate config resource options entered, no resource queries allowed for the compute_vm and compute_vm_scaleset metricsets
 		for _, resource := range config.Resources {
 			if resource.Query != "" {
-				return nil, errors.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
+				return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
 			}
 		}
 		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription

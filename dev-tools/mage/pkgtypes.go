@@ -185,19 +185,19 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 func getOSArchName(platform BuildPlatform, t PackageType) (string, error) {
 	names, found := OSArchNames[platform.GOOS()]
 	if !found {
-		return "", errors.Errorf("arch names for os=%v are not defined",
+		return "", fmt.Errorf("arch names for os=%v are not defined",
 			platform.GOOS())
 	}
 
 	archMap, found := names[t]
 	if !found {
-		return "", errors.Errorf("arch names for %v on os=%v are not defined",
+		return "", fmt.Errorf("arch names for %v on os=%v are not defined",
 			t, platform.GOOS())
 	}
 
 	arch, found := archMap[platform.Arch()]
 	if !found {
-		return "", errors.Errorf("arch name associated with %v for %v on "+
+		return "", fmt.Errorf("arch name associated with %v for %v on "+
 			"os=%v is not defined", platform.Arch(), t, platform.GOOS())
 	}
 
@@ -241,7 +241,7 @@ func (typ *PackageType) UnmarshalText(text []byte) error {
 	case "docker":
 		*typ = Docker
 	default:
-		return errors.Errorf("unknown package type: %v", string(text))
+		return fmt.Errorf("unknown package type: %v", string(text))
 	}
 	return nil
 }
@@ -286,7 +286,7 @@ func (typ PackageType) Build(spec PackageSpec) error {
 	case Docker:
 		return PackageDocker(spec)
 	default:
-		return errors.Errorf("unknown package type: %v", typ)
+		return fmt.Errorf("unknown package type: %v", typ)
 	}
 }
 
@@ -309,7 +309,7 @@ func (s PackageSpec) Clone() PackageSpec {
 func (s PackageSpec) ReplaceFile(target string, file PackageFile) {
 	_, found := s.Files[target]
 	if !found {
-		panic(errors.Errorf("failed to ReplaceFile because target=%v does not exist", target))
+		panic(fmt.Errorf("failed to ReplaceFile because target=%v does not exist", target))
 	}
 
 	s.Files[target] = file
@@ -435,7 +435,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 				panic(errors.Wrapf(err, "failed to expand template file for target=%v", target))
 			}
 		default:
-			panic(errors.Errorf("package file with target=%v must have either source, content, or template", target))
+			panic(fmt.Errorf("package file with target=%v must have either source, content, or template", target))
 		}
 
 		evaluatedFiles[f.Target] = f
@@ -706,7 +706,7 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	case RPM, Deb:
 		fpmPackageType = packageType.String()
 	default:
-		return errors.Errorf("unsupported package type=%v for runFPM", fpmPackageType)
+		return fmt.Errorf("unsupported package type=%v for runFPM", fpmPackageType)
 	}
 
 	if err := HaveDocker(); err != nil {
@@ -1006,7 +1006,7 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 // PackageDocker packages the Beat into a docker image.
 func PackageDocker(spec PackageSpec) error {
 	if err := HaveDocker(); err != nil {
-		return errors.Errorf("docker daemon required to build images: %s", err)
+		return fmt.Errorf("docker daemon required to build images: %s", err)
 	}
 
 	b, err := newDockerBuilder(spec)

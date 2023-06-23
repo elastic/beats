@@ -84,7 +84,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 	}
 
 	if !strings.Contains(dockerLogBeatDir, "dockerlogbeat") {
-		return errors.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
+		return fmt.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
 	}
 
 	dockerfile := filepath.Join(packageStagingDir, "Dockerfile")

@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -81,7 +82,7 @@ func PackageKibanaDashboardsFromBuildDir() {
 			case Deb, RPM:
 				pkgArgs.Spec.ReplaceFile("/usr/share/{{.BeatName}}/kibana", kibanaDashboards)
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 			break
 		}

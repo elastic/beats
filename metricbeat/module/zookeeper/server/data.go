@@ -20,6 +20,7 @@ package server
 import (
 	"bufio"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
@@ -155,12 +156,12 @@ func parseZxid(line string) (mapstr.M, error) {
 
 	zxidSplit := strings.Split(line, " ")
 	if len(zxidSplit) < 2 {
-		return nil, errors.Errorf("less than 2 tokens (%v) after splitting", zxidSplit)
+		return nil, fmt.Errorf("less than 2 tokens (%v) after splitting", zxidSplit)
 	}
 
 	zxidString := zxidSplit[1]
 	if len(zxidString) < 3 {
-		return nil, errors.Errorf("less than 3 characters on '%s'", zxidString)
+		return nil, fmt.Errorf("less than 3 characters on '%s'", zxidString)
 	}
 	zxid, err := strconv.ParseInt(zxidString[2:], 16, 64)
 	if err != nil {
@@ -185,12 +186,12 @@ func parseProposalSizes(line string) (mapstr.M, error) {
 
 	initialSplit := strings.Split(line, " ")
 	if len(initialSplit) < 4 {
-		return nil, errors.Errorf("less than 4 tokens (%v) after splitting", initialSplit)
+		return nil, fmt.Errorf("less than 4 tokens (%v) after splitting", initialSplit)
 	}
 
 	values := strings.Split(initialSplit[3], "/")
 	if len(values) < 3 {
-		return nil, errors.Errorf("less than 3 tokens (%v) after splitting", values)
+		return nil, fmt.Errorf("less than 3 tokens (%v) after splitting", values)
 	}
 	last, err := strconv.ParseInt(values[0], 10, 64)
 	if err != nil {
@@ -218,7 +219,7 @@ func parseLatencyLine(line string) (mapstr.M, error) {
 
 	values := latencyCapturer.FindStringSubmatch(line)
 	if len(values) < 4 {
-		return nil, errors.Errorf("less than 4 fields (%v) after splitting", values)
+		return nil, fmt.Errorf("less than 4 fields (%v) after splitting", values)
 	}
 
 	min, err := strconv.ParseInt(values[1], 10, 64)

@@ -19,6 +19,7 @@ package mage
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -77,7 +78,7 @@ func LoadNamedSpec(name string, files ...string) error {
 
 	packages, found := specs[name]
 	if !found {
-		return errors.Errorf("%v not found in package specs", name)
+		return fmt.Errorf("%v not found in package specs", name)
 	}
 
 	log.Printf("%v package spec loaded from %v", name, files)

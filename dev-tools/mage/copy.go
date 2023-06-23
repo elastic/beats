@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -106,7 +107,7 @@ func (t *CopyTask) fileCopy(src, dest string, info os.FileInfo) error {
 	defer srcFile.Close()
 
 	if !info.Mode().IsRegular() {
-		return errors.Errorf("failed to copy source file because it is not a " +
+		return fmt.Errorf("failed to copy source file because it is not a " +
 			"regular file")
 	}
 

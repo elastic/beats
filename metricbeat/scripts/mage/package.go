@@ -96,7 +96,7 @@ func CustomizePackaging() {
 			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 		}
 	}

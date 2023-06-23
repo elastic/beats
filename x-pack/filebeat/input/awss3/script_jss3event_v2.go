@@ -60,7 +60,7 @@ func newXMLDecoderConstructor(s *session) func(call goja.ConstructorCall) *goja.
 		s0, ok := a0.(string)
 
 		if !ok {
-			panic(errors.Errorf("Event constructor requires a "+
+			panic(fmt.Errorf("Event constructor requires a "+
 				"string argument but got %T", a0))
 		}
 

@@ -136,7 +136,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		confFile = confParams.Docker
 		tmplParams = map[string]interface{}{"Docker": true}
 	default:
-		panic(errors.Errorf("Invalid config file type: %v", typ))
+		panic(fmt.Errorf("Invalid config file type: %v", typ))
 	}
 
 	// Build the dependencies.

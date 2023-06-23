@@ -37,7 +37,7 @@ func EnsureIISIsRunning() error {
 		return errors.New("IIS is not not installed")
 	}
 	if ser[0].State != "Running" {
-		return errors.Errorf("IIS is installed but status is %s", ser[0].State)
+		return fmt.Errorf("IIS is installed but status is %s", ser[0].State)
 	}
 	return nil
 }

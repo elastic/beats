@@ -18,6 +18,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -56,7 +57,7 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 		case ticks:
 			opts.Ticks = true
 		default:
-			return opts, errors.Errorf("invalid core.metrics value '%v' (valid "+
+			return opts, fmt.Errorf("invalid core.metrics value '%v' (valid "+
 				"options are %v and %v)", metric, percentages, ticks)
 		}
 	}
