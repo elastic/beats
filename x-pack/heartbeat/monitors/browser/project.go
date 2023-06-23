@@ -10,6 +10,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -95,10 +97,43 @@ func (p *Project) Close() error {
 	return nil
 }
 
+<<<<<<< HEAD:x-pack/heartbeat/monitors/browser/project.go
 func (p *Project) extraArgs() []string {
 	extraArgs := p.projectCfg.SyntheticsArgs
 	if len(p.projectCfg.PlaywrightOpts) > 0 {
 		s, err := json.Marshal(p.projectCfg.PlaywrightOpts)
+=======
+// Dev flags + expected number of params, math.MaxInt32 for variadic flags
+var filterMap = map[string]int{
+	"--dry-run":         0,
+	"-h":                0,
+	"--help":            0,
+	"--inline":          1,
+	"--match":           math.MaxInt32,
+	"--outfd":           1,
+	"--pause-on-error":  0,
+	"--quiet-exit-code": 0,
+	"-r":                math.MaxInt32,
+	"--require":         math.MaxInt32,
+	"--reporter":        1,
+	"--tags":            math.MaxInt32,
+	"-V":                0,
+	"--version":         0,
+	"--ws-endpoint":     1,
+}
+
+func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
+	extraArgs := []string{}
+
+	if uiOrigin {
+		extraArgs = filterDevFlags(sj.browserCfg.SyntheticsArgs, filterMap)
+	} else {
+		extraArgs = append(extraArgs, sj.browserCfg.SyntheticsArgs...)
+	}
+
+	if len(sj.browserCfg.PlaywrightOpts) > 0 {
+		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
+>>>>>>> c6e955a2ff ([Heartbeat] filter dev flags inside synthetics args (#35788)):x-pack/heartbeat/monitors/browser/sourcejob.go
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
 			logp.L().Warn("could not serialize playwright options '%v': %w", p.projectCfg.PlaywrightOpts, err)
@@ -139,19 +174,34 @@ func (p *Project) extraArgs() []string {
 func (p *Project) jobs() []jobs.Job {
 	var j jobs.Job
 
+<<<<<<< HEAD:x-pack/heartbeat/monitors/browser/project.go
 	isScript := p.projectCfg.Source.Inline != nil
 	ctx := context.WithValue(p.ctx, synthexec.SynthexecTimeout, p.projectCfg.Timeout+30*time.Second)
 
 	if isScript {
 		src := p.projectCfg.Source.Inline.Script
 		j = synthexec.InlineJourneyJob(ctx, src, p.Params(), p.StdFields(), p.extraArgs()...)
+=======
+	isScript := sj.browserCfg.Source.Inline != nil
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
+	sFields := sj.StdFields()
+
+	if isScript {
+		src := sj.browserCfg.Source.Inline.Script
+		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sFields, sj.extraArgs(sFields.Origin != "")...)
+>>>>>>> c6e955a2ff ([Heartbeat] filter dev flags inside synthetics args (#35788)):x-pack/heartbeat/monitors/browser/sourcejob.go
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := p.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for project job: %w", err)
 			}
+<<<<<<< HEAD:x-pack/heartbeat/monitors/browser/project.go
 			sj, err := synthexec.ProjectJob(ctx, p.Workdir(), p.Params(), p.FilterJourneys(), p.StdFields(), p.extraArgs()...)
+=======
+
+			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
+>>>>>>> c6e955a2ff ([Heartbeat] filter dev flags inside synthetics args (#35788)):x-pack/heartbeat/monitors/browser/sourcejob.go
 			if err != nil {
 				return nil, err
 			}
@@ -167,4 +217,64 @@ func (p *Project) plugin() plugin.Plugin {
 		DoClose:   p.Close,
 		Endpoints: 1,
 	}
+}
+
+type argsIterator struct {
+	i    int
+	args []string
+	val  string
+}
+
+func (a *argsIterator) Next() bool {
+	if a.i >= len(a.args) {
+		return false
+	}
+	a.val = a.args[a.i]
+	a.i++
+	return true
+}
+
+func (a *argsIterator) Val() string {
+	return a.val
+}
+
+func (a *argsIterator) Peek() (val string, ok bool) {
+	if a.i >= len(a.args) {
+		return "", false
+	}
+
+	val = a.args[a.i]
+	ok = true
+
+	return val, ok
+}
+
+// Iterate through list and filter dev flags + potential params
+func filterDevFlags(args []string, filter map[string]int) []string {
+	result := []string{}
+
+	iter := argsIterator{i: 0, args: args}
+	for {
+		next := iter.Next()
+
+		if !next {
+			break
+		}
+
+		if pCount, ok := filter[iter.Val()]; ok {
+		ParamsIter:
+			for i := 0; i < pCount; i++ {
+				// Found filtered flag, check if it has associated params
+				if param, ok := iter.Peek(); ok && !strings.HasPrefix(param, "-") {
+					iter.Next()
+				} else {
+					break ParamsIter
+				}
+			}
+		} else {
+			result = append(result, iter.Val())
+		}
+	}
+
+	return result
 }
