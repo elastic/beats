@@ -112,7 +112,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 			fmt.Println(">> Deleting module manifest from cluster...")
 		}
 		if err := KubectlDelete(env, stdOut, stdErr, manifestPath); err != nil {
-			log.Printf("%s", fmt.Errorf("failed to apply manifest %s: %w", manifestPath), err)
+			log.Printf("%s", fmt.Errorf("failed to apply manifest %s: %w", manifestPath, err))
 		}
 	}()
 
