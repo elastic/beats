@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && integration
+//go:build integration
 
 package filestream
 
@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -62,14 +61,12 @@ logging:
 
 http:
   enabled: true
-  host: unix://%s
 `
 
 func TestLegacyMetrics(t *testing.T) {
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 
-	unixSocket := filepath.Join(filebeat.TempDir(), "http-metrics.sock")
-	cfg := fmt.Sprintf(fconfig, filebeat.TempDir(), filebeat.TempDir(), unixSocket)
+	cfg := fmt.Sprintf(fconfig, filebeat.TempDir(), filebeat.TempDir())
 
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
@@ -83,8 +80,7 @@ func TestLegacyMetrics(t *testing.T) {
 			Closed:    0,
 			Running:   0,
 			Started:   0,
-		},
-		unixSocket)
+		})
 
 	filestreamLogFile := filepath.Join(filebeat.TempDir(), "01.filestream")
 	filestreamLog, err := os.Create(filestreamLogFile)
@@ -102,7 +98,6 @@ func TestLegacyMetrics(t *testing.T) {
 			Started:   1,
 			Closed:    0,
 		},
-		unixSocket,
 		"Filestream input did not start the harvester")
 
 	// Wait for the harvester to close the file
@@ -113,7 +108,6 @@ func TestLegacyMetrics(t *testing.T) {
 			Started:   1,
 			Closed:    1,
 		},
-		unixSocket,
 		"Filestream input did not close the harvester")
 
 	// Write a line in the file harvested by the log input
@@ -132,7 +126,6 @@ func TestLegacyMetrics(t *testing.T) {
 			Started:   2,
 			Closed:    1,
 		},
-		unixSocket,
 		"Log input did not start harvester")
 
 	// Wait for the log input to close the file
@@ -143,7 +136,6 @@ func TestLegacyMetrics(t *testing.T) {
 			Started:   2,
 			Closed:    2,
 		},
-		unixSocket,
 		"Log input did not close the harvester")
 
 	// Writes one more line to each log file
@@ -158,7 +150,6 @@ func TestLegacyMetrics(t *testing.T) {
 			Started:   4,
 			Closed:    2,
 		},
-		unixSocket,
 		"Two harvesters should be running")
 
 	// Wait for both harvesters to close the file
@@ -169,15 +160,14 @@ func TestLegacyMetrics(t *testing.T) {
 			Started:   4,
 			Closed:    4,
 		},
-		unixSocket,
 		"All harvesters must be closed")
 }
 
-func waitForMetrics(t *testing.T, expect LegacyHarvesterMetrics, unixSocketFile string, msgAndArgs ...any) {
+func waitForMetrics(t *testing.T, expect LegacyHarvesterMetrics, msgAndArgs ...any) {
 	t.Helper()
 	got := LegacyHarvesterMetrics{}
 	assert.Eventually(t, func() bool {
-		got = getHarvesterMetrics(t, unixSocketFile)
+		got = getHarvesterMetrics(t)
 		return expect == got
 	}, 10*time.Second, 100*time.Millisecond, msgAndArgs...)
 
@@ -200,7 +190,6 @@ func waitForMetrics(t *testing.T, expect LegacyHarvesterMetrics, unixSocketFile 
 	if expect.Started != got.Started {
 		t.Logf("expecting 'started' to be %d, got %d instead", expect.Started, got.Started)
 	}
-
 }
 
 func compareMetrics(t *testing.T, expect, got LegacyHarvesterMetrics) {
@@ -230,19 +219,11 @@ type LegacyHarvesterMetrics struct {
 	Started   int `json:"started"`
 }
 
-func getHarvesterMetrics(t *testing.T, unixSocket string) LegacyHarvesterMetrics {
-	fakeDial := func(proto, addr string) (conn net.Conn, err error) {
-		return net.Dial("unix", unixSocket)
-	}
-
-	tr := &http.Transport{
-		Dial: fakeDial,
-	}
-	client := &http.Client{Transport: tr}
+func getHarvesterMetrics(t *testing.T) LegacyHarvesterMetrics {
 	// The host is ignored because we're connecting via Unix sockets.
-	resp, err := client.Get("http://filebeat/stats")
+	resp, err := http.Get("http://localhost:5066/stats")
 	if err != nil {
-		t.Fatalf("could not execute HTTP call on unix socket '%s': %s", unixSocket, err)
+		t.Fatalf("could not execute HTTP call: %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
