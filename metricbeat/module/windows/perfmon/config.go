@@ -20,10 +20,9 @@
 package perfmon
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 var allowedFormats = []string{"float", "large", "long"}

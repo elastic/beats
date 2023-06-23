@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,7 +62,7 @@ type Properties struct {
 func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 	timeSince, err := timeSince(props, unit.ActiveState)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error getting timestamp")
+		return mb.Event{}, fmt.Errorf("error getting timestamp: %w", err)
 	}
 
 	event := mb.Event{
