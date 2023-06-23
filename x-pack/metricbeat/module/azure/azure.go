@@ -7,8 +7,6 @@ package azure
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -41,7 +39,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 
 	//validate config based on metricset
@@ -77,7 +75,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// instantiate monitor client
 	monitorClient, err := NewClient(config)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing the monitor client: module azure - %s metricset", metricsetName)
+		return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -104,7 +102,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		results := m.Client.GetMetricValues(metrics, report)
 		err := EventsMapping(results, m.Client, report)
 		if err != nil {
-			return errors.Wrap(err, "error running EventsMapping")
+			return fmt.Errorf("error running EventsMapping: %w", err)
 		}
 	}
 	return nil

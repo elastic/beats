@@ -10,8 +10,9 @@ package test
 import (
 	"fmt"
 
+	"errors"
+
 	"github.com/StackExchange/wmi"
-	"github.com/pkg/errors"
 )
 
 // Service struct used to map Win32_Service
