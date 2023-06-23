@@ -20,6 +20,7 @@
 package entropy
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
