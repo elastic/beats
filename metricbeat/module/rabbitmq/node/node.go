@@ -19,8 +19,7 @@ package node
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq"
@@ -66,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 		return &ClusterMetricSet{ms}, nil
 	default:
-		return nil, errors.Errorf("incorrect node.collect: %s", config.Collect)
+		return nil, fmt.Errorf("incorrect node.collect: %s", config.Collect)
 	}
 }
 
@@ -83,7 +82,7 @@ func (m *MetricSet) fetchOverview() (*apiOverview, error) {
 	var apiOverview apiOverview
 	err = json.Unmarshal(d, &apiOverview)
 	if err != nil {
-		return nil, errors.Wrap(err, string(d))
+		return nil, fmt.Errorf(string(d)+": %d", err)
 	}
 	return &apiOverview, nil
 }
@@ -92,17 +91,17 @@ func (m *MetricSet) fetchOverview() (*apiOverview, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	o, err := m.fetchOverview()
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	node, err := rabbitmq.NewMetricSet(m.BaseMetricSet, rabbitmq.NodesPath+"/"+o.Node)
 	if err != nil {
-		return errors.Wrap(err, "error creating new metricset")
+		return fmt.Errorf("error creating new metricset: %w", err)
 	}
 
 	content, err := node.HTTP.FetchJSON()
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	evt := eventMapping(content)
@@ -114,7 +113,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 func (m *ClusterMetricSet) Fetch(r mb.ReporterV2) error {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	return eventsMapping(r, content)

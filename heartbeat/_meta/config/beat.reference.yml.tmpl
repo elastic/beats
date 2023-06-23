@@ -10,7 +10,7 @@
 ############################# Heartbeat ######################################
 
 
-# Define a directory to load monitor definitions from. Definitions take the form
+# Define a directory from which to load monitor definitions. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
@@ -25,7 +25,7 @@ heartbeat.monitors:
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
              # configured hosts
 
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  # ID used to uniquely identify this monitor in Elasticsearch even if the config changes
   id: my-monitor
 
   # Human readable display name for this service in Uptime UI and elsewhere
@@ -43,7 +43,7 @@ heartbeat.monitors:
   # List of hosts to ping
   hosts: ["localhost"]
 
-  # Configure IP protocol types to ping on if hostnames are configured.
+  # Configure IP protocol types to ping if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
   ipv4: true
   ipv6: true
@@ -55,7 +55,7 @@ heartbeat.monitors:
   # Waiting duration until another ICMP Echo Request is emitted.
   wait: 1s
 
-  # The tags of the monitors are included in their own field with each
+  # The tags of the monitors are included in their field with each
   # transaction published. Tags make it easy to group servers by different
   # logical properties.
   #tags: ["service-X", "web-tier"]
@@ -81,9 +81,9 @@ heartbeat.monitors:
   # How often to check for changes
   #reload.period: 1s
 
-- type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
+- type: tcp # monitor type `tcp`. Connect via TCP and optionally verify the endpoint
             # by sending/receiving a custom payload
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  # ID used to uniquely identify this monitor in Elasticsearch even if the config changes
   id: my-monitor
 
   # Human readable display name for this service in Uptime UI and elsewhere
@@ -97,23 +97,23 @@ heartbeat.monitors:
 
   # configure hosts to ping.
   # Entries can be:
-  #   - plain host name or IP like `localhost`:
+  #   - plain hostname or IP like `localhost`:
   #       Requires ports configs to be checked. If ssl is configured,
-  #       a SSL/TLS based connection will be established. Otherwise plain tcp connection
+  #       an SSL/TLS based connection will be established. Otherwise plain tcp connection
   #       will be established
   #   - hostname + port like `localhost:12345`:
-  #       Connect to port on given host. If ssl is configured,
-  #       a SSL/TLS based connection will be established. Otherwise plain tcp connection
+  #       Connect to port on a given host. If ssl is configured,
+  #       an SSL/TLS based connection will be established. Otherwise plain tcp connection
   #       will be established
   #   - full url syntax. `scheme://<host>:[port]`. The `<scheme>` can be one of
-  #     `tcp`, `plain`, `ssl` and `tls`. If `tcp`, `plain` is configured, a plain
+  #     `tcp`, `plain`, `ssl`, and `tls`. If `tcp`, `plain` is configured, a plain
   #     tcp connection will be established, even if ssl is configured.
   #     Using `tls`/`ssl`, an SSL connection is established. If no ssl is configured,
   #     system defaults will be used (not supported on windows).
-  #     If `port` is missing in url, the ports setting is required.
+  #     If `port` is missing in url, the port setting is required.
   hosts: ["localhost:9200"]
 
-  # Configure IP protocol types to ping on if hostnames are configured.
+  # Configure IP protocol types to ping if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
   ipv4: true
   ipv6: true
@@ -126,10 +126,10 @@ heartbeat.monitors:
   #timeout: 16s
 
   # Optional payload string to send to remote and expected answer. If none is
-  # configured, the endpoint is expected to be up if connection attempt was
+  # configured, the endpoint is expected to be up if a connection attempt was
   # successful. If only `send_string` is configured, any response will be
   # accepted as ok. If only `receive_string` is configured, no payload will be
-  # send, but client expects to receive expected payload on connect.
+  # send, but the client expects to receive the expected payload on connect.
   #check:
     #send: ''
     #receive: ''
@@ -159,8 +159,8 @@ heartbeat.monitors:
   # Set to true to publish fields with null values in events.
   #keep_null: false
 
-- type: http # monitor type `http`. Connect via HTTP an optionally verify response
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+- type: http # monitor type `http`. Connect via HTTP and optionally verify the response
+  # ID used to uniquely identify this monitor in Elasticsearch even if the config changes.
   id: my-http-monitor
 
   # Human readable display name for this service in Uptime UI and elsewhere
@@ -170,12 +170,12 @@ heartbeat.monitors:
   #enabled: true
 
   # Configure task schedule
-  schedule: '@every 5s' # every 5 seconds from start of beat
+  schedule: '@every 5s' # every 5 seconds from the start of beat
 
   # Configure URLs to ping
   urls: ["http://localhost:9200"]
 
-  # Configure IP protocol types to ping on if hostnames are configured.
+  # Configure IP protocol types to ping if hostnames are configured.
   # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
   ipv4: true
   ipv6: true
@@ -191,7 +191,7 @@ heartbeat.monitors:
   #username: ''
   #password: ''
 
-  # TLS/SSL connection settings for use with HTTPS endpoint. If not configured
+  # TLS/SSL connection settings for use with HTTPS endpoint. If not configured,
   # system defaults will be used.
   #ssl:
     # Certificate Authorities
@@ -202,7 +202,7 @@ heartbeat.monitors:
 
   # Request settings:
   #check.request:
-    # Configure HTTP method to use. Only 'HEAD', 'GET' and 'POST' methods are allowed.
+    # Configure HTTP method to use. Only 'HEAD', 'GET', and 'POST' methods are allowed.
     #method: "GET"
 
     # Dictionary of additional HTTP headers to send:
@@ -247,17 +247,17 @@ heartbeat.monitors:
   #keep_null: false
 
 heartbeat.scheduler:
-  # Limit number of concurrent tasks executed by heartbeat. The task limit if
+  # Limit the number of concurrent tasks executed by heartbeat. The task limit if
   # disabled if set to 0. The default is 0.
   #limit: 0
 
-  # Set the scheduler it's time zone
+  # Set the scheduler to its time zone
   #location: ''
 
 heartbeat.jobs:
   # Limit the number of concurrent monitors executed by heartbeat. This differs from
   # heartbeat.scheduler.limit in that it maps to individual monitors rather than the 
-  # subtasks of monitors. For non-browser monitors a subtask usually corresponds to a
+  # subtasks of monitors. For non-browser monitors, a subtask usually corresponds to a
   # single file descriptor.
   # This feature is most useful for the browser type
   #browser.limit: 1

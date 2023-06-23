@@ -18,10 +18,9 @@
 package aerospike
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	as "github.com/aerospike/aerospike-client-go"
 )
@@ -29,11 +28,11 @@ import (
 func ParseHost(host string) (*as.Host, error) {
 	pieces := strings.Split(host, ":")
 	if len(pieces) != 2 {
-		return nil, errors.Errorf("Can't parse host %s", host)
+		return nil, fmt.Errorf("Can't parse host %s", host)
 	}
 	port, err := strconv.Atoi(pieces[1])
 	if err != nil {
-		return nil, errors.Wrapf(err, "Can't parse port")
+		return nil, fmt.Errorf("Can't parse port: %w", err)
 	}
 	return as.NewHost(pieces[0], port), nil
 }
