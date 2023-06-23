@@ -147,6 +147,16 @@ A time offset from the current time to start reading from. To use
 `since`, either the `seek` option must be set to `since`, or the `seek` mode
 must be set to `cursor` and the `cursor_seek_fallback` set to `since`.
 
+This example demonstrates how to resume from the persisted cursor when
+it exists, or otherwise begin reading logs from the last 24 hours.
+
+["source","yaml",subs="attributes"]
+----
+seek: cursor
+cursor_seek_fallback: since
+since: -24h
+----
+
 [float]
 [id="{beatname_lc}-input-{type}-units"]
 ==== `units`
