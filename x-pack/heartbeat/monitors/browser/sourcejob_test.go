@@ -7,6 +7,7 @@ package browser
 
 import (
 	"encoding/json"
+	"fmt"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -126,36 +127,43 @@ func TestExtraArgs(t *testing.T) {
 		name string
 		cfg  *Config
 		want []string
+		ui   bool
 	}{
 		{
 			"no args",
 			&Config{},
-			nil,
+			[]string{},
+			false,
 		},
 		{
 			"default",
 			DefaultConfig(),
 			[]string{"--screenshots", "on"},
+			false,
 		},
 		{
 			"sandbox",
 			&Config{Sandbox: true},
 			[]string{"--sandbox"},
+			false,
 		},
 		{
 			"throttling truthy",
 			&Config{Throttling: true},
-			nil,
+			[]string{},
+			false,
 		},
 		{
 			"disable throttling",
 			&Config{Throttling: false},
 			[]string{"--no-throttling"},
+			false,
 		},
 		{
 			"override throttling - text format",
 			&Config{Throttling: "10d/3u/20l"},
 			[]string{"--throttling", "10d/3u/20l"},
+			false,
 		},
 		{
 			"override throttling - JSON format",
@@ -165,21 +173,25 @@ func TestExtraArgs(t *testing.T) {
 				"latency":  20,
 			}},
 			[]string{"--throttling", `{"download":10,"latency":20,"upload":3}`},
+			false,
 		},
 		{
 			"ignore_https_errors",
 			&Config{IgnoreHTTPSErrors: true},
 			[]string{"--ignore-https-errors"},
+			false,
 		},
 		{
 			"screenshots",
 			&Config{Screenshots: "off"},
 			[]string{"--screenshots", "off"},
+			false,
 		},
 		{
 			"capabilities",
 			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}},
 			[]string{"--capability", "trace", "ssblocks"},
+			false,
 		},
 		{
 			"playwright options",
@@ -187,11 +199,31 @@ func TestExtraArgs(t *testing.T) {
 				PlaywrightOpts: playWrightOpts,
 			},
 			[]string{"--playwright-options", string(playwrightOptsJsonBytes)},
+			false,
 		},
 		{
 			"kitchen sink",
 			&Config{SyntheticsArgs: []string{"--capability", "trace", "ssblocks"}, Sandbox: true},
 			[]string{"--capability", "trace", "ssblocks", "--sandbox"},
+			false,
+		},
+		{
+			"does not filter dev flags on non-ui origin",
+			&Config{SyntheticsArgs: []string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd"}, Sandbox: true},
+			[]string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd", "--sandbox"},
+			false,
+		},
+		{
+			"filters dev flags on ui origin",
+			&Config{SyntheticsArgs: []string{"--pause-on-error", "--dry-run", "--quiet-exit-code", "--outfd", "testfd"}, Sandbox: true},
+			[]string{"--sandbox"},
+			true,
+		},
+		{
+			"filters variadic dev flags on ui origin",
+			&Config{SyntheticsArgs: []string{"--tags", "tag1", "tag2", "tag3", "--match", "tag4", "tag5", "--sandbox", "-r", "require1", "require2", "--require", "require3", "require4", "require5"}},
+			[]string{"--sandbox"},
+			true,
 		},
 	}
 	for _, tt := range tests {
@@ -199,7 +231,7 @@ func TestExtraArgs(t *testing.T) {
 			s := &SourceJob{
 				browserCfg: tt.cfg,
 			}
-			if got := s.extraArgs(); !reflect.DeepEqual(got, tt.want) {
+			if got := s.extraArgs(tt.ui); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Project.extraArgs() = %v, want %v", got, tt.want)
 			}
 		})
@@ -222,4 +254,104 @@ func TestEmptyTimeout(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, s.browserCfg.Timeout, defaults.Timeout)
+}
+
+func TestFilterDevFlags(t *testing.T) {
+	allFlags := []string{}
+	for k := range filterMap {
+		allFlags = append(allFlags, k)
+	}
+
+	variadicGen := func(flag string, n int) []string {
+		params := []string{"dummy"}
+		params = append(params, flag)
+		for i := 0; i < n; i++ {
+			params = append(params, fmt.Sprintf("flag-%d", i))
+		}
+
+		return params
+	}
+	tests := []struct {
+		name           string
+		syntheticsArgs []string
+		want           []string
+	}{
+		{
+			"no args",
+			nil,
+			[]string{},
+		},
+		{
+			"no args",
+			[]string{},
+			[]string{},
+		},
+		{
+			"all filtered",
+			allFlags,
+			[]string{},
+		},
+		{
+			"keep unfiltered",
+			append([]string{"unfiltered"}, allFlags...),
+			[]string{"unfiltered"},
+		},
+		{
+			"filter associated params",
+			[]string{"--help", "malformed1", "--outfd", "param1", "malformed2", "--reporter", "-malformed3"},
+			[]string{"malformed1", "malformed2", "-malformed3"},
+		},
+		{
+			"filter variadic flags - tags - 10",
+			variadicGen("--tags", 10),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - tags - 50",
+			variadicGen("--tags", 50),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - tags - 100",
+			variadicGen("--tags", 100),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - require - 10",
+			variadicGen("--require", 10),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - require - 50",
+			variadicGen("--require", 50),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - require - 100",
+			variadicGen("-r", 100),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - match - 10",
+			variadicGen("--match", 10),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - match - 50",
+			variadicGen("--match", 50),
+			[]string{"dummy"},
+		},
+		{
+			"filter variadic flags - match - 100",
+			variadicGen("--match", 100),
+			[]string{"dummy"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := filterDevFlags(tt.syntheticsArgs, filterMap); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("syntheticsArgs = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
