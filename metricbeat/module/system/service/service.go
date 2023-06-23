@@ -20,6 +20,7 @@
 package service
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/coreos/go-systemd/v22/dbus"

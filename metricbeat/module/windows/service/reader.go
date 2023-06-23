@@ -22,6 +22,7 @@ package service
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"strconv"
 	"syscall"
 
@@ -155,7 +156,7 @@ func getMachineGUID() (string, error) {
 
 	guid, _, err := k.GetStringValue(name)
 	if err != nil {
-		return "", fmt.Errorf()`failed to get value of HKLM\%v\%v: %w`, path, name, err)
+		return "", fmt.Errorf(`failed to get value of HKLM\%v\%v: %w`, path, name, err)
 	}
 
 	return guid, nil

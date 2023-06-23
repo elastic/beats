@@ -21,6 +21,7 @@ package service
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strconv"
 	"syscall"
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"errors"
+
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/elastic-agent-libs/logp"
