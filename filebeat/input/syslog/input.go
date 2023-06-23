@@ -18,11 +18,10 @@
 package syslog
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -319,7 +318,7 @@ func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fie
 
 func mapValueToName(v int, m mapper) (string, error) {
 	if v < 0 || v >= len(m) {
-		return "", errors.Errorf("value out of bound: %d", v)
+		return "", fmt.Errorf("value out of bound: %d", v)
 	}
 	return m[v], nil
 }

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
 
 // DefaultTimeGrain is set as default timegrain for the azure metrics
@@ -19,23 +19,23 @@ const DefaultTimeGrain = "PT5M"
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
+func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {
-		for _, t := range *v.Timeseries {
-			for _, mv := range *t.Data {
-				if metricExists(*v.Name.Value, mv, previousMetrics) || metricIsEmpty(mv) {
+		for _, t := range v.Timeseries {
+			for _, mv := range t.Data {
+				if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
 					continue
 				}
 				// remove metric values that are not part of the timeline selected
-				if mv.TimeStamp.Time.After(startTime) && mv.TimeStamp.Time.Before(endTime) {
+				if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
 					continue
 				}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
-				val.timestamp = mv.TimeStamp.Time
+				val.timestamp = *mv.TimeStamp
 				if mv.Minimum != nil {
 					val.min = mv.Minimum
 				}
@@ -52,7 +52,7 @@ func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, s
 					val.count = mv.Count
 				}
 				if t.Metadatavalues != nil {
-					for _, dim := range *t.Metadatavalues {
+					for _, dim := range t.Metadatavalues {
 						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
 					}
 				}
@@ -64,7 +64,7 @@ func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, s
 }
 
 // metricExists will check if the metric value has been retrieved in the past
-func metricExists(name string, metric insights.MetricValue, metrics []MetricValue) bool {
+func metricExists(name string, metric armmonitor.MetricValue, metrics []MetricValue) bool {
 	for _, met := range metrics {
 		if name == met.name &&
 			metric.TimeStamp.Equal(met.timestamp) &&
@@ -80,7 +80,7 @@ func metricExists(name string, metric insights.MetricValue, metrics []MetricValu
 }
 
 // metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
-func metricIsEmpty(metric insights.MetricValue) bool {
+func metricIsEmpty(metric armmonitor.MetricValue) bool {
 	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
 		return true
 	}
@@ -138,22 +138,22 @@ func convertTimegrainToDuration(timegrain string) time.Duration {
 	var duration time.Duration
 	switch timegrain {
 	case "PT1M":
-		duration = time.Duration(time.Minute)
-	default:
+		duration = time.Minute
 	case "PT5M":
-		duration = time.Duration(5 * time.Minute)
+		duration = 5 * time.Minute
 	case "PT15M":
-		duration = time.Duration(15 * time.Minute)
+		duration = 15 * time.Minute
 	case "PT30M":
-		duration = time.Duration(30 * time.Minute)
+		duration = 30 * time.Minute
 	case "PT1H":
-		duration = time.Duration(time.Hour)
+		duration = time.Hour
 	case "PT6H":
-		duration = time.Duration(6 * time.Hour)
+		duration = 6 * time.Hour
 	case "PT12H":
-		duration = time.Duration(12 * time.Hour)
+		duration = 12 * time.Hour
 	case "PT1D":
-		duration = time.Duration(24 * time.Hour)
+		duration = 24 * time.Hour
+	default:
 	}
 	return duration
 }
@@ -173,7 +173,7 @@ func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 // getDimension will check if the dimension value is found in the list
 func getDimension(dimension string, dimensions []Dimension) (Dimension, bool) {
 	for _, dim := range dimensions {
-		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
+		if strings.EqualFold(dim.Name, dimension) {
 			return dim, true
 		}
 	}

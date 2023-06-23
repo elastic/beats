@@ -18,6 +18,7 @@
 package dns
 
 import (
+	"errors"
 	"net"
 	"strconv"
 	"strings"
@@ -25,7 +26,6 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/pkg/errors"
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"

@@ -6,7 +6,6 @@
     },
     "event": {
       "code": "24",
-      "ingested": "2022-06-08T05:43:59.529777700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",

@@ -380,6 +380,111 @@ var inputTests = []struct {
 		},
 	},
 
+	// Decoder tests.
+	{
+		name: "decode_xml",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				const text = `<?xml version="1.0" encoding="UTF-8"?>
+<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
+  <sender>Ástríðr Ragnar</sender>
+  <address>
+    <name>Joord Lennart</name>
+    <company>Sydøstlige Gruppe</company>
+    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+    <city>Boekend</city>
+    <country>Netherlands</country>
+  </address>
+  <item>
+    <name>Egil's Saga</name>
+    <note>Free Sample</note>
+    <number>1</number>
+    <cost>99.95</cost>
+    <sent>FALSE</sent>
+  </item>
+</order>
+`
+				io.ReadAll(r.Body)
+				r.Body.Close()
+				w.Write([]byte(text))
+			})
+			server := httptest.NewServer(r)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_xml("order").doc]
+	})
+	`,
+			"xsd": map[string]string{
+				"order": `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sender" type="xs:string"/>
+        <xs:element name="address">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="company" type="xs:string"/>
+              <xs:element name="address" type="xs:string"/>
+              <xs:element name="city" type="xs:string"/>
+              <xs:element name="country" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="item" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+              <xs:element name="number" type="xs:positiveInteger"/>
+              <xs:element name="cost" type="xs:decimal"/>
+              <xs:element name="sent" type="xs:boolean"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+`,
+			},
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"order": map[string]interface{}{
+					"address": map[string]interface{}{
+						"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
+						"city":    "Boekend",
+						"company": "Sydøstlige Gruppe",
+						"country": "Netherlands",
+						"name":    "Joord Lennart",
+					},
+					"item": []interface{}{
+						map[string]interface{}{
+							"cost":   99.95,
+							"name":   "Egil's Saga",
+							"note":   "Free Sample",
+							"number": 1.0, // CEL assumes float for number, so on exit from the env this stops being an int.
+							"sent":   false,
+						},
+					},
+					"noNamespaceSchemaLocation": "sales.xsd",
+					"orderid":                   "56733",
+					"sender":                    "Ástríðr Ragnar",
+					"xsi":                       "http://www.w3.org/2001/XMLSchema-instance",
+				},
+			},
+		},
+	},
+
 	// HTTP-based tests.
 	{
 		name:   "GET_request",
@@ -1147,7 +1252,7 @@ func TestInput(t *testing.T) {
 			client.published = client.published[:len(test.want)]
 			for i, got := range client.published {
 				if !reflect.DeepEqual(got.Fields, mapstr.M(test.want[i])) {
-					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, test.want[i]))
+					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(test.want[i])))
 				}
 			}
 

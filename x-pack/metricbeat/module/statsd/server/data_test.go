@@ -5,7 +5,7 @@
 package server
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 
@@ -820,7 +820,7 @@ func TestBuildMappings(t *testing.T) {
         value:
           field: started
 `,
-			err:      fmt.Errorf(`repeated label fields "repeated_label_field"`),
+			err:      errors.New(`repeated label fields "repeated_label_field"`),
 			expected: nil,
 		},
 		{
@@ -833,13 +833,14 @@ func TestBuildMappings(t *testing.T) {
         value:
           field: colliding_field
 `,
-			err:      fmt.Errorf(`collision between label field "colliding_field" and value field "colliding_field"`),
+			err:      errors.New(`collision between label field "colliding_field" and value field "colliding_field"`),
 			expected: nil,
 		},
 	} {
 		t.Run(test.title, func(t *testing.T) {
 			var mappings []StatsdMapping
 			err := yaml.Unmarshal([]byte(test.input), &mappings)
+			require.NoError(t, err)
 			actual, err := buildMappings(mappings)
 			for k, v := range actual {
 				v.regex = nil
@@ -874,6 +875,14 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
+			input: "counter1:11.12|c",
+			expected: []statsdMetric{{
+				name:       "counter1",
+				metricType: "c",
+				value:      "11.12",
+			}},
+		},
+		{
 			input: "counter2:15|c|@0.1",
 			expected: []statsdMetric{{
 				name:       "counter2",
@@ -883,12 +892,36 @@ func TestParseMetrics(t *testing.T) {
 			}},
 		},
 		{
-			input: "decrement-counter:-15|c",
-			expected: []statsdMetric{{
-				name:       "decrement-counter",
-				metricType: "c",
-				value:      "-15",
-			}},
+			// All metrics are parsed except the invalid packet
+			input: "decrement-counter:-15|c\nmeter1-1.4|m\ndecrement-counter:-20|c",
+			expected: []statsdMetric{
+				{
+					name:       "decrement-counter",
+					metricType: "c",
+					value:      "-15",
+				},
+				{
+					name:       "decrement-counter",
+					metricType: "c",
+					value:      "-20",
+				},
+			},
+		},
+		{
+			// All metrics are parsed except the invalid packet
+			input: "meter1-1.4|m\ndecrement-counter:-20|c\ntimer1:1.2|ms",
+			expected: []statsdMetric{
+				{
+					name:       "decrement-counter",
+					metricType: "c",
+					value:      "-20",
+				},
+				{
+					name:       "timer1",
+					metricType: "ms",
+					value:      "1.2",
+				},
+			},
 		},
 		{
 			input: "timer1:1.2|ms",
@@ -995,12 +1028,10 @@ func TestParseMetrics(t *testing.T) {
 		{
 			input:    "meter1-1.4|m",
 			expected: []statsdMetric{},
-			err:      errInvalidPacket,
 		},
 		{
 			input:    "meter1:1.4-m",
 			expected: []statsdMetric{},
-			err:      errInvalidPacket,
 		},
 	} {
 		actual, err := parse([]byte(test.input))
@@ -1013,6 +1044,47 @@ func TestParseMetrics(t *testing.T) {
 
 			assert.NoError(t, err)
 		}
+	}
+}
+
+func TestParseSingle(t *testing.T) {
+	tests := map[string]struct {
+		input string
+		err   error
+		want  statsdMetric
+	}{
+		"invalid packet #1": {input: "meter1-1.4|m", err: errInvalidPacket, want: statsdMetric{}},
+		"invalid packet #2": {input: "meter1:1.4-m", err: errInvalidPacket, want: statsdMetric{}},
+		"valid packet: counter with tags": {
+			input: "tags1:1|c|#k1:v1,k2:v2",
+			err:   nil,
+			want: statsdMetric{
+				name:       "tags1",
+				metricType: "c",
+				sampleRate: "",
+				value:      "1",
+				tags:       map[string]string{"k1": "v1", "k2": "v2"},
+			},
+		},
+		"valid packet: gauge": {
+			input: "gauge1:1.0|g",
+			err:   nil,
+			want: statsdMetric{
+				name:       "gauge1",
+				metricType: "g",
+				sampleRate: "",
+				value:      "1.0",
+				tags:       nil,
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := parseSingle([]byte(tc.input))
+			assert.Equal(t, tc.err, err)
+			assert.Equal(t, tc.want, got)
+		})
 	}
 }
 
@@ -1068,13 +1140,13 @@ func TestTagsGrouping(t *testing.T) {
 	}
 
 	expectedTags := []mapstr.M{
-		mapstr.M{
+		{
 			"labels": mapstr.M{
 				"k1": "v1",
 				"k2": "v2",
 			},
 		},
-		mapstr.M{
+		{
 			"labels": mapstr.M{
 				"k1": "v2",
 				"k2": "v3",
@@ -1182,6 +1254,7 @@ func TestGaugeDeltas(t *testing.T) {
 		"metric01": map[string]interface{}{"value": -1.0},
 	})
 }
+
 func TestCounter(t *testing.T) {
 	ms := mbtest.NewMetricSet(t, map[string]interface{}{"module": "statsd"}).(*MetricSet)
 	testData := []string{
@@ -1316,5 +1389,4 @@ func BenchmarkIngest(b *testing.B) {
 		err := ms.processor.Process(events[i%len(events)])
 		assert.NoError(b, err)
 	}
-
 }
