@@ -578,7 +578,10 @@ func PackageZip(spec PackageSpec) error {
 		return nil
 	}
 
-	return fmt.Errorf("failed to create .sha512 file"+": %w", CreateSHA512File(spec.OutputFile))
+	if err := CreateSHA512File(spec.OutputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+	}
+	return nil
 }
 
 // PackageTarGz packages a gzipped tar file.
@@ -678,7 +681,11 @@ func PackageTarGz(spec PackageSpec) error {
 		return nil
 	}
 
-	return fmt.Errorf("failed to create .sha512 file"+": %w", CreateSHA512File(spec.OutputFile))
+	if err := CreateSHA512File(spec.OutputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+	}
+
+	return nil
 }
 
 func replaceFileArch(filename string, pkgFile PackageFile, arch string) (string, PackageFile) {
@@ -789,7 +796,10 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		return fmt.Errorf("failed while running FPM in docker"+": %w", err)
 	}
 
-	return fmt.Errorf("failed to create .sha512 file"+": %w", CreateSHA512File(spec.OutputFile))
+	if err = CreateSHA512File(spec.OutputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+	}
+	return nil
 }
 
 func addUidGidEnvArgs(args []string) ([]string, error) {

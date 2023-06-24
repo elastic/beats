@@ -341,7 +341,11 @@ func Export() error {
 		if err != nil {
 			return fmt.Errorf("error creating release tarball"+": %w", err)
 		}
-		return fmt.Errorf("failed to create .sha512 file"+": %w", devtools.CreateSHA512File(outpath))
+
+		if err = devtools.CreateSHA512File(outpath); err != nil {
+			return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+		}
+		return nil
 	}
 
 	return nil

@@ -255,5 +255,9 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 		}
 		return err
 	}
-	return fmt.Errorf("failed to create .sha512 file"+": %w", CreateSHA512File(outputFile))
+
+	if err = CreateSHA512File(outputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+	}
+	return nil
 }
