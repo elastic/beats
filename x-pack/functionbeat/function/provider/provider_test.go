@@ -46,7 +46,7 @@ func TestRunnable(t *testing.T) {
 		}
 
 		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
-		assert.Equal(t, err, errReceived.Error())
+		assert.Equal(t, "could not create a client for the function: "+err.Error(), errReceived.Error())
 	})
 
 	t.Run("propagate functions errors to the coordinator", func(t *testing.T) {
@@ -58,7 +58,7 @@ func TestRunnable(t *testing.T) {
 		}
 
 		errReceived := runnable.Run(context.Background(), telemetry.Ignored())
-		assert.Equal(t, err, errReceived.Error())
+		assert.Equal(t, err.Error(), errReceived.Error())
 	})
 
 	t.Run("when there is no error run and exit normaly", func(t *testing.T) {
