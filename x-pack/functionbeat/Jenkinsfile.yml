@@ -16,7 +16,7 @@ stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "arm"
+          - "ubuntu-2204-aarch64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/functionbeat for arm"
