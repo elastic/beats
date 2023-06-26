@@ -119,13 +119,13 @@ pipeline {
           // to use the release manager as their definition is removed.
           when {
             allOf {
-              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              // expression { return env.IS_BRANCH_AVAILABLE == "true" }
               // DRA is not supported in 7.17 yet
-              not { branch '7.17' }
+              // not { branch '7.17' }
             }
           }
           steps {
-            runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
+            runReleaseManager(type: 'snapshot', branch: '7.17' outputFile: env.DRA_OUTPUT)
           }
           post {
             failure {
