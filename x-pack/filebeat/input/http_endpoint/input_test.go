@@ -251,9 +251,10 @@ func TestServerPool(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to post event #%d: %v", i, err)
 				}
+				body := dump(resp.Body)
 				if resp.StatusCode != http.StatusOK {
 					t.Errorf("unexpected response status code: %s (%d)\nresp: %s",
-						resp.Status, resp.StatusCode, dump(resp.Body))
+						resp.Status, resp.StatusCode, body)
 				}
 			}
 			cancel()
@@ -306,9 +307,9 @@ func newCtx(log, id string) (_ v2.Context, cancel func()) {
 	}, cancel
 }
 
-func dump(r io.ReadCloser) string {
+func dump(r io.ReadCloser) []byte {
 	defer r.Close()
 	var buf bytes.Buffer
 	io.Copy(&buf, r)
-	return buf.String()
+	return buf.Bytes()
 }
