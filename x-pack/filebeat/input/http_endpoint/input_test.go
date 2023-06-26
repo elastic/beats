@@ -265,6 +265,22 @@ func TestServerPool(t *testing.T) {
 			if !cmp.Equal(got, test.want) {
 				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(got, test.want))
 			}
+
+			// Try to re-register the same addresses.
+			ctx, cancel = newCtx("server_pool_test", test.name)
+			for _, cfg := range test.cfgs {
+				cfg := cfg
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					err := servers.serve(ctx, cfg, &pub)
+					if err != nil && err != http.ErrServerClosed && test.wantErr == nil {
+						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
+					}
+				}()
+			}
+			cancel()
+			wg.Wait()
 		})
 	}
 }
