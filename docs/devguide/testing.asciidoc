@@ -1,29 +1,76 @@
 [[testing]]
 === Testing
 
-Beats has a various sets of tests. This guide should help to understand how the different test suites work, how they are used and new tests are added.
+Beats repository has various sets of tests. This guide helps to
+understand how the different test suites work, how they are used and
+how new tests are added.
 
-In general there are two major test suites:
+=== Tests outside the Beats repository
+There are two frameworks outside the Beats repository testing Beats:
 
-* Tests written in Go
-* Tests written in Python
+* https://github.com/elastic/beats-tester[Beats Tester]
+* https://github.com/elastic/e2e-testing[End-to-End Testing]
+
+==== Beats Tester
+Beats Tester uses Vagrant and Ansible to ensure Beats can be
+installed, run and assert some basic functionality like logging and
+metrics are working as expected.
+
+Currently it runs on every PR, long living branches and on `main` (the
+last two on a daily schedule). It does not block PRs, nor does it
+appear on PR checks.
+
+It is currently run by Jenkins on
+https://beats-ci.elastic.co/job/Beats/job/beats-tester/[Beats Tester
+orchestrator], failure notifications are sent to Slack on #ingest-notifications.
+
+===== Known issues
+* It can be flaky due to a design issue: on every run it will fetch
+some artifacts from the https://artifacts-api.elastic.co[artifacts API],
+however if another job has published a newer artifact for that
+branch/PR, then the job will fail with a checksum error
+* It uses an older version of Ansible
+* Very few people understand how it works
+
+==== End to End Testing
+End to End Testing is used by the Observability team and focus on
+Kubernetes tests. It should not be used by the Elastic-Agent
+team.
+
+=== Tests in the Beats repository
+There are three test suites:
+
+* Unit Tests written in Go
+* Integration tests written in Go
+* Tests written in Python (deprecated, replaced by integration tests in Go)
 
 The tests written in Go use the https://golang.org/pkg/testing/[Go Testing
-package]. The tests written in Python depend on https://docs.pytest.org/en/latest/[pytest] and require a compiled and executable binary from the Go code. The python test run a beat with a specific config and params and either check if the output is as expected or if the correct things show up in the logs.
+package]. The tests written in Python depend on
+https://docs.pytest.org/en/latest/[pytest] and require a compiled and
+executable binary from the Go code (the system test binary). The
+python test run a beat with a specific config and params and either
+check if the output is as expected or if the correct things show up in
+the logs.
 
 For both of the above test suites so called integration tests exists. Integration tests in Beats are tests which require an external system like Elasticsearch to test if the integration with this service works as expected. Beats provides in its testsuite docker containers and docker-compose files to start these environments but a developer can run the required services also locally.
 
-==== Running Go Tests
+==== Running Go Unit Tests
 
-The Go tests can be executed in each Go package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
+The Go unit tests can be executed in each Go package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
 
 All Go tests are in the same package as the tested code itself and have the suffix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
 
 ===== Running Go Integration Tests
 
-Integration tests are labelled with the `//go:build integration` build tag and use the `_integration_test.go` suffix.
+Integration tests are labelled with the `//go:build integration` build
+tag and use the `_integration_test.go` suffix.
+They require some external dependencies to be running, like {es} or
+the system test binary that can be build with `mage buildSystemTestBinary`.
 
-To run the integration tests use the `mage goIntegTest` target, which will start the required services using https://docs.docker.com/compose/[docker-compose] and run all integration tests.
+To run the integration tests use the `mage goIntegTest` target, which
+will start the required services using
+https://docs.docker.com/compose/[docker-compose], build the system
+test binary and run all integration tests.
 
 It is possible to start the `docker-compose` services manually to allow selecting which specific tests should be run. An example follows for filebeat:
 
@@ -36,6 +83,11 @@ mage docker:composeBuild
 mage docker:composeUp
 # Run all integration tests.
 go test ./filebeat/...  -tags integration
+# Build the system test binary
+mage buildSystemTestBinary
+# Run a integration test that uses the system test binary
+cd ../x-pack/filebeat
+go test -tags=integration -count=1 ./tests/integration
 # Stop all started containers.
 mage docker:composeDown
 ----
@@ -62,10 +114,10 @@ To run the system and integration tests use the `mage pythonIntegTest` target, w
 ----
 # Create and activate the system test virtual environment (assumes a Unix system).
 source $(mage pythonVirtualEnv)/bin/activate
-# Pull and build the containers. Only needs to be done once unless you change the containers.
-mage docker:composeBuild
 # Bring up all containers, wait until they are healthy, and put them in the background.
 mage docker:composeUp
+# Build the system test binary
+mage buildSystemTestBinary
 # Run all system and integration tests.
 INTEGRATION_TESTS=1 pytest ./tests/system
 # Stop all started containers.
@@ -76,27 +128,23 @@ Filebeat's module python tests have additional documentation found in the <<file
 
 ==== Test commands
 
-To list all mage commands run `mage -l`. A quick summary of the available test Make commands is:
+To list all mage commands run `mage -l`. A quick summary the most used
+ones is:
 
-* `unit`: Go tests
-* `unit-tests`: Go tests with coverage reports
-* `integration-tests`: Go tests with services in local docker
-* `integration-tests-environment`: Go tests inside docker with service in docker
-* `fast-system-tests`: Python tests
-* `system-tests`: Python tests with coverage report
-* `INTEGRATION_TESTS=1 system-tests`: Python tests with local services
-* `system-tests-environment`: Python tests inside docker with service in docker
-* `testsuite`: Complete test suite in docker environment is run
-* `test`: Runs testsuite without environment
-
-There are two experimental test commands:
-
-* `benchmark-tests`: Running Go tests with `-bench` flag
-* `load-tests`: Running system tests with `LOAD_TESTS=1` flag
-
+* `buildSystemTestBinary`: builds a binary instrumented for use with Python system tests.
+* `docker:composeDown`: stops the docker-compose containers started by composeUp.
+* `docker:composeUp`: starts the docker-compose containers, waits until they are healthy, and puts them in the background.
+* `goIntegTest`: starts the docker containers and executes the Go integration tests.
+* `goUnitTest`: executes the Go unit tests.
+* `pythonIntegTest`: starts the docker containers and executes the Python integration tests.
+* `pythonVirtualEnv`: creates the testing virtual environment and prints its location.
 
 ==== Coverage report
 
+Coverage report is currently not working.
+
+To run a test suit with coverage report, set the environment variable
+`TEST_COVERAGE=true` before running the mage command.
 If the tests were run to create a test coverage, the coverage report files can be found under `build/docs`. To create a more human readable file out of the `.cov` file `make coverage-report` can be used. It creates a `.html` file for each report and a `full.html` as summary of all reports together in the directory `build/coverage`.
 
 ==== Race detection
