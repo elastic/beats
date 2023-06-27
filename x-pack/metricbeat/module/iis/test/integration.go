@@ -8,9 +8,8 @@
 package test
 
 import (
-	"fmt"
-
 	"errors"
+	"fmt"
 
 	"github.com/StackExchange/wmi"
 )
