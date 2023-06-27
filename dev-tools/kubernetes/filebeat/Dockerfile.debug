@@ -1,0 +1,21 @@
+FROM golang:1.19.10 as builder
+
+ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
+
+ENV CGO_ENABLED=0
+
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.9.0
+
+COPY build/filebeat-debugger /usr/share/filebeat/filebeat-debugger
+
+FROM alpine:3.15
+
+ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin
+
+WORKDIR /usr/share/filebeat
+
+COPY --from=builder /go/bin/dlv /go/bin/dlv
+COPY --from=builder /usr/share/filebeat/filebeat-debugger /usr/share/filebeat/filebeat-debugger
+
+ENTRYPOINT ["dlv", "--headless", "--listen=:56268", "--api-version=2", "--log",  "--log-output", "debugger", "exec", "/usr/share/filebeat/filebeat-debugger", "--"]
+CMD [ "-e" ]
