@@ -23,16 +23,22 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/packetbeat/npcap"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const installTimeout = 120 * time.Second
 
-func installNpcap(b *beat.Beat) error {
+// muInstall protects use of npcap.Installer. The only writes to npcap.Installer
+// are here and during init in x-pack/packetbeat/npcap/npcap_windows.go
+var muInstall sync.Mutex
+
+func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	if !b.Info.ElasticLicensed {
 		return nil
 	}
@@ -54,7 +60,7 @@ func installNpcap(b *beat.Beat) error {
 		return nil
 	}
 
-	canInstall, err := canInstallNpcap(b)
+	canInstall, err := canInstallNpcap(b, cfg)
 	if err != nil {
 		return err
 	}
@@ -67,6 +73,8 @@ func installNpcap(b *beat.Beat) error {
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
 
+	muInstall.Lock()
+	defer muInstall.Unlock()
 	if npcap.Installer == nil {
 		return nil
 	}
@@ -95,7 +103,7 @@ func installNpcap(b *beat.Beat) error {
 // configurations from agent normalised to the internal packetbeat format by this point.
 // In the case that the beat is managed, any data stream that has npcap.never_install
 // set to true will result in a block on the installation.
-func canInstallNpcap(b *beat.Beat) (bool, error) {
+func canInstallNpcap(b *beat.Beat, rawcfg *conf.C) (bool, error) {
 	type npcapInstallCfg struct {
 		NeverInstall bool `config:"npcap.never_install"`
 	}
@@ -105,9 +113,14 @@ func canInstallNpcap(b *beat.Beat) (bool, error) {
 		var cfg struct {
 			Streams []npcapInstallCfg `config:"streams"`
 		}
-		err := b.BeatConfig.Unpack(&cfg)
+		err := rawcfg.Unpack(&cfg)
 		if err != nil {
 			return false, fmt.Errorf("failed to unpack npcap config from agent configuration: %w", err)
+		}
+		if len(cfg.Streams) == 0 {
+			// We have no stream to monitor, so we don't need to install
+			// anything. We may be in the middle of a config check.
+			return false, nil
 		}
 		for _, c := range cfg.Streams {
 			if c.NeverInstall {
@@ -119,7 +132,7 @@ func canInstallNpcap(b *beat.Beat) (bool, error) {
 
 	// Packetbeat case.
 	var cfg npcapInstallCfg
-	err := b.BeatConfig.Unpack(&cfg)
+	err := rawcfg.Unpack(&cfg)
 	if err != nil {
 		return false, fmt.Errorf("failed to unpack npcap config from packetbeat configuration: %w", err)
 	}

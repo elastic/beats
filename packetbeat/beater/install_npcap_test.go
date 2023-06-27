@@ -213,7 +213,7 @@ func TestCanInstallNpcap(t *testing.T) {
 				BeatConfig: cfg,
 				Manager:    boolManager{managed: test.managed},
 			}
-			got, err := canInstallNpcap(b)
+			got, err := canInstallNpcap(b, b.BeatConfig)
 			if err != nil {
 				t.Errorf("unexpected error from canInstallNpcap: %v", err)
 			}
