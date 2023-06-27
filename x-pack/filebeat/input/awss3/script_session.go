@@ -93,7 +93,7 @@ func (s *session) setParseFunction() error {
 		return errors.New("parse is not a function")
 	}
 	if err := s.vm.ExportTo(parseFunc, &s.parseFunc); err != nil {
-		return fmt.Errorf("failed to export parse function"+": %w", err)
+		return fmt.Errorf("failed to export parse function: %w", err)
 	}
 	return nil
 }
@@ -109,10 +109,10 @@ func (s *session) registerScriptParams(params map[string]interface{}) error {
 	}
 	var register goja.Callable
 	if err := s.vm.ExportTo(registerFunc, &register); err != nil {
-		return fmt.Errorf("failed to export register function"+": %w", err)
+		return fmt.Errorf("failed to export register function: %w", err)
 	}
 	if _, err := register(goja.Undefined(), s.vm.ToValue(params)); err != nil {
-		return fmt.Errorf("failed to register script_params"+": %w", err)
+		return fmt.Errorf("failed to register script_params: %w", err)
 	}
 	s.log.Debug("Registered params with script")
 	return nil
@@ -127,11 +127,11 @@ func (s *session) executeTestFunction() error {
 		}
 		var test goja.Callable
 		if err := s.vm.ExportTo(testFunc, &test); err != nil {
-			return fmt.Errorf("failed to export test function"+": %w", err)
+			return fmt.Errorf("failed to export test function: %w", err)
 		}
 		_, err := test(goja.Undefined(), nil)
 		if err != nil {
-			return fmt.Errorf("failed in test() function"+": %w", err)
+			return fmt.Errorf("failed in test() function: %w", err)
 		}
 		s.log.Debugf("Successful test() execution for script.")
 	}

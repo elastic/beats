@@ -91,17 +91,17 @@ func expandTemplate(name, tmpl string, funcs template.FuncMap, args ...map[strin
 	t, err := t.Parse(tmpl)
 	if err != nil {
 		if name == "inline" {
-			return "", fmt.Errorf("failed to parse template '%v'"+": %w", tmpl, err)
+			return "", fmt.Errorf("failed to parse template '%v': %w", tmpl, err)
 		}
-		return "", fmt.Errorf("failed to parse template"+": %w", err)
+		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	buf := new(bytes.Buffer)
 	if err := t.Execute(buf, joinMaps(args...)); err != nil {
 		if name == "inline" {
-			return "", fmt.Errorf("failed to expand template '%v'"+": %w", tmpl, err)
+			return "", fmt.Errorf("failed to expand template '%v': %w", tmpl, err)
 		}
-		return "", fmt.Errorf("failed to expand template"+": %w", err)
+		return "", fmt.Errorf("failed to expand template: %w", err)
 	}
 
 	return buf.String(), nil
@@ -127,7 +127,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 func expandFile(src, dst string, args ...map[string]interface{}) error {
 	tmplData, err := ioutil.ReadFile(src)
 	if err != nil {
-		return fmt.Errorf("failed reading from template %v"+": %w", src, err)
+		return fmt.Errorf("failed reading from template %v: %w", src, err)
 	}
 
 	output, err := expandTemplate(src, string(tmplData), FuncMap, args...)
@@ -141,7 +141,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 	}
 
 	if err = ioutil.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
-		return fmt.Errorf("failed to write rendered template"+": %w", err)
+		return fmt.Errorf("failed to write rendered template: %w", err)
 	}
 
 	return nil
@@ -151,7 +151,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 func CWD(elem ...string) string {
 	wd, err := os.Getwd()
 	if err != nil {
-		panic(fmt.Errorf("failed to get the CWD"+": %w", err))
+		panic(fmt.Errorf("failed to get the CWD: %w", err))
 	}
 	return filepath.Join(append([]string{wd}, elem...)...)
 }
@@ -188,7 +188,7 @@ func (info *DockerInfo) IsBoot2Docker() bool {
 // HaveDocker returns an error if docker is unavailable.
 func HaveDocker() error {
 	if _, err := GetDockerInfo(); err != nil {
-		return fmt.Errorf("docker is not available"+": %w", err)
+		return fmt.Errorf("docker is not available: %w", err)
 	}
 	return nil
 }
@@ -274,7 +274,7 @@ func FindReplace(file string, re *regexp.Regexp, repl string) error {
 // MustFindReplace invokes FindReplace and panics if an error occurs.
 func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 	if err := FindReplace(file, re, repl); err != nil {
-		panic(fmt.Errorf("failed to find and replace"+": %w", err))
+		panic(fmt.Errorf("failed to find and replace: %w", err))
 	}
 }
 
@@ -285,7 +285,7 @@ func DownloadFile(url, destinationDir string) (string, error) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", fmt.Errorf("http get failed"+": %w", err)
+		return "", fmt.Errorf("http get failed: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -296,12 +296,12 @@ func DownloadFile(url, destinationDir string) (string, error) {
 	name := filepath.Join(destinationDir, filepath.Base(url))
 	f, err := os.Create(createDir(name))
 	if err != nil {
-		return "", fmt.Errorf("failed to create output file"+": %w", err)
+		return "", fmt.Errorf("failed to create output file: %w", err)
 	}
 	defer f.Close()
 
 	if _, err = io.Copy(f, resp.Body); err != nil {
-		return "", fmt.Errorf("failed to write file"+": %w", err)
+		return "", fmt.Errorf("failed to write file: %w", err)
 	}
 
 	return name, f.Close()
@@ -652,7 +652,7 @@ func FindFiles(globs ...string) ([]string, error) {
 	for _, glob := range globs {
 		files, err := filepath.Glob(glob)
 		if err != nil {
-			return nil, fmt.Errorf("failed on glob %v"+": %w", glob, err)
+			return nil, fmt.Errorf("failed on glob %v: %w", glob, err)
 		}
 		configFiles = append(configFiles, files...)
 	}
@@ -691,7 +691,7 @@ func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]strin
 func FileConcat(out string, perm os.FileMode, files ...string) error {
 	f, err := os.OpenFile(createDir(out), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
 	if err != nil {
-		return fmt.Errorf("failed to create file"+": %w", err)
+		return fmt.Errorf("failed to create file: %w", err)
 	}
 	defer f.Close()
 
@@ -735,13 +735,13 @@ func MustFileConcat(out string, perm os.FileMode, files ...string) {
 func VerifySHA256(file string, hash string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return fmt.Errorf("failed to open file for sha256 verification"+": %w", err)
+		return fmt.Errorf("failed to open file for sha256 verification: %w", err)
 	}
 	defer f.Close()
 
 	sum := sha256.New()
 	if _, err := io.Copy(sum, f); err != nil {
-		return fmt.Errorf("failed reading from input file"+": %w", err)
+		return fmt.Errorf("failed reading from input file: %w", err)
 	}
 
 	computedHash := hex.EncodeToString(sum.Sum(nil))
@@ -761,13 +761,13 @@ func VerifySHA256(file string, hash string) error {
 func CreateSHA512File(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return fmt.Errorf("failed to open file for sha512 summing"+": %w", err)
+		return fmt.Errorf("failed to open file for sha512 summing: %w", err)
 	}
 	defer f.Close()
 
 	sum := sha512.New()
 	if _, err := io.Copy(sum, f); err != nil {
-		return fmt.Errorf("failed reading from input file"+": %w", err)
+		return fmt.Errorf("failed reading from input file: %w", err)
 	}
 
 	computedHash := hex.EncodeToString(sum.Sum(nil))
@@ -856,7 +856,7 @@ func XPackBeatDir(path ...string) string {
 func LibbeatDir(path ...string) string {
 	esBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
-		panic(fmt.Errorf("failed determine libbeat dir location"+": %w", err))
+		panic(fmt.Errorf("failed determine libbeat dir location: %w", err))
 	}
 
 	return filepath.Join(append([]string{esBeatsDir, "libbeat"}, path...)...)
@@ -873,7 +873,7 @@ func CreateDir(file string) string {
 	// Create the output directory.
 	if dir := filepath.Dir(file); dir != "." {
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			panic(fmt.Errorf("failed to create parent dir for %v"+": %w", file, err))
+			panic(fmt.Errorf("failed to create parent dir for %v: %w", file, err))
 		}
 	}
 	return file

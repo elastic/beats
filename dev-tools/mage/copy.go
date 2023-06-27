@@ -37,7 +37,7 @@ func CopyFile(src, dest string) error {
 	copy := &CopyTask{Source: src, Dest: dest}
 	info, err := os.Stat(src)
 	if err != nil {
-		return fmt.Errorf("copy failed: cannot stat source file %v"+": %w", src, err)
+		return fmt.Errorf("copy failed: cannot stat source file %v: %w", src, err)
 	}
 	return copy.fileCopy(src, dest, info)
 }
@@ -55,17 +55,17 @@ type CopyTask struct {
 // Execute executes the copy and returns an error of there is a failure.
 func (t *CopyTask) Execute() error {
 	if err := t.init(); err != nil {
-		return fmt.Errorf("copy failed"+": %w", err)
+		return fmt.Errorf("copy failed: %w", err)
 	}
 
 	info, err := os.Stat(t.Source)
 	if err != nil {
-		return fmt.Errorf("copy failed: cannot stat source file %v"+": %w", t.Source, err)
+		return fmt.Errorf("copy failed: cannot stat source file %v: %w", t.Source, err)
 	}
 
 	err = t.recursiveCopy(t.Source, t.Dest, info)
 	if err != nil {
-		return fmt.Errorf("copy failed"+": %w", err)
+		return fmt.Errorf("copy failed: %w", err)
 	}
 
 	return nil
@@ -75,7 +75,7 @@ func (t *CopyTask) init() error {
 	for _, excl := range t.Exclude {
 		re, err := regexp.Compile(excl)
 		if err != nil {
-			return fmt.Errorf("bad exclude pattern %v"+": %w", excl, err)
+			return fmt.Errorf("bad exclude pattern %v: %w", excl, err)
 		}
 		t.excludes = append(t.excludes, re)
 	}
@@ -141,12 +141,12 @@ func (t *CopyTask) dirCopy(src, dest string, info os.FileInfo) error {
 		mode = info.Mode()
 	}
 	if err := os.MkdirAll(dest, mode&os.ModePerm); err != nil {
-		return fmt.Errorf("failed creating dirs"+": %w", err)
+		return fmt.Errorf("failed creating dirs: %w", err)
 	}
 
 	contents, err := ioutil.ReadDir(src)
 	if err != nil {
-		return fmt.Errorf("failed to read dir %v"+": %w", src, err)
+		return fmt.Errorf("failed to read dir %v: %w", src, err)
 	}
 
 	for _, info := range contents {

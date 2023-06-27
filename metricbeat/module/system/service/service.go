@@ -67,12 +67,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	conn, err := dbus.New()
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to dbus"+": %w", err)
+		return nil, fmt.Errorf("error connecting to dbus: %w", err)
 	}
 
 	unitFunction, err := instrospectForUnitMethods()
 	if err != nil {
-		return nil, fmt.Errorf("error finding ListUnits Method"+": %w", err)
+		return nil, fmt.Errorf("error finding ListUnits Method: %w", err)
 	}
 
 	return &MetricSet{
@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	units, err := m.unitList(m.conn, m.cfg.StateFilter, m.cfg.PatternFilter)
 	if err != nil {
-		return fmt.Errorf("error getting list of running units"+": %w", err)
+		return fmt.Errorf("error getting list of running units: %w", err)
 	}
 
 	for _, unit := range units {
@@ -134,11 +134,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func getProps(conn *dbus.Conn, unit string) (Properties, error) {
 	rawProps, err := conn.GetAllProperties(unit)
 	if err != nil {
-		return Properties{}, fmt.Errorf("error getting list of running units"+": %w", err)
+		return Properties{}, fmt.Errorf("error getting list of running units: %w", err)
 	}
 	parsed := Properties{}
 	if err := mapstructure.Decode(rawProps, &parsed); err != nil {
-		return parsed, fmt.Errorf("error decoding properties"+": %w", err)
+		return parsed, fmt.Errorf("error decoding properties: %w", err)
 	}
 	return parsed, nil
 }

@@ -75,7 +75,7 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 
 	cl, err := pm.removeClient(file)
 	if err != nil {
-		return fmt.Errorf("Error removing client"+": %w", err)
+		return fmt.Errorf("Error removing client: %w", err)
 	}
 
 	hash := cl.pipelineHash
@@ -86,7 +86,7 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 	pm.Logger.Debugf("Closing Client first from pipelineManager")
 	err = cl.Close()
 	if err != nil {
-		return fmt.Errorf("error closing client"+": %w", err)
+		return fmt.Errorf("error closing client: %w", err)
 	}
 
 	// if the pipeline is no longer in use, clean up
@@ -101,16 +101,16 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 
 	hashstring, err := hashstructure.Hash(containerConfig, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error creating config hash"+": %w", err)
+		return nil, fmt.Errorf("error creating config hash: %w", err)
 	}
 	pipeline, err := pm.getOrCreatePipeline(containerConfig, hashstring)
 	if err != nil {
-		return nil, fmt.Errorf("error getting pipeline"+": %w", err)
+		return nil, fmt.Errorf("error getting pipeline: %w", err)
 	}
 
 	reader, err := pipereader.NewReaderFromPath(file)
 	if err != nil {
-		return nil, fmt.Errorf("error creating reader for docker log stream"+": %w", err)
+		return nil, fmt.Errorf("error creating reader for docker log stream: %w", err)
 	}
 
 	// Why is this empty by default? What should be here? Who knows!
@@ -119,7 +119,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	}
 	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
 	if err != nil {
-		return nil, fmt.Errorf("error creating directory for local logs"+": %w", err)
+		return nil, fmt.Errorf("error creating directory for local logs: %w", err)
 	}
 	// set a default log size
 	if _, ok := info.Config["max-size"]; !ok {
@@ -132,13 +132,13 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 
 	localLog, err := jsonfilelog.New(info)
 	if err != nil {
-		return nil, fmt.Errorf("error creating local log"+": %w", err)
+		return nil, fmt.Errorf("error creating local log: %w", err)
 	}
 
 	//actually get to crafting the new client.
 	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog, pm.hostname)
 	if err != nil {
-		return nil, fmt.Errorf("error creating client"+": %w", err)
+		return nil, fmt.Errorf("error creating client: %w", err)
 	}
 
 	pm.registerClient(cl, hashstring, file)
@@ -209,7 +209,7 @@ func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConf
 	if !test {
 		pipeline, err = loadNewPipeline(logOptsConfig, pm.hostname, pm.Logger)
 		if err != nil {
-			return nil, fmt.Errorf("error loading pipeline"+": %w", err)
+			return nil, fmt.Errorf("error loading pipeline: %w", err)
 		}
 		pm.pipelines[hash] = pipeline
 	}

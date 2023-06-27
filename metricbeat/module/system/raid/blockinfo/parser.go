@@ -63,7 +63,7 @@ func parseIntVal(path string) (int64, error) {
 func getSyncStatus(path string, size int64) (SyncStatus, error) {
 	raw, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_completed"))
 	if err != nil {
-		return SyncStatus{}, fmt.Errorf("could not open sync_completed"+": %w", err)
+		return SyncStatus{}, fmt.Errorf("could not open sync_completed: %w", err)
 	}
 	completedState := strings.TrimSpace(string(raw))
 	if completedState == "none" {
@@ -78,12 +78,12 @@ func getSyncStatus(path string, size int64) (SyncStatus, error) {
 
 	current, err := strconv.ParseInt(matches[0], 10, 64)
 	if err != nil {
-		return SyncStatus{}, fmt.Errorf("could not parse data sync_completed"+": %w", err)
+		return SyncStatus{}, fmt.Errorf("could not parse data sync_completed: %w", err)
 	}
 
 	total, err := strconv.ParseInt(matches[1], 10, 64)
 	if err != nil {
-		return SyncStatus{}, fmt.Errorf("could not parse data sync_completed"+": %w", err)
+		return SyncStatus{}, fmt.Errorf("could not parse data sync_completed: %w", err)
 	}
 
 	return SyncStatus{Complete: current, Total: total}, nil
@@ -97,27 +97,27 @@ func newMD(path string) (MDDevice, error) {
 	dev.Name = filepath.Base(path)
 	size, err := parseIntVal(filepath.Join(path, "size"))
 	if err != nil {
-		return dev, fmt.Errorf("could not get device size"+": %w", err)
+		return dev, fmt.Errorf("could not get device size: %w", err)
 	}
 	dev.Size = size
 
 	//RAID array state
 	state, err := ioutil.ReadFile(filepath.Join(path, "md", "array_state"))
 	if err != nil {
-		return dev, fmt.Errorf("could not open array_state"+": %w", err)
+		return dev, fmt.Errorf("could not open array_state: %w", err)
 	}
 	dev.ArrayState = strings.TrimSpace(string(state))
 
 	//get total disks
 	disks, err := getDisks(path)
 	if err != nil {
-		return dev, fmt.Errorf("could not get disk data"+": %w", err)
+		return dev, fmt.Errorf("could not get disk data: %w", err)
 	}
 	dev.DiskStates = disks
 
 	level, err := ioutil.ReadFile(filepath.Join(path, "md", "level"))
 	if err != nil {
-		return dev, fmt.Errorf("could not get raid level"+": %w", err)
+		return dev, fmt.Errorf("could not get raid level: %w", err)
 	}
 	dev.Level = strings.TrimSpace(string(level))
 
@@ -128,14 +128,14 @@ func newMD(path string) (MDDevice, error) {
 		//Will be idle if nothing is going on
 		syncAction, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_action"))
 		if err != nil {
-			return dev, fmt.Errorf("could not open sync_action"+": %w", err)
+			return dev, fmt.Errorf("could not open sync_action: %w", err)
 		}
 		dev.SyncAction = strings.TrimSpace(string(syncAction))
 
 		//sync status
 		syncStats, err := getSyncStatus(path, dev.Size)
 		if err != nil {
-			return dev, fmt.Errorf("error getting sync data"+": %w", err)
+			return dev, fmt.Errorf("error getting sync data: %w", err)
 		}
 
 		dev.SyncStatus = syncStats
@@ -149,7 +149,7 @@ func getDisks(path string) (DiskStates, error) {
 	//so far, haven't found a less hacky way to do this.
 	devices, err := filepath.Glob(filepath.Join(path, "md", "dev-*"))
 	if err != nil {
-		return DiskStates{}, fmt.Errorf("could not get device list"+": %w", err)
+		return DiskStates{}, fmt.Errorf("could not get device list: %w", err)
 	}
 
 	var disks DiskStates
@@ -189,7 +189,7 @@ func getDisks(path string) (DiskStates, error) {
 func getDisk(path string) (string, error) {
 	state, err := ioutil.ReadFile(filepath.Join(path, "state"))
 	if err != nil {
-		return "", fmt.Errorf("error getting disk state"+": %w", err)
+		return "", fmt.Errorf("error getting disk state: %w", err)
 	}
 
 	return strings.TrimSpace(string(state)), nil

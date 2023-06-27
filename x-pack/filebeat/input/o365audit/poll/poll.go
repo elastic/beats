@@ -91,14 +91,14 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 	if r.tp != nil {
 		token, err := r.tp.Token()
 		if err != nil {
-			return fmt.Errorf("failed getting a token"+": %w", err)
+			return fmt.Errorf("failed getting a token: %w", err)
 		}
 		decorators = append(decorators, autorest.WithBearerAuthorization(token))
 	}
 
 	request, err := autorest.Prepare(&http.Request{}, decorators...)
 	if err != nil {
-		return fmt.Errorf("failed preparing request"+": %w", err)
+		return fmt.Errorf("failed preparing request: %w", err)
 	}
 	delay := max(item.Delay(), minDelay)
 	r.log.Debugf(" -- wait %s for %s", delay, request.URL.String())
@@ -243,7 +243,7 @@ func Terminate(err error) Action {
 		if err == nil {
 			return errors.New("polling terminated without a specific error")
 		}
-		return fmt.Errorf("polling terminated due to error"+": %w", err)
+		return fmt.Errorf("polling terminated due to error: %w", err)
 	}
 }
 

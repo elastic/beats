@@ -35,7 +35,7 @@ import (
 func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 	vmstat, err := GetVMStat(hostfs)
 	if err != nil {
-		return fmt.Errorf("error fetching VMStats"+": %w", err)
+		return fmt.Errorf("error fetching VMStats: %w", err)
 	}
 
 	pageStats := mapstr.M{}
@@ -53,7 +53,7 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 
 	thp, err := getHugePages(hostfs)
 	if err != nil {
-		return fmt.Errorf("error getting huge pages"+": %w", err)
+		return fmt.Errorf("error getting huge pages: %w", err)
 	}
 	baseMap["hugepages"] = thp
 
@@ -69,12 +69,12 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
 	eventRaw, err := metrics.Get(hostfs)
 	if err != nil {
-		return fmt.Errorf("error fetching memory metrics"+": %w", err)
+		return fmt.Errorf("error fetching memory metrics: %w", err)
 	}
 	swap := mapstr.M{}
 	err = typeconv.Convert(&swap, &eventRaw.Swap)
 	if err != nil {
-		return fmt.Errorf("error converting raw event"+": %w", err)
+		return fmt.Errorf("error converting raw event: %w", err)
 	}
 
 	baseMap["swap"] = swap
@@ -120,7 +120,7 @@ func getHugePages(hostfs resolve.Resolver) (mapstr.M, error) {
 	// see https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
 	table, err := memory.ParseMeminfo(hostfs)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing meminfo"+": %w", err)
+		return nil, fmt.Errorf("error parsing meminfo: %w", err)
 	}
 	thp := mapstr.M{}
 

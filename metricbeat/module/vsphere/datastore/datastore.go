@@ -60,12 +60,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return fmt.Errorf("error in NewClient"+": %w", err)
+		return fmt.Errorf("error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere"+": %w", err))
+			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
 		}
 	}()
 
@@ -76,19 +76,19 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Datastore"}, true)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView"+": %w", err)
+		return fmt.Errorf("error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere"+": %w", err))
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
 		}
 	}()
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
 	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &dst); err != nil {
-		return fmt.Errorf("error in Retrieve"+": %w", err)
+		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
 	for _, ds := range dst {

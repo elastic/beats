@@ -45,7 +45,7 @@ func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 	if ms.db == nil {
 		db, err := sql.Open("postgres", ms.HostData().URI)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open connection"+": %w", err)
+			return nil, fmt.Errorf("failed to open connection: %w", err)
 		}
 		ms.db = db
 	}
@@ -56,18 +56,18 @@ func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string]interface{}, error) {
 	db, err := ms.DB(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to obtain a connection with the database"+": %w", err)
+		return nil, fmt.Errorf("failed to obtain a connection with the database: %w", err)
 	}
 	defer db.Close()
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query database"+": %w", err)
+		return nil, fmt.Errorf("failed to query database: %w", err)
 	}
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return nil, fmt.Errorf("scanning columns"+": %w", err)
+		return nil, fmt.Errorf("scanning columns: %w", err)
 	}
 	vals := make([][]byte, len(columns))
 	valPointers := make([]interface{}, len(columns))
@@ -80,7 +80,7 @@ func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string
 	for rows.Next() {
 		err = rows.Scan(valPointers...)
 		if err != nil {
-			return nil, fmt.Errorf("scanning row"+": %w", err)
+			return nil, fmt.Errorf("scanning row: %w", err)
 		}
 
 		result := map[string]interface{}{}

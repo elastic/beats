@@ -80,12 +80,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return fmt.Errorf("error in NewClient"+": %w", err)
+		return fmt.Errorf("error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere"+": %w", err))
+			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
 		}
 	}()
 
@@ -97,7 +97,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var err error
 		customFieldsMap, err = setCustomFieldsMap(ctx, c)
 		if err != nil {
-			return fmt.Errorf("error in setCustomFieldsMap"+": %w", err)
+			return fmt.Errorf("error in setCustomFieldsMap: %w", err)
 		}
 	}
 
@@ -106,12 +106,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView"+": %w", err)
+		return fmt.Errorf("error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere"+": %w", err))
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
 		}
 	}()
 
@@ -119,7 +119,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	var vmt []mo.VirtualMachine
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
 	if err != nil {
-		return fmt.Errorf("error in Retrieve"+": %w", err)
+		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
 	for _, vm := range vmt {
@@ -278,11 +278,11 @@ func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]st
 	customFieldsManager, err := object.GetCustomFieldsManager(client)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get custom fields manager"+": %w", err)
+		return nil, fmt.Errorf("failed to get custom fields manager: %w", err)
 	}
 	field, err := customFieldsManager.Field(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get custom fields"+": %w", err)
+		return nil, fmt.Errorf("failed to get custom fields: %w", err)
 	}
 
 	for _, def := range field {

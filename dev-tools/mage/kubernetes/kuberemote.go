@@ -96,7 +96,7 @@ func NewKubeRemote(kubeconfig string, namespace string, name string, workDir str
 // Run runs the command remotely on the kubernetes cluster.
 func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writer, args ...string) error {
 	if err := r.syncSSHKey(); err != nil {
-		return fmt.Errorf("failed to sync SSH secret"+": %w", err)
+		return fmt.Errorf("failed to sync SSH secret: %w", err)
 	}
 	defer r.deleteSSHKey()
 	if err := r.syncServiceAccount(); err != nil {
@@ -105,21 +105,21 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 	defer r.deleteServiceAccount()
 	_, err := r.createPod(env, args...)
 	if err != nil {
-		return fmt.Errorf("failed to create execute pod"+": %w", err)
+		return fmt.Errorf("failed to create execute pod: %w", err)
 	}
 	defer r.deletePod()
 
 	// wait for SSH to be up inside the init container.
 	_, err = r.waitForPod(5*time.Minute, podInitReady)
 	if err != nil {
-		return fmt.Errorf("execute pod init container never started"+": %w", err)
+		return fmt.Errorf("execute pod init container never started: %w", err)
 	}
 	time.Sleep(1 * time.Second) // SSH inside of container can take a moment
 
 	// forward the SSH port so rsync can be ran.
 	randomPort, err := getFreePort()
 	if err != nil {
-		return fmt.Errorf("failed to find a free port"+": %w", err)
+		return fmt.Errorf("failed to find a free port: %w", err)
 	}
 	stopChannel := make(chan struct{}, 1)
 	readyChannel := make(chan struct{}, 1)
@@ -139,19 +139,19 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 	// wait for exec container to be running
 	_, err = r.waitForPod(5*time.Minute, containerRunning("exec"))
 	if err != nil {
-		return fmt.Errorf("execute pod container never started"+": %w", err)
+		return fmt.Errorf("execute pod container never started: %w", err)
 	}
 
 	// stream the logs of the container
 	err = r.streamLogs("exec", stdout)
 	if err != nil {
-		return fmt.Errorf("failed to stream the logs"+": %w", err)
+		return fmt.Errorf("failed to stream the logs: %w", err)
 	}
 
 	// wait for exec container to be completely done
 	pod, err := r.waitForPod(30*time.Second, podDone)
 	if err != nil {
-		return fmt.Errorf("execute pod didn't terminate after 30 seconds of log stream"+": %w", err)
+		return fmt.Errorf("execute pod didn't terminate after 30 seconds of log stream: %w", err)
 	}
 
 	// return error on failure
@@ -198,18 +198,18 @@ func (r *KubeRemote) syncServiceAccount() error {
 		createServiceAccountManifest(r.svcAccName),
 		metav1.CreateOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to create service account"+": %w", err)
+		return fmt.Errorf("failed to create service account: %w", err)
 	}
 	_, err = r.cs.RbacV1().ClusterRoles().Create(ctx, createClusterRoleManifest(r.name), metav1.CreateOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to create cluster role"+": %w", err)
+		return fmt.Errorf("failed to create cluster role: %w", err)
 	}
 	_, err = r.cs.RbacV1().ClusterRoleBindings().Create(
 		ctx,
 		createClusterRoleBindingManifest(r.name, r.namespace, r.svcAccName),
 		metav1.CreateOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to create cluster role binding"+": %w", err)
+		return fmt.Errorf("failed to create cluster role binding: %w", err)
 	}
 	return nil
 }

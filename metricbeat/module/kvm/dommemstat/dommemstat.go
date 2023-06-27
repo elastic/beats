@@ -101,7 +101,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		c, err = net.DialTimeout(u.Scheme, address, m.Timeout)
 		if err != nil {
-			return fmt.Errorf("cannot connect to %v"+": %w", u, err)
+			return fmt.Errorf("cannot connect to %v: %w", u, err)
 		}
 	}
 
@@ -109,11 +109,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	l := libvirt.New(c)
 	if err = l.Connect(); err != nil {
-		return fmt.Errorf("error connecting to libvirtd"+": %w", err)
+		return fmt.Errorf("error connecting to libvirtd: %w", err)
 	}
 	defer func() {
 		if err = l.Disconnect(); err != nil {
-			msg := fmt.Errorf("failed to disconnect"+": %w", err)
+			msg := fmt.Errorf("failed to disconnect: %w", err)
 			report.Error(msg)
 			m.Logger().Error(msg)
 		}
@@ -121,13 +121,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	domains, err := l.Domains()
 	if err != nil {
-		return fmt.Errorf("error listing domains"+": %w", err)
+		return fmt.Errorf("error listing domains: %w", err)
 	}
 
 	for _, d := range domains {
 		gotDomainMemoryStats, err := l.DomainMemoryStats(d, maximumStats, flags)
 		if err != nil {
-			msg := fmt.Errorf("error fetching memory stats for domain %s"+": %w", d.Name, err)
+			msg := fmt.Errorf("error fetching memory stats for domain %s: %w", d.Name, err)
 			report.Error(msg)
 			m.Logger().Error(msg)
 			continue

@@ -148,7 +148,7 @@ func GetServiceStates(handle Handle, state ServiceEnumState, protectedServices m
 				servicesBuffer = make([]byte, len(servicesBuffer)+int(bytesNeeded))
 				continue
 			}
-			return nil, fmt.Errorf("error while calling the _EnumServicesStatusEx api"+": %w", ServiceErrno(err.(syscall.Errno)))
+			return nil, fmt.Errorf("error while calling the _EnumServicesStatusEx api: %w", ServiceErrno(err.(syscall.Errno)))
 		}
 
 		break
@@ -215,7 +215,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 
 	serviceHandle, err := openServiceHandle(handle, service.ServiceName, ServiceQueryConfig)
 	if err != nil {
-		return service, fmt.Errorf("error while opening service %s"+": %w", service.ServiceName, err)
+		return service, fmt.Errorf("error while opening service %s: %w", service.ServiceName, err)
 	}
 
 	defer closeHandle(serviceHandle)
@@ -281,7 +281,7 @@ func getAdditionalServiceInfo(serviceHandle Handle, service *Status) error {
 				buffer = make([]byte, len(buffer)+int(bytesNeeded))
 				continue
 			}
-			return fmt.Errorf("error while querying the service configuration %s"+": %w", service.ServiceName, ServiceErrno(err.(syscall.Errno)))
+			return fmt.Errorf("error while querying the service configuration %s: %w", service.ServiceName, ServiceErrno(err.(syscall.Errno)))
 		}
 		serviceQueryConfig := (*QueryServiceConfig)(unsafe.Pointer(&buffer[0]))
 		service.StartType = ServiceStartType(serviceQueryConfig.DwStartType)
@@ -313,7 +313,7 @@ func getOptionalServiceInfo(serviceHandle Handle, service *Status) error {
 		if service.StartType == StartTypeAutomatic {
 			delayedInfoBuffer, err := queryServiceConfig2(serviceHandle, ConfigDelayedAutoStartInfo)
 			if err != nil {
-				return fmt.Errorf("error while querying rhe service configuration %s"+": %w", service.ServiceName, err)
+				return fmt.Errorf("error while querying rhe service configuration %s: %w", service.ServiceName, err)
 			}
 
 			delayedInfo = (*serviceDelayedAutoStartInfo)(unsafe.Pointer(&delayedInfoBuffer[0]))

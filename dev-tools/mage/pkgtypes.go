@@ -406,7 +406,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		// Execute the dependency if it exists.
 		if f.Dep != nil {
 			if err := f.Dep(s); err != nil {
-				panic(fmt.Errorf("failed executing package file dependency for target=%v"+": %w", target, err))
+				panic(fmt.Errorf("failed executing package file dependency for target=%v: %w", target, err))
 			}
 		}
 
@@ -421,17 +421,17 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 		case f.Content != "":
 			content, err := s.Expand(f.Content)
 			if err != nil {
-				panic(fmt.Errorf("failed to expand content template for target=%v"+": %w", target, err))
+				panic(fmt.Errorf("failed to expand content template for target=%v: %w", target, err))
 			}
 
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Target))
 			if err = ioutil.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
-				panic(fmt.Errorf("failed to write file containing content for target=%v"+": %w", target, err))
+				panic(fmt.Errorf("failed to write file containing content for target=%v: %w", target, err))
 			}
 		case f.Template != "":
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Template))
 			if err := s.ExpandFile(f.Template, CreateDir(f.Source)); err != nil {
-				panic(fmt.Errorf("failed to expand template file for target=%v"+": %w", target, err))
+				panic(fmt.Errorf("failed to expand template file for target=%v: %w", target, err))
 			}
 		default:
 			panic(fmt.Errorf("package file with target=%v must have either source, content, or template", target))
@@ -458,7 +458,7 @@ func (s PackageSpec) ImageName() (string, error) {
 	if name, _ := s.ExtraVars["image_name"]; name != "" {
 		imageName, err := s.Expand(name)
 		if err != nil {
-			return "", fmt.Errorf("failed to expand image_name"+": %w", err)
+			return "", fmt.Errorf("failed to expand image_name: %w", err)
 		}
 		return imageName, nil
 	}
@@ -480,11 +480,11 @@ func copyInstallScript(spec PackageSpec, script string, local *string) error {
 	}
 
 	if err := spec.ExpandFile(script, createDir(*local)); err != nil {
-		return fmt.Errorf("failed to copy install script to package dir"+": %w", err)
+		return fmt.Errorf("failed to copy install script to package dir: %w", err)
 	}
 
 	if err := os.Chmod(*local, 0755); err != nil {
-		return fmt.Errorf("failed to chmod install script"+": %w", err)
+		return fmt.Errorf("failed to chmod install script: %w", err)
 	}
 
 	return nil
@@ -493,7 +493,7 @@ func copyInstallScript(spec PackageSpec, script string, local *string) error {
 func (s PackageSpec) hash() string {
 	h, err := hashstructure.Hash(s, nil)
 	if err != nil {
-		panic(fmt.Errorf("failed to compute hash of spec"+": %w", err))
+		panic(fmt.Errorf("failed to compute hash of spec: %w", err))
 	}
 
 	hash := strconv.FormatUint(h, 10)
@@ -549,7 +549,7 @@ func PackageZip(spec PackageSpec) error {
 
 		if err := addFileToZip(w, baseDir, pkgFile); err != nil {
 			p, _ := filepath.Abs(pkgFile.Source)
-			return fmt.Errorf("failed adding file=%+v to zip"+": %w", p, err)
+			return fmt.Errorf("failed adding file=%+v to zip: %w", p, err)
 		}
 	}
 
@@ -569,7 +569,7 @@ func PackageZip(spec PackageSpec) error {
 
 	// Write the zip file.
 	if err := ioutil.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
-		return fmt.Errorf("failed to write zip file"+": %w", err)
+		return fmt.Errorf("failed to write zip file: %w", err)
 	}
 
 	// Any packages beginning with "tmp-" are temporary by nature so don't have
@@ -579,7 +579,7 @@ func PackageZip(spec PackageSpec) error {
 	}
 
 	if err := CreateSHA512File(spec.OutputFile); err != nil {
-		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
 	}
 	return nil
 }
@@ -621,7 +621,7 @@ func PackageTarGz(spec PackageSpec) error {
 		}
 
 		if err := addFileToTar(w, baseDir, pkgFile); err != nil {
-			return fmt.Errorf("failed adding file=%+v to tar"+": %w", pkgFile, err)
+			return fmt.Errorf("failed adding file=%+v to tar: %w", pkgFile, err)
 		}
 	}
 
@@ -638,7 +638,7 @@ func PackageTarGz(spec PackageSpec) error {
 		defer os.RemoveAll(tmpdir)
 
 		if err := addSymlinkToTar(tmpdir, w, baseDir, pkgFile); err != nil {
-			return fmt.Errorf("failed adding file=%+v to tar"+": %w", pkgFile, err)
+			return fmt.Errorf("failed adding file=%+v to tar: %w", pkgFile, err)
 		}
 	}
 
@@ -682,7 +682,7 @@ func PackageTarGz(spec PackageSpec) error {
 	}
 
 	if err := CreateSHA512File(spec.OutputFile); err != nil {
-		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
 	}
 
 	return nil
@@ -793,11 +793,11 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	)
 
 	if err = dockerRun(args...); err != nil {
-		return fmt.Errorf("failed while running FPM in docker"+": %w", err)
+		return fmt.Errorf("failed while running FPM in docker: %w", err)
 	}
 
 	if err = CreateSHA512File(spec.OutputFile); err != nil {
-		return fmt.Errorf("failed to create .sha512 file"+": %w", err)
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
 	}
 	return nil
 }
@@ -809,7 +809,7 @@ func addUidGidEnvArgs(args []string) ([]string, error) {
 
 	info, err := GetDockerInfo()
 	if err != nil {
-		return args, fmt.Errorf("failed to get docker info"+": %w", err)
+		return args, fmt.Errorf("failed to get docker info: %w", err)
 	}
 
 	uid, gid := os.Getuid(), os.Getgid()

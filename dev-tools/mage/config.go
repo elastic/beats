@@ -98,7 +98,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	if types.IsShort() {
 		file := filepath.Join(targetDir, BeatName+".yml")
 		if err := makeConfigTemplate(file, 0600, args, ShortConfigType); err != nil {
-			return fmt.Errorf("failed making short config"+": %w", err)
+			return fmt.Errorf("failed making short config: %w", err)
 		}
 	}
 
@@ -106,7 +106,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	if types.IsReference() {
 		file := filepath.Join(targetDir, BeatName+".reference.yml")
 		if err := makeConfigTemplate(file, 0644, args, ReferenceConfigType); err != nil {
-			return fmt.Errorf("failed making reference config"+": %w", err)
+			return fmt.Errorf("failed making reference config: %w", err)
 		}
 	}
 
@@ -114,7 +114,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	if types.IsDocker() {
 		file := filepath.Join(targetDir, BeatName+".docker.yml")
 		if err := makeConfigTemplate(file, 0600, args, DockerConfigType); err != nil {
-			return fmt.Errorf("failed making docker config"+": %w", err)
+			return fmt.Errorf("failed making docker config: %w", err)
 		}
 	}
 
@@ -192,18 +192,18 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	var err error
 	for _, templateGlob := range confParams.Templates {
 		if tmpl, err = tmpl.ParseGlob(templateGlob); err != nil {
-			return fmt.Errorf("failed to parse config templates in %q"+": %w", templateGlob, err)
+			return fmt.Errorf("failed to parse config templates in %q: %w", templateGlob, err)
 		}
 	}
 
 	data, err := ioutil.ReadFile(confFile.Template)
 	if err != nil {
-		return fmt.Errorf("failed to read config template %q"+": %w", confFile.Template, err)
+		return fmt.Errorf("failed to read config template %q: %w", confFile.Template, err)
 	}
 
 	tmpl, err = tmpl.Parse(string(data))
 	if err != nil {
-		return fmt.Errorf("failed to parse template"+": %w", err)
+		return fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	out, err := os.OpenFile(CreateDir(destination), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode)
@@ -213,7 +213,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	defer out.Close()
 
 	if err = tmpl.Execute(out, EnvMap(params)); err != nil {
-		return fmt.Errorf("failed building %v"+": %w", destination, err)
+		return fmt.Errorf("failed building %v: %w", destination, err)
 	}
 
 	return nil

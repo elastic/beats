@@ -70,7 +70,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, nil, fmt.Errorf("reading config"+": %w", err)
+		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
 
 	var sources []cursor.Source
@@ -100,7 +100,7 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	}
 
 	if _, err := auth.Token(); err != nil {
-		return fmt.Errorf("unable to acquire authentication token for tenant:%s"+": %w", tenantID, err)
+		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", tenantID, err)
 	}
 
 	return nil
@@ -150,7 +150,7 @@ func (inp *o365input) runOnce(
 	}
 
 	if _, err := tokenProvider.Token(); err != nil {
-		return fmt.Errorf("unable to acquire authentication token for tenant:%s"+": %w", stream.tenantID, err)
+		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", stream.tenantID, err)
 	}
 
 	config := &inp.config
@@ -171,7 +171,7 @@ func (inp *o365input) runOnce(
 		),
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create API poller"+": %w", err)
+		return fmt.Errorf("failed to create API poller: %w", err)
 	}
 
 	start := initCheckpoint(log, cursor, config.API.MaxRetention)
@@ -243,7 +243,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
 		ts = time.Now()
-		errs = append(errs, fmt.Errorf("failed parsing CreationTime"+": %w", err))
+		errs = append(errs, fmt.Errorf("failed parsing CreationTime: %w", err))
 	}
 	b := beat.Event{
 		Timestamp: ts,
