@@ -88,8 +88,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	}
 	httpStats, ok := d.(mapstr.M)
 	if !ok {
-		return fmt.Errorf("failure casting http_req_stats to common.Mapstr: %w", err)
-
+		return fmt.Errorf("failure casting http_req_stats to common.Mapstr")
 	}
 	err = metricsetMetrics.Delete("http_req_stats")
 	if err != nil {
@@ -113,7 +112,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	}
 	cpuUtil, ok := cpu.(float64)
 	if !ok {
-		return fmt.Errorf("failure casting cpu to float64: %w", err)
+		return fmt.Errorf("failure casting cpu to float64")
 	}
 	_, err = metricsetMetrics.Put("cpu", cpuUtil/100.0)
 	if err != nil {

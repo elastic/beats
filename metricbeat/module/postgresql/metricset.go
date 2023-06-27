@@ -100,9 +100,8 @@ func (ms *MetricSet) Close() error {
 		return nil
 	}
 
-	err := ms.db.Close()
-	if err != nil {
-		return fmt.Errorf("failed to close connection"+": %w", err)
+	if err := ms.db.Close(); err != nil {
+		return fmt.Errorf("failed to close connection: %w", err)
 	}
 	return nil
 }

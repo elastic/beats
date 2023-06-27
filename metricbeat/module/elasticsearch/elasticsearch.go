@@ -617,7 +617,7 @@ func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 
 	v, ok := settings.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf(groupKey+" settings are not a map"+": %w", err)
+		return nil, fmt.Errorf(groupKey + " settings are not a map")
 	}
 
 	return mapstr.M(v), nil

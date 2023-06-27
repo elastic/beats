@@ -6,9 +6,8 @@ package stats
 
 import (
 	"encoding/json"
-	"fmt"
-
 	"errors"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
 

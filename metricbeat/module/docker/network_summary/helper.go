@@ -59,9 +59,13 @@ func fetchContainerNetStats(client *client.Client, timeout time.Duration, contai
 	rootPID := inspect.ContainerJSONBase.State.Pid
 
 	proc, err := sysinfo.Process(rootPID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot fetch process information for PID %d: %w", rootPID, err)
+	}
+
 	procNet, ok := proc.(sysinfotypes.NetworkCounters)
 	if !ok {
-		return nil, fmt.Errorf("cannot fetch network counters for PID %d: %w", rootPID, err)
+		return nil, fmt.Errorf("cannot fetch network counters for PID %d", rootPID)
 	}
 
 	counters, err := procNet.NetworkCounters()
