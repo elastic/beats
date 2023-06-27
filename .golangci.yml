@@ -158,7 +158,7 @@ linters-settings:
     simple: false
     # Report pre-allocation suggestions on range loops.
     # Default: true
-    range-loops: false
+    range-loops: true
     # Report pre-allocation suggestions on for loops.
     # Default: false
     for-loops: true
