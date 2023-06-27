@@ -138,6 +138,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
 - Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
 - Fix metric collection in GCPPubSub input. {pull}35773[35773]
+- Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
 
 *Heartbeat*
 
