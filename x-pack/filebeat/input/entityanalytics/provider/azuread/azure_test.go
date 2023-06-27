@@ -36,13 +36,18 @@ func TestAzure_DoFetch(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	got, err := a.doFetch(ctx, ss, false)
+	gotUsers, gotDevices, err := a.doFetch(ctx, ss, false)
 	require.NoError(t, err)
 
 	var wantModifiedUsers collections.UUIDSet
 	for _, v := range mockfetcher.UserResponse {
 		wantModifiedUsers.Add(v.ID)
 	}
+	var wantModifiedDevices collections.UUIDSet
+	for _, v := range mockfetcher.DeviceResponse {
+		wantModifiedDevices.Add(v.ID)
+	}
 
-	require.Equal(t, wantModifiedUsers.Values(), got.Values())
+	require.Equal(t, wantModifiedUsers.Values(), gotUsers.Values())
+	require.Equal(t, wantModifiedDevices.Values(), gotDevices.Values())
 }

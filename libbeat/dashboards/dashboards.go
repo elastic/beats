@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	errw "github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -91,7 +89,7 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields mapstr.M) erro
 	}
 
 	if err := importer.Import(); err != nil {
-		return errw.Wrap(err, "fail to import the dashboards in Kibana")
+		return fmt.Errorf("fail to import the dashboards in Kibana: %w", err)
 	}
 
 	return nil

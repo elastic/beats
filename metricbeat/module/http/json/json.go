@@ -19,9 +19,8 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -144,7 +143,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			event := m.processBody(response, obj)
 
 			if reported := reporter.Event(event); !reported {
-				m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+				m.Logger().Debug(fmt.Errorf("error reporting event: %#v", event))
 				return nil
 			}
 		}
@@ -157,7 +156,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		event := m.processBody(response, jsonBody)
 
 		if reported := reporter.Event(event); !reported {
-			m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+			m.Logger().Debug(fmt.Errorf("error reporting event: %#v", event))
 			return nil
 		}
 	}
