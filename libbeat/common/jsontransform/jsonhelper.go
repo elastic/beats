@@ -35,11 +35,11 @@ var (
 	// ErrInvalidTimestamp is returned when parsing of a @timestamp field fails.
 	// Supported formats: ISO8601, RFC3339
 	ErrInvalidTimestamp = errors.New("failed to parse @timestamp, unknown format")
+	logger              = logp.NewLogger("jsonhelper")
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
-	logger := logp.NewLogger("jsonhelper")
 	if expandKeys {
 		if err := expandFields(keys); err != nil {
 			logger.Errorf("JSON: failed to expand fields: %s", err)
