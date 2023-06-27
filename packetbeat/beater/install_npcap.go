@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -33,6 +34,10 @@ import (
 )
 
 const installTimeout = 120 * time.Second
+
+// muInstall protects use of npcap.Installer. The only writes to npcap.Installer
+// are here and during init in x-pack/packetbeat/npcap/npcap_windows.go
+var muInstall sync.Mutex
 
 func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	if !b.Info.ElasticLicensed {
@@ -85,6 +90,8 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
 
+	muInstall.Lock()
+	defer muInstall.Unlock()
 	if npcap.Installer == nil {
 		return nil
 	}
@@ -126,6 +133,11 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C) (bool, error) {
 		err := rawcfg.Unpack(&cfg)
 		if err != nil {
 			return false, fmt.Errorf("failed to unpack npcap config from agent configuration: %w", err)
+		}
+		if len(cfg.Streams) == 0 {
+			// We have no stream to monitor, so we don't need to install
+			// anything. We may be in the middle of a config check.
+			return false, nil
 		}
 		for _, c := range cfg.Streams {
 			if c.NeverInstall {
