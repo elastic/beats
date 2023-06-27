@@ -54,7 +54,7 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 		var startReq StartLoggingRequest
 		err := json.NewDecoder(r.Body).Decode(&startReq)
 		if err != nil {
-			http.Error(w, fmt.Errorf("error decoding json request"+": %w", err).Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("error decoding json request: %v", err), http.StatusBadRequest)
 			return
 		}
 
