@@ -12,8 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func startMockBeat(t *testing.T, msg string, args ...string) BeatProc {
-	cfg := `
+var cfg = `
 mockbeat:
 name:
 queue.mem:
@@ -25,6 +24,7 @@ output.console:
     pretty: false
 `
 
+func startMockBeat(t *testing.T, msg string, args ...string) BeatProc {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", append([]string{"-E", "http.enabled=true"}, args...)...)
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
@@ -33,8 +33,10 @@ output.console:
 }
 
 func TestLoggingConsoleECS(t *testing.T) {
-	mockbeat := startMockBeat(t, "mockbeat start running", "-e")
-	line := mockbeat.WaitForLogs("ecs.version", 60*time.Second, "error waiting for ecs version")
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-E", "http.enabled=true", "-e")
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start()
+	line := mockbeat.WaitStdErrContains("ecs.version", 60*time.Second)
 
 	var m map[string]any
 	require.NoError(t, json.Unmarshal([]byte(line), &m), "Unmarshaling log line as json")

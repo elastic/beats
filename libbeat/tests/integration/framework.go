@@ -380,7 +380,7 @@ func EnsureESIsRunning(t *testing.T) {
 	}
 }
 
-func (b *BeatProc) FileContains(filename string, match string) bool {
+func (b *BeatProc) FileContains(filename string, match string) string {
 	file, err := os.Open(filename)
 	require.NoErrorf(b.t, err, "error opening: %s", filename)
 	r := bufio.NewReader(file)
@@ -393,25 +393,29 @@ func (b *BeatProc) FileContains(filename string, match string) bool {
 			break
 		}
 		if strings.Contains(line, match) {
-			return true
+			return line
 		}
 	}
-	return false
+	return ""
 }
 
-func (b *BeatProc) WaitFileContains(filename string, match string, waitFor time.Duration) {
+func (b *BeatProc) WaitFileContains(filename string, match string, waitFor time.Duration) string {
+	var returnValue string
 	require.Eventuallyf(b.t,
 		func() bool {
-			return b.FileContains(filename, match)
+			returnValue = b.FileContains(filename, match)
+			return returnValue != ""
 		}, waitFor, 100*time.Millisecond, "match string '%s' not found in %s", match, filename)
+
+	return returnValue
 }
 
-func (b *BeatProc) WaitStdErrContains(match string, waitFor time.Duration) {
-	b.WaitFileContains(b.stderr.Name(), match, waitFor)
+func (b *BeatProc) WaitStdErrContains(match string, waitFor time.Duration) string {
+	return b.WaitFileContains(b.stderr.Name(), match, waitFor)
 }
 
-func (b *BeatProc) WaitStdOutContains(match string, waitFor time.Duration) {
-	b.WaitFileContains(b.stdout.Name(), match, waitFor)
+func (b *BeatProc) WaitStdOutContains(match string, waitFor time.Duration) string {
+	return b.WaitFileContains(b.stdout.Name(), match, waitFor)
 }
 
 func (b *BeatProc) LoadMeta() (Meta, error) {
