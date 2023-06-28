@@ -7,13 +7,12 @@ package decoder
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"sync"
-
-	"errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"

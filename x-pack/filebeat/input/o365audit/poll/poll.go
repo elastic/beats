@@ -6,11 +6,10 @@ package poll
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
-
-	"errors"
 
 	"github.com/Azure/go-autorest/autorest"
 

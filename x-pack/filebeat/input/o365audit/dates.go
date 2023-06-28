@@ -5,10 +5,9 @@
 package o365audit
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

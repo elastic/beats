@@ -6,16 +6,14 @@ package o365audit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sort"
 	"time"
 
-	"errors"
-
 	"github.com/Azure/go-autorest/autorest"
-
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 )
 

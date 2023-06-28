@@ -18,9 +18,8 @@
 package publish
 
 import (
-	"net"
-
 	"errors"
+	"net"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
