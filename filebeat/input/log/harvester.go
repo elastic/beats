@@ -18,14 +18,15 @@
 // Package log harvests different inputs for new information. Currently
 // two harvester types exist:
 //
-//   * log
-//   * stdin
+//   - log
 //
-//  The log harvester reads a file line by line. In case the end of a file is found
-//  with an incomplete line, the line pointer stays at the beginning of the incomplete
-//  line. As soon as the line is completed, it is read and returned.
+//   - stdin
 //
-//  The stdin harvesters reads data from stdin.
+//     The log harvester reads a file line by line. In case the end of a file is found
+//     with an incomplete line, the line pointer stays at the beginning of the incomplete
+//     line. As soon as the line is completed, it is read and returned.
+//
+//     The stdin harvesters reads data from stdin.
 package log
 
 import (
@@ -198,12 +199,33 @@ func (h *Harvester) Run() error {
 			closeTimeout = time.After(h.config.CloseTimeout)
 		}
 
-		select {
-		// Applies when timeout is reached
-		case <-closeTimeout:
-			logp.Info("Closing harvester because close_timeout was reached: %s", source)
-		// Required when reader loop returns and reader finished
-		case <-h.done:
+		removedCheckTick := make(<-chan time.Time)
+		if h.config.CloseRemoved {
+			removedCheckTick = time.After(h.config.ScanFrequency)
+		}
+
+	L:
+		for {
+			select {
+			// Applies when timeout is reached
+			case <-closeTimeout:
+				logp.Info("Closing harvester because close_timeout was reached: %s", source)
+				break L
+			// Check whether file is removed
+			case <-removedCheckTick:
+				// 通过旁路判断文件是否被删除，避免输出堵塞时未能执行 errorChecks 导致已删文件的 fd 没有被及时释放的问题
+				if h.reader.fileReader.log.fs.Removed() {
+					logp.Info("Closing harvester because file was removed: %s", source)
+					break L
+				} else {
+					logp.Debug("harvester", "File was not removed: %s, check again after %v", source, h.config.ScanFrequency)
+					// update timer
+					removedCheckTick = time.After(h.config.ScanFrequency)
+				}
+			// Required when reader loop returns and reader finished
+			case <-h.done:
+				break L
+			}
 		}
 
 		h.stop()
