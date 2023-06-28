@@ -16,9 +16,8 @@ Beats Tester uses Vagrant and Ansible to ensure Beats can be
 installed, run and assert some basic functionality like logging and
 metrics are working as expected.
 
-Currently it runs on every PR, long living branches and on `main` (the
-last two on a daily schedule). It does not block PRs, nor does it
-appear on PR checks.
+Currently it runs on long living branches and on `main` on a daily
+schedule. It does not block PRs, nor does it appear on PR checks.
 
 It is currently run by Jenkins on
 https://beats-ci.elastic.co/job/Beats/job/beats-tester/[Beats Tester
