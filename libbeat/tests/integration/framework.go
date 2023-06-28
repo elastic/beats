@@ -22,9 +22,11 @@ package integration
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -34,6 +36,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -49,6 +52,11 @@ type BeatProc struct {
 	stdout        *os.File
 	stderr        *os.File
 	Process       *os.Process
+}
+
+type Meta struct {
+	UUID       uuid.UUID `json:"uuid"`
+	FirstStart time.Time `json:"first_start"`
 }
 
 // NewBeat createa a new Beat process from the system tests binary.
@@ -93,6 +101,10 @@ func (b *BeatProc) Start(args ...string) {
 		t.Fatalf("could not get full path from %q, err: %s", b.Binary, err)
 	}
 
+	b.stdout.Seek(0, 0)
+	b.stdout.Truncate(0)
+	b.stderr.Seek(0, 0)
+	b.stderr.Truncate(0)
 	var procAttr os.ProcAttr
 	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
 	process, err := os.StartProcess(fullPath, b.Args, &procAttr)
@@ -349,4 +361,42 @@ func (b *BeatProc) WaitStdErrContains(match string, waitFor time.Duration) strin
 
 func (b *BeatProc) WaitStdOutContains(match string, waitFor time.Duration) string {
 	return b.WaitFileContains(b.stdout.Name(), match, waitFor)
+}
+
+func (b *BeatProc) LoadMeta() (Meta, error) {
+	m := Meta{}
+	metaFile, err := os.Open(filepath.Join(b.TempDir(), "data", "meta.json"))
+	if err != nil {
+		return m, err
+	}
+	defer metaFile.Close()
+
+	metaBytes, _ := ioutil.ReadAll(metaFile)
+	json.Unmarshal(metaBytes, &m)
+	return m, nil
+}
+
+func GetESURL(t *testing.T, scheme string) url.URL {
+	t.Helper()
+
+	esHost := os.Getenv("ES_HOST")
+	if esHost == "" {
+		esHost = "localhost"
+	}
+
+	esPort := os.Getenv("ES_PORT")
+	if esPort == "" {
+		switch scheme {
+		case "http":
+			esPort = "9200"
+		case "https":
+			esPort = "9201"
+		}
+	}
+
+	esURL := url.URL{
+		Scheme: scheme,
+		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
+	}
+	return esURL
 }
