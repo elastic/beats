@@ -22,7 +22,7 @@ Please see <<azure-api-cost,additional notes about metrics and costs>> for more 
 
 The azure module comes with several predefined dashboards for virtual machines, VM guest metrics and virtual machine scale sets.
 
-The VM overview dashboard shows information about CPU, memory, disk usage as well as operations per second. The two available filters help narrowing down the dashbord to specific regions and/or resource groups. For example:
+The VM overview dashboard shows information about CPU, memory, disk usage as well as operations per second. The two available filters help narrowing down the dashboard to specific regions and/or resource groups. For example:
 
 image::./images/metricbeat-azure-vm-overview.png[]
 
