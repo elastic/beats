@@ -122,7 +122,7 @@ func (b *BeatProc) Stop() {
 // LogContains looks for `s` as a substring of every log line,
 // it will open the log file on every call, read it until EOF,
 // then close it.
-func (b *BeatProc) LogContains(s string) bool {
+func (b *BeatProc) LogContains(s string) string {
 	t := b.t
 	logFile := b.openLogFile()
 	_, err := logFile.Seek(b.logFileOffset, os.SEEK_SET)
@@ -153,22 +153,26 @@ func (b *BeatProc) LogContains(s string) bool {
 			break
 		}
 		if strings.Contains(line, s) {
-			return true
+			return line
 		}
 	}
 
-	return false
+	return ""
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
 // msgAndArgs should be a format string and arguments that will be printed
 // if the logs are not found, providing additional context for debugging.
-func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) {
+func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) string {
 	b.t.Helper()
+	var returnValue string
 	require.Eventually(b.t, func() bool {
-		return b.LogContains(s)
+		returnValue = b.LogContains(s)
+		return returnValue != ""
 	}, timeout, 100*time.Millisecond, msgAndArgs...)
+
+	return returnValue
 }
 
 // TempDir returns the temporary directory
