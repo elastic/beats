@@ -22,6 +22,7 @@ package integration
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -51,6 +52,9 @@ type BeatProc struct {
 	logFileOffset       int64
 	t                   *testing.T
 	tempDir             string
+	stdout              *os.File
+	stderr              *os.File
+	Process             *os.Process
 }
 
 // NewBeat createa a new Beat process from the system tests binary.
@@ -58,11 +62,17 @@ type BeatProc struct {
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
+	require.FileExistsf(t, binary, "beat binary must exists")
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
+	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
+	require.NoError(t, err, "error creating stdout file")
+	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
+	require.NoError(t, err, "error creating stderr file")
 	p := BeatProc{
 		Binary: binary,
 		Args: append([]string{
+			beatName,
 			"--systemTest",
 			"--path.home", tempDir,
 			"--path.logs", tempDir,
@@ -73,6 +83,8 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
 		beatName:   beatName,
 		configFile: configFile,
 		t:          t,
+		stdout:     stdoutFile,
+		stderr:     stderrFile,
 	}
 	return p
 }
@@ -132,11 +144,11 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 
-	b.Cmd = exec.Command(b.fullPath, b.Args...)
-	if err := b.Cmd.Start(); err != nil {
-		b.t.Fatalf("could not start %q process: %s", b.beatName, err)
-	}
-
+	var procAttr os.ProcAttr
+	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
+	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
+	require.NoError(b.t, err, "error starting beat process")
+	b.Process = process
 	b.cmdMutex.Unlock()
 }
 
@@ -150,6 +162,17 @@ func (b *BeatProc) waitBeatToExit() int {
 	}
 
 	return b.Cmd.ProcessState.ExitCode()
+}
+
+// Stop stops the Beat process
+// Start adds Cleanup function to stop when test ends, only run this if you want to inspect logs after beat shutsdown
+func (b *BeatProc) Stop() {
+	if err := b.Process.Signal(os.Interrupt); err != nil {
+		if errors.Is(err, os.ErrProcessDone) {
+			return
+		}
+		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
+	}
 }
 
 // LogContains looks for `s` as a substring of every log line,
@@ -215,7 +238,7 @@ func (b *BeatProc) TempDir() string {
 // WriteConfigFile writes the provided configuration string cfg to a file.
 // This file will be used as the configuration file for the Beat.
 func (b *BeatProc) WriteConfigFile(cfg string) {
-	if err := os.WriteFile(b.configFile, []byte(cfg), 0644); err != nil {
+	if err := os.WriteFile(b.configFile, []byte(cfg), 0o644); err != nil {
 		b.t.Fatalf("cannot create config file '%s': %s", b.configFile, err)
 	}
 
@@ -272,17 +295,17 @@ func createTempDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 
-	if err := os.MkdirAll(tempDir, 0766); err != nil {
+	if err := os.MkdirAll(tempDir, 0o766); err != nil {
 		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
 	}
-	t.Logf("Temporary directory: %s", tempDir)
 
 	cleanup := func() {
 		if !t.Failed() {
 			if err := os.RemoveAll(tempDir); err != nil {
 				t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
 			}
-			t.Logf("Temporary directory '%s' removed", tempDir)
+		} else {
+			t.Logf("Temporary directory saved: %s", tempDir)
 		}
 	}
 	t.Cleanup(cleanup)
@@ -340,4 +363,38 @@ func EnsureESIsRunning(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
 	}
+}
+
+func (b *BeatProc) FileContains(filename string, match string) bool {
+	file, err := os.Open(filename)
+	require.NoErrorf(b.t, err, "error opening: %s", filename)
+	r := bufio.NewReader(file)
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				b.t.Fatalf("error reading log file '%s': %s", file.Name(), err)
+			}
+			break
+		}
+		if strings.Contains(line, match) {
+			return true
+		}
+	}
+	return false
+}
+
+func (b *BeatProc) WaitFileContains(filename string, match string, waitFor time.Duration) {
+	require.Eventuallyf(b.t,
+		func() bool {
+			return b.FileContains(filename, match)
+		}, waitFor, 100*time.Millisecond, "match string '%s' not found in %s", match, filename)
+}
+
+func (b *BeatProc) WaitStdErrContains(match string, waitFor time.Duration) {
+	b.WaitFileContains(b.stderr.Name(), match, waitFor)
+}
+
+func (b *BeatProc) WaitStdOutContains(match string, waitFor time.Duration) {
+	b.WaitFileContains(b.stdout.Name(), match, waitFor)
 }
