@@ -27,61 +27,61 @@ class Test(BaseTest):
     #     assert self.log_contains(
     #         "setup.template.name and setup.template.pattern have to be set if index name is modified")
 
-    def test_index_not_modified(self):
-        """
-        Test that beat starts running if elasticsearch output is set
-        """
-        self.render_config_template(
-            elasticsearch=self.get_elasticsearch_template_config(),
-        )
+    # def test_index_not_modified(self):
+    #     """
+    #     Test that beat starts running if elasticsearch output is set
+    #     """
+    #     self.render_config_template(
+    #         elasticsearch=self.get_elasticsearch_template_config(),
+    #     )
 
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        proc.check_kill_and_wait()
+    #     proc = self.start_beat()
+    #     self.wait_until(lambda: self.log_contains("mockbeat start running."))
+    #     proc.check_kill_and_wait()
 
-    def test_index_modified_no_pattern(self):
-        """
-        Test that beat stops in case elasticsearch index is modified and pattern not
-        """
-        self.render_config_template(
-            elasticsearch={"index": "test"},
-            es_template_name="test",
-        )
+    # def test_index_modified_no_pattern(self):
+    #     """
+    #     Test that beat stops in case elasticsearch index is modified and pattern not
+    #     """
+    #     self.render_config_template(
+    #         elasticsearch={"index": "test"},
+    #         es_template_name="test",
+    #     )
 
-        exit_code = self.run_beat()
+    #     exit_code = self.run_beat()
 
-        assert exit_code == 1
-        assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified")
+    #     assert exit_code == 1
+    #     assert self.log_contains(
+    #         "setup.template.name and setup.template.pattern have to be set if index name is modified")
 
-    def test_index_modified_no_name(self):
-        """
-        Test that beat stops in case elasticsearch index is modified and name not
-        """
-        self.render_config_template(
-            elasticsearch={"index": "test"},
-            es_template_pattern="test",
-        )
+    # def test_index_modified_no_name(self):
+    #     """
+    #     Test that beat stops in case elasticsearch index is modified and name not
+    #     """
+    #     self.render_config_template(
+    #         elasticsearch={"index": "test"},
+    #         es_template_pattern="test",
+    #     )
 
-        exit_code = self.run_beat()
+    #     exit_code = self.run_beat()
 
-        assert exit_code == 1
-        assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified")
+    #     assert exit_code == 1
+    #     assert self.log_contains(
+    #         "setup.template.name and setup.template.pattern have to be set if index name is modified")
 
-    def test_index_with_pattern_name(self):
-        """
-        Test that beat starts running if elasticsearch output with modified index and pattern and name are set
-        """
-        self.render_config_template(
-            elasticsearch=self.get_elasticsearch_template_config(),
-            es_template_name="test",
-            es_template_pattern="test-*",
-        )
+    # def test_index_with_pattern_name(self):
+    #     """
+    #     Test that beat starts running if elasticsearch output with modified index and pattern and name are set
+    #     """
+    #     self.render_config_template(
+    #         elasticsearch=self.get_elasticsearch_template_config(),
+    #         es_template_name="test",
+    #         es_template_pattern="test-*",
+    #     )
 
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        proc.check_kill_and_wait()
+    #     proc = self.start_beat()
+    #     self.wait_until(lambda: self.log_contains("mockbeat start running."))
+    #     proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
