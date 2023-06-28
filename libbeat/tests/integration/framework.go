@@ -423,3 +423,28 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	json.Unmarshal(metaBytes, &m)
 	return m, nil
 }
+
+func GetESURL(t *testing.T, scheme string) url.URL {
+	t.Helper()
+
+	esHost := os.Getenv("ES_HOST")
+	if esHost == "" {
+		esHost = "localhost"
+	}
+
+	esPort := os.Getenv("ES_PORT")
+	if esPort == "" {
+		switch scheme {
+		case "http":
+			esPort = "9200"
+		case "https":
+			esPort = "9201"
+		}
+	}
+
+	esURL := url.URL{
+		Scheme: scheme,
+		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
+	}
+	return esURL
+}
