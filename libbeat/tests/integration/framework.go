@@ -101,7 +101,6 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
 	t := b.t
-
 	fullPath, err := filepath.Abs(b.Binary)
 	if err != nil {
 		t.Fatalf("could not get full path from %q, err: %s", b.Binary, err)
