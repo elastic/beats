@@ -12,7 +12,7 @@ import (
 )
 
 func TestLoggingConsoleECS(t *testing.T) {
-	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-E", "http.enabled=true", "-e")
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-e")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	line := mockbeat.WaitStdErrContains("ecs.version", 60*time.Second)
@@ -31,5 +31,8 @@ func TestLoggingConsoleECS(t *testing.T) {
 }
 
 func TestLoggingFileDefault(t *testing.T) {
-	startMockBeat(t, "Mockbeat is alive!")
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start()
+	mockbeat.WaitStdOutContains("Mockbeat is alive!", 60*time.Second)
 }
