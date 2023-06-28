@@ -95,7 +95,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
 // args are extra arguments to be passed to the Beat
 func (b *BeatProc) Start(args ...string) {
 	t := b.t
-	b.Args = append(b.Args, args...)
+	allArgs := append(b.Args, args...)
 	fullPath, err := filepath.Abs(b.Binary)
 	if err != nil {
 		t.Fatalf("could not get full path from %q, err: %s", b.Binary, err)
@@ -107,7 +107,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.stderr.Truncate(0)
 	var procAttr os.ProcAttr
 	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
-	process, err := os.StartProcess(fullPath, b.Args, &procAttr)
+	process, err := os.StartProcess(fullPath, allArgs, &procAttr)
 	require.NoError(t, err, "error starting beat process")
 	b.Process = process
 	t.Cleanup(func() {
