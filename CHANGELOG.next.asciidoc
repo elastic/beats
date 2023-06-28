@@ -327,6 +327,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add Okta input package for entity analytics. {pull}35611[35611]
 - Expose harvester metrics from filestream input {pull}35835[35835] {issue}33771[33771]
 - Add device support for Azure AD entity analytics. {pull}35807[35807]
+- Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
