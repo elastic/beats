@@ -24,7 +24,7 @@ type Config struct {
 }
 
 func TestHttpRoot(t *testing.T) {
-	startMockBeat(t, "Starting stats endpoint", "-E", "http.enabled=true")
+	startMockBeat(t, "Starting stats endpoint", mockbeatConfig, "-E", "http.enabled=true")
 	r, _ := http.Get("http://localhost:5066")
 	require.Equal(t, 200, r.StatusCode, "incorrect status code")
 
@@ -37,7 +37,7 @@ func TestHttpRoot(t *testing.T) {
 }
 
 func TestHttpStats(t *testing.T) {
-	startMockBeat(t, "Starting stats endpoint", "-E", "http.enabled=true")
+	startMockBeat(t, "Starting stats endpoint", mockbeatConfig, "-E", "http.enabled=true")
 	r, _ := http.Get("http://localhost:5066/stats")
 	require.Equal(t, 200, r.StatusCode, "incorrect status code")
 
@@ -52,13 +52,13 @@ func TestHttpStats(t *testing.T) {
 }
 
 func TestHttpError(t *testing.T) {
-	startMockBeat(t, "Starting stats endpoint", "-E", "http.enabled=true")
+	startMockBeat(t, "Starting stats endpoint", mockbeatConfig, "-E", "http.enabled=true")
 	r, _ := http.Get("http://localhost:5066/not-exist")
 	require.Equal(t, 404, r.StatusCode, "incorrect status code")
 }
 
 func TestHttpPProfDisabled(t *testing.T) {
-	startMockBeat(t, "Starting stats endpoint", "-E", "http.enabled=true")
+	startMockBeat(t, "Starting stats endpoint", mockbeatConfig, "-E", "http.enabled=true")
 	r, _ := http.Get("http://localhost:5066/debug/pprof/")
 	require.Equal(t, 404, r.StatusCode, "incorrect status code")
 }

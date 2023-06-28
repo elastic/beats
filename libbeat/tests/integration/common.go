@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var cfg = `
+var mockbeatConfig = `
 mockbeat:
 name:
 queue.mem:
@@ -18,7 +18,7 @@ output.console:
     pretty: false
 `
 
-func startMockBeat(t *testing.T, msg string, args ...string) BeatProc {
+func startMockBeat(t *testing.T, msg string, cfg string, args ...string) BeatProc {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", args...)
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()

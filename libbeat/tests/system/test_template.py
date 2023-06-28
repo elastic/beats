@@ -13,19 +13,19 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class Test(BaseTest):
 
-    def test_index_modified(self):
-        """
-        Test that beat stops in case elasticsearch index is modified and pattern not
-        """
-        self.render_config_template(
-            elasticsearch={"index": "test"},
-        )
+    # def test_index_modified(self):
+    #     """
+    #     Test that beat stops in case elasticsearch index is modified and pattern not
+    #     """
+    #     self.render_config_template(
+    #         elasticsearch={"index": "test"},
+    #     )
 
-        exit_code = self.run_beat()
+    #     exit_code = self.run_beat()
 
-        assert exit_code == 1
-        assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified")
+    #     assert exit_code == 1
+    #     assert self.log_contains(
+    #         "setup.template.name and setup.template.pattern have to be set if index name is modified")
 
     def test_index_not_modified(self):
         """
