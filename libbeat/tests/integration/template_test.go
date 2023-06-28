@@ -3,9 +3,8 @@
 package integration
 
 import (
-	"github.com/stretchr/testify/require"
-	// "os"
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )
