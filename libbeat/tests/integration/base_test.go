@@ -181,24 +181,30 @@ logging:
 	mockbeat.WaitStdErrContains("Total metrics", 10*time.Second)
 }
 
-// func TestPersistentUuid(t *testing.T) {
-// 	cfg := `
-// mockbeat:
-// name:
-// queue.mem:
-//   events: 4096
-//   flush.min_events: 8
-//   flush.timeout: 0.1s
-// output.console:
-//   code.json:
-//     pretty: true
-// `
-// 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-// 	mockbeat.WriteConfigFile(cfg)
-// 	mockbeat.Start()
-// 	mockbeat.WaitForLogs("Mockbeat is alive.", 10*time.Second)
-// 	metaFile, err := os.Open(filepath.Join(mockbeat.TempDir(), "data", "meta.json"))
-// 	require.NoError(t, err, "error opening meta.json file")
-// 	mockbeat.Stop()
-// 	mockbeat.WaitStdErrContains("Total metrics", 10*time.Second)
-// }
+func TestPersistentUuid(t *testing.T) {
+	cfg := `
+mockbeat:
+name:
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
+output.console:
+  code.json:
+    pretty: true
+`
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-e")
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start()
+	mockbeat.WaitStdErrContains("mockbeat start running.", 10*time.Second)
+	// mockbeat.WaitForLogs("Home path", 60*time.Second, "error waiting for mockbeat to start")
+
+	metaFile1, err := mockbeat.LoadMeta()
+	require.NoError(t, err, "error opening meta.json file")
+	mockbeat.Stop()
+	mockbeat.WaitStdErrContains("Beat ID: "+metaFile1.UUID.String(), 10*time.Second)
+	mockbeat.Start()
+	mockbeat.WaitStdErrContains("mockbeat start running.", 10*time.Second)
+	metaFile2, err := mockbeat.LoadMeta()
+	require.Equal(t, metaFile1.UUID.String(), metaFile2.UUID.String())
+}
