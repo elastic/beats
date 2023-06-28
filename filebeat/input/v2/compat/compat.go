@@ -22,6 +22,7 @@ package compat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -127,7 +128,7 @@ func (r *runner) Start() {
 			},
 			r.connector,
 		)
-		if err != nil {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)

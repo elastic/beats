@@ -122,16 +122,21 @@ The position to start reading the journal from. Valid settings are:
 
 * `head`: Starts reading at the beginning of the journal. After a restart,
 {beatname_uc} resends all log messages in the journal.
-* `tail`: Starts reading at the end of the journal. After a restart,
-{beatname_uc} resends the last message, which might result in duplicates. If
-multiple log messages are written to a journal while {beatname_uc} is down,
-only the last log message is sent on restart.
+* `tail`: Starts reading at the end of the journal. This means that no events
+will be sent until a new message is written.
 * `cursor`: On first read, starts reading at the beginning of the journal. After
 a reload or restart, continues reading at the last known position.
 
 If you have old log files and want to skip lines, start {beatname_uc} with
 `seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
 {beatname_uc}.
+
+[float]
+[id="{beatname_lc}-input-{type}-cursor_seek_fallback"]
+==== `cursor_seek_fallback`
+
+The position to start reading the journal from if no cursor information is
+available. Valid options are `head` and `tail`.
 
 [float]
 [id="{beatname_lc}-input-{type}-units"]
