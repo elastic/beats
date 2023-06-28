@@ -110,45 +110,50 @@ func (e *Event) deepUpdate(d mapstr.M, overwrite bool) {
 	if len(d) == 0 {
 		return
 	}
-	fieldsUpdate := d.Clone() // so we can delete redundant keys
 
-	var metaUpdate mapstr.M
-
-	for fieldKey, value := range d {
-		switch fieldKey {
-
-		// one of the updates is the timestamp which is not a part of the event fields
-		case timestampFieldKey:
-			if overwrite {
-				_ = e.setTimestamp(value)
-			}
-			delete(fieldsUpdate, fieldKey)
-
-		// some updates are addressed for the metadata not the fields
-		case metadataFieldKey:
-			switch meta := value.(type) {
-			case mapstr.M:
-				metaUpdate = meta
-			case map[string]interface{}:
-				metaUpdate = mapstr.M(meta)
-			}
-
-			delete(fieldsUpdate, fieldKey)
-		}
-	}
-
-	if metaUpdate != nil {
-		if e.Meta == nil {
-			e.Meta = mapstr.M{}
-		}
+	// TODO: Refactor to dynamic field removal/assignment when needed
+	timestampValue, timestampExists := d[timestampFieldKey]
+	if timestampExists {
 		if overwrite {
-			e.Meta.DeepUpdate(metaUpdate)
-		} else {
-			e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+			_ = e.setTimestamp(timestampValue)
 		}
+		delete(d, timestampFieldKey)
 	}
 
-	if len(fieldsUpdate) == 0 {
+	metaValue, metaExists := d[metadataFieldKey]
+	if metaExists {
+		var metaUpdate mapstr.M
+
+		switch meta := metaValue.(type) {
+		case mapstr.M:
+			metaUpdate = meta
+		case map[string]interface{}:
+			metaUpdate = mapstr.M(meta)
+		}
+
+		if metaUpdate != nil {
+			if e.Meta == nil {
+				e.Meta = mapstr.M{}
+			}
+			if overwrite {
+				e.Meta.DeepUpdate(metaUpdate)
+			} else {
+				e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+			}
+		}
+		delete(d, metadataFieldKey)
+	}
+
+	defer func() {
+		if timestampExists {
+			d[timestampFieldKey] = timestampValue
+		}
+		if metaExists {
+			d[metadataFieldKey] = metaValue
+		}
+	}()
+
+	if len(d) == 0 {
 		return
 	}
 
@@ -157,9 +162,9 @@ func (e *Event) deepUpdate(d mapstr.M, overwrite bool) {
 	}
 
 	if overwrite {
-		e.Fields.DeepUpdate(fieldsUpdate)
+		e.Fields.DeepUpdate(d)
 	} else {
-		e.Fields.DeepUpdateNoOverwrite(fieldsUpdate)
+		e.Fields.DeepUpdateNoOverwrite(d)
 	}
 }
 
