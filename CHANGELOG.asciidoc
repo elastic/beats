@@ -35,7 +35,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
 
 *Affecting all Beats*
 
-- Update Go version to 1.19.10 {pull}35751[35751]
+- Update Go version to 1.19.10. {pull}35751[35751]
 
 *Filebeat*
 
