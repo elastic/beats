@@ -198,11 +198,6 @@ func (b *BeatProc) LogContains(s string) string {
 	}
 
 	defer func() {
-		offset, err := logFile.Seek(0, os.SEEK_CUR)
-		if err != nil {
-			t.Fatalf("could not read offset for '%s': %s", logFile.Name(), err)
-		}
-		b.logFileOffset = offset
 		if err := logFile.Close(); err != nil {
 			// That's not quite a test error, but it can impact
 			// next executions of LogContains, so treat it as an error
@@ -212,13 +207,17 @@ func (b *BeatProc) LogContains(s string) string {
 
 	r := bufio.NewReader(logFile)
 	for {
-		line, err := r.ReadString('\n')
+		data, err := r.ReadBytes('\n')
+		line := string(data)
+		b.logFileOffset += int64(len(line))
+
 		if err != nil {
 			if err != io.EOF {
 				t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
 			}
 			break
 		}
+
 		if strings.Contains(line, s) {
 			return line
 		}
@@ -332,22 +331,7 @@ func createTempDir(t *testing.T) string {
 // using the default test credentials or the corresponding environment
 // variables.
 func EnsureESIsRunning(t *testing.T) {
-	t.Helper()
-
-	esHost := os.Getenv("ES_HOST")
-	if esHost == "" {
-		esHost = "localhost"
-	}
-
-	esPort := os.Getenv("ES_PORT")
-	if esPort == "" {
-		esPort = "9200"
-	}
-
-	esURL := url.URL{
-		Scheme: "http",
-		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
-	}
+	esURL := GetESURL(t, "http")
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
 	defer cancel()
@@ -356,17 +340,9 @@ func EnsureESIsRunning(t *testing.T) {
 		t.Fatalf("cannot create request to ensure ES is running: %s", err)
 	}
 
-	user := os.Getenv("ES_USER")
-	if user == "" {
-		user = "admin"
-	}
-
-	pass := os.Getenv("ES_PASS")
-	if pass == "" {
-		pass = "testing"
-	}
-
-	req.SetBasicAuth(user, pass)
+	u := esURL.User.Username()
+	p, _ := esURL.User.Password()
+	req.SetBasicAuth(u, p)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -449,9 +425,20 @@ func GetESURL(t *testing.T, scheme string) url.URL {
 		}
 	}
 
+	user := os.Getenv("ES_USER")
+	if user == "" {
+		user = "admin"
+	}
+
+	pass := os.Getenv("ES_PASS")
+	if pass == "" {
+		pass = "testing"
+	}
+
 	esURL := url.URL{
 		Scheme: scheme,
 		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
+		User:   url.UserPassword(user, pass),
 	}
 	return esURL
 }

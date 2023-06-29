@@ -11,41 +11,6 @@ from idxmgmt import IdxMgmt
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
-class Test(BaseTest):
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_json_template(self):
-        """
-        Test loading of json based template
-        """
-
-        template_name = "bla"
-        es = self.es_client()
-        self.copy_files(["template.json"])
-        path = os.path.join(self.working_dir, "template.json")
-        print(path)
-
-        self.render_config_template(
-            elasticsearch=self.get_elasticsearch_template_config(),
-            template_overwrite="true",
-            template_json_enabled="true",
-            template_json_path=path,
-            template_json_name=template_name,
-        )
-
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("Loading json template from file"))
-        self.wait_until(lambda: self.log_contains('Template with name \\\"bla\\\" loaded.'))
-        proc.check_kill_and_wait()
-
-        result = es.transport.perform_request('GET', '/_index_template/' + template_name)
-        assert len(result) == 1
-
-    def get_host(self):
-        return os.getenv('ES_HOST', 'localhost') + ':' + os.getenv('ES_PORT', '9200')
-
-
 class TestRunTemplate(BaseTest):
     """
     Test run cmd with focus on template setup

@@ -3,11 +3,29 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
+
+type IndexTemplateResult struct {
+	IndexTemplates []IndexTemplateEntry `json:"index_templates"`
+}
+
+type IndexTemplateEntry struct {
+	Name          string        `json:"name"`
+	IndexTemplate IndexTemplate `json:"index_template"`
+}
+
+type IndexTemplate struct {
+	IndexPatterns []string `json:"index_patterns"`
+}
 
 func TestIndexModified(t *testing.T) {
 	var mockbeatConfigWithIndex = `
@@ -89,4 +107,55 @@ setup.template:
 	esUrl := GetESURL(t, "http")
 	cfg := fmt.Sprintf(mockbeatConfigWithES, esUrl.String())
 	startMockBeat(t, "mockbeat start running.", cfg)
+}
+
+func TestJsonTemplate(t *testing.T) {
+	EnsureESIsRunning(t)
+	_, err := os.Stat("../files/template.json")
+	require.Equal(t, err, nil)
+
+	templateName := "bla"
+	var mockbeatConfigWithES = `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+setup.template:
+  name: test
+  pattern: test-*
+  overwrite: true
+  json:
+    enabled: true
+    path: %s
+    name: %s
+logging:
+  level: debug
+`
+
+	// prepare the config
+	pwd, err := os.Getwd()
+	path := filepath.Join(pwd, "../files/template.json")
+	esUrl := GetESURL(t, "http")
+	user := esUrl.User.Username()
+	pass, _ := esUrl.User.Password()
+	cfg := fmt.Sprintf(mockbeatConfigWithES, esUrl.String(), user, pass, path, templateName)
+
+	// start mockbeat and wait for the relevant log lines
+	mockbeat := startMockBeat(t, "mockbeat start running.", cfg)
+	msg := "Loading json template from file"
+	mockbeat.WaitForLogs(msg, 60*time.Second, fmt.Sprintf("error waiting for log: %s", msg))
+	msg = "Template with name \\\"bla\\\" loaded."
+	mockbeat.WaitForLogs(msg, 10*time.Second, fmt.Sprintf("error waiting for log: %s", msg))
+
+	// check effective changes in ES
+	req := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), templateName)
+	r, _ := http.Get(req)
+	require.Equal(t, 200, r.StatusCode, "incorrect status code")
+	body, _ := ioutil.ReadAll(r.Body)
+	var m IndexTemplateResult
+	json.Unmarshal(body, &m)
+	require.Equal(t, len(m.IndexTemplates), 1)
 }
