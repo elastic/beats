@@ -150,8 +150,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.trace.Start()
 	defer bt.trace.Close()
 
-	// Adapt local pipeline to synchronized mode if run_once is enabled,
-	// Otherwise, pipeline is unchanged
+	// Adapt local pipeline to synchronized mode if run_once is enabled
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 	if bt.config.RunOnce {
@@ -229,7 +228,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if bt.config.PublishTimeout > 0 {
 		logp.Info("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
 		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
-			"shutdown: time out waiting for pipeline to publish events."))
+			"shutdown: timed out waiting for pipeline to publish events."))
 	}
 
 	return nil
