@@ -49,7 +49,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
 
 *Heartbeat*
 
-- Removed zip_url and local browser sources. {pull}35429[35429]
+- Removed support for `zip_url` and `local` browser sources. {pull}35429[35429]
 
 [[release-notes-8.8.1]]
 === Beats version 8.8.1
