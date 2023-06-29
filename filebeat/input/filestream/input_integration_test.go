@@ -29,6 +29,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/encoding"
@@ -1059,4 +1060,60 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func FuzzFilestreamID(f *testing.F) {
+	f.Add("foo")
+	f.Add("my-ID")
+	f.Add("id with a space")
+	f.Add("Hello, 世界")
+	f.Add("foo::bar::")
+	f.Add("::")
+	f.Add(" ")
+	f.Fuzz(func(t *testing.T, id string) {
+		// Execute some testing to avoid "invalid" strings
+		if id == "" {
+			return
+		}
+
+		// Skip if id is not a valid UTF-8 string
+		if !utf8.ValidString(id) {
+			return
+		}
+
+		// Skip if any rune is not valid or the null character
+		for _, r := range []rune(id) {
+			if r == 0 || !utf8.ValidRune(r) {
+				return
+			}
+		}
+
+		// Test starts here
+		env := newInputTestingEnvironment(t)
+		testlogName := "test.log"
+		inp := env.mustCreateInput(map[string]interface{}{
+			"id":    id,
+			"paths": []string{env.abspath(testlogName) + "*"},
+		})
+
+		testlines := []byte("first log line\n")
+		env.mustWriteToFile(testlogName, testlines)
+
+		ctx, cancelInput := context.WithCancel(context.Background())
+		env.startInput(ctx, inp)
+
+		// first event has made it successfully
+		env.waitUntilEventCount(1)
+		env.requireOffsetInRegistry(testlogName, id, len(testlines))
+
+		newerTestlines := []byte("new first log line\nnew second log line\n")
+		env.mustWriteToFile(testlogName, newerTestlines)
+
+		env.waitUntilEventCount(3)
+
+		cancelInput()
+		env.waitUntilInputStops()
+
+		env.requireOffsetInRegistry(testlogName, id, len(newerTestlines))
+	})
 }
