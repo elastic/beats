@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v7.17.10\...v7.17.11[View commits]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Update Go version to 1.19.10 {pull}35751[35751]
+- Update Go version to 1.19.10. {pull}35751[35751]
 
 *Auditbeat*
 
