@@ -75,7 +75,7 @@ func defaultProcessors(check bool) []mapstr.M {
 	//   - add_kubernetes_metadata: ~
 	valueNETINFO, status := os.LookupEnv("NETINFO")
 
-	if check == true || (valueNETINFO == "true" && status == true) {
+	if check == true || (valueNETINFO == "false" && status == true) {
 		return []mapstr.M{
 			{"add_host_metadata": mapstr.M{
 				"netinfo.enabled": "false",
