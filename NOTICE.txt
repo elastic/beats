@@ -45628,11 +45628,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/gomega
-Version: v1.10.1
+Version: v1.10.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.10.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.10.3/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
@@ -48014,11 +48014,11 @@ Contents of probable licence file $GOMODCACHE/github.com/urso/diag@v0.0.0-202002
 
 --------------------------------------------------------------------------------
 Dependency : github.com/vishvananda/netlink
-Version: v1.1.0
+Version: v1.1.1-0.20201029203352-d40f9887b852
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/vishvananda/netlink@v1.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/vishvananda/netlink@v1.1.1-0.20201029203352-d40f9887b852/LICENSE:
 
 
                                  Apache License
