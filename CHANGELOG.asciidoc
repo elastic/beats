@@ -30,7 +30,7 @@ https://github.com/elastic/beats/compare/v7.17.10\...v7.17.11[View commits]
 ==== Bugfixes
 
 *Affecting all Beats*
-- Support for multiline zookeeper logs {issue}2496[2496]
+- Added support for multi-line ZooKeeper logs. {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (for example, 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
 - Fix lockfile logic, retry locking {pull}34194[34194]
