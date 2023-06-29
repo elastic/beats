@@ -120,8 +120,6 @@ pipeline {
           when {
             allOf {
               expression { return env.IS_BRANCH_AVAILABLE == "true" }
-              // DRA is not supported in 7.17 yet
-              not { branch '7.17' }
             }
           }
           steps {
@@ -144,8 +142,6 @@ pipeline {
               // minor version is created, therefore old release branches won't be able
               // to use the release manager as their definition is removed.
               expression { return env.IS_BRANCH_AVAILABLE == "true" }
-              // DRA is not supported in 7.17 yet
-              not { branch '7.17' }
             }
           }
           steps {
@@ -268,7 +264,7 @@ def generateSteps() {
 
 def generateArmStep(beat) {
   return {
-    withNode(labels: 'arm') {
+    withNode(labels: 'ubuntu-2204-aarch64') {
       withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
