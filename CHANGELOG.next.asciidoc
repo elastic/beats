@@ -142,7 +142,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
 - Fix metric collection in GCPPubSub input. {pull}35773[35773]
 - Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
-- Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}1[1]
+- Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}35972[35972]
 
 *Heartbeat*
 
