@@ -23,7 +23,6 @@ import (
 	"time"
 
 	gojson "github.com/goccy/go-json"
-	// gojson "encoding/json"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
