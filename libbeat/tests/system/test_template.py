@@ -11,60 +11,6 @@ from idxmgmt import IdxMgmt
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
-class TestRunTemplate(BaseTest):
-    """
-    Test run cmd with focus on template setup
-    """
-
-    def setUp(self):
-        super(TestRunTemplate, self).setUp()
-        # auto-derived default settings, if nothing else is set
-        self.data_stream = self.beat_name + "-9.9.9"
-
-        self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es, self.data_stream)
-        self.idxmgmt.delete(data_streams=[self.data_stream])
-
-    def tearDown(self):
-        self.idxmgmt.delete(data_streams=[self.data_stream])
-
-    def render_config(self, **kwargs):
-        self.render_config_template(
-            elasticsearch=self.get_elasticsearch_template_config(),
-            **kwargs
-        )
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_template_default(self):
-        """
-        Test run cmd with default settings for template
-        """
-        self.render_config()
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains('Template with name \\\"mockbeat-9.9.9\\\" loaded.'))
-        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
-        proc.check_kill_and_wait()
-
-        self.idxmgmt.assert_index_template_loaded(self.data_stream)
-        self.idxmgmt.assert_docs_written_to_data_stream(self.data_stream)
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_template_disabled(self):
-        """
-        Test run cmd does not load template when disabled in config
-        """
-        self.render_config()
-        proc = self.start_beat(extra_args=["-E", "setup.template.enabled=false"])
-        self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
-        proc.check_kill_and_wait()
-
-        self.idxmgmt.assert_index_template_not_loaded(self.data_stream)
-
-
 class TestCommandSetupTemplate(BaseTest):
     """
     Test beat command `setup` with focus on template
