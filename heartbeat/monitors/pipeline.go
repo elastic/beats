@@ -44,7 +44,7 @@ type SyncPipelineWrapper struct {
 	wg sync.WaitGroup
 }
 
-// Used to wrap every client and track emmitted vs acked events.
+// Used to wrap every client and track emitted vs acked events.
 type wrappedClient struct {
 	wg     *sync.WaitGroup
 	client beat.Client
