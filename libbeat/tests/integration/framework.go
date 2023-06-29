@@ -228,15 +228,14 @@ func (b *BeatProc) LogContains(s string) string {
 
 // WaitForLogs waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
-// msgAndArgs should be a format string and arguments that will be printed
-// if the logs are not found, providing additional context for debugging.
-func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) string {
+func (b *BeatProc) WaitForLogs(s string, timeout time.Duration) string {
 	b.t.Helper()
+	errMsg := fmt.Sprintf("Error waiting for log %s", s)
 	var returnValue string
 	require.Eventually(b.t, func() bool {
 		returnValue = b.LogContains(s)
 		return returnValue != ""
-	}, timeout, 100*time.Millisecond, msgAndArgs...)
+	}, timeout, 100*time.Millisecond, errMsg)
 
 	return returnValue
 }

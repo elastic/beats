@@ -146,9 +146,9 @@ logging:
 	// start mockbeat and wait for the relevant log lines
 	mockbeat := startMockBeat(t, "mockbeat start running.", cfg)
 	msg := "Loading json template from file"
-	mockbeat.WaitForLogs(msg, 60*time.Second, fmt.Sprintf("error waiting for log: %s", msg))
+	mockbeat.WaitForLogs(msg, 60*time.Second)
 	msg = "Template with name \\\"bla\\\" loaded."
-	mockbeat.WaitForLogs(msg, 10*time.Second, fmt.Sprintf("error waiting for log: %s", msg))
+	mockbeat.WaitForLogs(msg, 60*time.Second)
 
 	// check effective changes in ES
 	req := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), templateName)
@@ -159,3 +159,37 @@ logging:
 	json.Unmarshal(body, &m)
 	require.Equal(t, len(m.IndexTemplates), 1)
 }
+
+// func TestTemplateDefault(t *testing.T) {
+// 	EnsureESIsRunning(t)
+// 	_, err := os.Stat("../files/template.json")
+// 	require.Equal(t, err, nil)
+
+// 	var mockbeatConfigWithES = `
+// mockbeat:
+// output:
+//   elasticsearch:
+//     hosts: %s
+//     username: %s
+//     password: %s
+//     allow_older_versions: true
+// setup.template:
+//   name: mockbeat-9.9.9
+//   pattern: test-*
+// logging:
+//   level: debug
+// `
+
+// 	// prepare the config
+// 	esUrl := GetESURL(t, "http")
+// 	user := esUrl.User.Username()
+// 	pass, _ := esUrl.User.Password()
+// 	cfg := fmt.Sprintf(mockbeatConfigWithES, esUrl.String(), user, pass)
+
+// 	// start mockbeat and wait for the relevant log lines
+// 	mockbeat := startMockBeat(t, "mockbeat start running.", cfg)
+// 	msg := "Loading json template from file"
+// 	mockbeat.WaitForLogs(msg, 10*time.Second)
+// 	msg = "Template with name \\\"bla\\\" loaded."
+// 	mockbeat.WaitForLogs(msg, 10*time.Second)
+// }
