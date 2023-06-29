@@ -3,10 +3,8 @@
 package integration
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,19 +12,7 @@ import (
 	"time"
 )
 
-type IndexTemplateResult struct {
-	IndexTemplates []IndexTemplateEntry `json:"index_templates"`
-}
-
-type IndexTemplateEntry struct {
-	Name          string        `json:"name"`
-	IndexTemplate IndexTemplate `json:"index_template"`
-}
-
-type IndexTemplate struct {
-	IndexPatterns []string `json:"index_patterns"`
-}
-
+// Test that beat stops in case elasticsearch index is modified and pattern not
 func TestIndexModified(t *testing.T) {
 	var mockbeatConfigWithIndex = `
 mockbeat:
@@ -43,6 +29,7 @@ output:
 	mockbeat.WaitStdErrContains("setup.template.name and setup.template.pattern have to be set if index name is modified", 60*time.Second)
 }
 
+// Test that beat starts running if elasticsearch output is set
 func TestIndexNotModified(t *testing.T) {
 	EnsureESIsRunning(t)
 	var mockbeatConfigWithES = `
@@ -56,6 +43,7 @@ output:
 	startMockBeat(t, "mockbeat start running.", cfg)
 }
 
+// Test that beat stops in case elasticsearch index is modified and pattern not
 func TestIndexModifiedNoPattern(t *testing.T) {
 	var cfg = `
 mockbeat:
@@ -74,6 +62,7 @@ setup.template:
 	mockbeat.WaitStdErrContains("setup.template.name and setup.template.pattern have to be set if index name is modified", 60*time.Second)
 }
 
+// Test that beat stops in case elasticsearch index is modified and name not
 func TestIndexModifiedNoName(t *testing.T) {
 	var cfg = `
 mockbeat:
@@ -92,6 +81,7 @@ setup.template:
 	mockbeat.WaitStdErrContains("setup.template.name and setup.template.pattern have to be set if index name is modified", 60*time.Second)
 }
 
+// Test that beat starts running if elasticsearch output with modified index and pattern and name are set
 func TestIndexWithPatternName(t *testing.T) {
 	EnsureESIsRunning(t)
 	var mockbeatConfigWithES = `
@@ -109,6 +99,7 @@ setup.template:
 	startMockBeat(t, "mockbeat start running.", cfg)
 }
 
+// Test loading of json based template
 func TestJsonTemplate(t *testing.T) {
 	EnsureESIsRunning(t)
 	_, err := os.Stat("../files/template.json")
@@ -151,45 +142,83 @@ logging:
 	mockbeat.WaitForLogs(msg, 60*time.Second)
 
 	// check effective changes in ES
-	req := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), templateName)
-	r, _ := http.Get(req)
-	require.Equal(t, 200, r.StatusCode, "incorrect status code")
-	body, _ := ioutil.ReadAll(r.Body)
-	var m IndexTemplateResult
-	json.Unmarshal(body, &m)
+	m := ESGetIndexTemplate(t, esUrl, templateName)
 	require.Equal(t, len(m.IndexTemplates), 1)
 }
 
-// func TestTemplateDefault(t *testing.T) {
-// 	EnsureESIsRunning(t)
-// 	_, err := os.Stat("../files/template.json")
-// 	require.Equal(t, err, nil)
+// Test run cmd with default settings for template
+func TestTemplateDefault(t *testing.T) {
+	EnsureESIsRunning(t)
 
-// 	var mockbeatConfigWithES = `
-// mockbeat:
-// output:
-//   elasticsearch:
-//     hosts: %s
-//     username: %s
-//     password: %s
-//     allow_older_versions: true
-// setup.template:
-//   name: mockbeat-9.9.9
-//   pattern: test-*
-// logging:
-//   level: debug
-// `
+	var mockbeatConfigWithES = `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+logging:
+  level: debug
+`
+	datastream := "mockbeat-9.9.9"
 
-// 	// prepare the config
-// 	esUrl := GetESURL(t, "http")
-// 	user := esUrl.User.Username()
-// 	pass, _ := esUrl.User.Password()
-// 	cfg := fmt.Sprintf(mockbeatConfigWithES, esUrl.String(), user, pass)
+	// prepare the config
+	esUrl := GetESURL(t, "http")
+	user := esUrl.User.Username()
+	pass, _ := esUrl.User.Password()
+	cfg := fmt.Sprintf(mockbeatConfigWithES, esUrl.String(), user, pass)
 
-// 	// start mockbeat and wait for the relevant log lines
-// 	mockbeat := startMockBeat(t, "mockbeat start running.", cfg)
-// 	msg := "Loading json template from file"
-// 	mockbeat.WaitForLogs(msg, 10*time.Second)
-// 	msg = "Template with name \\\"bla\\\" loaded."
-// 	mockbeat.WaitForLogs(msg, 10*time.Second)
-// }
+	// Delete the existing index template
+	ESDeleteIndexTemplate(t, esUrl, datastream)
+
+	// start mockbeat and wait for the relevant log lines
+	mockbeat := startMockBeat(t, "mockbeat start running.", cfg)
+	mockbeat.WaitForLogs("Template with name \\\"mockbeat-9.9.9\\\" loaded.", 20*time.Second)
+	mockbeat.WaitForLogs("PublishEvents: 1 events have been published", 20*time.Second)
+
+	m := ESGetIndexTemplate(t, esUrl, datastream)
+	require.Equal(t, len(m.IndexTemplates), 1)
+	require.Equal(t, datastream, m.IndexTemplates[0].Name)
+
+	ESPostRefresh(t, esUrl)
+	docs := ESGetDocumentsFromDataStream(t, esUrl, datastream)
+	require.True(t, docs.Hits.Total.Value > 0)
+}
+
+// Test run cmd does not load template when disabled in config
+func TestTemplateDisabled(t *testing.T) {
+	EnsureESIsRunning(t)
+
+	var mockbeatConfigWithES = `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+setup.template:
+  enabled: false
+logging:
+  level: debug
+`
+	datastream := "mockbeat-9.9.9"
+
+	// prepare the config
+	esUrl := GetESURL(t, "http")
+	user := esUrl.User.Username()
+	pass, _ := esUrl.User.Password()
+	cfg := fmt.Sprintf(mockbeatConfigWithES, esUrl.String(), user, pass)
+
+	// Delete the existing index template
+	ESDeleteIndexTemplate(t, esUrl, datastream)
+
+	// start mockbeat and wait for the relevant log lines
+	mockbeat := startMockBeat(t, "mockbeat start running.", cfg)
+	mockbeat.WaitForLogs("PublishEvents: 1 events have been published", 20*time.Second)
+
+	u := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), datastream)
+	r, _ := http.Get(u)
+	require.Equal(t, 404, r.StatusCode, "incorrect status code")
+}
