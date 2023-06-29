@@ -21,7 +21,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
 - [Filebeat GCS input] Fixed an issue where `bucket_timeout` was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
 - Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
-- Fix input reload on autodiscover {issue}34388[34388] {pull}35645[35645]
+- Fix input reload on autodiscover. {issue}34388[34388] {pull}35645[35645]
 
 *Heartbeat*
 
