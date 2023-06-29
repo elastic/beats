@@ -7,8 +7,7 @@ package tablespace
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"fmt"
 )
 
 type usedAndFreeSpace struct {
@@ -28,7 +27,7 @@ func (d *usedAndFreeSpace) eventKey() string {
 func (e *tablespaceExtractor) usedAndFreeSpaceData(ctx context.Context) ([]usedAndFreeSpace, error) {
 	rows, err := e.db.QueryContext(ctx, "SELECT b.tablespace_name, tbs_size used, a.free_space free FROM (SELECT tablespace_name, sum(bytes) AS free_space FROM dba_free_space GROUP BY tablespace_name) a, (SELECT tablespace_name, sum(bytes) AS tbs_size FROM dba_data_files GROUP BY tablespace_name) b WHERE a.tablespace_name(+)=b.tablespace_name")
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]usedAndFreeSpace, 0)

@@ -19,11 +19,10 @@ package stats
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"net/url"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -54,18 +53,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	network, address, err := getNetworkAndAddress(m.HostData())
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	conn, err := net.DialTimeout(network, address, m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte("stats\n"))
 	if err != nil {
-		return errors.Wrap(err, "error in connection")
+		return fmt.Errorf("error in connection: %w", err)
 	}
 
 	scanner := bufio.NewScanner(conn)
@@ -95,7 +94,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 func getNetworkAndAddress(hostData mb.HostData) (network string, address string, err error) {
 	u, err := url.Parse(hostData.URI)
 	if err != nil {
-		err = errors.Wrap(err, "invalid URL")
+		err = fmt.Errorf("invalid URL: %w", err)
 		return
 	}
 
