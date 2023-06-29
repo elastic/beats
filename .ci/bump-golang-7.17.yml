@@ -1,6 +1,6 @@
 ---
-name: Bump golang-version to latest version
-pipelineid: 'bump-golang-version'
+name: Bump golang-version to latest version in 7.17
+pipelineid: "bump-golang-version-7.17"
 
 scms:
   githubConfig:
@@ -12,14 +12,14 @@ scms:
       repository: beats
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
-      branch: main
+      branch: 7.17
 
 actions:
   beats:
     kind: github/pullrequest
     scmid: githubConfig
     sourceid: latestGoVersion
-    title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
+    title: '[Automation][7.17] Bump Golang version to {{ source "latestGoVersion" }}'
     spec:
       automerge: false
       labels:
@@ -118,19 +118,20 @@ targets:
     kind: file
     spec:
       content: 'FROM golang:{{ source "latestGoVersion" }}'
+      # This list differs from the main branch, this is the main reason we have a separate job
       files:
-        - ./auditbeat/Dockerfile
-        - ./heartbeat/Dockerfile
         - ./metricbeat/Dockerfile
-        - ./packetbeat/Dockerfile
-        - ./x-pack/functionbeat/Dockerfile
+        - ./metricbeat/module/vsphere/_meta/Dockerfile
         - ./metricbeat/module/nats/_meta/Dockerfile
         - ./metricbeat/module/http/_meta/Dockerfile
-        - ./metricbeat/module/vsphere/_meta/Dockerfile
-        - ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
-        - ./dev-tools/kubernetes/filebeat/Dockerfile.debug
-        - ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
+        - ./filebeat/Dockerfile
+        - ./auditbeat/Dockerfile
+        - ./heartbeat/Dockerfile
+        - ./packetbeat/Dockerfile
+        - ./libbeat/Dockerfile
         - ./x-pack/metricbeat/module/stan/_meta/Dockerfile
+        - ./x-pack/functionbeat/Dockerfile
+        - ./x-pack/libbeat/Dockerfile
       matchpattern: 'FROM golang:\d+.\d+.\d+'
   update-gomod:
     name: "Update go.mod"
