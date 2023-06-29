@@ -455,3 +455,24 @@ func GetESURL(t *testing.T, scheme string) url.URL {
 	}
 	return esURL
 }
+
+func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
+	t.Helper()
+
+	kibanaHost := os.Getenv("KIBANA_HOST")
+	if kibanaHost == "" {
+		kibanaHost = "localhost"
+	}
+
+	kibanaPort := os.Getenv("KIBANA_PORT")
+	if kibanaPort == "" {
+		kibanaPort = "5601"
+	}
+
+	kibanaURL := url.URL{
+		Scheme: "http",
+		Host:   fmt.Sprintf("%s:%s", kibanaHost, kibanaPort),
+	}
+	kibanaUser := url.UserPassword("beats", "testing")
+	return kibanaURL, kibanaUser
+}
