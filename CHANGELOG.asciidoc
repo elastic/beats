@@ -29,7 +29,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
 
 *Metricbeat*
 
-- Fix EC2 host.cpu.usage {pull}35717[35717]
+- Fix calculation of the `host.cpu.usage` metric for EC2. {pull}35717[35717]
 
 ==== Added
 
