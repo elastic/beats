@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
@@ -22,6 +21,6 @@ func startMockBeat(t *testing.T, msg string, cfg string, args ...string) BeatPro
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", args...)
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs(msg, 60*time.Second, fmt.Sprintf("error waiting for log: %s", msg))
+	mockbeat.WaitForLogs(msg, 60*time.Second)
 	return mockbeat
 }
