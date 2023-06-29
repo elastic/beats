@@ -1,6 +1,6 @@
 ARG HAPROXY_VERSION
 FROM haproxy:${HAPROXY_VERSION}
-RUN apt-get update && apt-get install -y netcat
+RUN apt-get update && apt-get install -y netcat-openbsd
 
 HEALTHCHECK --interval=1s --retries=90 CMD nc -z localhost 14567 && nc -z localhost 14570
 

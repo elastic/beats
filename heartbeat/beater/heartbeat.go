@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -39,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -66,26 +68,40 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
-	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
-	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
-		// Connect to ES and setup the State loader if the output is not managed by agent
-		if err := makeStatesClient(b.Config.Output.Config(), replaceStateLoader, parsedConfig.RunFrom); err != nil {
-			logp.L().Warnf("could not connect to ES for state management during initial load: %s", err)
-		}
-	} else if b.Manager.Enabled() {
-		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
-	}
-
+	// The sock tracer should be setup before any other code to ensure its reliability
+	// The ES Loader, for instance, can exit early
 	var trace tracer.Tracer = tracer.NewNoopTracer()
 	stConfig := parsedConfig.SocketTrace
 	if stConfig != nil {
 		// Note this, intentionally, blocks until connected to the trace endpoint
 		var err error
-		logp.L().Info("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
-		trace, err = tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
-		if err != nil {
-			logp.L().Fatal("could not connect to socket trace at path %s after %s timeout: %s", stConfig.Path, stConfig.Wait, err)
+		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
+		sockTrace, err := tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
+		if err == nil {
+			trace = sockTrace
+		} else {
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
 		}
+	}
+
+	// Check if any of these can prevent using states client
+	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
+	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
+		// Connect to ES and setup the State loader if the output is not managed by agent
+		// Note this, intentionally, blocks until connected or max attempts reached
+		esClient, err := makeESClient(b.Config.Output.Config(), 3, 2*time.Second)
+		if err != nil {
+			if parsedConfig.RunOnce {
+				trace.Abort()
+				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
+			} else {
+				logp.L().Warnf("skipping monitor state management: %w", err)
+			}
+		} else {
+			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom))
+		}
+	} else if b.Manager.Enabled() {
+		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
 	}
 
 	limit := parsedConfig.Scheduler.Limit
@@ -131,21 +147,18 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}),
 		trace: trace,
 	}
+	runFromID := "<unknown location>"
+	if parsedConfig.RunFrom != nil {
+		runFromID = parsedConfig.RunFrom.ID
+	}
+	logp.L().Infof("heartbeat starting, running from: %v", runFromID)
 	return bt, nil
 }
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
-	err := bt.trace.Write("start\n")
-	if err != nil {
-		logp.L().Errorf("could not start trace: %s", err)
-	}
-	defer func() {
-		err := bt.trace.Close()
-		if err != nil {
-			logp.L().Errorf("could not close trace: %s", err)
-		}
-	}()
+	bt.trace.Start()
+	defer bt.trace.Close()
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
@@ -200,7 +213,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	<-bt.done
 
-	err = bt.trace.Write("stop")
 	if err != nil {
 		logp.L().Errorf("could not write trace stop event: %s", err)
 	}
@@ -248,8 +260,12 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 			return nil
 		}
 
-		if err := makeStatesClient(outCfg.Config(), bt.replaceStateLoader, bt.config.RunFrom); err != nil {
-			logp.L().Warnf("could not connect to ES for state management during managed reload: %s", err)
+		// Backoff panics with 0 duration, set to smallest unit
+		esClient, err := makeESClient(outCfg.Config(), 1, 1*time.Nanosecond)
+		if err != nil {
+			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
+		} else {
+			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}
 
 		return nil
@@ -263,7 +279,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.monitorFactory); err != nil {
-		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
+		logp.L().Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor
@@ -293,16 +309,28 @@ func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
-func makeStatesClient(cfg *conf.C, replace func(monitorstate.StateLoader), runFrom *config.LocationWithID) error {
-	esClient, err := eslegclient.NewConnectedClient(cfg, "Heartbeat")
-	if err != nil {
-		return err
+func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
+	var (
+		esClient *eslegclient.Connection
+		err      error
+	)
+
+	// ES client backoff
+	connectDelay := backoff.NewEqualJitterBackoff(
+		context.Background().Done(),
+		wait,
+		wait,
+	)
+
+	for i := 0; i < attempts; i++ {
+		esClient, err = eslegclient.NewConnectedClient(cfg, "Heartbeat")
+		if err == nil {
+			connectDelay.Reset()
+			return esClient, nil
+		} else {
+			connectDelay.Wait()
+		}
 	}
 
-	if esClient != nil {
-		logp.L().Info("replacing states loader")
-		replace(monitorstate.MakeESLoader(esClient, "synthetics-*,heartbeat-*", runFrom))
-	}
-
-	return nil
+	return nil, fmt.Errorf("could not establish states loader connection after %d attempts, with %s delay", attempts, wait)
 }

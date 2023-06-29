@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -58,10 +57,6 @@ type Settings struct {
 	// in faster than it can be written to disk for an extended period,
 	// this limit can keep it from overflowing memory.
 	WriteAheadLimit int
-
-	// A listener that should be sent ACKs when an event is successfully
-	// written to disk.
-	WriteToDiskListener queue.ACKListener
 
 	// RetryInterval specifies how long to wait before retrying a fatal error
 	// writing to disk. If MaxRetryInterval is nonzero, subsequent retries will
@@ -171,7 +166,7 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 		settings.RetryInterval = *userConfig.RetryInterval
 	}
 	if userConfig.MaxRetryInterval != nil {
-		settings.MaxRetryInterval = *userConfig.RetryInterval
+		settings.MaxRetryInterval = *userConfig.MaxRetryInterval
 	}
 
 	return settings, nil

@@ -6,11 +6,10 @@ package netflow
 
 import (
 	"bytes"
+	"fmt"
 	"net"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -108,7 +107,7 @@ func NewInput(
 	for _, yamlPath := range config.CustomDefinitions {
 		f, err := LoadFieldDefinitionsFromFile(yamlPath)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed parsing custom field definitions from file '%s'", yamlPath)
+			return nil, fmt.Errorf("failed parsing custom field definitions from file '%s': %w", yamlPath, err)
 		}
 		customFields = append(customFields, f)
 	}
@@ -117,9 +116,10 @@ func NewInput(
 		WithExpiration(config.ExpirationTimeout).
 		WithLogOutput(&logDebugWrapper{Logger: logger}).
 		WithCustomFields(customFields...).
-		WithSequenceResetEnabled(config.DetectSequenceReset))
+		WithSequenceResetEnabled(config.DetectSequenceReset).
+		WithSharedTemplates(config.ShareTemplates))
 	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing netflow decoder")
+		return nil, fmt.Errorf("error initializing netflow decoder: %w", err)
 	}
 
 	input := &netflowInput{

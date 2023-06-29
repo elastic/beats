@@ -143,9 +143,8 @@ sudo apt-get install python3-venv
 Beats is built using the `make release` target. By default, make will select from a limited number of preset build targets:
 
 - darwin/amd64
-- linux/386
+- darwin/arm64
 - linux/amd64
-- windows/386
 - windows/amd64
 
 You can change build targets using the `PLATFORMS` environment variable. Targets set with the `PLATFORMS` variable can either be a GOOS value, or a GOOS/arch pair.
@@ -193,17 +192,20 @@ Running the testsuite has the following requirements:
 * Docker >= {docker}
 * Docker-compose >= {docker-compose}
 
-For more details check the <<testing>> guide.
-
+For more details, refer to the <<testing>> guide.
 
 [float]
 [[documentation]]
 === Documentation
 
-The documentation for each Beat is located under `{beatname}/docs` and is based
-on asciidoc. After changing the docs, you should verify that the docs are still
-building to avoid breaking the automated docs build. To learn more about
-contributing docs, see the https://github.com/elastic/docs/blob/master/README.asciidoc[Docs HOWTO].
+The main documentation for each Beat is located under `<beatname>/docs` and is
+based on https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc]. The Beats
+documentation also makes extensive use of conditionals and content reuse to
+ensure consistency and accuracy. Before contributing to the documentation, read
+the following resources:
+
+* https://github.com/elastic/docs/blob/master/README.asciidoc[Docs HOWTO]
+* <<contributing-docs>>
 
 [float]
 [[dependencies]]
@@ -238,3 +240,4 @@ The following packages are required to run `go generate`:
 To keep up to date with changes to the official Beats for community developers,
 follow the developer changelog
 https://github.com/elastic/beats/blob/main/CHANGELOG-developer.next.asciidoc[here].
+

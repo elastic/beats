@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -75,7 +74,7 @@ type RunnerFactory interface {
 	// Create creates a new Runner based on the given configuration.
 	Create(p beat.PipelineConnector, config *config.C) (Runner, error)
 
-	// CheckConfig tests if a confiugation can be used to create an input. If it
+	// CheckConfig tests if a configuration can be used to create an input. If it
 	// is not possible to create an input using the configuration, an error must
 	// be returned.
 	CheckConfig(config *config.C) error
@@ -106,17 +105,17 @@ type Reloader struct {
 
 // NewReloader creates new Reloader instance for the given config
 func NewReloader(pipeline beat.PipelineConnector, cfg *config.C) *Reloader {
-	config := DefaultDynamicConfig
-	cfg.Unpack(&config)
+	conf := DefaultDynamicConfig
+	_ = cfg.Unpack(&conf)
 
-	path := config.Path
+	path := conf.Path
 	if !filepath.IsAbs(path) {
 		path = paths.Resolve(paths.Config, path)
 	}
 
 	return &Reloader{
 		pipeline: pipeline,
-		config:   config,
+		config:   conf,
 		path:     path,
 		done:     make(chan struct{}),
 	}
@@ -134,13 +133,13 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 
 	files, _, err := gw.Scan()
 	if err != nil {
-		return errors.Wrap(err, "fetching config files")
+		return fmt.Errorf("fetching config files: %w", err)
 	}
 
 	// Load all config objects
 	configs, err := rl.loadConfigs(files)
 	if err != nil {
-		return errors.Wrap(err, "loading configs")
+		return fmt.Errorf("loading configs: %w", err)
 	}
 
 	debugf("Number of module configs found: %v", len(configs))
@@ -222,11 +221,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
 		if !rl.config.Reload.Enabled {
 			logp.Info("Loading of config files completed.")
-			select {
-			case <-rl.done:
-				logp.Info("Dynamic config reloader stopped")
-				return
-			}
+			<-rl.done
+			logp.Info("Dynamic config reloader stopped")
+			return
 		}
 	}
 }

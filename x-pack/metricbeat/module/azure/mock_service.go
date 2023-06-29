@@ -5,8 +5,8 @@
 package azure
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -18,33 +18,33 @@ type MockService struct {
 }
 
 // GetResourceDefinitionById is a mock function for the azure service
-func (client *MockService) GetResourceDefinitionById(id string) (resources.GenericResource, error) {
+func (client *MockService) GetResourceDefinitionById(id string) (armresources.GenericResource, error) {
 	args := client.Called(id)
-	return args.Get(0).(resources.GenericResource), args.Error(1)
+	return args.Get(0).(armresources.GenericResource), args.Error(1)
 }
 
 // GetResourceDefinitions is a mock function for the azure service
-func (client *MockService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]resources.GenericResourceExpanded, error) {
+func (client *MockService) GetResourceDefinitions(id []string, group []string, rType string, query string) ([]*armresources.GenericResourceExpanded, error) {
 	args := client.Called(id, group, rType, query)
-	return args.Get(0).([]resources.GenericResourceExpanded), args.Error(1)
+	return args.Get(0).([]*armresources.GenericResourceExpanded), args.Error(1)
 }
 
 // GetMetricDefinitions is a mock function for the azure service
-func (client *MockService) GetMetricDefinitions(resourceId string, namespace string) (insights.MetricDefinitionCollection, error) {
+func (client *MockService) GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
 	args := client.Called(resourceId, namespace)
-	return args.Get(0).(insights.MetricDefinitionCollection), args.Error(1)
+	return args.Get(0).(armmonitor.MetricDefinitionCollection), args.Error(1)
 }
 
 // GetMetricNamespaces is a mock function for the azure service
-func (client *MockService) GetMetricNamespaces(resourceId string) (insights.MetricNamespaceCollection, error) {
+func (client *MockService) GetMetricNamespaces(resourceId string) (armmonitor.MetricNamespaceCollection, error) {
 	args := client.Called(resourceId)
-	return args.Get(0).(insights.MetricNamespaceCollection), args.Error(1)
+	return args.Get(0).(armmonitor.MetricNamespaceCollection), args.Error(1)
 }
 
 // GetMetricValues is a mock function for the azure service
-func (client *MockService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]insights.Metric, string, error) {
+func (client *MockService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]armmonitor.Metric, string, error) {
 	args := client.Called(resourceId, namespace)
-	return args.Get(0).([]insights.Metric), args.String(1), args.Error(2)
+	return args.Get(0).([]armmonitor.Metric), args.String(1), args.Error(2)
 }
 
 // MockReporterV2 mock implementation for testing purposes

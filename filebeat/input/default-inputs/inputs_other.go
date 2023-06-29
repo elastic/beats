@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows && !linux
-// +build !windows,!linux
 
 package inputs
 

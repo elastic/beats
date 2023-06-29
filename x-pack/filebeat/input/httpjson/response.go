@@ -8,6 +8,9 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"time"
+
+	"github.com/elastic/mito/lib/xml"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -22,10 +25,11 @@ func registerResponseTransforms() {
 }
 
 type response struct {
-	page   int64
-	url    url.URL
-	header http.Header
-	body   interface{}
+	page       int64
+	url        url.URL
+	header     http.Header
+	xmlDetails map[string]xml.Detail
+	body       interface{}
 }
 
 func (resp *response) clone() *response {
@@ -50,18 +54,22 @@ func (resp *response) clone() *response {
 }
 
 type responseProcessor struct {
+	metrics    *inputMetrics
 	log        *logp.Logger
 	transforms []basicTransform
 	split      *split
 	pagination *pagination
+	xmlDetails map[string]xml.Detail
 }
 
-func newResponseProcessor(config config, pagination *pagination, log *logp.Logger) []*responseProcessor {
+func newResponseProcessor(config config, pagination *pagination, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) []*responseProcessor {
 	rps := make([]*responseProcessor, 0, len(config.Chain)+1)
 
 	rp := &responseProcessor{
 		pagination: pagination,
+		xmlDetails: xmlDetails,
 		log:        log,
+		metrics:    metrics,
 	}
 	if config.Response == nil {
 		rps = append(rps, rp)
@@ -78,7 +86,9 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 	for _, ch := range config.Chain {
 		rp := &responseProcessor{
 			pagination: pagination,
+			xmlDetails: xmlDetails,
 			log:        log,
+			metrics:    metrics,
 		}
 		// chain calls responseProcessor object
 		if ch.Step != nil && ch.Step.Response != nil {
@@ -95,12 +105,14 @@ func newResponseProcessor(config config, pagination *pagination, log *logp.Logge
 	return rps
 }
 
-func newChainResponseProcessor(config chainConfig, httpClient *httpClient, log *logp.Logger) *responseProcessor {
+func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) *responseProcessor {
 	pagination := &pagination{httpClient: httpClient, log: log}
 
 	rp := &responseProcessor{
 		pagination: pagination,
+		xmlDetails: xmlDetails,
 		log:        log,
+		metrics:    metrics,
 	}
 	if config.Step != nil {
 		if config.Step.Response == nil {
@@ -135,10 +147,12 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 	ch := make(chan maybeMsg)
 	go func() {
 		defer close(ch)
+		var npages int64
 
 		for i, httpResp := range resps {
-			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp, rp.xmlDetails)
 			for {
+				pageStartTime := time.Now()
 				page, hasNext, err := iter.next()
 				if err != nil {
 					ch <- maybeMsg{err: err}
@@ -160,6 +174,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 
 				// last_response context object is updated here organically
 				trCtx.updateLastResponse(*page)
+				npages = page.page
 
 				rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
 
@@ -193,11 +208,15 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 						}
 					}
 				}
+
+				rp.metrics.updatePageExecutionTime(pageStartTime)
+
 				if !paginate {
 					break
 				}
 			}
 		}
+		rp.metrics.updatePagesPerInterval(npages)
 	}()
 
 	return ch

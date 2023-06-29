@@ -97,7 +97,7 @@ func TestNamespaceError(t *testing.T) {
 		},
 		{
 			"filter init fail",
-			func(_ *config.C) (Processor, error) {
+			func(_ *config.C) (beat.Processor, error) {
 				return nil, errors.New("test")
 			},
 			map[string]interface{}{
@@ -121,7 +121,7 @@ func TestNamespaceError(t *testing.T) {
 	}
 }
 
-func newTestFilterRule(_ *config.C) (Processor, error) {
+func newTestFilterRule(_ *config.C) (beat.Processor, error) {
 	return &testFilterRule{}, nil
 }
 

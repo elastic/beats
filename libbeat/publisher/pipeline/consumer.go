@@ -53,14 +53,12 @@ type eventConsumer struct {
 	// This waitgroup is released when this eventConsumer's worker
 	// goroutines return.
 	wg sync.WaitGroup
-
-	// The queue the eventConsumer will retrieve batches from.
-	queue queue.Queue
 }
 
-// consumerTarget specifies the output channel and parameters needed for
-// eventConsumer to generate a batch.
+// consumerTarget specifies the queue to read from, the parameters needed
+// to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
+	queue      queue.Queue
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
@@ -75,13 +73,11 @@ type retryRequest struct {
 
 func newEventConsumer(
 	log *logp.Logger,
-	queue queue.Queue,
 	observer outputObserver,
 ) *eventConsumer {
 	c := &eventConsumer{
 		logger:      log,
 		observer:    observer,
-		queue:       queue,
 		queueReader: makeQueueReader(),
 
 		targetChan: make(chan consumerTarget),
@@ -133,10 +129,10 @@ outerLoop:
 		// If possible, start reading the next batch in the background.
 		// We require a non-nil target channel so we don't queue up a large
 		// batch before we know the real requested size for our output.
-		if queueBatch == nil && !pendingRead && target.ch != nil {
+		if queueBatch == nil && !pendingRead && target.queue != nil && target.ch != nil {
 			pendingRead = true
 			c.queueReader.req <- queueReaderRequest{
-				queue:      c.queue,
+				queue:      target.queue,
 				retryer:    c,
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,

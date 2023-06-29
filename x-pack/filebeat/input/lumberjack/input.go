@@ -62,8 +62,8 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   inputCtx.Cancelation,
-		ACKHandler: newEventACKHandler(),
+		CloseRef:      inputCtx.Cancelation,
+		EventListener: newEventACKHandler(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)

@@ -16,16 +16,15 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package users
 
 import (
+	"fmt"
 	"net"
 	"strconv"
 
-	"github.com/godbus/dbus"
-	"github.com/pkg/errors"
+	"github.com/godbus/dbus/v5"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -57,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	conn, err := initDbusConnection()
 	if err != nil {
-		return nil, errors.Wrap(err, "error connecting to dbus")
+		return nil, fmt.Errorf("error connecting to dbus: %w", err)
 	}
 
 	return &MetricSet{
@@ -73,11 +72,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	sessions, err := listSessions(m.conn)
 	if err != nil {
-		return errors.Wrap(err, "error listing sessions")
+		return fmt.Errorf("error listing sessions: %w", err)
 	}
 
-	eventMapping(m.conn, sessions, report)
-
+	err = eventMapping(m.conn, sessions, report)
+	if err != nil {
+		return fmt.Errorf("error formatting event: %w", err)
+	}
 	return nil
 }
 
@@ -88,7 +89,7 @@ func eventMapping(conn *dbus.Conn, sessions []loginSession, report mb.ReporterV2
 
 		props, err := getSessionProps(conn, session.Path)
 		if err != nil {
-			return errors.Wrap(err, "error getting properties")
+			return fmt.Errorf("error getting properties: %w", err)
 		}
 
 		event := mapstr.M{

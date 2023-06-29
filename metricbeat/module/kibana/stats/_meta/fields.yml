@@ -98,6 +98,23 @@
         type: scaled_float
         description: >
           Event loop delay in milliseconds
+      - name: event_loop_utilization
+        type: group
+        description: >
+          The ratio of time the event loop is not idling in the event provider to the total time the event loop is running.
+        fields:
+        - name: active
+          type: scaled_float
+          description: >
+            Duration of time event loop has been active since last measurement.
+        - name: idle
+          type: scaled_float
+          description: >
+            Duration of time event loop has been idle since last measurement.
+        - name: utilization
+          type: scaled_float
+          description: >
+            Computed utilization value representing ratio of active to idle time since last measurement.
       - name: memory.heap
         type: group
         description: >

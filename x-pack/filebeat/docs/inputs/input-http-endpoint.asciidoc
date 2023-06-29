@@ -131,6 +131,20 @@ Authentication or checking that a specific header includes a specific value
   secret.value: secretheadertoken
 ----
 
+Validate webhook endpoint for a specific provider using CRC
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  secret.header: someheadername
+  secret.value: secretheadertoken
+  crc.provider: webhookProvider
+  crc.secret: secretToken
+----
+
 Validate a HMAC signature from a specific header
 ["source","yaml",subs="attributes"]
 ----
@@ -255,6 +269,15 @@ For example, `["content-type"]` will become `["Content-Type"]` when the filebeat
 
 This option copies the raw unmodified body of the incoming request to the event.original field as a string before sending the event to Elasticsearch.
 
+[float]
+==== `crc.provider`
+
+This option defines the provider of the webhook that uses CRC (Challenge-Response Check) for validating the endpoint. The HTTP endpoint input is responsible for ensuring the authenticity of incoming webhook requests by generating and verifying a unique token. By specifying the `crc.provider`, you ensure that the system correctly handles the specific CRC validation process required by the chosen provider.
+
+[float]
+==== `crc.secret`
+
+The secret token provided by the webhook owner for the CRC validation. It is required when a `crc.provider` is set.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

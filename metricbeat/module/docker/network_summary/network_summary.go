@@ -16,16 +16,15 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package network_summary
 
 import (
 	"context"
+	"fmt"
 	"runtime"
 
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -87,7 +86,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 
 	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "failed to get docker stats")
+		return fmt.Errorf("failed to get docker stats: %w", err)
 	}
 
 	for _, myStats := range stats {
@@ -97,19 +96,19 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 
 		inspect, err := m.dockerClient.ContainerInspect(ctx, myStats.Container.ID)
 		if err != nil {
-			return errors.Wrapf(err, "error fetching stats for container %s", myStats.Container.ID)
+			return fmt.Errorf("error fetching stats for container %s: %w", myStats.Container.ID, err)
 		}
 
 		rootPID := inspect.ContainerJSONBase.State.Pid
 
 		netNS, err := fetchNamespace(rootPID)
 		if err != nil {
-			return errors.Wrapf(err, "error fetching namespace for PID %d", rootPID)
+			return fmt.Errorf("error fetching namespace for PID %d: %w", rootPID, err)
 		}
 
 		networkStats, err := fetchContainerNetStats(m.dockerClient, m.Module().Config().Timeout, myStats.Container.ID)
 		if err != nil {
-			return errors.Wrap(err, "error fetching per-PID stats")
+			return fmt.Errorf("error fetching per-PID stats")
 		}
 
 		summary := network.MapProcNetCounters(networkStats)

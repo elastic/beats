@@ -36,6 +36,27 @@ func testSetupServer(t *testing.T, tokenValue string, expiresIn int) *httptest.S
 	}))
 }
 
+func testSetupErrServer(t *testing.T) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		payload := authResponse{
+			Error:            "invalid client",
+			ErrorDescription: "AADSTS7000215: Invalid client secret provided. Ensure the secret being sent in the request is the client secret value, not the client secret ID, for a secret added to app 'TEST-APP'.\\r\\nTrace ID: TRACE-ID\\r\\nCorrelation ID: CORRELATION-ID\\r\\nTimestamp: 2023-04-21 14:01:54Z",
+			ErrorCodes:       []int{7000215},
+			TraceID:          "TRACE-ID",
+			CorrelationID:    "CORRELATION-ID",
+			ErrorURI:         "https://login.microsoftonline.com/error?code=7000215",
+		}
+		data, err := json.Marshal(payload)
+		require.NoError(t, err)
+
+		w.WriteHeader(http.StatusUnauthorized)
+		_, err = w.Write(data)
+		require.NoError(t, err)
+
+		w.Header().Add("Content-Type", "application/json")
+	}))
+}
+
 func TestRenew(t *testing.T) {
 	t.Run("new-token", func(t *testing.T) {
 		value := "test-value"
@@ -94,5 +115,30 @@ func TestRenew(t *testing.T) {
 
 		require.Equal(t, expireTime, auth.(*oauth2).expires)
 		require.Equal(t, cachedToken, gotToken)
+	})
+
+	t.Run("invalid-token", func(t *testing.T) {
+		srv := testSetupErrServer(t)
+		defer srv.Close()
+
+		cfg, err := config.NewConfigFrom(&conf{
+			Endpoint: "http://" + srv.Listener.Addr().String(),
+			Secret:   "value",
+			ClientID: "client-id",
+			TenantID: "tenant-id",
+		})
+		require.NoError(t, err)
+
+		auth, err := New(cfg, logp.L())
+		require.NoError(t, err)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		_, err = auth.Token(ctx)
+		require.Error(t, err)
+
+		require.ErrorContains(t, err, "invalid client")
+		require.ErrorContains(t, err, "Invalid client secret provided")
 	})
 }

@@ -16,17 +16,16 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package consumergroup
 
 import (
+	"fmt"
 	"io"
 	"testing"
 	"time"
 
 	saramacluster "github.com/bsm/sarama-cluster"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -48,7 +47,7 @@ func TestData(t *testing.T) {
 
 	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
 	if err != nil {
-		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
+		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
 	defer c.Close()
 
@@ -71,7 +70,7 @@ func TestFetch(t *testing.T) {
 
 	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
 	if err != nil {
-		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
+		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
 	defer c.Close()
 
