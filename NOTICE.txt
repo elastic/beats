@@ -17583,11 +17583,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
+<<<<<<< HEAD
 Version: v0.0.0-20220715151400-c0bba94af5f8
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20220715151400-c0bba94af5f8/LICENSE:
+=======
+Version: v0.9.0
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.9.0/LICENSE:
+>>>>>>> d37986cd11 (Updated protobuf to 1.29.1 (#35946))
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -18192,11 +18200,19 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.46.0/LIC
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/protobuf
+<<<<<<< HEAD
 Version: v1.28.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/google.golang.org/protobuf@v1.28.0/LICENSE:
+=======
+Version: v1.29.1
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/google.golang.org/protobuf@v1.29.1/LICENSE:
+>>>>>>> d37986cd11 (Updated protobuf to 1.29.1 (#35946))
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 

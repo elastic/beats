@@ -167,6 +167,7 @@ require (
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
+<<<<<<< HEAD
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -178,6 +179,20 @@ require (
 	google.golang.org/genproto v0.0.0-20220426171045-31bebdecfb46
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
+=======
+	golang.org/x/mod v0.9.0
+	golang.org/x/net v0.9.0
+	golang.org/x/oauth2 v0.7.0
+	golang.org/x/sync v0.1.0
+	golang.org/x/sys v0.9.0
+	golang.org/x/text v0.9.0
+	golang.org/x/time v0.3.0
+	golang.org/x/tools v0.6.0
+	google.golang.org/api v0.103.0
+	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37
+	google.golang.org/grpc v1.51.0
+	google.golang.org/protobuf v1.29.1
+>>>>>>> d37986cd11 (Updated protobuf to 1.29.1 (#35946))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
