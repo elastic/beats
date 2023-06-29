@@ -151,7 +151,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	defer bt.trace.Close()
 
 	// Adapt local pipeline to synchronized mode if run_once is enabled,
-	// Otherwise, pipeline is unchange
+	// Otherwise, pipeline is unchanged
 	pipeline := b.Publisher
 	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
 	if bt.config.RunOnce {
@@ -212,7 +212,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	defer bt.scheduler.Stop()
 
-	// Wait until run_once ends or bt is being shutdown
+	// Wait until run_once ends or bt is being shut down
 	waitMonitors.AddChan(bt.done)
 	waitMonitors.Wait()
 
