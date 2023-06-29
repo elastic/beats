@@ -29,8 +29,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestKeystoreCreate(t *testing.T) {
-	cfg := `
+var cfg = `
 mockbeat:
 name:
 queue.mem:
@@ -44,6 +43,7 @@ keystore:
   path: %s
 `
 
+func TestKeystoreCreate(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "keystore", "create")
 	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
@@ -53,20 +53,6 @@ keystore:
 }
 
 func TestKeystoreCreateForce(t *testing.T) {
-	cfg := `
-mockbeat:
-name:
-queue.mem:
-  events: 4096
-  flush.min_events: 8
-  flush.timeout: 0.1s
-output.console:
-  code.json:
-    pretty: true
-keystore:
-  path: %s
-`
-
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "keystore", "create", "--force")
 	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
@@ -76,6 +62,7 @@ keystore:
 	require.FileExists(t, keystorePath)
 	keystore1, err := os.ReadFile(keystorePath)
 	require.NoError(t, err)
+
 	mockbeat.Start()
 	mockbeat.WaitStdOutContains("Created mockbeat keystore", 10*time.Second)
 	require.FileExists(t, keystorePath)
@@ -85,20 +72,6 @@ keystore:
 }
 
 func TestKeystoreRemoveNoKeyNoKeystore(t *testing.T) {
-	cfg := `
-mockbeat:
-name:
-queue.mem:
-  events: 4096
-  flush.min_events: 8
-  flush.timeout: 0.1s
-output.console:
-  code.json:
-    pretty: true
-keystore:
-  path: %s
-`
-
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "keystore", "remove", "mykey")
 	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
@@ -107,73 +80,136 @@ keystore:
 }
 
 func TestKeystoreRemoveNoExistingKey(t *testing.T) {
-	cfg := `
-mockbeat:
-name:
-queue.mem:
-  events: 4096
-  flush.min_events: 8
-  flush.timeout: 0.1s
-output.console:
-  code.json:
-    pretty: true
-keystore:
-  path: %s
-`
-
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
 	mockbeat.Start("keystore", "create")
 	mockbeat.WaitStdOutContains("Created mockbeat keystore", 10*time.Second)
 	mockbeat.Stop()
+
 	mockbeat.Start("keystore", "remove", "mykey")
 	mockbeat.WaitStdErrContains("could not find key 'mykey' in the keystore", 10*time.Second)
 }
 
 func TestKeystoreRemoveMultipleExistingKeys(t *testing.T) {
-	cfg := `
-mockbeat:
-name:
-queue.mem:
-  events: 4096
-  flush.min_events: 8
-  flush.timeout: 0.1s
-output.console:
-  code.json:
-    pretty: true
-keystore:
-  path: %s
-`
-
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
 	mockbeat.Start("keystore", "create")
 	mockbeat.WaitStdOutContains("Created mockbeat keystore", 10*time.Second)
 	mockbeat.Stop()
+
 	mockbeat.Start("keystore", "add", "key1", "--stdin")
 	fmt.Fprintf(os.Stdin, "pass1")
 	procState, err := mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
 	mockbeat.Start("keystore", "add", "key2", "--stdin")
 	fmt.Fprintf(os.Stdin, "pass2")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
 	mockbeat.Start("keystore", "add", "key3", "--stdin")
 	fmt.Fprintf(os.Stdin, "pass3")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
 	mockbeat.Start("keystore", "remove", "key2", "key3")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
 	mockbeat.Start("keystore", "list")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("key1", 10*time.Second)
+}
+
+func TestKeystoreList(t *testing.T) {
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
+	mockbeat.Start("keystore", "create")
+	mockbeat.WaitStdOutContains("Created mockbeat keystore", 10*time.Second)
+	mockbeat.Stop()
+
+	mockbeat.Start("keystore", "add", "key1", "--stdin")
+	fmt.Fprintf(os.Stdin, "pass1")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.Start("keystore", "add", "key2", "--stdin")
+	fmt.Fprintf(os.Stdin, "pass2")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.Start("keystore", "add", "key3", "--stdin")
+	fmt.Fprintf(os.Stdin, "pass3")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.Start("keystore", "list")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.WaitStdOutContains("key1", 10*time.Second)
+	mockbeat.WaitStdOutContains("key2", 10*time.Second)
+	mockbeat.WaitStdOutContains("key3", 10*time.Second)
+}
+
+func TestKeystoreListEmptyKeystore(t *testing.T) {
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
+	mockbeat.Start("keystore", "list")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+}
+
+func TestKeystoreAddSecretFromStdin(t *testing.T) {
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
+
+	mockbeat.Start("keystore", "create")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.Start("keystore", "add", "key1", "--stdin")
+	fmt.Fprintf(os.Stdin, "pass1")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+}
+
+func TestKeystoreUpdateForce(t *testing.T) {
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	keystorePath := filepath.Join(mockbeat.TempDir(), "test.keystore")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, keystorePath))
+	mockbeat.Start("keystore", "create")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.Start("keystore", "add", "key1", "--stdin")
+	fmt.Fprintf(os.Stdin, "pass1")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	mockbeat.Start("keystore", "add", "key1", "--force", "--stdin")
+	fmt.Fprintf(os.Stdin, "pass2")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
 }
