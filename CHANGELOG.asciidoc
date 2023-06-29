@@ -10,6 +10,7 @@ https://github.com/elastic/beats/compare/v7.17.10\...v7.17.11[View commits]
 ==== Bugfixes
 
 *Affecting all Beats*
+
 - Added support for multi-line ZooKeeper logs. {issue}2496[2496]
 - Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (for example, 2.31) require it. {issue}33792[33792]
 - Disable lockfile when running under elastic-agent. {pull}33988[33988]
@@ -43,6 +44,7 @@ https://github.com/elastic/beats/compare/v7.17.10\...v7.17.11[View commits]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
 
 *Winlogbeat*
+
 - Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 ==== Added
