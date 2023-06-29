@@ -53,7 +53,7 @@ https://github.com/elastic/beats/compare/v7.17.10\...v7.17.11[View commits]
 - 'add_cloud_metadata' processor - update Azure metadata API version to get missing `cloud.account.id` field
 - Make sure that Kubernetes watchers are closed when closing the Kubernetes meta processor. {pull}35630[35630]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
-- Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- Fix panic when the disk queue's MaxRetryInterval configuration is specified, but RetryInterval is not. {pull}35820[35820]
 
 
 
