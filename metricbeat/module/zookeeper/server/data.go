@@ -20,13 +20,14 @@ package server
 import (
 	"bufio"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -69,7 +70,7 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 		if strings.Contains(line, "Zxid") {
 			xid, err := parseZxid(line)
 			if err != nil {
-				err = errors.Wrapf(err, "error parsing 'zxid' line '%s'", line)
+				err = fmt.Errorf("error parsing 'zxid' line '%s': %w", line, err)
 				logger.Debug(err.Error())
 				continue
 			}
@@ -82,7 +83,7 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 		if strings.Contains(line, "Latency") {
 			latency, err := parseLatencyLine(line)
 			if err != nil {
-				err = errors.Wrapf(err, "error parsing 'latency values' line '%s'", line)
+				err = fmt.Errorf("error parsing 'latency values' line '%s': %w", line, err)
 				logger.Debug(err.Error())
 				continue
 			}
@@ -95,7 +96,7 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 		if strings.Contains(line, "Proposal sizes") {
 			proposalSizes, err := parseProposalSizes(line)
 			if err != nil {
-				err = errors.Wrapf(err, "error parsing 'proposal sizes' line '%s'", line)
+				err = fmt.Errorf("error parsing 'proposal sizes' line '%s': %w", line, err)
 				logger.Debug(err.Error())
 				continue
 			}
@@ -138,7 +139,7 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 
 			val, err := strconv.ParseInt(result[2], 10, 64)
 			if err != nil {
-				err = errors.Wrapf(err, "error trying to parse value '%s' as int", result[2])
+				err = fmt.Errorf("error trying to parse value '%s' as int: %w", result[2], err)
 				logger.Debug(err.Error())
 				continue
 			}
@@ -155,16 +156,16 @@ func parseZxid(line string) (mapstr.M, error) {
 
 	zxidSplit := strings.Split(line, " ")
 	if len(zxidSplit) < 2 {
-		return nil, errors.Errorf("less than 2 tokens (%v) after splitting", zxidSplit)
+		return nil, fmt.Errorf("less than 2 tokens (%v) after splitting", zxidSplit)
 	}
 
 	zxidString := zxidSplit[1]
 	if len(zxidString) < 3 {
-		return nil, errors.Errorf("less than 3 characters on '%s'", zxidString)
+		return nil, fmt.Errorf("less than 3 characters on '%s'", zxidString)
 	}
 	zxid, err := strconv.ParseInt(zxidString[2:], 16, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse value '%s' to int", zxidString[2:])
+		return nil, fmt.Errorf("error trying to parse value '%s' to int: %w", zxidString[2:], err)
 	}
 
 	bs := make([]byte, 8)
@@ -185,28 +186,28 @@ func parseProposalSizes(line string) (mapstr.M, error) {
 
 	initialSplit := strings.Split(line, " ")
 	if len(initialSplit) < 4 {
-		return nil, errors.Errorf("less than 4 tokens (%v) after splitting", initialSplit)
+		return nil, fmt.Errorf("less than 4 tokens (%v) after splitting", initialSplit)
 	}
 
 	values := strings.Split(initialSplit[3], "/")
 	if len(values) < 3 {
-		return nil, errors.Errorf("less than 3 tokens (%v) after splitting", values)
+		return nil, fmt.Errorf("less than 3 tokens (%v) after splitting", values)
 	}
 	last, err := strconv.ParseInt(values[0], 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse 'last' value as int from '%s'", values[0])
+		return nil, fmt.Errorf("error trying to parse 'last' value as int from '%s': %w", values[0], err)
 	}
 	output.Put("last", last)
 
 	min, err := strconv.ParseInt(values[1], 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse 'min' value as int from '%s'", values[1])
+		return nil, fmt.Errorf("error trying to parse 'min' value as int from '%s': %w", values[1], err)
 	}
 	output.Put("min", min)
 
 	max, err := strconv.ParseInt(values[2], 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse 'max' value as int from '%s'", values[2])
+		return nil, fmt.Errorf("error trying to parse 'max' value as int from '%s': %w", values[2], err)
 	}
 	output.Put("max", max)
 
@@ -218,24 +219,24 @@ func parseLatencyLine(line string) (mapstr.M, error) {
 
 	values := latencyCapturer.FindStringSubmatch(line)
 	if len(values) < 4 {
-		return nil, errors.Errorf("less than 4 fields (%v) after splitting", values)
+		return nil, fmt.Errorf("less than 4 fields (%v) after splitting", values)
 	}
 
 	min, err := strconv.ParseInt(values[1], 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse 'min' value '%s' as int", values[1])
+		return nil, fmt.Errorf("error trying to parse 'min' value '%s' as int: %w", values[1], err)
 	}
 	output.Put("min", min)
 
 	avg, err := strconv.ParseInt(values[2], 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse 'avg' value '%s' as int", values[2])
+		return nil, fmt.Errorf("error trying to parse 'avg' value '%s' as int: %w", values[2], err)
 	}
 	output.Put("avg", avg)
 
 	max, err := strconv.ParseInt(values[3], 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to parse 'max' value '%s' as int", values[3])
+		return nil, fmt.Errorf("error trying to parse 'max' value '%s' as int: %w", values[3], err)
 	}
 	output.Put("max", max)
 
