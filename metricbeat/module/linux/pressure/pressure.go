@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -75,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	events, err := fetchLinuxPSIStats(m)
 	if err != nil {
-		return errors.Wrap(err, "error fetching PSI stats")
+		return fmt.Errorf("error fetching PSI stats: %w", err)
 	}
 
 	for _, event := range events {
@@ -92,13 +91,13 @@ func fetchLinuxPSIStats(m *MetricSet) ([]mapstr.M, error) {
 
 	procfs, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
 	if err != nil {
-		return nil, errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+		return nil, fmt.Errorf("error creating new Host FS at %s: %w", m.mod.ResolveHostFS("/proc"), err)
 	}
 
 	for _, resource := range resources {
 		psiMetric, err := procfs.PSIStatsForResource(resource)
 		if err != nil {
-			return nil, errors.Wrap(err, "check that /proc/pressure is available, and/or enabled")
+			return nil, fmt.Errorf("check that /proc/pressure is available, and/or enabled: %w", err)
 		}
 
 		event := mapstr.M{
