@@ -163,7 +163,7 @@ type socketInfo struct {
 	inode uint64 // inode is the inode of the file corresponding to the socket.
 }
 
-// socketsFromProc returns the socket information held in the the /proc/net file
+// socketsFromProc returns the socket information held in the /proc/net file
 // at path.
 func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
 	file, err := os.Open(path)

@@ -437,7 +437,7 @@ const nonUnsignedIntVersion = `
 </Event>
 `
 
-// TestInvalidVersion verifies that the reader will accept events where the the
+// TestInvalidVersion verifies that the reader will accept events where the
 // version number is not an unsigned byte as per the schema definition.
 // Microsoft documentation defines version as:
 //

@@ -11,7 +11,7 @@ where:
 
 Example:
 # Extract all metrics, using jq to show changes in the active event count over time.
-# The active event count is the number events in the pipeline, including the the queue.
+# The active event count is the number events in the pipeline, including the queue.
 $(basename "$0") ./sample_logs/log_with_metrics.log | jq \"{timestamp: .timestamp, active: .monitoring.metrics.libbeat.pipeline.events.active}\"
 "
 

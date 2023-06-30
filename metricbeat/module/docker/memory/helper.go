@@ -41,7 +41,7 @@ type MemoryData struct {
 	PrivateWorkingSet uint64
 }
 
-// MemoryService is placeholder for the the memory stat parsers
+// MemoryService is placeholder for the memory stat parsers
 type MemoryService struct{}
 
 func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool) []MemoryData {

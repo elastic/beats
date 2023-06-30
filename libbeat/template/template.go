@@ -169,7 +169,7 @@ func (t *Template) load(fields mapping.Fields) (mapstr.M, error) {
 	return output, nil
 }
 
-// LoadFile loads the the template from the given file path
+// LoadFile loads the template from the given file path
 func (t *Template) LoadFile(file string) (mapstr.M, error) {
 	fields, err := mapping.LoadFieldsYaml(file)
 	if err != nil {

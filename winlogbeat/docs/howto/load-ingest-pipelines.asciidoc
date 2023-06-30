@@ -41,7 +41,7 @@ Make sure the user specified in +{beatname_lc}.yml+ is
 [float]
 === Manually install pipelines
 
-On a machine that has {beatname_uc} installed export the the pipelines
+On a machine that has {beatname_uc} installed export the pipelines
 to disk. This can be done with the `export` command with `pipelines`
 option specified.  For example, the following command exports the
 ingest pipelines:

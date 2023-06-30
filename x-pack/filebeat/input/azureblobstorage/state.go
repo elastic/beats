@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// state contains the the current state of the operation
+// state contains the current state of the operation
 type state struct {
 	// Mutex lock to help in concurrent R/W
 	mu sync.Mutex

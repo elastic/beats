@@ -110,7 +110,7 @@ func retrieveSupportedMetricAvailability(availabilities []*armmonitor.MetricAvai
 	return *availabilities[1].TimeGrain
 }
 
-// retrieveServiceNamespace func will check if the namespace is part of the service namespaces and returns the the selected name
+// retrieveServiceNamespace func will check if the namespace is part of the service namespaces and returns the selected name
 func retrieveServiceNamespace(item string) string {
 	for _, i := range storageServiceNamespaces {
 		if defaultStorageAccountNamespace+i == item {

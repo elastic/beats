@@ -6,7 +6,7 @@ IIS (Internet Information Services) is a secure, reliable, and scalable Web serv
 
 The `iis` module will periodically retrieve IIS related metrics using performance counters such as:
 
- - System/Process counters like the the overall server and CPU usage for the IIS Worker Process and memory (currently used and available memory for the IIS Worker Process).
+ - System/Process counters like the overall server and CPU usage for the IIS Worker Process and memory (currently used and available memory for the IIS Worker Process).
  - IIS performance counters like Web Service: Bytes Received/Sec, Web Service: Bytes Sent/Sec, etc, which are helpful to track to identify potential spikes in traffic.
  - Web Service Cache counters in order to monitor user mode cache and output cache.
 

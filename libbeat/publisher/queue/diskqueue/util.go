@@ -59,7 +59,7 @@ func writeErrorIsRetriable(err error) bool {
 
 // callbackRetryWriter is an io.Writer that wraps another writer and enables
 // write-with-retry. When a Write encounters an error, it is passed to the
-// retry callback. If the callback returns true, the the writer retries
+// retry callback. If the callback returns true, the writer retries
 // any unwritten portion of the input, otherwise it passes the error back
 // to the caller.
 // This helper is specifically for working with the writer loop, which needs

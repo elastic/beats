@@ -44,7 +44,7 @@ type Runnable struct {
 	makeClient clientFactory
 }
 
-// Run call the the function's Run method, the method is a specific goroutine, it will block until
+// Run call the function's Run method, the method is a specific goroutine, it will block until
 // beats shutdown or an error happen.
 func (r *Runnable) Run(ctx context.Context, t telemetry.T) error {
 	client, err := r.makeClient(r.config)

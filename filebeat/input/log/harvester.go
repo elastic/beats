@@ -643,7 +643,7 @@ func (h *Harvester) cleanup() {
 //	limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
 //
 // Each reader on the left, contains the reader on the right and calls `Next()` to fetch more data.
-// At the base of all readers the the log_file reader. That means in the data is flowing in the opposite direction:
+// At the base of all readers the log_file reader. That means in the data is flowing in the opposite direction:
 //
 //	log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
 //

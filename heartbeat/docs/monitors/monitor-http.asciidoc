@@ -196,7 +196,7 @@ response body for the strings `saved` or `Saved` and expects 200 or 201 status c
 
 Under `check.response.body`, specify these options:
 *`positive`*:: This option has the same behavior as given a list of regular expressions under `check.response.body`.
-*`negative`*:: A list of regular expressions to match the the body output negatively.
+*`negative`*:: A list of regular expressions to match the body output negatively.
 Return match failed if single expression matches.
 HTTP response bodies of up to 100MiB are supported.
 

@@ -90,7 +90,7 @@ func ExportPipelines(info beat.Info, version version.V, directory string) error 
 	return nil
 }
 
-// readAll reads pipelines from the the embedded filesystem and
+// readAll reads pipelines from the embedded filesystem and
 // returns a slice of pipelines suitable for sending to Elasticsearch
 // with load.
 func readAll(info beat.Info) (pipelines []pipeline, err error) {

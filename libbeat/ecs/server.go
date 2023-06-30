@@ -74,7 +74,7 @@ type Server struct {
 
 	// The subdomain portion of a fully qualified domain name includes all of
 	// the names except the host name under the registered_domain.  In a
-	// partially qualified domain, or if the the qualification level of the
+	// partially qualified domain, or if the qualification level of the
 	// full name cannot be determined, subdomain contains all of the names
 	// below the registered domain.
 	// For example the subdomain portion of "www.east.mydomain.co.uk" is

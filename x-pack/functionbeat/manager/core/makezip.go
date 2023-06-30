@@ -7,7 +7,7 @@ package core
 import (
 	"fmt"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
@@ -36,7 +36,7 @@ func rawYaml() ([]byte, error) {
 	return res, nil
 }
 
-// MakeZip creates a zip from the the current artifacts and the currently available configuration.
+// MakeZip creates a zip from the current artifacts and the currently available configuration.
 func MakeZip(
 	packageUncompressedLimit int64,
 	packageCompressedLimit int64,

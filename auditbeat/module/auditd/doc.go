@@ -16,5 +16,5 @@
 // under the License.
 
 // Package auditd is a metricset that subscribes to the Linux Audit Framework
-// to receive audit events from the the kernel.
+// to receive audit events from the kernel.
 package auditd

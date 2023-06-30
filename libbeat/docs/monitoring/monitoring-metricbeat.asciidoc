@@ -125,7 +125,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 . The next step depends on how you want to run {metricbeat}:
 * If you're running as a service and want to run a separate monitoring instance,
-take the the steps required for your environment to run two instances of
+take the steps required for your environment to run two instances of
 {metricbeat} as a service. The steps for doing this vary by platform and are
 beyond the scope of this documentation.
 * If you're running the binary directly in the foreground and want to run a

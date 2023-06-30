@@ -34,7 +34,7 @@ type TLS struct {
 }
 
 // InputConfig represents the config for a shipper input. This is the complete config for that input, mirrored and sent to us.
-// This is more or less the same as the the proto.UnitExpectedConfig type, but that doesn't have `config` struct tags,
+// This is more or less the same as the proto.UnitExpectedConfig type, but that doesn't have `config` struct tags,
 // so for the sake of quick prototyping we're just (roughly) duplicating the structure here, minus any fields the shipper doesn't need (for now)
 type InputConfig struct {
 	ID         string     `config:"id"`

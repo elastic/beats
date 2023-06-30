@@ -232,7 +232,7 @@ func TestEventIterator(t *testing.T) {
 			}
 			defer func() { assert.NoError(t, itr.Close()) }()
 
-			// Mock the EvtNext to cause the the RPC_S_INVALID_BOUND error.
+			// Mock the EvtNext to cause the RPC_S_INVALID_BOUND error.
 			itr.evtNext = mockEvtNext
 
 			var iterateCount int
