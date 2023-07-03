@@ -32,7 +32,7 @@ branch/PR, then the job will fail with a checksum error
 * Very few people understand how it works
 
 ==== End to End Testing
-End to End Testing is used by the Observability team and focus on
+End to End Testing is used by the Observability team and focuses on
 Kubernetes tests. It should not be used by the Elastic-Agent
 team.
 
@@ -41,7 +41,7 @@ There are three test suites:
 
 * Unit Tests written in Go
 * Integration tests written in Go
-* Tests written in Python (deprecated, replaced by integration tests in Go)
+* Tests written in Python (deprecated, in transition to integration tests in Go)
 
 The tests written in Go use the https://golang.org/pkg/testing/[Go Testing
 package]. The tests written in Python depend on
@@ -55,16 +55,16 @@ For both of the above test suites so called integration tests exists. Integratio
 
 ==== Running Go Unit Tests
 
-The Go unit tests can be executed in each Go package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
+The Go unit tests can be executed in each Go package by running `go test .`. This will execute all tests which don't require an external service to be running. To run all non integration tests for a beat run `mage unitTest`.
 
 All Go tests are in the same package as the tested code itself and have the suffix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
 
 ===== Running Go Integration Tests
 
-Integration tests are labelled with the `//go:build integration` build
+Integration tests are labeled with the `//go:build integration` build
 tag and use the `_integration_test.go` suffix.
 They require some external dependencies to be running, like {es} or
-the system test binary that can be build with `mage buildSystemTestBinary`.
+the system test binary that can be built with `mage buildSystemTestBinary`.
 
 To run the integration tests use the `mage goIntegTest` target, which
 will start the required services using
