@@ -56,7 +56,7 @@ func TestNormalHostMetrics(t *testing.T) {
 	require.NoError(t, err)
 
 	// get initial metrics
-	events, errs := mbtest.ReportingFetchV2Error(reporter)
+	_, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 
 	// second event
@@ -64,7 +64,7 @@ func TestNormalHostMetrics(t *testing.T) {
 	err = os.Setenv("HOST_PROC", secondProc)
 	require.NoError(t, err)
 
-	events, errs = mbtest.ReportingFetchV2Error(reporter)
+	events, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 	found, evt := findRootEvent(events)
 	require.True(t, found)
@@ -99,14 +99,14 @@ func TestRollover(t *testing.T) {
 	err = os.Setenv("HOST_PROC", firstProc)
 	require.NoError(t, err)
 
-	events, errs := mbtest.ReportingFetchV2Error(reporter)
+	_, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 
 	secondProc := filepath.Join(basePath, "/tests/rollover2/proc/")
 	err = os.Setenv("HOST_PROC", secondProc)
 	require.NoError(t, err)
 
-	events, errs = mbtest.ReportingFetchV2Error(reporter)
+	events, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 	found, evt := findRootEvent(events)
 	require.True(t, found)
@@ -132,14 +132,14 @@ func TestRollover32(t *testing.T) {
 	err = os.Setenv("HOST_PROC", firstProc)
 	require.NoError(t, err)
 
-	events, errs := mbtest.ReportingFetchV2Error(reporter)
+	_, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 
 	secondProc := filepath.Join(basePath, "/tests/rollover32_2/proc/")
 	err = os.Setenv("HOST_PROC", secondProc)
 	require.NoError(t, err)
 
-	events, errs = mbtest.ReportingFetchV2Error(reporter)
+	events, errs := mbtest.ReportingFetchV2Error(reporter)
 	require.Empty(t, errs)
 	found, evt := findRootEvent(events)
 	require.True(t, found)
