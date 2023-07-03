@@ -4,14 +4,12 @@
 
 // Package cel implements an input that uses the Common Expression Language to
 // perform requests and do endpoint processing of events. The cel package exposes
-// the github.com/elastic/mito/lib and github.com/google/cel-go/ext CEL extension
-// libraries.
+// the github.com/elastic/mito/lib CEL extension library.
 package cel
 
 import (
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -34,8 +32,6 @@ import (
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -72,7 +68,7 @@ var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), ver
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
-		Stability: feature.Experimental,
+		Stability: feature.Stable,
 		Manager:   NewInputManager(log, store),
 	}
 }
@@ -144,7 +140,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs)
 	if err != nil {
 		return err
 	}
@@ -855,12 +851,17 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string) (cel.Program, error) {
+	xml, err := lib.XML(nil, xsd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
+	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
+		xml,
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
@@ -905,23 +906,20 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
+	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
 		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
-	b, err := protojson.MarshalOptions{Indent: ""}.Marshal(v.(proto.Message))
-	if err != nil {
-		state["events"] = errorMessage(fmt.Sprintf("failed native conversion: %v", err))
-		return state, fmt.Errorf("failed native conversion: %w", err)
+	switch v := v.(type) {
+	case *structpb.Struct:
+		return v.AsMap(), nil
+	default:
+		// This should never happen.
+		errMsg := fmt.Sprintf("unexpected native conversion type: %T", v)
+		state["events"] = errorMessage(errMsg)
+		return state, errors.New(errMsg)
 	}
-	var res map[string]interface{}
-	err = json.Unmarshal(b, &res)
-	if err != nil {
-		state["events"] = errorMessage(fmt.Sprintf("failed json conversion: %v", err))
-		return state, fmt.Errorf("failed json conversion: %w", err)
-	}
-	return res, nil
 }
 
 func errorMessage(msg string) map[string]interface{} {

@@ -27,7 +27,7 @@ jobs:
 
       - name: check for modified NOTICE.txt
         id: notice-check
-        run: echo "modified=$(if git diff-index --quiet HEAD -- NOTICE.txt; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
+        run: echo "modified=$(if git status --porcelain --untracked-files=no | grep -q -E ' NOTICE.txt$'; then echo "true"; else echo "false"; fi)" >> $GITHUB_OUTPUT
 
       - name: commit NOTICE.txt
         if: steps.notice-check.outputs.modified == 'true'

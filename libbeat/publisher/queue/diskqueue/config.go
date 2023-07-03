@@ -166,7 +166,7 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 		settings.RetryInterval = *userConfig.RetryInterval
 	}
 	if userConfig.MaxRetryInterval != nil {
-		settings.MaxRetryInterval = *userConfig.RetryInterval
+		settings.MaxRetryInterval = *userConfig.MaxRetryInterval
 	}
 
 	return settings, nil

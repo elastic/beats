@@ -94,18 +94,17 @@ func TestReaderGroup(t *testing.T) {
 func TestDefaultHarvesterGroup(t *testing.T) {
 	source := &testSource{name: "/path/to/test"}
 
-	requireSourceAddedToBookkeeper :=
-		func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-			require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
-		}
+	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
+		require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
+	}
 
-	requireSourceRemovedFromBookkeeper :=
-		func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-			require.False(t, hg.readers.hasID(hg.identifier.ID(s)))
-		}
+	requireSourceRemovedFromBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
+		require.False(t, hg.readers.hasID(hg.identifier.ID(s)))
+	}
 
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
+
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
@@ -153,7 +152,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		mockHarvester := &mockHarvester{
 			onRun: harvesterRun,
-			wg:    &wg}
+			wg:    &wg,
+		}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		hg.tg = task.NewGroup(1, time.Second, &logp.Logger{}, "")
 
@@ -222,13 +222,16 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		goroutinesChecker.WaitUntilIncreased(1)
 		// wait until harvester is started
-		if mockHarvester.getRunCount() == 1 {
-			requireSourceAddedToBookkeeper(t, hg, source)
-			// after started, stop it
-			hg.Stop(source)
-			goroutinesChecker.WaitUntilOriginalCount()
-		}
-
+		require.Eventually(t,
+			func() bool { return mockHarvester.getRunCount() == 1 },
+			5*time.Second,
+			10*time.Millisecond,
+			"run count must equal one")
+		requireSourceAddedToBookkeeper(t, hg, source)
+		// after started, stop it
+		hg.Stop(source)
+		_, err := goroutinesChecker.WaitUntilOriginalCount()
+		require.NoError(t, err)
 		requireSourceRemovedFromBookkeeper(t, hg, source)
 	})
 
@@ -406,7 +409,7 @@ type mockHarvester struct {
 	onRun func(input.Context, Source, Cursor, Publisher) error
 }
 
-func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher) error {
+func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher, metrics *Metrics) error {
 	if m.wg != nil {
 		defer m.wg.Done()
 	}
@@ -458,6 +461,7 @@ func (tl *testLogger) Errorf(format string, args ...interface{}) {
 	sb.WriteString(fmt.Sprintf(format, args...))
 	sb.WriteString("\n")
 }
+
 func (tl *testLogger) String() string {
 	return (*strings.Builder)(tl).String()
 }

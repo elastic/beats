@@ -18,30 +18,36 @@ import (
 )
 
 var (
-	metricName = "CPUUtilization"
-	namespace  = "AWS/EC2"
-	dimName    = "InstanceId"
-	instanceID = "i-123"
+	metricName  = "CPUUtilization"
+	namespace   = "AWS/EC2"
+	dimName     = "InstanceId"
+	instanceID1 = "i-123"
+	instanceID2 = "i-456"
 
-	id1         = "cpu1"
-	metricName1 = "CPUUtilization"
-	label1      = instanceID + " " + metricName1
+	id1    = "cpu1"
+	label1 = instanceID1 + " " + metricName
 
 	id2         = "status1"
 	metricName2 = "StatusCheckFailed"
-	label2      = instanceID + " " + metricName2
+	label2      = instanceID1 + " " + metricName2
 
 	id3         = "status2"
 	metricName3 = "StatusCheckFailed_System"
-	label3      = instanceID + " " + metricName3
+	label3      = instanceID1 + " " + metricName3
 
 	id4         = "status3"
 	metricName4 = "StatusCheckFailed_Instance"
-	label4      = instanceID + " " + metricName4
+	label4      = instanceID1 + " " + metricName4
+
+	id5    = "cpu2"
+	label5 = instanceID2 + " " + metricName
 )
 
 // MockCloudwatchClient struct is used for unit tests.
 type MockCloudWatchClient struct{}
+
+// MockCloudwatchClientCrossAccounts struct is used for unit tests.
+type MockCloudwatchClientCrossAccounts struct{}
 
 // GetMetricData implements cloudwatch.GetMetricDataAPIClient interface
 func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
@@ -79,10 +85,34 @@ func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMet
 	}, nil
 }
 
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient interface for cross accounts
+func (m *MockCloudwatchClientCrossAccounts) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+	value1 := 0.25
+	value2 := 0.15
+
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:     &id1,
+				Label:  &label1,
+				Values: []float64{value1},
+			},
+			{
+				Id:     &id5,
+				Label:  &label5,
+				Values: []float64{value2},
+			},
+		},
+		NextToken: &emptyString,
+	}, nil
+}
+
 func (m *MockCloudWatchClient) ListMetrics(context.Context, *cloudwatch.ListMetricsInput, ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
-	dim := cloudwatchtypes.Dimension{
+	dim1 := cloudwatchtypes.Dimension{
 		Name:  &dimName,
-		Value: &instanceID,
+		Value: &instanceID1,
 	}
 
 	return &cloudwatch.ListMetricsOutput{
@@ -90,8 +120,39 @@ func (m *MockCloudWatchClient) ListMetrics(context.Context, *cloudwatch.ListMetr
 			{
 				MetricName: &metricName,
 				Namespace:  &namespace,
-				Dimensions: []cloudwatchtypes.Dimension{dim},
+				Dimensions: []cloudwatchtypes.Dimension{dim1},
 			},
+		},
+		NextToken: awssdk.String(""),
+	}, nil
+}
+
+func (m *MockCloudwatchClientCrossAccounts) ListMetrics(context.Context, *cloudwatch.ListMetricsInput, ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	dim1 := cloudwatchtypes.Dimension{
+		Name:  &dimName,
+		Value: &instanceID1,
+	}
+	dim2 := cloudwatchtypes.Dimension{
+		Name:  &dimName,
+		Value: &instanceID2,
+	}
+
+	return &cloudwatch.ListMetricsOutput{
+		Metrics: []cloudwatchtypes.Metric{
+			{
+				MetricName: &metricName,
+				Namespace:  &namespace,
+				Dimensions: []cloudwatchtypes.Dimension{dim1},
+			},
+			{
+				MetricName: &metricName,
+				Namespace:  &namespace,
+				Dimensions: []cloudwatchtypes.Dimension{dim2},
+			},
+		},
+		OwningAccounts: []string{
+			"123",
+			"456",
 		},
 		NextToken: awssdk.String(""),
 	}, nil
@@ -137,26 +198,39 @@ func (m *MockResourceGroupsTaggingClient) GetResources(_ context.Context, _ *res
 
 func TestGetListMetricsOutput(t *testing.T) {
 	svcCloudwatch := &MockCloudWatchClient{}
-	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, false, "123", svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
-	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
-	assert.Equal(t, metricName, *listMetricsOutput[0].MetricName)
-	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
-	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
-	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].Metric.MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Metric.Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Metric.Dimensions[0].Name)
+	assert.Equal(t, instanceID1, *listMetricsOutput[0].Metric.Dimensions[0].Value)
+}
+
+func TestGetListMetricsCrossAccountsOutput(t *testing.T) {
+	svcCloudwatch := &MockCloudwatchClientCrossAccounts{}
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, true, "123", svcCloudwatch)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(listMetricsOutput))
+	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].Metric.MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Metric.Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Metric.Dimensions[0].Name)
+	assert.Equal(t, instanceID1, *listMetricsOutput[0].Metric.Dimensions[0].Value)
+	assert.Equal(t, instanceID2, *listMetricsOutput[1].Metric.Dimensions[0].Value)
 }
 
 func TestGetListMetricsOutputWithWildcard(t *testing.T) {
 	svcCloudwatch := &MockCloudWatchClient{}
-	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", time.Minute*5, svcCloudwatch)
+	listMetricsOutput, err := GetListMetricsOutput("*", "us-west-1", time.Minute*5, false, "123", svcCloudwatch)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(listMetricsOutput))
-	assert.Equal(t, namespace, *listMetricsOutput[0].Namespace)
-	assert.Equal(t, metricName, *listMetricsOutput[0].MetricName)
-	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
-	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
-	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+	assert.Equal(t, namespace, *listMetricsOutput[0].Metric.Namespace)
+	assert.Equal(t, metricName, *listMetricsOutput[0].Metric.MetricName)
+	assert.Equal(t, 1, len(listMetricsOutput[0].Metric.Dimensions))
+	assert.Equal(t, dimName, *listMetricsOutput[0].Metric.Dimensions[0].Name)
+	assert.Equal(t, instanceID1, *listMetricsOutput[0].Metric.Dimensions[0].Value)
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
@@ -228,6 +302,35 @@ func TestGetMetricDataResults(t *testing.T) {
 	assert.Equal(t, id4, *getMetricDataResults[3].Id)
 	assert.Equal(t, label4, *getMetricDataResults[3].Label)
 	assert.Equal(t, 0.0, getMetricDataResults[3].Values[0])
+}
+
+func TestGetMetricDataResultsCrossAccounts(t *testing.T) {
+	startTime, endTime := GetStartTimeEndTime(time.Now(), 10*time.Minute, 0)
+
+	mockSvc := &MockCloudwatchClientCrossAccounts{}
+	metricInfo := cloudwatchtypes.Metric{
+		MetricName: &metricName,
+		Namespace:  &namespace,
+	}
+	metricStat := cloudwatchtypes.MetricStat{Metric: &metricInfo}
+	metricDataQueries := []cloudwatchtypes.MetricDataQuery{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			MetricStat: &metricStat,
+		},
+	}
+	getMetricDataResults, err := GetMetricDataResults(metricDataQueries, mockSvc, startTime, endTime)
+	assert.NoError(t, err)
+
+	assert.Equal(t, 2, len(getMetricDataResults))
+	assert.Equal(t, id1, *getMetricDataResults[0].Id)
+	assert.Equal(t, label1, *getMetricDataResults[0].Label)
+	assert.Equal(t, 0.25, getMetricDataResults[0].Values[0])
+
+	assert.Equal(t, id5, *getMetricDataResults[1].Id)
+	assert.Equal(t, label5, *getMetricDataResults[1].Label)
+	assert.Equal(t, 0.15, getMetricDataResults[1].Values[0])
 }
 
 func TestCheckTimestampInArray(t *testing.T) {

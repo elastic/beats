@@ -23,7 +23,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 // ReadInput shows the text and ask the user to provide input.

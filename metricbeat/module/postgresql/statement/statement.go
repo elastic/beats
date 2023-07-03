@@ -19,8 +19,7 @@ package statement
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
@@ -61,7 +60,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
 	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_statements")
 	if err != nil {
-		return errors.Wrap(err, "QueryStats")
+		return fmt.Errorf("QueryStats: %w", err)
 	}
 
 	for _, result := range results {

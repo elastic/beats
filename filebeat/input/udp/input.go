@@ -19,7 +19,6 @@ package udp
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -199,20 +198,19 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 			log.Warnf("failed to get address for %s: %v", device, err)
 			return out
 		}
-		p, err := strconv.ParseInt(port, 10, 16)
+		pn, err := strconv.ParseInt(port, 10, 16)
 		if err != nil {
 			log.Warnf("failed to get port for %s: %v", device, err)
 			return out
 		}
-		ph := strconv.FormatInt(p, 16)
 		addr := make([]string, 0, len(ip))
 		addr6 := make([]string, 0, len(ip))
 		for _, p := range ip {
 			switch len(p) {
 			case net.IPv4len:
-				addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To4()), ph))
+				addr = append(addr, ipv4KernelAddr(p, int(pn)))
 			case net.IPv6len:
-				addr6 = append(addr6, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To16()), ph))
+				addr6 = append(addr6, ipv6KernelAddr(p, int(pn)))
 			default:
 				log.Warnf("unexpected addr length %d for %s", len(p), p)
 			}
@@ -222,6 +220,22 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 	}
 
 	return out
+}
+
+func ipv4KernelAddr(ip net.IP, port int) string {
+	return fmt.Sprintf("%08X:%04X", reverse(ip.To4()), port)
+}
+
+func ipv6KernelAddr(ip net.IP, port int) string {
+	return fmt.Sprintf("%032X:%04X", reverse(ip.To16()), port)
+}
+
+func reverse(b []byte) []byte {
+	c := make([]byte, len(b))
+	for i, e := range b {
+		c[len(b)-1-i] = e
+	}
+	return c
 }
 
 // log logs metric for the given packet.
@@ -248,6 +262,23 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
 	}
+
+	// Do an initial check for access to the filesystem and of the
+	// value constructed by containsUnspecifiedAddr. This gives a
+	// base level for the rx_queue and drops values and ensures that
+	// if the constructed address values are malformed we panic early
+	// within the period of system testing.
+	rx, drops, err := procNetUDP("/proc/net/udp", addr, hasUnspecified, addrIsUnspecified)
+	if err != nil {
+		log.Warnf("failed to get initial udp stats from /proc: %v", err)
+	}
+	rx6, drops6, err := procNetUDP("/proc/net/udp6", addr, hasUnspecified6, addrIsUnspecified6)
+	if err != nil {
+		log.Warnf("failed to get initial udp6 stats from /proc: %v", err)
+	}
+	m.rxQueue.Set(uint64(rx + rx6))
+	m.drops.Set(uint64(drops + drops6))
+
 	t := time.NewTicker(each)
 	for {
 		select {
