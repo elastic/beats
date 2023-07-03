@@ -1,5 +1,12 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
-steps:
-  - label: "Example test"
-    command: echo "Hello!"
+env:
+  SETUP_GVM_VERSION: 'v0.5.0'
+
+  steps:
+  - label: ":golangci-lint: Lint"
+    key: lint-test
+    command: ".buildkite/scripts/lint_test.sh"
+    agents:
+      provider: "gcp"
+      image: "family/core-ubuntu-2004"
