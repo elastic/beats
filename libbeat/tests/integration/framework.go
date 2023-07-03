@@ -65,6 +65,31 @@ type Meta struct {
 	FirstStart time.Time `json:"first_start"`
 }
 
+type IndexTemplateResult struct {
+	IndexTemplates []IndexTemplateEntry `json:"index_templates"`
+}
+
+type IndexTemplateEntry struct {
+	Name          string        `json:"name"`
+	IndexTemplate IndexTemplate `json:"index_template"`
+}
+
+type IndexTemplate struct {
+	IndexPatterns []string `json:"index_patterns"`
+}
+
+type SearchResult struct {
+	Hits Hits `json:"hits"`
+}
+
+type Hits struct {
+	Total Total `json:"total"`
+}
+
+type Total struct {
+	Value int `json:"value"`
+}
+
 // NewBeat createa a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
@@ -461,4 +486,71 @@ func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
 	}
 	kibanaUser := url.UserPassword("beats", "testing")
 	return kibanaURL, kibanaUser
+}
+
+func HttpDo(t *testing.T, method string, targetURL url.URL) (statusCode int, body []byte, err error) {
+	t.Helper()
+	client := &http.Client{}
+	req, err := http.NewRequest(method, targetURL.String(), nil)
+	if err != nil {
+		return 0, nil, fmt.Errorf("error making request, method: %s, url: %s, error: %w", method, targetURL.String(), err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, nil, fmt.Errorf("error doing request, method: %s, url: %s, error: %w", method, targetURL.String(), err)
+	}
+	defer resp.Body.Close()
+	body, err = io.ReadAll(resp.Body)
+
+	if err != nil {
+		return resp.StatusCode, nil, fmt.Errorf("error reading request, method: %s, url: %s, status code: %d", method, targetURL.String(), resp.StatusCode)
+	}
+	return resp.StatusCode, body, nil
+}
+
+func FormatDatastreamURL(t *testing.T, srcURL url.URL, dataStream string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/_data_stream", dataStream)
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining data_stream path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func FormatIndexTemplateURL(t *testing.T, srcURL url.URL, template string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/_index_template", template)
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining index_template path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func FormatPolicyURL(t *testing.T, srcURL url.URL, policy string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/_ilm/policy", policy)
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining ilm policy path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func FormatRefreshURL(t *testing.T, srcURL url.URL) url.URL {
+	t.Helper()
+	srcURL.Path = "/_refresh"
+	return srcURL
+}
+
+func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/", dataStream, "_search")
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining ilm policy path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
 }

@@ -22,9 +22,7 @@ package integration
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 	"testing"
 
@@ -50,29 +48,16 @@ output.elasticsearch:
   allow_older_versions: true
  `
 
-type IndexTemplateResult struct {
-	IndexTemplates []IndexTemplateEntry `json:"index_templates"`
-}
-
-type IndexTemplateEntry struct {
-	Name          string        `json:"name"`
-	IndexTemplate IndexTemplate `json:"index_template"`
-}
-
-type IndexTemplate struct {
-	IndexPatterns []string `json:"index_patterns"`
-}
-
 func TestSetupIdxMgmt(t *testing.T) {
 	EnsureESIsRunning(t)
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
 	policy := "mockbeat"
 	t.Cleanup(func() {
-		err := deleteDataStream(t, dataStream)
-		if err != nil {
-			t.Logf("error deleting data_stream %s: %s", dataStream, err)
-		}
+		dsURL, err := FormatDatastreamURL(t, esURL, dataStream)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, dsURL)
+		require.NoError(t, err)
 	})
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(IdxMgmtCfg, esURL.String()))
@@ -89,13 +74,13 @@ func TestSetupTemplateDisabled(t *testing.T) {
 	EnsureESIsRunning(t)
 	dataStream := "mockbeat-9.9.9"
 	policy := "mockbeat"
-	t.Cleanup(func() {
-		err := deleteDataStream(t, dataStream)
-		if err != nil {
-			t.Logf("error deleting data_stream %s: %s", dataStream, err)
-		}
-	})
 	esURL := GetESURL(t, "http")
+	t.Cleanup(func() {
+		dsURL, err := FormatDatastreamURL(t, esURL, dataStream)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, dsURL)
+		require.NoError(t, err)
+	})
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(IdxMgmtCfg, esURL.String()))
 	mockbeat.Start("setup", "--index-management", "-v", "-e")
@@ -107,46 +92,38 @@ func TestSetupTemplateDisabled(t *testing.T) {
 	require.True(t, isPolicyCreated(t, policy))
 }
 
-func isTemplateLoaded(t *testing.T, data_stream string) bool {
+func isTemplateLoaded(t *testing.T, dataStream string) bool {
 	esURL := GetESURL(t, "http")
-	path, err := url.JoinPath("/_index_template", data_stream)
-	require.NoError(t, err, "error building template path")
-	esURL.Path = path
-	esURL.User = url.UserPassword("admin", "testing")
-	resp, err := http.Get(esURL.String())
-	require.NoError(t, err, "error getting datastream")
-	defer resp.Body.Close()
-	require.Equal(t, http.StatusOK, resp.StatusCode, "incorrect status code")
+	indexURL, err := FormatIndexTemplateURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	status, body, err := HttpDo(t, http.MethodGet, indexURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	body, _ := ioutil.ReadAll(resp.Body)
 	var r IndexTemplateResult
 	json.Unmarshal(body, &r)
 	for _, t := range r.IndexTemplates {
-		if t.Name == data_stream {
+		if t.Name == dataStream {
 			return true
 		}
 	}
 	return false
 }
 
-func isIndexPatternSet(t *testing.T, data_stream string) bool {
+func isIndexPatternSet(t *testing.T, dataStream string) bool {
 	esURL := GetESURL(t, "http")
-	path, err := url.JoinPath("/_index_template", data_stream)
-	require.NoError(t, err, "error building template path")
-	esURL.Path = path
-	esURL.User = url.UserPassword("admin", "testing")
-	resp, err := http.Get(esURL.String())
-	require.NoError(t, err, "error getting datastream")
-	defer resp.Body.Close()
-	require.Equal(t, http.StatusOK, resp.StatusCode, "incorrect status code")
+	indexURL, err := FormatIndexTemplateURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	status, body, err := HttpDo(t, http.MethodGet, indexURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	body, _ := ioutil.ReadAll(resp.Body)
 	var r IndexTemplateResult
 	json.Unmarshal(body, &r)
 	for _, t := range r.IndexTemplates {
-		if t.Name == data_stream {
+		if t.Name == dataStream {
 			for _, p := range t.IndexTemplate.IndexPatterns {
-				if p == data_stream {
+				if p == dataStream {
 					return true
 				}
 			}
@@ -157,16 +134,12 @@ func isIndexPatternSet(t *testing.T, data_stream string) bool {
 
 func isPolicyCreated(t *testing.T, policy string) bool {
 	esURL := GetESURL(t, "http")
-	path, err := url.JoinPath("/_ilm/policy/", policy)
-	require.NoError(t, err, "error building policy path")
-	esURL.Path = path
-	esURL.User = url.UserPassword("admin", "testing")
-	resp, err := http.Get(esURL.String())
-	require.NoError(t, err, "error getting policy")
-	defer resp.Body.Close()
-	require.Equal(t, http.StatusOK, resp.StatusCode, "incorrect status code")
+	policyURL, err := FormatPolicyURL(t, esURL, policy)
+	require.NoError(t, err)
+	status, body, err := HttpDo(t, http.MethodGet, policyURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	body, _ := ioutil.ReadAll(resp.Body)
 	if !strings.Contains(string(body), "max_primary_shard_size\":\"50gb") {
 		return false
 	}
@@ -175,51 +148,3 @@ func isPolicyCreated(t *testing.T, policy string) bool {
 	}
 	return true
 }
-
-func deleteDataStream(t *testing.T, data_stream string) error {
-	esURL := GetESURL(t, "http")
-	path, err := url.JoinPath("/_data_stream", data_stream)
-	if err != nil {
-		return fmt.Errorf("error joining data_stream path: %w", err)
-	}
-	esURL.Path = path
-	esURL.User = url.UserPassword("admin", "testing")
-	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", esURL.String(), nil)
-	if err != nil {
-		return fmt.Errorf("error making new delete request: %w", err)
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error doing delete request: %w", err)
-	}
-	defer resp.Body.Close()
-	if http.StatusOK != resp.StatusCode {
-		return fmt.Errorf("status code was %d", resp.StatusCode)
-	}
-	return nil
-}
-
-// func deleteDataStream(t *testing.T, data_stream string) error {
-// 	esURL := GetESURL(t, "http")
-// 	path, err := url.JoinPath("/_data_stream", data_stream)
-// 	if err != nil {
-// 		return fmt.Errorf("error joining data_stream path: %w", err)
-// 	}
-// 	esURL.Path = path
-// 	esURL.User = url.UserPassword("admin", "testing")
-// 	client := &http.Client{}
-// 	req, err := http.NewRequest("DELETE", esURL.String(), nil)
-// 	if err != nil {
-// 		return fmt.Errorf("error making new delete request: %w", err)
-// 	}
-// 	resp, err := client.Do(req)
-// 	if err != nil {
-// 		return fmt.Errorf("error doing delete request: %w", err)
-// 	}
-// 	defer resp.Body.Close()
-// 	if http.StatusOK != resp.StatusCode {
-// 		return fmt.Errorf("status code was %d", resp.StatusCode)
-// 	}
-// 	return nil
-// }
