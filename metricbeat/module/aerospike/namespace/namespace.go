@@ -18,10 +18,10 @@
 package namespace
 
 import (
+	"fmt"
 	"strings"
 
 	as "github.com/aerospike/aerospike-client-go"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/aerospike"
@@ -57,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	host, err := aerospike.ParseHost(base.Host())
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid host format, expected hostname:port")
+		return nil, fmt.Errorf("Invalid host format, expected hostname:port: %w", err)
 	}
 
 	return &MetricSet{
@@ -71,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err := m.connect(); err != nil {
-		return errors.Wrap(err, "error connecting to Aerospike")
+		return fmt.Errorf("error connecting to Aerospike: %w", err)
 	}
 
 	for _, node := range m.client.GetNodes() {

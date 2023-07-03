@@ -1138,5 +1138,24 @@
             "fortinet-firewall",
             "forwarded"
         ]
+    },
+    {
+        "@timestamp": "2023-05-22T08:19:38.000-02:00",
+        "event.dataset": "fortinet.firewall",
+        "event.module": "fortinet",
+        "event.timezone": "-02:00",
+        "fileset.name": "firewall",
+        "fortinet.firewall.desc": "Object update request from device of FortiClient received",
+        "input.type": "log",
+        "log.offset": 11198,
+        "message": "Send new version object to device (sn:FSAxxxxxxxxx, ip=127.0.0.1): objid=0000000000, curr_ver=00091.03310",
+        "observer.product": "Fortigate",
+        "observer.type": "firewall",
+        "observer.vendor": "Fortinet",
+        "service.type": "fortinet",
+        "tags": [
+            "fortinet-firewall",
+            "forwarded"
+        ]
     }
 ]

@@ -18,7 +18,7 @@
 package mgr_cluster_health
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -42,13 +42,13 @@ func eventMapping(statusContent, timeSyncStatusContent []byte) (mapstr.M, error)
 	var statusResponse StatusResponse
 	err := mgr.UnmarshalResponse(statusContent, &statusResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal response")
+		return nil, fmt.Errorf("could not unmarshal response: %w", err)
 	}
 
 	var timeSyncStatusResponse TimeSyncStatusResponse
 	err = mgr.UnmarshalResponse(timeSyncStatusContent, &timeSyncStatusResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal response")
+		return nil, fmt.Errorf("could not unmarshal response: %w", err)
 	}
 
 	return mapstr.M{

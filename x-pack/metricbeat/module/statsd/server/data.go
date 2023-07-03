@@ -6,10 +6,10 @@ package server
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"strconv"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
@@ -20,8 +20,7 @@ import (
 var errInvalidPacket = errors.New("invalid statsd packet")
 
 type metricProcessor struct {
-	registry      *registry
-	reservoirSize int
+	registry *registry
 }
 
 type statsdMetric struct {
@@ -32,12 +31,12 @@ type statsdMetric struct {
 	tags       map[string]string
 }
 
-func splitTags(rawTags []byte, kvSep []byte) map[string]string {
+func splitTags(rawTags, kvSep []byte) map[string]string {
 	tags := map[string]string{}
 	for _, kv := range bytes.Split(rawTags, []byte(",")) {
 		kvSplit := bytes.SplitN(kv, kvSep, 2)
 		if len(kvSplit) != 2 {
-			logger.Warnf("could not parse tags")
+			logger.Warn("could not parse tags")
 			continue
 		}
 		tags[string(kvSplit[0])] = string(kvSplit[1])
@@ -86,14 +85,16 @@ func parseSingle(b []byte) (statsdMetric, error) {
 	return s, nil
 }
 
-// parse will parse a statsd metric into its components
+// parse will parse statsd metrics into individual metric and then its components
 func parse(b []byte) ([]statsdMetric, error) {
-	metrics := []statsdMetric{}
-	for _, rawMetric := range bytes.Split(b, []byte("\n")) {
-		if len(rawMetric) > 0 {
-			metric, err := parseSingle(rawMetric)
+	rawMetrics := bytes.Split(b, []byte("\n"))
+	metrics := make([]statsdMetric, 0, len(rawMetrics))
+	for i := range rawMetrics {
+		if len(rawMetrics[i]) > 0 {
+			metric, err := parseSingle(rawMetrics[i])
 			if err != nil {
-				return metrics, err
+				logger.Warnf("invalid packet: %s", err)
+				continue
 			}
 			metrics = append(metrics, metric)
 		}
@@ -120,13 +121,13 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields ma
 		// Not all labels match
 		// Skip and continue to next mapping
 		if len(res) != (len(mapping.Labels) + 1) {
-			logger.Debugf("not all labels match in statsd.mapping, skipped")
+			logger.Debug("not all labels match in statsd.mapping, skipped")
 			continue
 		}
 
 		// Let's add the metric set fields from labels
 		names := mapping.regex.SubexpNames()
-		for i, _ := range res {
+		for i := range res {
 			for _, label := range mapping.Labels {
 				if label.Attr != names[i] {
 					continue
@@ -139,8 +140,6 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields ma
 		// Let's add the metric with the value field
 		metricSetFields[mapping.Value.Field] = metricValue
 	}
-
-	return
 }
 
 func newMetricProcessor(ttl time.Duration) *metricProcessor {
@@ -162,10 +161,10 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		var err error
 		sampleRate, err = strconv.ParseFloat(m.sampleRate, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process metric `%s` sample rate `%s`", m.name, m.sampleRate)
+			return fmt.Errorf("failed to process metric `%s` sample rate `%s`: %w", m.name, m.sampleRate, err)
 		}
 		if sampleRate <= 0.0 {
-			return errors.Errorf("sample rate of 0.0 is invalid for metric `%s`", m.name)
+			return fmt.Errorf("sample rate of 0.0 is invalid for metric `%s`: %w", m.name, err)
 		}
 	}
 
@@ -174,7 +173,11 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewCounter(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process counter `%s` with value `%s`", m.name, m.value)
+			v1, err := strconv.ParseFloat(m.value, 64)
+			if err != nil {
+				return fmt.Errorf("failed to process counter `%s` with value `%s`: %w", m.name, m.value, err)
+			}
+			v = int64(v1) // cast to int64
 		}
 		// apply sample rate
 		v = int64(float64(v) * (1.0 / sampleRate))
@@ -183,9 +186,8 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewGauge64(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process gauge `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process gauge `%s` with value `%s`: %w", m.name, m.value, err)
 		}
-
 		// inc/dec or set
 		if m.value[0] == '+' || m.value[0] == '-' {
 			c.Inc(v)
@@ -196,14 +198,14 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewTimer(m.name, m.tags)
 		v, err := strconv.ParseFloat(m.value, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process timer `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process timer `%s` with value `%s`: %w", m.name, m.value, err)
 		}
 		c.SampledUpdate(time.Duration(v), sampleRate)
 	case "h": // TODO: can these be floats?
 		c := p.registry.GetOrNewHistogram(m.name, m.tags)
 		v, err := strconv.ParseInt(m.value, 10, 64)
 		if err != nil {
-			return errors.Wrapf(err, "failed to process histogram `%s` with value `%s`", m.name, m.value)
+			return fmt.Errorf("failed to process histogram `%s` with value `%s`: %w", m.name, m.value, err)
 		}
 		c.Update(v)
 	case "s":

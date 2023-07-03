@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	GroupDeltaLinkResponse = "group-delta-link"
-	UserDeltaLinkResponse  = "user-delta-link"
+	GroupDeltaLinkResponse  = "group-delta-link"
+	UserDeltaLinkResponse   = "user-delta-link"
+	DeviceDeltaLinkResponse = "device-delta-link"
 )
 
 var GroupResponse = []*fetcher.Group{
@@ -27,6 +28,10 @@ var GroupResponse = []*fetcher.Group{
 			{
 				ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
 				Type: fetcher.MemberUser,
+			},
+			{
+				ID:   uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+				Type: fetcher.MemberDevice,
 			},
 		},
 	},
@@ -41,6 +46,10 @@ var GroupResponse = []*fetcher.Group{
 			{
 				ID:   uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
 				Type: fetcher.MemberUser,
+			},
+			{
+				ID:   uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+				Type: fetcher.MemberDevice,
 			},
 		},
 	},
@@ -85,8 +94,58 @@ var UserResponse = []*fetcher.User{
 	},
 }
 
-type mock struct {
+var DeviceResponse = []*fetcher.Device{
+	{
+		ID: uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+		Fields: map[string]interface{}{
+			"accountEnabled":         true,
+			"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
+			"displayName":            "DESKTOP-LK3PESR",
+			"operatingSystem":        "Windows",
+			"operatingSystemVersion": "10.0.19043.1237",
+			"physicalIds":            []interface{}{},
+			"extensionAttributes": map[string]interface{}{
+				"extensionAttribute1": "BYOD-Device",
+				"extensionAttribute2": nil,
+				"extensionAttribute3": nil,
+				"extensionAttribute4": nil,
+			},
+			"alternativeSecurityIds": []interface{}{
+				map[string]interface{}{
+					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
+					"identityProvider": nil,
+					"key":              "WAA1ADAAOQA6AD...QBnAD0A",
+				},
+			},
+		},
+	},
+	{
+		ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+		Fields: map[string]interface{}{
+			"accountEnabled":         true,
+			"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
+			"displayName":            "DESKTOP-LETW452G",
+			"operatingSystem":        "Windows",
+			"operatingSystemVersion": "10.0.19043.1337",
+			"physicalIds":            []interface{}{},
+			"extensionAttributes": map[string]interface{}{
+				"extensionAttribute1": "BYOD-Device",
+				"extensionAttribute2": nil,
+				"extensionAttribute3": nil,
+				"extensionAttribute4": nil,
+			},
+			"alternativeSecurityIds": []interface{}{
+				map[string]interface{}{
+					"type":             "2", // Rendered as string to avoid in-flight conversion to float.
+					"identityProvider": nil,
+					"key":              "DGFSGHSGGTH345A...35DSFH0A",
+				},
+			},
+		},
+	},
 }
+
+type mock struct{}
 
 // Groups returns a fixed set of groups.
 func (f *mock) Groups(ctx context.Context, _ string) ([]*fetcher.Group, string, error) {
@@ -96,6 +155,11 @@ func (f *mock) Groups(ctx context.Context, _ string) ([]*fetcher.Group, string, 
 // Users returns a fixed set of users.
 func (f *mock) Users(ctx context.Context, _ string) ([]*fetcher.User, string, error) {
 	return UserResponse, UserDeltaLinkResponse, nil
+}
+
+// Devices returns a fixed set of devices.
+func (f *mock) Devices(ctx context.Context, _ string) ([]*fetcher.Device, string, error) {
+	return DeviceResponse, DeviceDeltaLinkResponse, nil
 }
 
 // SetLogger is not used for this implementation.

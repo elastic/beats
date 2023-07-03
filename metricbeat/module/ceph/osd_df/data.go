@@ -19,8 +19,7 @@ package osd_df
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -51,7 +50,7 @@ func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d OsdDfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting data for OSD_DF")
+		return nil, fmt.Errorf("error getting data for OSD_DF: %w", err)
 	}
 
 	nodeList := d.Output.Nodes
