@@ -10,4 +10,4 @@ with_go
 
 install_go_dependencies
 
-mage -v check
+gotestsum --format testname --junitfile 'junit-report.xml' -- '-v ./...'
