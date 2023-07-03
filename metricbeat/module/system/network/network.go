@@ -180,12 +180,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 // with the ndo_get_stats64() callback defined in  net/ethernet/broadcom/tg3.c.
 // Long story short, we can't be completely sure if we're rolling over at max_u32 or max_u64.
 // if the previous value was > max_u32, do math assuming we've rolled over at max_u64.
+// On windows: This uses GetIfEntry: https://learn.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_if_row2 which uses ulong64.
+// On Darwin we just call netstat.
+// I'm assuming rollover behavior is similar.
 func createGaugeWithRollover(current uint64, prev uint64) uint64 {
 	// base case: no rollover
 	if current > prev || current == prev {
 		return current - prev
 	}
-
+	debugf("Warning: Gauge has rolled over. Current value: %d, previous: %d", current, prev)
 	// case: rollover
 	// case: we rolled over at 64 bits
 	if prev > math.MaxUint32 {

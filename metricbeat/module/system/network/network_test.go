@@ -23,6 +23,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -46,6 +47,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestNormalHostMetrics(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test requires linux")
+	}
 	basePath, err := os.Getwd()
 	require.NoError(t, err)
 
@@ -90,6 +94,9 @@ func TestNormalHostMetrics(t *testing.T) {
 }
 
 func TestRollover(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test requires linux")
+	}
 	basePath, err := os.Getwd()
 	require.NoError(t, err)
 
@@ -123,6 +130,9 @@ func TestRollover(t *testing.T) {
 }
 
 func TestRollover32(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("test requires linux")
+	}
 	basePath, err := os.Getwd()
 	require.NoError(t, err)
 
