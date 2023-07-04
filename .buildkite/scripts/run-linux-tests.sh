@@ -10,4 +10,6 @@ create_workspace
 
 install_go_dependencies
 
+go clean -modcache
+
 gotestsum --format testname --junitfile 'junit-report.xml' -- '-v ./...'

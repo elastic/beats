@@ -33,12 +33,12 @@ steps:
       provider: "gcp"
       image: "${WINDOWS_AGENT_IMAGE}"
     artifact_paths:
-      - "build/*.xml"
+      - "*.xml"
 
   - label: ":junit: Junit annotate"
     plugins:
       - junit-annotate#v2.4.1:
-          artifacts: "build/*.xml"
+          artifacts: "*.xml"
           fail-build-on-error: true
     agents:
       image: "${LINUX_AGENT_IMAGE}"
