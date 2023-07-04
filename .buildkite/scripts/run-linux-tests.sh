@@ -15,6 +15,8 @@ pwd
 
 install_go_dependencies
 
+which gotestsum
+
 go clean -modcache
 
-gotestsum --format testname --junitfile 'junit-report.xml' -- '-v ./...'
+gotestsum --format testname --junitfile junit-report.xml -- -v ./...
