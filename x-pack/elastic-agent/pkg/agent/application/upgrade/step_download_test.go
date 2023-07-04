@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
+
 	"github.com/stretchr/testify/require"
 )
 
