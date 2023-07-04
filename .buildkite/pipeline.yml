@@ -11,15 +11,17 @@ steps:
     key: lint-test
     command: ".buildkite/scripts/lint_test.sh"
     agents:
-      provider: "gcp"
       image: "${LINUX_AGENT_IMAGE}"
+      cpu: "8"
+      memory: "4G"
 
   - label: ":linux: Tests on Linux"
     key: linux-test
     command: ".buildkite/scripts/run-linux-tests.sh"
     agents:
-      provider: "gcp"
       image: "${LINUX_AGENT_IMAGE}"
+      cpu: "8"
+      memory: "4G"
     artifact_paths:
       - "build/*.xml"
 
@@ -38,7 +40,9 @@ steps:
           artifacts: "build/*.xml"
           fail-build-on-error: true
     agents:
-      provider: "gcp"
+      image: "${LINUX_AGENT_IMAGE}"
+      cpu: "4"
+      memory: "2G"
     depends_on:
       - step: "linux-test"
         allow_failure: true
