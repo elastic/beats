@@ -1,22 +1,9 @@
 #!/bin/bash
 
-set -euox pipefail
+set -euo pipefail
 
 source .buildkite/scripts/common.sh
 
-#create_workspace
-
-#with_go
-
-which go
-echo "$(go env GOPATH)"
-echo "$PATH"
-pwd
-
 install_go_dependencies
-
-which gotestsum
-
-go clean -modcache
 
 gotestsum --format testname --junitfile junit-report.xml -- -v ./...

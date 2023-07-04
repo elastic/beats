@@ -23,8 +23,7 @@ steps:
       image: "${LINUX_AGENT_IMAGE}"
       cpu: "8"
       memory: "4G"
-    artifact_paths:
-      - "build/*.xml"
+    artifact_paths: "*.xml"
 
   - label: ":windows: Tests on Windows"
     key: windows-test
@@ -32,8 +31,7 @@ steps:
     agents:
       provider: "gcp"
       image: "${WINDOWS_AGENT_IMAGE}"
-    artifact_paths:
-      - "*.xml"
+    artifact_paths: "*.xml"
 
   - label: ":junit: Junit annotate"
     plugins:
