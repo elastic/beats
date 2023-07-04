@@ -224,3 +224,15 @@
       type: integer
       description: >
         The BigQuery query output row count.
+  - name: binary_auth
+    type: group
+    description: >
+      Details pertaining to binary authorisation.
+    - name: dry_run_result
+      type: text
+      description: >
+        Result of binary authorisation when in dry run mode
+    - name: dry_run_enabled
+      type: bool
+      description: >
+        Boolean for storing if binary authorisation dry run mode is enabled

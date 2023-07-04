@@ -85,6 +85,25 @@ function Audit(keep_original_message) {
         }
     };
 
+    var convertLabels = new processor.Convert({
+
+        fields:[
+            {from:"json.labels", to: "labels"}
+        ],
+        mode:"rename",
+    });
+
+    var checkLabels = function(evt){
+        var arr = evt.Get()
+        if(Array.isArray(arr)){
+            if(arr.Get("imagepolicywebhook.image-policy.k8s.io/dry-run") === "True")
+            {
+                evt.Put("gcp.audit.binary_auth.dry_run_enabled",arr.Get("imagepolicywebhook.image-policy.k8s.io/dry-run"))
+                evt.Put("gcp.audit.binary_auth.dry_run_result",arr.Get("imagepolicywebhook.image-policy.k8s.io/overridden-verification-result"))
+            }
+        }
+    }
+
     // The log includes a protoPayload field.
     // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
     var convertLogEntry = new processor.Convert({
@@ -389,6 +408,8 @@ function Audit(keep_original_message) {
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
         .Add(copyFields)
+        .Add(convertLabels)
+        .Add(checkLabels)
         .Add(copyBigQueryFields)
         .Add(dropExtraFields)
         .Add(renameNestedFields)
