@@ -39,9 +39,7 @@ steps:
           artifacts: "*.xml"
           fail-build-on-error: true
     agents:
-      image: "${LINUX_AGENT_IMAGE}"
-      cpu: "4"
-      memory: "2G"
+      provider: "gcp"
     depends_on:
       - step: "linux-test"
         allow_failure: true
