@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+export GO_VERSION=$(cat .go-version)
+
 checkout_merge() {
     local target_branch=$1
     local pr_commit=$2
