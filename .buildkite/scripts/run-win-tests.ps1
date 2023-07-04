@@ -30,7 +30,7 @@ function installGoDependencies {
 }
 
 fixCRLF
-withGolang $env:GO_VERSION
+withGolang $env:GO_VERSION_CHOCO
 installGoDependencies
 
 $ErrorActionPreference = "Continue" # set +e
