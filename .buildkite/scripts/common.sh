@@ -2,13 +2,13 @@
 
 set -euo pipefail
 
-WORKSPACE="$(pwd)/bin"
+# WORKSPACE="$(go env GOPATH)/bin"
 
-create_workspace() {
-    if [[ ! -d "${WORKSPACE}" ]]; then
-    mkdir -p ${WORKSPACE}
-    fi
-}
+# create_workspace() {
+#     if [[ ! -d "${WORKSPACE}" ]]; then
+#     mkdir -p ${WORKSPACE}
+#     fi
+# }
 
 # with_go() {
 #     echo "Setting up the Go environment..."

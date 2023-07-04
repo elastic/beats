@@ -1,12 +1,17 @@
 #!/bin/bash
 
-set -euo pipefail
+set -euox pipefail
 
 source .buildkite/scripts/common.sh
 
-create_workspace
+#create_workspace
 
 #with_go
+
+which go
+echo "$(go env GOPATH)"
+echo "$PATH"
+pwd
 
 install_go_dependencies
 
