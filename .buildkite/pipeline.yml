@@ -1,5 +1,46 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
+env:
+  SETUP_GVM_VERSION: 'v0.5.0'
+  GO_VERSION_CHOCO: "1.20.5"
+  LINUX_AGENT_IMAGE: "golang:${GO_VERSION}"
+  WINDOWS_AGENT_IMAGE: "family/ci-windows-2022"
+
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+  - label: ":golangci-lint: Lint"
+    key: lint-test
+    command: ".buildkite/scripts/lint_test.sh"
+    agents:
+      image: "${LINUX_AGENT_IMAGE}"
+      cpu: "8"
+      memory: "4G"
+
+  - label: ":linux: Tests on Linux"
+    key: linux-test
+    command: ".buildkite/scripts/run-linux-tests.sh"
+    agents:
+      image: "${LINUX_AGENT_IMAGE}"
+      cpu: "8"
+      memory: "4G"
+    artifact_paths: "*.xml"
+
+  - label: ":windows: Tests on Windows"
+    key: windows-test
+    command: ".buildkite/scripts/run-win-tests.ps1"
+    agents:
+      provider: "gcp"
+      image: "${WINDOWS_AGENT_IMAGE}"
+    artifact_paths: "*.xml"
+
+  - label: ":junit: Junit annotate"
+    plugins:
+      - junit-annotate#v2.4.1:
+          artifacts: "*.xml"
+          fail-build-on-error: true
+    agents:
+      provider: "gcp"
+    depends_on:
+      - step: "linux-test"
+        allow_failure: true
+      - step: "windows-test"
+        allow_failure: true
