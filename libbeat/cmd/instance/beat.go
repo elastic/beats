@@ -778,6 +778,11 @@ func (b *Beat) configure(settings Settings) error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
+	// log if fips is enabled
+	if FIPSEnabled() {
+		logp.Info("BoringCrypto FIPS enabled")
+	}
+
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
 	if err != nil {
