@@ -437,7 +437,10 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case err := <-cm.client.Errors():
-			cm.logger.Errorf("elastic-agent-client error: %s", err)
+			if !errors.Is(context.Canceled, err) {
+				cm.logger.Errorf("elastic-agent-client error: %s", err)
+			}
+
 		}
 	}
 }
