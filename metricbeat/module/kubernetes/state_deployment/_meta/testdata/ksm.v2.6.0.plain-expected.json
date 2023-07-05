@@ -37,6 +37,10 @@
             "deployment": {
                 "name": "local-path-provisioner",
                 "paused": false,
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
+                },
                 "replicas": {
                     "available": 1,
                     "desired": 1,

@@ -65,6 +65,10 @@
             "deployment": {
                 "name": "coredns",
                 "paused": false,
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
+                },
                 "replicas": {
                     "available": 2,
                     "desired": 2,

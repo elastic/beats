@@ -32,7 +32,13 @@ var mapping = &p.MetricsMapping{
 		"kube_deployment_status_replicas_unavailable": p.Metric("replicas.unavailable"),
 		"kube_deployment_status_replicas_available":   p.Metric("replicas.available"),
 		"kube_deployment_spec_replicas":               p.Metric("replicas.desired"),
-		"kube_deployment_spec_paused":                 p.BooleanMetric("paused"),
+		"kube_deployment_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
+			"condition", map[string]string{
+				"Progressing": "progressing",
+				"Available":   "available",
+			},
+		)), //The current status conditions of a deployment
+		"kube_deployment_spec_paused": p.BooleanMetric("paused"),
 	},
 
 	Labels: map[string]p.LabelMap{
