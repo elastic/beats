@@ -221,6 +221,18 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "persistentvolumeclaim"
+	case *StorageClass:
+		sc := client.StorageV1().StorageClasses()
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return sc.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return sc.Watch(ctx, options)
+			},
+		}
+
+		objType = "storageclass"
 	case *Role:
 		r := client.RbacV1().Roles(opts.Namespace)
 		listwatch = &cache.ListWatch{

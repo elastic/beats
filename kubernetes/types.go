@@ -27,6 +27,7 @@ import (
 	networkingv1 "k8s.io/api/networking/v1"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -93,6 +94,9 @@ type PersistentVolume = v1.PersistentVolume
 
 // PersistentVolumeClaim data
 type PersistentVolumeClaim = v1.PersistentVolumeClaim
+
+// StorageClass data
+type StorageClass = storagev1.StorageClass
 
 // Role data
 type Role = rbacv1.Role

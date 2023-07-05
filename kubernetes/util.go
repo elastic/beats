@@ -113,8 +113,9 @@ func IsInCluster(kubeconfig string) bool {
 // If host is provided in the config use it directly.
 // If it is empty then try
 // 1. If beat is deployed in k8s cluster, use hostname of pod as the pod name to query pod metadata for node name.
-// 2. If step 1 fails or beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
-// 3. If node cannot be discovered with step 1,2, fallback to NODE_NAME env var as default value. In case it is not set return error.
+// 2. If step 1 fails or beat is deployed outside k8s cluster, use NODE_NAME env var.
+// 3. If node cannot be discovered with step 1,2, use machine-id to match against k8s nodes for node name. In case it is not set return error.
+// Note: There have been cases where machine-id reported by compute instances of some cloud providers where k8s nodes run on, has the wrong value.
 func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) (string, error) {
 	ctx := context.TODO()
 	// Discover node by configuration file (NODE) if set
@@ -132,6 +133,14 @@ func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) 
 		log.Debug(err)
 	}
 
+	// use environment variable NODE_NAME
+	node := os.Getenv("NODE_NAME")
+	if node != "" {
+		log.Infof("kubernetes: Node %s discovered by NODE_NAME environment variable", node)
+		return node, nil
+	}
+	log.Debug(errors.New("NODE_NAME environment variable is not set"))
+
 	// try discover node by machine id
 	node, err := discoverByMachineID(nd, ctx)
 	if err == nil {
@@ -139,13 +148,6 @@ func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) 
 		return node, nil
 	}
 	log.Debug(err)
-
-	// fallback to environment variable NODE_NAME
-	node = os.Getenv("NODE_NAME")
-	if node != "" {
-		log.Infof("kubernetes: Node %s discovered by NODE_NAME environment variable", node)
-		return node, nil
-	}
 
 	return "", errors.New("kubernetes: Node could not be discovered with any known method. Consider setting env var NODE_NAME")
 }
@@ -269,6 +271,15 @@ func GetContainersInPod(pod *Pod) []*ContainerInPod {
 	}
 
 	return containers
+}
+
+// PodLabels returns the labels in a pod
+func PodLabels(pod *Pod) mapstr.M {
+	labels := mapstr.M{}
+	for k, v := range pod.GetObjectMeta().GetLabels() {
+		_ = safemapstr.Put(labels, k, v)
+	}
+	return labels
 }
 
 // PodAnnotations returns the annotations in a pod

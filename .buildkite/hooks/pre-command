@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "elastic-agent-autodiscover" ]]; then
+  export GO_VERSION=$(cat .go-version)
+fi

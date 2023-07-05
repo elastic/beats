@@ -174,6 +174,17 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			podname:     "",
 			namespace:   "",
 		},
+		{
+			name:        "test value without inCluster, machine-ID set, node not found and env var set: priority given to the env var as more accurate",
+			host:        "",
+			isInCluster: false,
+			node:        "worker-2",
+			err:         nil,
+			setEnv:      true,
+			machineid:   "worker-1",
+			podname:     "",
+			namespace:   "",
+		},
 	}
 
 	for _, test := range tests {
