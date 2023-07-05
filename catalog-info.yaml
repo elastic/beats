@@ -47,6 +47,8 @@ spec:
       cancel_intermediate_builds_branch_filter: '!main'
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: '!main'
+      env:
+        ELASTIC_PR_COMMENTS_ENABLED: 'true'
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
