@@ -23,6 +23,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Metricbeat*
+- Introducing Deployment condition status metric in Kubernetes module {pull}35999[35999]
 
 
 *Osquerybeat*
