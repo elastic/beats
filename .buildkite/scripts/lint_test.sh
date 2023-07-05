@@ -9,4 +9,5 @@ create_workspace
 install_go_dependencies
 
 mage notice
+
 mage -v check
