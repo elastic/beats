@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- Do not print context cancelled error message when running under agent {pull}36005[36005]
 
 
 
