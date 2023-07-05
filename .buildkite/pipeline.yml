@@ -12,16 +12,16 @@ steps:
     command: ".buildkite/scripts/lint_test.sh"
     agents:
       image: "${LINUX_AGENT_IMAGE}"
-      cpu: "4"
-      memory: "2G"
+      cpu: "2"
+      memory: "1G"
 
   - label: ":linux: Tests on Linux"
     key: linux-test
     command: ".buildkite/scripts/run-linux-tests.sh"
     agents:
       image: "${LINUX_AGENT_IMAGE}"
-      cpu: "4"
-      memory: "2G"
+      cpu: "2"
+      memory: "1G"
     artifact_paths: "*.xml"
 
   - label: ":windows: Tests on Windows"
