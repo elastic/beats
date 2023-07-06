@@ -185,17 +185,19 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 // I'm assuming rollover behavior is similar.
 func createGaugeWithRollover(current uint64, prev uint64) uint64 {
 	// base case: no rollover
-	if current > prev || current == prev {
+	if current >= prev {
 		return current - prev
 	}
-	debugf("Warning: Gauge has rolled over. Current value: %d, previous: %d", current, prev)
+
 	// case: rollover
 	// case: we rolled over at 64 bits
 	if prev > math.MaxUint32 {
+		debugf("Warning: Rollover 64 bit gauge detected. Current value: %d, previous: %d", current, prev)
 		remaining := math.MaxUint64 - prev
 		return current + remaining
 	}
 	// case: we rolled over at 32 bits
+	debugf("Warning: Rollover 32 bit gauge detected. Current value: %d, previous: %d", current, prev)
 	remaining := math.MaxUint32 - prev
 	return current + remaining
 
