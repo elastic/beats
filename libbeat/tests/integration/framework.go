@@ -30,21 +30,26 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/stretchr/testify/require"
 )
 
 type BeatProc struct {
-	Binary        string
-	Args          []string
-	Cmd           *exec.Cmd
-	t             *testing.T
-	tempDir       string
-	configFile    string
-	beatName      string
-	logFileOffset int64
+	Args                []string
+	Binary              string
+	Cmd                 *exec.Cmd
+	RestartOnBeatOnExit bool
+	beatName            string
+	cmdMutex            sync.Mutex
+	configFile          string
+	fullPath            string
+	logFileOffset       int64
+	t                   *testing.T
+	tempDir             string
 }
 
 // NewBeat createa a new Beat process from the system tests binary.
@@ -72,25 +77,78 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
 }
 
 // Start starts the Beat process
-// args are extra arguments to be passed to the Beat
+// args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
 	t := b.t
-	b.Args = append(b.Args, args...)
+
 	fullPath, err := filepath.Abs(b.Binary)
 	if err != nil {
 		t.Fatalf("could not get full path from %q, err: %s", b.Binary, err)
 	}
-	b.Cmd = exec.Command(fullPath, b.Args...)
 
-	if err := b.Cmd.Start(); err != nil {
-		t.Fatalf("could not start process: %s", err)
+	b.fullPath = fullPath
+	b.Args = append(b.Args, args...)
+
+	done := atomic.MakeBool(false)
+	wg := sync.WaitGroup{}
+	if b.RestartOnBeatOnExit {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for !done.Load() {
+				b.startBeat()
+				b.waitBeatToExit()
+			}
+		}()
+	} else {
+		b.startBeat()
 	}
+
 	t.Cleanup(func() {
-		pid := b.Cmd.Process.Pid
+		b.cmdMutex.Lock()
+		// 1. Kill the Beat
 		if err := b.Cmd.Process.Signal(os.Interrupt); err != nil {
-			t.Fatalf("could not stop process with PID: %d, err: %s", pid, err)
+			t.Fatalf("could not stop process with PID: %d, err: %s",
+				b.Cmd.Process.Pid, err)
+		}
+
+		// Make sure the goroutine restarting the Beat has exited
+		if b.RestartOnBeatOnExit {
+			// 2. Set the done flag so the goroutine loop can exit
+			done.Store(true)
+			// 3. Release the mutex, keeping it locked until now
+			// ensures a new process won't start
+			b.cmdMutex.Unlock()
+			// 4. Wait for the goroutine to finish, this helps ensuring
+			// no other Beat process was started
+			wg.Wait()
 		}
 	})
+}
+
+// startBeat starts the Beat process. This method
+// does not block nor waits the Beat to finish.
+func (b *BeatProc) startBeat() {
+	b.cmdMutex.Lock()
+
+	b.Cmd = exec.Command(b.fullPath, b.Args...)
+	if err := b.Cmd.Start(); err != nil {
+		b.t.Fatalf("could not start %q process: %s", b.beatName, err)
+	}
+
+	b.cmdMutex.Unlock()
+}
+
+// waitBeatToExit blocks until the Beat exits, it returns
+// the process' exit code.
+// `startBeat` must be called before this method.
+func (b *BeatProc) waitBeatToExit() int {
+	if err := b.Cmd.Wait(); err != nil {
+		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
+			b.beatName, err, b.Cmd.ProcessState.ExitCode())
+	}
+
+	return b.Cmd.ProcessState.ExitCode()
 }
 
 // LogContains looks for `s` as a substring of every log line,
@@ -209,6 +267,7 @@ func (b *BeatProc) openLogFile() *os.File {
 func createTempDir(t *testing.T) string {
 	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
 		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
+
 	if err != nil {
 		t.Fatal(err)
 	}
