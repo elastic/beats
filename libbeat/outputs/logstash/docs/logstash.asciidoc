@@ -272,8 +272,9 @@ is best used with load balancing mode enabled. Example: If you have 2 hosts and
 ===== `loadbalance`
 
 If set to true and multiple {ls} hosts are configured, the output plugin
-load balances published events onto all {ls} hosts. If set to false,
-the output plugin sends all events to only one host (determined at random) and
+load balances published events across all {ls} hosts. While events are evenly distributed, they are not duplicated. 
+A single event is only published to a single host.
+If set to false, the output plugin sends all events to only one host (determined at random) and
 will switch to another host if the selected one becomes unresponsive. The default value is false.
 
 ["source","yaml",subs="attributes"]
