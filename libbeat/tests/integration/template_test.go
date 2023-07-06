@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -297,4 +298,343 @@ logging:
 	u := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), datastream)
 	r, _ := http.Get(u)
 	require.Equal(t, 404, r.StatusCode, "incorrect status code")
+}
+
+func TestSetupCmd(t *testing.T) {
+	EnsureESIsRunning(t)
+
+	cfg := `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+logging:
+  level: debug
+`
+	dataStream := "mockbeat-9.9.9"
+	policy := "mockbeat"
+	esURL := GetESURL(t, "http")
+	user := esURL.User.Username()
+	pass, _ := esURL.User.Password()
+	dataStreamURL, err := FormatDatastreamURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	templateURL, err := FormatIndexTemplateURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	policyURL, err := FormatPolicyURL(t, esURL, policy)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+		require.NoError(t, err)
+	})
+	// Make sure datastream, template and policy don't exist
+	_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+	require.NoError(t, err)
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
+	mockbeat.Start("setup", "--index-management")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	// check template loaded
+	status, body, err := HttpDo(t, http.MethodGet, templateURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
+
+	var r IndexTemplateResult
+	err = json.Unmarshal(body, &r)
+	require.NoError(t, err)
+	var found bool
+	for _, t := range r.IndexTemplates {
+		if t.Name == dataStream {
+			found = true
+		}
+	}
+	require.Truef(t, found, "data stream should be in: %v", r.IndexTemplates)
+
+	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
+
+	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+
+	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+}
+
+func TestSetupCmdTemplateDisabled(t *testing.T) {
+	EnsureESIsRunning(t)
+
+	cfg := `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+logging:
+  level: debug
+setup:
+  template:
+    enabled: false
+`
+	dataStream := "mockbeat-9.9.9"
+	policy := "mockbeat"
+	esURL := GetESURL(t, "http")
+	user := esURL.User.Username()
+	pass, _ := esURL.User.Password()
+	dataStreamURL, err := FormatDatastreamURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	templateURL, err := FormatIndexTemplateURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	policyURL, err := FormatPolicyURL(t, esURL, policy)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+		require.NoError(t, err)
+	})
+	// Make sure datastream, template and policy don't exist
+	_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+	require.NoError(t, err)
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
+	mockbeat.Start("setup", "--index-management")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	// check template didn't load
+	status, body, err := HttpDo(t, http.MethodGet, templateURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusNotFound, status, "incorrect status code")
+
+	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
+
+	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+
+	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+}
+
+func TestSetupCmdTemplateWithOpts(t *testing.T) {
+	EnsureESIsRunning(t)
+
+	cfg := `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+logging:
+  level: debug
+`
+	dataStream := "mockbeat-9.9.9"
+	policy := "mockbeat"
+	esURL := GetESURL(t, "http")
+	user := esURL.User.Username()
+	pass, _ := esURL.User.Password()
+	dataStreamURL, err := FormatDatastreamURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	templateURL, err := FormatIndexTemplateURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	policyURL, err := FormatPolicyURL(t, esURL, policy)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+		require.NoError(t, err)
+	})
+	// Make sure datastream, template and policy don't exist
+	_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+	require.NoError(t, err)
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
+	mockbeat.Start("setup", "--index-management", "-E", "setup.ilm.enabled=false", "-E", "setup.template.settings.index.number_of_shards=2")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	// check template loaded
+	status, body, err := HttpDo(t, http.MethodGet, templateURL)
+	require.NoError(t, err)
+	require.Equalf(t, http.StatusOK, status, "incorrect status code for :%s", templateURL.String())
+	require.Truef(t, strings.Contains(string(body), "number_of_shards\":\"2"), "number of shards not found in %s", string(body))
+}
+
+func TestTemplateCreatedOnIlmPolicyCreated(t *testing.T) {
+	EnsureESIsRunning(t)
+
+	cfg := `
+mockbeat:
+output:
+  elasticsearch:
+    hosts: %s
+    username: %s
+    password: %s
+    allow_older_versions: true
+logging:
+  level: debug
+`
+	dataStream := "mockbeat-9.9.9"
+	policy := "mockbeat"
+	esURL := GetESURL(t, "http")
+	user := esURL.User.Username()
+	pass, _ := esURL.User.Password()
+	dataStreamURL, err := FormatDatastreamURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	templateURL, err := FormatIndexTemplateURL(t, esURL, dataStream)
+	require.NoError(t, err)
+	policyURL, err := FormatPolicyURL(t, esURL, policy)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+		require.NoError(t, err)
+		_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+		require.NoError(t, err)
+	})
+	// Make sure datastream, template and policy don't exist
+	_, _, err = HttpDo(t, http.MethodDelete, dataStreamURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, templateURL)
+	require.NoError(t, err)
+	_, _, err = HttpDo(t, http.MethodDelete, policyURL)
+	require.NoError(t, err)
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), user, pass))
+	mockbeat.Start("setup", "--index-management", "-E", "setup.ilm.enabled=false")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	// check template loaded
+	status, body, err := HttpDo(t, http.MethodGet, templateURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
+
+	var r IndexTemplateResult
+	err = json.Unmarshal(body, &r)
+	require.NoError(t, err)
+	var found bool
+	for _, t := range r.IndexTemplates {
+		if t.Name == dataStream {
+			found = true
+		}
+	}
+	require.Truef(t, found, "data stream should be in: %v", r.IndexTemplates)
+
+	// check policy not created
+	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	require.NoError(t, err)
+	require.Equalf(t, http.StatusNotFound, status, "incorrect status code for: %s", policyURL.String())
+
+	mockbeat.Start("setup", "--index-management", "-E", "setup.template.overwrite=false", "-E", "setup.template.settings.index.number_of_shards=2")
+	procState, err = mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+
+	// check policy created
+	status, body, err = HttpDo(t, http.MethodGet, policyURL)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, status, "incorrect status code")
+
+	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+
+	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+}
+
+func TestExportTemplate(t *testing.T) {
+	cfg := `
+mockbeat:
+output:
+  console:
+    enabled: true
+logging:
+  level: debug
+`
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start("export", "template")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("mockbeat-9.9.9", 5*time.Second)
+}
+
+func TestExportTemplateDisabled(t *testing.T) {
+	cfg := `
+mockbeat:
+output:
+  console:
+    enabled: true
+logging:
+  level: debug
+`
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start("export", "template", "-E", "setup.template.enabled=false")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("mockbeat-9.9.9", 5*time.Second)
+}
+
+func TestExportAbsolutePath(t *testing.T) {
+	cfg := `
+mockbeat:
+output:
+  console:
+    enabled: true
+logging:
+  level: debug
+`
+
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	output := filepath.Join(mockbeat.TempDir(), "template", "mockbeat-9.9.9.json")
+	t.Cleanup(func() {
+		os.Remove(output)
+	})
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start("export", "template", "--dir", mockbeat.TempDir())
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("Writing to", 5*time.Second)
+	mockbeat.WaitFileContains(output, "mockbeat-9.9.9", 5*time.Second)
 }

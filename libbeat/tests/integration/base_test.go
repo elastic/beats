@@ -197,7 +197,6 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitStdErrContains("mockbeat start running.", 10*time.Second)
-	// mockbeat.WaitForLogs("Home path", 60*time.Second, "error waiting for mockbeat to start")
 
 	metaFile1, err := mockbeat.LoadMeta()
 	require.NoError(t, err, "error opening meta.json file")
