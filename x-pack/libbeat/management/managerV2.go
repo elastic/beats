@@ -34,6 +34,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
+var errStoppingOnOutputChange = errors.New("stopping Beat on output change")
+
 // diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
 // since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
 type diagnosticHandler struct {
@@ -594,6 +596,12 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 
 	// reload the output configuration
 	if err := cm.reloadOutput(outputUnit); err != nil {
+		// The manager has already signalled the Beat to stop,
+		// there is nothing else to do. Trying to reload inputs
+		// will only lead to race conditions.
+		if errors.Is(err, errStoppingOnOutputChange) {
+			return
+		}
 		// Output creation failed, there is no point in going any further
 		// because there is no output read the events.
 		//
@@ -690,7 +698,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(client.UnitStateStopping, "Restarting", nil)
 		cm.Stop()
-		return nil
+		return errStoppingOnOutputChange
 	}
 
 	reloadConfig, err := groupByOutputs(expected.Config)
@@ -698,12 +706,16 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		return fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
+	// Set those variables regardless of the outcome of output.Reload
+	// this ensures that if we're on a failed output state and a new
+	// output configuration is sent, the Beat will gracefully exit
+	cm.lastOutputCfg = expected.Config
+	cm.lastBeatOutputCfg = reloadConfig
+
 	err = output.Reload(reloadConfig)
 	if err != nil {
 		return fmt.Errorf("failed to reload output: %w", err)
 	}
-	cm.lastOutputCfg = expected.Config
-	cm.lastBeatOutputCfg = reloadConfig
 	return nil
 }
 
