@@ -19,6 +19,19 @@ type unitKey struct {
 	ID   string
 }
 
+// NewMockServer creates a GRPC server to mock the Elastic-Agent.
+// On the first check in call it will send the first element of `unit`
+// as the expected unit, on successive calls, if the Beat has reached
+// that state, it will move on to sending the next state.
+// It will also validate the features.
+//
+// if `observedCallback` is not nil, it will be called on every
+// check in receiving the `proto.CheckinObserved` sent by the
+// Beat and index from `units` that was last sent to the Beat.
+//
+// If `delay` is not zero, when the Beat state matches the last
+// sent units, the server will wait for `delay` before sending the
+// the next state. This will block the check in call from the Beat.
 func NewMockServer(
 	units [][]*proto.UnitExpected,
 	featuresIdxs []uint64,
@@ -37,7 +50,7 @@ func NewMockServer(
 			if observedCallback != nil {
 				observedCallback(observed, i)
 			}
-			matches := DoesStateMatch(observed, units[i], featuresIdxs[i])
+			matches := doesStateMatch(observed, units[i], featuresIdxs[i])
 			if !matches {
 				// send same set of units and features
 				return &proto.CheckinExpected{
@@ -72,7 +85,7 @@ func NewMockServer(
 	}
 }
 
-func DoesStateMatch(
+func doesStateMatch(
 	observed *proto.CheckinObserved,
 	expectedUnits []*proto.UnitExpected,
 	expectedFeaturesIdx uint64,

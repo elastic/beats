@@ -267,7 +267,6 @@ func (b *BeatProc) openLogFile() *os.File {
 func createTempDir(t *testing.T) string {
 	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
 		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
-
 	if err != nil {
 		t.Fatal(err)
 	}
