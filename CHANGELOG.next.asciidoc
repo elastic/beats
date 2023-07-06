@@ -23,22 +23,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-
 *Functionbeat*
 
 ==== Bugfixes
 
 *Affecting all Beats*
-- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
-- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
 
+
+
+*Filebeat*
 
 
 *Auditbeat*
 
 
 *Filebeat*
-- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 
 *Heartbeat*
@@ -51,7 +50,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Winlogbeat*
-- Move repeated channel not found errors to debug level.  {issue}35314[35314] {pull}35317[35317]
 
 
 *Functionbeat*
@@ -173,5 +171,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 

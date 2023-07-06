@@ -57,7 +57,10 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
-	logp.TestingSetup()
+	errSetup := logp.TestingSetup()
+	if errSetup != nil {
+		t.Errorf("Error in setup: %v", errSetup)
+	}
 
 	t.Run("download text/plain file", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
@@ -200,6 +203,14 @@ func TestS3ObjectProcessor(t *testing.T) {
 		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
+	})
+
+	t.Run("text file without end of line marker", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/no-eol.txt", "text/plain", 1)
+	})
+
+	t.Run("text file without end of line marker but with newline", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/no-eol-twolines.txt", "text/plain", 2)
 	})
 }
 

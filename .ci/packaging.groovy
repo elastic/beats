@@ -46,7 +46,7 @@ pipeline {
   stages {
     stage('Filter build') {
       options { skipDefaultCheckout() }
-      agent { label 'ubuntu-20 && immutable' }
+      agent { label 'ubuntu-22 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -120,8 +120,6 @@ pipeline {
           when {
             allOf {
               expression { return env.IS_BRANCH_AVAILABLE == "true" }
-              // DRA is not supported in 7.17 yet
-              not { branch '7.17' }
             }
           }
           steps {
@@ -144,8 +142,6 @@ pipeline {
               // minor version is created, therefore old release branches won't be able
               // to use the release manager as their definition is removed.
               expression { return env.IS_BRANCH_AVAILABLE == "true" }
-              // DRA is not supported in 7.17 yet
-              not { branch '7.17' }
             }
           }
           steps {
@@ -268,7 +264,7 @@ def generateSteps() {
 
 def generateArmStep(beat) {
   return {
-    withNode(labels: 'arm') {
+    withNode(labels: 'ubuntu-2204-aarch64') {
       withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
@@ -290,7 +286,7 @@ def generateArmStep(beat) {
 
 def generateLinuxStep(beat) {
   return {
-    withNode(labels: 'ubuntu-20.04 && immutable') {
+    withNode(labels: 'ubuntu-22.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()

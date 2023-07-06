@@ -119,6 +119,8 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
 - Update Go version to 1.17.1. {pull}27543[27543]
 - Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+- Improve tests files with shorter statements. {pull}35667[35667]
+- Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
 
 ==== Deprecated
 

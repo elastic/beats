@@ -71,7 +71,7 @@ func ModuleDocs() error {
 	}
 
 	// Run the docs_collector.py script.
-	ve, err := devtools.PythonVirtualenv()
+	ve, err := devtools.PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}
