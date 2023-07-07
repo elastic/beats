@@ -163,6 +163,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
+	Decoding                 decoderConfig           `config:"decoding"`
 }
 
 func (rc *readerConfig) Validate() error {

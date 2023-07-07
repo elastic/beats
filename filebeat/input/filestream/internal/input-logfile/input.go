@@ -30,6 +30,7 @@ import (
 
 type managedInput struct {
 	userID           string
+	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
@@ -61,6 +62,9 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	metrics := NewMetrics(inp.metricsID)
+	defer metrics.Close()
+
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      newReaderGroup(),
@@ -74,6 +78,7 @@ func (inp *managedInput) Run(
 			time.Minute, // magic number
 			ctx.Logger,
 			"harvester:"),
+		metrics: metrics,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()

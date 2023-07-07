@@ -2,10 +2,10 @@
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
+# If this option is not defined, the hostname is used.
 #name:
 
-# The tags of the shipper are included in their own field with each
+# The tags of the shipper are included in their field with each
 # transaction published. Tags make it easy to group servers by different
 # logical properties.
 #tags: ["service-X", "web-tier"]
@@ -17,7 +17,7 @@
 #  env: staging
 
 # If this option is set to true, the custom fields are stored as top-level
-# fields in the output document instead of being grouped under a fields
+# fields in the output document instead of being grouped under a field
 # sub-dictionary. Default is false.
 #fields_under_root: false
 
@@ -29,7 +29,7 @@
 #queue:
   # Queue type by name (default 'mem')
   # The memory queue will present all available events (up to the outputs
-  # bulk_max_size) to the output, the moment the output is ready to server
+  # bulk_max_size) to the output, the moment the output is ready to serve
   # another batch of events.
   #mem:
     # Max number of events the queue can buffer.
@@ -81,6 +81,6 @@
     # length of its retry interval each time, up to this maximum.
     #max_retry_interval: 30s
 
-# Sets the maximum number of CPUs that can be executing simultaneously. The
+# Sets the maximum number of CPUs that can be executed simultaneously. The
 # default is the number of logical CPUs available in the system.
 #max_procs:
