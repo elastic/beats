@@ -45789,6 +45789,26 @@ type: boolean
 
 --
 
+
+*`kubernetes.deployment.status.available`*::
++
+--
+Deployment Available Condition status (true, false or unknown)
+
+
+type: keyword
+
+--
+
+*`kubernetes.deployment.status.progressing`*::
++
+--
+Deployment Progresing Condition status (true, false or unknown)
+
+type: keyword
+
+--
+
 [float]
 === replicas
 
