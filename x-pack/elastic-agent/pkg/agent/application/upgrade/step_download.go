@@ -20,6 +20,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
+const (
+	defaultUpgradeFallbackPGP = "https://artifacts.elastic.co/GPG-KEY-elastic-agent"
+)
+
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string, skipVerifyOverride bool, pgpBytes ...string) (string, error) {
 	// do not update source config
 	settings := *u.settings
@@ -32,6 +36,8 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 			settings.SourceURI = sourceURI
 		}
 	}
+
+	pgpBytes = appendFallbackPGP(pgpBytes)
 
 	fetcher, err := newDownloader(version, u.log, &settings)
 	if err != nil {
@@ -61,6 +67,16 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	}
 
 	return path, nil
+}
+
+func appendFallbackPGP(pgpBytes []string) []string {
+	if pgpBytes == nil {
+		pgpBytes = make([]string, 0, 1)
+	}
+
+	fallbackPGP := download.PgpSourceURIPrefix + defaultUpgradeFallbackPGP
+	pgpBytes = append(pgpBytes, fallbackPGP)
+	return pgpBytes
 }
 
 func newDownloader(version string, log *logger.Logger, settings *artifact.Config) (download.Downloader, error) {
