@@ -194,12 +194,12 @@ func createGaugeWithRollover(current uint64, prev uint64) uint64 {
 	if prev > math.MaxUint32 {
 		debugf("Warning: Rollover 64 bit gauge detected. Current value: %d, previous: %d", current, prev)
 		remaining := math.MaxUint64 - prev
-		return current + remaining
+		return current + remaining + 1 // the +1 counts the actual "rollover" increment.
 	}
 	// case: we rolled over at 32 bits
 	debugf("Warning: Rollover 32 bit gauge detected. Current value: %d, previous: %d", current, prev)
 	remaining := math.MaxUint32 - prev
-	return current + remaining
+	return current + remaining + 1
 
 }
 

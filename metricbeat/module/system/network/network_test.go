@@ -122,11 +122,11 @@ func TestRollover(t *testing.T) {
 
 	ingressBytes, err := evt.RootFields.GetValue("host.network.ingress.bytes")
 	require.NoError(t, err)
-	require.Equal(t, uint64(600), ingressBytes)
+	require.Equal(t, uint64(601), ingressBytes)
 
 	egressBytes, err := evt.RootFields.GetValue("host.network.egress.bytes")
 	require.NoError(t, err)
-	require.Equal(t, uint64(901), egressBytes)
+	require.Equal(t, uint64(902), egressBytes)
 }
 
 func TestRollover32(t *testing.T) {
@@ -158,11 +158,11 @@ func TestRollover32(t *testing.T) {
 
 	egressBytes, err := evt.RootFields.GetValue("host.network.egress.bytes")
 	require.NoError(t, err)
-	require.Equal(t, uint64(3037888885), egressBytes)
+	require.Equal(t, uint64(3037888886), egressBytes)
 
 	ingressBytes, err := evt.RootFields.GetValue("host.network.ingress.bytes")
 	require.NoError(t, err)
-	require.Equal(t, uint64(1100), ingressBytes)
+	require.Equal(t, uint64(1101), ingressBytes)
 }
 
 func TestGauge(t *testing.T) {
@@ -170,7 +170,7 @@ func TestGauge(t *testing.T) {
 	var currentu32 uint64 = 10
 
 	resultu32 := createGaugeWithRollover(currentu32, prevu32)
-	require.Equal(t, uint64(20), resultu32)
+	require.Equal(t, uint64(21), resultu32)
 
 	var prevNoRollover uint64 = 347458374592
 	var currentNoRollover = prevNoRollover + 3452
@@ -180,7 +180,17 @@ func TestGauge(t *testing.T) {
 	var prevu64 uint64 = math.MaxUint64 - 5000
 	var currentu64 uint64 = 32
 	resultu64 := createGaugeWithRollover(currentu64, prevu64)
-	require.Equal(t, uint64(5032), resultu64)
+	require.Equal(t, uint64(5033), resultu64)
+}
+
+func TestGaugeRolloverIncrement(t *testing.T) {
+	// test to see if we're properly incrementing when we rollover
+	// i.e do we count the increment from MAX_INT to 0?
+	var prevU64 uint64 = math.MaxUint64
+	current := uint64(0)
+
+	resultu32 := createGaugeWithRollover(current, prevU64)
+	require.Equal(t, uint64(1), resultu32)
 }
 
 func findRootEvent(events []mb.Event) (bool, mb.Event) {
