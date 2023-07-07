@@ -595,13 +595,15 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	publisher.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
-	if err := cm.reloadOutput(outputUnit); err != nil {
-		// The manager has already signalled the Beat to stop,
-		// there is nothing else to do. Trying to reload inputs
-		// will only lead to race conditions.
-		if errors.Is(err, errStoppingOnOutputChange) {
-			return
-		}
+	restartBeat, err := cm.reloadOutput(outputUnit)
+	// The manager has already signalled the Beat to stop,
+	// there is nothing else to do. Trying to reload inputs
+	// will only lead to invalid state updates and possible
+	// race conditions.
+	if restartBeat {
+		return
+	}
+	if err != nil {
 		// Output creation failed, there is no point in going any further
 		// because there is no output read the events.
 		//
@@ -662,34 +664,40 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	}
 }
 
-func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
+// reloadOutput reload outputs, it returns a bool and an error.
+// The bool, if set, indicates that the output reload requires an restart,
+// in that case the error is always `nil`.
+//
+// In any other case, the bool is always false and the error will be non nil
+// if any error has occurred.
+func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) (bool, error) {
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 	output := cm.registry.GetReloadableOutput()
 	if output == nil {
-		return fmt.Errorf("failed to find beat reloadable type 'output'")
+		return false, fmt.Errorf("failed to find beat reloadable type 'output'")
 	}
 
 	if unit == nil {
 		// output is being stopped
 		err := output.Reload(nil)
 		if err != nil {
-			return fmt.Errorf("failed to reload output: %w", err)
+			return false, fmt.Errorf("failed to reload output: %w", err)
 		}
 		cm.lastOutputCfg = nil
 		cm.lastBeatOutputCfg = nil
-		return nil
+		return false, nil
 	}
 
 	expected := unit.Expected()
 	if expected.Config == nil {
 		// should not happen; hard stop
-		return fmt.Errorf("output unit has no config")
+		return false, fmt.Errorf("output unit has no config")
 	}
 
 	if cm.lastOutputCfg != nil && gproto.Equal(cm.lastOutputCfg, expected.Config) {
 		// configuration for the output did not change; do nothing
 		cm.logger.Debug("Skipped reloading output; configuration didn't change")
-		return nil
+		return false, nil
 	}
 
 	cm.logger.Debugf("Got output unit config '%s'", expected.Config.GetId())
@@ -698,12 +706,12 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(client.UnitStateStopping, "Restarting", nil)
 		cm.Stop()
-		return errStoppingOnOutputChange
+		return true, nil
 	}
 
 	reloadConfig, err := groupByOutputs(expected.Config)
 	if err != nil {
-		return fmt.Errorf("failed to generate config for output: %w", err)
+		return false, fmt.Errorf("failed to generate config for output: %w", err)
 	}
 
 	// Set those variables regardless of the outcome of output.Reload
@@ -714,9 +722,9 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 
 	err = output.Reload(reloadConfig)
 	if err != nil {
-		return fmt.Errorf("failed to reload output: %w", err)
+		return false, fmt.Errorf("failed to reload output: %w", err)
 	}
-	return nil
+	return false, nil
 }
 
 func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {

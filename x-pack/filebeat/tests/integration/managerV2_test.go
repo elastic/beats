@@ -15,7 +15,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -466,13 +465,13 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 		{}, // An empty one makes the Beat exit
 	}
 
-	// We use `testDone` to notify `require.Eventually` at the end of the test
-	// that the desired state has been reached.
-	testDone := atomic.MakeBool(false)
+	// We use `success` to signal the test has ended successfully
+	// if `success` is never closed, then the test will fail with a timeout.
+	success := make(chan struct{})
 	// The test is successful when we reach the last element of `protoUnits`
 	onObserved := func(observed *proto.CheckinObserved, protoUnitsIdx int) {
 		if protoUnitsIdx == len(protoUnits)-1 {
-			testDone.Store(true)
+			close(success)
 		}
 	}
 
@@ -493,13 +492,11 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 		"-E", "management.restart_on_output_change=true",
 	)
 
-	require.Eventually(
-		t,
-		func() bool { return testDone.Load() },
-		60*time.Second,
-		100*time.Millisecond,
-		"Output did not recover from a invalid configuration",
-	)
+	select {
+	case <-success:
+	case <-time.After(60 * time.Second):
+		t.Fatal("Output did not recover from a invalid configuration after 60s of waiting")
+	}
 }
 
 // generateLogFile generates a log file by appending the current

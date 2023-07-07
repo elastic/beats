@@ -34,8 +34,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
