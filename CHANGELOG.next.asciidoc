@@ -68,12 +68,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-
-*Auditbeat*
-
-
-*Filebeat*
-
+- Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 
 *Heartbeat*
 
