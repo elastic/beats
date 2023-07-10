@@ -1116,7 +1116,7 @@ var testCases = []struct {
 				switch r.URL.Path {
 				case "/":
 					fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212", "createdAt":"22/02/2022",
-					"nextLink":"%s/link1"}`, serverURL)
+						"nextLink":"%s/link1"}`, serverURL)
 				case "/link1":
 					fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213", "createdAt":"24/04/2022"}`)
 				case "/2212/1":
@@ -1195,7 +1195,7 @@ var testCases = []struct {
 				switch r.URL.Path {
 				case "/":
 					fmt.Fprintf(w, `{"files":[{"id":"1"},{"id":"2"}],"exportId":"2212","time":[{"timeStamp":"22/02/2022"}],
-					"nextLink":"%s/link1"}`, serverURL)
+						"nextLink":"%s/link1"}`, serverURL)
 				case "/link1":
 					fmt.Fprintln(w, `{"files":[{"id":"3"},{"id":"4"}], "exportId":"2213","time":[{"timeStamp":"24/04/2022"}]}`)
 				case "/2212/1":
