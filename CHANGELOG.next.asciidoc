@@ -146,6 +146,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
 - Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}35972[35972]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35996[35996]
+- Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
 
 *Heartbeat*
 
