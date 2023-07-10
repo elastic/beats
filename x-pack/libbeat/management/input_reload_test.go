@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -51,7 +52,7 @@ func TestInputReload(t *testing.T) {
 		configIdx = currentIdx
 	}
 
-	srv := mockSrv([][]*proto.UnitExpected{
+	srv := integration.NewMockServer([][]*proto.UnitExpected{
 		{
 			{
 				Id:             "output-unit",

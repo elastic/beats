@@ -20,9 +20,9 @@
 package perfmon
 
 import (
+	"errors"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 var allowedFormats = []string{"float", "large", "long"}
@@ -63,7 +63,7 @@ func (counter *QueryCounter) InitDefaults() {
 
 func (counter *QueryCounter) Validate() error {
 	if !isValidFormat(counter.Format) {
-		return errors.Errorf("initialization failed: format '%s' "+
+		return fmt.Errorf("initialization failed: format '%s' "+
 			"for counter '%s' is invalid (must be float, large or long)",
 			counter.Format, counter.Name)
 	}
