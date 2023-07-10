@@ -9,16 +9,15 @@ import (
 
 // JSONDecoder is a decoder for json data.
 type JSONDecoder struct {
-	offset       int64
-	isRootArray  bool
-	isCompressed bool
-	reader       *io.Reader
-	decoder      *json.Decoder
+	offset      int64
+	isRootArray bool
+	reader      *io.Reader
+	decoder     *json.Decoder
 }
 
 // NewJSONDecoder creates a new json decoder.
 // It returns an error if the json reader cannot be created.
-func NewJSONDecoder(config JSONConfig, r io.Reader, isCompressed bool) (Decoder, error) {
+func NewJSONDecoder(config DecoderConfig, r io.Reader) (Decoder, error) {
 	r, isRootArray, err := evaluateJSON(bufio.NewReader(r))
 	if err != nil {
 		return nil, fmt.Errorf("failed to evaluate json with error: %w", err)
@@ -34,10 +33,9 @@ func NewJSONDecoder(config JSONConfig, r io.Reader, isCompressed bool) (Decoder,
 	dec.UseNumber()
 
 	return &JSONDecoder{
-		isRootArray:  isRootArray,
-		isCompressed: isCompressed,
-		reader:       &r,
-		decoder:      dec,
+		isRootArray: isRootArray,
+		reader:      &r,
+		decoder:     dec,
 	}, nil
 }
 

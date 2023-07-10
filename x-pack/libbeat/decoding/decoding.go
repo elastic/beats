@@ -39,6 +39,8 @@ func NewDecoder(config DecoderConfig, r io.Reader, offset int64) (Decoder, error
 		return nil, nil
 	case config.Codec.Parquet != nil:
 		return NewParquetDecoder(config, r)
+	case config.Codec.JSON != nil:
+		return NewJSONDecoder(config, r)
 	default:
 		return nil, fmt.Errorf("unsupported config value: %v", config)
 	}
