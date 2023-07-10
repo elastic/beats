@@ -58,7 +58,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
 	results, err := m.QueryStats(ctx, "SELECT EXTRACT(EPOCH FROM write_lag)::INT AS write_lag, EXTRACT(EPOCH FROM flush_lag)::INT AS flush_lag, EXTRACT(EPOCH FROM replay_lag)::INT AS replay_lag, pid, usesysid, usename, application_name, client_addr, client_hostname, client_port, backend_start, backend_xmin, state, sent_lsn, write_lsn, replay_lsn, sync_priority, sync_state FROM pg_stat_replication;")
 	if err != nil {
-		return fmt.Errorf("error in QueryStats %w", err)
+		return fmt.Errorf("error in QueryStats: %w", err)
 	}
 
 	for _, result := range results {
