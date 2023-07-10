@@ -338,6 +338,9 @@ func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 	if len(addr) == 0 {
 		return 0, nil
 	}
+	if len(addr) != len(addrIsUnspecified) {
+		return 0, errors.New("mismatched address/unspecified lists: please report this")
+	}
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return 0, err
