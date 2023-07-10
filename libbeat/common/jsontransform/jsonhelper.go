@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,14 +34,12 @@ var (
 	// ErrInvalidTimestamp is returned when parsing of a @timestamp field fails.
 	// Supported formats: ISO8601, RFC3339
 	ErrInvalidTimestamp = errors.New("failed to parse @timestamp, unknown format")
-	logger              = logp.NewLogger("jsonhelper")
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
 	if expandKeys {
 		if err := expandFields(keys); err != nil {
-			logger.Errorf("JSON: failed to expand fields: %s", err)
 			event.SetErrorWithOption(createJSONError(err.Error()), addErrKey)
 			return
 		}
@@ -62,7 +59,6 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 		case "@timestamp":
 			vstr, ok := v.(string)
 			if !ok {
-				logger.Error("JSON: Won't overwrite @timestamp because value is not string")
 				event.SetErrorWithOption(createJSONError("@timestamp not overwritten (not string)"), addErrKey)
 				continue
 			}
@@ -70,7 +66,6 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 			// @timestamp must be of format RFC3339 or ISO8601
 			ts, err := parseTimestamp(vstr)
 			if err != nil {
-				logger.Errorf("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
 				event.SetErrorWithOption(createJSONError(fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)), addErrKey)
 				continue
 			}
@@ -99,12 +94,10 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 		case "type":
 			vstr, ok := v.(string)
 			if !ok {
-				logger.Error("JSON: Won't overwrite type because value is not string")
 				event.SetErrorWithOption(createJSONError("type not overwritten (not string)"), addErrKey)
 				continue
 			}
 			if len(vstr) == 0 || vstr[0] == '_' {
-				logger.Error("JSON: Won't overwrite type because value is empty or starts with an underscore")
 				event.SetErrorWithOption(createJSONError(fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)), addErrKey)
 				continue
 			}
