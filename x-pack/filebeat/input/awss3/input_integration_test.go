@@ -63,9 +63,17 @@ func getTerraformOutputs(t *testing.T, isLocalStack bool) terraformOutputData {
 		outputFile = terraformOutputYML
 	}
 
+	files, err := ioutil.ReadDir(path.Join(path.Dir(filename), "_meta/terraform"))
+	if err != nil {
+		t.Fatalf("failed reading directory: %v", err)
+	}
+	for _, file := range files {
+		t.Logf(file.Name())
+	}
+
 	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), outputFile))
 	if os.IsNotExist(err) {
-		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test.", filepath.Dir(terraformOutputYML))
+		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test ------- %v", filepath.Dir(terraformOutputYML), path.Join(path.Dir(filename), outputFile))
 	}
 	if err != nil {
 		t.Fatalf("failed reading terraform output data: %v", err)

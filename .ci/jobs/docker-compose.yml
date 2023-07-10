@@ -6,18 +6,16 @@ services:
     image: busybox
     depends_on:
       localstack: { condition: service_healthy }
-  
+      
   localstack:
-    image: localstack/localstack
-    hostname: localhost
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack:2.1.0
     ports:
-      - "4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
     environment:
-      - SERVICES=s3,sqs,sns,secretsmanager
       - DEBUG=1
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - HOST_TMP_FOLDER=${TMPDIR}
-      - HOSTNAME_EXTERNAL=localhost
+      - LOCALSTACK_HOST=localhost
       - S3_HOSTNAME=localhost
       - PROVIDER_OVERRIDE_S3=asf
     volumes:

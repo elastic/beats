@@ -118,7 +118,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filterStage: 'mandatory')
+        runBuildAndTest(filterStage: 'extended')
       }
     }
     stage('Extended') {
@@ -597,6 +597,7 @@ def targetWithoutNode(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
+          unstash("terraform-${name}")
           if (enableRetry) {
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
@@ -940,7 +941,7 @@ def startCloudTestEnv(Map args = [:]) {
         // Archive terraform states in case manual cleanup is needed.
         archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
-      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,outputs*.yml')
     }
   }
 }

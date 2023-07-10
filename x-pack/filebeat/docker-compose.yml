@@ -7,7 +7,6 @@ services:
     depends_on:
       elasticsearch: { condition: service_healthy }
       cometd: { condition: service_healthy }
-      localstack: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -25,20 +24,3 @@ services:
     hostname: cometd
     ports:
       - 8080:8080
-  
-  localstack:
-    image: localstack/localstack
-    hostname: localhost
-    ports:
-      - "4566:4566"            # LocalStack Gateway
-    environment:
-      - SERVICES=s3,sqs,sns,secretsmanager
-      - DEBUG=1
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - HOST_TMP_FOLDER=${TMPDIR}
-      - HOSTNAME_EXTERNAL=localhost
-      - S3_HOSTNAME=localhost
-      - PROVIDER_OVERRIDE_S3=asf
-    volumes:
-      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
