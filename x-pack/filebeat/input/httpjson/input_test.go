@@ -36,6 +36,7 @@ var testCases = []struct {
 	expectedFile string
 
 	skipReason string
+	isLongTest bool
 }{
 	{
 		name:        "simple_GET_request",
@@ -835,7 +836,16 @@ var testCases = []struct {
 				},
 			},
 		},
-		handler: defaultHandler(http.MethodGet, "", ""),
+		handler:    defaultHandler(http.MethodGet, "", ""),
+		isLongTest: true,
+		expected: func() []string {
+			bulkData := make([]string, 5000)
+			text := strings.Repeat(dummyText, 17)
+			for i := range bulkData {
+				bulkData[i] = fmt.Sprintf(`{ "text%d":%q }`, (i/2500)+1, text)
+			}
+			return bulkData
+		}(),
 	},
 	{
 		name: "replace_with_clause_and_first_response_object",
@@ -1267,21 +1277,21 @@ var testCases = []struct {
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				const text = `<?xml version="1.0" encoding="UTF-8"?>
 <order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
-<sender>Ástríðr Ragnar</sender>
-<address>
-<name>Joord Lennart</name>
-<company>Sydøstlige Gruppe</company>
-<address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
-<city>Boekend</city>
-<country>Netherlands</country>
-</address>
-<item>
-<name>Egil's Saga</name>
-<note>Free Sample</note>
-<number>1</number>
-<cost>99.95</cost>
-<sent>FALSE</sent>
-</item>
+  <sender>Ástríðr Ragnar</sender>
+  <address>
+    <name>Joord Lennart</name>
+    <company>Sydøstlige Gruppe</company>
+    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+    <city>Boekend</city>
+    <country>Netherlands</country>
+  </address>
+  <item>
+    <name>Egil's Saga</name>
+    <note>Free Sample</note>
+    <number>1</number>
+    <cost>99.95</cost>
+    <sent>FALSE</sent>
+  </item>
 </order>
 `
 				io.ReadAll(r.Body) //nolint:errcheck // not expecting any error here
@@ -1298,36 +1308,36 @@ var testCases = []struct {
 			"request.method": http.MethodGet,
 			"response.xsd": `<?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-<xs:element name="order">
-<xs:complexType>
-  <xs:sequence>
-	<xs:element name="sender" type="xs:string"/>
-	<xs:element name="address">
-	  <xs:complexType>
-		<xs:sequence>
-		  <xs:element name="name" type="xs:string"/>
-		  <xs:element name="company" type="xs:string"/>
-		  <xs:element name="address" type="xs:string"/>
-		  <xs:element name="city" type="xs:string"/>
-		  <xs:element name="country" type="xs:string"/>
-		</xs:sequence>
-	  </xs:complexType>
-	</xs:element>
-	<xs:element name="item" maxOccurs="unbounded">
-	  <xs:complexType>
-		<xs:sequence>
-		  <xs:element name="name" type="xs:string"/>
-		  <xs:element name="note" type="xs:string" minOccurs="0"/>
-		  <xs:element name="number" type="xs:positiveInteger"/>
-		  <xs:element name="cost" type="xs:decimal"/>
-		  <xs:element name="sent" type="xs:boolean"/>
-		</xs:sequence>
-	  </xs:complexType>
-	</xs:element>
-  </xs:sequence>
-  <xs:attribute name="orderid" type="xs:string" use="required"/>
-</xs:complexType>
-</xs:element>
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sender" type="xs:string"/>
+        <xs:element name="address">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="company" type="xs:string"/>
+              <xs:element name="address" type="xs:string"/>
+              <xs:element name="city" type="xs:string"/>
+              <xs:element name="country" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="item" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+              <xs:element name="number" type="xs:positiveInteger"/>
+              <xs:element name="cost" type="xs:decimal"/>
+              <xs:element name="sent" type="xs:boolean"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
 `,
 		},
@@ -1362,11 +1372,6 @@ var testCases = []struct {
 const dummyText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
 
 func TestInput(t *testing.T) {
-	bulkData := make([]string, 5000)
-	text := strings.Repeat(dummyText, 17)
-	for i := range bulkData {
-		bulkData[i] = fmt.Sprintf(`{ "text%d":%q }`, (i/2500)+1, text)
-	}
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			if test.skipReason != "" {
@@ -1401,12 +1406,9 @@ func TestInput(t *testing.T) {
 			g.Go(func() error {
 				return input.Run(ctx, chanClient)
 			})
-			var timeoutDuration time.Duration
-			if test.name == "pagination_when_used_with_chaining_with_bulk_data" {
+			timeoutDuration := 10 * time.Second
+			if test.isLongTest {
 				timeoutDuration = 2 * time.Minute
-				test.expected = bulkData
-			} else {
-				timeoutDuration = 10 * time.Second
 			}
 			timeout := time.NewTimer(timeoutDuration)
 			t.Cleanup(func() { _ = timeout.Stop() })
