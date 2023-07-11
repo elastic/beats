@@ -133,22 +133,22 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
-		prevInfo, ok := w.prev[path]
-		if !ok || !loginp.SameFile(&prevInfo, &fd) {
+		prevDesc, ok := w.prev[path]
+		if !ok || !loginp.SameFile(&prevDesc, &fd) {
 			newFilesByName[path] = &fd
 			newFilesByID[fd.FileID()] = &fd
 			continue
 		}
 
-		// if the two infos belong to the same file and it has been modified
+		// if the two descriptors belong to the same file and it has been modified
 		// if the size is smaller than before, it is truncated, if bigger, it is a write event.
 		// It might happen that a file is truncated and then more data is added, both
 		// within the same second, this will make the reader stop, but a new one will not
 		// start because the modification data is the same, to avoid this situation,
 		// we also check for size changes here.
-		if prevInfo.Info.ModTime() != fd.Info.ModTime() || prevInfo.Size() != info.Size() {
+		if prevDesc.Info.ModTime() != fd.Info.ModTime() || prevDesc.Info.Size() != fd.Info.Size() {
 			var e loginp.FSEvent
-			if prevInfo.Info.Size() > fd.Info.Size() || w.cfg.ResendOnModTime && prevInfo.Info.Size() == fd.Info.Size() {
+			if prevDesc.Info.Size() > fd.Info.Size() || w.cfg.ResendOnModTime && prevDesc.Info.Size() == fd.Info.Size() {
 				e = truncateEvent(path, fd)
 				truncatedCount++
 			} else {
@@ -189,11 +189,11 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	}
 
 	// remaining files in newFiles are newly created files
-	for path, info := range newFilesByName {
+	for path, fd := range newFilesByName {
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, *info):
+		case w.events <- createEvent(path, *fd):
 			createdCount++
 		}
 	}

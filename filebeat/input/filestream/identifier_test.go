@@ -18,11 +18,8 @@
 package filestream
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,11 +51,10 @@ func TestFileIdentifier(t *testing.T) {
 			t.Fatalf("cannot stat temporary file for test: %v", err)
 		}
 
-		src, err := identifier.GetSource(loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+		src := identifier.GetSource(loginp.FSEvent{
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: fi},
 		})
-		require.NoError(t, err)
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
 	})
@@ -79,11 +75,10 @@ func TestFileIdentifier(t *testing.T) {
 			t.Fatalf("cannot stat temporary file for test: %v", err)
 		}
 
-		src, err := identifier.GetSource(loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+		src := identifier.GetSource(loginp.FSEvent{
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: fi},
 		})
-		require.NoError(t, err)
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String()+"-my-suffix", src.Name())
 	})
@@ -126,195 +121,64 @@ func TestFileIdentifier(t *testing.T) {
 		}
 
 		for _, test := range testCases {
-			src, err := identifier.GetSource(loginp.FSEvent{
+			src := identifier.GetSource(loginp.FSEvent{
 				NewPath: test.newPath,
 				OldPath: test.oldPath,
 				Op:      test.operation,
 			})
-			require.NoError(t, err)
 			assert.Equal(t, test.expectedSrc, src.Name())
 		}
 	})
 
 	t.Run("fingerprint identifier", func(t *testing.T) {
-		t.Run("cannot set length under SHA block size", func(t *testing.T) {
-			c := conf.MustNewConfigFrom(map[string]interface{}{
-				"identifier": map[string]interface{}{
-					fingerprintName: map[string]interface{}{
-						"length": sha256.BlockSize - 1,
-					},
-				},
-			})
-			var cfg testFileIdentifierConfig
-			err := c.Unpack(&cfg)
-			require.NoError(t, err)
-
-			identifier, err := newFingerprintIdentifier(cfg.Identifier.Config())
-			require.Error(t, err)
-			require.Nil(t, identifier)
+		c := conf.MustNewConfigFrom(map[string]interface{}{
+			"identifier": map[string]interface{}{
+				"fingerprint": nil,
+			},
 		})
+		var cfg testFileIdentifierConfig
+		err := c.Unpack(&cfg)
+		require.NoError(t, err)
 
-		dir := t.TempDir()
-		filePath := filepath.Join(dir, "file")
+		identifier, err := newFileIdentifier(cfg.Identifier, "")
+		require.NoError(t, err)
+		assert.Equal(t, fingerprintName, identifier.Name())
 
 		testCases := []struct {
-			name         string
-			e            loginp.FSEvent
-			configLength interface{}
-			configOffset interface{}
-			fileSize     int64
-			expectedSrc  string
-			expErr       error
+			newPath     string
+			oldPath     string
+			operation   loginp.Operation
+			desc        loginp.FileDescriptor
+			expectedSrc string
 		}{
 			{
-				name: "Returns error for a created file with a size under the fingerprint length",
-				e: loginp.FSEvent{
-					NewPath: filePath,
-					Op:      loginp.OpCreate,
-				},
-				configLength: 256,
-				fileSize:     128,
-				expErr:       ErrFileSizeTooSmall,
+				newPath:     "/path/to/file",
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
 			},
 			{
-				name: "Returns error for a created file with a size under the fingerprint offset and length",
-				e: loginp.FSEvent{
-					NewPath: filePath,
-					Op:      loginp.OpCreate,
-				},
-				configLength: 256,
-				configOffset: 64,
-				fileSize:     300,
-				expErr:       ErrFileSizeTooSmall,
+				newPath:     "/new/path/to/file",
+				oldPath:     "/old/path/to/file",
+				operation:   loginp.OpRename,
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
 			},
 			{
-				name: "Computes fingerprint for a created file with a default fingerprint length",
-				e: loginp.FSEvent{
-					NewPath: filePath,
-					Op:      loginp.OpCreate,
-				},
-				fileSize: 1100,
-				// SHA256 from the 'a' character repeated 1024 times
-				expectedSrc: fingerprintName + identitySep + "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
-			},
-			{
-				name: "Computes fingerprint for a created file with an offset",
-				e: loginp.FSEvent{
-					NewPath: filePath,
-					Op:      loginp.OpCreate,
-				},
-				fileSize:     256,
-				configLength: 64,
-				configOffset: 128,
-				// SHA256 from the 'a' character repeated 64 times
-				expectedSrc: fingerprintName + identitySep + "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb",
-			},
-			{
-				name: "Computes fingerprint for a created file with enough bytes when length set to 256",
-				e: loginp.FSEvent{
-					NewPath: filePath,
-					Op:      loginp.OpCreate,
-				},
-				configLength: 256,
-				fileSize:     400,
-				// SHA256 from the 'a' character repeated 256 times
-				expectedSrc: fingerprintName + identitySep + "02d7160d77e18c6447be80c2e355c7ed4388545271702c50253b0914c65ce5fe",
-			},
-			{
-				name: "Computes fingerprint for a renamed file using the new path",
-				e: loginp.FSEvent{
-					NewPath: filePath,
-					OldPath: filePath,
-					Op:      loginp.OpRename,
-				},
-				configLength: 256,
-				fileSize:     400,
-				// SHA256 from the 'a' character repeated 256 times
-				expectedSrc: fingerprintName + identitySep + "02d7160d77e18c6447be80c2e355c7ed4388545271702c50253b0914c65ce5fe",
-			},
-			{
-				name: "Computes fingerprint for a deleted file",
-				e: loginp.FSEvent{
-					OldPath: filePath,
-					Op:      loginp.OpDelete,
-				},
-				configLength: 256,
-				fileSize:     400,
-				// SHA256 from the 'a' character repeated 256 times
-				expectedSrc: fingerprintName + identitySep + "02d7160d77e18c6447be80c2e355c7ed4388545271702c50253b0914c65ce5fe",
+				oldPath:     "/old/path/to/file",
+				operation:   loginp.OpDelete,
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
 			},
 		}
 
 		for _, test := range testCases {
-			t.Run(test.name, func(t *testing.T) {
-				c := conf.MustNewConfigFrom(map[string]interface{}{
-					"identifier": map[string]interface{}{
-						fingerprintName: map[string]interface{}{
-							"offset": test.configOffset,
-							"length": test.configLength,
-						},
-					},
-				})
-				var cfg testFileIdentifierConfig
-				err := c.Unpack(&cfg)
-				require.NoError(t, err)
-
-				identifier, err := newFingerprintIdentifier(cfg.Identifier.Config())
-				require.NoError(t, err)
-				assert.Equal(t, fingerprintName, identifier.Name())
-
-				content := bytes.Repeat([]byte{'a'}, int(test.fileSize))
-
-				err = os.WriteFile(filePath, content, 0777)
-				require.NoError(t, err)
-
-				test.e.Info, err = os.Stat(filePath)
-				require.NoError(t, err)
-
-				src, err := identifier.GetSource(test.e)
-				if test.expErr != nil {
-					require.ErrorIs(t, err, test.expErr)
-					return
-				}
-				require.NoError(t, err)
-				assert.Equal(t, test.expectedSrc, src.Name())
+			src := identifier.GetSource(loginp.FSEvent{
+				NewPath:    test.newPath,
+				OldPath:    test.oldPath,
+				Op:         test.operation,
+				Descriptor: test.desc,
 			})
+			assert.Equal(t, test.expectedSrc, src.Name())
 		}
-
-		t.Run("Supports offset", func(t *testing.T) {
-			c := conf.MustNewConfigFrom(map[string]interface{}{
-				"identifier": map[string]interface{}{
-					fingerprintName: map[string]interface{}{
-						"offset": 64,
-						"length": 128,
-					},
-				},
-			})
-			var cfg testFileIdentifierConfig
-			err := c.Unpack(&cfg)
-			require.NoError(t, err)
-
-			identifier, err := newFingerprintIdentifier(cfg.Identifier.Config())
-			require.NoError(t, err)
-			assert.Equal(t, fingerprintName, identifier.Name())
-
-			// different characters to mark the offset
-			content := append(bytes.Repeat([]byte{'a'}, 64), bytes.Repeat([]byte{'b'}, 128)...)
-
-			err = os.WriteFile(filePath, content, 0777)
-			require.NoError(t, err)
-
-			e := loginp.FSEvent{
-				NewPath: filePath,
-				Op:      loginp.OpCreate,
-			}
-			e.Info, err = os.Stat(filePath)
-			require.NoError(t, err)
-
-			src, err := identifier.GetSource(e)
-			require.NoError(t, err)
-			expectedSrc := fingerprintName + identitySep + "70ae1c5307f5250d5cb9e40742ba9613fcdf9b8d9eb6dd393330443b2d5effbd"
-			assert.Equal(t, expectedSrc, src.Name())
-		})
 	})
 }
