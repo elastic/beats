@@ -19,7 +19,7 @@ package jsontransform
 
 import (
 	"errors"
-	"strings"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -66,11 +66,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 			// @timestamp must be of format RFC3339 or ISO8601
 			ts, err := parseTimestamp(vstr)
 			if err != nil {
-				var builder strings.Builder
-				builder.WriteString("@timestamp not overwritten (parse error on ")
-				builder.WriteString(vstr)
-				builder.WriteString(")")
-				event.SetErrorWithOption(builder.String(), addErrKey, "", "")
+				event.SetErrorWithOption(fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr), addErrKey, "", "")
 				continue
 			}
 			event.Timestamp = ts
@@ -102,11 +98,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 				continue
 			}
 			if len(vstr) == 0 || vstr[0] == '_' {
-				var builder strings.Builder
-				builder.WriteString("type not overwritten (invalid value [")
-				builder.WriteString(vstr)
-				builder.WriteString("])")
-				event.SetErrorWithOption(builder.String(), addErrKey, "", "")
+				event.SetErrorWithOption(fmt.Sprintf("type not overwritten (invalid value [%s])", vstr), addErrKey, "", "")
 				continue
 			}
 			event.Fields[k] = vstr
