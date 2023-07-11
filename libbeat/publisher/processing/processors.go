@@ -59,13 +59,12 @@ func newGeneralizeProcessor(keepNull bool) *processorFn {
 			event.Timestamp = time.Now()
 		}
 
-		fields := g.Convert(event.Fields)
-		if fields == nil {
+		g.Convert(event.Fields)
+		if event.Fields == nil {
 			logger.Error("fail to convert to generic event")
 			return nil, nil
 		}
 
-		event.Fields = fields
 		return event, nil
 	})
 }
