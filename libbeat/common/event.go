@@ -53,23 +53,21 @@ func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 //
 // Nil values in maps are dropped during the conversion. Any unsupported types
 // that are found in the mapstr.M are dropped and warnings are logged.
-func (e *GenericEventConverter) Convert(m mapstr.M) mapstr.M {
+func (e *GenericEventConverter) Convert(m mapstr.M) {
 	keys := make([]string, 0, 10)
-	event, errs := e.normalizeMap(m, keys...)
+	errs := e.normalizeMap(m, keys...)
 	if len(errs) > 0 {
 		e.log.Warnf("Unsuccessful conversion to generic event: %v errors: %v, "+
 			"event=%#v", len(errs), errs, m)
 	}
-	return event
 }
 
 // normalizeMap normalizes each element contained in the given map. If an error
 // occurs during normalization, processing of m will continue, and all errors
 // are returned at the end.
-func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr.M, []error) {
+func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) []error {
 	var errs []error
 
-	out := make(mapstr.M, len(m))
 	for key, value := range m {
 		v, err := e.normalizeValue(value, append(keys, key)...)
 		if len(err) > 0 {
@@ -78,32 +76,33 @@ func (e *GenericEventConverter) normalizeMap(m mapstr.M, keys ...string) (mapstr
 
 		// Drop nil values from maps.
 		if !e.keepNull && v == nil {
+			delete(m, key)
 			if e.log.IsDebug() {
 				e.log.Debugf("Dropped nil value from event where key=%v", joinKeys(append(keys, key)...))
 			}
 			continue
 		}
 
-		out[key] = v
+		m[key] = v
 	}
 
-	return out, errs
+	return errs
 }
 
 // normalizeMapStrSlice normalizes each individual mapstr.M.
-func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...string) ([]mapstr.M, []error) {
+func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...string) []error {
 	var errs []error
 
-	out := make([]mapstr.M, 0, len(maps))
 	for i, m := range maps {
-		normalizedMap, err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
+		err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
-		out = append(out, normalizedMap)
+		// TODO: Not sure if this is needed
+		maps[i] = m
 	}
 
-	return out, errs
+	return errs
 }
 
 // normalizemMapStringSlice normalizes each individual map[string]interface{} and
@@ -111,13 +110,14 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]mapstr.M, []error) {
 	var errs []error
 
+	// TODO: Try to avoid allocating a new slice here.
 	out := make([]mapstr.M, 0, len(maps))
 	for i, m := range maps {
-		normalizedMap, err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
+		err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
-		out = append(out, normalizedMap)
+		out = append(out, m)
 	}
 
 	return out, errs
@@ -209,11 +209,17 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 	case []complex64, []complex128:
 	case Time, []Time:
 	case mapstr.M:
-		return e.normalizeMap(value.(mapstr.M), keys...)
+		v := value.(mapstr.M)
+		err := e.normalizeMap(v, keys...)
+		return v, err
 	case []mapstr.M:
-		return e.normalizeMapStrSlice(value.([]mapstr.M), keys...)
+		v := value.([]mapstr.M)
+		err := e.normalizeMapStrSlice(v, keys...)
+		return v, err
 	case map[string]interface{}:
-		return e.normalizeMap(value.(map[string]interface{}), keys...)
+		v := value.(map[string]interface{})
+		err := e.normalizeMap(v, keys...)
+		return mapstr.M(v), err
 	case []map[string]interface{}:
 		return e.normalizeMapStringSlice(value.([]map[string]interface{}), keys...)
 	default:
