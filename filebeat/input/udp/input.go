@@ -272,7 +272,7 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	if err != nil {
 		log.Warnf("failed to get initial udp stats from /proc: %v", err)
 	}
-	rx6, drops6, err := procNetUDP("/proc/net/udp6", addr, hasUnspecified6, addrIsUnspecified6)
+	rx6, drops6, err := procNetUDP("/proc/net/udp6", addr6, hasUnspecified6, addrIsUnspecified6)
 	if err != nil {
 		log.Warnf("failed to get initial udp6 stats from /proc: %v", err)
 	}
@@ -288,7 +288,7 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 				log.Warnf("failed to get udp stats from /proc: %v", err)
 				continue
 			}
-			rx6, drops6, err := procNetUDP("/proc/net/udp6", addr, hasUnspecified6, addrIsUnspecified6)
+			rx6, drops6, err := procNetUDP("/proc/net/udp6", addr6, hasUnspecified6, addrIsUnspecified6)
 			if err != nil {
 				log.Warnf("failed to get udp6 stats from /proc: %v", err)
 				continue
@@ -332,6 +332,9 @@ func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []strin
 func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecified []bool) (rx, drops int64, err error) {
 	if len(addr) == 0 {
 		return 0, 0, nil
+	}
+	if len(addr) != len(addrIsUnspecified) {
+		return 0, 0, errors.New("mismatched address/unspecified lists: please report this")
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {
