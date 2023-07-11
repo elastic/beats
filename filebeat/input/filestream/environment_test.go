@@ -221,7 +221,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, inputID, fi)
+	id := e.getIDFromPath(filepath, inputID, fi)
 	var entry registryEntry
 	require.Eventuallyf(e.t, func() bool {
 		offsetStr.Reset()
@@ -251,7 +251,7 @@ func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename, inputID stri
 			continue
 		}
 
-		id := getIDFromPath(filepath, inputID, fi)
+		id := e.getIDFromPath(filepath, inputID, fi)
 		entry, err := e.getRegistryState(id)
 		if err != nil {
 			continue
@@ -295,7 +295,11 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, inputID, fi)
+	id := e.getIDFromPath(filepath, inputID, fi)
+	entry, err := e.getRegistryState(id)
+	for err != nil || entry.Cursor.Offset != expectedOffset {
+		entry, err = e.getRegistryState(id)
+	}
 
 	require.Eventuallyf(e.t, func() bool {
 		cursorString.Reset()
@@ -334,7 +338,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 	}
 
 	inputStore, _ := e.stateStore.Access()
-	id := getIDFromPath(filepath, inputID, fi)
+	id := e.getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
 	err = inputStore.Get(id, &entry)
@@ -372,9 +376,11 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 	return entry, nil
 }
 
-func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
-	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+func (e *inputTestingEnvironment) getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
+	identifier, err := newINodeDeviceIdentifier(nil)
+	require.NoError(e.t, err)
+	src, err := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	require.NoError(e.t, err)
 	return "filestream::" + inputID + "::" + src.Name()
 }
 
