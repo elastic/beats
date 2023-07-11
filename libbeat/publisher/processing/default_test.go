@@ -346,12 +346,6 @@ func TestNormalization(t *testing.T) {
 		mod       mapstr.M
 		want      mapstr.M
 	}{
-		"no sharing if normalized": {
-			normalize: true,
-			in:        mapstr.M{"a": "b"},
-			mod:       mapstr.M{"change": "x"},
-			want:      mapstr.M{"a": "b"},
-		},
 		"data sharing if not normalized": {
 			normalize: false,
 			in:        mapstr.M{"a": "b"},

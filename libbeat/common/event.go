@@ -53,13 +53,14 @@ func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 //
 // Nil values in maps are dropped during the conversion. Any unsupported types
 // that are found in the mapstr.M are dropped and warnings are logged.
-func (e *GenericEventConverter) Convert(m mapstr.M) {
+func (e *GenericEventConverter) Convert(m mapstr.M) []error {
 	keys := make([]string, 0, 10)
 	errs := e.normalizeMap(m, keys...)
 	if len(errs) > 0 {
 		e.log.Warnf("Unsuccessful conversion to generic event: %v errors: %v, "+
 			"event=%#v", len(errs), errs, m)
 	}
+	return errs
 }
 
 // normalizeMap normalizes each element contained in the given map. If an error
@@ -98,8 +99,6 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
-		// TODO: Not sure if this is needed
-		maps[i] = m
 	}
 
 	return errs
@@ -110,7 +109,7 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]mapstr.M, []error) {
 	var errs []error
 
-	// TODO: Try to avoid allocating a new slice here.
+	// TODO: Avoid allocating a new slice here.
 	out := make([]mapstr.M, 0, len(maps))
 	for i, m := range maps {
 		err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
@@ -126,16 +125,16 @@ func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interf
 // normalizeSlice normalizes each element of the slice and returns a []interface{}.
 func (e *GenericEventConverter) normalizeSlice(v reflect.Value, keys ...string) (interface{}, []error) {
 	var errs []error
-	var sliceValues []interface{}
-
 	n := v.Len()
+	sliceValues := make([]interface{}, n)
+
 	for i := 0; i < n; i++ {
 		sliceValue, err := e.normalizeValue(v.Index(i).Interface(), append(keys, strconv.Itoa(i))...)
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
 
-		sliceValues = append(sliceValues, sliceValue)
+		sliceValues[i] = sliceValue
 	}
 
 	return sliceValues, errs
@@ -166,12 +165,12 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		value = times
 	}
 
-	switch value.(type) {
+	switch v := value.(type) {
 	case encoding.TextMarshaler:
 		if reflect.ValueOf(value).Kind() == reflect.Ptr && reflect.ValueOf(value).IsNil() {
 			return nil, nil
 		}
-		text, err := value.(encoding.TextMarshaler).MarshalText()
+		text, err := v.MarshalText()
 		if err != nil {
 			return nil, []error{fmt.Errorf("key=%v: error converting %T to string: %w", joinKeys(keys...), value, err)}
 		}
@@ -209,40 +208,37 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 	case []complex64, []complex128:
 	case Time, []Time:
 	case mapstr.M:
-		v := value.(mapstr.M)
 		err := e.normalizeMap(v, keys...)
 		return v, err
 	case []mapstr.M:
-		v := value.([]mapstr.M)
 		err := e.normalizeMapStrSlice(v, keys...)
 		return v, err
 	case map[string]interface{}:
-		v := value.(map[string]interface{})
 		err := e.normalizeMap(v, keys...)
 		return mapstr.M(v), err
 	case []map[string]interface{}:
 		return e.normalizeMapStringSlice(value.([]map[string]interface{}), keys...)
 	default:
-		v := reflect.ValueOf(value)
+		val := reflect.ValueOf(value)
 
-		switch v.Type().Kind() {
+		switch val.Type().Kind() {
 		case reflect.Ptr:
 			// Dereference pointers.
 			return e.normalizeValue(followPointer(value), keys...)
 		case reflect.Bool:
-			return v.Bool(), nil
+			return val.Bool(), nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			return v.Int(), nil
+			return val.Int(), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			return v.Uint() &^ (1 << 63), nil
+			return val.Uint() &^ (1 << 63), nil
 		case reflect.Float32, reflect.Float64:
-			return v.Float(), nil
+			return val.Float(), nil
 		case reflect.Complex64, reflect.Complex128:
-			return v.Complex(), nil
+			return val.Complex(), nil
 		case reflect.String:
-			return v.String(), nil
+			return val.String(), nil
 		case reflect.Array, reflect.Slice:
-			return e.normalizeSlice(v, keys...)
+			return e.normalizeSlice(val, keys...)
 		case reflect.Map, reflect.Struct:
 			var m mapstr.M
 			err := marshalUnmarshal(value, &m)

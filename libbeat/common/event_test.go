@@ -22,18 +22,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func BenchmarkTestConvertNestedMapStr(b *testing.B) {
+func TestConvertNestedMapStr(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
-		Input  mapstr.M
-		Output mapstr.M
+		Input       mapstr.M
+		Output      mapstr.M
+		ShouldError bool
 	}
 
 	type String string
@@ -99,9 +101,10 @@ func BenchmarkTestConvertNestedMapStr(b *testing.B) {
 			Input: mapstr.M{
 				"env":  nil,
 				"key2": uintptr(88),
-				"key3": func() { b.Log("hello") },
+				"key3": func() { t.Log("hello") },
 			},
-			Output: mapstr.M{},
+			Output:      mapstr.M{},
+			ShouldError: true,
 		},
 		{
 			Input: mapstr.M{
@@ -128,19 +131,26 @@ func BenchmarkTestConvertNestedMapStr(b *testing.B) {
 			},
 		},
 		{
-			mapstr.M{"k": map[string]int{"hits": 1}},
-			mapstr.M{"k": mapstr.M{"hits": float64(1)}},
+			Input: mapstr.M{
+				"k": map[string]int{"hits": 1},
+			},
+			Output: mapstr.M{
+				"k": mapstr.M{"hits": float64(1)},
+			},
 		},
 	}
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
-		g.Convert(test.Input)
-		assert.Equal(b, test.Output, test.Input, "Test case %d", i)
+		errs := g.Convert(test.Input)
+		if !test.ShouldError {
+			assert.Empty(t, errs)
+		}
+		assert.Equal(t, test.Output, test.Input, "Test case %d", i)
 	}
 }
 
-func BenchmarkTestConvertNestedStruct(b *testing.B) {
+func TestConvertNestedStruct(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
@@ -194,12 +204,13 @@ func BenchmarkTestConvertNestedStruct(b *testing.B) {
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
-		g.Convert(test.Input)
-		assert.EqualValues(b, test.Output, test.Input, "Test case %v", i)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
+		assert.EqualValues(t, test.Output, test.Input, "Test case %v", i)
 	}
 }
 
-func BenchmarkTestConvertWithNullEmission(b *testing.B) {
+func TestConvertWithNullEmission(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
@@ -207,7 +218,6 @@ func BenchmarkTestConvertWithNullEmission(b *testing.B) {
 		Output mapstr.M
 	}
 
-	type String string
 	type TestStruct struct {
 		A interface{}
 	}
@@ -240,37 +250,38 @@ func BenchmarkTestConvertWithNullEmission(b *testing.B) {
 
 	g := NewGenericEventConverter(true)
 	for i, test := range tests {
-		g.Convert(test.Input)
-		assert.EqualValues(b, test.Output, test.Input, "Test case %v", i)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
+		assert.EqualValues(t, test.Output, test.Input, "Test case %v", i)
 	}
 }
 
-func BenchmarkTestNormalizeValue(b *testing.B) {
+func TestNormalizeValue(t *testing.T) {
 	logp.TestingSetup()
 
 	type testCase struct{ in, out interface{} }
 
-	runTests := func(check func(b *testing.B, a, i interface{}), tests map[string]testCase) {
+	runTests := func(check func(t *testing.T, a, b interface{}), tests map[string]testCase) {
 		g := NewGenericEventConverter(false)
 		for name, test := range tests {
 			test := test
-			b.Run(name, func(b *testing.B) {
+			t.Run(name, func(t *testing.T) {
 				out, err := g.normalizeValue(test.in)
 				if err != nil {
-					b.Error(err)
+					t.Error(err)
 					return
 				}
-				check(b, test.out, out)
+				check(t, test.out, out)
 			})
 		}
 	}
 
-	checkEq := func(b *testing.B, a, i interface{}) {
-		assert.Equal(b, a, i)
+	checkEq := func(t *testing.T, a, b interface{}) {
+		assert.Equal(t, a, b)
 	}
 
-	checkDelta := func(b *testing.B, a, i interface{}) {
-		assert.InDelta(b, a, i, 0.000001)
+	checkDelta := func(t *testing.T, a, b interface{}) {
+		assert.InDelta(t, a, b, 0.000001)
 	}
 
 	var nilStringPtr *string
@@ -278,7 +289,7 @@ func BenchmarkTestNormalizeValue(b *testing.B) {
 	someString := "foo"
 	uuidValue, err := uuid.NewV1()
 	if err != nil {
-		b.Fatalf("error while generating uuid: %v", err)
+		t.Fatalf("error while generating uuid: %v", err)
 	}
 
 	type mybool bool
@@ -335,7 +346,7 @@ func BenchmarkTestNormalizeValue(b *testing.B) {
 	})
 }
 
-func BenchmarkTestNormalizeMapError(b *testing.B) {
+func TestNormalizeMapError(t *testing.T) {
 	badInputs := []mapstr.M{
 		{"func": func() {}},
 		{"chan": make(chan struct{})},
@@ -345,21 +356,21 @@ func BenchmarkTestNormalizeMapError(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i, in := range badInputs {
 		errs := g.normalizeMap(in, "bad.type")
-		if assert.Len(b, errs, 1) {
-			b.Log(errs[0])
-			assert.Contains(b, errs[0].Error(), "key=bad.type", "Test case %v", i)
+		if assert.Len(t, errs, 1) {
+			t.Log(errs[0])
+			assert.Contains(t, errs[0].Error(), "key=bad.type", "Test case %v", i)
 		}
 	}
 }
 
-func BenchmarkTestJoinKeys(b *testing.B) {
-	assert.Equal(b, "", joinKeys(""))
-	assert.Equal(b, "co", joinKeys("co"))
-	assert.Equal(b, "co.elastic", joinKeys("", "co", "elastic"))
-	assert.Equal(b, "co.elastic", joinKeys("co", "elastic"))
+func TestJoinKeys(t *testing.T) {
+	assert.Equal(t, "", joinKeys(""))
+	assert.Equal(t, "co", joinKeys("co"))
+	assert.Equal(t, "co.elastic", joinKeys("", "co", "elastic"))
+	assert.Equal(t, "co.elastic", joinKeys("co", "elastic"))
 }
 
-func BenchmarkTestMarshalUnmarshalMap(b *testing.B) {
+func TestMarshalUnmarshalMap(t *testing.T) {
 	tests := []struct {
 		in  mapstr.M
 		out mapstr.M
@@ -371,15 +382,15 @@ func BenchmarkTestMarshalUnmarshalMap(b *testing.B) {
 		var out mapstr.M
 		err := marshalUnmarshal(test.in, &out)
 		if err != nil {
-			b.Error(err)
+			t.Error(err)
 			continue
 		}
 
-		assert.Equal(b, test.out, out, "Test case %v", i)
+		assert.Equal(t, test.out, out, "Test case %v", i)
 	}
 }
 
-func BenchmarkTestMarshalUnmarshalArray(b *testing.B) {
+func TestMarshalUnmarshalArray(t *testing.T) {
 	tests := []struct {
 		in  interface{}
 		out interface{}
@@ -391,41 +402,42 @@ func BenchmarkTestMarshalUnmarshalArray(b *testing.B) {
 		var out interface{}
 		err := marshalUnmarshal(test.in, &out)
 		if err != nil {
-			b.Error(err)
+			t.Error(err)
 			continue
 		}
 
-		assert.Equal(b, test.out, out, "Test case %v", i)
+		assert.Equal(t, test.out, out, "Test case %v", i)
 	}
 }
 
-func BenchmarkTestNormalizeTime(b *testing.B) {
+func TestNormalizeTime(t *testing.T) {
 	ny, err := time.LoadLocation("America/New_York")
 	if err != nil {
-		b.Fatal(err)
+		t.Fatal(err)
 	}
 
 	now := time.Now().In(ny)
 	g := NewGenericEventConverter(false)
 	v, errs := g.normalizeValue(now, "@timestamp")
 	if len(errs) > 0 {
-		b.Fatal(errs)
+		t.Fatal(errs)
 	}
 
 	utcCommonTime, ok := v.(Time)
 	if !ok {
-		b.Fatalf("expected common.Time, but got %T (%v)", v, v)
+		t.Fatalf("expected common.Time, but got %T (%v)", v, v)
 	}
 
-	assert.Equal(b, time.UTC, time.Time(utcCommonTime).Location())
-	assert.True(b, now.Equal(time.Time(utcCommonTime)))
+	assert.Equal(t, time.UTC, time.Time(utcCommonTime).Location())
+	assert.True(t, now.Equal(time.Time(utcCommonTime)))
 }
 
 // Uses TextMarshaler interface.
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": NetString("hola")})
+		errs := g.Convert(mapstr.M{"key": NetString("hola")})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -433,7 +445,8 @@ func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
+		errs := g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -441,7 +454,8 @@ func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		errs := g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -449,7 +463,8 @@ func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
+		errs := g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -458,7 +473,8 @@ func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	type myString string
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
+		errs := g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -467,10 +483,11 @@ func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	val := "foo"
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": &val})
+		errs := g.Convert(mapstr.M{"key": &val})
+		assert.Empty(b, errs)
 	}
 }
-func BenchmarkTestDeDotJSON(b *testing.B) {
+func TestDeDotJSON(t *testing.T) {
 	var tests = []struct {
 		input  []byte
 		output []byte
@@ -519,11 +536,11 @@ func BenchmarkTestDeDotJSON(b *testing.B) {
 	}
 	for _, test := range tests {
 		input, output := test.valuer(), test.valuer()
-		assert.Nil(b, json.Unmarshal(test.input, &input))
-		assert.Nil(b, json.Unmarshal(test.output, &output))
-		assert.Equal(b, output, DeDotJSON(input))
+		assert.Nil(t, json.Unmarshal(test.input, &input))
+		assert.Nil(t, json.Unmarshal(test.output, &output))
+		assert.Equal(t, output, DeDotJSON(input))
 		if _, ok := test.valuer().(map[string]interface{}); ok {
-			assert.Equal(b, mapstr.M(output.(map[string]interface{})), DeDotJSON(mapstr.M(input.(map[string]interface{}))))
+			assert.Equal(t, mapstr.M(output.(map[string]interface{})), DeDotJSON(mapstr.M(input.(map[string]interface{}))))
 		}
 	}
 }
