@@ -66,6 +66,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
 			"toJSON":              toJSON,
+			"max":                 max,
+			"min":                 min,
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
@@ -293,6 +295,20 @@ func mul(a, b int64) int64 {
 
 func div(a, b int64) int64 {
 	return a / b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func base64Encode(values ...string) string {
