@@ -68,7 +68,7 @@ type redact struct {
 func (c config) Validate() error {
 	if c.Redact == nil {
 		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/8.9/filebeat-input-cel.html#_redact_fields")
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
 	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
