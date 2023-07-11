@@ -53,6 +53,7 @@ func TestWriteJSONKeys(t *testing.T) {
 		expectedMetadata  mapstr.M
 		expectedTimestamp time.Time
 		expectedFields    mapstr.M
+		addErrorKeys      bool
 	}{
 		"overwrite_true": {
 			overwriteKeys: true,
@@ -192,6 +193,31 @@ func TestWriteJSONKeys(t *testing.T) {
 				},
 			},
 		},
+		"error_case": {
+			expandKeys:    false,
+			overwriteKeys: true,
+			keys: map[string]interface{}{
+				"top_b": map[string]interface{}{
+					"inner_d.inner_e": "COMPLETELY_NEW_e",
+				},
+				"@timestamp": map[string]interface{}{"when": "now", "another": "yesterday"},
+			},
+			expectedMetadata:  eventMetadata.Clone(),
+			expectedTimestamp: eventTimestamp,
+			expectedFields: mapstr.M{
+				"error": mapstr.M{
+					"message": "@timestamp not overwritten (not string)",
+					"type":    "json",
+				},
+				"top_a": 23,
+				"top_b": mapstr.M{
+					"inner_c":         "see",
+					"inner_d":         "dee",
+					"inner_d.inner_e": "COMPLETELY_NEW_e",
+				},
+			},
+			addErrorKeys: true,
+		},
 	}
 
 	for name, test := range tests {
@@ -202,7 +228,7 @@ func TestWriteJSONKeys(t *testing.T) {
 				Fields:    eventFields.Clone(),
 			}
 
-			WriteJSONKeys(event, test.keys, test.expandKeys, test.overwriteKeys, false)
+			WriteJSONKeys(event, test.keys, test.expandKeys, test.overwriteKeys, test.addErrorKeys)
 			require.Equal(t, test.expectedMetadata, event.Meta)
 			require.Equal(t, test.expectedTimestamp.UnixNano(), event.Timestamp.UnixNano())
 			require.Equal(t, test.expectedFields, event.Fields)
