@@ -15,6 +15,7 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"math"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -297,18 +298,24 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
+func min(nums ...int64) int64 {
+	min := int64(math.MaxInt64)
+	for _, num := range nums {
+		if num < min {
+			min = num
+		}
 	}
-	return b
+	return min
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
+func max(nums ...int64) int64 {
+	max := int64(math.MinInt64)
+	for _, num := range nums {
+		if num > max {
+			max = num
+		}
 	}
-	return b
+	return max
 }
 
 func base64Encode(values ...string) string {

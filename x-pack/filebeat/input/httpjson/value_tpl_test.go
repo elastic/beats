@@ -371,6 +371,20 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "1",
 		},
 		{
+			name:        "func max with list",
+			value:       `[[max 1 4 5 3 2]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "5",
+		},
+		{
+			name:        "func min with list",
+			value:       `[[min 4 6 2 1 3 7]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1",
+		},
+		{
 			name:        "func sha1 hmac Hex",
 			value:       `[[hmac "sha1" "secret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
