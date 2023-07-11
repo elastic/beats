@@ -119,7 +119,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		if err != nil && in.config.RegionName == "" {
 			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
 		}
-		if regionName != in.config.RegionName {
+		if in.config.RegionName != "" && regionName != in.config.RegionName {
 			inputContext.Logger.Warnf("configured region disagrees with queue_url region: %q != %q: using %[1]q",
 				in.config.RegionName, regionName)
 			regionName = in.config.RegionName
