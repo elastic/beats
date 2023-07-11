@@ -193,6 +193,7 @@ func TestWriteJSONKeys(t *testing.T) {
 				},
 			},
 		},
+		//This benchmark make sure that when an error is found in the event, the proper fields are defined and measured
 		"error_case": {
 			expandKeys:    false,
 			overwriteKeys: true,
