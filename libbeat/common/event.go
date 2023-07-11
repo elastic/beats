@@ -98,8 +98,6 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 		if len(err) > 0 {
 			errs = append(errs, err...)
 		}
-		// TODO: Not sure if this is needed
-		maps[i] = m
 	}
 
 	return errs
@@ -110,7 +108,7 @@ func (e *GenericEventConverter) normalizeMapStrSlice(maps []mapstr.M, keys ...st
 func (e *GenericEventConverter) normalizeMapStringSlice(maps []map[string]interface{}, keys ...string) ([]mapstr.M, []error) {
 	var errs []error
 
-	// TODO: Try to avoid allocating a new slice here.
+	// TODO: Avoid allocating a new slice here.
 	out := make([]mapstr.M, 0, len(maps))
 	for i, m := range maps {
 		err := e.normalizeMap(m, append(keys, strconv.Itoa(i))...)
