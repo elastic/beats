@@ -18,12 +18,10 @@
 package filestream
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/urso/sderr"
-	"gotest.tools/gotestsum/log"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -80,18 +78,12 @@ func (p *fileProspector) Init(
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
-		src, err := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi})
-		if err != nil {
-			log.Debugf("cannot create identity for %q: %v", fm.Source, err)
-			return "", fm
-		}
-
-		newKey := newID(src)
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 		return newKey, fm
 	})
 
@@ -117,19 +109,13 @@ func (p *fileProspector) Init(
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
 		if fm.IdentifierName != identifierName {
-			src, _ := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi})
-			if err != nil {
-				log.Debugf("cannot create identity for %q: %v", fm.Source, err)
-				return "", fm
-			}
-
-			newKey := src.Name()
+			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}).Name()
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
@@ -166,14 +152,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 				return nil
 			}
 
-			src, err := p.identifier.GetSource(fe)
-			if errors.Is(err, ErrFileSizeTooSmall) {
-				log.Debugf("cannot create identity for %q: %v", fe.NewPath, err)
-				continue
-			}
-			if err != nil {
-				return err
-			}
+			src := p.identifier.GetSource(fe)
 			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
@@ -209,7 +188,7 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
-			err := updater.ResetCursor(src, state{Offset: event.Info.Size()})
+			err := updater.ResetCursor(src, state{Offset: event.Descriptor.Info.Size()})
 			if err != nil {
 				log.Errorf("setting cursor for ignored file: %v", err)
 			}
@@ -245,12 +224,12 @@ func (p *fileProspector) onFSEvent(
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
 	if p.ignoreOlder > 0 {
 		now := time.Now()
-		if now.Sub(fe.Info.ModTime()) > p.ignoreOlder {
+		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
 			log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
 			return true
 		}
 	}
-	if !ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
 	}
@@ -277,16 +256,11 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 	// if file_identity is based on path, the current reader has to be cancelled
 	// and a new one has to start.
 	if !p.identifier.Supports(trackRename) {
-		prevSrc, err := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
-		if err != nil {
-			log.Debugf("cannot create identity for %q: %v", fe.OldPath, err)
-			return
-		}
-
+		prevSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: fe.OldPath})
 		hg.Stop(prevSrc)
 
 		log.Debugf("Remove state for file as file renamed and path file_identity is configured: %s", fe.OldPath)
-		err = s.Remove(prevSrc)
+		err := s.Remove(prevSrc)
 		if err != nil {
 			log.Errorf("Error while removing old state of renamed file (%s): %v", fe.OldPath, err)
 		}
@@ -311,12 +285,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 			log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
 
 			fe.Op = loginp.OpDelete
-			srcToClose, err := p.identifier.GetSource(fe)
-			if err != nil {
-				log.Debugf("cannot create identity for %q: %v", fe.OldPath, err)
-				return
-			}
-
+			srcToClose := p.identifier.GetSource(fe)
 			hg.Stop(srcToClose)
 		}
 	}

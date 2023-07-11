@@ -442,23 +442,9 @@ Set the location of the marker file the following way:
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
 
-*`fingerprint`*:: To identify files based on their first bytes of content.
+*`fingerprint`*:: To identify files based on their content byte range.
 
-This option is the most stable file identity, however it's slower than the rest of the options
-and requires files to have different content in the given range of bytes.
+WARNING: In order to use this file identity option, one must use a filestream input with
+enabled <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint option in its scanner>>. Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 
-Normally, log lines contain timestamps and other unique fields that should let to use this option
-but in every use-case users should inspect their logs and determine what are appropriate values for
-the `offset` and `length` parameters. Default `offset` is 0 and default `length` is `1024` or 1 KB.
-
-WARNING: This strategy delays ingesting new files until they grow to `offset`+`length` bytes and can be
-fingerprinted.
-
-WARNING: Changing either the `length` or `offset` parameter will lead to re-ingesting all the existing files and data duplication.
-
-[source,yaml]
-----
-file_identity.fingerprint:
-	offset: 0
-  length: 1024
-----
+Please refer to the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint configuration for details>>.

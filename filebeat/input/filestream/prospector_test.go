@@ -503,7 +503,7 @@ func (t *testHarvesterGroup) StopHarvesters() error {
 
 type mockFileWatcher struct {
 	events      []loginp.FSEvent
-	filesOnDisk map[string]os.FileInfo
+	filesOnDisk map[string]loginp.FileDescriptor
 
 	outputCount, eventCount int
 
@@ -523,7 +523,7 @@ func newMockFileWatcher(events []loginp.FSEvent, eventCount int) *mockFileWatche
 // newMockFileWatcherWithFiles creates an FSWatch mock to
 // get the required file information from the file system using
 // the GetFiles function.
-func newMockFileWatcherWithFiles(filesOnDisk map[string]os.FileInfo) *mockFileWatcher {
+func newMockFileWatcherWithFiles(filesOnDisk map[string]loginp.FileDescriptor) *mockFileWatcher {
 	return &mockFileWatcher{
 		filesOnDisk: filesOnDisk,
 		out:         make(chan loginp.FSEvent),
@@ -542,7 +542,7 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 
 func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
-func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return m.filesOnDisk }
+func (m *mockFileWatcher) GetFiles() map[string]loginp.FileDescriptor { return m.filesOnDisk }
 
 type mockMetadataUpdater struct {
 	table map[string]interface{}
