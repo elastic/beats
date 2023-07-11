@@ -39,7 +39,7 @@ var (
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
 	if expandKeys {
-		if err := expandFields(keys); err != nil && addErrKey {
+		if err := expandFields(keys); err != nil {
 			event.SetErrorWithOption(err.Error(), addErrKey, "", "")
 			return
 		}
