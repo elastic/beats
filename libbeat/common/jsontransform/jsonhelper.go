@@ -40,7 +40,7 @@ var (
 func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
 	if expandKeys {
 		if err := expandFields(keys); err != nil && addErrKey {
-			event.SetErrorWithOption(err.Error(), addErrKey)
+			event.SetErrorWithOption(err.Error(), addErrKey, "", "")
 			return
 		}
 	}
@@ -59,7 +59,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 		case "@timestamp":
 			vstr, ok := v.(string)
 			if !ok {
-				event.SetErrorWithOption("@timestamp not overwritten (not string)", addErrKey)
+				event.SetErrorWithOption("@timestamp not overwritten (not string)", addErrKey, "", "")
 				continue
 			}
 
@@ -70,7 +70,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 				builder.WriteString("@timestamp not overwritten (parse error on ")
 				builder.WriteString(vstr)
 				builder.WriteString(")")
-				event.SetErrorWithOption(builder.String(), addErrKey)
+				event.SetErrorWithOption(builder.String(), addErrKey, "", "")
 				continue
 			}
 			event.Timestamp = ts
@@ -92,13 +92,13 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 				event.Meta.DeepUpdate(mapstr.M(m))
 
 			default:
-				event.SetErrorWithOption("failed to update @metadata", addErrKey)
+				event.SetErrorWithOption("failed to update @metadata", addErrKey, "", "")
 			}
 
 		case "type":
 			vstr, ok := v.(string)
 			if !ok {
-				event.SetErrorWithOption("type not overwritten (not string)", addErrKey)
+				event.SetErrorWithOption("type not overwritten (not string)", addErrKey, "", "")
 				continue
 			}
 			if len(vstr) == 0 || vstr[0] == '_' {
@@ -106,7 +106,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 				builder.WriteString("type not overwritten (invalid value [")
 				builder.WriteString(vstr)
 				builder.WriteString("])")
-				event.SetErrorWithOption(builder.String(), addErrKey)
+				event.SetErrorWithOption(builder.String(), addErrKey, "", "")
 				continue
 			}
 			event.Fields[k] = vstr
