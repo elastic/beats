@@ -192,8 +192,8 @@ the `offset` and `length` parameters. Default `offset` is 0 and default `length`
 [source,yaml]
 ----
 fingerprint:
-	enabled: false
-	offset: 0
+  enabled: false
+  offset: 0
   length: 1024
 ----
 
