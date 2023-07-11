@@ -39,12 +39,12 @@ type HostFSConfig struct {
 	HostFS string `config:"hostfs"`
 }
 
-// MetricbeatHostFSConfig
+// MetricbeatHostFSConfig carries config information for the hostfs setting
 type MetricbeatHostFSConfig struct {
 	HostFS string `config:"system.hostfs"`
 }
 
-// Init either the system or linux module. This will produce different modules depending on if we're running under agent or not.
+// InitSystemModule initializes either either the system or linux module. This will produce different modules depending on if we're running under agent or not.
 func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	// common code for the base use case of `hostfs` being set at the module-level
 	logger := logp.L()
@@ -53,7 +53,7 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
 		return fleetInit(base, hostfs, userSet)
 	}
-	return metricbeatInit(base, hostfs, userSet)
+	return metricbeatInit(base, hostfs)
 }
 
 func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
@@ -71,12 +71,11 @@ func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module
 }
 
 // Deal with the legacy configs available to metricbeat
-func metricbeatInit(base mb.BaseModule, modulePath string, moduleSet bool) (mb.Module, error) {
+func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
 	var hostfs = modulePath
 	var userSet bool
 	// allow the CLI to override other settings
 	if hostfsCLI != nil && *hostfsCLI != "" {
-		cfgwarn.Deprecate("8.0.0", "The --system.hostfs flag will be removed in the future and replaced by a config value.")
 		hostfs = *hostfsCLI
 		userSet = true
 	}
