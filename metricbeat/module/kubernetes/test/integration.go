@@ -79,10 +79,12 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":     "kubernetes",
-		"metricsets": []string{metricSetName},
-		"host":       "${NODE_NAME}",
-		"hosts":      []string{"http://0.0.0.0:10251"},
+		"module":                "kubernetes",
+		"metricsets":            []string{metricSetName},
+		"host":                  "${NODE_NAME}",
+		"hosts":                 []string{"https://0.0.0.0:10259"},
+		"bearer_token_file":     "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		"ssl.verification_mode": "none",
 	}
 }
 
@@ -90,13 +92,11 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":            "kubernetes",
-		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
-		"hosts":             []string{"https://0.0.0.0:10257"},
-		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
-		"ssl": map[string]interface{}{
-			"verification_mode": "none",
-		},
+		"module":                "kubernetes",
+		"metricsets":            []string{metricSetName},
+		"host":                  "${NODE_NAME}",
+		"hosts":                 []string{"https://0.0.0.0:10257"},
+		"bearer_token_file":     "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		"ssl.verification_mode": "none",
 	}
 }

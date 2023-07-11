@@ -24,7 +24,7 @@ pipeline {
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.13.7"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
-    KIND_VERSION = 'v0.11.1'
+    KIND_VERSION = 'v0.15.0'
     K8S_VERSION = 'v1.21.1'
   }
   options {
