@@ -20,10 +20,11 @@ The host and UDP port to listen on for event streams.
 [id="{beatname_lc}-input-{type}-udp-read-buffer"]
 ==== `read_buffer`
 
-The size of the read buffer on the UDP socket.
+The size of the read buffer on the UDP socket. If not specified the default 
+from the operating system will be used.
 
 [float]
 [id="{beatname_lc}-input-{type}-udp-timeout"]
 ==== `timeout`
 
-The read and write timeout for socket operations.
+The read and write timeout for socket operations. The default is `5m`.
