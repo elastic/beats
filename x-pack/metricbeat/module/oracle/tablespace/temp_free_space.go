@@ -7,8 +7,7 @@ package tablespace
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"fmt"
 )
 
 type tempFreeSpace struct {
@@ -29,7 +28,7 @@ func (d *tempFreeSpace) eventKey() string {
 func (e *tablespaceExtractor) tempFreeSpaceData(ctx context.Context) ([]tempFreeSpace, error) {
 	rows, err := e.db.QueryContext(ctx, "SELECT TABLESPACE_NAME, TABLESPACE_SIZE, ALLOCATED_SPACE, FREE_SPACE FROM DBA_TEMP_FREE_SPACE")
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]tempFreeSpace, 0)

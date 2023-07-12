@@ -124,6 +124,13 @@ targets:
         - ./metricbeat/Dockerfile
         - ./packetbeat/Dockerfile
         - ./x-pack/functionbeat/Dockerfile
+        - ./metricbeat/module/nats/_meta/Dockerfile
+        - ./metricbeat/module/http/_meta/Dockerfile
+        - ./metricbeat/module/vsphere/_meta/Dockerfile
+        - ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
+        - ./dev-tools/kubernetes/filebeat/Dockerfile.debug
+        - ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
+        - ./x-pack/metricbeat/module/stan/_meta/Dockerfile
       matchpattern: 'FROM golang:\d+.\d+.\d+'
   update-gomod:
     name: "Update go.mod"
