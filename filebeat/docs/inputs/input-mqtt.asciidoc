@@ -70,7 +70,7 @@ A client password used for authentication provided on the application level by t
 
 ===== `clean_session`
 
-The clean_session flag indicates whether the client wants to establish a persistent session with the broker. 
+The `clean_session` flag indicates whether the client wants to establish a persistent session with the broker. 
 The default is `true`.
 
 When `clean_session` is set to false, the session is considered to be persistent. The broker stores all subscriptions for 
