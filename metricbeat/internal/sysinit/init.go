@@ -19,6 +19,7 @@ package sysinit
 
 import (
 	"flag"
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -90,12 +91,16 @@ func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
 // A user can supply either `system.hostfs` or `hostfs`.
 // In additon, we will probably want to change Integration Config values to `hostfs` as well.
 // We need to figure out which one we got, if any.
-func findConfigValue(base mb.BaseModule) (string, bool) {
+// Returns false if no config value was set
+func findConfigValue(base mb.BaseModule) (string, bool, error) {
 	partialConfig := HostFSConfig{}
-	base.UnpackConfig(&partialConfig)
+	err := base.UnpackConfig(&partialConfig)
+	if err != nil {
+		return "", false, fmt.Errorf("error unpacking hostfs config: %w", err)
+	}
 	// if the newer value is set, just use that.
 	if partialConfig.HostFS != "" {
-		return partialConfig.HostFS, true
+		return partialConfig.HostFS, true, nil
 	}
 
 	legacyConfig := MetricbeatHostFSConfig{}
@@ -103,9 +108,9 @@ func findConfigValue(base mb.BaseModule) (string, bool) {
 	if legacyConfig.HostFS != "" {
 		cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config.")
 		// Only fallback to this if the user didn't set anything else
-		return legacyConfig.HostFS, true
+		return legacyConfig.HostFS, true, nil
 	}
 
-	return "/", false
+	return "/", false, nil
 
 }
