@@ -300,6 +300,19 @@ filebeat.inputs:
   # original for harvesting but will report the symlink name as the source.
   #prospector.scanner.symlinks: false
 
+  # If enabled, instead of relying on the device ID and inode values when comparing files,
+  # compare hashes of the given byte ranges in files. A file becomes an ingest target
+  # when its size grows larger than offset+length (see below). Until then it's ignored.
+  #prospector.scanner.fingerprint.enabled: false
+
+  # If the fingerprint mode is enabled, sets the offset from the beginning of the file
+  # for the byte range used for computing the fingerprint value.
+  #prospector.scanner.fingerprint.offset: 0
+
+  # If the fingerprint mode is enabled, sets the length of the byte range used for
+  # computing the fingerprint value.
+  #prospector.scanner.fingerprint.length: 0
+
   ### Parsers configuration
 
   #### JSON configuration
