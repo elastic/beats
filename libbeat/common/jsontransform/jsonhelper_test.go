@@ -426,10 +426,6 @@ func BenchmarkWriteJSONKeys(b *testing.B) {
 	}
 }
 
-func createNewEvent(timestamp time.Time, meta mapstr.M, field mapstr.M) *beat.Event {
-	return
-}
-
 func clone(a map[string]interface{}) map[string]interface{} {
 	newMap := make(map[string]interface{})
 	for k, v := range a {

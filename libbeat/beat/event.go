@@ -235,10 +235,10 @@ func (e *Event) SetErrorWithOption(message string, addErrKey bool, data string, 
 	if addErrKey {
 		errorField := mapstr.M{"message": message, "type": "json"}
 		if data != "" {
-			_, _ = errorField.Put("data", data)
+			errorField["data"] = data
 		}
 		if field != "" {
-			_, _ = errorField.Put("field", field)
+			errorField["field"] = field
 		}
 		e.Fields["error"] = errorField
 	}
