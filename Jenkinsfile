@@ -600,15 +600,15 @@ def targetWithoutNode(Map args = [:]) {
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
             // unstash in the same directory where the files were stashed
-            dir('input/awss3/_meta/terraform'){
-              echo "terraform-${name}"
-              try {
-                unstash(name: "terraform-${name}")
-                sh "ls -la ${pwd()}"
-              } catch (error) {
-                echo "error unstashing: ${error}"
-              }
-          }
+          //   dir('input/awss3/_meta/terraform'){
+          //     echo "terraform-${name}"
+          //     try {
+          //       unstash(name: "terraform-${name}")
+          //       sh "ls -la ${pwd()}"
+          //     } catch (error) {
+          //       echo "error unstashing: ${error}"
+          //     }
+          // }
           if (enableRetry) {
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
@@ -947,9 +947,9 @@ def startCloudTestEnv(Map args = [:]) {
         // Archive terraform states in case manual cleanup is needed.
         archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
-      dir("x-pack/filebeat/input/awss3/_meta/terraform"){
+   //   dir("x-pack/filebeat/input/awss3/_meta/terraform"){
         stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,*.yml')
-    }
+  //  }
     }
   }
 }
