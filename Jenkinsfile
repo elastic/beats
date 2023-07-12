@@ -309,7 +309,7 @@ def cloud(Map args = [:]) {
       withCloudTestEnv(args) {
         startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
         try {
-          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
+          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id, name: args.directory)
         } finally {
           terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
         }
@@ -590,6 +590,8 @@ def targetWithoutNode(Map args = [:]) {
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
   def withNodejs = args.get('withNodejs', false)
+  // def dirs = args.get('dirs',[])
+  String name = normalise(args.name)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
@@ -597,6 +599,16 @@ def targetWithoutNode(Map args = [:]) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
+            // unstash in the same directory where the files were stashed
+            dir('input/awss3/_meta/terraform'){
+              echo "terraform-${name}"
+              try {
+                unstash(name: "terraform-${name}")
+                sh "ls -la ${pwd()}"
+              } catch (error) {
+                echo "error unstashing: ${error}"
+              }
+          }
           if (enableRetry) {
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
@@ -935,7 +947,9 @@ def startCloudTestEnv(Map args = [:]) {
         // Archive terraform states in case manual cleanup is needed.
         archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
       }
-      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
+      dir("x-pack/filebeat/input/awss3/_meta/terraform"){
+        stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,*.yml')
+    }
     }
   }
 }
