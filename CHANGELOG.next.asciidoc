@@ -342,7 +342,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add device support for Azure AD entity analytics. {pull}35807[35807]
 - Improve CEL input performance. {pull}35915[35915]
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
-- Add clean_session parameter to MQTT input .  {pull}35806[16204]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
 
 
 *Auditbeat*
