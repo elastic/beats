@@ -345,7 +345,7 @@ XML documents may require additional type information to enable correct parsing 
 filebeat.inputs:
 - type: cel
   # Provide an XSD, 'order', for use during CEL execution (truncated for example).
-  regexp:
+  xsd:
     order: |
        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
          <xs:element name="order">
@@ -630,6 +630,37 @@ Whether to use the host's local time rather that UTC for timestamping rotated lo
 ==== `resource.tracer.compress`
 
 This determines whether rotated logs should be gzip compressed.
+
+[float]
+==== `redact`
+
+During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behaviour. For safety reasons if the `redact` configuration is missing a warning is logged.
+
+In the case of no-required redaction an empty `redact.fields` configuration should be used to silence the logged warning.
+
+["source","yaml",subs="attributes"]
+----
+- type: cel
+  redact:
+    fields: ~
+----
+
+As an example, if a user-constructed Basic Authentication request is used in a CEL program the password can be redacted like so
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  resource.url: http://localhost:9200/_search
+  state:
+    user: user@domain.tld
+    password: P@$$W0₹D
+  redact:
+    fields: password
+    delete: true
+----
+
+Note that fields under the `auth` configuration hierarchy are not exposed to the `state` and so do not need to be redacted. For this reason it is preferable to use these for authentication over the request construction shown above where possible.
 
 [float]
 ==== `redact.fields`

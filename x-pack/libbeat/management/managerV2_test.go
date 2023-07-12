@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 func TestManagerV2(t *testing.T) {
@@ -74,7 +75,7 @@ func TestManagerV2(t *testing.T) {
 		t.Logf("FQDN feature flag set to %v", fqdnEnabled)
 	}
 
-	srv := mockSrv([][]*proto.UnitExpected{
+	srv := integration.NewMockServer([][]*proto.UnitExpected{
 		{
 			{
 				Id:             "output-unit",
@@ -99,7 +100,7 @@ func TestManagerV2(t *testing.T) {
 					Streams: []*proto.Stream{
 						{
 							Id: "system/metrics-system.filesystem-default-system-1",
-							Source: requireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
 								"metricsets": []interface{}{"filesystem"},
 								"period":     "1m",
 							}),
@@ -120,14 +121,14 @@ func TestManagerV2(t *testing.T) {
 					Streams: []*proto.Stream{
 						{
 							Id: "system/metrics-system.filesystem-default-system-2",
-							Source: requireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
 								"metricsets": []interface{}{"filesystem"},
 								"period":     "1m",
 							}),
 						},
 						{
 							Id: "system/metrics-system.filesystem-default-system-3",
-							Source: requireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
 								"metricsets": []interface{}{"filesystem"},
 								"period":     "1m",
 							}),
@@ -253,7 +254,7 @@ func TestOutputError(t *testing.T) {
 				Id:   "default",
 				Type: "mock",
 				Name: "mock",
-				Source: requireNewStruct(t,
+				Source: integration.RequireNewStruct(t,
 					map[string]interface{}{
 						"Is":        "this",
 						"required?": "Yes!",
@@ -280,7 +281,7 @@ func TestOutputError(t *testing.T) {
 				Id:   "default",
 				Type: "mock",
 				Name: "mock",
-				Source: requireNewStruct(t,
+				Source: integration.RequireNewStruct(t,
 					map[string]interface{}{
 						"this":     "is",
 						"required": true,
@@ -346,59 +347,6 @@ func TestOutputError(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return stateReached
 	}, 10*time.Second, 100*time.Millisecond, "desired state, output failed, was not reached")
-}
-
-func mockSrv(
-	units [][]*proto.UnitExpected,
-	featuresIdxs []uint64,
-	features []*proto.Features,
-	observedCallback func(*proto.CheckinObserved, int),
-	delay time.Duration,
-) *mock.StubServerV2 {
-	i := 0
-	agentInfo := &proto.CheckinAgentInfo{
-		Id:       "elastic-agent-id",
-		Version:  "8.6.0",
-		Snapshot: true,
-	}
-	return &mock.StubServerV2{
-		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			if observedCallback != nil {
-				observedCallback(observed, i)
-			}
-			matches := DoesStateMatch(observed, units[i], featuresIdxs[i])
-			if !matches {
-				// send same set of units and features
-				return &proto.CheckinExpected{
-					AgentInfo:   agentInfo,
-					Units:       units[i],
-					Features:    features[i],
-					FeaturesIdx: featuresIdxs[i],
-				}
-			}
-			// delay sending next expected based on delay
-			if delay > 0 {
-				<-time.After(delay)
-			}
-			// send next set of units and features
-			i += 1
-			if i >= len(units) {
-				// stay on last index
-				i = len(units) - 1
-			}
-			return &proto.CheckinExpected{
-				AgentInfo:   agentInfo,
-				Units:       units[i],
-				Features:    features[i],
-				FeaturesIdx: featuresIdxs[i],
-			}
-		},
-		ActionImpl: func(response *proto.ActionResponse) error {
-			// actions not tested here
-			return nil
-		},
-		ActionsChan: make(chan *mock.PerformAction, 100),
-	}
 }
 
 type reloadable struct {

@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -131,11 +130,11 @@ func loadModulesD() (modules map[string][]moduleDefinition, err error) {
 	for _, file := range files {
 		contents, err := ioutil.ReadFile(file)
 		if err != nil {
-			return nil, errors.Wrapf(err, "reading %s", file)
+			return nil, fmt.Errorf("reading %s: %w", file, err)
 		}
 		var cfg []moduleDefinition
 		if err = yaml.Unmarshal(contents, &cfg); err != nil {
-			return nil, errors.Wrapf(err, "parsing %s as YAML", file)
+			return nil, fmt.Errorf("parsing %s as YAML: %w", file, err)
 		}
 		modules[file] = cfg
 	}
