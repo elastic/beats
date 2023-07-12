@@ -229,8 +229,8 @@ func metadataKey(key string) (string, bool) {
 }
 
 // SetErrorWithOption sets the event error field with the message when the addErrKey is set to true.
-// if you want to include the data and field you can pass them as parameters and will be appended into the
-// error as fields with the corresponding name
+// If you want to include the data and field you can pass them as parameters and will be appended into the
+// error as fields with the corresponding name.
 func (e *Event) SetErrorWithOption(message string, addErrKey bool, data string, field string) {
 	if addErrKey {
 		errorField := mapstr.M{"message": message, "type": "json"}
