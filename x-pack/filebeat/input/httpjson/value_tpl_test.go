@@ -392,6 +392,20 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errMaxWrongNoOfArgs.Error(),
 		},
 		{
+			name:        "func max with mixed type argument list",
+			value:       `[[max 4 6.24 2.1 1 -3.3 -1.2 7]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "7",
+		},
+		{
+			name:          "func max with unknown type in list",
+			value:         `[[max 1 "b" -2]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedError: errMaxUnknownType.Error(),
+		},
+		{
 			name:        "func min",
 			value:       `[[min 1 4]]`,
 			paramCtx:    emptyTransformContext(),
@@ -404,6 +418,20 @@ func TestValueTpl(t *testing.T) {
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "1",
+		},
+		{
+			name:        "func min with mixed list",
+			value:       `[[min 4 6.24 2.1 1 -3.3 -1.2 7]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "-3.3",
+		},
+		{
+			name:          "func min with unknown type in list",
+			value:         `[[min 1 "b" -2]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedError: errMinUnknownType.Error(),
 		},
 		{
 			name:        "func min with year expression",

@@ -43,6 +43,9 @@ var (
 	errExecutingTemplate   = errors.New("the template execution failed")
 	errMinWrongNoOfArgs    = errors.New("template: :1:2: executing \"\" at <min>: wrong number of args for min: want at least 1 got 0")
 	errMaxWrongNoOfArgs    = errors.New("template: :1:2: executing \"\" at <max>: wrong number of args for max: want at least 1 got 0")
+	errMinUnknownType      = errors.New("template: :1:2: executing \"\" at <min 1 \"b\" -2>: error calling min: unknown type for \"b\" (string)")
+	errMaxUnknownType      = errors.New("template: :1:2: executing \"\" at <max 1 \"b\" -2>: error calling max: unknown type for \"b\" (string)")
+	errStrUnknownType      = "unknown type for %q (%T)"
 )
 
 type valueTpl struct {
@@ -69,8 +72,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
 			"toJSON":              toJSON,
-			"max":                 max,
-			"min":                 min,
+			"max":                 maximum,
+			"min":                 minimum,
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
@@ -300,32 +303,184 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-func min(a int, nums ...int) int {
-	min := math.MaxInt
+// minimum returns the minimum of a and an arbitrary number of values.
+func minimum(a interface{}, nums ...interface{}) (interface{}, error) {
+	var min interface{}
+	var err error
+
+	min = math.MaxInt
 	nums = append(nums, a)
-	if len(nums) == 0 {
-		return 0
+	if len(nums) == 1 {
+		return nums[0], nil
 	}
 	for _, num := range nums {
-		if num < min {
-			min = num
+		min, err = findMin(min, num)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return min
+	return min, nil
 }
 
-func max(a int, nums ...int) int {
-	max := math.MinInt
+// findMin returns the minimum of two values.
+func findMin(b, a interface{}) (interface{}, error) {
+	ai := reflect.ValueOf(a)
+	bi := reflect.ValueOf(b)
+
+	switch ai.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		switch bi.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			if ai.Int() < bi.Int() {
+				return ai.Int(), nil
+			}
+			return bi.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if ai.Int() < int64(bi.Uint()) {
+				return ai.Int(), nil
+			}
+			return bi.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			if float64(ai.Int()) < bi.Float() {
+				return ai.Int(), nil
+			}
+			return bi.Float(), nil
+		default:
+			return nil, fmt.Errorf(errStrUnknownType, bi, b)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch bi.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			if int64(ai.Uint()) < bi.Int() {
+				return ai.Uint(), nil
+			}
+			return bi.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if ai.Uint() < bi.Uint() {
+				return ai.Uint(), nil
+			}
+			return bi.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			if float64(ai.Uint()) < bi.Float() {
+				return ai.Uint(), nil
+			}
+			return bi.Float(), nil
+		default:
+			return nil, fmt.Errorf(errStrUnknownType, bi, b)
+		}
+	case reflect.Float32, reflect.Float64:
+		switch bi.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			if ai.Float() < float64(bi.Int()) {
+				return ai.Float(), nil
+			}
+			return bi.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if ai.Float() < float64(bi.Uint()) {
+				return ai.Float(), nil
+			}
+			return bi.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			if ai.Float() < bi.Float() {
+				return ai.Float(), nil
+			}
+			return bi.Float(), nil
+		default:
+			return nil, fmt.Errorf(errStrUnknownType, bi, b)
+		}
+	default:
+		return nil, fmt.Errorf(errStrUnknownType, ai, a)
+	}
+}
+
+// maximum returns the maximum of a and an arbitrary number of values.
+func maximum(a interface{}, nums ...interface{}) (interface{}, error) {
+	var max interface{}
+	var err error
+
+	max = math.MinInt
 	nums = append(nums, a)
-	if len(nums) == 0 {
-		return 0
+	if len(nums) == 1 {
+		return nums[0], nil
 	}
 	for _, num := range nums {
-		if num > max {
-			max = num
+		max, err = findMax(max, num)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return max
+	return max, nil
+}
+
+// finds the maximum of two values
+func findMax(b, a interface{}) (interface{}, error) {
+	ai := reflect.ValueOf(a)
+	bi := reflect.ValueOf(b)
+
+	switch ai.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		switch bi.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			if ai.Int() > bi.Int() {
+				return ai.Int(), nil
+			}
+			return bi.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if ai.Int() > int64(bi.Uint()) {
+				return ai.Int(), nil
+			}
+			return bi.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			if float64(ai.Int()) > bi.Float() {
+				return ai.Int(), nil
+			}
+			return bi.Float(), nil
+		default:
+			return nil, fmt.Errorf(errStrUnknownType, bi, b)
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		switch bi.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			if int64(ai.Uint()) > bi.Int() {
+				return ai.Uint(), nil
+			}
+			return bi.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if ai.Uint() > bi.Uint() {
+				return ai.Uint(), nil
+			}
+			return bi.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			if float64(ai.Uint()) > bi.Float() {
+				return ai.Uint(), nil
+			}
+			return bi.Float(), nil
+		default:
+			return nil, fmt.Errorf(errStrUnknownType, bi, b)
+		}
+	case reflect.Float32, reflect.Float64:
+		switch bi.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			if ai.Float() > float64(bi.Int()) {
+				return ai.Float(), nil
+			}
+			return bi.Int(), nil
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			if ai.Float() > float64(bi.Uint()) {
+				return ai.Float(), nil
+			}
+			return bi.Uint(), nil
+		case reflect.Float32, reflect.Float64:
+			if ai.Float() > bi.Float() {
+				return ai.Float(), nil
+			}
+			return bi.Float(), nil
+		default:
+			return nil, fmt.Errorf(errStrUnknownType, bi, b)
+		}
+	default:
+		return nil, fmt.Errorf(errStrUnknownType, ai, a)
+	}
 }
 
 func base64Encode(values ...string) string {
