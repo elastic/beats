@@ -158,7 +158,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	id := env.getIDFromPath(env.abspath(testlogName), "fake-ID", fi)
+	id := getIDFromPath(env.abspath(testlogName), "fake-ID", fi)
 	env.requireOffsetInRegistryByID(id, len(testlines))
 }
 
