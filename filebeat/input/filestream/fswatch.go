@@ -130,31 +130,39 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
 
 	for path, fd := range paths {
-
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
-		if !ok || !loginp.SameFile(&prevDesc, &fd) {
-			newFilesByName[path] = &fd
-			newFilesByID[fd.FileID()] = &fd
+		sfd := fd // to avoid memory aliasing
+		if !ok || !loginp.SameFile(&prevDesc, &sfd) {
+			newFilesByName[path] = &sfd
+			newFilesByID[fd.FileID()] = &sfd
 			continue
 		}
 
-		// if the two descriptors belong to the same file and it has been modified
-		// if the size is smaller than before, it is truncated, if bigger, it is a write event.
-		// It might happen that a file is truncated and then more data is added, both
-		// within the same second, this will make the reader stop, but a new one will not
-		// start because the modification data is the same, to avoid this situation,
-		// we also check for size changes here.
-		if prevDesc.Info.ModTime() != fd.Info.ModTime() || prevDesc.Info.Size() != fd.Info.Size() {
-			var e loginp.FSEvent
-			if prevDesc.Info.Size() > fd.Info.Size() || w.cfg.ResendOnModTime && prevDesc.Info.Size() == fd.Info.Size() {
+		var e loginp.FSEvent
+		switch {
+
+		// the new size is smaller, the file was truncated
+		case prevDesc.Info.Size() > fd.Info.Size():
+			e = truncateEvent(path, fd)
+			truncatedCount++
+
+		// the size is the same, timestamps are different, the file was touched
+		case prevDesc.Info.Size() == fd.Info.Size() && prevDesc.Info.ModTime() != fd.Info.ModTime():
+			if w.cfg.ResendOnModTime {
 				e = truncateEvent(path, fd)
 				truncatedCount++
-			} else {
-				e = writeEvent(path, fd)
-				writtenCount++
 			}
+
+		// the new size is larger, something was written
+		case prevDesc.Info.Size() < fd.Info.Size():
+			e = writeEvent(path, fd)
+			writtenCount++
+		}
+
+		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
+		if e.Op != loginp.OpDone {
 			select {
 			case <-ctx.Done():
 				return
@@ -336,8 +344,8 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 // match the configured paths.
 func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	fdByName := map[string]loginp.FileDescriptor{}
-	// used to determine if a symlink resolves in a already known file
-	uniqueIDs := map[string]struct{}{}
+	// used to determine if a symlink resolves in a already known target
+	uniqueIDs := map[string]string{}
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -347,21 +355,24 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 
 		for _, filename := range matches {
-			// creating a file descriptor can be expensive, so we do the light checks first
-			if s.shouldSkipFile(filename) {
-				continue
-			}
-
-			fd, err := s.createFileDescriptor(filename)
+			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				s.log.Debug("createFileDescriptor(%s) failed: %s", filename, err)
+				s.log.Debugf("failed to create an ingest target for file %q: %s", filename, err)
 				continue
 			}
 
-			if s.checkIfKnownFile(&fd, uniqueIDs) {
+			fd, err := s.toFileDescriptor(&it)
+			if err != nil {
+				s.log.Debug("failed to create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
 			}
 
+			fileID := fd.FileID()
+			if knownFilename, exists := uniqueIDs[fileID]; exists {
+				s.log.Info("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
+				continue
+			}
+			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
 	}
@@ -369,96 +380,86 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	return fdByName
 }
 
-func (s *fileScanner) shouldSkipFile(filename string) bool {
-	if s.isFileExcluded(filename) || !s.isFileIncluded(filename) {
-		s.log.Debugf("Exclude file: %s", filename)
-		return true
-	}
-
-	var err error
-
-	fileInfo, err := os.Lstat(filename)
-	if err != nil {
-		s.log.Debugf("lstat(%s) failed: %s", filename, err)
-		return true
-	}
-
-	if fileInfo.IsDir() {
-		s.log.Debugf("Skipping directory: %s", filename)
-		return true
-	}
-
-	originalFilename := filename
-
-	isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
-	if isSymlink {
-		if !s.cfg.Symlinks {
-			s.log.Debugf("File %s skipped as it is a symlink", filename)
-			return true
-		}
-		originalFilename, err = filepath.EvalSymlinks(filename)
-		if err != nil {
-			s.log.Debugf("Finding path to original file has failed %s: %+v", filename, err)
-			return true
-		}
-		// Check if original file is included to make sure we are not reading from
-		// unwanted files.
-		if s.isFileExcluded(originalFilename) || !s.isFileIncluded(originalFilename) {
-			s.log.Debugf("Exclude original file: %s", filename)
-			return true
-		}
-	}
-
-	// if fingerprinting is enabled and the file is too small
-	// for computing a fingerprint, we have to skip it
-	// until it grows up and becomes a real file that's worth our attention.
-	if s.cfg.Fingerprint.Enabled {
-		var (
-			fi  os.FileInfo
-			err error
-		)
-
-		// the previous Lstat does not follow symlinks, so we have to stat again
-		if !isSymlink {
-			fi = fileInfo
-		} else {
-			fi, err = os.Stat(originalFilename)
-			if err != nil {
-				s.log.Debugf("stat(%s) failed: %s", filename, err)
-				return true
-			}
-		}
-
-		fileSize := fi.Size()
-		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
-		if fileSize < minSize {
-			s.log.Debugf("filesize - %d, expected at least - %d for fingerprinting", fileSize, minSize)
-			return true
-		}
-	}
-
-	return false
+type ingestTarget struct {
+	filename         string
+	originalFilename string
+	symlink          bool
+	info             os.FileInfo
 }
 
-func (s *fileScanner) createFileDescriptor(filename string) (fd loginp.FileDescriptor, err error) {
-	fd.Filename = filename
-	fd.Info, err = os.Stat(filename)
-	if err != nil {
-		return fd, fmt.Errorf("failed to stat %q: %w", filename, err)
+func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
+	if s.isFileExcluded(filename) {
+		return it, fmt.Errorf("file %q is excluded from ingestion", filename)
 	}
 
-	if s.cfg.Fingerprint.Enabled {
-		h := sha256.New()
-		file, err := os.Open(filename)
+	if !s.isFileIncluded(filename) {
+		return it, fmt.Errorf("file %q is not included in ingestion", filename)
+	}
+
+	it.filename = filename
+	it.originalFilename = filename
+
+	it.info, err = os.Lstat(it.filename) // to determine if it's a symlink
+	if err != nil {
+		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
+	}
+
+	if it.info.IsDir() {
+		return it, fmt.Errorf("file %q is a directory", it.filename)
+	}
+
+	it.symlink = it.info.Mode()&os.ModeSymlink > 0
+
+	if it.symlink {
+		if !s.cfg.Symlinks {
+			return it, fmt.Errorf("file %q is a symlink and they're disabled", it.filename)
+		}
+
+		// now we know it's a symlink, we stat with link resolution
+		it.info, err = os.Stat(it.filename)
 		if err != nil {
-			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", filename, err)
+			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
+		}
+
+		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
+		if err != nil {
+			return it, fmt.Errorf("failed to resolve the symlink %q: %w", it.filename, err)
+		}
+
+		if s.isFileExcluded(it.originalFilename) {
+			return it, fmt.Errorf("file %q->%q is excluded from ingestion", it.filename, it.originalFilename)
+		}
+
+		if !s.isFileIncluded(it.originalFilename) {
+			return it, fmt.Errorf("file %q->%q is not included in ingestion", it.filename, it.originalFilename)
+		}
+	}
+
+	return it, nil
+}
+
+func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
+	fd.Filename = it.filename
+	fd.Info = it.info
+
+	if s.cfg.Fingerprint.Enabled {
+		fileSize := it.info.Size()
+		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
+		if fileSize < minSize {
+			return fd, fmt.Errorf("filesize of %q is %d, expected at least %d for fingerprinting", fd.Filename, fileSize, minSize)
+		}
+
+		h := sha256.New()
+		file, err := os.Open(it.originalFilename)
+		if err != nil {
+			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
 		}
 		defer file.Close()
 
 		if s.cfg.Fingerprint.Offset != 0 {
 			_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
 			if err != nil {
-				return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", filename, err)
+				return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", fd.Filename, err)
 			}
 		}
 
@@ -466,7 +467,7 @@ func (s *fileScanner) createFileDescriptor(filename string) (fd loginp.FileDescr
 		buf := make([]byte, h.BlockSize())
 		_, err = io.CopyBuffer(h, r, buf)
 		if err != nil {
-			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, filename, err)
+			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
 		}
 
 		fd.Fingerprint = hex.EncodeToString(h.Sum(nil))
@@ -475,34 +476,12 @@ func (s *fileScanner) createFileDescriptor(filename string) (fd loginp.FileDescr
 	return fd, nil
 }
 
-// If symlink is enabled, this function checks if the original file is not part of same input
-// If original is harvested by other input, states will potentially overwrite each other
-func (s *fileScanner) checkIfKnownFile(fd *loginp.FileDescriptor, uniqueIDs map[string]struct{}) bool {
-	// if symlinks are not enabled there is no point for this check
-	// since filenames are already unique in the initial set and symlinks are excluded from it
-	if !s.cfg.Symlinks {
-		return false
-	}
-
-	fileID := fd.FileID()
-	if _, exists := uniqueIDs[fileID]; exists {
-		s.log.Info("Symlink %q points to a known file %q. Skipping file: %q", fd.Filename, fd.Info.Name())
-		return true
-	}
-	uniqueIDs[fileID] = struct{}{}
-
-	return false
-}
-
 func (s *fileScanner) isFileExcluded(file string) bool {
 	return len(s.cfg.ExcludedFiles) > 0 && s.matchAny(s.cfg.ExcludedFiles, file)
 }
 
 func (s *fileScanner) isFileIncluded(file string) bool {
-	if len(s.cfg.IncludedFiles) == 0 {
-		return true
-	}
-	return s.matchAny(s.cfg.IncludedFiles, file)
+	return len(s.cfg.IncludedFiles) == 0 || s.matchAny(s.cfg.IncludedFiles, file)
 }
 
 // matchAny checks if the text matches any of the regular expressions

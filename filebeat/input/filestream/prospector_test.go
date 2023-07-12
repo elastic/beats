@@ -737,10 +737,6 @@ func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
 func (t testFileInfo) Sys() interface{}   { return t.sys }
 
-func testSameFile(fi1, fi2 os.FileInfo) bool {
-	return fi1.Name() == fi2.Name()
-}
-
 func createTestFileDescriptor() loginp.FileDescriptor {
 	return createTestFileDescriptorWithInfo(testFileInfo{})
 }
