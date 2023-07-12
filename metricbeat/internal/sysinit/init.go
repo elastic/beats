@@ -49,7 +49,10 @@ type MetricbeatHostFSConfig struct {
 func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	// common code for the base use case of `hostfs` being set at the module-level
 	logger := logp.L()
-	hostfs, userSet := findConfigValue(base)
+	hostfs, userSet, err := findConfigValue(base)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching config value: %w", err)
+	}
 	if fleetmode.Enabled() {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
 		return fleetInit(base, hostfs, userSet)
@@ -104,7 +107,10 @@ func findConfigValue(base mb.BaseModule) (string, bool, error) {
 	}
 
 	legacyConfig := MetricbeatHostFSConfig{}
-	base.UnpackConfig(&legacyConfig)
+	err = base.UnpackConfig(&legacyConfig)
+	if err != nil {
+		return "", false, fmt.Errorf("error unpacking legacy config: %w", err)
+	}
 	if legacyConfig.HostFS != "" {
 		cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config.")
 		// Only fallback to this if the user didn't set anything else
