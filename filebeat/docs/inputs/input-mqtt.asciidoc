@@ -73,7 +73,7 @@ A client password used for authentication provided on the application level by t
 The clean_session flag indicates whether the client wants to establish a persistent session with the broker. 
 The default is `false`.
 
-When clean_session is set to false, considered a persistent session, the broker stores all subscriptions for 
+When `clean_session` is set to false, the session is considered to be persistent. The broker stores all subscriptions for 
 the client and all missed messages for the client that subscribed with a Quality of Service (QoS) level 1 or 2. 
 
 In contrast, when CleanSession is set to true, the broker doesn’t retain any information for the client 
