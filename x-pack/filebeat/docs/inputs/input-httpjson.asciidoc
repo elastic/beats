@@ -214,8 +214,8 @@ Some built-in helper functions are provided to work with the input state inside 
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
-- `max`: returns the maximum value of a list of integers.
-- `min`: returns the minimum value of a list of integers.
+- `max`: returns the maximum value of a list of integers where at least one value is required. If no values are provided, it returns an error.
+- `min`: returns the minimum value of a list of integers where at least one value is required. If no values are provided, it returns an error.
 - `mul`: multiplies two integers.
 - `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `[[now (parseDuration "-1h")]]` returns the time at 1 hour before now.
 - `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.

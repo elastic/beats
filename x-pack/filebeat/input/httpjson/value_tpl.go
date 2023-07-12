@@ -41,6 +41,8 @@ const (
 var (
 	errEmptyTemplateResult = errors.New("the template result is empty")
 	errExecutingTemplate   = errors.New("the template execution failed")
+	errMinWrongNoOfArgs    = errors.New("template: :1:2: executing \"\" at <min>: wrong number of args for min: want at least 1 got 0")
+	errMaxWrongNoOfArgs    = errors.New("template: :1:2: executing \"\" at <max>: wrong number of args for max: want at least 1 got 0")
 )
 
 type valueTpl struct {
@@ -298,8 +300,12 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-func min(nums ...int64) int64 {
-	min := int64(math.MaxInt64)
+func min(a int, nums ...int) int {
+	min := math.MaxInt
+	nums = append(nums, a)
+	if len(nums) == 0 {
+		return 0
+	}
 	for _, num := range nums {
 		if num < min {
 			min = num
@@ -308,8 +314,12 @@ func min(nums ...int64) int64 {
 	return min
 }
 
-func max(nums ...int64) int64 {
-	max := int64(math.MinInt64)
+func max(a int, nums ...int) int {
+	max := math.MinInt
+	nums = append(nums, a)
+	if len(nums) == 0 {
+		return 0
+	}
 	for _, num := range nums {
 		if num > max {
 			max = num
