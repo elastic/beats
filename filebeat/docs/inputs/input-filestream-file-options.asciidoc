@@ -187,7 +187,7 @@ WARNING: Enabling the fingerprint mode delays ingesting new files until they gro
 
 Normally, log lines contain timestamps and other unique fields that should let to use the fingerprint mode
 but in every use-case users should inspect their logs and determine what are the appropriate values for
-the `offset` and `length` parameters. Default `offset` is 0 and default `length` is `1024` or 1 KB.
+the `offset` and `length` parameters. Default `offset` is 0 and default `length` is `1024` or 1 KB. `length` cannot be less than `64`.
 
 [source,yaml]
 ----
@@ -559,6 +559,11 @@ file_identity.inode_marker.path: /logs/.filebeat-marker
 WARNING: In order to use this file identity option, one must enable the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint option in the scanner>>. Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 
 Please refer to the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint configuration for details>>.
+
+[source,yaml]
+----
+file_identity.fingerprint: ~
+----
 
 [[filestream-log-rotation-support]]
 [float]

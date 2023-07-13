@@ -281,16 +281,20 @@ type fileScanner struct {
 }
 
 func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner, error) {
-	if config.Fingerprint.Enabled && config.Fingerprint.Length < sha256.BlockSize {
-		err := fmt.Errorf("fingerprint size %d cannot be smaller than %d", config.Fingerprint.Length, sha256.BlockSize)
-		return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
-	}
-
 	s := fileScanner{
 		paths: paths,
 		cfg:   config,
 		log:   logp.NewLogger(scannerDebugKey),
 	}
+
+	if s.cfg.Fingerprint.Enabled {
+		if s.cfg.Fingerprint.Length < sha256.BlockSize {
+			err := fmt.Errorf("fingerprint size %d cannot be smaller than %d", config.Fingerprint.Length, sha256.BlockSize)
+			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
+		}
+		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
+	}
+
 	err := s.resolveRecursiveGlobs(config)
 	if err != nil {
 		return nil, err
@@ -357,19 +361,19 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		for _, filename := range matches {
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				s.log.Debugf("failed to create an ingest target for file %q: %s", filename, err)
+				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
 				continue
 			}
 
 			fd, err := s.toFileDescriptor(&it)
 			if err != nil {
-				s.log.Debug("failed to create a file descriptor for an ingest target %q: %s", filename, err)
+				s.log.Debugf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
 			}
 
 			fileID := fd.FileID()
 			if knownFilename, exists := uniqueIDs[fileID]; exists {
-				s.log.Info("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
+				s.log.Infof("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
 				continue
 			}
 			uniqueIDs[fileID] = fd.Filename

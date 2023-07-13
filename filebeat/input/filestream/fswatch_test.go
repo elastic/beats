@@ -62,12 +62,10 @@ scanner:
 		e := fw.Event()
 		expEvent := loginp.FSEvent{
 			NewPath: filename,
-			OldPath: "",
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
-				Filename:    filename,
-				Fingerprint: "",
-				Info:        testFileInfo{path: basename, size: 5}, // 5 bytes written
+				Filename: filename,
+				Info:     testFileInfo{path: basename, size: 5}, // 5 bytes written
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -89,9 +87,8 @@ scanner:
 			OldPath: filename,
 			Op:      loginp.OpWrite,
 			Descriptor: loginp.FileDescriptor{
-				Filename:    filename,
-				Fingerprint: "",
-				Info:        testFileInfo{path: basename, size: 10}, // +5 bytes appended
+				Filename: filename,
+				Info:     testFileInfo{path: basename, size: 10}, // +5 bytes appended
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -112,9 +109,8 @@ scanner:
 			OldPath: filename,
 			Op:      loginp.OpRename,
 			Descriptor: loginp.FileDescriptor{
-				Filename:    newFilename,
-				Fingerprint: "",
-				Info:        testFileInfo{path: newBasename, size: 10},
+				Filename: newFilename,
+				Info:     testFileInfo{path: newBasename, size: 10},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -133,9 +129,8 @@ scanner:
 			OldPath: filename,
 			Op:      loginp.OpTruncate,
 			Descriptor: loginp.FileDescriptor{
-				Filename:    filename,
-				Fingerprint: "",
-				Info:        testFileInfo{path: basename, size: 2},
+				Filename: filename,
+				Info:     testFileInfo{path: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -154,9 +149,8 @@ scanner:
 			OldPath: filename,
 			Op:      loginp.OpTruncate,
 			Descriptor: loginp.FileDescriptor{
-				Filename:    filename,
-				Fingerprint: "",
-				Info:        testFileInfo{path: basename, size: 2},
+				Filename: filename,
+				Info:     testFileInfo{path: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -171,13 +165,11 @@ scanner:
 
 		e := fw.Event()
 		expEvent := loginp.FSEvent{
-			NewPath: "",
 			OldPath: filename,
 			Op:      loginp.OpDelete,
 			Descriptor: loginp.FileDescriptor{
-				Filename:    filename,
-				Fingerprint: "",
-				Info:        testFileInfo{path: basename, size: 2},
+				Filename: filename,
+				Info:     testFileInfo{path: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -211,7 +203,6 @@ scanner:
 		e := fw.Event()
 		expEvent := loginp.FSEvent{
 			NewPath: filename,
-			OldPath: "",
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
@@ -244,7 +235,6 @@ scanner:
 		e := fw.Event()
 		expEvent := loginp.FSEvent{
 			NewPath: filename,
-			OldPath: "",
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
@@ -274,7 +264,7 @@ func TestFileScanner(t *testing.T) {
 	travelerBasename := "traveler.log"
 	normalSymlinkBasename := "normal_symlink.log"
 	exclSymlinkBasename := "excl_symlink.log"
-	travelerSymlinkBasename := "traveler_symlink.log"
+	travelerSymlinkBasename := "portal.log"
 
 	normalFilename := filepath.Join(dir, normalBasename)
 	undersizedFilename := filepath.Join(dir, undersizedBasename)
@@ -336,40 +326,35 @@ scanner:
 `,
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
-					Filename:    normalFilename,
-					Fingerprint: "",
+					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
 						path: normalBasename,
 					},
 				},
 				undersizedFilename: {
-					Filename:    undersizedFilename,
-					Fingerprint: "",
+					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
 						path: undersizedBasename,
 					},
 				},
 				excludedFilename: {
-					Filename:    excludedFilename,
-					Fingerprint: "",
+					Filename: excludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
 						path: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
-					Filename:    excludedIncludedFilename,
-					Fingerprint: "",
+					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						path: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
-					Filename:    travelerSymlinkFilename,
-					Fingerprint: "",
+					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
 						path: travelerSymlinkBasename,
@@ -390,32 +375,28 @@ scanner:
 `,
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
-					Filename:    normalFilename,
-					Fingerprint: "",
+					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
 						path: normalBasename,
 					},
 				},
 				undersizedFilename: {
-					Filename:    undersizedFilename,
-					Fingerprint: "",
+					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
 						path: undersizedBasename,
 					},
 				},
 				excludedFilename: {
-					Filename:    excludedFilename,
-					Fingerprint: "",
+					Filename: excludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
 						path: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
-					Filename:    excludedIncludedFilename,
-					Fingerprint: "",
+					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						path: excludedIncludedBasename,
@@ -437,27 +418,48 @@ scanner:
 `,
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
-					Filename:    normalFilename,
-					Fingerprint: "",
+					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
 						path: normalBasename,
 					},
 				},
 				undersizedFilename: {
-					Filename:    undersizedFilename,
-					Fingerprint: "",
+					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
 						path: undersizedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
-					Filename:    travelerSymlinkFilename,
-					Fingerprint: "",
+					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
 						path: travelerSymlinkBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns no symlink if the original file is excluded",
+			cfgStr: `
+scanner:
+  exclude_files: ['.*exclude.*', '.*traveler.*']
+  symlinks: true
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename: normalFilename,
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						path: normalBasename,
+					},
+				},
+				undersizedFilename: {
+					Filename: undersizedFilename,
+					Info: testFileInfo{
+						size: sizes[undersizedFilename],
+						path: undersizedBasename,
 					},
 				},
 			},
@@ -476,11 +478,51 @@ scanner:
 `,
 			expDesc: map[string]loginp.FileDescriptor{
 				excludedIncludedFilename: {
-					Filename:    excludedIncludedFilename,
-					Fingerprint: "",
+					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						path: excludedIncludedBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns no included symlink if the original file is not included",
+			cfgStr: `
+scanner:
+  include_files: ['.*include.*', '.*portal.*']
+  symlinks: true
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						path: excludedIncludedBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns an included symlink if the original file is included",
+			cfgStr: `
+scanner:
+  include_files: ['.*include.*', '.*portal.*', '.*traveler.*']
+  symlinks: true
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						path: excludedIncludedBasename,
+					},
+				},
+				travelerSymlinkFilename: {
+					Filename: travelerSymlinkFilename,
+					Info: testFileInfo{
+						size: sizes[travelerFilename],
+						path: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -586,6 +628,26 @@ scanner:
 			requireEqualFiles(t, tc.expDesc, s.GetFiles())
 		})
 	}
+
+	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
+		cfgStr := `
+scanner:
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1
+`
+		cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+		require.NoError(t, err)
+
+		ns := &conf.Namespace{}
+		err = ns.Unpack(cfg)
+		require.NoError(t, err)
+
+		_, err = newFileWatcher(paths, ns)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "fingerprint size 1 cannot be smaller than 64")
+	})
 }
 
 func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
