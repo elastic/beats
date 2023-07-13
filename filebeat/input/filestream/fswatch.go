@@ -367,13 +367,13 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			fd, err := s.toFileDescriptor(&it)
 			if err != nil {
-				s.log.Debugf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
+				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
 			}
 
 			fileID := fd.FileID()
 			if knownFilename, exists := uniqueIDs[fileID]; exists {
-				s.log.Infof("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
+				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
 				continue
 			}
 			uniqueIDs[fileID] = fd.Filename
