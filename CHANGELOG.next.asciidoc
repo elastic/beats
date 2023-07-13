@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Do not print context cancelled error message when running under agent {pull}36006[36006]
 - Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
 - Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
 
 *Auditbeat*
 
