@@ -289,7 +289,7 @@ func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner,
 
 	if s.cfg.Fingerprint.Enabled {
 		if s.cfg.Fingerprint.Length < sha256.BlockSize {
-			err := fmt.Errorf("fingerprint size %d cannot be smaller than %d", config.Fingerprint.Length, sha256.BlockSize)
+			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
 		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
@@ -450,7 +450,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		fileSize := it.info.Size()
 		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 		if fileSize < minSize {
-			return fd, fmt.Errorf("filesize of %q is %d, expected at least %d for fingerprinting", fd.Filename, fileSize, minSize)
+			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
 		}
 
 		h := sha256.New()
