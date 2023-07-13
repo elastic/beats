@@ -469,9 +469,12 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 		r := io.LimitReader(file, s.cfg.Fingerprint.Length)
 		buf := make([]byte, h.BlockSize())
-		_, err = io.CopyBuffer(h, r, buf)
+		written, err := io.CopyBuffer(h, r, buf)
 		if err != nil {
 			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
+		}
+		if written != s.cfg.Fingerprint.Length {
+			return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
 		}
 
 		fd.Fingerprint = hex.EncodeToString(h.Sum(nil))
