@@ -98,8 +98,8 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 	if len(d) == 0 {
 		return
 	}
-	fieldsUpdate := d.Clone() // so we can delete redundant keys
 
+<<<<<<< HEAD
 	var metaUpdate common.MapStr
 
 	for fieldKey, value := range d {
@@ -129,14 +129,63 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 		if e.Meta == nil {
 			e.Meta = common.MapStr{}
 		}
+=======
+	// It's supported to update the timestamp using this function.
+	// However, we must handle it separately since it's a separate field of the event.
+	timestampValue, timestampExists := d[timestampFieldKey]
+	if timestampExists {
+>>>>>>> faf88b7d69 (Decrease Clones (#35945))
 		if overwrite {
-			e.Meta.DeepUpdate(metaUpdate)
-		} else {
-			e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+			_ = e.setTimestamp(timestampValue)
 		}
+
+		// Temporary delete it from the update map,
+		// so we can do `e.Fields.DeepUpdate(d)` or
+		// `e.Fields.DeepUpdateNoOverwrite(d)` later
+		delete(d, timestampFieldKey)
 	}
 
-	if len(fieldsUpdate) == 0 {
+	// It's supported to update the metadata using this function.
+	// However, we must handle it separately since it's a separate field of the event.
+	metaValue, metaExists := d[metadataFieldKey]
+	if metaExists {
+		var metaUpdate mapstr.M
+
+		switch meta := metaValue.(type) {
+		case mapstr.M:
+			metaUpdate = meta
+		case map[string]interface{}:
+			metaUpdate = mapstr.M(meta)
+		}
+
+		if metaUpdate != nil {
+			if e.Meta == nil {
+				e.Meta = mapstr.M{}
+			}
+			if overwrite {
+				e.Meta.DeepUpdate(metaUpdate)
+			} else {
+				e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+			}
+		}
+
+		// Temporary delete it from the update map,
+		// so we can do `e.Fields.DeepUpdate(d)` or
+		// `e.Fields.DeepUpdateNoOverwrite(d)` later
+		delete(d, metadataFieldKey)
+	}
+
+	// At the end we revert all changes we made to the update map
+	defer func() {
+		if timestampExists {
+			d[timestampFieldKey] = timestampValue
+		}
+		if metaExists {
+			d[metadataFieldKey] = metaValue
+		}
+	}()
+
+	if len(d) == 0 {
 		return
 	}
 
@@ -145,9 +194,9 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 	}
 
 	if overwrite {
-		e.Fields.DeepUpdate(fieldsUpdate)
+		e.Fields.DeepUpdate(d)
 	} else {
-		e.Fields.DeepUpdateNoOverwrite(fieldsUpdate)
+		e.Fields.DeepUpdateNoOverwrite(d)
 	}
 }
 

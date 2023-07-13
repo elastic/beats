@@ -29,6 +29,38 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
+- Support for multiline zookeeper logs {issue}2496[2496]
+- Allow `clock_nanosleep` in the default seccomp profiles for amd64 and 386. Newer versions of glibc (e.g. 2.31) require it. {issue}33792[33792]
+- Disable lockfile when running under elastic-agent. {pull}33988[33988]
+- Fix lockfile logic, retry locking {pull}34194[34194]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Log errors from the Elastic Agent V2 client errors channel. Avoids blocking when error occurs communicating with the Elastic Agent. {pull}34392[34392]
+- Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
+- Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
+- Fix dropped events when monitor a beat under the agent and send its `Host info` log entry. {pull}34599[34599]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix race condition when stopping runners {pull}32433[32433]
+- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
+- Fix panics when a processor is closed twice {pull}34647[34647]
+- Update elastic-agent-system-metrics to v0.4.6 to allow builds on mips platforms. {pull}34674[34674]
+- The Elasticsearch output now splits large requests instead of dropping them when it receives a StatusRequestEntityTooLarge error. {pull}34911[34911]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
+- In cases where the matcher detects a non-string type in a match statement, report the error as a debug statement, and not a warning statement. {pull}35119[35119]
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+- Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
+- Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
+- Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- Do not print context cancelled error message when running under agent {pull}36006[36006]
+- Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
+- Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
+
+*Auditbeat*
 
 *Filebeat*
 
