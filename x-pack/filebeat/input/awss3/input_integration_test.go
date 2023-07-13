@@ -153,6 +153,7 @@ func TestInputRunSQS(t *testing.T) {
 	// Ensure SQS is empty before testing.
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL)
 
+	// Upload some test files into S3
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
