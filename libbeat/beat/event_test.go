@@ -28,13 +28,13 @@ import (
 )
 
 const (
-	PROPSIZE = 1024 * 2014 * 10
+	propSize = 1024 * 2014 * 10
 )
 
 var largeProp string
 
 func init() {
-	b := make([]byte, PROPSIZE)
+	b := make([]byte, propSize)
 	_, _ = rand.Read(b)
 	largeProp = string(b)
 }

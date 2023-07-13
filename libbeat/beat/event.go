@@ -111,15 +111,22 @@ func (e *Event) deepUpdate(d mapstr.M, overwrite bool) {
 		return
 	}
 
-	// TODO: Refactor to dynamic field removal/assignment when needed
+	// It's supported to update the timestamp using this function.
+	// However, we must handle it separately since it's a separate field of the event.
 	timestampValue, timestampExists := d[timestampFieldKey]
 	if timestampExists {
 		if overwrite {
 			_ = e.setTimestamp(timestampValue)
 		}
+
+		// Temporary delete it from the update map,
+		// so we can do `e.Fields.DeepUpdate(d)` or
+		// `e.Fields.DeepUpdateNoOverwrite(d)` later
 		delete(d, timestampFieldKey)
 	}
 
+	// It's supported to update the metadata using this function.
+	// However, we must handle it separately since it's a separate field of the event.
 	metaValue, metaExists := d[metadataFieldKey]
 	if metaExists {
 		var metaUpdate mapstr.M
@@ -141,9 +148,14 @@ func (e *Event) deepUpdate(d mapstr.M, overwrite bool) {
 				e.Meta.DeepUpdateNoOverwrite(metaUpdate)
 			}
 		}
+
+		// Temporary delete it from the update map,
+		// so we can do `e.Fields.DeepUpdate(d)` or
+		// `e.Fields.DeepUpdateNoOverwrite(d)` later
 		delete(d, metadataFieldKey)
 	}
 
+	// At the end we revert all changes we made to the update map
 	defer func() {
 		if timestampExists {
 			d[timestampFieldKey] = timestampValue
