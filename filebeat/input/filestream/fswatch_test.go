@@ -250,6 +250,49 @@ scanner:
 		e = fw.Event()
 		require.Equal(t, loginp.OpDone, e.Op)
 	})
+
+	t.Run("does not emit an event for a fingerprint collision", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+  fingerprint.enabled: true
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename:    filename,
+				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Info:        testFileInfo{path: basename, size: 1024},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+
+		// collisions are resolved in the alphabetical order, the first filename wins
+		basename = "created_collision.log"
+		filename = filepath.Join(dir, basename)
+		err = os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+		require.NoError(t, err)
+
+		e = fw.Event()
+		// means no event
+		require.Equal(t, loginp.OpDone, e.Op)
+	})
 }
 
 func TestFileScanner(t *testing.T) {
