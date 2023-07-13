@@ -18,37 +18,37 @@
 package mqtt
 
 import (
-        "errors"
+	"errors"
 
-        "github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type mqttInputConfig struct {
-        Hosts  []string `config:"hosts" validate:"required,min=1"`
-        Topics []string `config:"topics" validate:"required,min=1"`
-        QoS    int      `config:"qos" validate:"min=0,max=2"`
+	Hosts  []string `config:"hosts" validate:"required,min=1"`
+	Topics []string `config:"topics" validate:"required,min=1"`
+	QoS    int      `config:"qos" validate:"min=0,max=2"`
 
-        ClientID     string `config:"client_id" validate:"nonzero"`
-        Username     string `config:"username"`
-        Password     string `config:"password"`
-        CleanSession bool   `config:"clean_session"`
+	ClientID     string `config:"client_id" validate:"nonzero"`
+	Username     string `config:"username"`
+	Password     string `config:"password"`
+	CleanSession bool   `config:"clean_session"`
 
-        TLS *tlscommon.Config `config:"ssl"`
+	TLS *tlscommon.Config `config:"ssl"`
 }
 
 // The default config for the mqtt input.
 func defaultConfig() mqttInputConfig {
-        return mqttInputConfig{
-                ClientID:     "filebeat",
-                Topics:       []string{"#"},
-                CleanSession: true,
-        }
+	return mqttInputConfig{
+		ClientID:     "filebeat",
+		Topics:       []string{"#"},
+		CleanSession: true,
+	}
 }
 
 // Validate validates the config.
 func (mic *mqttInputConfig) Validate() error {
-        if len(mic.ClientID) < 1 || len(mic.ClientID) > 23 {
-                return errors.New("ClientID must be between 1 and 23 characters long")
-        }
-        return nil
+	if len(mic.ClientID) < 1 || len(mic.ClientID) > 23 {
+		return errors.New("ClientID must be between 1 and 23 characters long")
+	}
+	return nil
 }
