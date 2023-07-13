@@ -383,9 +383,10 @@ func (s *store) remove(key string) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
-	s.UpdateTTL(resource, 0)
+	s.ephemeralStore.Remove(resource)
 	return nil
 }
+
 
 // UpdateTTL updates the time-to-live of a resource. Inactive resources with expired TTL are subject to removal.
 // The TTL value is part of the internal state, and will be written immediately to the persistent store.
