@@ -36,7 +36,7 @@ func TestFileWatcher(t *testing.T) {
 	paths := []string{filepath.Join(dir, "*.log")}
 	cfgStr := `
 scanner:
-  check_interval: 10ms
+  check_interval: 100ms
   resend_on_touch: true
   symlinks: false
   recursive_glob: true
@@ -180,7 +180,7 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  check_interval: 100ms
   symlinks: false
   recursive_glob: true
   fingerprint:
@@ -218,7 +218,7 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  check_interval: 100ms
 `
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -256,7 +256,7 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  check_interval: 100ms
   fingerprint.enabled: true
 `
 
@@ -689,7 +689,7 @@ scanner:
 
 		_, err = newFileWatcher(paths, ns)
 		require.Error(t, err)
-		require.Contains(t, err.Error(), "fingerprint size 1 cannot be smaller than 64")
+		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
 }
 
