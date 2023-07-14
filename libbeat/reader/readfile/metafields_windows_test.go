@@ -27,20 +27,23 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+type winTestInfo struct {
+	testFileInfo
+	idxhi uint
+	idxlo uint
+	vol   uint
+}
+
 func createTestFileInfo() os.FileInfo {
 	return testFileInfo{
-		name: "filename",
-		size: 42,
-		time: time.Now(),
-		sys: &struct {
-			idxhi uint
-			idxlo uint
-			vol   uint
-		}{
-			idxhi: 100,
-			idxlo: 200,
-			vol:   300,
+		testFileInfo: testFileInfo{
+			name: "filename",
+			size: 42,
+			time: time.Now(),
 		},
+		idxhi: 100,
+		idxlo: 200,
+		vol:   300,
 	}
 }
 
