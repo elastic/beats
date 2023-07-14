@@ -118,7 +118,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filterStage: 'extended') // change this before merge
+        runBuildAndTest(filterStage: 'mandatory')
       }
     }
     stage('Extended') {
