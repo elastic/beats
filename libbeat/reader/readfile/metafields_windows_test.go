@@ -50,16 +50,16 @@ func createTestFileInfo() os.FileInfo {
 func checkFields(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
-	idxlo, err := actual.GetValue(idxloKey)
-	require.NoError(t, err)
-	require.Equal(t, "100", idxlo)
-	err = actual.Delete(idxloKey)
-	require.NoError(t, err)
-
 	idxhi, err := actual.GetValue(idxhiKey)
 	require.NoError(t, err)
-	require.Equal(t, "200", idxhi)
+	require.Equal(t, "100", idxhi)
 	err = actual.Delete(idxhiKey)
+	require.NoError(t, err)
+
+	idxlo, err := actual.GetValue(idxloKey)
+	require.NoError(t, err)
+	require.Equal(t, "200", idxlo)
+	err = actual.Delete(idxloKey)
 	require.NoError(t, err)
 
 	vol, err := actual.GetValue(volKey)
