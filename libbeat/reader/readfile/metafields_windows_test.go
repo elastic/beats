@@ -35,7 +35,7 @@ type winTestInfo struct {
 }
 
 func createTestFileInfo() os.FileInfo {
-	return testFileInfo{
+	return winTestInfo{
 		testFileInfo: testFileInfo{
 			name: "filename",
 			size: 42,
