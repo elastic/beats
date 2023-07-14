@@ -591,25 +591,27 @@ def targetWithoutNode(Map args = [:]) {
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
   def withNodejs = args.get('withNodejs', false)
-  String name = normalise("${directory}")
+  String name = normalise(args.directory)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
+      // unstash terraform outputs in the same directory where the files were stashed
+      dirs?.each { folder ->
+        dir("${folder}") {
+          try {
+            unstash("terraform-${name}")
+            //unstash does not print verbose output , hence printing contents of the directory for logging purposes
+            sh "ls -la ${pwd()}"
+          } catch (error) {
+            echo "error unstashing: ${error}"
+          }
+        }
+      }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
           if (enableRetry) {
-            // unstash in the same directory where the files were stashed
-            dir('input/awss3/_meta/terraform'){
-              echo "terraform-${name}"
-              try {
-                unstash(name: "terraform-${name}")
-                sh "ls -la ${pwd()}"
-              } catch (error) {
-                echo "error unstashing: ${error}"
-              }
-            }
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
             retry(3) {
@@ -948,7 +950,7 @@ def startCloudTestEnv(Map args = [:]) {
           // Archive terraform states in case manual cleanup is needed.
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
           dir("${folder}") {
-            stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,*.yml')
+            stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,outputs*.yml')
           }
         }
       }

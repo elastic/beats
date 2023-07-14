@@ -104,6 +104,7 @@ func makeTestConfigSQS(queueURL string) *conf.C {
 queue_url: %s
 max_number_of_messages: 1
 visibility_timeout: 30s
+region: us-east-1
 file_selectors:
 -
   regex: 'events-array.json$'
