@@ -79,12 +79,12 @@ func (p *fileProspector) Init(
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
-		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 		return newKey, fm
 	})
 
@@ -110,13 +110,13 @@ func (p *fileProspector) Init(
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
 		if fm.IdentifierName != identifierName {
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
+			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}).Name()
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
@@ -189,6 +189,13 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+<<<<<<< HEAD
+=======
+			err := updater.ResetCursor(src, state{Offset: event.Descriptor.Info.Size()})
+			if err != nil {
+				log.Errorf("setting cursor for ignored file: %v", err)
+			}
+>>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 			return
 		}
 
@@ -219,12 +226,12 @@ func (p *fileProspector) onFSEvent(
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
 	if p.ignoreOlder > 0 {
 		now := time.Now()
-		if now.Sub(fe.Info.ModTime()) > p.ignoreOlder {
+		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
 			log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
 			return true
 		}
 	}
-	if !ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
 	}

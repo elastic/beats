@@ -33,6 +33,7 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
+<<<<<<< HEAD
 	Paths          []string                `config:"paths"`
 	Close          closerConfig            `config:"close"`
 	FileWatcher    *common.ConfigNamespace `config:"prospector"`
@@ -43,6 +44,20 @@ type config struct {
 	IgnoreOlder    time.Duration           `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
 	Rotation       *common.ConfigNamespace `config:"rotation"`
+=======
+	ID             string             `config:"id"`
+	Paths          []string           `config:"paths"`
+	Close          closerConfig       `config:"close"`
+	FileWatcher    *conf.Namespace    `config:"prospector"`
+	FileIdentity   *conf.Namespace    `config:"file_identity"`
+	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool               `config:"clean_removed"`
+	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
+	IgnoreOlder    time.Duration      `config:"ignore_older"`
+	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
+	Rotation       *conf.Namespace    `config:"rotation"`
+	TakeOver       bool               `config:"take_over"`
+>>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 }
 
 type closerConfig struct {

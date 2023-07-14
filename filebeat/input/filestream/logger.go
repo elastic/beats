@@ -28,8 +28,11 @@ func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Sourc
 		"operation", event.Op.String(),
 		"source_name", src.Name(),
 	)
-	if event.Info != nil && event.Info.Sys() != nil {
-		log = log.With("os_id", file.GetOSState(event.Info))
+	if event.Descriptor.Fingerprint != "" {
+		log = log.With("fingerprint", event.Descriptor.Fingerprint)
+	}
+	if event.Descriptor.Info != nil && event.Descriptor.Info.Sys() != nil {
+		log = log.With("os_id", file.GetOSState(event.Descriptor.Info))
 	}
 	if event.NewPath != "" {
 		log = log.With("new_path", event.NewPath)
