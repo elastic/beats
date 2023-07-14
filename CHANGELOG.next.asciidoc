@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Do not print context cancelled error message when running under agent {pull}36006[36006]
 - Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
 - Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
 
 *Auditbeat*
 
@@ -346,6 +347,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Improve CEL input performance. {pull}35915[35915]
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
 - Added support for min/max template functions in httpjson input. {issue}4414[4414] {pull}36036[36036]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
+- Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
