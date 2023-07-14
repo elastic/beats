@@ -29,13 +29,13 @@ import (
 
 type winTestInfo struct {
 	testFileInfo
-	idxhi uint
-	idxlo uint
-	vol   uint
+	idxhi uint32
+	idxlo uint32
+	vol   uint32
 }
 
 func createTestFileInfo() os.FileInfo {
-	return winTestInfo{
+	return &winTestInfo{
 		testFileInfo: testFileInfo{
 			name: "filename",
 			size: 42,
