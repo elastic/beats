@@ -71,12 +71,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 
-*Auditbeat*
-   - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
-
-*Libbeat*
-- Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
-
 *Heartbeat*
 
 
