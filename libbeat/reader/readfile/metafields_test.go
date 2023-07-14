@@ -18,6 +18,7 @@
 package readfile
 
 import (
+	"errors"
 	"io"
 	"os"
 	"testing"
@@ -54,7 +55,7 @@ func TestMetaFields(t *testing.T) {
 	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), "hash", offset}
 	for {
 		msg, err := in.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 
