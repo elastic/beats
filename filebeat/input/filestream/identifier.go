@@ -19,7 +19,6 @@ package filestream
 
 import (
 	"fmt"
-	"os"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -36,18 +35,18 @@ const (
 	nativeName      = "native"
 	pathName        = "path"
 	inodeMarkerName = "inode_marker"
+	fingerprintName = "fingerprint"
 
 	DefaultIdentifierName = nativeName
 	identitySep           = "::"
 )
 
-var (
-	identifierFactories = map[string]identifierFactory{
-		nativeName:      newINodeDeviceIdentifier,
-		pathName:        newPathIdentifier,
-		inodeMarkerName: newINodeMarkerIdentifier,
-	}
-)
+var identifierFactories = map[string]identifierFactory{
+	nativeName:      newINodeDeviceIdentifier,
+	pathName:        newPathIdentifier,
+	inodeMarkerName: newINodeMarkerIdentifier,
+	fingerprintName: newFingerprintIdentifier,
+}
 
 type identifierFactory func(*common.Config) (fileIdentifier, error)
 
@@ -60,19 +59,19 @@ type fileIdentifier interface {
 // fileSource implements the Source interface
 // It is required to identify and manage file sources.
 type fileSource struct {
-	info      os.FileInfo
+	info      loginp.FileDescriptor
 	newPath   string
 	oldPath   string
 	truncated bool
 	archived  bool
 
-	name                string
+	fileID              string
 	identifierGenerator string
 }
 
 // Name returns the registry identifier of the file.
 func (f fileSource) Name() string {
-	return f.name
+	return f.fileID
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
@@ -110,12 +109,12 @@ func newINodeDeviceIdentifier(_ *common.Config) (fileIdentifier, error) {
 
 func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	return fileSource{
-		info:                e.Info,
+		info:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
+		fileID:              i.name + identitySep + file.GetOSState(e.Descriptor.Info).String(),
 		identifierGenerator: i.name,
 	}
 }
@@ -149,12 +148,12 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		path = e.OldPath
 	}
 	return fileSource{
-		info:                e.Info,
+		info:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                p.name + identitySep + path,
+		fileID:              p.name + identitySep + path,
 		identifierGenerator: p.name,
 	}
 }
@@ -181,7 +180,7 @@ func withSuffix(inner fileIdentifier, suffix string) fileIdentifier {
 
 func (s *suffixIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	fs := s.i.GetSource(e)
-	fs.name += "-" + s.suffix
+	fs.fileID += "-" + s.suffix
 	return fs
 }
 
