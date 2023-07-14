@@ -61,7 +61,10 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		},
 	})
 
-	setFileSystemMetadata(r.fi, message.Fields)
+	err = setFileSystemMetadata(r.fi, message.Fields)
+	if err != nil {
+		return message, fmt.Errorf("failed to set file system metadata: %w", err)
+	}
 
 	if r.fingerprint != "" {
 		_, err = message.Fields.Put("log.file.fingerprint", r.fingerprint)
