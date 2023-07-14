@@ -21,6 +21,8 @@ import (
 	"os"
 
 	"github.com/elastic/go-concert/unison"
+
+	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const (
@@ -54,6 +56,33 @@ func (o *Operation) String() string {
 	return name
 }
 
+// FileDescriptor represents full information about a file.
+type FileDescriptor struct {
+	// Filename is an original filename this descriptor was created from.
+	// In case it was a symlink, this will be the filename of the symlink unlike
+	// the filename from the `Info`.
+	Filename string
+	// Info is the result of file stat
+	Info os.FileInfo
+	// Fingerprint is a computed hash of the file header
+	Fingerprint string
+}
+
+// FileID returns a unique file ID
+// If fingerprint is computed it's used as the ID.
+// Otherwise, a combination of the device ID and inode is used.
+func (fd FileDescriptor) FileID() string {
+	if fd.Fingerprint != "" {
+		return fd.Fingerprint
+	}
+	return file_helper.GetOSState(fd.Info).String()
+}
+
+// SameFile returns true if descriptors point to the same file.
+func SameFile(a, b *FileDescriptor) bool {
+	return a.FileID() == b.FileID()
+}
+
 // FSEvent returns inforamation about file system changes.
 type FSEvent struct {
 	// NewPath is the new path of the file.
@@ -63,16 +92,16 @@ type FSEvent struct {
 	OldPath string
 	// Op is the file system event: create, write, rename, remove
 	Op Operation
-	// Info describes the file in the event.
-	Info os.FileInfo
+	// Descriptor describes the file in the event.
+	Descriptor FileDescriptor
 }
 
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
-	// the values are the FileInfos describing the file.
-	GetFiles() map[string]os.FileInfo
+	// the values are the file descriptors that contain all necessary information about the file.
+	GetFiles() map[string]FileDescriptor
 }
 
 // FSWatcher returns file events of the monitored files.

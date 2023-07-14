@@ -19,26 +19,41 @@ package filestream
 
 import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/file"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
-	log := logger.With(
-		"operation", event.Op.String(),
-		"source_name", src.Name(),
-	)
-	if event.Descriptor.Fingerprint != "" {
-		log = log.With("fingerprint", event.Descriptor.Fingerprint)
+type fingerprintIdentifier struct {
+	log *logp.Logger
+}
+
+func newFingerprintIdentifier(cfg *conf.C) (fileIdentifier, error) {
+	return &fingerprintIdentifier{
+		log: logp.NewLogger("fingerprint_identifier"),
+	}, nil
+}
+
+func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	return fileSource{
+		info:                e.Descriptor,
+		newPath:             e.NewPath,
+		oldPath:             e.OldPath,
+		truncated:           e.Op == loginp.OpTruncate,
+		archived:            e.Op == loginp.OpArchived,
+		fileID:              fingerprintName + identitySep + e.Descriptor.Fingerprint,
+		identifierGenerator: fingerprintName,
 	}
-	if event.Descriptor.Info != nil && event.Descriptor.Info.Sys() != nil {
-		log = log.With("os_id", file.GetOSState(event.Descriptor.Info))
+}
+
+func (i *fingerprintIdentifier) Name() string {
+	return fingerprintName
+}
+
+func (i *fingerprintIdentifier) Supports(f identifierFeature) bool {
+	switch f {
+	case trackRename:
+		return true
+	default:
 	}
-	if event.NewPath != "" {
-		log = log.With("new_path", event.NewPath)
-	}
-	if event.OldPath != "" {
-		log = log.With("old_path", event.OldPath)
-	}
-	return log
+	return false
 }
