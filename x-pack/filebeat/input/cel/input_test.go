@@ -1202,6 +1202,7 @@ func TestInput(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
 
 			conf := defaultConfig()
+			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				t.Fatalf("unexpected error unpacking config: %v", err)
