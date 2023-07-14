@@ -32,7 +32,7 @@ func createTestFileInfo() os.FileInfo {
 		name: "filename",
 		size: 42,
 		time: time.Now(),
-		sys: struct {
+		sys: &struct {
 			idxhi uint
 			idxlo uint
 			vol   uint
