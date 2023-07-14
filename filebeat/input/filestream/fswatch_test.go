@@ -28,12 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
-=======
-	conf "github.com/elastic/elastic-agent-libs/config"
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestFileWatcher(t *testing.T) {
@@ -670,33 +665,10 @@ scanner:
 		},
 	}
 
-<<<<<<< HEAD
-	for name, test := range testCases {
-		test := test
-
-		t.Run(name, func(t *testing.T) {
-			cfg := fileScannerConfig{
-				ExcludedFiles: test.excludedFiles,
-				IncludedFiles: test.includedFiles,
-				Symlinks:      test.symlinks,
-				RecursiveGlob: false,
-			}
-			fs, err := newFileScanner(test.paths, cfg)
-			if err != nil {
-				t.Fatal(err)
-			}
-			files := fs.GetFiles()
-			paths := make([]string, 0)
-			for p, _ := range files {
-				paths = append(paths, p)
-			}
-			assert.ElementsMatch(t, paths, test.expectedFiles)
-=======
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			s := createScannerWithConfig(t, paths, tc.cfgStr)
 			requireEqualFiles(t, tc.expDesc, s.GetFiles())
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 		})
 	}
 
@@ -708,10 +680,10 @@ scanner:
     offset: 0
     length: 1
 `
-		cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+		cfg, err := common.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 		require.NoError(t, err)
 
-		ns := &conf.Namespace{}
+		ns := &common.ConfigNamespace{}
 		err = ns.Unpack(cfg)
 		require.NoError(t, err)
 
@@ -722,10 +694,10 @@ scanner:
 }
 
 func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
-	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+	cfg, err := common.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
-	ns := &conf.Namespace{}
+	ns := &common.ConfigNamespace{}
 	err = ns.Unpack(cfg)
 	require.NoError(t, err)
 
@@ -736,10 +708,10 @@ func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 }
 
 func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSScanner {
-	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+	cfg, err := common.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
-	ns := &conf.Namespace{}
+	ns := &common.ConfigNamespace{}
 	err = ns.Unpack(cfg)
 	require.NoError(t, err)
 
@@ -763,135 +735,6 @@ func requireEqualFiles(t *testing.T, expected, actual map[string]loginp.FileDesc
 	}
 }
 
-<<<<<<< HEAD
-func TestFileWatchNewDeleteModified(t *testing.T) {
-	oldTs := time.Now()
-	newTs := oldTs.Add(5 * time.Second)
-	testCases := map[string]struct {
-		prevFiles      map[string]os.FileInfo
-		nextFiles      map[string]os.FileInfo
-		expectedEvents []loginp.FSEvent
-	}{
-		"one new file": {
-			prevFiles: map[string]os.FileInfo{},
-			nextFiles: map[string]os.FileInfo{
-				"new_path": testFileInfo{"new_path", 5, oldTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "new_path", Info: testFileInfo{"new_path", 5, oldTs, nil}},
-			},
-		},
-		"one deleted file": {
-			prevFiles: map[string]os.FileInfo{
-				"old_path": testFileInfo{"old_path", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{},
-			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "old_path", NewPath: "", Info: testFileInfo{"old_path", 5, oldTs, nil}},
-			},
-		},
-		"one modified file": {
-			prevFiles: map[string]os.FileInfo{
-				"path": testFileInfo{"path", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path": testFileInfo{"path", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path", NewPath: "path", Info: testFileInfo{"path", 10, newTs, nil}},
-			},
-		},
-		"two modified files": {
-			prevFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 5, oldTs, nil},
-				"path2": testFileInfo{"path2", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 10, newTs, nil},
-				"path2": testFileInfo{"path2", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs, nil}},
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path2", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs, nil}},
-			},
-		},
-		"one modified file, one new file": {
-			prevFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 10, newTs, nil},
-				"path2": testFileInfo{"path2", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs, nil}},
-				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs, nil}},
-			},
-		},
-		"one new file, one deleted file": {
-			prevFiles: map[string]os.FileInfo{
-				"path_deleted": testFileInfo{"path_deleted", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path_new": testFileInfo{"path_new", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "path_deleted", NewPath: "", Info: testFileInfo{"path_deleted", 5, oldTs, nil}},
-				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "path_new", Info: testFileInfo{"path_new", 10, newTs, nil}},
-			},
-		},
-	}
-
-	for name, test := range testCases {
-		test := test
-
-		t.Run(name, func(t *testing.T) {
-			w := fileWatcher{
-				log:          logp.L(),
-				prev:         test.prevFiles,
-				scanner:      &mockScanner{test.nextFiles},
-				events:       make(chan loginp.FSEvent),
-				sameFileFunc: testSameFile,
-			}
-
-			go w.watch(context.Background())
-
-			count := len(test.expectedEvents)
-			actual := make([]loginp.FSEvent, count)
-			for i := 0; i < count; i++ {
-				actual[i] = w.Event()
-			}
-
-			assert.ElementsMatch(t, actual, test.expectedEvents)
-		})
-	}
-}
-
-type mockScanner struct {
-	files map[string]os.FileInfo
-}
-
-func (m *mockScanner) GetFiles() map[string]os.FileInfo {
-	return m.files
-}
-
-type testFileInfo struct {
-	path string
-	size int64
-	time time.Time
-	sys  interface{}
-}
-
-func (t testFileInfo) Name() string       { return t.path }
-func (t testFileInfo) Size() int64        { return t.size }
-func (t testFileInfo) Mode() os.FileMode  { return 0 }
-func (t testFileInfo) ModTime() time.Time { return t.time }
-func (t testFileInfo) IsDir() bool        { return false }
-func (t testFileInfo) Sys() interface{}   { return t.sys }
-
-func testSameFile(fi1, fi2 os.FileInfo) bool {
-	return fi1.Name() == fi2.Name()
-=======
 func requireEqualEvents(t *testing.T, expected, actual loginp.FSEvent) {
 	t.Helper()
 	require.Equal(t, expected.NewPath, actual.NewPath, "NewPath")
@@ -913,13 +756,4 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 		result += filename + "\n"
 	}
 	return result
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
-}
-
-func mustDuration(durStr string) time.Duration {
-	dur, err := time.ParseDuration(durStr)
-	if err != nil {
-		panic(err)
-	}
-	return dur
 }

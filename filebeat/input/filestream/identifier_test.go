@@ -131,7 +131,7 @@ func TestFileIdentifier(t *testing.T) {
 	})
 
 	t.Run("fingerprint identifier", func(t *testing.T) {
-		c := conf.MustNewConfigFrom(map[string]interface{}{
+		c := common.MustNewConfigFrom(map[string]interface{}{
 			"identifier": map[string]interface{}{
 				"fingerprint": nil,
 			},

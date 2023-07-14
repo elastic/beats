@@ -31,49 +31,18 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
-	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
-=======
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
-<<<<<<< HEAD
-	recursiveGlobDepth = 8
-	scannerName        = "scanner"
-	watcherDebugKey    = "file_watcher"
-)
-
-var (
-	watcherFactories = map[string]watcherFactory{
-		scannerName: newScannerWatcher,
-	}
-)
-
-type watcherFactory func(paths []string, cfg *common.Config) (loginp.FSWatcher, error)
-
-// fileScanner looks for files which match the patterns in paths.
-// It is able to exclude files and symlinks.
-type fileScanner struct {
-	paths         []string
-	excludedFiles []match.Matcher
-	includedFiles []match.Matcher
-	symlinks      bool
-
-	log *logp.Logger
-}
-
-=======
 	RecursiveGlobDepth           = 8
 	DefaultFingerprintSize int64 = 1024 // 1KB
 	scannerDebugKey              = "scanner"
 	watcherDebugKey              = "file_watcher"
 )
 
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 type fileWatcherConfig struct {
 	// Interval is the time between two scans.
 	Interval time.Duration `config:"check_interval"`
@@ -94,18 +63,12 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-<<<<<<< HEAD
 func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
+	var config *common.Config
 	if ns == nil {
-		return newScannerWatcher(paths, common.NewConfig())
-=======
-func newFileWatcher(paths []string, ns *conf.Namespace) (loginp.FSWatcher, error) {
-	var config *conf.C
-	if ns == nil {
-		config = conf.NewConfig()
+		config = common.NewConfig()
 	} else {
 		config = ns.Config()
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 	}
 
 	return newScannerWatcher(paths, config)
@@ -177,23 +140,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			continue
 		}
 
-<<<<<<< HEAD
-		// if the two infos belong to the same file and it has been modified
-		// if the size is smaller than before, it is truncated, if bigger, it is a write event
-		if prevInfo.ModTime() != info.ModTime() {
-			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
-				select {
-				case <-ctx.Done():
-					return
-				case w.events <- truncateEvent(path, info):
-				}
-			} else {
-				select {
-				case <-ctx.Done():
-					return
-				case w.events <- writeEvent(path, info):
-				}
-=======
 		var e loginp.FSEvent
 		switch {
 
@@ -221,7 +167,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			case <-ctx.Done():
 				return
 			case w.events <- e:
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 			}
 		}
 
@@ -259,7 +204,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		case w.events <- createEvent(path, *fd):
 			createdCount++
 		}
-
 	}
 
 	w.log.With(
@@ -373,7 +317,7 @@ func (s *fileScanner) resolveRecursiveGlobs(c fileScannerConfig) error {
 	s.log.Debug("recursive glob enabled")
 	var paths []string
 	for _, path := range s.paths {
-		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
+		patterns, err := file.GlobPatterns(path, RecursiveGlobDepth)
 		if err != nil {
 			return err
 		}
@@ -480,12 +424,6 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		if err != nil {
 			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
-<<<<<<< HEAD
-		fileID := file_helper.GetOSState(fileInfo).String()
-		if finfo, exists := uniqFileID[fileID]; exists {
-			s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
-			return true
-=======
 
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {
@@ -498,7 +436,6 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 
 		if !s.isFileIncluded(it.originalFilename) {
 			return it, fmt.Errorf("file %q->%q is not included in ingestion", it.filename, it.originalFilename)
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 		}
 	}
 

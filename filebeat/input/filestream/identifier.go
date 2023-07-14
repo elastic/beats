@@ -41,22 +41,12 @@ const (
 	identitySep           = "::"
 )
 
-<<<<<<< HEAD
-var (
-	identifierFactories = map[string]identifierFactory{
-		nativeName:      newINodeDeviceIdentifier,
-		pathName:        newPathIdentifier,
-		inodeMarkerName: newINodeMarkerIdentifier,
-	}
-)
-=======
 var identifierFactories = map[string]identifierFactory{
 	nativeName:      newINodeDeviceIdentifier,
 	pathName:        newPathIdentifier,
 	inodeMarkerName: newINodeMarkerIdentifier,
 	fingerprintName: newFingerprintIdentifier,
 }
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 
 type identifierFactory func(*common.Config) (fileIdentifier, error)
 

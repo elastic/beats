@@ -26,6 +26,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -42,12 +43,10 @@ const (
 	prospectorDebugKey               = "file_prospector"
 )
 
-var (
-	ignoreInactiveSettings = map[string]ignoreInactiveType{
-		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
-		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
-	}
-)
+var ignoreInactiveSettings = map[string]ignoreInactiveType{
+	ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
+	ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
+}
 
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
@@ -126,8 +125,9 @@ func (p *fileProspector) Init(
 	return nil
 }
 
-// nolint: dupl // Different prospectors have a similar run method
 // Run starts the fileProspector which accepts FS events from a file watcher.
+//
+//nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
@@ -173,7 +173,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
@@ -189,23 +188,22 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
-<<<<<<< HEAD
-=======
 			err := updater.ResetCursor(src, state{Offset: event.Descriptor.Info.Size()})
 			if err != nil {
 				log.Errorf("setting cursor for ignored file: %v", err)
 			}
->>>>>>> b701377c9b (Add new `fingerprint` file identity (#35734))
 			return
 		}
 
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debugf("File %s has been truncated", event.NewPath)
+		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
-		log.Errorf("resseting cursor on truncated file: %v", err)
+		if err != nil {
+			log.Errorf("resetting cursor on truncated file: %v", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -296,7 +294,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
 	err := hg.StopGroup()
 	if err != nil {
-		log.Errorf("Error while stopping harverster group: %v", err)
+		log.Errorf("Error while stopping harvester group: %v", err)
 	}
 }
 

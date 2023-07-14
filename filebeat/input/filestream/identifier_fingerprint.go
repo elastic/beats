@@ -19,15 +19,15 @@ package filestream
 
 import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type fingerprintIdentifier struct {
 	log *logp.Logger
 }
 
-func newFingerprintIdentifier(cfg *conf.C) (fileIdentifier, error) {
+func newFingerprintIdentifier(cfg *common.Config) (fileIdentifier, error) {
 	return &fingerprintIdentifier{
 		log: logp.NewLogger("fingerprint_identifier"),
 	}, nil

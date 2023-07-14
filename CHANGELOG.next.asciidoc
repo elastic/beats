@@ -69,25 +69,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Add sanitization capabilities to azure-eventhub input {pull}34874[34874]
-- Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
-- Add support for CRC validation in Zoom module. {pull}35604[35604]
-- Add execution budget to CEL input. {pull}35409[35409]
-- Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
-- Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
-- Add metrics for filestream input. {pull}35529[35529]
-- Add support for collecting `httpjson` metrics. {pull}35392[35392]
-- Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
-- Mark CEL input as GA. {pull}35559[35559]
-- Add metrics for gcp-pubsub input. {pull}35614[35614]
-- [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
-- Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
-- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
-- Add Okta input package for entity analytics. {pull}35611[35611]
-- Expose harvester metrics from filestream input {pull}35835[35835] {issue}33771[33771]
-- Add device support for Azure AD entity analytics. {pull}35807[35807]
-- Improve CEL input performance. {pull}35915[35915]
-- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
-- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 
 *Auditbeat*
@@ -135,8 +116,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-
-
-
-
-
