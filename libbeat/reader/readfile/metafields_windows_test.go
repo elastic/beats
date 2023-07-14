@@ -52,19 +52,19 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 
 	idxhi, err := actual.GetValue(idxhiKey)
 	require.NoError(t, err)
-	require.Equal(t, "100", idxhi)
+	require.Equal(t, uint(100), idxhi)
 	err = actual.Delete(idxhiKey)
 	require.NoError(t, err)
 
 	idxlo, err := actual.GetValue(idxloKey)
 	require.NoError(t, err)
-	require.Equal(t, "200", idxlo)
+	require.Equal(t, uint(200), idxlo)
 	err = actual.Delete(idxloKey)
 	require.NoError(t, err)
 
 	vol, err := actual.GetValue(volKey)
 	require.NoError(t, err)
-	require.Equal(t, "300", vol)
+	require.Equal(t, uint(300), vol)
 	err = actual.Delete(volKey)
 	require.NoError(t, err)
 
