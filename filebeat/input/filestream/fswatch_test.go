@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -691,6 +692,62 @@ scanner:
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
+}
+
+const benchmarkFileCount = 1000
+
+func BenchmarkGetFiles(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: false,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
+}
+
+func BenchmarkGetFilesWithFingerprint(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  1024,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
 }
 
 func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
