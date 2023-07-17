@@ -28,15 +28,15 @@ import (
 )
 
 const (
-	deviceKey = "log.file.device"
-	inodeKey  = "log.file.inode"
+	deviceIDKey = "log.file.device_id"
+	inodeKey    = "log.file.inode"
 )
 
 func setFileSystemMetadata(fi os.FileInfo, fields mapstr.M) error {
 	osstate := file.GetOSState(fi)
-	_, err := fields.Put(deviceKey, osstate.Device)
+	_, err := fields.Put(deviceIDKey, osstate.Device)
 	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", deviceKey, err)
+		return fmt.Errorf("failed to set %q: %w", deviceIDKey, err)
 	}
 	_, err = fields.Put(inodeKey, osstate.Inode)
 	if err != nil {

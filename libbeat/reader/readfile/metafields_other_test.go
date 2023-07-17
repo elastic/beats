@@ -42,10 +42,10 @@ func createTestFileInfo() os.FileInfo {
 func checkFields(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
-	dev, err := actual.GetValue(deviceKey)
+	dev, err := actual.GetValue(deviceIDKey)
 	require.NoError(t, err)
 	require.Equal(t, uint64(17), dev)
-	err = actual.Delete(deviceKey)
+	err = actual.Delete(deviceIDKey)
 	require.NoError(t, err)
 
 	inode, err := actual.GetValue(inodeKey)
