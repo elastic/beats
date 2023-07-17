@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -453,7 +454,6 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
 		}
 
-		h := sha256.New()
 		file, err := os.Open(it.originalFilename)
 		if err != nil {
 			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
@@ -467,9 +467,10 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			}
 		}
 
-		r := io.LimitReader(file, s.cfg.Fingerprint.Length)
-		buf := make([]byte, h.BlockSize())
-		written, err := io.CopyBuffer(h, r, buf)
+		bfile := bufio.NewReaderSize(file, int(s.cfg.Fingerprint.Length))
+		r := io.LimitReader(bfile, s.cfg.Fingerprint.Length)
+		h := sha256.New()
+		written, err := io.Copy(h, r)
 		if err != nil {
 			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
 		}
