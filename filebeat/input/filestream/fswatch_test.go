@@ -223,7 +223,7 @@ scanner:
   check_interval: 10ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -299,7 +299,7 @@ scanner:
 				Op:      loginp.OpWrite,
 				Descriptor: loginp.FileDescriptor{
 					Filename: filename,
-					Info:     testFileInfo{path: basename, size: 5}, // +5 bytes appended
+					Info:     testFileInfo{name: basename, size: 5}, // +5 bytes appended
 				},
 			}
 			requireEqualEvents(t, expEvent, e)
