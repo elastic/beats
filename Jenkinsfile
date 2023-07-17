@@ -309,7 +309,7 @@ def cloud(Map args = [:]) {
       withCloudTestEnv(args) {
         startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
         try {
-          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id, name: args.directory)
+          targetWithoutNode(dirs: args.dirs, context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
         } finally {
           terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
         }
@@ -578,6 +578,7 @@ def target(Map args = [:]) {
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
 def targetWithoutNode(Map args = [:]) {
+  def dirs = args.get('dirs',[])
   def command = args.command
   def context = args.context
   def directory = args.get('directory', '')
@@ -590,23 +591,26 @@ def targetWithoutNode(Map args = [:]) {
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
   def withNodejs = args.get('withNodejs', false)
-  String name = normalise(args.name)
+  String name = normalise(args.directory)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
+      // unstash terraform outputs in the same directory where the files were stashed
+      dirs?.each { folder ->
+        dir("${folder}") {
+          try {
+            unstash("terraform-${name}")
+            //unstash does not print verbose output , hence printing contents of the directory for logging purposes
+            sh "ls -la ${pwd()}"
+          } catch (error) {
+            echo "error unstashing: ${error}"
+          }
+        }
+      }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          dir('input/awss3/_meta/terraform'){
-              echo "terraform-${name}"
-              try {
-                unstash(name: "terraform-${name}")
-                sh "ls -la ${pwd()}"
-              } catch (error) {
-                echo "error unstashing: ${error}"
-              }
-          }
           if (enableRetry) {
             // Retry the same command to bypass any kind of flakiness.
             // Downside: genuine failures will be repeated.
@@ -947,12 +951,14 @@ def startCloudTestEnv(Map args = [:]) {
         
         error('startCloudTestEnv: terraform apply failed.')
       } finally {
-        // Archive terraform states in case manual cleanup is needed.
-        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+          dirs?.each { folder ->
+          // Archive terraform states in case manual cleanup is needed.
+          archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+          dir("${folder}") {
+            stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,outputs*.yml')
+          }
+        }
       }
-      dir("x-pack/filebeat/input/awss3/_meta/terraform"){
-        stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,*.yml')
-    }
     }
   }
 }
