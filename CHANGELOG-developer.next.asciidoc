@@ -83,6 +83,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix the multiple host support for mongodb module {pull}34624[34624]
 - Skip HTTPJSON flakey test. {issue}34929[34929] {pull}35138[35138]
 - Fix ingest pipeline for panw module to parse url scheme correctly {pull}35757[35757]
+- Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
 
 ==== Added
 
