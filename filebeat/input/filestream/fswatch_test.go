@@ -757,3 +757,31 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 	}
 	return result
 }
+
+func BenchmarkToFileDescriptor(b *testing.B) {
+	dir := b.TempDir()
+	basename := "created.log"
+	filename := filepath.Join(dir, basename)
+	err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+	require.NoError(b, err)
+
+	s := fileScanner{
+		paths: []string{filename},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  1024,
+			},
+		},
+	}
+
+	it, err := s.getIngestTarget(filename)
+	require.NoError(b, err)
+
+	for i := 0; i < b.N; i++ {
+		fd, err := s.toFileDescriptor(&it)
+		require.NoError(b, err)
+		require.Equal(b, "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a", fd.Fingerprint)
+	}
+}
