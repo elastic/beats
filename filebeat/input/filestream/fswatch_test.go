@@ -218,10 +218,10 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 100ms
+  check_interval: 10ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -251,16 +251,40 @@ scanner:
 		require.Equal(t, loginp.OpDone, e.Op)
 	})
 
+	t.Run("does not emit events for empty files", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err := os.WriteFile(filename, nil, 0777)
+		require.NoError(t, err)
+
+		require.NoError(t, err)
+		e := fw.Event()
+		require.Equal(t, loginp.OpDone, e.Op)
+	})
+
 	t.Run("does not emit an event for a fingerprint collision", func(t *testing.T) {
 		dir := t.TempDir()
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 100ms
+  check_interval: 10ms
   fingerprint.enabled: true
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
