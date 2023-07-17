@@ -174,6 +174,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
+		sqsMessagesWaiting:                  monitoring.NewInt(reg, "sqs_messages_waiting_gauge"),
 		sqsWorkerUtilization:                monitoring.NewFloat(reg, "sqs_worker_utilization"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
 		sqsLagTime:                          metrics.NewUniformSample(1024),

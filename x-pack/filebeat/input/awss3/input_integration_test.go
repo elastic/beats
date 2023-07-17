@@ -263,12 +263,12 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
-	//	assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 8)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), uint64(0x13))
 	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
-	//assert.Greater(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0)
+	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
 
 func TestInputRunSQS(t *testing.T) {
@@ -315,12 +315,12 @@ func TestInputRunSQS(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
-	//assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0) - Issue created - https://github.com/elastic/beats/issues/36077
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
-	//assert.Greater(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) - Issue created - https://github.com/elastic/beats/issues/36077
+	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
 
 func TestInputRunS3(t *testing.T) {
@@ -555,10 +555,10 @@ func TestInputRunSNS(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
-	//assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0) - Issue created - https://github.com/elastic/beats/issues/36077
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesWaiting.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
-	//assert.Greater(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) - Issue created - https://github.com/elastic/beats/issues/36077
+	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
