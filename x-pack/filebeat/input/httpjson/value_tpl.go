@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"math"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -26,7 +25,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"golang.org/x/exp/constraints"
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -48,6 +46,9 @@ type valueTpl struct {
 	*template.Template
 }
 
+// number is a custom interface type that can be used to represent a number in a template.
+type number interface{ ~int | ~uint | ~float64 }
+
 func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
@@ -68,12 +69,12 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
 			"toJSON":              toJSON,
-			"maxInt":              maxInt,
-			"minInt":              minInt,
-			"maxUint":             maxUint,
-			"minUint":             minUint,
-			"maxFloat":            maxFloat,
-			"minFloat":            minFloat,
+			"maxInt":              max[int],
+			"minInt":              min[int],
+			"maxUint":             max[uint],
+			"minUint":             min[uint],
+			"maxFloat":            max[float64],
+			"minFloat":            min[float64],
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
@@ -303,98 +304,30 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-// minInt returns the minimum of a and an arbitrary number of integers.
-func minInt(a int, nums ...int) int {
-	min := math.MaxInt
-	nums = append(nums, a)
-	if len(nums) == 1 {
-		return nums[0]
+// min returns the minimum value of a list of numbers.
+func min[T number](head T, tail ...T) T {
+	for _, t := range tail {
+		if t != t {
+			return t
+		}
+		if t < head {
+			head = t
+		}
 	}
-	for _, num := range nums {
-		min = findMin(min, num)
-	}
-	return min
+	return head
 }
 
-// maxInt returns the maximum of a and an arbitrary number of integers.
-func maxInt(a int, nums ...int) int {
-	max := math.MinInt
-	nums = append(nums, a)
-	if len(nums) == 1 {
-		return nums[0]
+// max returns the maximum value of a list of numbers.
+func max[T number](head T, tail ...T) T {
+	for _, t := range tail {
+		if t != t {
+			return t
+		}
+		if t > head {
+			head = t
+		}
 	}
-	for _, num := range nums {
-		max = findMax(max, num)
-	}
-	return max
-}
-
-// minUint returns the minimum of a and an arbitrary number of unsigned integers.
-func minUint(a uint, nums ...uint) uint {
-	min := uint(math.MaxUint)
-	nums = append(nums, a)
-	if len(nums) == 1 {
-		return nums[0]
-	}
-	for _, num := range nums {
-		min = findMin(min, num)
-	}
-	return min
-}
-
-// maxUint returns the maximum of a and an arbitrary number of unsigned integers.
-func maxUint(a uint, nums ...uint) uint {
-	max := uint(0)
-	nums = append(nums, a)
-	if len(nums) == 1 {
-		return nums[0]
-	}
-	for _, num := range nums {
-		max = findMax(max, num)
-	}
-	return max
-}
-
-// minFloat returns the minimum of a and an arbitrary number of floating point numbers.
-func minFloat(a float64, nums ...float64) float64 {
-	min := math.MaxFloat64
-	nums = append(nums, a)
-	if len(nums) == 1 {
-		return nums[0]
-	}
-	for _, num := range nums {
-		min = math.Min(min, num)
-	}
-	return min
-}
-
-// maxFloat returns the maximum of a and an arbitrary number of floating point numbers.
-func maxFloat(a float64, nums ...float64) float64 {
-	max := math.SmallestNonzeroFloat64
-	nums = append(nums, a)
-	if len(nums) == 1 {
-		return nums[0]
-	}
-	for _, num := range nums {
-		max = math.Max(max, num)
-	}
-	return max
-}
-
-// findMin finds the minimum value between two ordered values
-func findMin[T constraints.Ordered](a, b T) T {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-// findMax finds the maximum value between two ordered values
-func findMax[T constraints.Ordered](a, b T) T {
-	if a > b {
-		return a
-	}
-	return b
+	return head
 }
 
 func base64Encode(values ...string) string {
