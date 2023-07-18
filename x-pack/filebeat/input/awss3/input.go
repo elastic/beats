@@ -423,12 +423,12 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 				switch apiError.ErrorCode() {
 				case sqsAccessDeniedErrorCode:
 					// stop polling if auth error is encountered
-					receiver.metrics.setSQSMessagesWaiting(int64(count))
+					receiver.metrics.sqsMessagesWaiting.Set(int64(count))
 					return
 				}
 			}
 
-			receiver.metrics.setSQSMessagesWaiting(int64(count))
+			receiver.metrics.sqsMessagesWaiting.Set(int64(count))
 		}
 	}
 }

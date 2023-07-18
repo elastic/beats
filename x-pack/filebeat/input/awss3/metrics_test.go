@@ -57,6 +57,8 @@ func TestNewInputMetricsInstance(t *testing.T) {
 		metrics.s3EventsCreatedTotal,
 		metrics.s3ObjectsInflight,
 		metrics.s3ObjectProcessingTime)
+
+	assert.Equal(t, int64(-1), metrics.sqsMessagesWaiting.Get())
 }
 
 func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
