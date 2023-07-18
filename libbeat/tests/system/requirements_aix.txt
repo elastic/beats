@@ -35,15 +35,9 @@ pyrsistent==0.16.0
 pytest==7.3.2
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
-<<<<<<< HEAD
-PyYAML==5.4.1
+PyYAML==5.3.1
 redis==2.10.6
 requests==2.25.1
-=======
-PyYAML==5.3.1
-redis==4.4.4
-requests==2.31.0
->>>>>>> 46adbacfb5 (Pin PyYAML version to 5.3.1 to avoid CI errors temporarily (#36091))
 semver==2.8.1
 setuptools==47.3.2
 six==1.15.0
