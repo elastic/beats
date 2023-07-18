@@ -95,7 +95,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	osstate := file.GetOSState(e.Descriptor.Info)
 	return fileSource{
-		info:                e.Descriptor,
+		desc:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
