@@ -121,6 +121,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
 - Improve tests files with shorter statements. {pull}35667[35667]
 - Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
+- Pin PyYAML version to 5.3.1 to avoid CI errors temporarily {pull}36091[36091]
 
 ==== Deprecated
 
