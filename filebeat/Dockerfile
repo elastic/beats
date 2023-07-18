@@ -20,4 +20,4 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip3 install --upgrade pip==20.1.1
 RUN pip3 install --upgrade docker-compose==1.23.2
-RUN pip3 install --upgrade PyYAML==6.0.0
+RUN pip3 install --upgrade PyYAML==5.3.1
