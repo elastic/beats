@@ -295,8 +295,7 @@ scanner:
 			e := fw.Event()
 			expEvent := loginp.FSEvent{
 				NewPath: filename,
-				OldPath: filename,
-				Op:      loginp.OpWrite,
+				Op:      loginp.OpCreate,
 				Descriptor: loginp.FileDescriptor{
 					Filename: filename,
 					Info:     testFileInfo{name: basename, size: 5}, // +5 bytes appended
