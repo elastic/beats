@@ -202,6 +202,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// no need to react on empty new files
 		if fd.Info.Size() == 0 {
 			w.log.Warnf("file %q has no content yet, skipping", fd.Filename)
+			delete(paths, path)
 			continue
 		}
 		select {
