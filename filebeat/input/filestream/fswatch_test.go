@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -28,12 +29,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
-=======
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
->>>>>>> 0cd57755c1 (Fix empty new file edge case (#36076))
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestFileWatcher(t *testing.T) {
@@ -302,7 +299,7 @@ scanner:
 				Op:      loginp.OpWrite,
 				Descriptor: loginp.FileDescriptor{
 					Filename: filename,
-					Info:     testFileInfo{name: basename, size: 5}, // +5 bytes appended
+					Info:     testFileInfo{path: basename, size: 5}, // +5 bytes appended
 				},
 			}
 			requireEqualEvents(t, expEvent, e)
