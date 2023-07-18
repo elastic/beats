@@ -26,6 +26,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -42,12 +43,10 @@ const (
 	prospectorDebugKey               = "file_prospector"
 )
 
-var (
-	ignoreInactiveSettings = map[string]ignoreInactiveType{
-		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
-		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
-	}
-)
+var ignoreInactiveSettings = map[string]ignoreInactiveType{
+	ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
+	ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
+}
 
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
@@ -79,12 +78,12 @@ func (p *fileProspector) Init(
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
-		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 		return newKey, fm
 	})
 
@@ -110,13 +109,13 @@ func (p *fileProspector) Init(
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
 		if fm.IdentifierName != identifierName {
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
+			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}).Name()
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
@@ -126,8 +125,9 @@ func (p *fileProspector) Init(
 	return nil
 }
 
-// nolint: dupl // Different prospectors have a similar run method
 // Run starts the fileProspector which accepts FS events from a file watcher.
+//
+//nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
@@ -173,7 +173,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
@@ -189,16 +188,22 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+			err := updater.ResetCursor(src, state{Offset: event.Descriptor.Info.Size()})
+			if err != nil {
+				log.Errorf("setting cursor for ignored file: %v", err)
+			}
 			return
 		}
 
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debugf("File %s has been truncated", event.NewPath)
+		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
 
 		err := updater.ResetCursor(src, state{Offset: 0})
-		log.Errorf("resseting cursor on truncated file: %v", err)
+		if err != nil {
+			log.Errorf("resetting cursor on truncated file: %v", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -219,12 +224,12 @@ func (p *fileProspector) onFSEvent(
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
 	if p.ignoreOlder > 0 {
 		now := time.Now()
-		if now.Sub(fe.Info.ModTime()) > p.ignoreOlder {
+		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
 			log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
 			return true
 		}
 	}
-	if !ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
 	}
@@ -289,7 +294,7 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
 	err := hg.StopGroup()
 	if err != nil {
-		log.Errorf("Error while stopping harverster group: %v", err)
+		log.Errorf("Error while stopping harvester group: %v", err)
 	}
 }
 

@@ -12,8 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -41,7 +39,7 @@ type azureInput struct {
 	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
 	hub          *eventhub.Hub           // hub will be assigned
-	ackChannel   chan int
+	// ackChannel   chan int
 }
 
 const (
@@ -51,7 +49,7 @@ const (
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
 	}
 }
 
@@ -63,7 +61,7 @@ func NewInput(
 ) (input.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "reading %s input config", inputName)
+		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
@@ -152,13 +150,13 @@ func (a *azureInput) Stop() {
 	if a.hub != nil {
 		err := a.hub.Close(a.workerCtx)
 		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhub"), "error", err)
+			a.log.Errorw("error while closing eventhub", "error", err)
 		}
 	}
 	if a.processor != nil {
 		err := a.processor.Close(a.workerCtx)
 		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhostprocessor"), "error", err)
+			a.log.Errorw("error while closing eventhostprocessor", "error", err)
 		}
 	}
 	a.workerCancel()
@@ -180,9 +178,9 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 	}
 	messages := a.parseMultipleMessages(event.Data)
 	for _, msg := range messages {
-		azure.Put("offset", event.SystemProperties.Offset)
-		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+		_, _ = azure.Put("offset", event.SystemProperties.Offset)
+		_, _ = azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		_, _ = azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		ok := a.outlet.OnEvent(beat.Event{
 			Timestamp: timestamp,
 			Fields: common.MapStr{
@@ -202,6 +200,15 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
+
+	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
+	// Sanitization occurs if options are available and the message contains an invalid JSON.
+	//
+	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
+	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
+		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+	}
+
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
 	if err == nil {
