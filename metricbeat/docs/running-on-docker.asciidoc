@@ -18,7 +18,9 @@ docker run \
   --mount type=bind,source=/proc,target=/hostfs/proc,readonly \ <1>
   --mount type=bind,source=/sys/fs/cgroup,target=/hostfs/sys/fs/cgroup,readonly \ <2>
   --mount type=bind,source=/,target=/hostfs,readonly \ <3>
-  --net=host \ <4>
+  --mount type=bind,source=/var/run/dbus/system_bus_socket,target=/hostfs/var/run/dbus/system_bus_socket,readonly \ <4>
+  --env DBUS_SYSTEM_BUS_ADDRESS='unix:path=/hostfs/var/run/dbus/system_bus_socket' \ <4>
+  --net=host \ <5>
   {dockerimage} -e -system.hostfs=/hostfs
 ----
 
@@ -36,7 +38,9 @@ mounted inside the directory specified by the `hostfs` config value.
 <3> If you want to be able to monitor filesystems from the host by using the
 <<metricbeat-metricset-system-filesystem,system filesystem metricset>>, then those filesystems need to be mounted inside
 of the container. They can be mounted at any location.
-<4> The <<metricbeat-metricset-system-network,system network metricset>> uses data from `/proc/net/dev`, or
+<4> The <<metricbeat-metricset-system-users,system users metricset>> and <<metricbeat-metricset-system-service,system service metricset>>
+both require access to dbus. Mount the dbus socket and set the `DBUS_SYSTEM_BUS_ADDRESS` environment variable to the mounted system socket path.
+<5> The <<metricbeat-metricset-system-network,system network metricset>> uses data from `/proc/net/dev`, or
 `/hostfs/proc/net/dev` when using `hostfs=/hostfs`. The only way
 to make this file contain the host's network devices is to use the `--net=host`
 flag. This is due to Linux namespacing; simply bind mounting the host's `/proc`
