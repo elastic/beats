@@ -46,9 +46,6 @@ type valueTpl struct {
 	*template.Template
 }
 
-// number is a custom interface type that can be used to represent a number in a template.
-type number interface{ ~int | ~uint | ~float64 }
-
 func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
@@ -69,12 +66,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
 			"toJSON":              toJSON,
-			"maxInt":              max[int],
-			"minInt":              min[int],
-			"maxUint":             max[uint],
-			"minUint":             min[uint],
-			"maxFloat":            max[float64],
-			"minFloat":            min[float64],
+			"max":                 max,
+			"min":                 min,
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
@@ -304,30 +297,30 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-// min returns the minimum value of a list of numbers.
-func min[T number](head T, tail ...T) T {
-	for _, t := range tail {
-		if t != t {
-			return t
-		}
-		if t < head {
-			head = t
-		}
+func min(arg1, arg2 reflect.Value) (interface{}, error) {
+	lessThan, err := lt(arg1, arg2)
+	if err != nil {
+		return nil, err
 	}
-	return head
+
+	// arg1 is < arg2.
+	if lessThan {
+		return arg1.Interface(), nil
+	}
+	return arg2.Interface(), nil
 }
 
-// max returns the maximum value of a list of numbers.
-func max[T number](head T, tail ...T) T {
-	for _, t := range tail {
-		if t != t {
-			return t
-		}
-		if t > head {
-			head = t
-		}
+func max(arg1, arg2 reflect.Value) (interface{}, error) {
+	lessThan, err := lt(arg1, arg2)
+	if err != nil {
+		return nil, err
 	}
-	return head
+
+	// arg1 is < arg2.
+	if lessThan {
+		return arg2.Interface(), nil
+	}
+	return arg1.Interface(), nil
 }
 
 func base64Encode(values ...string) string {
