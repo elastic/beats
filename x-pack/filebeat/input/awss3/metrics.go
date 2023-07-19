@@ -79,18 +79,6 @@ func (m *inputMetrics) Close() {
 	m.unregister()
 }
 
-func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
-	if m.sqsMessagesWaiting == nil {
-		// if metric not initialized, and count is -1, do nothing
-		if count == -1 {
-			return
-		}
-		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
-	}
-
-	m.sqsMessagesWaiting.Set(count)
-}
-
 // beginSQSWorker tracks the start of a new SQS worker. The returned ID
 // must be used to call endSQSWorker when the worker finishes. It also
 // increments the sqsMessagesInflight counter.
@@ -187,6 +175,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		s3ObjectsInflight:                   monitoring.NewUint(reg, "s3_objects_inflight_gauge"),
 		s3ObjectProcessingTime:              metrics.NewUniformSample(1024),
 	}
+	out.sqsMessagesWaiting.Set(int64(-1))
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).

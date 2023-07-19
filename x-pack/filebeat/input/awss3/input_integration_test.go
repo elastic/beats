@@ -522,7 +522,7 @@ func TestInputRunSNS(t *testing.T) {
 	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS, awsCfg)
 
 	s3Client := s3.NewFromConfig(awsCfg)
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, s3Client,
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS, s3Client,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
 		"testdata/log.json",
