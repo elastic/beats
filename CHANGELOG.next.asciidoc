@@ -350,6 +350,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 - Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
