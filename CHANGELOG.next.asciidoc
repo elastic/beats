@@ -257,6 +257,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Elastic Logging Plugin*
 
+*Libbeat*
+- Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
 
 ==== Added
 
