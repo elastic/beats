@@ -56,6 +56,7 @@ func getTerraformOutputs(t *testing.T, isLocalStack bool) terraformOutputData {
 	t.Helper()
 
 	_, filename, _, _ := runtime.Caller(0)
+
 	var outputFile string
 	if isLocalStack {
 		outputFile = terraformOutputLsYML
@@ -63,17 +64,9 @@ func getTerraformOutputs(t *testing.T, isLocalStack bool) terraformOutputData {
 		outputFile = terraformOutputYML
 	}
 
-	files, err := ioutil.ReadDir(path.Join(path.Dir(filename), "_meta/terraform"))
-	if err != nil {
-		t.Fatalf("failed reading directory: %v", err)
-	}
-	for _, file := range files {
-		t.Logf(file.Name())
-	}
-
 	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), outputFile))
 	if os.IsNotExist(err) {
-		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test ------- %v", filepath.Dir(terraformOutputYML), path.Join(path.Dir(filename), outputFile))
+		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test.", filepath.Dir(outputFile))
 	}
 	if err != nil {
 		t.Fatalf("failed reading terraform output data: %v", err)
@@ -197,8 +190,8 @@ func makeLocalstackConfig(awsRegion string) (aws.Config, error) {
 	)
 }
 
-// Tests reading SQS notifcation via awss3 input when an Object is PUT into S3
-// and a notification is generated to SQS using Localstack
+// Tests reading SQS notifcation via awss3 input when an object is PUT in S3
+// and a notification is generated to SQS on Localstack
 func TestInputRunSQSOnLocalstack(t *testing.T) {
 	logp.TestingSetup()
 
@@ -215,13 +208,6 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	awsCfg, err := makeLocalstackConfig(region)
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	// Initialize s3Input with the test config
-	s3Input := &s3Input{
-		config:    config,
-		awsConfig: awsCfg,
-		store:     openTestStatestore(),
 	}
 
 	// Ensure SQS is empty before testing.
@@ -248,6 +234,12 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 		cancel()
 	})
 
+	// Initialize s3Input with the test config
+	s3Input := &s3Input{
+		config:    config,
+		awsConfig: awsCfg,
+		store:     openTestStatestore(),
+	}
 	// Run S3 Input with desired context
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {

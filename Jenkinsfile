@@ -118,7 +118,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filterStage: 'extended')
+        runBuildAndTest(filterStage: 'mandatory')
       }
     }
     stage('Extended') {
@@ -934,7 +934,7 @@ def startCloudTestEnv(Map args = [:]) {
   stage("${name}-prepare-cloud-env"){
     withBeatsEnv(archive: false, withModule: false) {
       try {
-        // Run the docker compose file to setup the emulated cloud environment
+        // Run the docker services to setup the emulated cloud environment
         sh(label: 'Run docker-compose services for emulated cloud env', script: ".ci/scripts/install-docker-services.sh ", returnStatus: true)
         dirs?.each { folder ->
           retryWithSleep(retries: 2, seconds: 5, backoff: true){
