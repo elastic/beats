@@ -25,11 +25,11 @@ filebeat.inputs:
   id: my-filestream-id
 
   # Change to true to enable this input configuration.
-  enabled: false
+  enabled: true
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
-    - /var/log/*.log
+    - /Users/hs/logs/*.log
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
@@ -136,9 +136,17 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
+#output.console:
+#  pretty: true
+#output.console:
+#  codec.format:
+#    string: '%{[@timestamp]} %{[message]}'
+output:
+  http:
+    hosts: ["10.0.1.48:8666/infinity_receiver/adx1001/track"]
+#output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+#  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -175,7 +183,7 @@ processors:
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
-#logging.level: debug
+logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",

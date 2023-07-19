@@ -18,10 +18,10 @@
 package main
 
 import (
-	"os"
-
 	"github.com/elastic/beats/v7/filebeat/cmd"
+	_ "github.com/elastic/beats/v7/filebeat/httpout"
 	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	"os"
 )
 
 // The basic model of execution:
