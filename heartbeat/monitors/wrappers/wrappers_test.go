@@ -71,36 +71,35 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
-	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil)
+	t.Helper()
+	wrapped := WrapCommon(tt.jobs, tt.sFields, nil)
 
-		core, observedLogs := observer.New(zapcore.InfoLevel)
-		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-			return zapcore.NewTee(in, core)
-		})))
+	core, observedLogs := observer.New(zapcore.InfoLevel)
+	logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+		return zapcore.NewTee(in, core)
+	})))
 
-		results, err := jobs.ExecJobsAndConts(t, wrapped)
-		assert.NoError(t, err)
+	resultEvents, err := jobs.ExecJobsAndConts(t, wrapped)
+	assert.NoError(t, err)
 
-		require.Equal(t, len(results), len(tt.want), "Expected test def wants to correspond exactly to number results.")
-		for idx, r := range results {
-			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
+	require.Equal(t, len(tt.want), len(resultEvents), "Expected test def had a different number of result events")
+	for idx, r := range resultEvents {
+		t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
 
-				want := tt.want[idx]
-				testslike.Test(t, lookslike.Strict(want), r.Fields)
+			want := tt.want[idx]
+			testslike.Test(t, lookslike.Strict(want), r.Fields)
 
-				if tt.metaWant != nil {
-					metaWant := tt.metaWant[idx]
-					testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
-				}
+			if tt.metaWant != nil {
+				metaWant := tt.metaWant[idx]
+				testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
+			}
 
-			})
-		}
+		})
+	}
 
-		if tt.logValidator != nil {
-			tt.logValidator(t, results, observedLogs.All())
-		}
-	})
+	if tt.logValidator != nil {
+		tt.logValidator(t, resultEvents, observedLogs.All())
+	}
 }
 
 func TestSimpleJob(t *testing.T) {
@@ -433,8 +432,10 @@ func stateValidator() validator.Validator {
 func summaryValidator(up int, down int) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"summary": map[string]interface{}{
-			"up":   uint16(up),
-			"down": uint16(down),
+			"up":           up,
+			"down":         down,
+			"attempt":      1,
+			"max_attempts": maxAttempts,
 		},
 	})
 }
@@ -653,9 +654,9 @@ func TestProjectBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, urlStr),
 					expectedMonFields,
+					summaryValidator(1, 0),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "up"},
-						"summary": map[string]interface{}{"up": 1, "down": 0},
 						"event": map[string]interface{}{
 							"type": "heartbeat/summary",
 						},
@@ -673,9 +674,9 @@ func TestProjectBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, urlStr),
 					expectedMonFields,
+					summaryValidator(0, 1),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "down"},
-						"summary": map[string]interface{}{"up": 0, "down": 1},
 						"error": map[string]interface{}{
 							"type":    isdef.IsString,
 							"message": "testerr",

@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -65,7 +66,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			logMonitorRun(nil),
 		),
 		func() jobs.JobWrapper {
-			return makeAddSummary()
+			return addLightweightSummary()
 		},
 		func() jobs.JobWrapper {
 			return addMonitorState(stdMonFields, mst)
@@ -91,9 +92,14 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 	)
 }
 
+const maxAttempts = 2
+
 // addMonitorState computes the various state fields
 func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
+		attempt := atomic.Int32{}
+		attempt.Add(1) // set to 1 at start of job
+
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := job(event)
 
@@ -106,10 +112,44 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) j
 			if err != nil {
 				return nil, fmt.Errorf("could not wrap state for '%s', no status assigned: %w", sf.ID, err)
 			}
+			statusStr := monitorstate.StateStatus(status.(string))
+			if statusStr == "" {
+				return nil, fmt.Errorf("could not convert status (%v) to monitorstate.StatusStauts", statusStr)
+			}
+
+			curState := mst.GetCurrentState(sf)
+			stateTransition := curState != nil && curState.Status != statusStr
+			hasAttemptsRemaining := attempt.Load() < maxAttempts
+
+			// only execute a retry if we are going from down -> up AND more retries are available
+			if stateTransition && hasAttemptsRemaining {
+				// we are at a state transition, retry if this is not already a retry
+				// move the summary fields
+				summary, err := event.GetValue("summary")
+				if err != nil {
+					return nil, fmt.Errorf("could not retrieve summary in addMonitorState: %w", err)
+				}
+				err = event.Delete("summary")
+				if err != nil {
+					return nil, fmt.Errorf("could not delete summary in addMonitorState: %w", err)
+				}
+
+				_, err = event.PutValue("attempt.summary", summary)
+				if err != nil {
+					return nil, fmt.Errorf("could not put attempt.summary in addMonitorState: %w", err)
+				}
+
+				// Restart the job, short circuit all else
+				attempt.Add(1)
+				return []jobs.Job{job}, nil
+			}
+
+			// reset to 1 for next job root invocation
+			attempt.Store(1)
 
 			ms := mst.RecordStatus(sf, monitorstate.StateStatus(status.(string)))
 
-			eventext.MergeEventFields(event, mapstr.M{"state": ms})
+			eventext.MergeEventFields(event, mapstr.M{"state": ms, "summary": mapstr.M{"attempt": int(attempt.Load()), "max_attempts": maxAttempts}})
 
 			return cont, nil
 		}
@@ -279,16 +319,15 @@ func logMonitorRun(match EventMatcher) jobs.JobWrapper {
 	}
 }
 
-// makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary() jobs.JobWrapper {
+// addLightweightSummary summarizes the job, adding the `summary` field to the last event emitted.
+func addLightweightSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
 		mtx        sync.Mutex
-		monitorId  string
-		remaining  uint16
-		up         uint16
-		down       uint16
+		remaining  int
+		up         int
+		down       int
 		checkGroup string
 		generation uint64
 	}{
@@ -300,6 +339,7 @@ func makeAddSummary() jobs.JobWrapper {
 		state.up = 0
 		state.down = 0
 		state.generation++
+
 		u, err := uuid.NewV1()
 		if err != nil {
 			panic(fmt.Sprintf("cannot generate UUIDs on this system: %s", err))
@@ -330,27 +370,34 @@ func makeAddSummary() jobs.JobWrapper {
 			_, _ = event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations
-			state.remaining += uint16(len(cont))
+			state.remaining += len(cont)
 			// Reduce total remaining to account for the just executed job
 			state.remaining--
 
 			// After last job
 			if state.remaining == 0 {
-				up := state.up
-				down := state.down
+				if len(cont) != 0 {
+					// this should __never__ happen, but in the off chance it does we could track it with some work
+					logp.L().Errorf("heartbeat wrapper invariant violation, > 0 continuations with 0 remaining jobs, cg:%s", state.checkGroup)
+				}
 
-				eventext.MergeEventFields(event, mapstr.M{
-					"summary": mapstr.M{
-						"up":   up,
-						"down": down,
-					},
-				})
+				addSummaryFields(event, state.up, state.down)
+
 				resetState()
 			}
 
 			return cont, jobErr
 		}
 	}
+}
+
+func addSummaryFields(event *beat.Event, up int, down int) {
+	eventext.MergeEventFields(event, mapstr.M{
+		"summary": mapstr.M{
+			"up":   up,
+			"down": down,
+		},
+	})
 }
 
 type EventMatcher func(event *beat.Event) bool
@@ -369,17 +416,11 @@ func addBrowserSummary(sf stdfields.StdMonitorFields, match EventMatcher) jobs.J
 				return nil, fmt.Errorf("could not wrap summary for '%s', no status assigned: %w", sf.ID, err)
 			}
 
-			up, down := 1, 0
 			if monitorstate.StateStatus(status.(string)) == monitorstate.StatusDown {
-				up, down = 0, 1
+				addSummaryFields(event, 0, 1)
+			} else {
+				addSummaryFields(event, 1, 0)
 			}
-
-			eventext.MergeEventFields(event, mapstr.M{
-				"summary": mapstr.M{
-					"up":   up,
-					"down": down,
-				},
-			})
 
 			return cont, jobErr
 		}
