@@ -195,7 +195,9 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		message.Fields = event.Fields
 		message.Meta = event.Meta
 	} else {
-		message.AddFields(mapstr.M{p.target: jsonFields})
+		fields := mapstr.M{}
+		fields.Put(p.target, jsonFields)
+		message.AddFields(fields)
 	}
 
 	return message, err
