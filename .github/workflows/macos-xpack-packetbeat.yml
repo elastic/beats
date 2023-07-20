@@ -23,7 +23,7 @@ jobs:
         go-version-file: .go-version
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version-file: '.python-version'
     - name: Install dependencies
       run:  go install github.com/magefile/mage
     - name: Run build

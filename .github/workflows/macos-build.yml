@@ -45,6 +45,9 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: ${{ github.event.inputs.go_version }}
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
     - name: Install dependencies
       run:  go install github.com/magefile/mage
     - uses: actions/checkout@v3
