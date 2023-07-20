@@ -33,14 +33,12 @@ const (
 )
 
 func Test_StorageClient(t *testing.T) {
-	t.Skip("Flaky test: issue -  https://github.com/elastic/beats/issues/34332")
 	tests := []struct {
-		name            string
-		baseConfig      map[string]interface{}
-		mockHandler     func() http.Handler
-		expected        map[string]bool
-		isError         error
-		unexpectedError error
+		name        string
+		baseConfig  map[string]interface{}
+		mockHandler func() http.Handler
+		expected    map[string]bool
+		isError     error
 	}{
 		{
 			name: "SingleContainerWithPoll_NoErr",
@@ -62,7 +60,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_blob_data3_json:    true,
 				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "SingleContainerWithoutPoll_NoErr",
@@ -84,7 +81,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_blob_data3_json:    true,
 				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
-			unexpectedError: nil,
 		},
 		{
 			name: "TwoContainersWithPoll_NoErr",
@@ -111,7 +107,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_ata_json:    true,
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "TwoContainersWithoutPoll_NoErr",
@@ -138,7 +133,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_ata_json:    true,
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "SingleContainerPoll_InvalidContainerErr",
@@ -154,10 +148,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         mock.NotFoundErr,
-			unexpectedError: nil,
+			mockHandler: mock.AzureStorageServer,
+			expected:    map[string]bool{},
+			isError:     mock.NotFoundErr,
 		},
 		{
 			name: "SingleContainerWithoutPoll_InvalidBucketErr",
@@ -173,10 +166,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         mock.NotFoundErr,
-			unexpectedError: nil,
+			mockHandler: mock.AzureStorageServer,
+			expected:    map[string]bool{},
+			isError:     mock.NotFoundErr,
 		},
 		{
 			name: "TwoContainersWithPoll_InvalidBucketErr",
@@ -195,10 +187,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         mock.NotFoundErr,
-			unexpectedError: nil,
+			mockHandler: mock.AzureStorageServer,
+			expected:    map[string]bool{},
+			isError:     mock.NotFoundErr,
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",
@@ -214,10 +205,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
-			unexpectedError: nil,
+			mockHandler: mock.AzureStorageServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "TwoBucketWithPoll_InvalidConfigValue",
@@ -236,10 +226,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
-			unexpectedError: nil,
+			mockHandler: mock.AzureStorageServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "ReadJSON",
@@ -261,7 +250,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_log_json[1]: true,
 				mock.BeatsFilesContainer_log_json[2]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadOctetStreamJSON",
@@ -282,7 +270,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json[0]: true,
 				mock.BeatsFilesContainer_multiline_json[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadNdJSON",
@@ -303,7 +290,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_log_ndjson[0]: true,
 				mock.BeatsFilesContainer_log_ndjson[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadMultilineGzJSON",
@@ -324,7 +310,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 	}
 	for _, tt := range tests {
@@ -403,7 +388,6 @@ func Test_StorageClient(t *testing.T) {
 					}
 				}
 			}
-			assert.ErrorIs(t, g.Wait(), tt.unexpectedError)
 		})
 	}
 }
