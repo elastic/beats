@@ -44,9 +44,10 @@ jobs:
       with:
         go-version-file: .go-version
     - name: unitTest
+      working-directory: ${{ env.BEAT_MODULE }}
       run: |
         go install github.com/magefile/mage
-        mage -d ${{ env.BEAT_MODULE }} build unitTest
+        mage build unitTest
 
   goIntegTest:
     runs-on: ubuntu-latest
@@ -61,10 +62,11 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version-file: .go-version
-    - name: unitTest
+    - name: goIntegTest
+      working-directory: ${{ env.BEAT_MODULE }}
       run: |
         go install github.com/magefile/mage
-        mage -d ${{ env.BEAT_MODULE }} goIntegTest
+        mage goIntegTest
 
   pythonIntegTest:
     runs-on: ubuntu-latest
@@ -79,10 +81,11 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version-file: .go-version
-    - name: unitTest
+    - name: pythonIntegTest
+      working-directory: ${{ env.BEAT_MODULE }}
       run: |
         go install github.com/magefile/mage
-        mage -d ${{ env.BEAT_MODULE }} pythonIntegTest
+        mage pythonIntegTest
 
   crosscompile:
     runs-on: ubuntu-latest
@@ -97,7 +100,8 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version-file: .go-version
-    - name: unitTest
+    - name: crosscompile
+      working-directory: ${{ env.BEAT_MODULE }}
       run: |
         go install github.com/magefile/mage
-        make -C ${{ env.BEAT_MODULE }} crosscompile
+        make crosscompile
