@@ -139,6 +139,24 @@ func GolangCrossBuild(params BuildArgs) error {
 		return err
 	}
 
+	repoInfo, err := GetProjectRepoInfo()
+	if err != nil {
+		return fmt.Errorf("failed to determine repo root and package sub dir: %w", err)
+	}
+
+	projectMountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
+	// TODO: Resolve custom dir
+	// // use custom dir for build if given, subdir if not:
+	// cwd := repoInfo.SubDir
+	// if b.InDir != "" {
+	// 	cwd = b.InDir
+	// }
+	// workDir := filepath.ToSlash(filepath.Join(mountPoint, cwd))
+
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", projectMountPoint); err != nil {
+		return err
+	}
+
 	return Build(params)
 }
 
