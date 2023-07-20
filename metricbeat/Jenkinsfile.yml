@@ -14,7 +14,7 @@ when:
 platform: "immutable && ubuntu-22" ## default label for all the stages
 stages:
     unitTest:
-        mage: "pip3 install pytest==7.3.2 && mage build unitTest"
+        mage: "PYENV_VERSION=$(cat ../.python-version); pyenv install  $PYENV_VERSION && eval \"$(pyenv init -)\"  && mage build unitTest"
         stage: mandatory
     goIntegTest:
         installK8s: true
