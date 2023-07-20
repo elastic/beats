@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
 - Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
 - Fix handling of region name configuration in awss3 input {pull}36034[36034]
+- Fixed concurrency and flakey tests issue in azure blob storage input. {issue}35983[35983] {pull}36124[36124]
 
 *Heartbeat*
 
@@ -158,7 +159,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
 - Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
 - Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
-- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
+- Fix browser monitor summary reporting as up when monitor is down. 35983
 - Fix beat capabilities on Docker image. {pull}33584[33584]
 - Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
 - Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]

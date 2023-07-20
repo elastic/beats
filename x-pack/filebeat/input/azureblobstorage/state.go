@@ -38,7 +38,7 @@ func newState() *state {
 }
 
 // saveForTx updates and returns the current state checkpoint, locks the state
-// and returns an unlock function, done. The caller must call done when
+// and returns an unlock function done(). The caller must call done when
 // s and cp are no longer needed in a locked state. done may not be called
 // more than once.
 func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint, done func()) {
@@ -58,7 +58,7 @@ func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint
 }
 
 // savePartialForTx partially updates and returns the current state checkpoint, locks the state
-// and returns an unlock function, done. The caller must call done when
+// and returns an unlock function done(). The caller must call done when
 // s and cp are no longer needed in a locked state. done may not be called
 // more than once.
 func (s *state) savePartialForTx(name string, offset int64) (cp *Checkpoint, done func()) {
@@ -67,7 +67,7 @@ func (s *state) savePartialForTx(name string, offset int64) (cp *Checkpoint, don
 	return s.cp, func() { s.mu.Unlock() }
 }
 
-// setCheckpoint, sets checkpoint from source to current state instance
+// setCheckpoint sets checkpoint from source to current state instance
 func (s *state) setCheckpoint(chkpt *Checkpoint) {
 	if chkpt.PartiallyProcessed == nil {
 		chkpt.PartiallyProcessed = make(map[string]int64)
@@ -75,7 +75,7 @@ func (s *state) setCheckpoint(chkpt *Checkpoint) {
 	s.cp = chkpt
 }
 
-// checkpoint, returns the current state checkpoint
+// checkpoint returns the current state checkpoint
 func (s *state) checkpoint() *Checkpoint {
 	return s.cp
 }
