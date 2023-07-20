@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +30,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestFileWatcher(t *testing.T) {
@@ -65,7 +67,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 5}, // 5 bytes written
+				Info:     testFileInfo{name: basename, size: 5}, // 5 bytes written
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -88,7 +90,7 @@ scanner:
 			Op:      loginp.OpWrite,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 10}, // +5 bytes appended
+				Info:     testFileInfo{name: basename, size: 10}, // +5 bytes appended
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -110,7 +112,7 @@ scanner:
 			Op:      loginp.OpRename,
 			Descriptor: loginp.FileDescriptor{
 				Filename: newFilename,
-				Info:     testFileInfo{path: newBasename, size: 10},
+				Info:     testFileInfo{name: newBasename, size: 10},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -130,7 +132,7 @@ scanner:
 			Op:      loginp.OpTruncate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 2},
+				Info:     testFileInfo{name: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -150,7 +152,7 @@ scanner:
 			Op:      loginp.OpTruncate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 2},
+				Info:     testFileInfo{name: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -169,7 +171,7 @@ scanner:
 			Op:      loginp.OpDelete,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 2},
+				Info:     testFileInfo{name: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -207,7 +209,7 @@ scanner:
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
 				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
-				Info:        testFileInfo{path: basename, size: 1024},
+				Info:        testFileInfo{name: basename, size: 1024},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -218,10 +220,10 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 100ms
+  check_interval: 10ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -238,7 +240,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 1024},
+				Info:     testFileInfo{name: basename, size: 1024},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -251,16 +253,68 @@ scanner:
 		require.Equal(t, loginp.OpDone, e.Op)
 	})
 
+	t.Run("does not emit events for empty files", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		err := logp.DevelopmentSetup(logp.ToObserverOutput())
+		require.NoError(t, err)
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err = os.WriteFile(filename, nil, 0777)
+		require.NoError(t, err)
+
+		t.Run("issues a warning in logs", func(t *testing.T) {
+			var lastWarning string
+			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
+			require.Eventually(t, func() bool {
+				logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+				if len(logs) == 0 {
+					return false
+				}
+				lastWarning = logs[len(logs)-1].Message
+				return strings.Contains(lastWarning, expLogMsg)
+			}, 100*time.Millisecond, 10*time.Millisecond, "required a warning message %q but got %q", expLogMsg, lastWarning)
+		})
+
+		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
+			err = os.WriteFile(filename, []byte("hello"), 0777)
+			require.NoError(t, err)
+
+			e := fw.Event()
+			expEvent := loginp.FSEvent{
+				NewPath: filename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: filename,
+					Info:     testFileInfo{name: basename, size: 5}, // +5 bytes appended
+				},
+			}
+			requireEqualEvents(t, expEvent, e)
+		})
+	})
+
 	t.Run("does not emit an event for a fingerprint collision", func(t *testing.T) {
 		dir := t.TempDir()
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 100ms
+  check_interval: 10ms
   fingerprint.enabled: true
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -278,7 +332,7 @@ scanner:
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
 				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
-				Info:        testFileInfo{path: basename, size: 1024},
+				Info:        testFileInfo{name: basename, size: 1024},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -372,35 +426,35 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 				excludedFilename: {
 					Filename: excludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
 					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -421,28 +475,28 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 				excludedFilename: {
 					Filename: excludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 			},
@@ -464,21 +518,21 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
 					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -495,14 +549,14 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 			},
@@ -524,7 +578,7 @@ scanner:
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 			},
@@ -541,7 +595,7 @@ scanner:
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 			},
@@ -558,14 +612,14 @@ scanner:
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
 					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -587,7 +641,7 @@ scanner:
 					Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				excludedFilename: {
@@ -595,7 +649,7 @@ scanner:
 					Fingerprint: "bd151321c3bbdb44185414a1b56b5649a00206dd4792e7230db8904e43987336",
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
@@ -603,7 +657,7 @@ scanner:
 					Fingerprint: "bfdb99a65297062658c26dfcea816d76065df2a2da2594bfd9b96e9e405da1c2",
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
@@ -611,7 +665,7 @@ scanner:
 					Fingerprint: "c4058942bffcea08810a072d5966dfa5c06eb79b902bf0011890dd8d22e1a5f8",
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -633,7 +687,7 @@ scanner:
 					Fingerprint: "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb",
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				// undersizedFilename got excluded because of the matching fingerprint
@@ -642,7 +696,7 @@ scanner:
 					Fingerprint: "9c225a1e6a7df9c869499e923565b93937e88382bb9188145f117195cd41dcd1",
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
@@ -650,7 +704,7 @@ scanner:
 					Fingerprint: "7985b2b9750bdd3c76903db408aff3859204d6334279eaf516ecaeb618a218d5",
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
@@ -658,7 +712,7 @@ scanner:
 					Fingerprint: "da437600754a8eed6c194b7241b078679551c06c7dc89685a9a71be7829ad7e5",
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -691,6 +745,62 @@ scanner:
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
+}
+
+const benchmarkFileCount = 1000
+
+func BenchmarkGetFiles(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: false,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
+}
+
+func BenchmarkGetFilesWithFingerprint(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  1024,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
 }
 
 func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {

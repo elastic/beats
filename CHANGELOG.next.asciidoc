@@ -148,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35996[35996]
 - Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
 - Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
+- Fix handling of region name configuration in awss3 input {pull}36034[36034]
 
 *Heartbeat*
 
@@ -349,6 +350,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
 - Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
+- Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -443,6 +446,3 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 ==== Known Issues
-
-
-
