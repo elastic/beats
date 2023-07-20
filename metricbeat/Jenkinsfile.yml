@@ -14,7 +14,7 @@ when:
 platform: "immutable && ubuntu-22" ## default label for all the stages
 stages:
     unitTest:
-        mage: "mage build unitTest"
+        mage: "VIRTUAL_ENV=./venv mage build unitTest"
         stage: mandatory
     goIntegTest:
         installK8s: true
