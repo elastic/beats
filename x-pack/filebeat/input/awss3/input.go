@@ -411,6 +411,10 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 	t := time.NewTicker(time.Minute)
 	defer t.Stop()
+	// Initialize the metric to 0 at the start of the one minute time interval to avoid
+	// giving misleading metric value -1 even though SQS messages are processed.
+	// The value will be updated every minute
+	receiver.metrics.sqsMessagesWaiting.Set(int64(0))
 	for {
 		select {
 		case <-ctx.Done():

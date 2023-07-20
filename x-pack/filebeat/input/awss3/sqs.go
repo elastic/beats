@@ -79,9 +79,6 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		// Process each SQS message asynchronously with a goroutine.
 		r.log.Debugf("Received %v SQS messages.", len(msgs))
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-		// Initialize the sqs_message_waiting_guage to 0 to indicate that that SQS messages are received.
-		// PollSqsWaitingMetric shall reassign the value if there are messages waiting or if there is an error in processing the messages.
-		r.metrics.sqsMessagesWaiting.Set(int64(0))
 		workerWg.Add(len(msgs))
 
 		for _, msg := range msgs {
