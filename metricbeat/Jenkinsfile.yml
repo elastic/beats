@@ -13,21 +13,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-22" ## default label for all the stages
 stages:
-    unitTest:
-        mage: "PYENV_GIT_TAG=v2.3.22 curl https://pyenv.run | bash; PYENV_VERSION=$(cat ../.python-version); pyenv install  $PYENV_VERSION && eval \"$(pyenv init -)\"  && mage build unitTest"
-        stage: mandatory
-    goIntegTest:
-        installK8s: true
-        mage: "mage goIntegTest"
-        withModule: true
-        stage: mandatory
-    pythonIntegTest:
-        mage: "mage pythonIntegTest"
-        withModule: true
-        stage: mandatory
-    crosscompile:
-        make: "make -C metricbeat crosscompile"
-        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

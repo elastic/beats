@@ -29,3 +29,75 @@ jobs:
         go install github.com/magefile/mage
         make -C ${{ env.BEAT_MODULE }} check update
         make check-no-changes
+
+  unitTest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: unitTest
+      run: |
+        go install github.com/magefile/mage
+        mage -d ${{ env.BEAT_MODULE }} build unitTest
+
+  goIntegTest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: unitTest
+      run: |
+        go install github.com/magefile/mage
+        mage -d ${{ env.BEAT_MODULE }} goIntegTest
+
+  pythonIntegTest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: unitTest
+      run: |
+        go install github.com/magefile/mage
+        mage -d ${{ env.BEAT_MODULE }} pythonIntegTest
+
+  crosscompile:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: unitTest
+      run: |
+        go install github.com/magefile/mage
+        make -C ${{ env.BEAT_MODULE }} crosscompile
