@@ -990,7 +990,7 @@ def terraformCleanup(Map args = [:]) {
   String directory = args.dir
   stage("${name}-tear-down-cloud-env"){
     withBeatsEnv(archive: false, withModule: false) {
-      unstash(name: "terraform-${name}")
+      unstash("terraform-${name}")
       retryWithSleep(retries: 2, seconds: 5, backoff: true) {
         sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
       }
