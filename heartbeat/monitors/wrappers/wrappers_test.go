@@ -434,9 +434,11 @@ func summaryValidator(up int, down int) validator.Validator {
 		"summary": map[string]interface{}{
 			"up":           up,
 			"down":         down,
-			"attempt":      1,
-			"max_attempts": maxAttempts,
 		},
+		"attempt": {
+			"attempt": 1,
+			"max_attempts": maxAttempts,
+		}
 	})
 }
 

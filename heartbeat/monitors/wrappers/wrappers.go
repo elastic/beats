@@ -139,17 +139,26 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) j
 					return nil, fmt.Errorf("could not put attempt.summary in addMonitorState: %w", err)
 				}
 
-				// Restart the job, short circuit all else
 				attempt.Add(1)
-				return []jobs.Job{job}, nil
-			}
 
-			// reset to 1 for next job root invocation
-			attempt.Store(1)
+				eventext.MergeEventFields(event, mapstr.M{
+					"attempt": mapstr.M{
+						"summary":      summary,
+						"attempt":      int(attempt.Load()),
+						"max_attempts": maxAttempts,
+					},
+				})
+
+				// Restart the job, short circuit all else
+				return []jobs.Job{job}, nil
+			} else {
+				// reset to 1 for next job root invocation
+				attempt.Store(1)
+			}
 
 			ms := mst.RecordStatus(sf, monitorstate.StateStatus(status.(string)))
 
-			eventext.MergeEventFields(event, mapstr.M{"state": ms, "summary": mapstr.M{"attempt": int(attempt.Load()), "max_attempts": maxAttempts}})
+			eventext.MergeEventFields(event, mapstr.M{"state": ms, "attempt": mapstr.M{"attempt": int(attempt.Load()), "max_attempts": maxAttempts}})
 
 			return cont, nil
 		}

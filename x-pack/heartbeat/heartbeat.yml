@@ -23,15 +23,15 @@ heartbeat.config.monitors:
 heartbeat.monitors:
 - type: http
   # Set enabled to true (or delete the following line) to enable this monitor
-  enabled: false
+  enabled: true
   # ID used to uniquely identify this monitor in Elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere
   name: My Monitor
   # List of URLs to query
-  urls: ["http://localhost:9200"]
+  urls: ["http://localhost:5678/pattern?r=200x1,500x1,200x1,500x1,500x1,200x1,200x1"]
   # Configure task schedule
-  schedule: '@every 10s'
+  schedule: '@every 1s'
   # Total test connection and data exchange timeout
   #timeout: 16s
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
@@ -96,11 +96,11 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-
+output.console: ~
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
+#output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  #hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
