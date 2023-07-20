@@ -20,7 +20,7 @@ import (
 var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
 
 const (
-	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232 eventId=1`
+	standardMessage = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|src=10.0.0.192 dst=12.121.122.82 spt=1232 eventId=1 in=4294967296 out=4294967296`
 
 	headerOnly = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|`
 
@@ -124,6 +124,8 @@ func TestEventUnpack(t *testing.T) {
 			"dst":     IPField("12.121.122.82"),
 			"spt":     IntegerField(1232),
 			"eventId": LongField(1),
+			"in":      LongField(4294967296),
+			"out":     LongField(4294967296),
 		}, e.Extensions)
 	})
 
@@ -449,6 +451,8 @@ func TestEventUnpackWithFullExtensionNames(t *testing.T) {
 		"destinationAddress": IPField("12.121.122.82"),
 		"sourcePort":         IntegerField(1232),
 		"eventId":            LongField(1),
+		"bytesIn":            LongField(4294967296),
+		"bytesOut":           LongField(4294967296),
 	}, e.Extensions)
 }
 
