@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +30,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestFileWatcher(t *testing.T) {
@@ -218,10 +220,10 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 100ms
+  check_interval: 10ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -251,16 +253,68 @@ scanner:
 		require.Equal(t, loginp.OpDone, e.Op)
 	})
 
+	t.Run("does not emit events for empty files", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		err := logp.DevelopmentSetup(logp.ToObserverOutput())
+		require.NoError(t, err)
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err = os.WriteFile(filename, nil, 0777)
+		require.NoError(t, err)
+
+		t.Run("issues a warning in logs", func(t *testing.T) {
+			var lastWarning string
+			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
+			require.Eventually(t, func() bool {
+				logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+				if len(logs) == 0 {
+					return false
+				}
+				lastWarning = logs[len(logs)-1].Message
+				return strings.Contains(lastWarning, expLogMsg)
+			}, 100*time.Millisecond, 10*time.Millisecond, "required a warning message %q but got %q", expLogMsg, lastWarning)
+		})
+
+		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
+			err = os.WriteFile(filename, []byte("hello"), 0777)
+			require.NoError(t, err)
+
+			e := fw.Event()
+			expEvent := loginp.FSEvent{
+				NewPath: filename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: filename,
+					Info:     testFileInfo{path: basename, size: 5}, // +5 bytes appended
+				},
+			}
+			requireEqualEvents(t, expEvent, e)
+		})
+	})
+
 	t.Run("does not emit an event for a fingerprint collision", func(t *testing.T) {
 		dir := t.TempDir()
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 100ms
+  check_interval: 10ms
   fingerprint.enabled: true
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -691,6 +745,62 @@ scanner:
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
+}
+
+const benchmarkFileCount = 1000
+
+func BenchmarkGetFiles(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: false,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
+}
+
+func BenchmarkGetFilesWithFingerprint(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  1024,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
 }
 
 func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
