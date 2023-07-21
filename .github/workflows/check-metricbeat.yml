@@ -49,6 +49,7 @@ jobs:
         go install github.com/magefile/mage
         mage build unitTest
 
+  # FIXME neeeds more resources some containers does not start
   goIntegTest:
     runs-on: ubuntu-latest
     needs: unitTest
@@ -69,6 +70,7 @@ jobs:
         go install github.com/magefile/mage
         mage goIntegTest
 
+  # FIXME neeeds more resources some containers does not start
   pythonIntegTest:
     runs-on: ubuntu-latest
     needs: unitTest
@@ -109,6 +111,7 @@ jobs:
         go install github.com/magefile/mage
         make crosscompile
 
+  # FIXME Docker linux is not supported (130 tests fail)
   windows-2022:
     runs-on: windows-2022
     needs: unitTest
@@ -129,6 +132,7 @@ jobs:
         go install github.com/magefile/mage
         mage build unitTest
 
+  # FIXME Docker linux is not supported (130 tests fail)
   windows-2019:
     runs-on: windows-2019
     needs: unitTest
@@ -168,6 +172,6 @@ jobs:
       working-directory: ${{ env.BEAT_MODULE }}
       run: |
         go install github.com/magefile/mage
-        make package
+        mage package
       env:
         PLATFORMS: "+all linux/arm64 linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
