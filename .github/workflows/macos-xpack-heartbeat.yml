@@ -21,6 +21,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version-file: .go-version
+        cache-dependency-path: ./go.sum
     - uses: actions/setup-python@v4
       with:
         python-version-file: '.python-version'

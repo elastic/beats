@@ -40,16 +40,6 @@ stages:
 #                 - "macosM1Test"
 #             tags: false         ## for all the tags
 #         stage: extended
-    windows-2022:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2022"
-        stage: mandatory
-    windows-2019:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
-        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -75,17 +65,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
         stage: extended_win
-    packaging-linux:
-        packaging-linux: "mage package"
-        e2e:
-            enabled: false     ## e2e is enabled only for x-pack beats
-        stage: packaging
-        when:
-            branches: false    ## Only on a PR basis for the time being
-            tags: false        ## packaging on branches/tags is already in place with the downstream build.
-            changeset:         ## when PR contains any of those entries in the changeset
-              - "^metricbeat/.*"
-              - "@oss"               ## special token regarding the changeset for the oss
     packaging-arm:
         packaging-arm: "mage package"
         e2e:

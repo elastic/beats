@@ -25,6 +25,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version-file: .go-version
+        cache-dependency-path: ./go.sum
     - name: Run check-default
       run: |
         go install github.com/magefile/mage

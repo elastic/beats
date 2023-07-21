@@ -25,6 +25,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version-file: .go-version
+        cache-dependency-path: ./go.sum
     - name: Update package lists
       run: sudo apt-get update
     - name: Install libpcap-dev
