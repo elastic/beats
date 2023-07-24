@@ -161,8 +161,6 @@ https://github.com/elastic/beats/compare/v8.6.1\...v8.6.2[View commits]
 - Only log publish event messages in trace log level under elastic-agent. {pull}34391[34391]
 - Fix issue where updating a single Elastic Agent configuration unit results in other units being turned off. {pull}34504[34504]
 
-*Auditbeat*
-
 *Filebeat*
 - [Azure blob storage] Changed logger field name from `container` to `container_name` so that it does not clash
 - [GCS] Added support for more mime types & introduced offset tracking via cursor state. Also added support for
