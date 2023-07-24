@@ -139,6 +139,18 @@ func GolangCrossBuild(params BuildArgs) error {
 		return err
 	}
 
+	// Support projects outside of the beats directory.
+	repoInfo, err := GetProjectRepoInfo()
+	if err != nil {
+		return err
+	}
+
+	// TODO: Support custom build dir/subdir
+	projectMountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", projectMountPoint); err != nil {
+		return err
+	}
+
 	return Build(params)
 }
 
