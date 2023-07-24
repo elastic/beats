@@ -10,6 +10,7 @@ upgrade.
 
 * <<release-notes-8.7.1>>
 * <<release-notes-8.7.0>>
+* <<release-notes-8.6.2>>
 * <<release-notes-8.6.1>>
 * <<release-notes-8.6.0>>
 * <<release-notes-8.5.3>>
