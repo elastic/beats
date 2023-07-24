@@ -77,7 +77,7 @@ https://github.com/elastic/beats/compare/v8.8.2\...v8.9.0[View commits]
 - Add device support for Azure AD entity analytics. {pull}35807[35807]
 
 *Libbeat*
-- Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
+- Added support for Apache Parquet file reader. {issue}34662[34662] {pull}35183[35183]
 
 *Metricbeat*
 
@@ -104,7 +104,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
 *Affecting all Beats*
 
 - Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
-- Upgraded apache arrow library used in `x-pack/libbeat/reader/parquet` from v11 to v12.0.1 in order to fix cross-compilation issues. {pull}35640[35640]
+- Upgraded Apache Arrow library used in `x-pack/libbeat/reader/parquet` from v11 to v12.0.1 in order to fix cross-compilation issues. {pull}35640[35640]
 - Fix panic when the disk queue's MaxRetryInterval configuration is specified, but RetryInterval is not. {pull}35820[35820]
 
 *Filebeat*
