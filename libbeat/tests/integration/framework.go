@@ -151,8 +151,10 @@ func (b *BeatProc) Start(args ...string) {
 		b.cmdMutex.Lock()
 		// 1. Kill the Beat
 		if err := b.Process.Signal(os.Interrupt); err != nil {
-			t.Fatalf("could not stop process with PID: %d, err: %s",
-				b.Process.Pid, err)
+			if !errors.Is(err, os.ErrProcessDone) {
+				t.Fatalf("could not stop process with PID: %d, err: %s",
+					b.Process.Pid, err)
+			}
 		}
 
 		// Make sure the goroutine restarting the Beat has exited
@@ -202,6 +204,8 @@ func (b *BeatProc) waitBeatToExit() int {
 // Stop stops the Beat process
 // Start adds Cleanup function to stop when test ends, only run this if you want to inspect logs after beat shutsdown
 func (b *BeatProc) Stop() {
+	b.cmdMutex.Lock()
+	defer b.cmdMutex.Unlock()
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
