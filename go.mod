@@ -1,6 +1,6 @@
 module github.com/elastic/elastic-agent-system-metrics
 
-go 1.19
+go 1.20
 
 require (
 	github.com/elastic/elastic-agent-libs v0.2.11
