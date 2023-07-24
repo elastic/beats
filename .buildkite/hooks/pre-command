@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -euo pipefail
+
+echo "Golang version:"
+version=$(cat .go-version)
+export GO_VERSION="${version}"
+echo "${GO_VERSION}"

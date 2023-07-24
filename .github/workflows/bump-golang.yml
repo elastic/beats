@@ -26,4 +26,4 @@ jobs:
       - name: Run Updatecli
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: updatecli apply --config ./.ci/bump-golang.yml
+        run: updatecli apply --config ./.github/tools/updatecli/bump-golang.yml
