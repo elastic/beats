@@ -30,7 +30,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -46,7 +45,6 @@ import (
 type BeatProc struct {
 	Args                []string
 	Binary              string
-	Cmd                 *exec.Cmd
 	RestartOnBeatOnExit bool
 	beatName            string
 	cmdMutex            sync.Mutex
@@ -94,7 +92,7 @@ type Total struct {
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
-func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
+func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
@@ -119,7 +117,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
 		stdout:     stdoutFile,
 		stderr:     stderrFile,
 	}
-	return p
+	return &p
 }
 
 // Start starts the Beat process
@@ -152,9 +150,9 @@ func (b *BeatProc) Start(args ...string) {
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
 		// 1. Kill the Beat
-		if err := b.Cmd.Process.Signal(os.Interrupt); err != nil {
+		if err := b.Process.Signal(os.Interrupt); err != nil {
 			t.Fatalf("could not stop process with PID: %d, err: %s",
-				b.Cmd.Process.Pid, err)
+				b.Process.Pid, err)
 		}
 
 		// Make sure the goroutine restarting the Beat has exited
@@ -192,12 +190,13 @@ func (b *BeatProc) startBeat() {
 // the process' exit code.
 // `startBeat` must be called before this method.
 func (b *BeatProc) waitBeatToExit() int {
-	if err := b.Cmd.Wait(); err != nil {
+	processState, err := b.Process.Wait()
+	if err != nil {
 		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
-			b.beatName, err, b.Cmd.ProcessState.ExitCode())
+			b.beatName, err, processState.ExitCode())
 	}
 
-	return b.Cmd.ProcessState.ExitCode()
+	return processState.ExitCode()
 }
 
 // Stop stops the Beat process
