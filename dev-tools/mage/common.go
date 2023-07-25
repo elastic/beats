@@ -29,6 +29,7 @@ import (
 	"debug/elf"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -50,7 +51,6 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
-	"github.com/pkg/errors"
 )
 
 // Expand expands the given Go text/template string.
@@ -91,17 +91,17 @@ func expandTemplate(name, tmpl string, funcs template.FuncMap, args ...map[strin
 	t, err := t.Parse(tmpl)
 	if err != nil {
 		if name == "inline" {
-			return "", errors.Wrapf(err, "failed to parse template '%v'", tmpl)
+			return "", fmt.Errorf("failed to parse template '%v': %w", tmpl, err)
 		}
-		return "", errors.Wrap(err, "failed to parse template")
+		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	buf := new(bytes.Buffer)
 	if err := t.Execute(buf, joinMaps(args...)); err != nil {
 		if name == "inline" {
-			return "", errors.Wrapf(err, "failed to expand template '%v'", tmpl)
+			return "", fmt.Errorf("failed to expand template '%v': %w", tmpl, err)
 		}
-		return "", errors.Wrap(err, "failed to expand template")
+		return "", fmt.Errorf("failed to expand template: %w", err)
 	}
 
 	return buf.String(), nil
@@ -127,7 +127,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 func expandFile(src, dst string, args ...map[string]interface{}) error {
 	tmplData, err := ioutil.ReadFile(src)
 	if err != nil {
-		return errors.Wrapf(err, "failed reading from template %v", src)
+		return fmt.Errorf("failed reading from template %v: %w", src, err)
 	}
 
 	output, err := expandTemplate(src, string(tmplData), FuncMap, args...)
@@ -141,7 +141,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 	}
 
 	if err = ioutil.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
-		return errors.Wrap(err, "failed to write rendered template")
+		return fmt.Errorf("failed to write rendered template: %w", err)
 	}
 
 	return nil
@@ -151,7 +151,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 func CWD(elem ...string) string {
 	wd, err := os.Getwd()
 	if err != nil {
-		panic(errors.Wrap(err, "failed to get the CWD"))
+		panic(fmt.Errorf("failed to get the CWD: %w", err))
 	}
 	return filepath.Join(append([]string{wd}, elem...)...)
 }
@@ -188,7 +188,7 @@ func (info *DockerInfo) IsBoot2Docker() bool {
 // HaveDocker returns an error if docker is unavailable.
 func HaveDocker() error {
 	if _, err := GetDockerInfo(); err != nil {
-		return errors.Wrap(err, "docker is not available")
+		return fmt.Errorf("docker is not available: %w", err)
 	}
 	return nil
 }
@@ -274,7 +274,7 @@ func FindReplace(file string, re *regexp.Regexp, repl string) error {
 // MustFindReplace invokes FindReplace and panics if an error occurs.
 func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 	if err := FindReplace(file, re, repl); err != nil {
-		panic(errors.Wrap(err, "failed to find and replace"))
+		panic(fmt.Errorf("failed to find and replace: %w", err))
 	}
 }
 
@@ -285,23 +285,23 @@ func DownloadFile(url, destinationDir string) (string, error) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", errors.Wrap(err, "http get failed")
+		return "", fmt.Errorf("http get failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.Errorf("download failed with http status: %v", resp.StatusCode)
+		return "", fmt.Errorf("download failed with http status: %v", resp.StatusCode)
 	}
 
 	name := filepath.Join(destinationDir, filepath.Base(url))
 	f, err := os.Create(createDir(name))
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create output file")
+		return "", fmt.Errorf("failed to create output file: %w", err)
 	}
 	defer f.Close()
 
 	if _, err = io.Copy(f, resp.Body); err != nil {
-		return "", errors.Wrap(err, "failed to write file")
+		return "", fmt.Errorf("failed to write file: %w", err)
 	}
 
 	return name, f.Close()
@@ -316,7 +316,7 @@ func Extract(sourceFile, destinationDir string) error {
 	case ext == ".zip":
 		return unzip(sourceFile, destinationDir)
 	default:
-		return errors.Errorf("failed to extract %v, unhandled file extension", sourceFile)
+		return fmt.Errorf("failed to extract %v, unhandled file extension", sourceFile)
 	}
 }
 
@@ -340,7 +340,7 @@ func unzip(sourceFile, destinationDir string) error {
 
 		path := filepath.Join(destinationDir, f.Name)
 		if !strings.HasPrefix(path, destinationDir) {
-			return errors.Errorf("illegal file path in zip: %v", f.Name)
+			return fmt.Errorf("illegal file path in zip: %v", f.Name)
 		}
 
 		if f.FileInfo().IsDir() {
@@ -485,7 +485,7 @@ func untar(sourceFile, destinationDir string) error {
 
 		path := filepath.Join(destinationDir, header.Name)
 		if !strings.HasPrefix(path, destinationDir) {
-			return errors.Errorf("illegal file path in tar: %v", header.Name)
+			return fmt.Errorf("illegal file path in tar: %v", header.Name)
 		}
 
 		switch header.Typeflag {
@@ -511,7 +511,7 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 		default:
-			return errors.Errorf("unable to untar type=%c in file=%s", header.Typeflag, path)
+			return fmt.Errorf("unable to untar type=%c in file=%s", header.Typeflag, path)
 		}
 	}
 
@@ -613,7 +613,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 
 	wg.Wait()
 	if len(errs) > 0 {
-		panic(errors.Errorf(strings.Join(errs, "\n")))
+		panic(fmt.Errorf(strings.Join(errs, "\n")))
 	}
 }
 
@@ -652,7 +652,7 @@ func FindFiles(globs ...string) ([]string, error) {
 	for _, glob := range globs {
 		files, err := filepath.Glob(glob)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed on glob %v", glob)
+			return nil, fmt.Errorf("failed on glob %v: %w", glob, err)
 		}
 		configFiles = append(configFiles, files...)
 	}
@@ -691,7 +691,7 @@ func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]strin
 func FileConcat(out string, perm os.FileMode, files ...string) error {
 	f, err := os.OpenFile(createDir(out), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
 	if err != nil {
-		return errors.Wrap(err, "failed to create file")
+		return fmt.Errorf("failed to create file: %w", err)
 	}
 	defer f.Close()
 
@@ -735,20 +735,20 @@ func MustFileConcat(out string, perm os.FileMode, files ...string) {
 func VerifySHA256(file string, hash string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return errors.Wrap(err, "failed to open file for sha256 verification")
+		return fmt.Errorf("failed to open file for sha256 verification: %w", err)
 	}
 	defer f.Close()
 
 	sum := sha256.New()
 	if _, err := io.Copy(sum, f); err != nil {
-		return errors.Wrap(err, "failed reading from input file")
+		return fmt.Errorf("failed reading from input file: %w", err)
 	}
 
 	computedHash := hex.EncodeToString(sum.Sum(nil))
 	expectedHash := strings.TrimSpace(hash)
 
 	if computedHash != expectedHash {
-		return errors.Errorf("SHA256 verification of %v failed. Expected=%v, "+
+		return fmt.Errorf("SHA256 verification of %v failed. Expected=%v, "+
 			"but computed=%v", f.Name(), expectedHash, computedHash)
 	}
 	log.Println("SHA256 OK:", f.Name())
@@ -761,13 +761,13 @@ func VerifySHA256(file string, hash string) error {
 func CreateSHA512File(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return errors.Wrap(err, "failed to open file for sha512 summing")
+		return fmt.Errorf("failed to open file for sha512 summing: %w", err)
 	}
 	defer f.Close()
 
 	sum := sha512.New()
 	if _, err := io.Copy(sum, f); err != nil {
-		return errors.Wrap(err, "failed reading from input file")
+		return fmt.Errorf("failed reading from input file: %w", err)
 	}
 
 	computedHash := hex.EncodeToString(sum.Sum(nil))
@@ -856,7 +856,7 @@ func XPackBeatDir(path ...string) string {
 func LibbeatDir(path ...string) string {
 	esBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
-		panic(errors.Wrap(err, "failed determine libbeat dir location"))
+		panic(fmt.Errorf("failed determine libbeat dir location: %w", err))
 	}
 
 	return filepath.Join(append([]string{esBeatsDir, "libbeat"}, path...)...)
@@ -873,7 +873,7 @@ func CreateDir(file string) string {
 	// Create the output directory.
 	if dir := filepath.Dir(file); dir != "." {
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			panic(errors.Wrapf(err, "failed to create parent dir for %v", file))
+			panic(fmt.Errorf("failed to create parent dir for %v: %w", file, err))
 		}
 	}
 	return file
@@ -895,7 +895,7 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	names := parseVersionRegex.SubexpNames()
 	matches := parseVersionRegex.FindStringSubmatch(version)
 	if len(matches) == 0 {
-		err = errors.Errorf("failed to parse version '%v'", version)
+		err = fmt.Errorf("failed to parse version '%v'", version)
 		return
 	}
 

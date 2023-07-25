@@ -3,6 +3,54 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.8.2]]
+=== Beats version 8.8.2
+https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
+- Upgraded apache arrow library used in `x-pack/libbeat/reader/parquet` from v11 to v12.0.1 in order to fix cross-compilation issues. {pull}35640[35640]
+- Fix panic when the disk queue's MaxRetryInterval configuration is specified, but RetryInterval is not. {pull}35820[35820]
+
+*Filebeat*
+
+- Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
+- [Filebeat GCS input] Fixed an issue where `bucket_timeout` was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
+- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
+- Fix input reload on autodiscover. {issue}34388[34388] {pull}35645[35645]
+
+*Heartbeat*
+
+- Fix serialization of processors when running diagnostics. {pull}35698[35698]
+
+*Metricbeat*
+
+- Fix calculation of the `host.cpu.usage` metric for EC2. {pull}35717[35717]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.19.10. {pull}35751[35751]
+
+*Filebeat*
+
+- [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
+
+*Packetbeat*
+
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
+
+==== Deprecated
+
+*Heartbeat*
+
+- Removed support for `zip_url` and `local` browser sources. {pull}35429[35429]
+
 [[release-notes-8.8.1]]
 === Beats version 8.8.1
 https://github.com/elastic/beats/compare/v8.8.0\...v8.8.1[View commits]

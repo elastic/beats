@@ -82,6 +82,19 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			wantErr:  errBadQueueURL,
 		},
 		{
+			name:     "mismatch_regions_no_default",
+			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			deflt:    "",
+			want:     "us-east-1",
+		},
+		{
+			name:     "mismatch_regions",
+			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			deflt:    "ap-west-1",
+			want:     "ap-west-1",
+			wantErr:  regionMismatchError{queueURLRegion: "us-east-1", defaultRegion: "ap-west-1"},
+		},
+		{
 			name:     "localstack",
 			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-d9clk9",
 			deflt:    "localstack",

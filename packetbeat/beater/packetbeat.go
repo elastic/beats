@@ -133,6 +133,18 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		}
 	}
 
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON()
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
+
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
 	}
