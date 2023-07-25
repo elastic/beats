@@ -312,8 +312,17 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		coverToHTML := sh.RunCmd("go", "tool", "cover",
 			"-html="+params.CoverageProfileFile,
 			"-o", htmlCoverReport)
+
 		if err = coverToHTML(); err != nil {
-			return fmt.Errorf("failed to write HTML code coverage report: %w", err)
+			// ignore known issue, see https://github.com/elastic/beats/issues/35927
+			if !(strings.Contains(err.Error(), "can't read") &&
+				strings.Contains(err.Error(), "filebeat/input/syslog/format_check.rl")) {
+				return fmt.Errorf("failed to write HTML code coverage report: %w", err)
+			}
+			fmt.Println(">> go test: go tool cover returned an error, but " +
+				"will ignore it, see https://github.com/elastic/beats/issues/35927")
+			fmt.Println(">> go test: the error was:")
+			fmt.Println(">> go test:", err.Error())
 		}
 	}
 
