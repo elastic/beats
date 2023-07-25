@@ -36,6 +36,7 @@ var inputTests = []struct {
 	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
 	handler       http.HandlerFunc
 	config        map[string]interface{}
+	time          func() time.Time
 	persistCursor map[string]interface{}
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
@@ -56,6 +57,23 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{"message": "Hello, World!"},
 		},
+	},
+	{
+		name: "hello_world_time",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"Hello, World!": now}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"Hello, World!": "2010-02-08T00:00:00Z",
+			},
+		}},
 	},
 	{
 		name: "bad_events_type",
@@ -1238,7 +1256,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}

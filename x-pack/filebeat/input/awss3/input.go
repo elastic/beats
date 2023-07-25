@@ -410,6 +410,12 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 }
 
 func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
+	// Run GetApproximateMessageCount before start of timer to set initial count for sqs waiting metric
+	// This is to avoid misleading values in metric when sqs messages are processed before the ticker channel kicks in
+	if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
+		return
+	}
+
 	t := time.NewTicker(time.Minute)
 	defer t.Stop()
 	// Initialize the metric to 0 at the start of the one minute time interval to avoid
@@ -421,22 +427,31 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			count, err := receiver.GetApproximateMessageCount(ctx)
-
-			var apiError smithy.APIError
-			if errors.As(err, &apiError) {
-				switch apiError.ErrorCode() {
-				case sqsAccessDeniedErrorCode:
-					// stop polling if auth error is encountered
-					// Set it back to -1 because there is a permission error
-					receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
-					return
-				}
+			if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
+				return
 			}
-
-			receiver.metrics.sqsMessagesWaiting.Set(int64(count))
 		}
 	}
+}
+
+// updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
+// If there is an error, the metric is reinitialized to -1 and true is returned
+func updateMessageCount(receiver *sqsReader, ctx context.Context) bool {
+	count, err := receiver.GetApproximateMessageCount(ctx)
+
+	var apiError smithy.APIError
+	if errors.As(err, &apiError) {
+		switch apiError.ErrorCode() {
+		case sqsAccessDeniedErrorCode:
+			// stop polling if auth error is encountered
+			// Set it back to -1 because there is a permission error
+			receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
+			return true
+		}
+	}
+
+	receiver.metrics.sqsMessagesWaiting.Set(int64(count))
+	return false
 }
 
 // boolPtr returns a pointer to b.

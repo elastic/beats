@@ -83,6 +83,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		// PollSqsWaitingMetric shall reassign the value if there are messages waiting
 		r.metrics.sqsMessagesWaiting.Set(int64(0))
 		workerWg.Add(len(msgs))
+
 		for _, msg := range msgs {
 			go func(msg types.Message, start time.Time) {
 				id := r.metrics.beginSQSWorker()

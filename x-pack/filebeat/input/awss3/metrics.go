@@ -175,6 +175,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		s3ObjectsInflight:                   monitoring.NewUint(reg, "s3_objects_inflight_gauge"),
 		s3ObjectProcessingTime:              metrics.NewUniformSample(1024),
 	}
+	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
 	out.sqsMessagesWaiting.Set(int64(-1))
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
