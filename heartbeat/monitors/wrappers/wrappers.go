@@ -65,9 +65,6 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 			logMonitorRun(nil),
 		),
 		func() jobs.JobWrapper {
-			return makeAddSummary()
-		},
-		func() jobs.JobWrapper {
 			return addMonitorState(stdMonFields, mst)
 		},
 	)
@@ -85,7 +82,6 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(byEventType("heartbeat/summary")),
 		addMonitorErr,
-		addBrowserSummary(stdMonFields, byEventType("heartbeat/summary")),
 		addMonitorState(stdMonFields, mst),
 		logMonitorRun(byEventType("heartbeat/summary")),
 	)
@@ -347,39 +343,6 @@ func makeAddSummary() jobs.JobWrapper {
 				})
 				resetState()
 			}
-
-			return cont, jobErr
-		}
-	}
-}
-
-type EventMatcher func(event *beat.Event) bool
-
-func addBrowserSummary(sf stdfields.StdMonitorFields, match EventMatcher) jobs.JobWrapper {
-	return func(job jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, jobErr := job(event)
-
-			if match != nil && !match(event) {
-				return cont, jobErr
-			}
-
-			status, err := event.GetValue("monitor.status")
-			if err != nil {
-				return nil, fmt.Errorf("could not wrap summary for '%s', no status assigned: %w", sf.ID, err)
-			}
-
-			up, down := 1, 0
-			if monitorstate.StateStatus(status.(string)) == monitorstate.StatusDown {
-				up, down = 0, 1
-			}
-
-			eventext.MergeEventFields(event, mapstr.M{
-				"summary": mapstr.M{
-					"up":   up,
-					"down": down,
-				},
-			})
 
 			return cont, jobErr
 		}

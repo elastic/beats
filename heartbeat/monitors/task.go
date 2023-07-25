@@ -20,6 +20,8 @@ package monitors
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
@@ -67,7 +69,7 @@ func (e ProcessorsError) Error() string {
 
 func (t *configuredJob) prepareSchedulerJob() scheduler.TaskFunc {
 	return func(_ context.Context) []scheduler.TaskFunc {
-		return runPublishJob(t.job, t.pubClient)
+		return runPublishJob(t.job, t.pubClient, NewJobState(2))
 	}
 }
 
@@ -99,12 +101,36 @@ func (t *configuredJob) Stop() {
 	}
 }
 
-func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.TaskFunc {
+type JobSummary struct {
+	Attempt          uint32  `json:"attempt"`
+	MaxAttempts      uint32  `json:"max_attempts"`
+	FinalAttempt     bool    `json:"final_attempt"`
+	Up               *uint32 `json:"up"`
+	Down             *uint32 `json:"down"`
+	Status           string  `json:"status"`
+	mtx              sync.Mutex
+	contsOutstanding *uint32
+}
+
+func NewJobState(maxAttempts uint32) *JobSummary {
+	return &JobSummary{
+		Attempt:          1,
+		MaxAttempts:      maxAttempts,
+		Up:               new(uint32),
+		Down:             new(uint32),
+		contsOutstanding: new(uint32),
+		mtx:              sync.Mutex{},
+	}
+}
+
+func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: mapstr.M{},
 	}
 
 	conts, err := job(event)
+	// Subtract one for the job we just ran, but add back in the length of the continuations
+	outstandingConts := atomic.AddUint32(js.contsOutstanding, uint32(-1+len(conts)))
 	if err != nil {
 		logp.L().Info("Job failed with: %s", err)
 	}
@@ -128,8 +154,24 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.Tas
 		}
 	}
 
-	if !hasContinuations {
-		return nil
+	ms, err := event.GetValue("monitor.status")
+	if err != nil {
+		msStr, ok := ms.(string)
+		if !ok {
+			logp.L().Errorf("monitor status found, but wasn't a string: %v", ms)
+		}
+
+		if msStr == "up" {
+			atomic.AddUint32(js.Up, 1)
+		} else {
+			atomic.AddUint32(js.Down, 1)
+		}
+	}
+
+	// The job has completed, all continuations have executed
+	if outstandingConts == 0 {
+		// terminal event, should be a summary
+		event.PutValue("summary", js)
 	}
 
 	contTasks := make([]scheduler.TaskFunc, len(conts))
@@ -140,7 +182,7 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.Tas
 		localCont := cont
 
 		contTasks[i] = func(_ context.Context) []scheduler.TaskFunc {
-			return runPublishJob(localCont, pubClient)
+			return runPublishJob(localCont, pubClient, js)
 		}
 	}
 	return contTasks
