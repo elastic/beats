@@ -44,6 +44,7 @@ import (
 
 type BeatProc struct {
 	Args                []string
+	baseArgs            []string
 	Binary              string
 	RestartOnBeatOnExit bool
 	beatName            string
@@ -102,7 +103,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.NoError(t, err, "error creating stderr file")
 	p := BeatProc{
 		Binary: binary,
-		Args: append([]string{
+		baseArgs: append([]string{
 			beatName,
 			"--systemTest",
 			"--path.home", tempDir,
@@ -130,7 +131,7 @@ func (b *BeatProc) Start(args ...string) {
 	}
 
 	b.fullPath = fullPath
-	b.Args = append(b.Args, args...)
+	b.Args = append(b.baseArgs, args...)
 
 	done := atomic.MakeBool(false)
 	wg := sync.WaitGroup{}
@@ -167,6 +168,8 @@ func (b *BeatProc) Start(args ...string) {
 			// 4. Wait for the goroutine to finish, this helps ensuring
 			// no other Beat process was started
 			wg.Wait()
+		} else {
+			b.cmdMutex.Unlock()
 		}
 	})
 }
@@ -279,6 +282,7 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 	}
 
 	b.Args = append(b.Args, "-c", b.configFile)
+	b.baseArgs = append(b.baseArgs, "-c", b.configFile)
 }
 
 // openLogFile opens the log file for reading and returns it.
