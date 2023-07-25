@@ -70,7 +70,7 @@ func TestInputReload(t *testing.T) {
 				Id:             "input-unit-1",
 				Type:           proto.UnitType_INPUT,
 				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
+				State:          proto.State_STARTING,
 				LogLevel:       proto.UnitLogLevel_DEBUG,
 				Config: &proto.UnitExpectedConfig{
 					Id:   "log-input",
