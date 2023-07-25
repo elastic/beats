@@ -205,8 +205,13 @@ require (
 	github.com/elastic/elastic-agent-libs v0.3.9
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
+<<<<<<< HEAD
 	github.com/elastic/go-elasticsearch/v8 v8.8.1
 	github.com/elastic/mito v1.4.0
+=======
+	github.com/elastic/go-elasticsearch/v8 v8.8.2
+	github.com/elastic/mito v1.5.0
+>>>>>>> a3e66cd5d6 (x-pack/filebeat/input/cel: update mito version to v1.5.0 (#36146))
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/google/cel-go v0.15.3

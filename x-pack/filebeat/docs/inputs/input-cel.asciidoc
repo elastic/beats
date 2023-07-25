@@ -1,6 +1,11 @@
 [role="xpack"]
 
 :type: cel
+<<<<<<< HEAD
+=======
+:mito_version: v1.5.0
+:mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
+>>>>>>> a3e66cd5d6 (x-pack/filebeat/input/cel: update mito version to v1.5.0 (#36146))
 
 [id="{beatname_lc}-input-{type}"]
 === Common Expression Language input
@@ -68,7 +73,7 @@ filebeat.inputs:
 
 ==== Execution
 
-The execution environment provided for the input includes includes the function, macros and global variables provided by the mito and ext.Strings libraries.
+The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library.
 A single JSON object is provided as an input accessible through a `state` variable.
 `state` contains a string `url` field and may contain arbitrary other fields configured via the input's `state` configuration.
 If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
@@ -130,12 +135,14 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 
 The CEL input will log the complete state after evaluation when logging at the DEBUG level.
 This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object.
+See <<cel-state-redact,`redact`>> configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 
 ==== CEL extension libraries
 
-As noted above the `cel` input provides function, macro and global variables to extend the language.
+As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
+<<<<<<< HEAD
 * https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#Collections[Collections]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#hdr-Collate[Collate]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#hdr-Drop[Drop]
@@ -146,6 +153,19 @@ As noted above the `cel` input provides function, macro and global variables to 
 ** https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#hdr-With[With]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#hdr-With_Replace[With Replace]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#hdr-With_Update[With Update]
+=======
+* {mito_docs}/lib#Collections[Collections]
+** {mito_docs}/lib#hdr-Collate[Collate]
+** {mito_docs}/lib#hdr-Drop[Drop]
+** {mito_docs}/lib#hdr-Drop_Empty[Drop Empty]
+** {mito_docs}/lib#hdr-Flatten[Flatten]
+** {mito_docs}/lib#hdr-Max[Max]
+** {mito_docs}/lib#hdr-Min[Min]
+** {mito_docs}/lib#hdr-With[With]
+** {mito_docs}/lib#hdr-With_Replace[With Replace]
+** {mito_docs}/lib#hdr-With_Update[With Update]
+** {mito_docs}/lib#hdr-Zip[Zip]
+>>>>>>> a3e66cd5d6 (x-pack/filebeat/input/cel: update mito version to v1.5.0 (#36146))
 
 * https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#Crypto[Crypto]
 ** https://pkg.go.dev/github.com/elastic/mito@v1.4.0/lib#hdr-Base64[Base64]
@@ -631,6 +651,7 @@ Whether to use the host's local time rather that UTC for timestamping rotated lo
 
 This determines whether rotated logs should be gzip compressed.
 
+[[cel-state-redact]]
 [float]
 ==== `redact`
 
