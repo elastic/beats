@@ -44,6 +44,21 @@ filebeat.inputs:
     })
 ----
 
+or equivalently using the text format from ipify.org
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=text
+  program: |
+    {
+        "events": [{"ip": string(get(state.url).Body)}]
+    }
+----
+
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
