@@ -26,8 +26,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -119,7 +117,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 	req, err := http.NewRequest(h.method, h.uri, reader)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create HTTP request")
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 	req.Header = h.headers
 	if h.hostData.User != "" || h.hostData.Password != "" {
@@ -218,7 +216,7 @@ func getAuthHeaderFromToken(path string) (string, error) {
 
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
-		return "", errors.Wrap(err, "reading bearer token file")
+		return "", fmt.Errorf("reading bearer token file: %w", err)
 	}
 
 	if len(b) != 0 {

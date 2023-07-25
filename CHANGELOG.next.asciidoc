@@ -12,11 +12,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.19.10 {pull}35751[35751]
 - Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 
+
 *Auditbeat*
 
 
 *Filebeat*
-- Fix input reload on autodiscover {issue}34388[34388] {pull}35645[35645]
 
 
 *Heartbeat*
@@ -70,6 +70,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- Do not print context cancelled error message when running under agent {pull}36006[36006]
+- Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
+- Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
+- Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
+- Support build of projects outside of beats directory {pull}36126[36126]
 
 *Auditbeat*
 
@@ -132,12 +138,21 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
 - Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
+- Fix error message formatting from filestream input. {pull}35658[35658]
 - Fix error when trying to use `include_message` parser {issue}35440[35440]
 - Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
 - Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
 - Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
 - Fix metric collection in GCPPubSub input. {pull}35773[35773]
+- Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
+- Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}35972[35972]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35996[35996]
+- Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
+- Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
+- Fix handling of region name configuration in awss3 input {pull}36034[36034]
+- Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
+- Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
 
 *Heartbeat*
 
@@ -161,6 +176,12 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix formatting issue with socket trace timeout. {pull}35434[35434]
 - Update gval version. {pull}35636[35636]
 - Fix serialization of processors when running diagnostics. {pull}35698[35698]
+- Filter dev flags for ui monitors inside synthetics_args. {pull}35788[35788]
+- Fix temp dir running out of space with project monitors. {issue}35843[35843]
+- Fixing the grok expression outputs of log files {pull}35221[35221]
+
+*Heartbeat*
+
 
 *Heartbeat*
 
@@ -232,6 +253,10 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow program termination when attempting to open an absent channel. {pull}35474[35474]
 
 *Functionbeat*
+
+
+*Functionbeat*
+
 
 
 *Elastic Logging Plugin*
@@ -320,8 +345,18 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add metrics for gcp-pubsub input. {pull}35614[35614]
 - [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
 - Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 - Add Okta input package for entity analytics. {pull}35611[35611]
 - Expose harvester metrics from filestream input {pull}35835[35835] {issue}33771[33771]
+- Add device support for Azure AD entity analytics. {pull}35807[35807]
+- Improve CEL input performance. {pull}35915[35915]
+- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Added support for min/max template functions in httpjson input. {issue}36094[36094] {pull}36036[36036]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
+- Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
+- Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
+- Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -353,6 +388,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 - Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
+- Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
+
 
 *Osquerybeat*
 
@@ -361,6 +398,11 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
 - Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
+- Add support for multiple regions in GCP {pull}32964[32964]
+
+*Packetbeat*
+
 
 *Winlogbeat*
 
@@ -372,6 +414,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 - Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
 - Handle empty DNS answer data in QueryResults for the Sysmon Pipeline {pull}35207[35207]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 
 
 *Elastic Log Driver*
@@ -388,7 +431,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Heartbeat*
 
-- Removed zip_url and local browser sources. {pull}35429[35429]
 
 *Metricbeat*
 

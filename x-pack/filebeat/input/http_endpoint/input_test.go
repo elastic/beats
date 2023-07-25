@@ -251,9 +251,10 @@ func TestServerPool(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to post event #%d: %v", i, err)
 				}
+				body := dump(resp.Body)
 				if resp.StatusCode != http.StatusOK {
 					t.Errorf("unexpected response status code: %s (%d)\nresp: %s",
-						resp.Status, resp.StatusCode, dump(resp.Body))
+						resp.Status, resp.StatusCode, body)
 				}
 			}
 			cancel()
@@ -265,6 +266,22 @@ func TestServerPool(t *testing.T) {
 			if !cmp.Equal(got, test.want) {
 				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(got, test.want))
 			}
+
+			// Try to re-register the same addresses.
+			ctx, cancel = newCtx("server_pool_test", test.name)
+			for _, cfg := range test.cfgs {
+				cfg := cfg
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					err := servers.serve(ctx, cfg, &pub)
+					if err != nil && err != http.ErrServerClosed && test.wantErr == nil {
+						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
+					}
+				}()
+			}
+			cancel()
+			wg.Wait()
 		})
 	}
 }
@@ -290,9 +307,9 @@ func newCtx(log, id string) (_ v2.Context, cancel func()) {
 	}, cancel
 }
 
-func dump(r io.ReadCloser) string {
+func dump(r io.ReadCloser) []byte {
 	defer r.Close()
 	var buf bytes.Buffer
 	io.Copy(&buf, r)
-	return buf.String()
+	return buf.Bytes()
 }
