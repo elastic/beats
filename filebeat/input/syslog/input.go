@@ -34,9 +34,9 @@ import (
 )
 
 // Parser is generated from a ragel state machine using the following command:
-//go:generate ragel -Z -G2 rfc3164_parser.rl -o rfc3164_parser.go
-//go:generate ragel -Z -G2 rfc5424_parser.rl -o rfc5424_parser.go
-//go:generate ragel -Z -G2 format_check.rl -o format_check.go
+//go:generate ragel -Z -G2 parser/rfc3164_parser.rl -o rfc3164_parser.go
+//go:generate ragel -Z -G2 parser/rfc5424_parser.rl -o rfc5424_parser.go
+//go:generate ragel -Z -G2 parser/format_check.rl -o format_check.go
 //go:generate goimports -l -w rfc3164_parser.go
 //go:generate goimports -l -w rfc5424_parser.go
 
