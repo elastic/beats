@@ -51,7 +51,7 @@ func TestStatesESLoader(t *testing.T) {
 
 		monID := etc.createTestMonitorStateInES(t, testStatus)
 		// Since we've continued this state it should register the initial state
-		ms := etc.tracker.getCurrentState(monID)
+		ms := etc.tracker.GetCurrentState(monID)
 		require.True(t, ms.StartedAt.After(testStart.Add(-time.Nanosecond)), "timestamp for new state is off")
 		requireMSStatusCount(t, ms, testStatus, 1)
 

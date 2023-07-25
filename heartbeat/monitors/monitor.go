@@ -70,6 +70,8 @@ type Monitor struct {
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
+
+	monitorStateTracker *monitorstate.Tracker
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -125,15 +127,16 @@ func newMonitorUnsafe(
 	}
 
 	m := &Monitor{
-		stdFields:      standardFields,
-		pluginName:     pluginFactory.Name,
-		addTask:        addTask,
-		configuredJobs: []*configuredJob{},
-		pubClient:      pubClient,
-		internalsMtx:   sync.Mutex{},
-		config:         config,
-		stats:          pluginFactory.Stats,
-		state:          MON_INIT,
+		stdFields:           standardFields,
+		pluginName:          pluginFactory.Name,
+		addTask:             addTask,
+		configuredJobs:      []*configuredJob{},
+		pubClient:           pubClient,
+		internalsMtx:        sync.Mutex{},
+		config:              config,
+		stats:               pluginFactory.Stats,
+		state:               MON_INIT,
+		monitorStateTracker: monitorstate.NewTracker(stateLoader, false),
 	}
 
 	if m.stdFields.ID == "" {
@@ -179,7 +182,7 @@ func newMonitorUnsafe(
 		// We need to use the lightweight wrapping for error jobs
 		// since browser wrapping won't write summaries, but the fake job here is
 		// effectively a lightweight job
-		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false))
+		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields)
 	}
 
 	m.endpoints = p.Endpoints

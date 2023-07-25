@@ -21,12 +21,14 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"sync/atomic"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -69,7 +71,10 @@ func (e ProcessorsError) Error() string {
 
 func (t *configuredJob) prepareSchedulerJob() scheduler.TaskFunc {
 	return func(_ context.Context) []scheduler.TaskFunc {
-		return runPublishJob(t.job, t.pubClient, NewJobState(2))
+		// TODO: Use something better than a timestamp for the retry group
+		retryGroup := fmt.Sprintf("R-%x", time.Now().UnixMilli())
+		js := NewJobSummary(t.job, 1, 2, retryGroup)
+		return runPublishJob(t.job, t.pubClient, js, t.monitor.stdFields, t.monitor.monitorStateTracker)
 	}
 }
 
@@ -102,40 +107,96 @@ func (t *configuredJob) Stop() {
 }
 
 type JobSummary struct {
-	Attempt          uint32  `json:"attempt"`
-	MaxAttempts      uint32  `json:"max_attempts"`
-	FinalAttempt     bool    `json:"final_attempt"`
-	Up               *uint32 `json:"up"`
-	Down             *uint32 `json:"down"`
-	Status           string  `json:"status"`
-	mtx              sync.Mutex
-	contsOutstanding *uint32
+	Attempt          uint32                   `json:"attempt"`
+	MaxAttempts      uint32                   `json:"max_attempts"`
+	FinalAttempt     bool                     `json:"final_attempt"`
+	Up               uint32                   `json:"up"`
+	Down             uint32                   `json:"down"`
+	Status           monitorstate.StateStatus `json:"status"`
+	RetryGroup       string                   `json:"retry_group"`
+	mtx              *sync.Mutex
+	contsOutstanding uint32
+	rootJob          jobs.Job
 }
 
-func NewJobState(maxAttempts uint32) *JobSummary {
+func NewJobSummary(rootJob jobs.Job, attempt uint32, maxAttempts uint32, retryGroup string) *JobSummary {
 	return &JobSummary{
-		Attempt:          1,
+		Attempt:          attempt,
 		MaxAttempts:      maxAttempts,
-		Up:               new(uint32),
-		Down:             new(uint32),
-		contsOutstanding: new(uint32),
-		mtx:              sync.Mutex{},
+		RetryGroup:       retryGroup,
+		contsOutstanding: 1,
+		mtx:              &sync.Mutex{},
+		rootJob:          rootJob,
 	}
 }
 
-func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary) []scheduler.TaskFunc {
+func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: mapstr.M{},
 	}
 
 	conts, err := job(event)
-	// Subtract one for the job we just ran, but add back in the length of the continuations
-	outstandingConts := atomic.AddUint32(js.contsOutstanding, uint32(-1+len(conts)))
+
+	// Needed because we re-assign js on summary
+	// TODO: refactor code to not do this weird mutation
+	js.mtx.Lock()
+	defer js.mtx.Unlock()
+
+	var outstandingConts uint32
+
+	js.contsOutstanding--
+	js.contsOutstanding += uint32(len(conts))
+	outstandingConts = js.contsOutstanding
+
 	if err != nil {
 		logp.L().Info("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0
+
+	ms, err := event.GetValue("monitor.status")
+	if err == nil { // if this event contains a status...
+		msStr, ok := ms.(string)
+		if !ok {
+			logp.L().Errorf("monitor status found, but wasn't a string: %v", ms)
+		}
+
+		if msStr == "up" {
+			js.Up++
+		} else {
+			js.Down++
+		}
+	}
+
+	var contJs *JobSummary = js
+	// The job has completed, all continuations have executed
+	if outstandingConts == 0 {
+		if js.Down > 0 {
+			js.Status = monitorstate.StatusDown
+		} else {
+			js.Status = monitorstate.StatusUp
+		}
+
+		ms := mst.RecordStatus(sf, monitorstate.StateStatus(js.Status))
+
+		// terminal event, should be a summary
+		eventext.MergeEventFields(event, mapstr.M{
+			"summary": js,
+			"state":   ms,
+		})
+
+		// TODO: Clean up this equality
+		stateChange := js.Status != mst.GetCurrentState(sf).Status
+		canRetry := js.Attempt < js.MaxAttempts
+
+		logp.L().Infof("retry decision: %t && %t , state comp (%s == %s)", stateChange, canRetry, js.Status, mst.GetCurrentState(sf).Status)
+		if stateChange && canRetry {
+			conts = []jobs.Job{js.rootJob}
+			contJs = NewJobSummary(js.rootJob, js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+		} else {
+			js.FinalAttempt = true
+		}
+	}
 
 	if event.Fields != nil && !eventext.IsEventCancelled(event) {
 		// If continuations are present we defensively publish a clone of the event
@@ -154,26 +215,6 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary)
 		}
 	}
 
-	ms, err := event.GetValue("monitor.status")
-	if err != nil {
-		msStr, ok := ms.(string)
-		if !ok {
-			logp.L().Errorf("monitor status found, but wasn't a string: %v", ms)
-		}
-
-		if msStr == "up" {
-			atomic.AddUint32(js.Up, 1)
-		} else {
-			atomic.AddUint32(js.Down, 1)
-		}
-	}
-
-	// The job has completed, all continuations have executed
-	if outstandingConts == 0 {
-		// terminal event, should be a summary
-		event.PutValue("summary", js)
-	}
-
 	contTasks := make([]scheduler.TaskFunc, len(conts))
 	for i, cont := range conts {
 		// Move the continuation into the local block scope
@@ -182,7 +223,7 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary)
 		localCont := cont
 
 		contTasks[i] = func(_ context.Context) []scheduler.TaskFunc {
-			return runPublishJob(localCont, pubClient, js)
+			return runPublishJob(localCont, pubClient, contJs, sf, mst)
 		}
 	}
 	return contTasks

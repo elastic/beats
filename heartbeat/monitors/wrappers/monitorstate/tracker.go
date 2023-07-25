@@ -62,7 +62,7 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	state := t.getCurrentState(sf)
+	state := t.GetCurrentState(sf)
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
 		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
@@ -74,7 +74,7 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 	return state.copy()
 }
 
-func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) {
+func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) {
 	if state, ok := t.states[sf.ID]; ok {
 		return state
 	}
