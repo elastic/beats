@@ -329,7 +329,9 @@ func (p *copyTruncateFileProspector) onRotatedFile(
 			hg.Start(ctx, src)
 			return
 		}
-		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		descCopy := fe.Descriptor
+		descCopy.Info = fi
+		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Descriptor: descCopy})
 		p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 		p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 		hg.Start(ctx, src)
