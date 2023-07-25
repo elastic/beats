@@ -65,14 +65,10 @@ func (e ProcessorsError) Error() string {
 	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
-func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
+func (t *configuredJob) prepareSchedulerJob() scheduler.TaskFunc {
 	return func(_ context.Context) []scheduler.TaskFunc {
-		return runPublishJob(job, t.pubClient)
+		return runPublishJob(t.job, t.pubClient)
 	}
-}
-
-func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
-	return t.prepareSchedulerJob(t.job)
 }
 
 // Start schedules this configuredJob for execution.
@@ -86,7 +82,7 @@ func (t *configuredJob) Start(pubClient pipeline.ISyncClient) {
 		return
 	}
 
-	tf := t.makeSchedulerTaskFunc()
+	tf := t.prepareSchedulerJob()
 	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, pubClient.Wait)
 	if err != nil {
 		logp.L().Info("could not start monitor: %v", err)
