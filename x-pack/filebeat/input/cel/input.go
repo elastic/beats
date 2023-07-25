@@ -76,7 +76,17 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-type input struct{}
+type input struct {
+	time func() time.Time
+}
+
+// now is time.Now with a modifiable time source.
+func (i input) now() time.Time {
+	if i.time == nil {
+		return time.Now()
+	}
+	return i.time()
+}
 
 func (input) Name() string { return inputName }
 
@@ -110,7 +120,7 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
@@ -221,8 +231,8 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			// Process a set of event requests.
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
 			metrics.executions.Add(1)
-			start := time.Now()
-			state, err = evalWith(ctx, prg, state)
+			start := i.now()
+			state, err = evalWith(ctx, prg, state, start)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
 			if err != nil {
 				switch {
@@ -899,8 +909,20 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 	return prg, nil
 }
 
-func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}) (map[string]interface{}, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{root: state})
+func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
+	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+		// Replace global program "now" with current time. This is necessary
+		// as the lib.Time now global is static at program instantiation time
+		// which will persist over multiple evaluations. The lib.Time behaviour
+		// is correct for mito where CEL program instances live for only a
+		// single evaluation. Rather than incurring the cost of creating a new
+		// cel.Program for each evaluation, shadow lib.Time's now with a new
+		// value for each eval. We retain the lib.Time now global for
+		// compatibility between CEL programs developed in mito with programs
+		// run in the input.
+		"now": now,
+		root:  state,
+	})
 	if e := ctx.Err(); e != nil {
 		err = e
 	}
