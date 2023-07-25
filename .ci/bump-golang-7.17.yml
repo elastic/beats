@@ -121,7 +121,6 @@ targets:
       # This list differs from the main branch, this is the main reason we have a separate job
       files:
         - ./metricbeat/Dockerfile
-        - ./metricbeat/module/vsphere/_meta/Dockerfile
         - ./metricbeat/module/nats/_meta/Dockerfile
         - ./metricbeat/module/http/_meta/Dockerfile
         - ./filebeat/Dockerfile
