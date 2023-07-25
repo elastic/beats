@@ -9,4 +9,6 @@ modules.
 
 Filebeat modules require Elasticsearch 5.2 or later.
 
+NOTE: Bug fixes, enhancements, and new Filebeat modules are no longer implemented. We recommend that you {fleet-guide}/migrate-beats-to-agent.html[migrate to {agent}], whose integrations are actively maintained.
+
 include::modules_list.asciidoc[]
