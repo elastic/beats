@@ -3,6 +3,17 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.12]]
+=== Beats version 7.17.12
+https://github.com/elastic/beats/compare/v7.17.11\...v7.17.12[View commits]
+
+==== Added
+
+*Filebeat*
+
+- Add sanitization capabilities to `azure-eventhub` input {pull}34874[34874]
+- Add fingerprint mode for the filestream scanner and the new file identity based on it {issue}34419[34419] {pull}35734[35734]
+
 [[release-notes-7.17.11]]
 === Beats version 7.17.11
 https://github.com/elastic/beats/compare/v7.17.10\...v7.17.11[View commits]
