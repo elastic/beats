@@ -4,6 +4,7 @@ This directory contains a Terraform module that creates the AWS resources needed
 for executing the integration tests for the `aws-s3` Filebeat input. It creates
 an S3 bucket and SQS queue and configures S3 `ObjectCreated:*` notifications to
 be delivered to SQS. It also creates a second S3 bucket, SNS topic, SQS queue and configures S3 `ObjectCreated:*` notifications to be delivered to SNS and also creates a subscription for this SNS topic to SQS queue to automatically place messages sent to SNS topic in SQS queue.
+
 ## Cloud AWS environment
 
 It outputs configuration information that is consumed by the tests to
