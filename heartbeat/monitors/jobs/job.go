@@ -80,13 +80,12 @@ type StatefulWrapper[T any] interface {
 
 type StatefulWrapperFactory[T any] func(rootJob Job) StatefulWrapper[T]
 
-func WrapStateful[T StatefulWrapper[T]](makeSp StatefulWrapperFactory[T]) JobWrapper {
+func WrapStateful[T StatefulWrapper[T]](makeSW StatefulWrapperFactory[T]) JobWrapper {
 	return func(j Job) Job {
 		return func(event *beat.Event) ([]Job, error) {
-			sp := makeSp(j)
-			conts, err := sp.Wrap(j)(event)
-			return WrapAll(conts, sp.Wrap), err
+			sw := makeSW(j)
+			conts, err := sw.Wrap(j)(event)
+			return WrapAll(conts, sw.Wrap), err
 		}
 	}
-
 }
