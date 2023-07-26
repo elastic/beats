@@ -143,7 +143,7 @@ func IsRFC5424Format(data []byte) bool {
 		}
 		goto st0
 	tr9:
-// line-disable-directive parser/format_check.rl:17
+		// line-disable-directive parser/format_check.rl:17
 
 		isRFC5424 = true
 
@@ -294,7 +294,7 @@ func IsRFC5424Format(data []byte) bool {
 		}
 	}
 
-// line-disable-directive parser/format_check.rl:28
+	// line-disable-directive parser/format_check.rl:28
 
 	return isRFC5424
 }

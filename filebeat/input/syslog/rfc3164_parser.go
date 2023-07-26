@@ -332,17 +332,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto tr0
 	tr0:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st2
 	tr134:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -355,17 +355,17 @@ func ParserRFC3164(data []byte, event *event) {
 //line rfc3164_parser.go:342
 		goto st2
 	tr1:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st3
 	tr135:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -399,17 +399,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr14:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st4
 	tr136:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -452,7 +452,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr18:
-// line-disable-directive parser/common.rl:19
+		// line-disable-directive parser/common.rl:19
 
 		event.SetYear(data[tok:p])
 
@@ -468,7 +468,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr19:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -493,7 +493,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr21:
-// line-disable-directive parser/common.rl:23
+		// line-disable-directive parser/common.rl:23
 
 		event.SetMonthNumeric(data[tok:p])
 
@@ -509,7 +509,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr22:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -542,7 +542,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr24:
-// line-disable-directive parser/common.rl:27
+		// line-disable-directive parser/common.rl:27
 
 		event.SetDay(data[tok:p])
 
@@ -561,7 +561,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr25:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -586,7 +586,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr28:
-// line-disable-directive parser/common.rl:31
+		// line-disable-directive parser/common.rl:31
 
 		event.SetHour(data[tok:p])
 
@@ -602,7 +602,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr29:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -627,7 +627,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr31:
-// line-disable-directive parser/common.rl:35
+		// line-disable-directive parser/common.rl:35
 
 		event.SetMinute(data[tok:p])
 
@@ -643,7 +643,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr32:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -684,19 +684,19 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr34:
-// line-disable-directive parser/common.rl:39
+		// line-disable-directive parser/common.rl:39
 
 		event.SetSecond(data[tok:p])
 
 		goto st23
 	tr61:
-// line-disable-directive parser/common.rl:103
+		// line-disable-directive parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
 		goto st23
 	tr68:
-// line-disable-directive parser/common.rl:43
+		// line-disable-directive parser/common.rl:43
 
 		event.SetNanosecond(data[tok:p])
 
@@ -732,11 +732,11 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto tr0
 	tr39:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -751,7 +751,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st24
 	tr42:
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -796,11 +796,11 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr40:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -815,7 +815,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st25
 	tr43:
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -867,7 +867,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr45:
-// line-disable-directive parser/common.rl:91
+		// line-disable-directive parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -891,7 +891,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto tr47
 	tr47:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -917,7 +917,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st27
 	tr49:
-// line-disable-directive parser/common.rl:95
+		// line-disable-directive parser/common.rl:95
 
 		event.SetProgram(data[tok:p])
 
@@ -949,7 +949,7 @@ func ParserRFC3164(data []byte, event *event) {
 	st_case_29:
 		goto tr0
 	tr50:
-// line-disable-directive parser/common.rl:95
+		// line-disable-directive parser/common.rl:95
 
 		event.SetProgram(data[tok:p])
 
@@ -965,7 +965,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr52:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -984,7 +984,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr54:
-// line-disable-directive parser/common.rl:99
+		// line-disable-directive parser/common.rl:99
 
 		event.SetPid(data[tok:p])
 
@@ -1012,7 +1012,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr46:
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1025,7 +1025,7 @@ func ParserRFC3164(data []byte, event *event) {
 			}
 		}
 
-// line-disable-directive parser/common.rl:91
+		// line-disable-directive parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -1068,7 +1068,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr57:
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1083,7 +1083,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st35
 	tr58:
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1096,7 +1096,7 @@ func ParserRFC3164(data []byte, event *event) {
 			}
 		}
 
-// line-disable-directive parser/common.rl:91
+		// line-disable-directive parser/common.rl:91
 
 		event.SetHostname(data[tok:p])
 
@@ -1139,11 +1139,11 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr41:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1158,7 +1158,7 @@ func ParserRFC3164(data []byte, event *event) {
 
 		goto st36
 	tr44:
-// line-disable-directive parser/common.rl:80
+		// line-disable-directive parser/common.rl:80
 
 		if p-1 > 0 {
 			for _, b := range noDuplicates {
@@ -1203,21 +1203,21 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr35:
-// line-disable-directive parser/common.rl:39
+		// line-disable-directive parser/common.rl:39
 
 		event.SetSecond(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st37
 	tr69:
-// line-disable-directive parser/common.rl:43
+		// line-disable-directive parser/common.rl:43
 
 		event.SetNanosecond(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1286,19 +1286,19 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr37:
-// line-disable-directive parser/common.rl:39
+		// line-disable-directive parser/common.rl:39
 
 		event.SetSecond(data[tok:p])
 
 		goto st42
 	tr65:
-// line-disable-directive parser/common.rl:103
+		// line-disable-directive parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
 		goto st42
 	tr71:
-// line-disable-directive parser/common.rl:43
+		// line-disable-directive parser/common.rl:43
 
 		event.SetNanosecond(data[tok:p])
 
@@ -1317,7 +1317,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr63:
-// line-disable-directive parser/common.rl:103
+		// line-disable-directive parser/common.rl:103
 
 		event.SetTimeZone(data[tok:p])
 
@@ -1341,7 +1341,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr36:
-// line-disable-directive parser/common.rl:39
+		// line-disable-directive parser/common.rl:39
 
 		event.SetSecond(data[tok:p])
 
@@ -1357,7 +1357,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr67:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1392,21 +1392,21 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr38:
-// line-disable-directive parser/common.rl:39
+		// line-disable-directive parser/common.rl:39
 
 		event.SetSecond(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st46
 	tr72:
-// line-disable-directive parser/common.rl:43
+		// line-disable-directive parser/common.rl:43
 
 		event.SetNanosecond(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1432,7 +1432,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr26:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1448,17 +1448,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr4:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st48
 	tr137:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1501,7 +1501,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr77:
-// line-disable-directive parser/common.rl:15
+		// line-disable-directive parser/common.rl:15
 
 		event.SetMonth(data[tok:p])
 
@@ -1543,7 +1543,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr83:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1562,7 +1562,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr84:
-// line-disable-directive parser/common.rl:27
+		// line-disable-directive parser/common.rl:27
 
 		event.SetDay(data[tok:p])
 
@@ -1581,7 +1581,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr85:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1606,7 +1606,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr88:
-// line-disable-directive parser/common.rl:31
+		// line-disable-directive parser/common.rl:31
 
 		event.SetHour(data[tok:p])
 
@@ -1622,7 +1622,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr89:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1647,7 +1647,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr91:
-// line-disable-directive parser/common.rl:35
+		// line-disable-directive parser/common.rl:35
 
 		event.SetMinute(data[tok:p])
 
@@ -1663,7 +1663,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr92:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1696,7 +1696,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr94:
-// line-disable-directive parser/common.rl:39
+		// line-disable-directive parser/common.rl:39
 
 		event.SetSecond(data[tok:p])
 
@@ -1712,7 +1712,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr95:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1739,7 +1739,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr86:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1755,7 +1755,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr80:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1771,7 +1771,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr81:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1795,7 +1795,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr82:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1882,17 +1882,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr5:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st75
 	tr138:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -1968,17 +1968,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr6:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st82
 	tr139:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2054,17 +2054,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr7:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st89
 	tr140:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2149,17 +2149,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr8:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st95
 	tr141:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2216,17 +2216,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr9:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st99
 	tr142:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2251,17 +2251,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr10:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st101
 	tr143:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2301,17 +2301,17 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr11:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
 		goto st104
 	tr144:
-// line-disable-directive parser/common.rl:107
+		// line-disable-directive parser/common.rl:107
 
 		event.SetSequence(data[tok:p])
 
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2360,7 +2360,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr2:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2442,7 +2442,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr133:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2482,7 +2482,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto tr134
 	tr3:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2498,7 +2498,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr145:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2562,7 +2562,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		goto st2
 	tr147:
-// line-disable-directive parser/common.rl:7
+		// line-disable-directive parser/common.rl:7
 
 		event.SetPriority(data[tok:p])
 
@@ -2608,7 +2608,7 @@ func ParserRFC3164(data []byte, event *event) {
 	st_case_1:
 		goto tr12
 	tr12:
-// line-disable-directive parser/common.rl:3
+		// line-disable-directive parser/common.rl:3
 
 		tok = p
 
@@ -2994,7 +2994,7 @@ func ParserRFC3164(data []byte, event *event) {
 		if (p) == eof {
 			switch cs {
 			case 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122:
-// line-disable-directive parser/common.rl:11
+				// line-disable-directive parser/common.rl:11
 
 				event.SetMessage(data[tok:p])
 
@@ -3004,6 +3004,6 @@ func ParserRFC3164(data []byte, event *event) {
 
 	}
 
-// line-disable-directive parser/rfc3164_parser.rl:28
+	// line-disable-directive parser/rfc3164_parser.rl:28
 
 }
