@@ -24,23 +24,6 @@ import (
 // A Job represents a unit of execution, and may return multiple continuation jobs.
 type Job func(event *beat.Event) ([]Job, error)
 
-type StatefulWrapper[T any] interface {
-	Wrap(j Job) Job
-}
-
-type StatefulWrapperFactory[T any] func(rootJob Job) StatefulWrapper[T]
-
-func WrapStateful[T StatefulWrapper[T]](makeSp StatefulWrapperFactory[T]) JobWrapper {
-	return func(j Job) Job {
-		return func(event *beat.Event) ([]Job, error) {
-			sp := makeSp(j)
-			conts, err := sp.Wrap(j)(event)
-			return WrapAll(conts, sp.Wrap), err
-		}
-	}
-
-}
-
 // MakeSimpleJob creates a new Job from a callback function. The callback should
 // return an valid event and can not create any sub-tasks to be executed after
 // completion.
@@ -89,4 +72,21 @@ func Wrap(job Job, wrapper JobWrapper) Job {
 		cont, err := wrapper(job)(event)
 		return WrapAll(cont, wrapper), err
 	}
+}
+
+type StatefulWrapper[T any] interface {
+	Wrap(j Job) Job
+}
+
+type StatefulWrapperFactory[T any] func(rootJob Job) StatefulWrapper[T]
+
+func WrapStateful[T StatefulWrapper[T]](makeSp StatefulWrapperFactory[T]) JobWrapper {
+	return func(j Job) Job {
+		return func(event *beat.Event) ([]Job, error) {
+			sp := makeSp(j)
+			conts, err := sp.Wrap(j)(event)
+			return WrapAll(conts, sp.Wrap), err
+		}
+	}
+
 }
