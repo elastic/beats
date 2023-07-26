@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of region name configuration in awss3 input {pull}36034[36034]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
+- Update mito CEL extension library to v1.5.0. {pull}36146[36146]
 
 *Heartbeat*
 
