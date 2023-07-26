@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.4.0
+:mito_version: v1.5.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -44,6 +44,21 @@ filebeat.inputs:
     })
 ----
 
+or equivalently using the text format from ipify.org
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=text
+  program: |
+    {
+        "events": [{"ip": string(get(state.url).Body)}]
+    }
+----
+
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
@@ -70,7 +85,7 @@ filebeat.inputs:
 
 ==== Execution
 
-The execution environment provided for the input includes includes the function, macros and global variables provided by the mito and ext.Strings libraries.
+The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library.
 A single JSON object is provided as an input accessible through a `state` variable.
 `state` contains a string `url` field and may contain arbitrary other fields configured via the input's `state` configuration.
 If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
@@ -132,11 +147,12 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 
 The CEL input will log the complete state after evaluation when logging at the DEBUG level.
 This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object.
+See <<cel-state-redact,`redact`>> configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 
 ==== CEL extension libraries
 
-As noted above the `cel` input provides function, macro and global variables to extend the language.
+As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
 * {mito_docs}/lib#Collections[Collections]
 ** {mito_docs}/lib#hdr-Collate[Collate]
@@ -148,6 +164,7 @@ As noted above the `cel` input provides function, macro and global variables to 
 ** {mito_docs}/lib#hdr-With[With]
 ** {mito_docs}/lib#hdr-With_Replace[With Replace]
 ** {mito_docs}/lib#hdr-With_Update[With Update]
+** {mito_docs}/lib#hdr-Zip[Zip]
 
 * {mito_docs}/lib#Crypto[Crypto]
 ** {mito_docs}/lib#hdr-Base64[Base64]
@@ -633,6 +650,7 @@ Whether to use the host's local time rather that UTC for timestamping rotated lo
 
 This determines whether rotated logs should be gzip compressed.
 
+[[cel-state-redact]]
 [float]
 ==== `redact`
 
