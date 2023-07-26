@@ -174,14 +174,16 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				js.Status = monitorstate.StatusUp
 			}
 
+			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
 			ms := s.stateTracker.RecordStatus(s.sf, js.Status)
 			eventext.MergeEventFields(event, mapstr.M{
 				"summary": js,
 				"state":   ms,
 			})
 
-			// Time to retry
-			if js.Status == monitorstate.StatusDown && js.Attempt < js.MaxAttempts {
+			// Time to retry, perhaps
+			logp.L().Infof("RETRY INFO: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
+			if js.Status != lastStatus && js.Attempt < js.MaxAttempts {
 				// Reset the job summary for the next attempt
 				s.jobSummary = newJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 				s.contsRemaining++

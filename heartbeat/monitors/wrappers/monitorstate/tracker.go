@@ -74,6 +74,14 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 	return state.copy()
 }
 
+func (t *Tracker) GetCurrentStatus(sf stdfields.StdMonitorFields) StateStatus {
+	s := t.GetCurrentState(sf)
+	if s == nil {
+		return StatusEmpty
+	}
+	return s.Status
+}
+
 func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) {
 	if state, ok := t.states[sf.ID]; ok {
 		return state

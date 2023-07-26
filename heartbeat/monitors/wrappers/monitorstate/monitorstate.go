@@ -37,6 +37,8 @@ const (
 	StatusUp       StateStatus = "up"
 	StatusDown     StateStatus = "down"
 	StatusFlapping StateStatus = "flap"
+	// Nil, essentially
+	StatusEmpty StateStatus = ""
 )
 
 func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int, flappingEnabled bool) *State {
