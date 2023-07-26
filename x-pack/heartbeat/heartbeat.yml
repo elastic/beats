@@ -22,7 +22,7 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: browser
-  enabled: true
+  enabled: false
   id: my-browser
   name: my browser
   source:

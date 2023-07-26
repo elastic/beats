@@ -43,7 +43,7 @@ func (tsw *TestSWrapper) Wrap(j Job) Job {
 	}
 }
 
-func TestJob2SJob(t *testing.T) {
+func TestStatefulWrapper(t *testing.T) {
 	innerj1Fields := mapstr.M{
 		"innerjob":   "innervalue",
 		"innercount": 1,
@@ -64,11 +64,11 @@ func TestJob2SJob(t *testing.T) {
 		}, nil
 	}
 
-	wrapped := WrapStateful[*TestSWrapper](j, func(_ Job) StatefulWrapper[*TestSWrapper] { return &TestSWrapper{rootCounter: 1} })
+	wrapper := WrapStateful[*TestSWrapper](func(rootJob Job) StatefulWrapper[*TestSWrapper] { return &TestSWrapper{rootCounter: 1} })
 
 	// Run this ten times to ensure state is not carried across retries
 	for i := 0; i < 10; i++ {
-		events, err := ExecJobAndConts(t, wrapped)
+		events, err := ExecJobAndConts(t, wrapper(j))
 		assert.NoError(t, err)
 		assert.Len(t, events, 2)
 		testslike.Test(

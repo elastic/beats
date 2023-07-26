@@ -34,6 +34,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
@@ -71,8 +73,9 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
+	t.Helper()
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil)
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, 1)
 
 		core, observedLogs := observer.New(zapcore.InfoLevel)
 		logger.SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
@@ -430,12 +433,20 @@ func stateValidator() validator.Validator {
 
 // This duplicates hbtest.SummaryChecks to avoid an import cycle.
 // It could be refactored out, but it just isn't worth it.
-func summaryValidator(up int, down int) validator.Validator {
+func summaryValidator(up uint16, down uint16) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
-		"summary": map[string]interface{}{
-			"up":   uint16(up),
-			"down": uint16(down),
-		},
+		"summary": isdef.Is("summary", func(path llpath.Path, v interface{}) *llresult.Results {
+			js, ok := v.(JobSummary)
+			if !ok {
+				return llresult.SimpleResult(path, false, fmt.Sprintf("expected a *JobSummary, got %v", v))
+			}
+
+			if js.Up != up || js.Down != down {
+				return llresult.SimpleResult(path, false, fmt.Sprintf("expected up/down to be %d/%d, got %d/%d", up, down, js.Up, js.Down))
+			}
+
+			return llresult.ValidResult(path)
+		}),
 	})
 }
 
@@ -504,16 +515,14 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 		eventext.MergeEventFields(event, mapstr.M{
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
-				"type":        "browser",
-				"check_group": inlineMonitorValues.checkGroup,
+				"type":   "browser",
+				"status": "up",
 			},
 		})
 		return nil, nil
 	}
 }
 
-// Browser inline jobs monitor information should not be altered
-// by the wrappers as they are handled separately in synth enricher
 func TestInlineBrowserJob(t *testing.T) {
 	sFields := testBrowserMonFields
 	sFields.ID = inlineMonitorValues.id
@@ -527,13 +536,16 @@ func TestInlineBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, "http://foo.com"),
 					lookslike.MustCompile(map[string]interface{}{
+						"state": isdef.Optional(hbtestllext.IsMonitorState),
 						"monitor": map[string]interface{}{
 							"type":        "browser",
 							"id":          inlineMonitorValues.id,
 							"name":        inlineMonitorValues.name,
-							"check_group": inlineMonitorValues.checkGroup,
+							"check_group": isdef.IsString,
+							"status":      "up",
 						},
 					}),
+					summaryValidator(1, 0),
 					hbtestllext.MonitorTimespanValidator,
 				),
 			),
@@ -550,15 +562,6 @@ var projectMonitorValues = BrowserMonitor{
 	durationMs: time.Second.Microseconds(),
 }
 
-// Used for testing legacy zip_url / local monitorss
-var legacyProjectMonitorValues = BrowserMonitor{
-	id:                "journey-1",
-	name:              "Journey 1",
-	checkGroup:        "acheckgroup",
-	legacyProjectId:   "my-project",
-	legacyProjectName: "My Project",
-}
-
 func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error, bm BrowserMonitor) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
@@ -567,11 +570,11 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 		eventext.MergeEventFields(event, mapstr.M{
 			"url": URLFields(parsed),
 			"monitor": mapstr.M{
-				"type":        "browser",
-				"id":          bm.id,
-				"name":        bm.name,
-				"check_group": bm.checkGroup,
-				"duration":    mapstr.M{"us": bm.durationMs},
+				"type":     "browser",
+				"id":       bm.id,
+				"name":     bm.name,
+				"status":   "up",
+				"duration": mapstr.M{"us": bm.durationMs},
 			},
 		})
 		if summary {
@@ -621,11 +624,12 @@ func TestProjectBrowserJob(t *testing.T) {
 				"name":        projectMonitorValues.name,
 				"duration":    mapstr.M{"us": time.Second.Microseconds()},
 				"origin":      "my-origin",
-				"check_group": projectMonitorValues.checkGroup,
+				"check_group": isdef.IsString,
 				"timespan": mapstr.M{
 					"gte": hbtestllext.IsTime,
 					"lt":  hbtestllext.IsTime,
 				},
+				"status": isdef.IsString,
 			},
 			"url": URLFields(urlU),
 		}),
@@ -638,6 +642,7 @@ func TestProjectBrowserJob(t *testing.T) {
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
+					summaryValidator(1, 0),
 					urlValidator(t, urlStr),
 					expectedMonFields,
 				))},
@@ -653,9 +658,9 @@ func TestProjectBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, urlStr),
 					expectedMonFields,
+					summaryValidator(1, 0),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "up"},
-						"summary": map[string]interface{}{"up": 1, "down": 0},
 						"event": map[string]interface{}{
 							"type": "heartbeat/summary",
 						},
@@ -673,9 +678,9 @@ func TestProjectBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, urlStr),
 					expectedMonFields,
+					summaryValidator(0, 1),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "down"},
-						"summary": map[string]interface{}{"up": 0, "down": 1},
 						"error": map[string]interface{}{
 							"type":    isdef.IsString,
 							"message": "testerr",
@@ -687,40 +692,6 @@ func TestProjectBrowserJob(t *testing.T) {
 				))},
 		nil,
 		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2, "down"),
-	})
-
-	legacySFields := testBrowserMonFields
-	legacySFields.ID = legacyProjectMonitorValues.legacyProjectId
-	legacySFields.Name = legacyProjectMonitorValues.legacyProjectName
-	legacySFields.IsLegacyBrowserSource = true
-
-	expectedLegacyMonFields := lookslike.MustCompile(map[string]interface{}{
-		"monitor": map[string]interface{}{
-			"type":        "browser",
-			"id":          legacyProjectMonitorValues.legacyProjectId,
-			"name":        legacyProjectMonitorValues.legacyProjectName,
-			"duration":    mapstr.M{"us": int64(0)},
-			"check_group": legacyProjectMonitorValues.checkGroup,
-			"timespan": mapstr.M{
-				"gte": hbtestllext.IsTime,
-				"lt":  hbtestllext.IsTime,
-			},
-		},
-		"url": URLFields(urlU),
-	})
-
-	testCommonWrap(t, testDef{
-		"legacy", // has no summary fields!
-		legacySFields,
-		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, legacyProjectMonitorValues)},
-		[]validator.Validator{
-			lookslike.Strict(
-				lookslike.Compose(
-					urlValidator(t, urlStr),
-					expectedLegacyMonFields,
-				))},
-		nil,
-		nil,
 	})
 }
 
@@ -741,7 +712,7 @@ func TestECSErrors(t *testing.T) {
 
 	for name, makeSummaryEvent := range testCases {
 		t.Run(name, func(t *testing.T) {
-			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil)
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil, 1)
 			event := &beat.Event{}
 			_, err := j[0](event)
 			require.NoError(t, err)

@@ -41,17 +41,18 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader, maxAttempts uint16) []jobs.Job {
+	mst := monitorstate.NewTracker(stateLoader, false)
 	if stdMonFields.Type == "browser" {
-		return WrapBrowser(js, stdMonFields)
+		return WrapBrowser(js, stdMonFields, mst, maxAttempts)
 	} else {
-		return WrapLightweight(js, stdMonFields)
+		return WrapLightweight(js, stdMonFields, mst, maxAttempts)
 	}
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
-	return jobs.WrapAllSeparately(
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) []jobs.Job {
+	wrapped := jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
 			addMonitorTimespan(stdMonFields),
@@ -63,14 +64,18 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			logMonitorRun(nil),
 		),
 	)
-
+	var swrapped []jobs.Job
+	for _, wj := range wrapped {
+		swrapped = append(swrapped, addSummarizer(stdMonFields, mst, maxAttempts)(wj))
+	}
+	return swrapped
 }
 
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
-	return jobs.WrapAll(
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) []jobs.Job {
+	wrapped := jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
@@ -79,6 +84,114 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 		addMonitorErr,
 		logMonitorRun(byEventType("heartbeat/summary")),
 	)
+	var swrapped []jobs.Job
+	for _, wj := range wrapped {
+		swrapped = append(swrapped, addSummarizer(stdMonFields, mst, maxAttempts)(wj))
+	}
+	return swrapped
+}
+
+type Summarizer struct {
+	rootJob        jobs.Job
+	contsRemaining uint16
+	mtx            *sync.Mutex
+	jobSummary     *JobSummary
+	checkGroup     string
+	stateTracker   *monitorstate.Tracker
+	sf             stdfields.StdMonitorFields
+}
+
+func addSummarizer(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) jobs.JobWrapper {
+	return jobs.WrapStateful[*Summarizer](func(rootJob jobs.Job) jobs.StatefulWrapper[*Summarizer] {
+		return newSummarizer(rootJob, sf, mst, maxAttempts)
+	})
+}
+
+func newSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) *Summarizer {
+	uu, err := uuid.NewV1()
+	if err != nil {
+		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
+	}
+	return &Summarizer{
+		rootJob:        rootJob,
+		contsRemaining: 1,
+		mtx:            &sync.Mutex{},
+		jobSummary:     newJobSummary(1, maxAttempts, uu.String()),
+		checkGroup:     uu.String(),
+		stateTracker:   mst,
+		sf:             sf,
+	}
+}
+
+func newJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
+	return &JobSummary{
+		MaxAttempts: maxAttempts,
+		Attempt:     attempt,
+		RetryGroup:  retryGroup,
+	}
+}
+
+type JobSummary struct {
+	Attempt      uint16                   `json:"attempt"`
+	MaxAttempts  uint16                   `json:"max_attempts"`
+	FinalAttempt bool                     `json:"final_attempt"`
+	Up           uint16                   `json:"up"`
+	Down         uint16                   `json:"down"`
+	Status       monitorstate.StateStatus `json:"status"`
+	RetryGroup   string                   `json:"retry_group"`
+}
+
+func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		conts, jobErr := j(event)
+
+		_, _ = event.PutValue("monitor.check_group", s.checkGroup)
+
+		s.mtx.Lock()
+		defer s.mtx.Unlock()
+
+		js := s.jobSummary
+
+		s.contsRemaining-- // we just ran one cont, discount it
+		// these many still need to be processed
+		s.contsRemaining += uint16(len(conts))
+
+		monitorStatus, err := event.GetValue("monitor.status")
+		if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
+			msss := monitorstate.StateStatus(monitorStatus.(string))
+
+			if msss == monitorstate.StatusUp {
+				js.Up++
+			} else {
+				js.Down++
+			}
+		}
+
+		if s.contsRemaining == 0 {
+			if js.Down > 0 {
+				js.Status = monitorstate.StatusDown
+			} else {
+				js.Status = monitorstate.StatusUp
+			}
+
+			ms := s.stateTracker.RecordStatus(s.sf, js.Status)
+			eventext.MergeEventFields(event, mapstr.M{
+				"summary": js,
+				"state":   ms,
+			})
+
+			// Time to retry
+			if js.Status == monitorstate.StatusDown && js.Attempt < js.MaxAttempts {
+				// Reset the job summary for the next attempt
+				s.jobSummary = newJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+				s.contsRemaining++
+				s.checkGroup = fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt)
+				return []jobs.Job{s.rootJob}, jobErr
+			}
+		}
+
+		return conts, jobErr
+	}
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
@@ -240,80 +353,6 @@ func logMonitorRun(match EventMatcher) jobs.JobWrapper {
 			}
 
 			return cont, err
-		}
-	}
-}
-
-// makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary() jobs.JobWrapper {
-	// This is a tricky method. The way this works is that we track the state across jobs in the
-	// state struct here.
-	state := struct {
-		mtx        sync.Mutex
-		monitorId  string
-		remaining  uint16
-		up         uint16
-		down       uint16
-		checkGroup string
-		generation uint64
-	}{
-		mtx: sync.Mutex{},
-	}
-	// Note this is not threadsafe, must be called from a mutex
-	resetState := func() {
-		state.remaining = 1
-		state.up = 0
-		state.down = 0
-		state.generation++
-		u, err := uuid.NewV1()
-		if err != nil {
-			panic(fmt.Sprintf("cannot generate UUIDs on this system: %s", err))
-		}
-		state.checkGroup = u.String()
-	}
-	resetState()
-
-	return func(job jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, jobErr := job(event)
-			state.mtx.Lock()
-			defer state.mtx.Unlock()
-
-			// If the event is cancelled we don't record it as being either up or down since
-			// we discard the event anyway.
-			var eventStatus interface{}
-			if !eventext.IsEventCancelled(event) {
-				// After each job
-				eventStatus, _ = event.GetValue("monitor.status")
-				if eventStatus == "up" {
-					state.up++
-				} else {
-					state.down++
-				}
-			}
-
-			_, _ = event.PutValue("monitor.check_group", state.checkGroup)
-
-			// Adjust the total remaining to account for new continuations
-			state.remaining += uint16(len(cont))
-			// Reduce total remaining to account for the just executed job
-			state.remaining--
-
-			// After last job
-			if state.remaining == 0 {
-				up := state.up
-				down := state.down
-
-				eventext.MergeEventFields(event, mapstr.M{
-					"summary": mapstr.M{
-						"up":   up,
-						"down": down,
-					},
-				})
-				resetState()
-			}
-
-			return cont, jobErr
 		}
 	}
 }

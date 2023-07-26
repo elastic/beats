@@ -18,8 +18,6 @@
 package jobs
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -32,50 +30,15 @@ type StatefulWrapper[T any] interface {
 
 type StatefulWrapperFactory[T any] func(rootJob Job) StatefulWrapper[T]
 
-func WrapStateful[T StatefulWrapper[T]](j Job, makeSp StatefulWrapperFactory[T]) Job {
-	return func(event *beat.Event) ([]Job, error) {
-		sp := makeSp()
-		conts, err := sp.Wrap(j)(event)
-		return WrapAll(conts, sp.Wrap), err
-	}
-}
-
-type Retrier struct {
-	rootJob        Job
-	maxAttempts    uint16
-	attempt        uint16
-	contsRemaining uint16
-	mtx            *sync.Mutex
-	retryOn        func(*beat.Event) bool
-}
-
-func NewRetrier(rootJob Job, retryOn func(*beat.Event) bool) *Retrier {
-	return &Retrier{
-		rootJob:        rootJob,
-		maxAttempts:    2,
-		attempt:        1,
-		contsRemaining: 1,
-		retryOn:        retryOn,
-		mtx:            &sync.Mutex{},
-	}
-}
-
-func (r *Retrier) Wrap(j Job) Job {
-	return func(event *beat.Event) ([]Job, error) {
-		conts, err := j(event)
-		r.mtx.Lock()
-		defer r.mtx.Unlock()
-		r.contsRemaining-- // we just ran one cont, discount it
-		// these many still need to be processed
-		r.contsRemaining += uint16(len(conts))
-
-		if r.contsRemaining == 0 && r.attempt < r.maxAttempts && r.retryOn(event) {
-			r.attempt++
-			return conts, err
-		} else {
-			return conts, err
+func WrapStateful[T StatefulWrapper[T]](makeSp StatefulWrapperFactory[T]) JobWrapper {
+	return func(j Job) Job {
+		return func(event *beat.Event) ([]Job, error) {
+			sp := makeSp(j)
+			conts, err := sp.Wrap(j)(event)
+			return WrapAll(conts, sp.Wrap), err
 		}
 	}
+
 }
 
 // MakeSimpleJob creates a new Job from a callback function. The callback should
