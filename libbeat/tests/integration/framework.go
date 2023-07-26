@@ -178,7 +178,7 @@ func (b *BeatProc) Start(args ...string) {
 // does not block nor waits the Beat to finish.
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
-
+	defer b.cmdMutex.Unlock()
 	b.stdout.Seek(0, 0)
 	b.stdout.Truncate(0)
 	b.stderr.Seek(0, 0)
@@ -188,7 +188,6 @@ func (b *BeatProc) startBeat() {
 	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
 	require.NoError(b.t, err, "error starting beat process")
 	b.Process = process
-	b.cmdMutex.Unlock()
 }
 
 // waitBeatToExit blocks until the Beat exits, it returns
@@ -259,6 +258,8 @@ func (b *BeatProc) LogContains(s string) bool {
 
 // WaitForLogs waits for the specified string s to be present in the logs within
 // the given timeout duration and fails the test if s is not found.
+// msgAndArgs should be a format string and arguments that will be printed
+// if the logs are not found, providing additional context for debugging.
 func (b *BeatProc) WaitForLogs(s string, timeout time.Duration, msgAndArgs ...any) {
 	b.t.Helper()
 	require.Eventually(b.t, func() bool {
@@ -375,7 +376,7 @@ func EnsureESIsRunning(t *testing.T) {
 		// If you're reading this message, you probably forgot to start ES
 		// run `mage compose:Up` from Filebeat's folder to start all
 		// containers required for integration tests
-		t.Fatalf("cannot execute HTTP request to ES: %s", err)
+		t.Fatalf("cannot execute HTTP request to ES: %s,", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
@@ -428,8 +429,10 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	}
 	defer metaFile.Close()
 
-	metaBytes, _ := ioutil.ReadAll(metaFile)
-	json.Unmarshal(metaBytes, &m)
+	metaBytes, err := ioutil.ReadAll(metaFile)
+	require.NoError(b.t, err, "error reading meta file")
+	err = json.Unmarshal(metaBytes, &m)
+	require.NoError(b.t, err, "error unmarshalling meta data")
 	return m, nil
 }
 
@@ -448,6 +451,8 @@ func GetESURL(t *testing.T, scheme string) url.URL {
 			esPort = "9200"
 		case "https":
 			esPort = "9201"
+		default:
+			t.Fatalf("could not determine port from env variable: ES_PORT=%s", esPort)
 		}
 	}
 
