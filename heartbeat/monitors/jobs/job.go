@@ -24,6 +24,44 @@ import (
 // A Job represents a unit of execution, and may return multiple continuation jobs.
 type Job func(event *beat.Event) ([]Job, error)
 
+type SJob[T any] func(event *beat.Event) (conts []SJob[T], err error)
+
+func Job2SJob[T any](j Job, getState func() T) SJob[T] {
+	rootState := getState()
+
+	return func(event *beat.Event) (conts []SJob[T], err error) {
+		jconts, err := j(event)
+		for _, jc := range jconts {
+			Job2SJob[T](jc, func() T { return rootState })
+		}
+		return conts, err
+	}
+}
+
+type StatefulJob struct {
+	rootJob Job
+}
+
+func (sj *StatefulJob) Init() *StatefulJobInvocation {
+	return &StatefulJobInvocation{
+		sj:    sj,
+		state: "something",
+	}
+}
+
+type StatefulJobInvocation struct {
+	sj    *StatefulJob
+	state string
+}
+
+func (sji *StatefulJobInvocation) ToJob() Job {
+	sj := sji.sj
+	return func(event *beat.Event) ([]Job, error) {
+		conts, err := sj.rootJob(event)
+		sij.ProcessEvent()
+	}
+}
+
 // MakeSimpleJob creates a new Job from a callback function. The callback should
 // return an valid event and can not create any sub-tasks to be executed after
 // completion.

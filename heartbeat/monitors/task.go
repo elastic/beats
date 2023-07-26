@@ -21,9 +21,9 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -70,11 +70,9 @@ func (e ProcessorsError) Error() string {
 }
 
 func (t *configuredJob) prepareSchedulerJob() scheduler.TaskFunc {
+	mj := NewMetaJob(t.job, t.monitor.stdFields, t.monitor.monitorStateTracker)
 	return func(_ context.Context) []scheduler.TaskFunc {
-		// TODO: Use something better than a timestamp for the retry group
-		retryGroup := fmt.Sprintf("R-%x", time.Now().UnixMilli())
-		js := NewJobSummary(t.job, 1, 2, retryGroup)
-		return runPublishJob(t.job, t.pubClient, js, t.monitor.stdFields, t.monitor.monitorStateTracker)
+		return mj.RunWithRetries(2)
 	}
 }
 
@@ -106,53 +104,64 @@ func (t *configuredJob) Stop() {
 	}
 }
 
-type JobSummary struct {
-	Attempt          uint32                   `json:"attempt"`
-	MaxAttempts      uint32                   `json:"max_attempts"`
-	FinalAttempt     bool                     `json:"final_attempt"`
-	Up               uint32                   `json:"up"`
-	Down             uint32                   `json:"down"`
-	Status           monitorstate.StateStatus `json:"status"`
-	RetryGroup       string                   `json:"retry_group"`
-	mtx              *sync.Mutex
-	contsOutstanding uint32
-	rootJob          jobs.Job
+type MetaJob struct {
+	stdFields    stdfields.StdMonitorFields
+	stateTracker *monitorstate.Tracker
+	rootJob      jobs.Job
 }
 
-func NewJobSummary(rootJob jobs.Job, attempt uint32, maxAttempts uint32, retryGroup string) *JobSummary {
-	return &JobSummary{
-		Attempt:          attempt,
-		MaxAttempts:      maxAttempts,
-		RetryGroup:       retryGroup,
+type MetaJobRun struct {
+	checkGroup       string
+	jobSummary       *JobSummary
+	MetaJob          *MetaJob
+	mtx              *sync.Mutex
+	contsOutstanding uint16
+}
+
+func NewMetaJob(rootJob jobs.Job, sf stdfields.StdMonitorFields, st *monitorstate.Tracker) *MetaJob {
+	return &MetaJob{
+		rootJob:      rootJob,
+		stateTracker: st,
+		stdFields:    sf,
+	}
+
+}
+
+func (mj *MetaJob) RunWithRetries(maxRetries uint16) []scheduler.TaskFunc {
+	u, err := uuid.NewV1()
+	if err != nil {
+		panic(fmt.Sprintf("cannot generate UUIDs on this system: %s", err))
+	}
+	retryGroup := u.String()
+
+	mjr := MetaJobRun{
+		MetaJob:          mj,
+		jobSummary:       NewJobSummary(1, maxRetries, retryGroup),
 		contsOutstanding: 1,
 		mtx:              &sync.Mutex{},
-		rootJob:          rootJob,
 	}
+
+	mjr.RunJob(mj.rootJob)
 }
 
-func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) []scheduler.TaskFunc {
+func (mjr *MetaJobRun) RunJob(j jobs.Job) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: mapstr.M{},
 	}
-
-	conts, err := job(event)
-
-	// Needed because we re-assign js on summary
-	// TODO: refactor code to not do this weird mutation
-	js.mtx.Lock()
-	defer js.mtx.Unlock()
-
-	var outstandingConts uint32
-
-	js.contsOutstanding--
-	js.contsOutstanding += uint32(len(conts))
-	outstandingConts = js.contsOutstanding
+	conts, err := j(event)
 
 	if err != nil {
-		logp.L().Info("Job failed with: %s", err)
+		logp.L().Infof("Job failed with: %s", err)
 	}
 
-	hasContinuations := len(conts) > 0
+	mjr.mtx.Lock()
+	defer mjr.mtx.Unlock()
+
+	mj := mjr.MetaJob
+	js := mjr.jobSummary
+
+	mjr.contsOutstanding--
+	mjr.contsOutstanding += uint16(len(conts))
 
 	ms, err := event.GetValue("monitor.status")
 	if err == nil { // if this event contains a status...
@@ -168,16 +177,15 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary,
 		}
 	}
 
-	var contJs *JobSummary = js
 	// The job has completed, all continuations have executed
-	if outstandingConts == 0 {
+	if mjr.contsOutstanding == 0 {
 		if js.Down > 0 {
 			js.Status = monitorstate.StatusDown
 		} else {
 			js.Status = monitorstate.StatusUp
 		}
 
-		ms := mst.RecordStatus(sf, monitorstate.StateStatus(js.Status))
+		ms := mjr.MetaJob.stateTracker.RecordStatus(mj.stdFields, monitorstate.StateStatus(js.Status))
 
 		// terminal event, should be a summary
 		eventext.MergeEventFields(event, mapstr.M{
@@ -186,17 +194,53 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, js *JobSummary,
 		})
 
 		// TODO: Clean up this equality
-		stateChange := js.Status != mst.GetCurrentState(sf).Status
+		stateChange := js.Status != mj.stateTracker.GetCurrentState(mj.stdFields).Status
 		canRetry := js.Attempt < js.MaxAttempts
 
-		logp.L().Infof("retry decision: %t && %t , state comp (%s == %s)", stateChange, canRetry, js.Status, mst.GetCurrentState(sf).Status)
+		logp.L().Infof("retry decision: %t && %t , state comp (%s == %s)", stateChange, canRetry, js.Status, mj.stateTracker.GetCurrentState(mj.stdFields).Status)
 		if stateChange && canRetry {
-			conts = []jobs.Job{js.rootJob}
-			contJs = NewJobSummary(js.rootJob, js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+			conts = []jobs.Job{mj.rootJob}
+			retryMjr := *mjr
+			retryMjr.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 		} else {
 			js.FinalAttempt = true
 		}
 	}
+
+	return jobs.WrapAll(conts, func(cont jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			return mjr.RunJob(cont), nil
+		}
+	})
+}
+
+type JobSummary struct {
+	Attempt      uint16                   `json:"attempt"`
+	MaxAttempts  uint16                   `json:"max_attempts"`
+	FinalAttempt bool                     `json:"final_attempt"`
+	Up           uint16                   `json:"up"`
+	Down         uint16                   `json:"down"`
+	Status       monitorstate.StateStatus `json:"status"`
+	RetryGroup   string                   `json:"retry_group"`
+}
+
+func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
+	return &JobSummary{
+		Attempt:     attempt,
+		MaxAttempts: maxAttempts,
+		RetryGroup:  retryGroup,
+	}
+}
+
+func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient, mj *MetaJob) []scheduler.TaskFunc {
+	conts, err := job(event)
+
+	// Needed because we re-assign js on summary
+	// TODO: refactor code to not do this weird mutation
+	js.mtx.Lock()
+	defer js.mtx.Unlock()
+
+	var outstandingConts uint32
 
 	if event.Fields != nil && !eventext.IsEventCancelled(event) {
 		// If continuations are present we defensively publish a clone of the event
