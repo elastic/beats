@@ -182,7 +182,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			})
 
 			// Time to retry, perhaps
-			logp.L().Infof("RETRY INFO: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
+			logp.L().Debugf("retry info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
 			if js.Status != lastStatus && js.Attempt < js.MaxAttempts {
 				// Reset the job summary for the next attempt
 				s.jobSummary = newJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
