@@ -20,10 +20,9 @@
 package dialer
 
 import (
+	"errors"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/transport"
 )

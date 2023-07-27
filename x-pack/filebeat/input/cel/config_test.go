@@ -112,7 +112,8 @@ func TestConfigMustFailWithInvalidResource(t *testing.T) {
 		}
 		cfg := conf.MustNewConfigFrom(m)
 		conf := defaultConfig()
-		conf.Program = "{}" // Provide an empty program to avoid validation error from that.
+		conf.Program = "{}"     // Provide an empty program to avoid validation error from that.
+		conf.Redact = &redact{} // Make sure we pass the redact requirement.
 		err := cfg.Unpack(&conf)
 		if fmt.Sprint(err) != fmt.Sprint(test.want) {
 			t.Errorf("unexpected error return from Unpack: got:%v want:%v", err, test.want)
@@ -458,7 +459,8 @@ func TestConfigOauth2Validation(t *testing.T) {
 			test.input["resource.url"] = "localhost"
 			cfg := conf.MustNewConfigFrom(test.input)
 			conf := defaultConfig()
-			conf.Program = "{}" // Provide an empty program to avoid validation error from that.
+			conf.Program = "{}"     // Provide an empty program to avoid validation error from that.
+			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
@@ -509,7 +511,8 @@ func TestKeepAliveSetting(t *testing.T) {
 			test.input["resource.url"] = "localhost"
 			cfg := conf.MustNewConfigFrom(test.input)
 			conf := defaultConfig()
-			conf.Program = "{}" // Provide an empty program to avoid validation error from that.
+			conf.Program = "{}"     // Provide an empty program to avoid validation error from that.
+			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error return from Unpack: got: %v want: %v", err, test.wantErr)

@@ -52,8 +52,8 @@ func TestFileIdentifier(t *testing.T) {
 		}
 
 		src := identifier.GetSource(loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: fi},
 		})
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
@@ -76,8 +76,8 @@ func TestFileIdentifier(t *testing.T) {
 		}
 
 		src := identifier.GetSource(loginp.FSEvent{
-			NewPath: tmpFile.Name(),
-			Info:    fi,
+			NewPath:    tmpFile.Name(),
+			Descriptor: loginp.FileDescriptor{Info: fi},
 		})
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String()+"-my-suffix", src.Name())
@@ -125,6 +125,58 @@ func TestFileIdentifier(t *testing.T) {
 				NewPath: test.newPath,
 				OldPath: test.oldPath,
 				Op:      test.operation,
+			})
+			assert.Equal(t, test.expectedSrc, src.Name())
+		}
+	})
+
+	t.Run("fingerprint identifier", func(t *testing.T) {
+		c := conf.MustNewConfigFrom(map[string]interface{}{
+			"identifier": map[string]interface{}{
+				"fingerprint": nil,
+			},
+		})
+		var cfg testFileIdentifierConfig
+		err := c.Unpack(&cfg)
+		require.NoError(t, err)
+
+		identifier, err := newFileIdentifier(cfg.Identifier, "")
+		require.NoError(t, err)
+		assert.Equal(t, fingerprintName, identifier.Name())
+
+		testCases := []struct {
+			newPath     string
+			oldPath     string
+			operation   loginp.Operation
+			desc        loginp.FileDescriptor
+			expectedSrc string
+		}{
+			{
+				newPath:     "/path/to/file",
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
+			},
+			{
+				newPath:     "/new/path/to/file",
+				oldPath:     "/old/path/to/file",
+				operation:   loginp.OpRename,
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
+			},
+			{
+				oldPath:     "/old/path/to/file",
+				operation:   loginp.OpDelete,
+				desc:        loginp.FileDescriptor{Fingerprint: "fingerprintvalue"},
+				expectedSrc: fingerprintName + "::fingerprintvalue",
+			},
+		}
+
+		for _, test := range testCases {
+			src := identifier.GetSource(loginp.FSEvent{
+				NewPath:    test.newPath,
+				OldPath:    test.oldPath,
+				Op:         test.operation,
+				Descriptor: test.desc,
 			})
 			assert.Equal(t, test.expectedSrc, src.Name())
 		}

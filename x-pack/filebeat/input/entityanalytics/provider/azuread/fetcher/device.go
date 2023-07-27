@@ -11,26 +11,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// TODO: Implement fetchers for the registered owners and users
-// for devices. These will then be retained in the following fields
-// of Device.
-//
-// 	// A set of UUIDs for registered owners of this device.
-// 	RegisteredOwners collections.UUIDSet `json:"registeredOwners"`
-// 	// A set of UUIDs for registered users of this device.
-// 	RegisteredUsers collections.UUIDSet `json:"registeredUsers"`
-//
-// and the addition of the following lines to Merge
-//
-// 	other.RegisteredOwners.ForEach(func(elem uuid.UUID) {
-// 		d.RegisteredOwners.Add(elem)
-// 	})
-// 	other.RegisteredUsers.ForEach(func(elem uuid.UUID) {
-// 		d.RegisteredUsers.Add(elem)
-// 	})
-//
-// with associated test extensions.
-
 // Device represents a device identity asset.
 type Device struct {
 	// The ID (UUIDv4) of the device.
@@ -41,6 +21,10 @@ type Device struct {
 	MemberOf collections.UUIDSet `json:"memberOf"`
 	// A set of UUIDs which are groups this device is a transitive member of.
 	TransitiveMemberOf collections.UUIDSet `json:"transitiveMemberOf"`
+	// A set of UUIDs for registered owners of this device.
+	RegisteredOwners collections.UUIDSet `json:"registeredOwners"`
+	// A set of UUIDs for registered users of this device.
+	RegisteredUsers collections.UUIDSet `json:"registeredUsers"`
 	// Discovered indicates that this device was newly discovered. This does not
 	// necessarily imply the device was recently added in Azure Active Directory,
 	// but it does indicate that it's the first time the device has been seen by
@@ -67,6 +51,12 @@ func (d *Device) Merge(other *Device) {
 	})
 	other.TransitiveMemberOf.ForEach(func(elem uuid.UUID) {
 		d.TransitiveMemberOf.Add(elem)
+	})
+	other.RegisteredOwners.ForEach(func(elem uuid.UUID) {
+		d.RegisteredOwners.Add(elem)
+	})
+	other.RegisteredUsers.ForEach(func(elem uuid.UUID) {
+		d.RegisteredUsers.Add(elem)
 	})
 	d.Deleted = other.Deleted
 }

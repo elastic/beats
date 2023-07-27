@@ -19,9 +19,8 @@ package pageinfo
 
 import (
 	"bufio"
+	"fmt"
 	"os"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -67,7 +66,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	fd, err := os.Open(pagePath)
 	if err != nil {
-		return errors.Wrap(err, "error opening file")
+		return fmt.Errorf("error opening file: %w", err)
 	}
 	defer fd.Close()
 
@@ -75,7 +74,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	zones, err := readPageFile(reader)
 	if err != nil {
-		return errors.Wrap(err, "error reading pagetypeinfo")
+		return fmt.Errorf("error reading pagetypeinfo: %w", err)
 	}
 
 	report.Event(mb.Event{
