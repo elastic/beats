@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of region name configuration in awss3 input {pull}36034[36034]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
+- Update mito CEL extension library to v1.5.0. {pull}36146[36146]
 
 *Heartbeat*
 
@@ -169,6 +170,13 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
 - Make generic SQL GA {pull}34637[34637]
 - Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
+- Add context with timeout in AWS API calls {pull}35425[35425]
+- Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
+- Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
+- Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Fix EC2 host.cpu.usage {pull}35717[35717]
+- Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
+- Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 
 *Osquerybeat*
 
@@ -236,6 +244,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 - Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Add support for localstack based input integration testing {pull}35727[35727]
 - Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
 
