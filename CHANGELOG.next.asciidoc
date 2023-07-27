@@ -70,8 +70,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
-
-
+- Do not print context cancelled error message when running under agent {pull}36006[36006]
+- Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
+- Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
+- Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
+- Support build of projects outside of beats directory {pull}36126[36126]
 
 *Auditbeat*
 
@@ -143,6 +147,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix metric collection in GCPPubSub input. {pull}35773[35773]
 - Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
 - Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}35972[35972]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35996[35996]
+- Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
+- Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
+- Fix handling of region name configuration in awss3 input {pull}36034[36034]
+- Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
+- Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
+- Update mito CEL extension library to v1.5.0. {pull}36146[36146]
 
 *Heartbeat*
 
@@ -220,6 +231,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
 - Fix EC2 host.cpu.usage {pull}35717[35717]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
+- Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 
 *Osquerybeat*
 
@@ -341,6 +353,13 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add device support for Azure AD entity analytics. {pull}35807[35807]
 - Improve CEL input performance. {pull}35915[35915]
 - Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Added support for min/max template functions in httpjson input. {issue}36094[36094] {pull}36036[36036]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
+- Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
+- Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Add support for localstack based input integration testing {pull}35727[35727]
+- Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
+- Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
 
 *Auditbeat*
    - Migration of system/package module storage from gob encoding to flatbuffer encoding in bolt db. {pull}34817[34817]
@@ -372,6 +391,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 - Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
+- Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
+
 
 *Osquerybeat*
 
@@ -433,6 +454,3 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 ==== Known Issues
-
-
-

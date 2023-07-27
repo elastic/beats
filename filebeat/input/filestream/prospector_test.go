@@ -21,6 +21,7 @@ package filestream
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"sync"
@@ -39,7 +40,7 @@ import (
 func TestProspector_InitCleanIfRemoved(t *testing.T) {
 	testCases := map[string]struct {
 		entries             map[string]loginp.Value
-		filesOnDisk         map[string]os.FileInfo
+		filesOnDisk         map[string]loginp.FileDescriptor
 		cleanRemoved        bool
 		expectedCleanedKeys []string
 	}{
@@ -108,7 +109,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 
 	testCases := map[string]struct {
 		entries             map[string]loginp.Value
-		filesOnDisk         map[string]os.FileInfo
+		filesOnDisk         map[string]loginp.FileDescriptor
 		expectedUpdatedKeys map[string]string
 	}{
 		"prospector init does not update keys if there are no entries": {
@@ -137,8 +138,8 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 					},
 				},
 			},
-			filesOnDisk: map[string]os.FileInfo{
-				tmpFileName: fi,
+			filesOnDisk: map[string]loginp.FileDescriptor{
+				tmpFileName: {Info: fi},
 			},
 			expectedUpdatedKeys: map[string]string{"not_path::key1": "path::" + tmpFileName},
 		},
@@ -170,8 +171,8 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}{
 		"two new files": {
 			events: []loginp.FSEvent{
-				{Op: loginp.OpCreate, NewPath: "/path/to/file", Info: testFileInfo{}},
-				{Op: loginp.OpCreate, NewPath: "/path/to/other/file", Info: testFileInfo{}},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+				{Op: loginp.OpCreate, NewPath: "/path/to/other/file", Descriptor: createTestFileDescriptor()},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -181,7 +182,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
-				{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpWrite, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -190,8 +191,8 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"one updated then truncated file": {
 			events: []loginp.FSEvent{
-				{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
-				{Op: loginp.OpTruncate, NewPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpWrite, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
+				{Op: loginp.OpTruncate, NewPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -202,14 +203,14 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		"old files with ignore older configured": {
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpCreate,
-					NewPath: "/path/to/file",
-					Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
+					Op:         loginp.OpCreate,
+					NewPath:    "/path/to/file",
+					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
 				},
 				{
-					Op:      loginp.OpWrite,
-					NewPath: "/path/to/other/file",
-					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo, nil},
+					Op:         loginp.OpWrite,
+					NewPath:    "/path/to/other/file",
+					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/other/file", 5, minuteAgo, nil}),
 				},
 			},
 			ignoreOlder: 10 * time.Second,
@@ -220,14 +221,14 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		"newer files with ignore older": {
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpCreate,
-					NewPath: "/path/to/file",
-					Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
+					Op:         loginp.OpCreate,
+					NewPath:    "/path/to/file",
+					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
 				},
 				{
-					Op:      loginp.OpWrite,
-					NewPath: "/path/to/other/file",
-					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo, nil},
+					Op:         loginp.OpWrite,
+					NewPath:    "/path/to/other/file",
+					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/other/file", 5, minuteAgo, nil}),
 				},
 			},
 			ignoreOlder: 5 * time.Minute,
@@ -265,14 +266,14 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	minuteAgo := time.Now().Add(-1 * time.Minute)
 
 	eventCreate := loginp.FSEvent{
-		Op:      loginp.OpCreate,
-		NewPath: "/path/to/file",
-		Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
+		Op:         loginp.OpCreate,
+		NewPath:    "/path/to/file",
+		Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
 	}
 	eventUpdated := loginp.FSEvent{
-		Op:      loginp.OpWrite,
-		NewPath: "/path/to/file",
-		Info:    testFileInfo{"/path/to/file", 10, time.Now(), nil},
+		Op:         loginp.OpWrite,
+		NewPath:    "/path/to/file",
+		Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 10, time.Now(), nil}),
 	}
 	expectedEvents := []harvesterEvent{
 		harvesterStart("path::/path/to/file"),
@@ -328,13 +329,13 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}{
 		"one deleted file without clean removed": {
 			events: []loginp.FSEvent{
-				{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpDelete, OldPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
 			},
 			cleanRemoved: false,
 		},
 		"one deleted file with clean removed": {
 			events: []loginp.FSEvent{
-				{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpDelete, OldPath: "/path/to/file", Descriptor: createTestFileDescriptor()},
 			},
 			cleanRemoved: true,
 		},
@@ -377,10 +378,10 @@ func TestProspectorRenamedFile(t *testing.T) {
 		"one renamed file without rename tracker": {
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpRename,
-					OldPath: "/old/path/to/file",
-					NewPath: "/new/path/to/file",
-					Info:    testFileInfo{},
+					Op:         loginp.OpRename,
+					OldPath:    "/old/path/to/file",
+					NewPath:    "/new/path/to/file",
+					Descriptor: createTestFileDescriptor(),
 				},
 			},
 			expectedEvents: []harvesterEvent{
@@ -392,10 +393,10 @@ func TestProspectorRenamedFile(t *testing.T) {
 		"one renamed file with rename tracker": {
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpRename,
-					OldPath: "/old/path/to/file",
-					NewPath: "/new/path/to/file",
-					Info:    testFileInfo{},
+					Op:         loginp.OpRename,
+					OldPath:    "/old/path/to/file",
+					NewPath:    "/new/path/to/file",
+					Descriptor: createTestFileDescriptor(),
 				},
 			},
 			trackRename: true,
@@ -406,10 +407,10 @@ func TestProspectorRenamedFile(t *testing.T) {
 		"one renamed file with rename tracker with close renamed": {
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpRename,
-					OldPath: "/old/path/to/file",
-					NewPath: "/new/path/to/file",
-					Info:    testFileInfo{},
+					Op:         loginp.OpRename,
+					OldPath:    "/old/path/to/file",
+					NewPath:    "/new/path/to/file",
+					Descriptor: createTestFileDescriptor(),
 				},
 			},
 			trackRename:  true,
@@ -503,7 +504,7 @@ func (t *testHarvesterGroup) StopHarvesters() error {
 
 type mockFileWatcher struct {
 	events      []loginp.FSEvent
-	filesOnDisk map[string]os.FileInfo
+	filesOnDisk map[string]loginp.FileDescriptor
 
 	outputCount, eventCount int
 
@@ -523,7 +524,7 @@ func newMockFileWatcher(events []loginp.FSEvent, eventCount int) *mockFileWatche
 // newMockFileWatcherWithFiles creates an FSWatch mock to
 // get the required file information from the file system using
 // the GetFiles function.
-func newMockFileWatcherWithFiles(filesOnDisk map[string]os.FileInfo) *mockFileWatcher {
+func newMockFileWatcherWithFiles(filesOnDisk map[string]loginp.FileDescriptor) *mockFileWatcher {
 	return &mockFileWatcher{
 		filesOnDisk: filesOnDisk,
 		out:         make(chan loginp.FSEvent),
@@ -542,7 +543,7 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 
 func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
-func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return m.filesOnDisk }
+func (m *mockFileWatcher) GetFiles() map[string]loginp.FileDescriptor { return m.filesOnDisk }
 
 type mockMetadataUpdater struct {
 	table map[string]interface{}
@@ -668,10 +669,10 @@ func TestOnRenameFileIdentity(t *testing.T) {
 			populateStore: true,
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpRename,
-					OldPath: "/old/path/to/file",
-					NewPath: "/new/path/to/file",
-					Info:    testFileInfo{},
+					Op:         loginp.OpRename,
+					OldPath:    "/old/path/to/file",
+					NewPath:    "/new/path/to/file",
+					Descriptor: createTestFileDescriptor(),
 				},
 			},
 		},
@@ -681,10 +682,10 @@ func TestOnRenameFileIdentity(t *testing.T) {
 			populateStore: false,
 			events: []loginp.FSEvent{
 				{
-					Op:      loginp.OpRename,
-					OldPath: "/old/path/to/file",
-					NewPath: "/new/path/to/file",
-					Info:    testFileInfo{},
+					Op:         loginp.OpRename,
+					OldPath:    "/old/path/to/file",
+					NewPath:    "/new/path/to/file",
+					Descriptor: createTestFileDescriptor(),
 				},
 			},
 		},
@@ -719,5 +720,31 @@ func TestOnRenameFileIdentity(t *testing.T) {
 				t.Errorf("fileMeta.IdentifierName %s, expecting: %q, got: %q", tc.errMsg, expectedIdentifier, meta.IdentifierName)
 			}
 		})
+	}
+}
+
+type testFileInfo struct {
+	name string
+	size int64
+	time time.Time
+	sys  interface{}
+}
+
+func (t testFileInfo) Name() string       { return t.name }
+func (t testFileInfo) Size() int64        { return t.size }
+func (t testFileInfo) Mode() os.FileMode  { return 0 }
+func (t testFileInfo) ModTime() time.Time { return t.time }
+func (t testFileInfo) IsDir() bool        { return false }
+func (t testFileInfo) Sys() interface{}   { return t.sys }
+
+func createTestFileDescriptor() loginp.FileDescriptor {
+	return createTestFileDescriptorWithInfo(testFileInfo{})
+}
+
+func createTestFileDescriptorWithInfo(fi fs.FileInfo) loginp.FileDescriptor {
+	return loginp.FileDescriptor{
+		Info:        fi,
+		Fingerprint: "fingerprint",
+		Filename:    "filename",
 	}
 }
