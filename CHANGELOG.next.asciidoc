@@ -232,6 +232,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix EC2 host.cpu.usage {pull}35717[35717]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 - Add support for PostgreSQL replication metrics {pull}35562[35562]
+- Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
+
 
 *Osquerybeat*
 
@@ -357,6 +359,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 - Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Add support for localstack based input integration testing {pull}35727[35727]
 - Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
 
