@@ -127,11 +127,12 @@ func usageIntervalFrom(reference time.Time) (time.Time, time.Time) {
 // reference time.
 //
 // For example, if the reference time is 2007-01-09 09:41:00Z, the forecast period is:
+// The forecast data is fetched from current day - 2 and for next 30 days.
 //
-//	2007-01-01T00:00:00Z -> 2007-01-31:59:59Z
+//	2007-01-07T00:00:00Z -> 2007-02-05:59:59Z
 func forecastIntervalFrom(reference time.Time) (time.Time, time.Time) {
-	referenceUTC := reference.UTC()
-	beginningOfMonth := time.Date(referenceUTC.Year(), referenceUTC.Month(), 1, 0, 0, 0, 0, time.UTC)
-	endOfMonth := beginningOfMonth.AddDate(0, 1, 0).Add(-1 * time.Second)
-	return beginningOfMonth, endOfMonth
+	referenceUTC := reference.UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
+	forecastStartDate := time.Date(referenceUTC.Year(), referenceUTC.Month(), referenceUTC.Day(), 0, 0, 0, 0, time.UTC)
+	forecastEndDate := forecastStartDate.AddDate(0, 0, 0).Add(-1*time.Second).AddDate(0, 0, 30)
+	return forecastStartDate, forecastEndDate
 }

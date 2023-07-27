@@ -231,6 +231,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
 - Fix EC2 host.cpu.usage {pull}35717[35717]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
+- Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 
 *Osquerybeat*
 
