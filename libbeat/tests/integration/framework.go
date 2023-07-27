@@ -162,8 +162,11 @@ func (b *BeatProc) Start(args ...string) {
 		if b.RestartOnBeatOnExit {
 			// 2. Set the done flag so the goroutine loop can exit
 			done.Store(true)
-			// 3. Release the mutex, keeping it locked until now
-			// ensures a new process won't start
+			// 3. Release the mutex, keeping it locked
+			// until now ensures a new process won't
+			// start.  Lock must be released before
+			// wg.Wait() or there is a possibility of
+			// deadlock.
 			b.cmdMutex.Unlock()
 			// 4. Wait for the goroutine to finish, this helps ensuring
 			// no other Beat process was started
