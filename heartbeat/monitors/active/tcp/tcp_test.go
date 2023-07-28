@@ -100,7 +100,7 @@ func TestUpEndpointJob(t *testing.T) {
 
 			validators := []validator.Validator{
 				hbtest.BaseChecks(serverURL.Hostname(), "up", "tcp"),
-				hbtest.SummaryChecks(1, 0),
+				hbtest.SummaryStateChecks(1, 0),
 				hbtest.URLChecks(t, hostURL),
 				hbtest.RespondingTCPChecks(),
 			}
@@ -130,7 +130,7 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, dialErr),
 		)),
@@ -148,7 +148,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, dialErr),
 		)),
@@ -177,7 +177,7 @@ func TestCheckUp(t *testing.T) {
 			hbtest.BaseChecks(ip, "up", "tcp"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
@@ -209,7 +209,7 @@ func TestCheckDown(t *testing.T) {
 			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
 				"tcp": map[string]interface{}{
@@ -233,7 +233,7 @@ func TestNXDomainJob(t *testing.T) {
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("", "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.ErrorChecks(dialErr, "io"),
 		)),

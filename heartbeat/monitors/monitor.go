@@ -182,7 +182,8 @@ func newMonitorUnsafe(
 		// We need to use the lightweight wrapping for error jobs
 		// since browser wrapping won't write summaries, but the fake job here is
 		// effectively a lightweight job
-		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false), 2)
+		m.stdFields.BadConfig = true
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader, 1)
 	}
 
 	m.endpoints = p.Endpoints

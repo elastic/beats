@@ -43,10 +43,10 @@ import (
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader, maxAttempts uint16) []jobs.Job {
 	mst := monitorstate.NewTracker(stateLoader, false)
 	var wrapped []jobs.Job
-	if stdMonFields.Type == "browser" {
-		wrapped = WrapBrowser(js, stdMonFields, mst, maxAttempts)
-	} else {
+	if stdMonFields.Type != "browser" || stdMonFields.BadConfig {
 		wrapped = WrapLightweight(js, stdMonFields, mst, maxAttempts)
+	} else {
+		wrapped = WrapBrowser(js, stdMonFields, mst, maxAttempts)
 	}
 	return jobs.WrapAllSeparately(
 		wrapped,

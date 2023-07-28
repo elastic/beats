@@ -50,7 +50,7 @@ func TestICMPFields(t *testing.T) {
 	validator := lookslike.Strict(
 		lookslike.Compose(
 			hbtest.BaseChecks(ip, "up", "icmp"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.URLChecks(t, hostURL),
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
@@ -72,7 +72,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
 	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, nil)
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1}, nil, 1)
 	_, _ = wrapped[0](e)
 	return tl, e
 }

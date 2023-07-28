@@ -78,7 +78,7 @@ func TestSocks5Job(t *testing.T) {
 					hbtest.BaseChecks(ip, "up", "tcp"),
 					hbtest.RespondingTCPChecks(),
 					hbtest.SimpleURLChecks(t, "tcp", host, port),
-					hbtest.SummaryChecks(1, 0),
+					hbtest.SummaryStateChecks(1, 0),
 					hbtest.ResolveChecks(ip),
 					lookslike.MustCompile(map[string]interface{}{
 						"tcp": map[string]interface{}{

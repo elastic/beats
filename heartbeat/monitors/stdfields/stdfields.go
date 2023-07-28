@@ -51,6 +51,9 @@ type StdMonitorFields struct {
 		Local  *config.C `config:"local"`
 	} `config:"source"`
 	RunFrom *hbconfig.LocationWithID `config:"run_from"`
+	// Set to true by monitor.go if monitor configuration is unrunnable
+	// Maybe there's a more elegant way to handle this
+	BadConfig bool
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
