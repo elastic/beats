@@ -1562,7 +1562,7 @@ observe the activity of the input.
 | `httpjson_interval_total`                  | Total number of intervals executed.
 | `httpjson_interval_errors_total`           | Total number of interval errors.
 | `httpjson_interval_execution_time`         | Histogram of the interval execution time.
-| `httpjson_interval_pages_total`            | Histogram of the total number of pages per interval.
+| `httpjson_interval_pages`                  | Histogram of the total number of pages per interval.
 | `httpjson_interval_pages_execution_time`   | Histogram of the interval pages execution time.
 |=======
 
