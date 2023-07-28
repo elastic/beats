@@ -1,4 +1,4 @@
-package summarizertest
+package summarizertesthelper
 
 // summarizertest exists to provide a helper function
 // for the summarizer. We need a separate package to

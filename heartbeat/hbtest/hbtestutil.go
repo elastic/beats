@@ -39,7 +39,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertest"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -194,7 +194,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 // SummaryStateChecks validates the "summary" + "state" fields
 func SummaryStateChecks(up uint16, down uint16) validator.Validator {
 	return lookslike.Compose(
-		summarizertest.SummaryValidator(up, down),
+		summarizertesthelper.SummaryValidator(up, down),
 		lookslike.MustCompile(map[string]interface{}{
 			"state": hbtestllext.IsMonitorState,
 		}),
