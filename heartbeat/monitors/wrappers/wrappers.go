@@ -40,24 +40,24 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
-func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader, maxAttempts uint16) []jobs.Job {
+func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
 	mst := monitorstate.NewTracker(stateLoader, false)
 	var wrapped []jobs.Job
 	if stdMonFields.Type != "browser" || stdMonFields.BadConfig {
-		wrapped = WrapLightweight(js, stdMonFields, mst, maxAttempts)
+		wrapped = WrapLightweight(js, stdMonFields, mst)
 	} else {
-		wrapped = WrapBrowser(js, stdMonFields, mst, maxAttempts)
+		wrapped = WrapBrowser(js, stdMonFields, mst)
 	}
 	return jobs.WrapAllSeparately(
 		wrapped,
 		func(j jobs.Job) jobs.JobWrapper {
-			return summarizer.NewSummarizer(j, stdMonFields, mst, maxAttempts).Wrap
+			return summarizer.NewSummarizer(j, stdMonFields, mst).Wrap
 		},
 	)
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),
@@ -73,7 +73,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.Tracker) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorTimespan(stdMonFields),

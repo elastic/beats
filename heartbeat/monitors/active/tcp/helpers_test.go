@@ -45,7 +45,7 @@ func testTCPConfigCheck(t *testing.T, configMap mapstr.M) *beat.Event {
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil, 1)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

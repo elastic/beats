@@ -86,7 +86,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil, 1)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -326,7 +326,7 @@ func TestLargeResponse(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, 1)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -442,7 +442,7 @@ func TestJsonBody(t *testing.T) {
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
-			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, 1)[0]
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 			event := &beat.Event{}
 			_, err = job(event)
@@ -672,7 +672,7 @@ func TestRedirect(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, 1)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	events, err := jobs.ExecJobAndConts(t, job)
 	require.NoError(t, err)
@@ -716,7 +716,7 @@ func TestNoHeaders(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, 1)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -894,7 +894,7 @@ func TestUserAgentInject(t *testing.T) {
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, 1)[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

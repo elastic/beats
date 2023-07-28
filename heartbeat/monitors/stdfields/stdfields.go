@@ -40,6 +40,7 @@ type StdMonitorFields struct {
 	Service           ServiceFields      `config:"service"`
 	Origin            string             `config:"origin"`
 	LegacyServiceName string             `config:"service_name"`
+	MaxAttempts       uint16             `config:"max_attempts"`
 	// Used by zip_url and local monitors
 	// kibana originating monitors only run one journey at a time
 	// and just use the `fields` syntax / manually set monitor IDs
@@ -57,7 +58,7 @@ type StdMonitorFields struct {
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
-	sFields := StdMonitorFields{Enabled: true}
+	sFields := StdMonitorFields{Enabled: true, MaxAttempts: 2}
 
 	if err := conf.Unpack(&sFields); err != nil {
 		return sFields, fmt.Errorf("error unpacking monitor plugin config: %w", err)

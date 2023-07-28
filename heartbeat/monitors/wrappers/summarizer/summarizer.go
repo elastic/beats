@@ -34,7 +34,7 @@ type JobSummary struct {
 	RetryGroup   string                   `json:"retry_group"`
 }
 
-func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) *Summarizer {
+func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
 	uu, err := uuid.NewV1()
 	if err != nil {
 		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
@@ -43,7 +43,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 		rootJob:        rootJob,
 		contsRemaining: 1,
 		mtx:            &sync.Mutex{},
-		jobSummary:     NewJobSummary(1, maxAttempts, uu.String()),
+		jobSummary:     NewJobSummary(1, sf.MaxAttempts, uu.String()),
 		checkGroup:     uu.String(),
 		stateTracker:   mst,
 		sf:             sf,
@@ -51,6 +51,10 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 }
 
 func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
+	if maxAttempts < 1 {
+		maxAttempts = 1
+	}
+
 	return &JobSummary{
 		MaxAttempts: maxAttempts,
 		Attempt:     attempt,
@@ -60,7 +64,7 @@ func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSu
 
 func AddSummarizer(sf stdfields.StdMonitorFields, mst *monitorstate.Tracker, maxAttempts uint16) jobs.JobWrapper {
 	return jobs.WrapStateful[*Summarizer](func(rootJob jobs.Job) jobs.StatefulWrapper[*Summarizer] {
-		return NewSummarizer(rootJob, sf, mst, maxAttempts)
+		return NewSummarizer(rootJob, sf, mst)
 	})
 }
 

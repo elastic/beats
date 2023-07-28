@@ -158,7 +158,7 @@ func newMonitorUnsafe(
 
 	var wrappedJobs []jobs.Job
 	if err == nil {
-		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader, 2)
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	} else {
 		// If we've hit an error at this point, still run on schedule, but always return an error.
 		// This way the error is clearly communicated through to kibana.
@@ -182,7 +182,7 @@ func newMonitorUnsafe(
 		// since browser wrapping won't write summaries, but the fake job here is
 		// effectively a lightweight job
 		m.stdFields.BadConfig = true
-		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader, 1)
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	}
 
 	m.endpoints = p.Endpoints
