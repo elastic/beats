@@ -190,6 +190,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
+			o.UsePathStyle = in.config.PathStyle
 		}),
 	}
 

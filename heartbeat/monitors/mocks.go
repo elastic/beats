@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -80,9 +79,8 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 			AddTask:     sched.Add,
 			StateLoader: monitorstate.NilStateLoader,
 			PluginsReg:  pluginsReg,
-			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-				c, _ := pipeline.Connect()
-				return SyncPipelineClientAdaptor{C: c}, nil
+			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
+				return pipeline.Connect()
 			},
 		}),
 		sched,
@@ -162,12 +160,6 @@ func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	pc.Clients = append(pc.Clients, c)
 
 	return c, nil
-}
-
-// Convenience function for tests
-func (pc *MockPipeline) ConnectSync() pipeline.ISyncClient {
-	c, _ := pc.Connect()
-	return SyncPipelineClientAdaptor{C: c}
 }
 
 func (pc *MockPipeline) PublishedEvents() []*beat.Event {
