@@ -379,7 +379,7 @@ func EnsureESIsRunning(t *testing.T) {
 		// If you're reading this message, you probably forgot to start ES
 		// run `mage compose:Up` from Filebeat's folder to start all
 		// containers required for integration tests
-		t.Fatalf("cannot execute HTTP request to ES: %s,", err)
+		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage compose:Up)", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
