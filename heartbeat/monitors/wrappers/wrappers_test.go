@@ -45,6 +45,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -436,7 +437,7 @@ func stateValidator() validator.Validator {
 func summaryValidator(up uint16, down uint16) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"summary": isdef.Is("summary", func(path llpath.Path, v interface{}) *llresult.Results {
-			js, ok := v.(JobSummary)
+			js, ok := v.(summarizer.JobSummary)
 			if !ok {
 				return llresult.SimpleResult(path, false, fmt.Sprintf("expected a *JobSummary, got %v", v))
 			}
