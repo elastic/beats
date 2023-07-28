@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.19.12
+=======
+FROM golang:1.20.6
+>>>>>>> a278734f11 (upgrade Go to 1.20.6 (#36000))
 
 RUN \
     apt-get update \
@@ -11,7 +15,7 @@ RUN \
       && rm -rf /var/lib/apt/lists/*
 
 # Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts
-# with the system Python installation. golang:1.19.10 uses Debian 12 which now enforces PEP668.
+# with the system Python installation. golang:1.20.6 uses Debian 12 which now enforces PEP668.
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"

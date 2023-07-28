@@ -9,7 +9,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
-
+- Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
+- Upgrade Go to 1.20.6 {pull}36000[36000]
 
 *Auditbeat*
 

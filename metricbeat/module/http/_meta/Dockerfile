@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.19.12
+=======
+FROM golang:1.20.6
+>>>>>>> a278734f11 (upgrade Go to 1.20.6 (#36000))
 
 COPY test/main.go main.go
 

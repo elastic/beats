@@ -126,7 +126,7 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 }
 
 // GoTestIntegrationForModule executes the Go integration tests sequentially.
-// Currently all test cases must be present under "./module" directory.
+// Currently, all test cases must be present under "./module" directory.
 //
 // Motivation: previous implementation executed all integration tests at once,
 // causing high CPU load, high memory usage and resulted in timeouts.
@@ -295,13 +295,21 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	// Generate a HTML code coverage report.
 	var htmlCoverReport string
 	if params.CoverageProfileFile != "" {
+
 		htmlCoverReport = strings.TrimSuffix(params.CoverageProfileFile,
 			filepath.Ext(params.CoverageProfileFile)) + ".html"
+
 		coverToHTML := sh.RunCmd("go", "tool", "cover",
 			"-html="+params.CoverageProfileFile,
 			"-o", htmlCoverReport)
+<<<<<<< HEAD
 		if err = coverToHTML(); err != nil {
 			return errors.Wrap(err, "failed to write HTML code coverage report")
+=======
+
+		if err := coverToHTML(); err != nil {
+			return fmt.Errorf("failed to write HTML code coverage report: %w", err)
+>>>>>>> a278734f11 (upgrade Go to 1.20.6 (#36000))
 		}
 	}
 
