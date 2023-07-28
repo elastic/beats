@@ -87,7 +87,7 @@ func (t *configuredJob) Start(pubClient pipeline.ISyncClient) {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, pubClient.Wait)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ParsedMaintenanceWindows, t.monitor.stdFields.ID, tf, t.config.Type, pubClient.Wait)
 	if err != nil {
 		logp.L().Info("could not start monitor: %v", err)
 	}
