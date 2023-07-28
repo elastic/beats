@@ -64,7 +64,7 @@ func TestStatefulWrapper(t *testing.T) {
 		}, nil
 	}
 
-	wrapper := WrapStateful[*TestSWrapper](func(rootJob Job) StatefulWrapper[*TestSWrapper] { return &TestSWrapper{rootCounter: 1} })
+	wrapper := WrapStateful[*TestSWrapper](func(rootJob Job) StatefulWrapper[*TestSWrapper] { return &TestSWrapper{} })
 
 	// Run this ten times to ensure state is not carried across retries
 	for i := 0; i < 10; i++ {

@@ -34,8 +34,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
-	"github.com/elastic/go-lookslike/llpath"
-	"github.com/elastic/go-lookslike/llresult"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
@@ -45,7 +43,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertest"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -127,7 +125,7 @@ func TestSimpleJob(t *testing.T) {
 				}),
 				hbtestllext.MonitorTimespanValidator,
 				stateValidator(),
-				summaryValidator(1, 0),
+				summarizertest.SummaryValidator(1, 0),
 			)},
 		nil,
 		func(t *testing.T, results []*beat.Event, observed []observer.LoggedEntry) {
@@ -205,7 +203,7 @@ func TestAdditionalStdFields(t *testing.T) {
 						}),
 						stateValidator(),
 						hbtestllext.MonitorTimespanValidator,
-						summaryValidator(1, 0),
+						summarizertest.SummaryValidator(1, 0),
 					)},
 				nil,
 				nil,
@@ -243,7 +241,7 @@ func TestErrorJob(t *testing.T) {
 			lookslike.Compose(
 				errorJobValidator,
 				hbtestllext.MonitorTimespanValidator,
-				summaryValidator(0, 1),
+				summarizertest.SummaryValidator(0, 1),
 			)},
 		nil,
 		nil,
@@ -268,7 +266,7 @@ func TestMultiJobNoConts(t *testing.T) {
 			}),
 			stateValidator(),
 			hbtestllext.MonitorTimespanValidator,
-			summaryValidator(1, 0),
+			summarizertest.SummaryValidator(1, 0),
 		)
 	}
 
@@ -328,12 +326,12 @@ func TestMultiJobConts(t *testing.T) {
 			contJobValidator("http://foo.com", "1st"),
 			lookslike.Compose(
 				contJobValidator("http://foo.com", "2nd"),
-				summaryValidator(2, 0),
+				summarizertest.SummaryValidator(2, 0),
 			),
 			contJobValidator("http://bar.com", "1st"),
 			lookslike.Compose(
 				contJobValidator("http://bar.com", "2nd"),
-				summaryValidator(2, 0),
+				summarizertest.SummaryValidator(2, 0),
 			),
 		},
 		nil,
@@ -391,14 +389,14 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			),
 			lookslike.Compose(
 				contJobValidator("http://foo.com", "2nd"),
-				summaryValidator(1, 0),
+				summarizertest.SummaryValidator(1, 0),
 			),
 			lookslike.Compose(
 				contJobValidator("http://bar.com", "1st"),
 			),
 			lookslike.Compose(
 				contJobValidator("http://bar.com", "2nd"),
-				summaryValidator(1, 0),
+				summarizertest.SummaryValidator(1, 0),
 			),
 		},
 		[]validator.Validator{
@@ -429,25 +427,6 @@ func urlValidator(t *testing.T, u string) validator.Validator {
 func stateValidator() validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
 		"state": hbtestllext.IsMonitorState,
-	})
-}
-
-// This duplicates hbtest.SummaryChecks to avoid an import cycle.
-// It could be refactored out, but it just isn't worth it.
-func summaryValidator(up uint16, down uint16) validator.Validator {
-	return lookslike.MustCompile(map[string]interface{}{
-		"summary": isdef.Is("summary", func(path llpath.Path, v interface{}) *llresult.Results {
-			js, ok := v.(summarizer.JobSummary)
-			if !ok {
-				return llresult.SimpleResult(path, false, fmt.Sprintf("expected a *JobSummary, got %v", v))
-			}
-
-			if js.Up != up || js.Down != down {
-				return llresult.SimpleResult(path, false, fmt.Sprintf("expected up/down to be %d/%d, got %d/%d", up, down, js.Up, js.Down))
-			}
-
-			return llresult.ValidResult(path)
-		}),
 	})
 }
 
@@ -546,7 +525,7 @@ func TestInlineBrowserJob(t *testing.T) {
 							"status":      "up",
 						},
 					}),
-					summaryValidator(1, 0),
+					summarizertest.SummaryValidator(1, 0),
 					hbtestllext.MonitorTimespanValidator,
 				),
 			),
@@ -643,7 +622,7 @@ func TestProjectBrowserJob(t *testing.T) {
 		[]validator.Validator{
 			lookslike.Strict(
 				lookslike.Compose(
-					summaryValidator(1, 0),
+					summarizertest.SummaryValidator(1, 0),
 					urlValidator(t, urlStr),
 					expectedMonFields,
 				))},
@@ -659,7 +638,7 @@ func TestProjectBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, urlStr),
 					expectedMonFields,
-					summaryValidator(1, 0),
+					summarizertest.SummaryValidator(1, 0),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "up"},
 						"event": map[string]interface{}{
@@ -679,7 +658,7 @@ func TestProjectBrowserJob(t *testing.T) {
 				lookslike.Compose(
 					urlValidator(t, urlStr),
 					expectedMonFields,
-					summaryValidator(0, 1),
+					summarizertest.SummaryValidator(0, 1),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{"status": "down"},
 						"error": map[string]interface{}{
