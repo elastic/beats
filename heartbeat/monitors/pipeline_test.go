@@ -20,21 +20,18 @@ package monitors
 import (
 	"context"
 	"testing"
-
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-lookslike/validator"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/testslike"
+	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func Test_runPublishJob(t *testing.T) {
+func TestSyncPipelineWrapper(t *testing.T) {
 	defineJob := func(fields mapstr.M) func(event *beat.Event) (j []jobs.Job, e error) {
 		return func(event *beat.Event) (j []jobs.Job, e error) {
 			eventext.MergeEventFields(event, fields)
@@ -44,16 +41,14 @@ func Test_runPublishJob(t *testing.T) {
 	simpleJob := defineJob(mapstr.M{"foo": "bar"})
 
 	testCases := []struct {
-		name       string
-		job        jobs.Job
-		validators []validator.Validator
+		name string
+		job  jobs.Job
+		acks int
 	}{
 		{
 			"simple",
 			simpleJob,
-			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-			},
+			1,
 		},
 		{
 			"one cont",
@@ -61,10 +56,7 @@ func Test_runPublishJob(t *testing.T) {
 				_, _ = simpleJob(event)
 				return []jobs.Job{simpleJob}, nil
 			},
-			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-			},
+			2,
 		},
 		{
 			"multiple conts",
@@ -75,11 +67,7 @@ func Test_runPublishJob(t *testing.T) {
 					defineJob(mapstr.M{"blah": "blargh"}),
 				}, nil
 			},
-			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-				lookslike.MustCompile(map[string]interface{}{"baz": "bot"}),
-				lookslike.MustCompile(map[string]interface{}{"blah": "blargh"}),
-			},
+			3,
 		},
 		{
 			"cancelled cont",
@@ -87,16 +75,18 @@ func Test_runPublishJob(t *testing.T) {
 				eventext.CancelEvent(event)
 				return []jobs.Job{simpleJob}, nil
 			},
-			[]validator.Validator{
-				lookslike.MustCompile(map[string]interface{}{"foo": "bar"}),
-			},
+			1,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			done := make(chan bool)
 			pipel := &MockPipeline{}
-			client, err := pipel.Connect()
+			sync := &SyncPipelineWrapper{}
+			wrapped := WithSyncPipelineWrapper(pipel, sync)
+
+			client, err := wrapped.Connect()
 			require.NoError(t, err)
 			queue := runPublishJob(tc.job, client)
 			for {
@@ -111,9 +101,25 @@ func Test_runPublishJob(t *testing.T) {
 			err = client.Close()
 			require.NoError(t, err)
 
-			require.Len(t, pipel.PublishedEvents(), len(tc.validators))
-			for idx, event := range pipel.PublishedEvents() {
-				testslike.Test(t, tc.validators[idx], event.Fields)
+			go func() {
+				sync.Wait()
+				done <- true
+			}()
+
+			wait := time.After(1000 * time.Millisecond)
+			select {
+			case <-done:
+				assert.Fail(t, "pipeline exited before events were published")
+			case <-wait:
+			}
+
+			sync.onACK(tc.acks)
+
+			wait = time.After(1000 * time.Millisecond)
+			select {
+			case <-done:
+			case <-wait:
+				assert.Fail(t, "pipeline exceeded timeout after every event acked")
 			}
 		})
 	}
