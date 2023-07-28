@@ -58,7 +58,7 @@ type StdMonitorFields struct {
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
-	sFields := StdMonitorFields{Enabled: true, MaxAttempts: 2}
+	sFields := StdMonitorFields{Enabled: true, MaxAttempts: 1}
 
 	if err := conf.Unpack(&sFields); err != nil {
 		return sFields, fmt.Errorf("error unpacking monitor plugin config: %w", err)
