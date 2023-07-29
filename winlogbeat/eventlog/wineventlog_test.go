@@ -307,7 +307,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 		log := openLog(t, map[string]interface{}{
 			"name":           path,
 			"no_more_events": "stop",
-			"event_id": 3, 5
+			"event_id":       3, 5,
 		})
 		defer log.Close()
 
