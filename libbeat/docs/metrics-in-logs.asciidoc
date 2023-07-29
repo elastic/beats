@@ -28,7 +28,7 @@ The following tables attempt to explain the meaning of salient fields under `.mo
 | `.beat`                | Object | Information that is common to all Beats, e.g. version, goroutines, file handles, CPU, memory |
 | `.libbeat`             | Object | Information about the publisher pipeline and output, also common to all Beats |
 ifeval::["{beatname_lc}"=="filebeat"]
-| `.filebeat`            | Object | Information specific to Filebeat, e.g. harvester, events |
+| `.filebeat`            | Object | Information specific to {filebeat}, e.g. harvester, events |
 endif::[]
 |===
 
