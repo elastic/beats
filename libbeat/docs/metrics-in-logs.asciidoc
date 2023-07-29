@@ -54,7 +54,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 |===
 | Field path (relative to `.monitoring.metrics.filebeat`) | Type    | Meaning                              | Troubleshooting hints
 
-| `.events.active` | Integer | Number of events being actively processed by Filebeat (including events Filebeat has already sent to the libbeat publisher pipeline, but not including events the pipeline has sent to the output). | If this number grows over time, it may indicate that Filebeat inputs are harvesting events too fast for the pipeline and output to keep up.
+| `.events.active` | Integer | Number of events being actively processed by {filebeat} (including events {filebeat} has already sent to the libbeat publisher pipeline, but not including events the pipeline has sent to the output). | If this number grows over time, it may indicate that {filebeat} inputs are harvesting events too fast for the pipeline and output to keep up.
 |===
 endif::[]
 
