@@ -33,7 +33,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
-- Fix end point deregistration in http_endpoint input. {issue}16826[16826] {pull}36173[36173]
+- Add missing query while reading ".evtx" file. {issue}16826[16826] {pull}36173[36173]
 
 *Functionbeat*
 
