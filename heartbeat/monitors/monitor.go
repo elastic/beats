@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 
@@ -63,9 +62,9 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 	close        func() error
 
-	// pubClient accepts an ISyncClient as the lowest common denominator of client
-	// since async clients are a subset of sync clients
-	pubClient pipeline.ISyncClient
+	// pubClient accepts a generic beat.Client. Pipeline synchronicity is implemented
+	// at client wrapper-level
+	pubClient beat.Client
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
@@ -89,7 +88,7 @@ func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
 func newMonitor(
 	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pubClient pipeline.ISyncClient,
+	pubClient beat.Client,
 	taskAdder scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
@@ -106,7 +105,7 @@ func newMonitor(
 func newMonitorUnsafe(
 	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pubClient pipeline.ISyncClient,
+	pubClient beat.Client,
 	addTask scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),

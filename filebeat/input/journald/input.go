@@ -40,6 +40,7 @@ import (
 type journald struct {
 	Backoff            time.Duration
 	MaxBackoff         time.Duration
+	Since              *time.Duration
 	Seek               journalread.SeekMode
 	CursorSeekFallback journalread.SeekMode
 	Matches            journalfield.IncludeMatches
@@ -104,6 +105,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	return sources, &journald{
 		Backoff:            config.Backoff,
 		MaxBackoff:         config.MaxBackoff,
+		Since:              config.Since,
 		Seek:               config.Seek,
 		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            journalfield.IncludeMatches(config.Matches),
@@ -140,7 +142,13 @@ func (inp *journald) Run(
 	}
 	defer reader.Close()
 
-	if err := reader.Seek(seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)); err != nil {
+	mode, pos := seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)
+	if mode == journalread.SeekSince {
+		err = reader.SeekRealtimeUsec(uint64(time.Now().Add(*inp.Since).UnixMicro()))
+	} else {
+		err = reader.Seek(mode, pos)
+	}
+	if err != nil {
 		log.Error("Continue from current position. Seek failed with: %v", err)
 	}
 
@@ -168,7 +176,10 @@ func (inp *journald) Run(
 func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (*journalread.Reader, error) {
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
 	reader, err := journalread.Open(log, src.Name(), backoff,
-		withFilters(inp.Matches), withUnits(inp.Units), withTransports(inp.Transports), withSyslogIdentifiers(inp.Identifiers))
+		withFilters(inp.Matches),
+		withUnits(inp.Units),
+		withTransports(inp.Transports),
+		withSyslogIdentifiers(inp.Identifiers))
 	if err != nil {
 		return nil, sderr.Wrap(err, "failed to create reader for %{path} journal", src.Name())
 	}
@@ -223,12 +234,14 @@ func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error 
 // seekBy tries to find the last known position in the journal, so we can continue collecting
 // from the last known position.
 // The checkpoint is ignored if the user has configured the input to always
-// seek to the head/tail of the journal on startup.
-func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekMode) (journalread.SeekMode, string) {
-	mode := seek
+// seek to the head/tail/since of the journal on startup.
+func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekMode) (mode journalread.SeekMode, pos string) {
+	mode = seek
 	if mode == journalread.SeekCursor && cp.Position == "" {
 		mode = defaultSeek
-		if mode != journalread.SeekHead && mode != journalread.SeekTail {
+		switch mode {
+		case journalread.SeekHead, journalread.SeekTail, journalread.SeekSince:
+		default:
 			log.Error("Invalid option for cursor_seek_fallback")
 			mode = journalread.SeekHead
 		}
