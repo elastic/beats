@@ -2,7 +2,7 @@
 
 Every 30 seconds (by default), Beats collect a _snapshot_ of metrics about itself. From this snapshot, Beat computes a _delta snapshot_; this delta snapshot contains any metrics that have _changed_ since the last snapshot. Note that the values of the metrics are the values when the snapshot is taken, **NOT** the _difference_ in values from the last snapshot.
 
-If this delta snapshot contains _any_ metrics (indicating that at least one metric changed since the last snapshot), this delta snapshot is serialized as JSON and emitted in the Beat's logs at the `INFO` log level. Here is an example of such a log entry:
+If this delta snapshot contains _any_ metrics (indicating at least one metric that has changed since the last snapshot), this delta snapshot is serialized as JSON and emitted in the Beat's logs at the `INFO` log level. Here is an example of such a log entry:
 
 [source,json]
 ----
