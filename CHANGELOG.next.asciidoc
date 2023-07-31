@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix powershell details regexp to prevent excessive backtracking when processing command invocations. {pull}36178[36178]
 
 *Functionbeat*
 
