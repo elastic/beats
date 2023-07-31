@@ -175,6 +175,10 @@
           type: integer
           description: >
             The number of endpoints that failed
+        - name: status
+          type: keyword
+          description: >
+            The status of this check as a whole. Either up or down.
         - name: attempt
           type: short
           description: >

@@ -16427,6 +16427,16 @@ type: integer
 
 --
 
+*`summary.status`*::
++
+--
+The status of this check as a whole. Either up or down.
+
+
+type: keyword
+
+--
+
 *`summary.attempt`*::
 +
 --
