@@ -476,10 +476,6 @@ type BrowserMonitor struct {
 	name       string
 	checkGroup string
 	durationMs int64
-	// Used for testing legacy zip_url and local monitors
-	// where the top-level id/name are used to populate monitor.project
-	legacyProjectId   string
-	legacyProjectName string
 }
 
 var inlineMonitorValues = BrowserMonitor{
