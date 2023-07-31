@@ -143,17 +143,13 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 		PeerCertificates:  []*x509.Certificate{certificate},
 	}, time.Duration(1))
 
-	//nolint:errcheck // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
-	expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
+	_, _ = expected.Put("tls.rtt.handshake.us", hbtestllext.IsInt64)
 
 	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
 	// We don't actually care about the exact cipher matching, since we're not testing the TLS
 	// implementation, we trust go there, just that most of the metadata is present
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		//nolint:errcheck // There are no new changes to this line but
-		// linter has been activated in the meantime. We'll cleanup separately.
-		expected.Put("tls.cipher", isdef.IsString)
+		_, _ = expected.Put("tls.cipher", isdef.IsString)
 	}
 
 	return lookslike.MustCompile(expected)
@@ -289,8 +285,7 @@ func StartHTTPSServer(t *testing.T, tlsCert tls.Certificate) (host string, port 
 	require.NoError(t, err)
 
 	// No need to start a real server, since this is invalid, we just
-	//nolint:gosec // There are no new changes to this line but
-	// linter has been activated in the meantime. We'll cleanup separately.
+	//nolint:gosec // it's a test, sec issues don't apply
 	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
 		Certificates: []tls.Certificate{tlsCert},
 	})
