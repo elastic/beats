@@ -181,10 +181,17 @@ ifeval::["{beatname_lc}"=="filebeat"]
 |===
 endif::[]
 
-ifeval::["{beatname_lc}"=="filebeat"]
 [discrete]
 == Useful commands
 
+[discrete]
+=== Parse monitoring metrics from unstructured {beatname_uc} logs
+
+For {beatname_uc} versions that emit unstructured logs, the following script can be
+used to parse monitoring metrics from such logs: https://github.com/elastic/beats/blob/main/script/metrics_from_log_file.sh.
+
+
+ifeval::["{beatname_lc}"=="filebeat"]
 [discrete]
 === Check if {filebeat} is processing events
 
