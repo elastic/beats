@@ -125,29 +125,9 @@ func TestJourneyEnricher(t *testing.T) {
 		})
 	}
 
-	tests := []struct {
-		name                  string
-		IsLegacyBrowserSource bool
-	}{
-		{
-			name:                  "legacy project monitor",
-			IsLegacyBrowserSource: true,
-		},
-		{
-			name:                  "modern monitor",
-			IsLegacyBrowserSource: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
-
-			je := makeTestJourneyEnricher(sFields)
-			for _, se := range synthEvents {
-				check(t, se, je)
-			}
-		})
+	je := makeTestJourneyEnricher(sFields)
+	for _, se := range synthEvents {
+		check(t, se, je)
 	}
 }
 
