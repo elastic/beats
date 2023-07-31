@@ -15,28 +15,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package monitors
+//go:build integration
 
-import "github.com/elastic/beats/v7/libbeat/beat"
+package integration
 
-type SyncPipelineClientAdaptor struct {
-	C beat.Client
-}
+import (
+	"testing"
+	"time"
 
-func (s SyncPipelineClientAdaptor) Publish(event beat.Event) error {
-	s.C.Publish(event)
-	return nil
-}
+	"github.com/stretchr/testify/require"
+)
 
-func (s SyncPipelineClientAdaptor) PublishAll(events []beat.Event) error {
-	s.C.PublishAll(events)
-	return nil
-}
-
-func (s SyncPipelineClientAdaptor) Close() error {
-	return s.C.Close()
-}
-
-func (s SyncPipelineClientAdaptor) Wait() {
-	// intentionally blank, async pipelines should be empty
+func TestCmdVersion(t *testing.T) {
+	cfg := `
+mockbeat:
+name:
+logging:
+  level: debug
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
+output.console:
+  code.json:
+    pretty: true
+`
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(cfg)
+	mockbeat.Start("version")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("mockbeat", 10*time.Second)
+	mockbeat.WaitStdOutContains("version", 10*time.Second)
+	mockbeat.WaitStdOutContains("9.9.9", 10*time.Second)
 }

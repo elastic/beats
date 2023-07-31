@@ -71,7 +71,7 @@ func TestLegacyMetrics(t *testing.T) {
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogs("Metrics endpoint listening on:", 10*time.Second, "The metric server is not running")
+	filebeat.WaitForLogs("Metrics endpoint listening on:", 10*time.Second)
 
 	// After starting Filebeat all counters must be zero
 	waitForMetrics(t,
