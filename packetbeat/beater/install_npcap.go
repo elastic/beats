@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -61,13 +62,21 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	}
 
 	log := logp.NewLogger("npcap_install")
-	canInstall, err := canInstallNpcap(b, cfg, log)
-	if err != nil {
-		return err
-	}
-	if !canInstall {
-		log.Warn("npcap installation/upgrade disabled by user")
-		return nil
+	// Only check whether we have been requested to never_install if there
+	// is already an Npcap installation present. This should not be necessary,
+	// but the start-up logic of packetbeat is tightly coupled to the presence
+	// of a backing sniffer. This should really not be necessary, but the changes
+	// to modify this behaviour are non-trivial, so just avoid the issue.
+	isInstalled := strings.HasPrefix(npcap.Version(), "Npcap version")
+	if isInstalled {
+		canInstall, err := canInstallNpcap(b, cfg, log)
+		if err != nil {
+			return err
+		}
+		if !canInstall {
+			log.Warn("npcap installation/upgrade disabled by user")
+			return nil
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
@@ -121,12 +130,12 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, erro
 		if len(cfg.Streams) == 0 {
 			// We have no stream to monitor, so we don't need to install
 			// anything. We may be in the middle of a config check.
-			log.Info("cannot install because no configured stream")
+			log.Debug("cannot install because no configured stream")
 			return false, nil
 		}
 		for _, c := range cfg.Streams {
 			if c.NeverInstall {
-				log.Infof("cannot install because %s has never_install set to true", c.Type)
+				log.Debugf("cannot install because %s has never_install set to true", c.Type)
 				return false, nil
 			}
 		}
@@ -140,7 +149,7 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, erro
 		return false, fmt.Errorf("failed to unpack npcap config from packetbeat configuration: %w", err)
 	}
 	if cfg.NeverInstall {
-		log.Infof("cannot install because %s has never_install set to true", cfg.Type)
+		log.Debugf("cannot install because %s has never_install set to true", cfg.Type)
 	}
 	return !cfg.NeverInstall, err
 }
