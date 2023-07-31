@@ -37,45 +37,45 @@ func TestManagerV2(t *testing.T) {
 	inputs := &reloadableList{}
 	r.MustRegisterInput(inputs)
 
-	configsSet := false
-	configsCleared := false
-	logLevelSet := false
-	fqdnEnabled := false
-	allStopped := false
+	configsSet := atomic.Bool{}
+	configsCleared := atomic.Bool{}
+	logLevelSet := atomic.Bool{}
+	fqdnEnabled := atomic.Bool{}
+	allStopped := atomic.Bool{}
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
 		if currentIdx == 1 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			if oCfg != nil && len(iCfgs) == 3 {
-				configsSet = true
-				t.Logf("output and inputs configuration set")
+				configsSet.Store(true)
+				t.Log("output and inputs configuration set")
 			}
 		} else if currentIdx == 2 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			if oCfg == nil || len(iCfgs) != 3 {
 				// should not happen (config no longer set)
-				configsSet = false
-				t.Logf("output and inputs configuration cleared (should not happen)")
+				configsSet.Store(false)
+				t.Log("output and inputs configuration cleared (should not happen)")
 			}
 		} else {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			if oCfg == nil && len(iCfgs) == 0 {
-				configsCleared = true
+				configsCleared.Store(true)
 			}
 			if len(observed.Units) == 0 {
-				allStopped = true
-				t.Logf("output and inputs configuration cleared (stopping)")
+				allStopped.Store(true)
+				t.Log("output and inputs configuration cleared (stopping)")
 			}
 		}
 		if logp.GetLevel() == zapcore.DebugLevel {
-			logLevelSet = true
-			t.Logf("debug log level set")
+			logLevelSet.Store(true)
+			t.Log("debug log level set")
 		}
 
-		fqdnEnabled = features.FQDN()
-		t.Logf("FQDN feature flag set to %v", fqdnEnabled)
+		fqdnEnabled.Store(features.FQDN())
+		t.Logf("FQDN feature flag set to %v", fqdnEnabled.Load())
 	}
 
 	srv := integration.NewMockServer([][]*proto.UnitExpected{
@@ -221,7 +221,7 @@ func TestManagerV2(t *testing.T) {
 	defer m.Stop()
 
 	require.Eventually(t, func() bool {
-		return configsSet && configsCleared && logLevelSet && fqdnEnabled && allStopped
+		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
 	}, 15*time.Second, 300*time.Millisecond)
 }
 
@@ -245,7 +245,7 @@ func TestOutputError(t *testing.T) {
 	}
 	r.MustRegisterInput(inputs)
 
-	stateReached := false
+	stateReached := atomic.Bool{}
 	units := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -303,7 +303,7 @@ func TestOutputError(t *testing.T) {
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			if DoesStateMatch(observed, desiredState, 0) {
-				stateReached = true
+				stateReached.Store(true)
 			}
 			return &proto.CheckinExpected{
 				Units: units,
@@ -348,7 +348,7 @@ func TestOutputError(t *testing.T) {
 	defer m.Stop()
 
 	require.Eventually(t, func() bool {
-		return stateReached
+		return stateReached.Load()
 	}, 10*time.Second, 100*time.Millisecond, "desired state, output failed, was not reached")
 }
 
