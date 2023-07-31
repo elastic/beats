@@ -17,6 +17,7 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
@@ -65,12 +66,9 @@ func TestLightweightSummaries(t *testing.T) {
 	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
-		testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
-			"summary": map[string]interface{}{
-				"up":   hbtestllext.IsUint16,
-				"down": hbtestllext.IsUint16,
-			},
-		}), lastEvent.Fields)
+		testslike.Test(t,
+			summarizertesthelper.SummaryValidator(1, 0),
+			lastEvent.Fields)
 
 		for _, e := range firstEvents {
 			summary, _ := e.GetValue("summary")
