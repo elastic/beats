@@ -1,8 +1,8 @@
 
 
-Every 30 seconds (by default), a Beat collects a _snapshot_ of metrics about itself. From this snapshot, a Beat computes a _delta snapshot_; this delta snapshot contains any metrics that have _changed_ since the last snapshot. Note that the values of the metrics are the values when the snapshot is taken, _NOT_ the _difference_ in values from the last snapshot.
+Every 30 seconds (by default), {beatname_uc} collects a _snapshot_ of metrics about itself. From this snapshot, {beatname_uc} computes a _delta snapshot_; this delta snapshot contains any metrics that have _changed_ since the last snapshot. Note that the values of the metrics are the values when the snapshot is taken, _NOT_ the _difference_ in values from the last snapshot.
 
-If this delta snapshot contains _any_ metrics (indicating at least one metric that has changed since the last snapshot), this delta snapshot is serialized as JSON and emitted in the Beat's logs at the `INFO` log level. Here is an example of such a log entry:
+If this delta snapshot contains _any_ metrics (indicating at least one metric that has changed since the last snapshot), this delta snapshot is serialized as JSON and emitted in {beatname_uc}'s logs at the `INFO` log level. Here is an example of such a log entry:
 
 [source,json]
 ----
@@ -142,7 +142,7 @@ Focussing on the `.monitoring.metrics` field, and formatting the JSON, it's valu
 }
 ----
 
-The following tables explain the meaning of the most important fields under `.monitoring.metrics` and also provide hints that might be helpful in troubleshooting Beats issues.
+The following tables explain the meaning of the most important fields under `.monitoring.metrics` and also provide hints that might be helpful in troubleshooting {beatname_uc} issues.
 
 [cols="1,1,2,2"]
 |===
@@ -166,10 +166,10 @@ endif::[]
 |===
 | Field path (relative to `.monitoring.metrics.libbeat`) | Type    | Meaning                              | Troubleshooting hints
 
-| `.pipeline.events.active` | Integer | Number of events currently in the libbeat publisher pipeline. | If this number grows over time, it may indicate that the Beat (e.g. {filebeat}) is producing events faster than the output can consume them. Consider increasing the number of output workers (if this setting is supported by the output; {es} and {ls} outputs support this setting). If this number reaches the maximum queue size (`queue.mem.events` for the in-memory queue), it may indicate backpressure on the Beat, implying that the Beat may need to stop ingesting more events from the source.
-| `.output.events.total` | Integer | Number of events currently being processed by the output. | If this number grows over time, it may indicate that the output destination (e.g. {ls} pipeline or {es} cluster) is not able to accept events at the same or faster rate than what the Beat is sending to it.
+| `.pipeline.events.active` | Integer | Number of events currently in the libbeat publisher pipeline. | If this number grows over time, it may indicate that {beatname_uc} is producing events faster than the output can consume them. Consider increasing the number of output workers (if this setting is supported by the output; {es} and {ls} outputs support this setting). If this number reaches the maximum queue size (`queue.mem.events` for the in-memory queue), it may indicate backpressure on {beatname_uc}, implying that {beatname_uc} may need to stop ingesting more events from the source.
+| `.output.events.total` | Integer | Number of events currently being processed by the output. | If this number grows over time, it may indicate that the output destination (e.g. {ls} pipeline or {es} cluster) is not able to accept events at the same or faster rate than what {beatname_uc} is sending to it.
 | `.output.events.acked` | Integer | Number of events acknowledged by the output destination. | Generally, we want this number to be the same as `.output.events.total` as this indicates that the output destination has reliably received all the events sent to it.
-| `.output.events.failed` | Integer | Number of events that the Beat tried to send to the output destination, but the destination failed to receive them. | Generally, we want this field to be absent or its value to be zero. When the value is greater than zero, it's useful to check the Beat's logs right before this log entry's `@timestamp` to see if there are any connectivity issues with the output destination. Note that failed events are not lost or dropped; they will be sent back to the publisher pipeline for retrying later.
+| `.output.events.failed` | Integer | Number of events that {beatname_uc} tried to send to the output destination, but the destination failed to receive them. | Generally, we want this field to be absent or its value to be zero. When the value is greater than zero, it's useful to check {beatname_uc}'s logs right before this log entry's `@timestamp` to see if there are any connectivity issues with the output destination. Note that failed events are not lost or dropped; they will be sent back to the publisher pipeline for retrying later.
 |===
 
 ifeval::["{beatname_lc}"=="filebeat"]
