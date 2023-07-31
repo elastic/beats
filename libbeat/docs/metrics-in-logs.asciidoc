@@ -12,11 +12,134 @@ If this delta snapshot contains _any_ metrics (indicating at least one metric th
 [discrete]
 == Details
 
-Focussing on the `.monitoring.metrics` field, it's value is:
+Focussing on the `.monitoring.metrics` field, and formatting the JSON, it's value is:
 
 [source,json]
 ----
-{"beat":{"cgroup":{"memory":{"mem":{"usage":{"bytes":0}}}},"cpu":{"system":{"ticks":692690,"time":{"ms":60}},"total":{"ticks":3167250,"time":{"ms":150},"value":3167250},"user":{"ticks":2474560,"time":{"ms":90}}},"handles":{"limit":{"hard":1048576,"soft":1048576},"open":32},"info":{"ephemeral_id":"2bab8688-34c0-4522-80af-db86948d547d","uptime":{"ms":617670096},"version":"8.6.2"},"memstats":{"gc_next":57189272,"memory_alloc":43589824,"memory_total":275281335792,"rss":183574528},"runtime":{"goroutines":212}},"filebeat":{"events":{"active":5,"added":52,"done":49},"harvester":{"open_files":6,"running":6,"started":1}},"libbeat":{"config":{"module":{"running":15}},"output":{"events":{"acked":48,"active":0,"batches":6,"total":48},"read":{"bytes":210},"write":{"bytes":26923}},"pipeline":{"clients":15,"events":{"active":5,"filtered":1,"published":51,"total":52},"queue":{"acked":48}}},"registrar":{"states":{"current":14,"update":49},"writes":{"success":6,"total":6}},"system":{"load":{"1":0.91,"15":0.37,"5":0.4,"norm":{"1":0.1138,"15":0.0463,"5":0.05}}}}
+{
+  "beat": {
+    "cgroup": {
+      "memory": {
+        "mem": {
+          "usage": {
+            "bytes": 0
+          }
+        }
+      }
+    },
+    "cpu": {
+      "system": {
+        "ticks": 692690,
+        "time": {
+          "ms": 60
+        }
+      },
+      "total": {
+        "ticks": 3167250,
+        "time": {
+          "ms": 150
+        },
+        "value": 3167250
+      },
+      "user": {
+        "ticks": 2474560,
+        "time": {
+          "ms": 90
+        }
+      }
+    },
+    "handles": {
+      "limit": {
+        "hard": 1048576,
+        "soft": 1048576
+      },
+      "open": 32
+    },
+    "info": {
+      "ephemeral_id": "2bab8688-34c0-4522-80af-db86948d547d",
+      "uptime": {
+        "ms": 617670096
+      },
+      "version": "8.6.2"
+    },
+    "memstats": {
+      "gc_next": 57189272,
+      "memory_alloc": 43589824,
+      "memory_total": 275281335792,
+      "rss": 183574528
+    },
+    "runtime": {
+      "goroutines": 212
+    }
+  },
+  "filebeat": {
+    "events": {
+      "active": 5,
+      "added": 52,
+      "done": 49
+    },
+    "harvester": {
+      "open_files": 6,
+      "running": 6,
+      "started": 1
+    }
+  },
+  "libbeat": {
+    "config": {
+      "module": {
+        "running": 15
+      }
+    },
+    "output": {
+      "events": {
+        "acked": 48,
+        "active": 0,
+        "batches": 6,
+        "total": 48
+      },
+      "read": {
+        "bytes": 210
+      },
+      "write": {
+        "bytes": 26923
+      }
+    },
+    "pipeline": {
+      "clients": 15,
+      "events": {
+        "active": 5,
+        "filtered": 1,
+        "published": 51,
+        "total": 52
+      },
+      "queue": {
+        "acked": 48
+      }
+    }
+  },
+  "registrar": {
+    "states": {
+      "current": 14,
+      "update": 49
+    },
+    "writes": {
+      "success": 6,
+      "total": 6
+    }
+  },
+  "system": {
+    "load": {
+      "1": 0.91,
+      "5": 0.4,
+      "15": 0.37,
+      "norm": {
+        "1": 0.1138,
+        "5": 0.05,
+        "15": 0.0463
+      }
+    }
+  }
+}
 ----
 
 The following tables explain the meaning of the most important fields under `.monitoring.metrics` and also provide hints that might be helpful in troubleshooting Beats issues.
