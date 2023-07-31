@@ -46,12 +46,17 @@ type Module struct {
 	config   ModuleConfig
 }
 
+type FilesetOverrides struct {
+	EnableAllFilesets         bool
+	ForceEnableModuleFilesets bool
+}
+
 // newModuleRegistry reads and loads the configured module into the registry.
 func newModuleRegistry(modulesPath string,
 	moduleConfigs []*ModuleConfig,
 	overrides *ModuleOverrides,
 	beatInfo beat.Info,
-	enableAllFilesets bool,
+	filesetOverrides FilesetOverrides,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
 		registry: []Module{},
@@ -61,7 +66,7 @@ func newModuleRegistry(modulesPath string,
 	for _, mcfg := range moduleConfigs {
 		// an empty ModuleConfig can reach this so we only force enable a
 		// config if the Module name is set and Enabled pointer is valid.
-		if enableAllFilesets && mcfg.Module != "" && mcfg.Enabled != nil {
+		if (filesetOverrides.EnableAllFilesets || filesetOverrides.ForceEnableModuleFilesets) && mcfg.Module != "" && mcfg.Enabled != nil {
 			*mcfg.Enabled = true
 		}
 		if mcfg.Module == "" || (mcfg.Enabled != nil && !(*mcfg.Enabled)) {
@@ -80,8 +85,18 @@ func newModuleRegistry(modulesPath string,
 			config:   *mcfg,
 			filesets: []Fileset{},
 		}
-		for filesetName, fcfg := range mcfg.Filesets {
+		if filesetOverrides.ForceEnableModuleFilesets {
+			if mcfg.Filesets == nil {
+				mcfg.Filesets = make(map[string]*FilesetConfig)
+			}
+			for _, fName := range moduleFilesets {
+				if _, ok := mcfg.Filesets[fName]; !ok {
+					mcfg.Filesets[fName] = &FilesetConfig{Enabled: func() *bool { b := true; return &b }()}
+				}
+			}
+		}
 
+		for filesetName, fcfg := range mcfg.Filesets {
 			fcfg, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
 			if err != nil {
 				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %w", mcfg.Module, filesetName, err)
@@ -89,7 +104,7 @@ func newModuleRegistry(modulesPath string,
 
 			// ModuleConfig can have empty Filesets so we only force
 			// enable if the Enabled pointer is valid
-			if enableAllFilesets && fcfg.Enabled != nil {
+			if (filesetOverrides.EnableAllFilesets || filesetOverrides.ForceEnableModuleFilesets) && fcfg.Enabled != nil {
 				*fcfg.Enabled = true
 			}
 			if fcfg.Enabled != nil && !(*fcfg.Enabled) {
@@ -128,7 +143,7 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, enableAllFilesets bool) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, filesetOverrides FilesetOverrides) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
@@ -166,7 +181,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, e
 	}
 
 	enableFilesetsFromOverrides(mcfgs, modulesOverrides)
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, enableAllFilesets)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, filesetOverrides)
 }
 
 // enableFilesetsFromOverrides enables in mcfgs the filesets mentioned in overrides,
