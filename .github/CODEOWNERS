@@ -155,6 +155,7 @@ CHANGELOG*
 /x-pack/filebeat/module/proofpoint @elastic/security-external-integrations
 /x-pack/filebeat/module/rabbitmq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/radware @elastic/security-external-integrations
+/x-pack/filebeat/module/salesforce @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/snort @elastic/security-external-integrations
 /x-pack/filebeat/module/snyk @elastic/security-external-integrations
 /x-pack/filebeat/module/sonicwall @elastic/security-external-integrations
