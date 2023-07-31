@@ -126,6 +126,7 @@ The position to start reading the journal from. Valid settings are:
 will be sent until a new message is written.
 * `cursor`: On first read, starts reading at the beginning of the journal. After
 a reload or restart, continues reading at the last known position.
+* `since`: Use the `since` option to determine where to start reading from.
 
 If you have old log files and want to skip lines, start {beatname_uc} with
 `seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
@@ -136,7 +137,25 @@ If you have old log files and want to skip lines, start {beatname_uc} with
 ==== `cursor_seek_fallback`
 
 The position to start reading the journal from if no cursor information is
-available. Valid options are `head` and `tail`.
+available. Valid options are `head`, `tail` and `since`.
+
+[float]
+[id="{beatname_lc}-input-{type}-since"]
+==== `since`
+
+A time offset from the current time to start reading from. To use
+`since`, either the `seek` option must be set to `since`, or the `seek` mode
+must be set to `cursor` and the `cursor_seek_fallback` set to `since`.
+
+This example demonstrates how to resume from the persisted cursor when
+it exists, or otherwise begin reading logs from the last 24 hours.
+
+["source","yaml",subs="attributes"]
+----
+seek: cursor
+cursor_seek_fallback: since
+since: -24h
+----
 
 [float]
 [id="{beatname_lc}-input-{type}-units"]

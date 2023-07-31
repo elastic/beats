@@ -41,11 +41,13 @@ updates:
       - dependabot
       - Team:Security-External Integrations
     allow:
-      # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/go-libaudit/*
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
+    ignore:
+      # Skip github.com/elastic/mito because it requires documentation updates.
+      - dependency-name: github.com/elastic/mito
     reviewers:
       - elastic/security-external-integrations
     open-pull-requests-limit: 2

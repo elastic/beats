@@ -618,7 +618,7 @@ def targetWithoutNode(Map args = [:]) {
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
             }
           } else {
-            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+              cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
       }
@@ -934,6 +934,8 @@ def startCloudTestEnv(Map args = [:]) {
   stage("${name}-prepare-cloud-env"){
     withBeatsEnv(archive: false, withModule: false) {
       try {
+        // Run the docker services to setup the emulated cloud environment
+        sh(label: 'Run docker-compose services for emulated cloud env', script: ".ci/scripts/install-docker-services.sh ", returnStatus: true)
         dirs?.each { folder ->
           retryWithSleep(retries: 2, seconds: 5, backoff: true){
             terraformApply(folder)
@@ -944,9 +946,12 @@ def startCloudTestEnv(Map args = [:]) {
           // If it failed then cleanup without failing the build
           sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
         }
+        // Cleanup the docker services
+        sh(label: 'Docker Compose Cleanup', script: ".ci/scripts/docker-services-cleanup.sh", returnStatus: true)
+        
         error('startCloudTestEnv: terraform apply failed.')
       } finally {
-        dirs?.each { folder ->
+          dirs?.each { folder ->
           // Archive terraform states in case manual cleanup is needed.
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
           dir("${folder}") {
@@ -978,6 +983,7 @@ def terraformApply(String directory) {
 * Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
+* This also tears down any associated docker services
 */
 def terraformCleanup(Map args = [:]) {
   String name = normalise(args.name)
@@ -988,6 +994,8 @@ def terraformCleanup(Map args = [:]) {
       retryWithSleep(retries: 2, seconds: 5, backoff: true) {
         sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
       }
+      // Cleanup associated docker services
+      sh(label: 'Docker Compose Cleanup', script: ".ci/scripts/docker-services-cleanup.sh")
     }
   }
 }
