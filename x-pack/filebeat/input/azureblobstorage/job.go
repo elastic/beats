@@ -230,11 +230,8 @@ func (j *job) createEvent(message string, offset int64) beat.Event {
 					},
 				},
 			},
-			// Structs are used here in order to save map allocations
-			"cloud": struct {
-				Provider string `json:"provider"`
-			}{
-				Provider: "azure",
+			"cloud": mapstr.M{
+				"provider": "azure",
 			},
 		},
 	}

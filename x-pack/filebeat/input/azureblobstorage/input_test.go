@@ -34,11 +34,11 @@ const (
 
 func Test_StorageClient(t *testing.T) {
 	tests := []struct {
-		name        string
-		baseConfig  map[string]interface{}
-		mockHandler func() http.Handler
-		expected    map[string]bool
-		isError     error
+		name          string
+		baseConfig    map[string]interface{}
+		mockHandler   func() http.Handler
+		expected      map[string]bool
+		expectedError error
 	}{
 		{
 			name: "SingleContainerWithPoll_NoErr",
@@ -148,9 +148,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler: mock.AzureStorageServer,
-			expected:    map[string]bool{},
-			isError:     mock.NotFoundErr,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
 		},
 		{
 			name: "SingleContainerWithoutPoll_InvalidBucketErr",
@@ -166,9 +166,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler: mock.AzureStorageServer,
-			expected:    map[string]bool{},
-			isError:     mock.NotFoundErr,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
 		},
 		{
 			name: "TwoContainersWithPoll_InvalidBucketErr",
@@ -187,9 +187,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler: mock.AzureStorageServer,
-			expected:    map[string]bool{},
-			isError:     mock.NotFoundErr,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",
@@ -205,9 +205,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler: mock.AzureStorageServer,
-			expected:    map[string]bool{},
-			isError:     errors.New("requires value <= 5000 accessing 'max_workers'"),
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "TwoBucketWithPoll_InvalidConfigValue",
@@ -226,9 +226,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler: mock.AzureStorageServer,
-			expected:    map[string]bool{},
-			isError:     errors.New("requires value <= 5000 accessing 'max_workers'"),
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "ReadJSON",
@@ -321,7 +321,7 @@ func Test_StorageClient(t *testing.T) {
 			conf := config{}
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				assert.EqualError(t, err, tt.isError.Error())
+				assert.EqualError(t, err, tt.expectedError.Error())
 				return
 			}
 			input := newStatelessInput(conf, serv.URL+"/")
@@ -349,14 +349,14 @@ func Test_StorageClient(t *testing.T) {
 			t.Cleanup(func() { timeout.Stop() })
 
 			if len(tt.expected) == 0 {
-				if tt.isError != nil && g.Wait() != nil {
+				if tt.expectedError != nil && g.Wait() != nil {
 					//nolint:errorlint // This will never be a wrapped error
-					if tt.isError == mock.NotFoundErr {
+					if tt.expectedError == mock.NotFoundErr {
 						arr := strings.Split(g.Wait().Error(), "\n")
 						errStr := strings.Join(arr[1:], "\n")
-						assert.Equal(t, tt.isError.Error(), errStr)
+						assert.Equal(t, tt.expectedError.Error(), errStr)
 					} else {
-						assert.EqualError(t, g.Wait(), tt.isError.Error())
+						assert.EqualError(t, g.Wait(), tt.expectedError.Error())
 					}
 					cancel()
 				} else {
@@ -380,9 +380,135 @@ func Test_StorageClient(t *testing.T) {
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
 					assert.True(t, tt.expected[val.(string)])
-					assert.Equal(t, tt.isError, err)
+					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
+						cancel()
+						break wait
+					}
+				}
+			}
+		})
+	}
+}
+
+func Test_Concurrency(t *testing.T) {
+	tests := []struct {
+		name        string
+		baseConfig  map[string]interface{}
+		mockHandler func() http.Handler
+		expectedLen int
+	}{
+		{
+			name: "TestConcurrency_100_Workers",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         100,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": mock.ConcurrencyContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureConcurrencyServer,
+			expectedLen: mock.TotalRandomDataSets,
+		},
+		{
+			name: "TestConcurrency_1000_Workers",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1000,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": mock.ConcurrencyContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureConcurrencyServer,
+			expectedLen: mock.TotalRandomDataSets,
+		},
+		{
+			name: "TestConcurrency_2000_Workers",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2000,
+				"poll":                                true,
+				"poll_interval":                       "500s",
+				"containers": []map[string]interface{}{
+					{
+						"name": mock.ConcurrencyContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureConcurrencyServer,
+			expectedLen: mock.TotalRandomDataSets,
+		},
+		{
+			name: "TestConcurrency_5000_Workers",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         5000,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": mock.ConcurrencyContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureConcurrencyServer,
+			expectedLen: mock.TotalRandomDataSets,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			serv := httptest.NewServer(tt.mockHandler())
+			t.Cleanup(serv.Close)
+
+			cfg := conf.MustNewConfigFrom(tt.baseConfig)
+			conf := config{}
+			err := cfg.Unpack(&conf)
+			assert.NoError(t, err)
+			input := newStatelessInput(conf, serv.URL+"/")
+
+			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
+			assert.NoError(t, input.Test(v2.TestContext{}))
+
+			chanClient := beattest.NewChanClient(tt.expectedLen)
+			t.Cleanup(func() { _ = chanClient.Close() })
+
+			ctx, cancel := newV2Context()
+			t.Cleanup(cancel)
+
+			var g errgroup.Group
+			g.Go(func() error {
+				return input.Run(ctx, chanClient)
+			})
+			timeout := time.NewTimer(100 * time.Second)
+			t.Cleanup(func() { timeout.Stop() })
+
+			var receivedCount int
+		wait:
+			for {
+				select {
+				case <-timeout.C:
+					t.Errorf("timed out waiting for %d events", tt.expectedLen)
+					cancel()
+					return
+				case got := <-chanClient.Channel:
+					var err error
+					_, err = got.Fields.GetValue("message")
+					assert.NoError(t, err)
+					receivedCount += 1
+					if receivedCount == tt.expectedLen {
 						cancel()
 						break wait
 					}
