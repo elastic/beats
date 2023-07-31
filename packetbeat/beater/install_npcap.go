@@ -60,11 +60,11 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 		return nil
 	}
 
-	canInstall, err := canInstallNpcap(b, cfg)
+	log := logp.NewLogger("npcap_install")
+	canInstall, err := canInstallNpcap(b, cfg, log)
 	if err != nil {
 		return err
 	}
-	log := logp.NewLogger("npcap_install")
 	if !canInstall {
 		log.Warn("npcap installation/upgrade disabled by user")
 		return nil
@@ -103,9 +103,10 @@ func installNpcap(b *beat.Beat, cfg *conf.C) error {
 // configurations from agent normalised to the internal packetbeat format by this point.
 // In the case that the beat is managed, any data stream that has npcap.never_install
 // set to true will result in a block on the installation.
-func canInstallNpcap(b *beat.Beat, rawcfg *conf.C) (bool, error) {
+func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, error) {
 	type npcapInstallCfg struct {
-		NeverInstall bool `config:"npcap.never_install"`
+		Type         string `config:"type"`
+		NeverInstall bool   `config:"npcap.never_install"`
 	}
 
 	// Agent managed case.
@@ -120,10 +121,12 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C) (bool, error) {
 		if len(cfg.Streams) == 0 {
 			// We have no stream to monitor, so we don't need to install
 			// anything. We may be in the middle of a config check.
+			log.Info("cannot install because no configured stream")
 			return false, nil
 		}
 		for _, c := range cfg.Streams {
 			if c.NeverInstall {
+				log.Infof("cannot install because %s has never_install set to true", c.Type)
 				return false, nil
 			}
 		}
@@ -135,6 +138,9 @@ func canInstallNpcap(b *beat.Beat, rawcfg *conf.C) (bool, error) {
 	err := rawcfg.Unpack(&cfg)
 	if err != nil {
 		return false, fmt.Errorf("failed to unpack npcap config from packetbeat configuration: %w", err)
+	}
+	if cfg.NeverInstall {
+		log.Infof("cannot install because %s has never_install set to true", cfg.Type)
 	}
 	return !cfg.NeverInstall, err
 }
