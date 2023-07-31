@@ -190,8 +190,8 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
 		var (
-			done func()
 			cp   *Checkpoint
+			done func()
 		)
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
