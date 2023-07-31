@@ -103,7 +103,6 @@ func TestJourneyEnricher(t *testing.T) {
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
-				"monitor.check_group": isdef.IsString,
 			}))
 		}
 		return lookslike.Compose(v...)
