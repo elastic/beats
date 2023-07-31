@@ -63,7 +63,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 == Useful commands
 
 [discrete]
-=== Check if Filebeat is processing events
+=== Check if {filebeat} is processing events
 
 [source]
 ----
