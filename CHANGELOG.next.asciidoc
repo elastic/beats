@@ -134,6 +134,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix temp dir running out of space with project monitors. {issue}35843[35843]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
 - Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
+- Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
 
 *Heartbeat*
 
