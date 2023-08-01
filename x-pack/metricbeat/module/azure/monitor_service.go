@@ -197,9 +197,13 @@ func (service *MonitorService) GetMetricNamespaces(resourceId string) (armmonito
 
 // GetMetricDefinitions will return all supported metrics based on the resource id and namespace
 func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
-	pager := service.metricDefinitionClient.NewListPager(resourceId, &armmonitor.MetricDefinitionsClientListOptions{
-		Metricnamespace: &namespace,
-	})
+	opts := &armmonitor.MetricDefinitionsClientListOptions{}
+
+	if namespace != "" {
+		opts.Metricnamespace = &namespace
+	}
+
+	pager := service.metricDefinitionClient.NewListPager(resourceId, opts)
 
 	metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
 
@@ -246,17 +250,22 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 
 		metricNames := strings.Join(metricNames[i:end], ",")
 
-		resp, err := service.metricsClient.List(service.context, resourceId, &armmonitor.MetricsClientListOptions{
-			Aggregation:     &aggregations,
-			Filter:          metricsFilter,
-			Interval:        tg,
-			Metricnames:     &metricNames,
-			Metricnamespace: &namespace,
-			Timespan:        &timespan,
-			Top:             nil,
+		opts := &armmonitor.MetricsClientListOptions{
+			Aggregation: &aggregations,
+			Filter:      metricsFilter,
+			Interval:    tg,
+			Metricnames: &metricNames,
+			Timespan:    &timespan,
+			Top:         nil,
 			// Orderby:         &orderBy,
 			ResultType: &resultTypeData,
-		})
+		}
+
+		if namespace != "" {
+			opts.Metricnamespace = &namespace
+		}
+
+		resp, err := service.metricsClient.List(service.context, resourceId, opts)
 
 		// check for applied charges before returning any errors
 		if resp.Cost != nil && *resp.Cost != 0 {
