@@ -80,7 +80,7 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []autodiscoverElbClient
+	clients := make([]autodiscoverElbClient, 0, len(config.Regions))
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
