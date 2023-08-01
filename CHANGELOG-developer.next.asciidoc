@@ -156,10 +156,6 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add DropFields processor to js API {pull}33458[33458]
 - Add support for different folders when testing data {pull}34467[34467]
 - Add logging of metric registration in inputmon. {pull}35647[35647]
-- Add Okta API package for entity analytics. {pull}35478[35478]
-- Add benchmarking to HTTPJSON input testing. {pull}35138[35138]
-- Allow non-AWS endpoints for testing Filebeat awss3 input. {issue}35496[35496] {pull}35520[35520]
-- Add AUTH (username) and SSL/TLS support for Redis module {pull}35240[35240]
 - Pin PyYAML version to 5.3.1 to avoid CI errors temporarily {pull}36091[36091]
 
 ==== Deprecated
