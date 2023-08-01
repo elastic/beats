@@ -44,7 +44,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("aws_elb autodiscover is experimental")
+	cfgwarn.Deprecate("8.11.0", "aws_elb autodiscover is now deprecated.")
 
 	config := awsauto.DefaultConfig()
 	err := c.Unpack(&config)
