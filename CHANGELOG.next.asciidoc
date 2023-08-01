@@ -190,6 +190,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Winlogbeat*
 
+- Fix powershell details regexp to prevent excessive backtracking when processing command invocations. {pull}36178[36178]
 
 *Functionbeat*
 
