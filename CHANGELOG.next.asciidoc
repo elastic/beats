@@ -187,6 +187,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
+- Fix handling of Npcap installation options from Fleet. {pull}35541[35541] {pull}35935[35935]
 
 *Winlogbeat*
 
