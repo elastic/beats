@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix handling of Npcap installation options from Fleet. {pull}35541[35541] {pull}35935[35935]
 
 *Winlogbeat*
 
