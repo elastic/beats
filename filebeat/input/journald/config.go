@@ -48,6 +48,10 @@ type config struct {
 	// MaxBackoff is the limit of the backoff time.
 	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
 
+	// Since is the relative time offset from now to provide journal
+	// entries from. If Since is nil, no offset is applied.
+	Since *time.Duration `config:"since"`
+
 	// Seek is the method to read from journals.
 	Seek journalread.SeekMode `config:"seek"`
 
@@ -100,7 +104,11 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 	return c.Unpack((*journalfield.IncludeMatches)(im))
 }
 
-var errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")
+var (
+	errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")
+	errInvalidSeek         = errors.New("invalid setting for seek")
+	errInvalidSeekSince    = errors.New("incompatible setting for since and seek or cursor_seek_fallback")
+)
 
 func defaultConfig() config {
 	return config{
@@ -113,8 +121,26 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	if c.CursorSeekFallback != journalread.SeekHead && c.CursorSeekFallback != journalread.SeekTail {
+	if c.Seek == journalread.SeekInvalid {
+		return errInvalidSeek
+	}
+	switch c.CursorSeekFallback {
+	case journalread.SeekHead, journalread.SeekTail, journalread.SeekSince:
+	default:
 		return errInvalidSeekFallback
+	}
+	if c.Since == nil {
+		switch {
+		case c.Seek == journalread.SeekSince,
+			c.Seek == journalread.SeekCursor && c.CursorSeekFallback == journalread.SeekSince:
+			return errInvalidSeekSince
+		default:
+			return nil
+		}
+	}
+	needSince := c.Seek == journalread.SeekSince || (c.Seek == journalread.SeekCursor && c.CursorSeekFallback == journalread.SeekSince)
+	if !needSince {
+		return errInvalidSeekSince
 	}
 	return nil
 }

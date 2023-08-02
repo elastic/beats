@@ -23,6 +23,7 @@ import (
 	"context"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -219,6 +220,20 @@ func TestInputIncludeMatches(t *testing.T) {
 // TestInputSeek test the output of various seek modes while reading
 // from input-multiline-parser.journal.
 func TestInputSeek(t *testing.T) {
+	// timeOfFirstEvent is the @timestamp on the "pam_unix" message.
+	var timeOfFirstEvent = time.Date(2021, time.November, 22, 17, 10, 4, 51729000, time.UTC)
+
+	var allMessages = []string{
+		"pam_unix(sudo:session): session closed for user root",
+		"Started Outputs some log lines.",
+		"1st line",
+		"2nd line",
+		"3rd line",
+		"4th line",
+		"5th line",
+		"6th line",
+	}
+
 	tests := map[string]struct {
 		config           mapstr.M
 		expectedMessages []string
@@ -227,16 +242,7 @@ func TestInputSeek(t *testing.T) {
 			config: map[string]any{
 				"seek": "head",
 			},
-			expectedMessages: []string{
-				"pam_unix(sudo:session): session closed for user root",
-				"Started Outputs some log lines.",
-				"1st line",
-				"2nd line",
-				"3rd line",
-				"4th line",
-				"5th line",
-				"6th line",
-			},
+			expectedMessages: allMessages,
 		},
 		"seek tail": {
 			config: map[string]any{
@@ -248,23 +254,33 @@ func TestInputSeek(t *testing.T) {
 			config: map[string]any{
 				"seek": "cursor",
 			},
-			expectedMessages: []string{
-				"pam_unix(sudo:session): session closed for user root",
-				"Started Outputs some log lines.",
-				"1st line",
-				"2nd line",
-				"3rd line",
-				"4th line",
-				"5th line",
-				"6th line",
-			},
+			expectedMessages: allMessages,
 		},
-		"seek cursor fallback": {
+		"seek cursor with tail fallback": {
 			config: map[string]any{
 				"seek":                 "cursor",
 				"cursor_seek_fallback": "tail",
 			},
 			expectedMessages: nil, // No messages are expected because it will fall back to seek=tail.
+		},
+		"seek since": {
+			config: map[string]any{
+				"seek": "since",
+				// Query using one microsecond after the first event so that the first event
+				// is not returned. Note that journald uses microsecond precision for times.
+				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
+			},
+			expectedMessages: allMessages[1:],
+		},
+		"seek cursor with since fallback": {
+			config: map[string]any{
+				"seek":                 "cursor",
+				"cursor_seek_fallback": "since",
+				// Query using one microsecond after the first event so that the first event
+				// is not returned. Note that journald uses microsecond precision for times.
+				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
+			},
+			expectedMessages: allMessages[1:],
 		},
 	}
 
