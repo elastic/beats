@@ -48,12 +48,14 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoa
 	} else {
 		wrapped = WrapBrowser(js, stdMonFields, mst)
 	}
-	return jobs.WrapAllSeparately(
-		wrapped,
-		func(j jobs.Job) jobs.JobWrapper {
-			return summarizer.NewSummarizer(j, stdMonFields, mst).Wrap
-		},
-	)
+	for i, j := range wrapped {
+		wrapped[i] = func(event *beat.Event) ([]jobs.Job, error) {
+			logp.L().Warnf("ROOT EXEC")
+			s := summarizer.NewSummarizer(j, stdMonFields, mst)
+			return s.Wrap(j)(event)
+		}
+	}
+	return wrapped
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
