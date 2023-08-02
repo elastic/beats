@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
@@ -43,6 +44,7 @@ type ConfigAWS struct {
 	FIPSEnabled          bool              `config:"fips_enabled"`
 	TLS                  *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
 	DefaultRegion        string            `config:"default_region"`
+	ResolveEndpoint      bool              `config:"resolve_endpoint"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
@@ -54,6 +56,17 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 		} else {
 			awsConfig.Region = "us-east-1"
 		}
+	}
+
+	if beatsConfig.ResolveEndpoint && beatsConfig.Endpoint != "" {
+		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
+		customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+			return aws.Endpoint{
+				PartitionID: "aws",
+				URL:         beatsConfig.Endpoint,
+			}, nil
+		})
+		awsConfig.EndpointResolverWithOptions = customResolver
 	}
 
 	// Assume IAM role if iam_role config parameter is given

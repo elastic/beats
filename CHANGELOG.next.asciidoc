@@ -365,6 +365,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Libbeat*
 - Added support for apache parquet file reader. {issue}34662[34662] {pull}35183[35183]
+- Add support for endpoint resolver in AWS config {pull}36208[36208]
 
 *Heartbeat*
 - Users can now configure max scheduler job limits per monitor type via env var. {pull}34307[34307]
