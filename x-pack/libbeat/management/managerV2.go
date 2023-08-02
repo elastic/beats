@@ -662,9 +662,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 		_ = unit.UpdateState(client.UnitStateStopped, "Stopped", nil)
 	}
 
-	// now update the statuses of all units
-	// if there isn't an error with the input, we set it as
-	// healthy because there is no way to know more information about it.
+	// now update the statuses of all units that contain only healthy
+	// inputs. If there isn't an error with the inputs, we set the unit as
+	// healthy because there is no way to know more information about its inputs.
 	for _, unit := range healthyInputs {
 		expected := unit.Expected()
 		if expected.State == client.UnitStateStopped {
