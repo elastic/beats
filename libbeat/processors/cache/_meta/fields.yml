@@ -1,0 +1,5 @@
+- key: cache
+  title: Cache
+  description: >
+    Cache processor
+  fields: ~

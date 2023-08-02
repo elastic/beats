@@ -15,6 +15,7 @@ This document describes the fields that are exported by Winlogbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat-common>>
+* <<exported-fields-cache>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
@@ -93,6 +94,12 @@ Time series instance id
 type: keyword
 
 --
+
+[[exported-fields-cache]]
+== Cache fields
+
+Cache processor
+
 
 [[exported-fields-cloud]]
 == Cloud provider metadata fields

@@ -170,6 +170,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Skip dependabot updates for github.com/elastic/mito. {pull}36158[36158]
 - Add device handling to Okta API package for entity analytics. {pull}35980[35980]
 - Make Filebeat HTTPJSON input process responses sequentially. {pull}36493[36493]
+- Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
 
 ==== Deprecated
 
