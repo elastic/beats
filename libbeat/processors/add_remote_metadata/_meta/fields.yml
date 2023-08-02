@@ -1,0 +1,5 @@
+- key: remote
+  title: Remote
+  description: >
+    Remote metadata fields
+  fields: ~

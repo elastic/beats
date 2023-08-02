@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
+* <<exported-fields-remote>>
 
 --
 [[exported-fields-beat-common]]
@@ -15672,5 +15673,11 @@ example: albert
 type: text
 
 --
+
+[[exported-fields-remote]]
+== Remote fields
+
+Remote metadata fields
+
 
 :edit_url!:

@@ -37,6 +37,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
+* <<exported-fields-remote>>
 * <<exported-fields-sip>>
 * <<exported-fields-thrift>>
 * <<exported-fields-tls_detailed>>
@@ -18661,6 +18662,12 @@ If the Redis command has resulted in an error, this field contains the error mes
 
 
 --
+
+[[exported-fields-remote]]
+== Remote fields
+
+Remote metadata fields
+
 
 [[exported-fields-sip]]
 == SIP fields

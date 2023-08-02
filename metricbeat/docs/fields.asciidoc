@@ -76,6 +76,7 @@ grouped in the following categories:
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
 * <<exported-fields-redisenterprise>>
+* <<exported-fields-remote>>
 * <<exported-fields-sql>>
 * <<exported-fields-stan>>
 * <<exported-fields-statsd>>
@@ -59050,6 +59051,12 @@ Redis metrics collected from Redis Enterprise Server.
 
 `redisenterprise` contains the information and statistics from Redis Enterprise Server.
 
+
+
+[[exported-fields-remote]]
+== Remote fields
+
+Remote metadata fields
 
 
 [[exported-fields-sql]]

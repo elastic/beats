@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-powershell>>
 * <<exported-fields-process>>
+* <<exported-fields-remote>>
 * <<exported-fields-security>>
 * <<exported-fields-sysmon>>
 * <<exported-fields-winlog>>
@@ -16156,6 +16157,12 @@ example: albert
 type: text
 
 --
+
+[[exported-fields-remote]]
+== Remote fields
+
+Remote metadata fields
+
 
 [[exported-fields-security]]
 == Security module fields
