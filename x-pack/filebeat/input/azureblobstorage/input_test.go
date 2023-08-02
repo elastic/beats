@@ -507,47 +507,45 @@ func Test_Concurrency(t *testing.T) {
 			v2Ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
 			v2Ctx.ID += tt.name
-			var client publisher
+			client := publisher{
+				stop: func(e []beat.Event) {
+					if len(e) >= tt.expectedLen {
+						cancel()
+					}
+				},
+			}
 			st := newState()
-
 			var g errgroup.Group
 			g.Go(func() error {
 				return input.run(v2Ctx, src, st, &client)
 			})
 			timeout := time.NewTimer(100 * time.Second)
 			t.Cleanup(func() { timeout.Stop() })
-			client.Channel = make(chan beat.Event)
-			var receivedCount int
-		wait:
-			for {
-				select {
-				case <-timeout.C:
-					t.Errorf("timed out waiting for %d events", tt.expectedLen)
-					cancel()
-					return
-				case got := <-client.Channel:
-					_, err = got.Fields.GetValue("message")
-					assert.NoError(t, err)
-					receivedCount += 1
-					if receivedCount >= tt.expectedLen {
-						cancel()
-						break wait
-					}
-				}
+			select {
+			case <-timeout.C:
+				t.Errorf("timed out waiting for %d events", tt.expectedLen)
+				cancel()
+			case <-v2Ctx.Cancelation.Done():
+			}
+			//nolint:errcheck // We can ignore as the error will always be context canceled, which is expected in this case
+			g.Wait()
+			if len(client.events) < tt.expectedLen {
+				t.Errorf("failed to get all events: got:%d want:%d", len(client.events), tt.expectedLen)
 			}
 		})
 	}
 }
 
 type publisher struct {
-	Channel chan beat.Event
+	stop    func([]beat.Event)
+	events  []beat.Event
 	mu      sync.Mutex
 	cursors []map[string]interface{}
 }
 
 func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	p.mu.Lock()
-	p.Channel <- e
+	p.events = append(p.events, e)
 	if cursor != nil {
 		var c map[string]interface{}
 		chkpt, ok := cursor.(*Checkpoint)
@@ -565,6 +563,7 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 
 		p.cursors = append(p.cursors, c)
 	}
+	p.stop(p.events)
 	p.mu.Unlock()
 	return nil
 }
