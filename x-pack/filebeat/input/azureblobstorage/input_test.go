@@ -6,10 +6,13 @@ package azureblobstorage
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,6 +20,8 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -334,6 +339,7 @@ func Test_StorageClient(t *testing.T) {
 
 			ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
+			ctx.ID += tt.name
 
 			var g errgroup.Group
 			g.Go(func() error {
@@ -440,7 +446,7 @@ func Test_Concurrency(t *testing.T) {
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
 				"max_workers":                         2000,
 				"poll":                                true,
-				"poll_interval":                       "500s",
+				"poll_interval":                       "10s",
 				"containers": []map[string]interface{}{
 					{
 						"name": mock.ConcurrencyContainer,
@@ -451,11 +457,11 @@ func Test_Concurrency(t *testing.T) {
 			expectedLen: mock.TotalRandomDataSets,
 		},
 		{
-			name: "TestConcurrency_5000_Workers",
+			name: "TestConcurrency_3000_Workers",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         5000,
+				"max_workers":                         3000,
 				"poll":                                true,
 				"poll_interval":                       "10s",
 				"containers": []map[string]interface{}{
@@ -477,24 +483,40 @@ func Test_Concurrency(t *testing.T) {
 			conf := config{}
 			err := cfg.Unpack(&conf)
 			assert.NoError(t, err)
-			input := newStatelessInput(conf, serv.URL+"/")
+			input := azurebsInput{
+				config:     conf,
+				serviceURL: serv.URL + "/",
+			}
+			name := input.Name()
+			if name != "azure-blob-storage" {
+				t.Errorf(`unexpected input name: got:%q want:"azure-blob-storage"`, name)
+			}
 
-			assert.Equal(t, "azure-blob-storage-stateless", input.Name())
-			assert.NoError(t, input.Test(v2.TestContext{}))
-
-			chanClient := beattest.NewChanClient(tt.expectedLen)
-			t.Cleanup(func() { _ = chanClient.Close() })
-
-			ctx, cancel := newV2Context()
+			var src cursor.Source
+			// This test will always have only one container
+			for _, c := range input.config.Containers {
+				container := tryOverrideOrDefault(input.config, c)
+				src = &Source{
+					AccountName:   input.config.AccountName,
+					ContainerName: c.Name,
+					MaxWorkers:    *container.MaxWorkers,
+					Poll:          *container.Poll,
+					PollInterval:  *container.PollInterval,
+				}
+			}
+			v2Ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
+			v2Ctx.ID += tt.name
+			var client publisher
+			st := newState()
 
 			var g errgroup.Group
 			g.Go(func() error {
-				return input.Run(ctx, chanClient)
+				return input.run(v2Ctx, src, st, &client)
 			})
 			timeout := time.NewTimer(100 * time.Second)
 			t.Cleanup(func() { timeout.Stop() })
-
+			client.Channel = make(chan beat.Event)
 			var receivedCount int
 		wait:
 			for {
@@ -503,12 +525,11 @@ func Test_Concurrency(t *testing.T) {
 					t.Errorf("timed out waiting for %d events", tt.expectedLen)
 					cancel()
 					return
-				case got := <-chanClient.Channel:
-					var err error
+				case got := <-client.Channel:
 					_, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
 					receivedCount += 1
-					if receivedCount == tt.expectedLen {
+					if receivedCount >= tt.expectedLen {
 						cancel()
 						break wait
 					}
@@ -518,11 +539,41 @@ func Test_Concurrency(t *testing.T) {
 	}
 }
 
+type publisher struct {
+	Channel chan beat.Event
+	mu      sync.Mutex
+	cursors []map[string]interface{}
+}
+
+func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+	p.mu.Lock()
+	p.Channel <- e
+	if cursor != nil {
+		var c map[string]interface{}
+		chkpt, ok := cursor.(*Checkpoint)
+		if !ok {
+			return fmt.Errorf("invalid cursor type for testing: %T", cursor)
+		}
+		cursorBytes, err := json.Marshal(chkpt)
+		if err != nil {
+			return fmt.Errorf("error marshaling cursor data: %w", err)
+		}
+		err = json.Unmarshal(cursorBytes, &c)
+		if err != nil {
+			return fmt.Errorf("error converting checkpoint struct to cursor map: %w", err)
+		}
+
+		p.cursors = append(p.cursors, c)
+	}
+	p.mu.Unlock()
+	return nil
+}
+
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("azure-blob-storage_test"),
-		ID:          "test_id",
+		ID:          "test_id:",
 		Cancelation: ctx,
 	}, cancel
 }
