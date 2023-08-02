@@ -49,6 +49,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		return nil, nil, err
 	}
 
+	//nolint:prealloc // No need to preallocate the slice here
 	var sources []cursor.Source
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
