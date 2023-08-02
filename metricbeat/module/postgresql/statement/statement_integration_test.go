@@ -31,7 +31,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/35995")
 	service := compose.EnsureUp(t, "postgresql")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
