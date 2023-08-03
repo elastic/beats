@@ -2,7 +2,7 @@ ARG NATS_VERSION=2.0.4
 FROM nats:$NATS_VERSION
 
 # build stage
-FROM golang:1.13-alpine3.11 AS build-env
+FROM golang:1.20.7 AS build-env
 RUN apk --no-cache add build-base git mercurial gcc
 RUN cd src && go get -d github.com/nats-io/nats.go/
 RUN cd src/github.com/nats-io/nats.go/examples/nats-bench && git checkout tags/v1.10.0 && go build .
