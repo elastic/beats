@@ -9,4 +9,6 @@ modules.
 
 Filebeat modules require Elasticsearch 5.2 or later.
 
+NOTE: While {filebeat} modules are still supported, we recommend {agent} integrations over {filebeat} modules. Integrations provide a streamlined way to connect data from a variety of vendors to the {stack}. Refer to the https://www.elastic.co/integrations/data-integrations[full list of integrations]. For more information, please refer to the {fleet-guide}/beats-agent-comparison.html[{beats} vs {agent} comparison documentation].
+
 include::modules_list.asciidoc[]
