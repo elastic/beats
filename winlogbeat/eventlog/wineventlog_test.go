@@ -322,7 +322,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 			assert.Equal(t, io.EOF, err)
 		}
 
-		assert.Len(t, records, 20)
+		assert.Len(t, records, 21)
 	})
 }
 
