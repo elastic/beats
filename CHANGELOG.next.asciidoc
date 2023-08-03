@@ -202,6 +202,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}36286[36286]
 - [Azure] Add input metrics to the azure-eventhub input. {pull}35739[35739]
 - Reduce HTTPJSON metrics allocations. {pull}36282[36282]
+- Add support for a simplified input configuraton when running under Elastic-Agent {pull}36390[36390]
 
 *Auditbeat*
 
