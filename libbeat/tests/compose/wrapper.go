@@ -36,7 +36,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 )
@@ -149,7 +148,11 @@ func (d *wrapperDriver) LockFile() string {
 }
 
 func (d *wrapperDriver) Close() error {
-	return errors.Wrap(d.client.Close(), "failed to close wrapper driver")
+	err := d.client.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close wrapper driver: %w", err)
+	}
+	return nil
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
@@ -231,7 +234,7 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 	opts := types.CopyToContainerOptions{}
 	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
 	if err != nil {
-		return errors.Wrapf(err, "failed to copy environment to container %s", id)
+		return fmt.Errorf("failed to copy environment to container %s: %w", id, err)
 	}
 	return nil
 }

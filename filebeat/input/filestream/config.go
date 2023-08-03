@@ -33,6 +33,7 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
+	ID             string             `config:"id"`
 	Paths          []string           `config:"paths"`
 	Close          closerConfig       `config:"close"`
 	FileWatcher    *conf.Namespace    `config:"prospector"`

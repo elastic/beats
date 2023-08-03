@@ -20,7 +20,7 @@
 package load
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -52,7 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	load, err := cpu.Load()
 	if err != nil {
-		return errors.Wrap(err, "failed to get CPU load values")
+		return fmt.Errorf("failed to get CPU load values: %w", err)
 	}
 
 	avgs := load.Averages()
