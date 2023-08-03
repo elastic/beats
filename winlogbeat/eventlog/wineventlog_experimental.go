@@ -256,7 +256,7 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 }
 
 func (l *winEventLogExp) Read() ([]Record, error) {
-	var records []Record
+	records := make([]Record, 0, l.maxRead)
 	defer func() {
 		l.metrics.log(records)
 	}()

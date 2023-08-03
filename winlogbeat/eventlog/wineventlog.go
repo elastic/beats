@@ -424,7 +424,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 		return nil, err
 	}
 
-	var records []Record
+	records := make([]Record, 0, len(handles))
 	defer func() {
 		l.metrics.log(records)
 		for _, h := range handles {
