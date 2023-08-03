@@ -1,5 +1,5 @@
 # Module: aws
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-aws.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-aws.html
 
 - module: aws
   period: 1m
@@ -52,5 +52,6 @@
 - module: aws
   period: 1m
   latency: 5m
+  include_linked_accounts: false
   metricsets:
     - s3_request

@@ -87,7 +87,7 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			Processor:     e.processors,
 			KeepNull:      e.keepNull,
 		},
-		ACKHandler: acker.Counting(func(n int) {
+		EventListener: acker.Counting(func(n int) {
 			addPublished(e.source.Name(), n)
 			e.log.Debugw("Successfully published events.", "event.count", n)
 		}),
@@ -131,8 +131,17 @@ func (e *eventLogger) run(
 		}
 	}()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
+	channelNotFoundErrDetected := false
+
 runLoop:
 	for stop := false; !stop; {
+		select {
+		case <-done:
+			return
+		default:
+		}
+
 		err = api.Open(state)
 
 		switch {
@@ -141,13 +150,19 @@ runLoop:
 			time.Sleep(time.Second * 5)
 			continue
 		case !api.IsFile() && eventlog.IsChannelNotFound(err):
-			e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			if !channelNotFoundErrDetected {
+				e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			} else {
+				e.log.Debugw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			}
+			channelNotFoundErrDetected = true
 			time.Sleep(time.Second * 5)
 			continue
 		case err != nil:
 			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
+		channelNotFoundErrDetected = false
 
 		e.log.Debug("Opened successfully.")
 

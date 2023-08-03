@@ -7,8 +7,7 @@ package performance
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -35,7 +34,7 @@ func (e *performanceExtractor) bufferCacheHitRatio(ctx context.Context) ([]buffe
        1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio"
 FROM V$BUFFER_POOL_STATISTICS`)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]bufferCacheHitRatio, 0)

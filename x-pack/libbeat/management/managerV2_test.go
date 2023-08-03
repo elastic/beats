@@ -5,6 +5,7 @@
 package management
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"testing"
@@ -22,10 +23,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 func TestManagerV2(t *testing.T) {
-
 	r := reload.NewRegistry()
 
 	output := &reloadable{}
@@ -74,7 +75,7 @@ func TestManagerV2(t *testing.T) {
 		t.Logf("FQDN feature flag set to %v", fqdnEnabled)
 	}
 
-	srv := mockSrv([][]*proto.UnitExpected{
+	srv := integration.NewMockServer([][]*proto.UnitExpected{
 		{
 			{
 				Id:             "output-unit",
@@ -99,7 +100,7 @@ func TestManagerV2(t *testing.T) {
 					Streams: []*proto.Stream{
 						{
 							Id: "system/metrics-system.filesystem-default-system-1",
-							Source: requireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
 								"metricsets": []interface{}{"filesystem"},
 								"period":     "1m",
 							}),
@@ -120,14 +121,14 @@ func TestManagerV2(t *testing.T) {
 					Streams: []*proto.Stream{
 						{
 							Id: "system/metrics-system.filesystem-default-system-2",
-							Source: requireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
 								"metricsets": []interface{}{"filesystem"},
 								"period":     "1m",
 							}),
 						},
 						{
 							Id: "system/metrics-system.filesystem-default-system-3",
-							Source: requireNewStruct(t, map[string]interface{}{
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
 								"metricsets": []interface{}{"filesystem"},
 								"period":     "1m",
 							}),
@@ -221,86 +222,131 @@ func TestManagerV2(t *testing.T) {
 	}, 15*time.Second, 300*time.Millisecond)
 }
 
-func mockSrv(
-	units [][]*proto.UnitExpected,
-	featuresIdxs []uint64,
-	features []*proto.Features,
-	observedCallback func(*proto.CheckinObserved, int),
-	delay time.Duration,
-) *mock.StubServerV2 {
-	i := 0
-	agentInfo := &proto.CheckinAgentInfo{
-		Id:       "elastic-agent-id",
-		Version:  "8.6.0",
-		Snapshot: true,
+func TestOutputError(t *testing.T) {
+	// Uncomment the line below to see the debug logs for this test
+	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
+	r := reload.NewRegistry()
+
+	output := &mockOutput{
+		ReloadFn: func(config *reload.ConfigWithMeta) error {
+			return errors.New("any kind of error will do")
+		},
 	}
-	return &mock.StubServerV2{
+	r.MustRegisterOutput(output)
+	inputs := &mockReloadable{
+		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
+			err := errors.New("Inputs should not be reloaded if the output fails")
+			t.Fatal(err)
+			return err
+		},
+	}
+	r.MustRegisterInput(inputs)
+
+	stateReached := false
+	units := []*proto.UnitExpected{
+		{
+			Id:             "output-unit",
+			Type:           proto.UnitType_OUTPUT,
+			State:          proto.State_HEALTHY,
+			ConfigStateIdx: 1,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "mock",
+				Name: "mock",
+				Source: integration.RequireNewStruct(t,
+					map[string]interface{}{
+						"Is":        "this",
+						"required?": "Yes!",
+					}),
+			},
+		},
+		{
+			Id:             "input-unit",
+			Type:           proto.UnitType_INPUT,
+			State:          proto.State_HEALTHY,
+			ConfigStateIdx: 1,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+		},
+	}
+
+	desiredState := []*proto.UnitExpected{
+		{
+			Id:             "output-unit",
+			Type:           proto.UnitType_OUTPUT,
+			State:          proto.State_FAILED,
+			ConfigStateIdx: 1,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "mock",
+				Name: "mock",
+				Source: integration.RequireNewStruct(t,
+					map[string]interface{}{
+						"this":     "is",
+						"required": true,
+					}),
+			},
+		},
+		{
+			Id:             "input-unit",
+			Type:           proto.UnitType_INPUT,
+			State:          proto.State_STARTING,
+			ConfigStateIdx: 1,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+		},
+	}
+
+	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			if observedCallback != nil {
-				observedCallback(observed, i)
-			}
-			matches := doesStateMatch(observed, units[i], featuresIdxs[i])
-			if !matches {
-				// send same set of units and features
-				return &proto.CheckinExpected{
-					AgentInfo:   agentInfo,
-					Units:       units[i],
-					Features:    features[i],
-					FeaturesIdx: featuresIdxs[i],
-				}
-			}
-			// delay sending next expected based on delay
-			if delay > 0 {
-				<-time.After(delay)
-			}
-			// send next set of units and features
-			i += 1
-			if i >= len(units) {
-				// stay on last index
-				i = len(units) - 1
+			if DoesStateMatch(observed, desiredState, 0) {
+				stateReached = true
 			}
 			return &proto.CheckinExpected{
-				AgentInfo:   agentInfo,
-				Units:       units[i],
-				Features:    features[i],
-				FeaturesIdx: featuresIdxs[i],
+				Units: units,
 			}
 		},
-		ActionImpl: func(response *proto.ActionResponse) error {
-			// actions not tested here
-			return nil
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	if err := server.Start(); err != nil {
+		t.Fatalf("could not start mock Elastic-Agent server: %s", err)
+	}
+	defer server.Stop()
+
+	client := client.NewV2(
+		fmt.Sprintf(":%d", server.Port),
+		"",
+		client.VersionInfo{},
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{
+			Enabled: true,
 		},
-		ActionsChan: make(chan *mock.PerformAction, 100),
-	}
-}
-
-func doesStateMatch(
-	observed *proto.CheckinObserved,
-	expectedUnits []*proto.UnitExpected,
-	expectedFeaturesIdx uint64,
-) bool {
-	if len(observed.Units) != len(expectedUnits) {
-		return false
-	}
-	expectedMap := make(map[unitKey]*proto.UnitExpected)
-	for _, exp := range expectedUnits {
-		expectedMap[unitKey{client.UnitType(exp.Type), exp.Id}] = exp
-	}
-	for _, unit := range observed.Units {
-		exp, ok := expectedMap[unitKey{client.UnitType(unit.Type), unit.Id}]
-		if !ok {
-			return false
-		}
-		if unit.State != exp.State || unit.ConfigStateIdx != exp.ConfigStateIdx {
-			return false
-		}
+		r,
+		client,
+	)
+	if err != nil {
+		t.Fatalf("could not instantiate ManagerV2: %s", err)
 	}
 
-	if observed.FeaturesIdx != expectedFeaturesIdx {
-		return false
+	mm, ok := m.(*BeatV2Manager)
+	if !ok {
+		t.Fatalf("unexpected type for BeatV2Manager: %T", m)
 	}
 
-	return true
+	mm.changeDebounce = 10 * time.Millisecond
+	mm.forceReloadDebounce = 100 * time.Millisecond
+
+	if err := m.Start(); err != nil {
+		t.Fatalf("could not start ManagerV2: %s", err)
+	}
+	defer m.Stop()
+
+	require.Eventually(t, func() bool {
+		return stateReached
+	}, 10*time.Second, 100*time.Millisecond, "desired state, output failed, was not reached")
 }
 
 type reloadable struct {
@@ -337,4 +383,54 @@ func (r *reloadableList) Configs() []*reload.ConfigWithMeta {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	return r.configs
+}
+
+type mockOutput struct {
+	mutex     sync.Mutex
+	ReloadFn  func(config *reload.ConfigWithMeta) error
+	ConfigFn  func() *reload.ConfigWithMeta
+	ConfigsFn func() []*reload.ConfigWithMeta
+}
+
+func (m *mockOutput) Reload(config *reload.ConfigWithMeta) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.ReloadFn(config)
+}
+
+func (m *mockOutput) Config() *reload.ConfigWithMeta {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.ConfigFn()
+}
+
+func (m *mockOutput) Configs() []*reload.ConfigWithMeta {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.ConfigsFn()
+}
+
+type mockReloadable struct {
+	mutex     sync.Mutex
+	ReloadFn  func(configs []*reload.ConfigWithMeta) error
+	ConfigFn  func() *reload.ConfigWithMeta
+	ConfigsFn func() []*reload.ConfigWithMeta
+}
+
+func (m *mockReloadable) Reload(configs []*reload.ConfigWithMeta) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.ReloadFn(configs)
+}
+
+func (m *mockReloadable) Config() *reload.ConfigWithMeta {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.ConfigFn()
+}
+
+func (m *mockReloadable) Configs() []*reload.ConfigWithMeta {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	return m.ConfigsFn()
 }

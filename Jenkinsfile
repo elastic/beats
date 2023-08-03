@@ -309,7 +309,7 @@ def cloud(Map args = [:]) {
       withCloudTestEnv(args) {
         startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
         try {
-          targetWithoutNode(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
+          targetWithoutNode(dirs: args.dirs, context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
         } finally {
           terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
         }
@@ -414,7 +414,6 @@ def packagingArm(Map args = [:]) {
 def packagingLinux(Map args = [:]) {
   def PLATFORMS = [ '+all',
                 'linux/amd64',
-                'linux/386',
                 'linux/arm64',
                 // armv7 packaging isn't working, and we don't currently
                 // need it for release. Do not re-enable it without
@@ -427,7 +426,6 @@ def packagingLinux(Map args = [:]) {
                 //'linux/mips64',
                 //'linux/s390x',
                 'windows/amd64',
-                'windows/386',
                 'darwin/amd64',
                 'darwin/arm64'
               ].join(' ')
@@ -580,6 +578,7 @@ def target(Map args = [:]) {
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
 def targetWithoutNode(Map args = [:]) {
+  def dirs = args.get('dirs',[])
   def command = args.command
   def context = args.context
   def directory = args.get('directory', '')
@@ -592,9 +591,22 @@ def targetWithoutNode(Map args = [:]) {
   def enableRetry = args.get('enableRetry', false)
   def withGCP = args.get('withGCP', false)
   def withNodejs = args.get('withNodejs', false)
+  String name = normalise(args.directory)
   withGithubNotify(context: "${context}") {
     withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
       dumpVariables()
+      // unstash terraform outputs in the same directory where the files were stashed
+      dirs?.each { folder ->
+        dir("${folder}") {
+          try {
+            unstash("terraform-${name}")
+            //unstash does not print verbose output , hence printing contents of the directory for logging purposes
+            sh "ls -la ${pwd()}"
+          } catch (error) {
+            echo "error unstashing: ${error}"
+          }
+        }
+      }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
@@ -606,7 +618,7 @@ def targetWithoutNode(Map args = [:]) {
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
             }
           } else {
-            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+              cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
       }
@@ -707,7 +719,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
           error("Error '${err.toString()}'")
         } finally {
           if (archive) {
-            archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/build/system-tests/docker-logs/TEST-docker-compose-*.log")
+            archiveArtifacts(allowEmptyArchive: true, artifacts: "${directory}/build/system-tests/docker-logs/TEST-docker-compose-*.log, ${directory}/build/integration-tests/**/**")
             archiveTestOutput(directory: directory, testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
           }
           tearDown()
@@ -922,6 +934,8 @@ def startCloudTestEnv(Map args = [:]) {
   stage("${name}-prepare-cloud-env"){
     withBeatsEnv(archive: false, withModule: false) {
       try {
+        // Run the docker services to setup the emulated cloud environment
+        sh(label: 'Run docker-compose services for emulated cloud env', script: ".ci/scripts/install-docker-services.sh ", returnStatus: true)
         dirs?.each { folder ->
           retryWithSleep(retries: 2, seconds: 5, backoff: true){
             terraformApply(folder)
@@ -932,12 +946,19 @@ def startCloudTestEnv(Map args = [:]) {
           // If it failed then cleanup without failing the build
           sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
         }
+        // Cleanup the docker services
+        sh(label: 'Docker Compose Cleanup', script: ".ci/scripts/docker-services-cleanup.sh", returnStatus: true)
+        
         error('startCloudTestEnv: terraform apply failed.')
       } finally {
-        // Archive terraform states in case manual cleanup is needed.
-        archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+          dirs?.each { folder ->
+          // Archive terraform states in case manual cleanup is needed.
+          archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
+          dir("${folder}") {
+            stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**,outputs*.yml')
+          }
+        }
       }
-      stash(name: "terraform-${name}", allowEmpty: true, includes: '**/terraform.tfstate,**/.terraform/**')
     }
   }
 }
@@ -962,6 +983,7 @@ def terraformApply(String directory) {
 * Tear down the terraform environments, by looking for all terraform states in directory
 * then it runs terraform destroy for each one.
 * It uses terraform states previously stashed by startCloudTestEnv.
+* This also tears down any associated docker services
 */
 def terraformCleanup(Map args = [:]) {
   String name = normalise(args.name)
@@ -972,6 +994,8 @@ def terraformCleanup(Map args = [:]) {
       retryWithSleep(retries: 2, seconds: 5, backoff: true) {
         sh(label: "Terraform Cleanup", script: ".ci/scripts/terraform-cleanup.sh ${directory}")
       }
+      // Cleanup associated docker services
+      sh(label: 'Docker Compose Cleanup', script: ".ci/scripts/docker-services-cleanup.sh")
     }
   }
 }

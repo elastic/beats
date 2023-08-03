@@ -76,7 +76,7 @@ func init() {
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
-func NewDecodeJSONFields(c *cfg.C) (processors.Processor, error) {
+func NewDecodeJSONFields(c *cfg.C) (beat.Processor, error) {
 	config := defaultConfig
 	logger := logp.NewLogger("truncate_fields")
 
@@ -122,11 +122,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
-			event.SetErrorWithOption(mapstr.M{
-				"message": "parsing input as JSON: " + err.Error(),
-				"data":    text,
-				"field":   field,
-			}, f.addErrorKey)
+			event.SetErrorWithOption(fmt.Sprintf("parsing input as JSON: %s", err.Error()), f.addErrorKey, text, field)
 			continue
 		}
 

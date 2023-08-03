@@ -7,11 +7,13 @@ package http_endpoint
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"reflect"
 	"sync"
+	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
@@ -86,7 +88,7 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 
 func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	err := servers.serve(ctx, e, publisher)
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
@@ -117,6 +119,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	if ok {
 		err = checkTLSConsistency(e.addr, s.tls, e.config.TLS)
 		if err != nil {
+			p.mu.Unlock()
 			return err
 		}
 
@@ -138,7 +141,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 
 	mux := http.NewServeMux()
 	mux.Handle(pattern, newHandler(e.config, pub, log))
-	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
+	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	s = &server{
 		idOf: map[string]string{pattern: ctx.ID},
 		tls:  e.config.TLS,
@@ -158,6 +161,9 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
 		err = s.srv.ListenAndServe()
 	}
+	p.mu.Lock()
+	delete(p.servers, e.addr)
+	p.mu.Unlock()
 	s.setErr(err)
 	s.cancel()
 	return err
@@ -257,6 +263,7 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.Handle
 		responseBody:          c.ResponseBody,
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
+		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
 
 	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)

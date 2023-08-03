@@ -21,7 +21,7 @@ import (
 var logger = log.New(ioutil.Discard, "", 0)
 
 func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
-	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain)
+	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain, false)
 }
 
 func TestSessionMap_GetOrCreate(t *testing.T) {

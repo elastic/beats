@@ -54,7 +54,7 @@ var withECSVersion = processing.WithFields(mapstr.M{
 func HeartbeatSettings() instance.Settings {
 	return instance.Settings{
 		Name:          Name,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 		HasDashboards: false,
 	}
 }

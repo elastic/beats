@@ -19,11 +19,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -51,6 +52,27 @@ func init() {
 	}
 }
 
+func configID(config *conf.C) (string, error) {
+	var tmp struct {
+		ID string `config:"id"`
+	}
+	if err := config.Unpack(&tmp); err != nil {
+		return "", fmt.Errorf("error extracting ID: %w", err)
+	}
+	if tmp.ID != "" {
+		return tmp.ID, nil
+	}
+
+	var h map[string]interface{}
+	_ = config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute ID from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%16X", id), nil
+}
+
 type pubsubInput struct {
 	config
 
@@ -63,19 +85,21 @@ type pubsubInput struct {
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on pubsub worker goroutine.
 
-	ackedCount *atomic.Uint32 // Total number of successfully ACKed pubsub messages.
+	id      string // id is the ID for metrics registration.
+	metrics *inputMetrics
 }
 
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
 // a topic subscription.
-func NewInput(
-	cfg *conf.C,
-	connector channel.Connector,
-	inputContext input.Context,
-) (inp input.Input, err error) {
+func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
 	if err = cfg.Unpack(&conf); err != nil {
+		return nil, err
+	}
+
+	id, err := configID(cfg)
+	if err != nil {
 		return nil, err
 	}
 
@@ -109,18 +133,23 @@ func NewInput(
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
-		ackedCount:   atomic.NewUint32(0),
+		id:           id,
 	}
 
 	// Build outlet for events.
 	in.outlet, err = connector.ConnectWith(cfg, beat.ClientConfig{
-		ACKHandler: acker.ConnectionOnly(
+		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
 				for _, priv := range privates {
 					if msg, ok := priv.(*pubsub.Message); ok {
 						msg.Ack()
-						in.ackedCount.Inc()
+
+						in.metrics.ackedMessageCount.Inc()
+						in.metrics.bytesProcessedTotal.Add(uint64(len(msg.Data)))
+						in.metrics.processingTime.Update(time.Since(msg.PublishTime).Nanoseconds())
+						in.log.Error("ACKing pub/sub event")
 					} else {
+						in.metrics.failedAckedMessageCount.Inc()
 						in.log.Error("Failed ACKing pub/sub event")
 					}
 				}
@@ -138,6 +167,7 @@ func NewInput(
 // will ever start the pubsub worker.
 func (in *pubsubInput) Run() {
 	in.workerOnce.Do(func() {
+		in.metrics = newInputMetrics(in.id, nil)
 		in.workerWg.Add(1)
 		go func() {
 			in.log.Info("Pub/Sub input worker has started.")
@@ -194,6 +224,7 @@ func (in *pubsubInput) run() error {
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
 			msg.Nack()
+			in.metrics.nackedMessageCount.Inc()
 			in.log.Debug("OnEvent returned false. Stopping input worker.")
 			cancel()
 		}
@@ -204,6 +235,7 @@ func (in *pubsubInput) run() error {
 func (in *pubsubInput) Stop() {
 	in.workerCancel()
 	in.workerWg.Wait()
+	in.metrics.Close()
 }
 
 // Wait is an alias for Stop.

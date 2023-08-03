@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration && linux
-// +build integration,linux
 
 package osd_df
 

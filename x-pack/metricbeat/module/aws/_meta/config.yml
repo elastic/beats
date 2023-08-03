@@ -49,5 +49,6 @@
 - module: aws
   period: 1m
   latency: 5m
+  include_linked_accounts: false
   metricsets:
     - s3_request

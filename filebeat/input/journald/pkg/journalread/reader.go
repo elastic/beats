@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package journalread
 
@@ -55,6 +54,7 @@ type journal interface {
 	GetEntry() (*sdjournal.JournalEntry, error)
 	SeekHead() error
 	SeekTail() error
+	SeekRealtimeUsec(usec uint64) error
 	SeekCursor(string) error
 }
 
@@ -145,6 +145,13 @@ func (r *Reader) Seek(mode SeekMode, cursor string) (err error) {
 		return fmt.Errorf("invalid seek mode '%v'", mode)
 	}
 	return err
+}
+
+// SeekRealtimeUsec moves the read pointer to the entry with the
+// specified CLOCK_REALTIME timestamp. This corresponds to
+// sd_journal_seek_realtime_usec.
+func (r *Reader) SeekRealtimeUsec(usec uint64) error {
+	return r.journal.SeekRealtimeUsec(usec)
 }
 
 // Next reads a new journald entry from the journal. It blocks if there is

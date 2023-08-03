@@ -94,11 +94,18 @@ receiving a custom payload.
 *<<monitor-http-options,`http`>>*:: Connects via HTTP and optionally verifies that the host returns the
 expected response. Will use `Elastic-Heartbeat` as
 the user agent product.
-*<<monitor-browser-options,`browser`>>*:: Allows users to run the synthetic
-monitoring tests via Synthetic Agent on the Chromium browser.
 
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
+
+[NOTE]
+=====
+*Looking for browser monitor options?*  {heartbeat} browser checks are in beta and will never be made generally available.
+
+If you want to set up browser checks, we highly recommend using Synthetics via {observability-guide}/synthetics-get-started-project.html[Projects] or the {observability-guide}/synthetics-get-started-ui.html[Synthetics app in {kib}] to create and manage browser monitors.
+
+If you need to refer to how beta {heartbeat} browser checks were set up previously, refer to the {beats-ref-root}/heartbeat/8.7/monitor-browser-options.html[Browser options documentation for 8.7].
+=====
 
 include::monitors/monitor-common-options.asciidoc[]
 
@@ -107,8 +114,6 @@ include::monitors/monitor-icmp.asciidoc[]
 include::monitors/monitor-tcp.asciidoc[]
 
 include::monitors/monitor-http.asciidoc[]
-
-include::monitors/monitor-browser.asciidoc[]
 
 [float]
 [[run-once-mode]]
@@ -124,6 +129,24 @@ the next run will occur. That duration is encoded in the `monitor.timespan` fiel
 [source,yaml]
 ----------------------------------------------------------------------
 # heartbeat.yml
+heartbeat.run_once: true
+heartbeat.monitors:
+# your monitor config here...
+----------------------------------------------------------------------
+
+[float]
+[[publish-timeout]]
+=== Publish timeout (Experimental)
+
+You can configure {beatname_uc} to exit after an elapsed timeout if unable to publish pending events.
+This is an experimental feature and is subject to change. 
+
+Note, the `heartbeat.run_once` flag is required for `publish_timeout` to take effect.
+
+[source,yaml]
+----------------------------------------------------------------------
+# heartbeat.yml
+heartbeat.publish_timeout: 30s
 heartbeat.run_once: true
 heartbeat.monitors:
 # your monitor config here...

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package filestream
 
@@ -48,16 +47,16 @@ func newINodeMarkerIdentifier(cfg *conf.C) (fileIdentifier, error) {
 	}
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %v", err)
+		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %w", err)
 	}
 
 	fi, err := os.Stat(config.MarkerPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while opening marker file at %s: %v", config.MarkerPath, err)
+		return nil, fmt.Errorf("error while opening marker file at %s: %w", config.MarkerPath, err)
 	}
 	markerContent, err := ioutil.ReadFile(config.MarkerPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading marker file at %s: %v", config.MarkerPath, err)
+		return nil, fmt.Errorf("error while reading marker file at %s: %w", config.MarkerPath, err)
 	}
 	return &inodeMarkerIdentifier{
 		log:                       logp.NewLogger("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
@@ -94,14 +93,14 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 }
 
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	osstate := file.GetOSState(e.Info)
+	osstate := file.GetOSState(e.Descriptor.Info)
 	return fileSource{
-		info:                e.Info,
+		desc:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
+		fileID:              i.name + identitySep + osstate.InodeString() + "-" + i.markerContents(),
 		identifierGenerator: i.name,
 	}
 }

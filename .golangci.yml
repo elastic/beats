@@ -50,8 +50,6 @@ linters:
     - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
-    - structcheck # finds unused struct fields
-    - varcheck # Finds unused global variables and constants
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
@@ -64,6 +62,7 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
+    - prealloc # Finds slice declarations that could potentially be pre-allocated
 
 # all available settings of specific linters
 linters-settings:
@@ -75,8 +74,8 @@ linters-settings:
     # List of functions to exclude from checking, where each entry is a single function to exclude.
     # See https://github.com/kisielk/errcheck#excluding-functions for details.
     exclude-functions:
-      - (mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
-      - (mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
+      - (github.com/elastic/elastic-agent-libs/mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
+      - (github.com/elastic/elastic-agent-libs/mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
 
   errorlint:
     # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
@@ -110,7 +109,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.7"
+    go: "1.20.6"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -128,19 +127,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.7"
+    go: "1.20.6"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.7"
+    go: "1.20.6"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.7"
+    go: "1.20.6"
 
   gosec:
     excludes:
@@ -149,3 +148,17 @@ linters-settings:
     - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
     - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
     - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+
+  prealloc:
+    # IMPORTANT: we don't recommend using this linter before doing performance profiling.
+    # For most programs usage of prealloc will be a premature optimization.
+
+    # Report pre-allocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
+    # Default: true
+    simple: false
+    # Report pre-allocation suggestions on range loops.
+    # Default: true
+    range-loops: true
+    # Report pre-allocation suggestions on for loops.
+    # Default: false
+    for-loops: true

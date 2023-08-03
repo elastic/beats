@@ -29,6 +29,38 @@ func TestInputMetricsClose(t *testing.T) {
 	})
 }
 
+// TestNewInputMetricsInstance asserts that all the metrics are initialized
+// when a newInputMetrics method is invoked. This avoids nil hit panics when
+// a getter is invoked on any uninitialized metric.
+func TestNewInputMetricsInstance(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	metrics := newInputMetrics("some-new-metric-test", reg, 1)
+
+	assert.NotNil(t, metrics.sqsMessagesWaiting,
+		metrics.sqsMaxMessagesInflight,
+		metrics.sqsWorkerStartTimes,
+		metrics.sqsWorkerUtilizationLastUpdate,
+		metrics.sqsMessagesReceivedTotal,
+		metrics.sqsVisibilityTimeoutExtensionsTotal,
+		metrics.sqsMessagesInflight,
+		metrics.sqsMessagesReturnedTotal,
+		metrics.sqsMessagesDeletedTotal,
+		metrics.sqsMessagesWaiting,
+		metrics.sqsWorkerUtilization,
+		metrics.sqsMessageProcessingTime,
+		metrics.sqsLagTime,
+		metrics.s3ObjectsRequestedTotal,
+		metrics.s3ObjectsAckedTotal,
+		metrics.s3ObjectsListedTotal,
+		metrics.s3ObjectsProcessedTotal,
+		metrics.s3BytesProcessedTotal,
+		metrics.s3EventsCreatedTotal,
+		metrics.s3ObjectsInflight,
+		metrics.s3ObjectProcessingTime)
+
+	assert.Equal(t, int64(-1), metrics.sqsMessagesWaiting.Get())
+}
+
 func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 	const interval = 5000
 
@@ -94,10 +126,13 @@ func TestInputMetricsSQSWorkerUtilization(t *testing.T) {
 var fakeTimeMs = &atomic.Int64{}
 
 func useFakeCurrentTimeThenReset() (reset func()) {
-	currentTime = func() time.Time {
-		return time.UnixMilli(fakeTimeMs.Load())
+	clockValue.Swap(clock{
+		Now: func() time.Time {
+			return time.UnixMilli(fakeTimeMs.Load())
+		},
+	})
+	reset = func() {
+		clockValue.Swap(realClock)
 	}
-	return func() {
-		currentTime = time.Now
-	}
+	return reset
 }

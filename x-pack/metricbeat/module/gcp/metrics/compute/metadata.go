@@ -6,13 +6,16 @@ package compute
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
-	compute "google.golang.org/api/compute/v1"
+	compute "cloud.google.com/go/compute/apiv1"
+	"cloud.google.com/go/compute/apiv1/computepb"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -26,7 +29,7 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
-		computeInstances: make(map[uint64]*compute.Instance),
+		computeInstances: make(map[uint64]*computepb.Instance),
 		logger:           logp.NewLogger("metrics-compute"),
 	}, nil
 }
@@ -50,7 +53,7 @@ type metadataCollector struct {
 	region           string
 	regions          []string
 	opt              []option.ClientOption
-	computeInstances map[uint64]*compute.Instance
+	computeInstances map[uint64]*computepb.Instance
 	logger           *logp.Logger
 }
 
@@ -114,19 +117,27 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 		return computeMetadata, nil
 	}
 
-	if instance.Labels != nil {
-		computeMetadata.User = instance.Labels
+	labels := instance.GetLabels()
+	if labels != nil {
+		computeMetadata.User = labels
 	}
 
-	if instance.MachineType != "" {
-		computeMetadata.machineType = instance.MachineType
+	machineType := instance.GetMachineType()
+	if machineType != "" {
+		computeMetadata.machineType = machineType
 	}
 
-	if instance.Metadata != nil && instance.Metadata.Items != nil {
-		computeMetadata.Metadata = make(map[string]string)
+	metadata := instance.GetMetadata()
 
-		for _, i := range instance.Metadata.Items {
-			computeMetadata.Metadata[i.Key] = *i.Value
+	if metadata != nil {
+		metadataItems := metadata.GetItems()
+
+		if metadataItems != nil {
+			computeMetadata.Metadata = make(map[string]string)
+
+			for _, item := range metadataItems {
+				computeMetadata.Metadata[item.GetKey()] = item.GetValue()
+			}
 		}
 	}
 
@@ -134,7 +145,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 }
 
 // instance returns data from an instance ID using the cache or making a request
-func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*compute.Instance, error) {
+func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*computepb.Instance, error) {
 	s.getComputeInstances(ctx)
 
 	instanceIdInt, _ := strconv.Atoi(instanceID)
@@ -144,7 +155,7 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*c
 	}
 
 	// Remake the compute instances map to avoid having stale data.
-	s.computeInstances = make(map[uint64]*compute.Instance)
+	s.computeInstances = make(map[uint64]*computepb.Instance)
 
 	return nil, nil
 }
@@ -172,21 +183,32 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 
 	s.logger.Debug("Compute API Instances.AggregatedList")
 
-	computeService, err := compute.NewService(ctx, s.opt...)
+	instancesClient, err := compute.NewInstancesRESTClient(ctx, s.opt...)
 	if err != nil {
-		s.logger.Errorf("error getting client from Compute service: %v", err)
+		s.logger.Errorf("error getting client from compute service: %v", err)
 		return
 	}
 
-	req := computeService.Instances.AggregatedList(s.projectID)
-	if err := req.Pages(ctx, func(page *compute.InstanceAggregatedList) error {
-		for _, instancesScopedList := range page.Items {
-			for _, instance := range instancesScopedList.Instances {
-				s.computeInstances[instance.Id] = instance
-			}
+	defer instancesClient.Close()
+
+	it := instancesClient.AggregatedList(ctx, &computepb.AggregatedListInstancesRequest{
+		Project: s.projectID,
+	})
+
+	for {
+		instancesScopedListPair, err := it.Next()
+		if errors.Is(err, iterator.Done) {
+			break
 		}
-		return nil
-	}); err != nil {
-		s.logger.Errorf("google Instances.AggregatedList error: %v", err)
+
+		if err != nil {
+			s.logger.Errorf("error getting next instance from InstancesScopedListPairIterator: %v", err)
+			break
+		}
+
+		instances := instancesScopedListPair.Value.GetInstances()
+		for _, instance := range instances {
+			s.computeInstances[instance.GetId()] = instance
+		}
 	}
 }

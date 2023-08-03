@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
@@ -287,9 +286,9 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
-	}
-	l.message = func(event win.EvtHandle) (string, error) {
-		return win.Message(event, l.renderBuf, l.cache.get)
+		l.message = func(event win.EvtHandle) (string, error) {
+			return win.Message(event, l.renderBuf, l.cache.get)
+		}
 	}
 
 	return l, nil
@@ -463,7 +462,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 			l.metrics.logError(err)
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
-		if r.Message == "" {
+		if r.Message == "" && l.message != nil {
 			r.Message, err = l.message(h)
 			if err != nil {
 				l.metrics.logError(err)

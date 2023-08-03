@@ -123,6 +123,24 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		logp.Err("Failed to generate ID from config: %v, %v", err, config)
 		return nil, err
 	}
+	if len(config.Interfaces) != 0 {
+		// Install Npcap if needed. This needs to happen before any other
+		// work on Windows, including config checking, because that involves
+		// probing interfaces.
+		//
+		// Users may block installation of Npcap, so we defer the install
+		// until we have a configuration that will tell us if it has been
+		// blocked. To do this we must have a valid config.
+		//
+		// When Packetbeat is managed by fleet we will only have this if
+		// Create has been called via the agent Reload process. We take
+		// the opportunity to not install the DLL if there is no configured
+		// interface.
+		err := installNpcap(p.beat, cfg)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	publisher, err := publish.NewTransactionPublisher(
 		p.beat.Info.Name,
@@ -157,7 +175,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(config, protocols, sniffer.DecodersFor(id, publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(id, config, protocols, sniffer.DecodersFor(id, publisher, protocols, watcher, flows, config))
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +214,7 @@ func setupFlows(pipeline beat.Pipeline, watcher *procs.ProcessesWatcher, cfg con
 	return flows.NewFlows(client.PublishAll, watcher, cfg.Flows)
 }
 
-func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, decoders sniffer.Decoders) (*sniffer.Sniffer, error) {
+func setupSniffer(id string, cfg config.Config, protocols *protos.ProtocolsStruct, decoders sniffer.Decoders) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -209,7 +227,7 @@ func setupSniffer(cfg config.Config, protocols *protos.ProtocolsStruct, decoders
 		cfg.Interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(false, "", decoders, cfg.Interfaces)
+	return sniffer.New(id, false, "", decoders, cfg.Interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based

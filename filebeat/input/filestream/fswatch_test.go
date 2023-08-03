@@ -19,230 +19,879 @@ package filestream
 
 import (
 	"context"
-	"io/ioutil"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/match"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var (
-	excludedFileName = "excluded_file"
-	includedFileName = "included_file"
-	directoryPath    = "unharvestable_dir"
-)
+func TestFileWatcher(t *testing.T) {
+	dir := t.TempDir()
+	paths := []string{filepath.Join(dir, "*.log")}
+	cfgStr := `
+scanner:
+  check_interval: 100ms
+  resend_on_touch: true
+  symlinks: false
+  recursive_glob: true
+  fingerprint:
+    enabled: false
+    offset: 0
+    length: 1024
+`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	fw := createWatcherWithConfig(t, paths, cfgStr)
+
+	go fw.Run(ctx)
+
+	t.Run("detects a new file", func(t *testing.T) {
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err := os.WriteFile(filename, []byte("hello"), 0777)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename: filename,
+				Info:     testFileInfo{name: basename, size: 5}, // 5 bytes written
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("detects a file write", func(t *testing.T) {
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+
+		f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0777)
+		require.NoError(t, err)
+		_, err = f.WriteString("world")
+		require.NoError(t, err)
+		f.Close()
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			OldPath: filename,
+			Op:      loginp.OpWrite,
+			Descriptor: loginp.FileDescriptor{
+				Filename: filename,
+				Info:     testFileInfo{name: basename, size: 10}, // +5 bytes appended
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("detects a file rename", func(t *testing.T) {
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		newBasename := "renamed.log"
+		newFilename := filepath.Join(dir, newBasename)
+
+		err := os.Rename(filename, newFilename)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: newFilename,
+			OldPath: filename,
+			Op:      loginp.OpRename,
+			Descriptor: loginp.FileDescriptor{
+				Filename: newFilename,
+				Info:     testFileInfo{name: newBasename, size: 10},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("detects a file truncate", func(t *testing.T) {
+		basename := "renamed.log"
+		filename := filepath.Join(dir, basename)
+
+		err := os.Truncate(filename, 2)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			OldPath: filename,
+			Op:      loginp.OpTruncate,
+			Descriptor: loginp.FileDescriptor{
+				Filename: filename,
+				Info:     testFileInfo{name: basename, size: 2},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("emits truncate on touch when resend_on_touch is enabled", func(t *testing.T) {
+		basename := "renamed.log"
+		filename := filepath.Join(dir, basename)
+		time := time.Now().Local().Add(time.Hour)
+		err := os.Chtimes(filename, time, time)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			OldPath: filename,
+			Op:      loginp.OpTruncate,
+			Descriptor: loginp.FileDescriptor{
+				Filename: filename,
+				Info:     testFileInfo{name: basename, size: 2},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("detects a file remove", func(t *testing.T) {
+		basename := "renamed.log"
+		filename := filepath.Join(dir, basename)
+
+		err := os.Remove(filename)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			OldPath: filename,
+			Op:      loginp.OpDelete,
+			Descriptor: loginp.FileDescriptor{
+				Filename: filename,
+				Info:     testFileInfo{name: basename, size: 2},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("propagates a fingerprints for a new file", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 100ms
+  symlinks: false
+  recursive_glob: true
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1024
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename:    filename,
+				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Info:        testFileInfo{name: basename, size: 1024},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+	})
+
+	t.Run("does not emit events if a file is touched and resend_on_touch is disabled", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+		defer cancel()
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename: filename,
+				Info:     testFileInfo{name: basename, size: 1024},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+
+		time := time.Now().Local().Add(time.Hour)
+		err = os.Chtimes(filename, time, time)
+		require.NoError(t, err)
+
+		e = fw.Event()
+		require.Equal(t, loginp.OpDone, e.Op)
+	})
+
+	t.Run("does not emit events for empty files", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		err := logp.DevelopmentSetup(logp.ToObserverOutput())
+		require.NoError(t, err)
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err = os.WriteFile(filename, nil, 0777)
+		require.NoError(t, err)
+
+		t.Run("issues a warning in logs", func(t *testing.T) {
+			var lastWarning string
+			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
+			require.Eventually(t, func() bool {
+				logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+				if len(logs) == 0 {
+					return false
+				}
+				lastWarning = logs[len(logs)-1].Message
+				return strings.Contains(lastWarning, expLogMsg)
+			}, 100*time.Millisecond, 10*time.Millisecond, "required a warning message %q but got %q", expLogMsg, lastWarning)
+		})
+
+		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
+			err = os.WriteFile(filename, []byte("hello"), 0777)
+			require.NoError(t, err)
+
+			e := fw.Event()
+			expEvent := loginp.FSEvent{
+				NewPath: filename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: filename,
+					Info:     testFileInfo{name: basename, size: 5}, // +5 bytes appended
+				},
+			}
+			requireEqualEvents(t, expEvent, e)
+		})
+	})
+
+	t.Run("does not emit an event for a fingerprint collision", func(t *testing.T) {
+		dir := t.TempDir()
+		paths := []string{filepath.Join(dir, "*.log")}
+		cfgStr := `
+scanner:
+  check_interval: 10ms
+  fingerprint.enabled: true
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+		go fw.Run(ctx)
+
+		basename := "created.log"
+		filename := filepath.Join(dir, basename)
+		err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+		require.NoError(t, err)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: filename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename:    filename,
+				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Info:        testFileInfo{name: basename, size: 1024},
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+
+		// collisions are resolved in the alphabetical order, the first filename wins
+		basename = "created_collision.log"
+		filename = filepath.Join(dir, basename)
+		err = os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+		require.NoError(t, err)
+
+		e = fw.Event()
+		// means no event
+		require.Equal(t, loginp.OpDone, e.Op)
+	})
+}
 
 func TestFileScanner(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "fswatch_test_file_scanner")
-	if err != nil {
-		t.Fatalf("cannot create temporary test dir: %v", err)
+	dir := t.TempDir()
+	dir2 := t.TempDir() // for symlink testing
+	paths := []string{filepath.Join(dir, "*.log")}
+
+	normalBasename := "normal.log"
+	undersizedBasename := "undersized.log"
+	excludedBasename := "excluded.log"
+	excludedIncludedBasename := "excluded_included.log"
+	travelerBasename := "traveler.log"
+	normalSymlinkBasename := "normal_symlink.log"
+	exclSymlinkBasename := "excl_symlink.log"
+	travelerSymlinkBasename := "portal.log"
+
+	normalFilename := filepath.Join(dir, normalBasename)
+	undersizedFilename := filepath.Join(dir, undersizedBasename)
+	excludedFilename := filepath.Join(dir, excludedBasename)
+	excludedIncludedFilename := filepath.Join(dir, excludedIncludedBasename)
+	travelerFilename := filepath.Join(dir2, travelerBasename)
+	normalSymlinkFilename := filepath.Join(dir, normalSymlinkBasename)
+	exclSymlinkFilename := filepath.Join(dir, exclSymlinkBasename)
+	travelerSymlinkFilename := filepath.Join(dir, travelerSymlinkBasename)
+
+	files := map[string]string{
+		normalFilename:           strings.Repeat("a", 1024),
+		undersizedFilename:       strings.Repeat("a", 128),
+		excludedFilename:         strings.Repeat("nothing to see here", 1024),
+		excludedIncludedFilename: strings.Repeat("perhaps something to see here", 1024),
+		travelerFilename:         strings.Repeat("folks, I think I got lost", 1024),
 	}
-	defer os.RemoveAll(tmpDir)
-	setupFilesForScannerTest(t, tmpDir)
 
-	excludedFilePath := filepath.Join(tmpDir, excludedFileName)
-	includedFilePath := filepath.Join(tmpDir, includedFileName)
+	sizes := make(map[string]int64, len(files))
+	for filename, content := range files {
+		sizes[filename] = int64(len(content))
+	}
+	for filename, content := range files {
+		err := os.WriteFile(filename, []byte(content), 0777)
+		require.NoError(t, err)
+	}
 
-	testCases := map[string]struct {
-		paths         []string
-		excludedFiles []match.Matcher
-		includedFiles []match.Matcher
-		symlinks      bool
-		expectedFiles []string
+	// this is to test that a symlink for a known file does not add the file twice
+	err := os.Symlink(normalFilename, normalSymlinkFilename)
+	require.NoError(t, err)
+
+	// this is to test that a symlink for an unknown file is added once
+	err = os.Symlink(travelerFilename, travelerSymlinkFilename)
+	require.NoError(t, err)
+
+	// this is to test that a symlink to an excluded file is not added
+	err = os.Symlink(exclSymlinkFilename, exclSymlinkFilename)
+	require.NoError(t, err)
+
+	// this is to test that directories are handled and excluded
+	err = os.Mkdir(filepath.Join(dir, "dir"), 0777)
+	require.NoError(t, err)
+
+	cases := []struct {
+		name    string
+		cfgStr  string
+		expDesc map[string]loginp.FileDescriptor
 	}{
-		"select all files": {
-			paths:         []string{excludedFilePath, includedFilePath},
-			expectedFiles: []string{excludedFilePath, includedFilePath},
-		},
-		"skip excluded files": {
-			paths: []string{excludedFilePath, includedFilePath},
-			excludedFiles: []match.Matcher{
-				match.MustCompile(excludedFileName),
+		{
+			name: "returns all files when no limits, not including the repeated symlink",
+			cfgStr: `
+scanner:
+  symlinks: true
+  recursive_glob: true
+  fingerprint:
+    enabled: false
+    offset: 0
+    length: 1024
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename: normalFilename,
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						name: normalBasename,
+					},
+				},
+				undersizedFilename: {
+					Filename: undersizedFilename,
+					Info: testFileInfo{
+						size: sizes[undersizedFilename],
+						name: undersizedBasename,
+					},
+				},
+				excludedFilename: {
+					Filename: excludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedFilename],
+						name: excludedBasename,
+					},
+				},
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
+				travelerSymlinkFilename: {
+					Filename: travelerSymlinkFilename,
+					Info: testFileInfo{
+						size: sizes[travelerFilename],
+						name: travelerSymlinkBasename,
+					},
+				},
 			},
-			expectedFiles: []string{includedFilePath},
 		},
-		"only include included_files": {
-			paths: []string{excludedFilePath, includedFilePath},
-			includedFiles: []match.Matcher{
-				match.MustCompile(includedFileName),
+		{
+			name: "returns filtered files, excluding symlinks",
+			cfgStr: `
+scanner:
+  symlinks: false # symlinks are disabled
+  recursive_glob: false
+  fingerprint:
+    enabled: false
+    offset: 0
+    length: 1024
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename: normalFilename,
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						name: normalBasename,
+					},
+				},
+				undersizedFilename: {
+					Filename: undersizedFilename,
+					Info: testFileInfo{
+						size: sizes[undersizedFilename],
+						name: undersizedBasename,
+					},
+				},
+				excludedFilename: {
+					Filename: excludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedFilename],
+						name: excludedBasename,
+					},
+				},
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
 			},
-			expectedFiles: []string{includedFilePath},
 		},
-		"skip directories": {
-			paths:         []string{filepath.Join(tmpDir, directoryPath)},
-			expectedFiles: []string{},
+		{
+			name: "returns files according to excluded list",
+			cfgStr: `
+scanner:
+  exclude_files: ['.*exclude.*']
+  symlinks: true
+  recursive_glob: true
+  fingerprint:
+    enabled: false
+    offset: 0
+    length: 1024
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename: normalFilename,
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						name: normalBasename,
+					},
+				},
+				undersizedFilename: {
+					Filename: undersizedFilename,
+					Info: testFileInfo{
+						size: sizes[undersizedFilename],
+						name: undersizedBasename,
+					},
+				},
+				travelerSymlinkFilename: {
+					Filename: travelerSymlinkFilename,
+					Info: testFileInfo{
+						size: sizes[travelerFilename],
+						name: travelerSymlinkBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns no symlink if the original file is excluded",
+			cfgStr: `
+scanner:
+  exclude_files: ['.*exclude.*', '.*traveler.*']
+  symlinks: true
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename: normalFilename,
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						name: normalBasename,
+					},
+				},
+				undersizedFilename: {
+					Filename: undersizedFilename,
+					Info: testFileInfo{
+						size: sizes[undersizedFilename],
+						name: undersizedBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns files according to included list",
+			cfgStr: `
+scanner:
+  include_files: ['.*include.*']
+  symlinks: true
+  recursive_glob: true
+  fingerprint:
+    enabled: false
+    offset: 0
+    length: 1024
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns no included symlink if the original file is not included",
+			cfgStr: `
+scanner:
+  include_files: ['.*include.*', '.*portal.*']
+  symlinks: true
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns an included symlink if the original file is included",
+			cfgStr: `
+scanner:
+  include_files: ['.*include.*', '.*portal.*', '.*traveler.*']
+  symlinks: true
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				excludedIncludedFilename: {
+					Filename: excludedIncludedFilename,
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
+				travelerSymlinkFilename: {
+					Filename: travelerSymlinkFilename,
+					Info: testFileInfo{
+						size: sizes[travelerFilename],
+						name: travelerSymlinkBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns all files except too small to fingerprint",
+			cfgStr: `
+scanner:
+  symlinks: true
+  recursive_glob: true
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1024
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename:    normalFilename,
+					Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						name: normalBasename,
+					},
+				},
+				excludedFilename: {
+					Filename:    excludedFilename,
+					Fingerprint: "bd151321c3bbdb44185414a1b56b5649a00206dd4792e7230db8904e43987336",
+					Info: testFileInfo{
+						size: sizes[excludedFilename],
+						name: excludedBasename,
+					},
+				},
+				excludedIncludedFilename: {
+					Filename:    excludedIncludedFilename,
+					Fingerprint: "bfdb99a65297062658c26dfcea816d76065df2a2da2594bfd9b96e9e405da1c2",
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
+				travelerSymlinkFilename: {
+					Filename:    travelerSymlinkFilename,
+					Fingerprint: "c4058942bffcea08810a072d5966dfa5c06eb79b902bf0011890dd8d22e1a5f8",
+					Info: testFileInfo{
+						size: sizes[travelerFilename],
+						name: travelerSymlinkBasename,
+					},
+				},
+			},
+		},
+		{
+			name: "returns all files that match a non-standard fingerprint window",
+			cfgStr: `
+scanner:
+  symlinks: true
+  recursive_glob: true
+  fingerprint:
+    enabled: true
+    offset: 2
+    length: 64
+`,
+			expDesc: map[string]loginp.FileDescriptor{
+				normalFilename: {
+					Filename:    normalFilename,
+					Fingerprint: "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb",
+					Info: testFileInfo{
+						size: sizes[normalFilename],
+						name: normalBasename,
+					},
+				},
+				// undersizedFilename got excluded because of the matching fingerprint
+				excludedFilename: {
+					Filename:    excludedFilename,
+					Fingerprint: "9c225a1e6a7df9c869499e923565b93937e88382bb9188145f117195cd41dcd1",
+					Info: testFileInfo{
+						size: sizes[excludedFilename],
+						name: excludedBasename,
+					},
+				},
+				excludedIncludedFilename: {
+					Filename:    excludedIncludedFilename,
+					Fingerprint: "7985b2b9750bdd3c76903db408aff3859204d6334279eaf516ecaeb618a218d5",
+					Info: testFileInfo{
+						size: sizes[excludedIncludedFilename],
+						name: excludedIncludedBasename,
+					},
+				},
+				travelerSymlinkFilename: {
+					Filename:    travelerSymlinkFilename,
+					Fingerprint: "da437600754a8eed6c194b7241b078679551c06c7dc89685a9a71be7829ad7e5",
+					Info: testFileInfo{
+						size: sizes[travelerFilename],
+						name: travelerSymlinkBasename,
+					},
+				},
+			},
 		},
 	}
 
-	for name, test := range testCases {
-		test := test
-
-		t.Run(name, func(t *testing.T) {
-			cfg := fileScannerConfig{
-				ExcludedFiles: test.excludedFiles,
-				IncludedFiles: test.includedFiles,
-				Symlinks:      test.symlinks,
-				RecursiveGlob: false,
-			}
-			fs, err := newFileScanner(test.paths, cfg)
-			if err != nil {
-				t.Fatal(err)
-			}
-			files := fs.GetFiles()
-			paths := make([]string, 0)
-			for p := range files {
-				paths = append(paths, p)
-			}
-			assert.ElementsMatch(t, paths, test.expectedFiles)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			s := createScannerWithConfig(t, paths, tc.cfgStr)
+			requireEqualFiles(t, tc.expDesc, s.GetFiles())
 		})
 	}
+
+	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
+		cfgStr := `
+scanner:
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1
+`
+		cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+		require.NoError(t, err)
+
+		ns := &conf.Namespace{}
+		err = ns.Unpack(cfg)
+		require.NoError(t, err)
+
+		_, err = newFileWatcher(paths, ns)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
+	})
 }
 
-func setupFilesForScannerTest(t *testing.T, tmpDir string) {
-	err := os.Mkdir(filepath.Join(tmpDir, directoryPath), 0750)
-	if err != nil {
-		t.Fatalf("cannot create non harvestable directory: %v", err)
-	}
-	for _, path := range []string{excludedFileName, includedFileName} {
-		f, err := os.Create(filepath.Join(tmpDir, path))
-		if err != nil {
-			t.Fatalf("file %s, error %v", path, err)
-		}
-		f.Close()
-	}
-}
+const benchmarkFileCount = 1000
 
-func TestFileWatchNewDeleteModified(t *testing.T) {
-	oldTs := time.Now()
-	newTs := oldTs.Add(5 * time.Second)
-	testCases := map[string]struct {
-		prevFiles      map[string]os.FileInfo
-		nextFiles      map[string]os.FileInfo
-		expectedEvents []loginp.FSEvent
-	}{
-		"one new file": {
-			prevFiles: map[string]os.FileInfo{},
-			nextFiles: map[string]os.FileInfo{
-				"new_path": testFileInfo{"new_path", 5, oldTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				{Op: loginp.OpCreate, OldPath: "", NewPath: "new_path", Info: testFileInfo{"new_path", 5, oldTs, nil}},
-			},
-		},
-		"one deleted file": {
-			prevFiles: map[string]os.FileInfo{
-				"old_path": testFileInfo{"old_path", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{},
-			expectedEvents: []loginp.FSEvent{
-				{Op: loginp.OpDelete, OldPath: "old_path", NewPath: "", Info: testFileInfo{"old_path", 5, oldTs, nil}},
-			},
-		},
-		"one modified file": {
-			prevFiles: map[string]os.FileInfo{
-				"path": testFileInfo{"path", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path": testFileInfo{"path", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				{Op: loginp.OpWrite, OldPath: "path", NewPath: "path", Info: testFileInfo{"path", 10, newTs, nil}},
-			},
-		},
-		"two modified files": {
-			prevFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 5, oldTs, nil},
-				"path2": testFileInfo{"path2", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 10, newTs, nil},
-				"path2": testFileInfo{"path2", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs, nil}},
-				{Op: loginp.OpWrite, OldPath: "path2", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs, nil}},
-			},
-		},
-		"one modified file, one new file": {
-			prevFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 10, newTs, nil},
-				"path2": testFileInfo{"path2", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs, nil}},
-				{Op: loginp.OpCreate, OldPath: "", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs, nil}},
-			},
-		},
-		"one new file, one deleted file": {
-			prevFiles: map[string]os.FileInfo{
-				"path_deleted": testFileInfo{"path_deleted", 5, oldTs, nil},
-			},
-			nextFiles: map[string]os.FileInfo{
-				"path_new": testFileInfo{"path_new", 10, newTs, nil},
-			},
-			expectedEvents: []loginp.FSEvent{
-				{Op: loginp.OpDelete, OldPath: "path_deleted", NewPath: "", Info: testFileInfo{"path_deleted", 5, oldTs, nil}},
-				{Op: loginp.OpCreate, OldPath: "", NewPath: "path_new", Info: testFileInfo{"path_new", 10, newTs, nil}},
+func BenchmarkGetFiles(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: false,
 			},
 		},
 	}
 
-	for name, test := range testCases {
-		test := test
-
-		t.Run(name, func(t *testing.T) {
-			w := fileWatcher{
-				log:          logp.L(),
-				prev:         test.prevFiles,
-				scanner:      &mockScanner{test.nextFiles},
-				events:       make(chan loginp.FSEvent),
-				sameFileFunc: testSameFile,
-			}
-
-			go w.watch(context.Background())
-
-			count := len(test.expectedEvents)
-			actual := make([]loginp.FSEvent, count)
-			for i := 0; i < count; i++ {
-				actual[i] = w.Event()
-			}
-
-			assert.ElementsMatch(t, actual, test.expectedEvents)
-		})
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
 	}
 }
 
-type mockScanner struct {
-	files map[string]os.FileInfo
+func BenchmarkGetFilesWithFingerprint(b *testing.B) {
+	dir := b.TempDir()
+	basenameFormat := "file-%d.log"
+
+	for i := 0; i < benchmarkFileCount; i++ {
+		filename := filepath.Join(dir, fmt.Sprintf(basenameFormat, i))
+		content := fmt.Sprintf("content-%d\n", i)
+		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
+		require.NoError(b, err)
+	}
+
+	s := fileScanner{
+		paths: []string{filepath.Join(dir, "*.log")},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  1024,
+			},
+		},
+	}
+
+	for i := 0; i < b.N; i++ {
+		files := s.GetFiles()
+		require.Len(b, files, benchmarkFileCount)
+	}
 }
 
-func (m *mockScanner) GetFiles() map[string]os.FileInfo {
-	return m.files
+func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
+	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+	require.NoError(t, err)
+
+	ns := &conf.Namespace{}
+	err = ns.Unpack(cfg)
+	require.NoError(t, err)
+
+	fw, err := newFileWatcher(paths, ns)
+	require.NoError(t, err)
+
+	return fw
 }
 
-type testFileInfo struct {
-	path string
-	size int64
-	time time.Time
-	sys  interface{}
+func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSScanner {
+	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
+	require.NoError(t, err)
+
+	ns := &conf.Namespace{}
+	err = ns.Unpack(cfg)
+	require.NoError(t, err)
+
+	config := defaultFileWatcherConfig()
+	err = ns.Config().Unpack(&config)
+	require.NoError(t, err)
+	scanner, err := newFileScanner(paths, config.Scanner)
+	require.NoError(t, err)
+
+	return scanner
 }
 
-func (t testFileInfo) Name() string       { return t.path }
-func (t testFileInfo) Size() int64        { return t.size }
-func (t testFileInfo) Mode() os.FileMode  { return 0 }
-func (t testFileInfo) ModTime() time.Time { return t.time }
-func (t testFileInfo) IsDir() bool        { return false }
-func (t testFileInfo) Sys() interface{}   { return t.sys }
+func requireEqualFiles(t *testing.T, expected, actual map[string]loginp.FileDescriptor) {
+	t.Helper()
+	require.Equalf(t, len(expected), len(actual), "amount of files does not match:\n\nexpected \n%v\n\n actual \n%v\n", filenames(expected), filenames(actual))
 
-func testSameFile(fi1, fi2 os.FileInfo) bool {
-	return fi1.Name() == fi2.Name()
+	for expFilename, expFD := range expected {
+		actFD, exists := actual[expFilename]
+		require.Truef(t, exists, "the actual file list is missing expected filename %s", expFilename)
+		requireEqualDescriptors(t, expFD, actFD)
+	}
+}
+
+func requireEqualEvents(t *testing.T, expected, actual loginp.FSEvent) {
+	t.Helper()
+	require.Equal(t, expected.NewPath, actual.NewPath, "NewPath")
+	require.Equal(t, expected.OldPath, actual.OldPath, "OldPath")
+	require.Equal(t, expected.Op, actual.Op, "Op")
+	requireEqualDescriptors(t, expected.Descriptor, actual.Descriptor)
+}
+
+func requireEqualDescriptors(t *testing.T, expected, actual loginp.FileDescriptor) {
+	t.Helper()
+	require.Equal(t, expected.Filename, actual.Filename, "Filename")
+	require.Equal(t, expected.Fingerprint, actual.Fingerprint, "Fingerprint")
+	require.Equal(t, expected.Info.Name(), actual.Info.Name(), "Info.Name()")
+	require.Equal(t, expected.Info.Size(), actual.Info.Size(), "Info.Size()")
+}
+
+func filenames(m map[string]loginp.FileDescriptor) (result string) {
+	for filename := range m {
+		result += filename + "\n"
+	}
+	return result
+}
+
+func BenchmarkToFileDescriptor(b *testing.B) {
+	dir := b.TempDir()
+	basename := "created.log"
+	filename := filepath.Join(dir, basename)
+	err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
+	require.NoError(b, err)
+
+	s := fileScanner{
+		paths: []string{filename},
+		cfg: fileScannerConfig{
+			Fingerprint: fingerprintConfig{
+				Enabled: true,
+				Offset:  0,
+				Length:  1024,
+			},
+		},
+	}
+
+	it, err := s.getIngestTarget(filename)
+	require.NoError(b, err)
+
+	for i := 0; i < b.N; i++ {
+		fd, err := s.toFileDescriptor(&it)
+		require.NoError(b, err)
+		require.Equal(b, "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a", fd.Fingerprint)
+	}
 }

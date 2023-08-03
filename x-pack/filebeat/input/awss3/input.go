@@ -115,11 +115,15 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	defer cancelInputCtx()
 
 	if in.config.QueueURL != "" {
-		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-		if err != nil {
+		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint, in.config.RegionName)
+		if err != nil && in.config.RegionName == "" {
 			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
 		}
-
+		var warn regionMismatchError
+		if errors.As(err, &warn) {
+			// Warn of mismatch, but go ahead with configured region name.
+			inputContext.Logger.Warnf("%v: using %q", err, regionName)
+		}
 		in.awsConfig.Region = regionName
 
 		// Create SQS receiver and S3 notification processor.
@@ -140,8 +144,8 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
 		// Create client for publishing events and receive notification of their ACKs.
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:   inputContext.Cancelation,
-			ACKHandler: awscommon.NewEventACKHandler(),
+			CloseRef:      inputContext.Cancelation,
+			EventListener: awscommon.NewEventACKHandler(),
 			Processing: beat.ProcessingConfig{
 				// This input only produces events with basic types so normalization
 				// is not required.
@@ -186,6 +190,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
+			o.UsePathStyle = in.config.PathStyle
 		}),
 	}
 
@@ -300,20 +305,39 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	return s3Poller, nil
 }
 
-func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
+var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+
+func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (region string, err error) {
 	// get region from queueURL
 	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
-	url, err := url.Parse(queueURL)
+	u, err := url.Parse(queueURL)
 	if err != nil {
 		return "", fmt.Errorf(queueURL + " is not a valid URL")
 	}
-	if url.Scheme == "https" && url.Host != "" {
-		queueHostSplit := strings.Split(url.Host, ".")
-		if len(queueHostSplit) > 2 && (strings.Join(queueHostSplit[2:], ".") == endpoint || (endpoint == "" && queueHostSplit[2] == "amazonaws")) {
-			return queueHostSplit[1], nil
+	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
+		queueHostSplit := strings.SplitN(u.Host, ".", 3)
+		if len(queueHostSplit) == 3 {
+			if queueHostSplit[2] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
+				region = queueHostSplit[1]
+				if defaultRegion != "" && region != defaultRegion {
+					return defaultRegion, regionMismatchError{queueURLRegion: region, defaultRegion: defaultRegion}
+				}
+				return region, nil
+			}
+		} else if defaultRegion != "" {
+			return defaultRegion, nil
 		}
 	}
-	return "", fmt.Errorf("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+	return "", errBadQueueURL
+}
+
+type regionMismatchError struct {
+	queueURLRegion string
+	defaultRegion  string
+}
+
+func (e regionMismatchError) Error() string {
+	return fmt.Sprintf("configured region disagrees with queue_url region: %q != %q", e.queueURLRegion, e.defaultRegion)
 }
 
 func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
@@ -386,6 +410,12 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 }
 
 func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
+	// Run GetApproximateMessageCount before start of timer to set initial count for sqs waiting metric
+	// This is to avoid misleading values in metric when sqs messages are processed before the ticker channel kicks in
+	if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
+		return
+	}
+
 	t := time.NewTicker(time.Minute)
 	defer t.Stop()
 	for {
@@ -393,21 +423,31 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			count, err := receiver.GetApproximateMessageCount(ctx)
-
-			var apiError smithy.APIError
-			if errors.As(err, &apiError) {
-				switch apiError.ErrorCode() {
-				case sqsAccessDeniedErrorCode:
-					// stop polling if auth error is encountered
-					receiver.metrics.setSQSMessagesWaiting(int64(count))
-					return
-				}
+			if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
+				return
 			}
-
-			receiver.metrics.setSQSMessagesWaiting(int64(count))
 		}
 	}
+}
+
+// updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
+// If there is an error, the metric is reinitialized to -1 and true is returned
+func updateMessageCount(receiver *sqsReader, ctx context.Context) bool {
+	count, err := receiver.GetApproximateMessageCount(ctx)
+
+	var apiError smithy.APIError
+	if errors.As(err, &apiError) {
+		switch apiError.ErrorCode() {
+		case sqsAccessDeniedErrorCode:
+			// stop polling if auth error is encountered
+			// Set it back to -1 because there is a permission error
+			receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
+			return true
+		}
+	}
+
+	receiver.metrics.sqsMessagesWaiting.Set(int64(count))
+	return false
 }
 
 // boolPtr returns a pointer to b.

@@ -18,7 +18,11 @@
 package filestream
 
 import (
+	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -28,34 +32,17 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
-	RecursiveGlobDepth = 8
-	scannerName        = "scanner"
-	watcherDebugKey    = "file_watcher"
+	RecursiveGlobDepth           = 8
+	DefaultFingerprintSize int64 = 1024 // 1KB
+	scannerDebugKey              = "scanner"
+	watcherDebugKey              = "file_watcher"
 )
-
-var watcherFactories = map[string]watcherFactory{
-	scannerName: newScannerWatcher,
-}
-
-type watcherFactory func(paths []string, cfg *conf.C) (loginp.FSWatcher, error)
-
-// fileScanner looks for files which match the patterns in paths.
-// It is able to exclude files and symlinks.
-type fileScanner struct {
-	paths         []string
-	excludedFiles []match.Matcher
-	includedFiles []match.Matcher
-	symlinks      bool
-
-	log *logp.Logger
-}
 
 type fileWatcherConfig struct {
 	// Interval is the time between two scans.
@@ -70,27 +57,22 @@ type fileWatcherConfig struct {
 // fileWatcher gets the list of files from a FSWatcher and creates events by
 // comparing the files between its last two runs.
 type fileWatcher struct {
-	interval        time.Duration
-	resendOnModTime bool
-	prev            map[string]os.FileInfo
-	scanner         loginp.FSScanner
-	log             *logp.Logger
-	events          chan loginp.FSEvent
-	sameFileFunc    func(os.FileInfo, os.FileInfo) bool
+	cfg     fileWatcherConfig
+	prev    map[string]loginp.FileDescriptor
+	scanner loginp.FSScanner
+	log     *logp.Logger
+	events  chan loginp.FSEvent
 }
 
 func newFileWatcher(paths []string, ns *conf.Namespace) (loginp.FSWatcher, error) {
+	var config *conf.C
 	if ns == nil {
-		return newScannerWatcher(paths, conf.NewConfig())
+		config = conf.NewConfig()
+	} else {
+		config = ns.Config()
 	}
 
-	watcherType := ns.Name()
-	f, ok := watcherFactories[watcherType]
-	if !ok {
-		return nil, fmt.Errorf("no such file watcher: %s", watcherType)
-	}
-
-	return f(paths, ns.Config())
+	return newScannerWatcher(paths, config)
 }
 
 func newScannerWatcher(paths []string, c *conf.C) (loginp.FSWatcher, error) {
@@ -104,13 +86,11 @@ func newScannerWatcher(paths []string, c *conf.C) (loginp.FSWatcher, error) {
 		return nil, err
 	}
 	return &fileWatcher{
-		log:             logp.NewLogger(watcherDebugKey),
-		interval:        config.Interval,
-		resendOnModTime: config.ResendOnModTime,
-		prev:            make(map[string]os.FileInfo, 0),
-		scanner:         scanner,
-		events:          make(chan loginp.FSEvent),
-		sameFileFunc:    os.SameFile,
+		log:     logp.NewLogger(watcherDebugKey),
+		cfg:     config,
+		prev:    make(map[string]loginp.FileDescriptor, 0),
+		scanner: scanner,
+		events:  make(chan loginp.FSEvent),
 	}, nil
 }
 
@@ -128,7 +108,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	// run initial scan before starting regular
 	w.watch(ctx)
 
-	_ = timed.Periodic(ctx, w.interval, func() error {
+	_ = timed.Periodic(ctx, w.cfg.Interval, func() error {
 		w.watch(ctx)
 
 		return nil
@@ -140,136 +120,198 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	paths := w.scanner.GetFiles()
 
-	newFiles := make(map[string]os.FileInfo)
+	// for debugging purposes
+	writtenCount := 0
+	truncatedCount := 0
+	renamedCount := 0
+	removedCount := 0
+	createdCount := 0
 
-	for path, info := range paths {
+	newFilesByName := make(map[string]*loginp.FileDescriptor)
+	newFilesByID := make(map[string]*loginp.FileDescriptor)
 
+	for path, fd := range paths {
 		// if the scanner found a new path or an existing path
 		// with a different file, it is a new file
-		prevInfo, ok := w.prev[path]
-		if !ok || !w.sameFileFunc(prevInfo, info) {
-			newFiles[path] = info
+		prevDesc, ok := w.prev[path]
+		sfd := fd // to avoid memory aliasing
+		if !ok || !loginp.SameFile(&prevDesc, &sfd) {
+			newFilesByName[path] = &sfd
+			newFilesByID[fd.FileID()] = &sfd
 			continue
 		}
 
-		// if the two infos belong to the same file and it has been modified
-		// if the size is smaller than before, it is truncated, if bigger, it is a write event
-		if prevInfo.ModTime() != info.ModTime() {
-			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
-				select {
-				case <-ctx.Done():
-					return
-				case w.events <- truncateEvent(path, info):
-				}
-			} else {
-				select {
-				case <-ctx.Done():
-					return
-				case w.events <- writeEvent(path, info):
-				}
+		var e loginp.FSEvent
+		switch {
+
+		// the new size is smaller, the file was truncated
+		case prevDesc.Info.Size() > fd.Info.Size():
+			e = truncateEvent(path, fd)
+			truncatedCount++
+
+		// the size is the same, timestamps are different, the file was touched
+		case prevDesc.Info.Size() == fd.Info.Size() && prevDesc.Info.ModTime() != fd.Info.ModTime():
+			if w.cfg.ResendOnModTime {
+				e = truncateEvent(path, fd)
+				truncatedCount++
+			}
+
+		// the new size is larger, something was written
+		case prevDesc.Info.Size() < fd.Info.Size():
+			e = writeEvent(path, fd)
+			writtenCount++
+		}
+
+		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
+		if e.Op != loginp.OpDone {
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- e:
 			}
 		}
 
-		// delete from previous state, as we have more up to date info
+		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
 	}
 
-	// remaining files are in the prev map are the ones that are missing
+	// remaining files in the prev map are the ones that are missing
 	// either because they have been deleted or renamed
-	for removedPath, removedInfo := range w.prev {
-		for newPath, newInfo := range newFiles {
-			if w.sameFileFunc(removedInfo, newInfo) {
-				select {
-				case <-ctx.Done():
-					return
-				case w.events <- renamedEvent(removedPath, newPath, newInfo):
-					delete(newFiles, newPath)
-					goto CHECK_NEXT_REMOVED
-				}
-			}
-		}
+	for remainingPath, remainingDesc := range w.prev {
+		var e loginp.FSEvent
 
+		id := remainingDesc.FileID()
+		if newDesc, renamed := newFilesByID[id]; renamed {
+			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc)
+			delete(newFilesByName, newDesc.Filename)
+			delete(newFilesByID, id)
+			renamedCount++
+		} else {
+			e = deleteEvent(remainingPath, remainingDesc)
+			removedCount++
+		}
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- deleteEvent(removedPath, removedInfo):
+		case w.events <- e:
 		}
-	CHECK_NEXT_REMOVED:
 	}
 
-	// remaining files in newFiles are new
-	for path, info := range newFiles {
+	// remaining files in newFiles are newly created files
+	for path, fd := range newFilesByName {
+		// no need to react on empty new files
+		if fd.Info.Size() == 0 {
+			w.log.Warnf("file %q has no content yet, skipping", fd.Filename)
+			delete(paths, path)
+			continue
+		}
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, info):
+		case w.events <- createEvent(path, *fd):
+			createdCount++
 		}
 	}
 
-	w.log.Debugf("Found %d paths", len(paths))
+	w.log.With(
+		"total", len(paths),
+		"written", writtenCount,
+		"truncated", truncatedCount,
+		"renamed", renamedCount,
+		"removed", removedCount,
+		"created", createdCount,
+	).Debugf("File scan complete")
+
 	w.prev = paths
 }
 
-func createEvent(path string, fi os.FileInfo) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Info: fi}
+func createEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: path, Descriptor: fd}
 }
 
-func writeEvent(path string, fi os.FileInfo) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Info: fi}
+func writeEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Descriptor: fd}
 }
 
-func truncateEvent(path string, fi os.FileInfo) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Info: fi}
+func truncateEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Descriptor: fd}
 }
 
-func renamedEvent(oldPath, path string, fi os.FileInfo) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Info: fi}
+func renamedEvent(oldPath, path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Descriptor: fd}
 }
 
-func deleteEvent(path string, fi os.FileInfo) loginp.FSEvent {
-	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Info: fi}
+func deleteEvent(path string, fd loginp.FileDescriptor) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpDelete, OldPath: path, NewPath: "", Descriptor: fd}
 }
 
 func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
-func (w *fileWatcher) GetFiles() map[string]os.FileInfo {
+func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
 	return w.scanner.GetFiles()
 }
 
+type fingerprintConfig struct {
+	Enabled bool  `config:"enabled"`
+	Offset  int64 `config:"offset"`
+	Length  int64 `config:"length"`
+}
+
 type fileScannerConfig struct {
-	ExcludedFiles []match.Matcher `config:"exclude_files"`
-	IncludedFiles []match.Matcher `config:"include_files"`
-	Symlinks      bool            `config:"symlinks"`
-	RecursiveGlob bool            `config:"recursive_glob"`
+	ExcludedFiles []match.Matcher   `config:"exclude_files"`
+	IncludedFiles []match.Matcher   `config:"include_files"`
+	Symlinks      bool              `config:"symlinks"`
+	RecursiveGlob bool              `config:"recursive_glob"`
+	Fingerprint   fingerprintConfig `config:"fingerprint"`
 }
 
 func defaultFileScannerConfig() fileScannerConfig {
 	return fileScannerConfig{
 		Symlinks:      false,
 		RecursiveGlob: true,
+		Fingerprint: fingerprintConfig{
+			Enabled: false,
+			Offset:  0,
+			Length:  DefaultFingerprintSize,
+		},
 	}
 }
 
-func newFileScanner(paths []string, cfg fileScannerConfig) (loginp.FSScanner, error) {
-	fs := fileScanner{
-		paths:         paths,
-		excludedFiles: cfg.ExcludedFiles,
-		includedFiles: cfg.IncludedFiles,
-		symlinks:      cfg.Symlinks,
-		log:           logp.NewLogger(scannerName),
+// fileScanner looks for files which match the patterns in paths.
+// It is able to exclude files and symlinks.
+type fileScanner struct {
+	paths []string
+	cfg   fileScannerConfig
+	log   *logp.Logger
+}
+
+func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner, error) {
+	s := fileScanner{
+		paths: paths,
+		cfg:   config,
+		log:   logp.NewLogger(scannerDebugKey),
 	}
-	err := fs.resolveRecursiveGlobs(cfg)
+
+	if s.cfg.Fingerprint.Enabled {
+		if s.cfg.Fingerprint.Length < sha256.BlockSize {
+			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
+			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
+		}
+		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
+	}
+
+	err := s.resolveRecursiveGlobs(config)
 	if err != nil {
 		return nil, err
 	}
-	err = fs.normalizeGlobPatterns()
+	err = s.normalizeGlobPatterns()
 	if err != nil {
 		return nil, err
 	}
 
-	return &fs, nil
+	return &s, nil
 }
 
 // resolveRecursiveGlobs expands `**` from the globs in multiple patterns
@@ -309,11 +351,12 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 	return nil
 }
 
-// GetFiles returns a map of files and fileinfos which
+// GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
-func (s *fileScanner) GetFiles() map[string]os.FileInfo {
-	pathInfo := map[string]os.FileInfo{}
-	uniqFileID := map[string]os.FileInfo{}
+func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
+	fdByName := map[string]loginp.FileDescriptor{}
+	// used to determine if a symlink resolves in a already known target
+	uniqueIDs := map[string]string{}
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -322,93 +365,137 @@ func (s *fileScanner) GetFiles() map[string]os.FileInfo {
 			continue
 		}
 
-		for _, file := range matches {
-			if s.shouldSkipFile(file) {
-				continue
-			}
-
-			// If symlink is enabled, it is checked that original is not part of same input
-			// If original is harvested by other input, states will potentially overwrite each other
-			if s.isOriginalAndSymlinkConfigured(file, uniqFileID) {
-				continue
-			}
-
-			fileInfo, err := os.Stat(file)
+		for _, filename := range matches {
+			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				s.log.Debug("stat(%s) failed: %s", file, err)
+				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
 				continue
 			}
-			pathInfo[file] = fileInfo
+
+			fd, err := s.toFileDescriptor(&it)
+			if err != nil {
+				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
+				continue
+			}
+
+			fileID := fd.FileID()
+			if knownFilename, exists := uniqueIDs[fileID]; exists {
+				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
+				continue
+			}
+			uniqueIDs[fileID] = fd.Filename
+			fdByName[filename] = fd
 		}
 	}
 
-	return pathInfo
+	return fdByName
 }
 
-func (s *fileScanner) shouldSkipFile(file string) bool {
-	if s.isFileExcluded(file) || !s.isFileIncluded(file) {
-		s.log.Debugf("Exclude file: %s", file)
-		return true
-	}
-
-	fileInfo, err := os.Lstat(file)
-	if err != nil {
-		s.log.Debugf("lstat(%s) failed: %s", file, err)
-		return true
-	}
-
-	if fileInfo.IsDir() {
-		s.log.Debugf("Skipping directory: %s", file)
-		return true
-	}
-
-	isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
-	if isSymlink && !s.symlinks {
-		s.log.Debugf("File %s skipped as it is a symlink", file)
-		return true
-	}
-
-	originalFile, err := filepath.EvalSymlinks(file)
-	if err != nil {
-		s.log.Debugf("finding path to original file has failed %s: %+v", file, err)
-		return true
-	}
-	// Check if original file is included to make sure we are not reading from
-	// unwanted files.
-	if s.isFileExcluded(originalFile) || !s.isFileIncluded(originalFile) {
-		s.log.Debugf("Exclude original file: %s", file)
-		return true
-	}
-
-	return false
+type ingestTarget struct {
+	filename         string
+	originalFilename string
+	symlink          bool
+	info             os.FileInfo
 }
 
-func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, uniqFileID map[string]os.FileInfo) bool {
-	if s.symlinks {
-		fileInfo, err := os.Stat(file)
+func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
+	if s.isFileExcluded(filename) {
+		return it, fmt.Errorf("file %q is excluded from ingestion", filename)
+	}
+
+	if !s.isFileIncluded(filename) {
+		return it, fmt.Errorf("file %q is not included in ingestion", filename)
+	}
+
+	it.filename = filename
+	it.originalFilename = filename
+
+	it.info, err = os.Lstat(it.filename) // to determine if it's a symlink
+	if err != nil {
+		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
+	}
+
+	if it.info.IsDir() {
+		return it, fmt.Errorf("file %q is a directory", it.filename)
+	}
+
+	it.symlink = it.info.Mode()&os.ModeSymlink > 0
+
+	if it.symlink {
+		if !s.cfg.Symlinks {
+			return it, fmt.Errorf("file %q is a symlink and they're disabled", it.filename)
+		}
+
+		// now we know it's a symlink, we stat with link resolution
+		it.info, err = os.Stat(it.filename)
 		if err != nil {
-			s.log.Debugf("stat(%s) failed: %s", file, err)
-			return false
+			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
-		fileID := file_helper.GetOSState(fileInfo).String()
-		if finfo, exists := uniqFileID[fileID]; exists {
-			s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
-			return true
+
+		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
+		if err != nil {
+			return it, fmt.Errorf("failed to resolve the symlink %q: %w", it.filename, err)
 		}
-		uniqFileID[fileID] = fileInfo
+
+		if s.isFileExcluded(it.originalFilename) {
+			return it, fmt.Errorf("file %q->%q is excluded from ingestion", it.filename, it.originalFilename)
+		}
+
+		if !s.isFileIncluded(it.originalFilename) {
+			return it, fmt.Errorf("file %q->%q is not included in ingestion", it.filename, it.originalFilename)
+		}
 	}
-	return false
+
+	return it, nil
+}
+
+func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
+	fd.Filename = it.filename
+	fd.Info = it.info
+
+	if s.cfg.Fingerprint.Enabled {
+		fileSize := it.info.Size()
+		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
+		if fileSize < minSize {
+			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
+		}
+
+		file, err := os.Open(it.originalFilename)
+		if err != nil {
+			return fd, fmt.Errorf("failed to open %q for fingerprinting: %w", it.originalFilename, err)
+		}
+		defer file.Close()
+
+		if s.cfg.Fingerprint.Offset != 0 {
+			_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
+			if err != nil {
+				return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", fd.Filename, err)
+			}
+		}
+
+		bfile := bufio.NewReaderSize(file, int(s.cfg.Fingerprint.Length))
+		r := io.LimitReader(bfile, s.cfg.Fingerprint.Length)
+		h := sha256.New()
+		written, err := io.Copy(h, r)
+		if err != nil {
+			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
+		}
+		if written != s.cfg.Fingerprint.Length {
+			return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
+		}
+
+		fd.Fingerprint = hex.EncodeToString(h.Sum(nil))
+	}
+
+	return fd, nil
 }
 
 func (s *fileScanner) isFileExcluded(file string) bool {
-	return len(s.excludedFiles) > 0 && s.matchAny(s.excludedFiles, file)
+	return len(s.cfg.ExcludedFiles) > 0 && s.matchAny(s.cfg.ExcludedFiles, file)
 }
 
 func (s *fileScanner) isFileIncluded(file string) bool {
-	if len(s.includedFiles) == 0 {
-		return true
-	}
-	return s.matchAny(s.includedFiles, file)
+	return len(s.cfg.IncludedFiles) == 0 || s.matchAny(s.cfg.IncludedFiles, file)
 }
 
 // matchAny checks if the text matches any of the regular expressions

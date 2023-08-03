@@ -31,9 +31,10 @@ import (
 	"runtime"
 	"strings"
 
+	"errors"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -53,7 +54,7 @@ func Check() error {
 
 	changes, err := GitDiffIndex()
 	if err != nil {
-		return errors.Wrap(err, "failed to diff the git index")
+		return fmt.Errorf("failed to diff the git index: %w", err)
 	}
 
 	if len(changes) > 0 {
@@ -61,7 +62,7 @@ func Check() error {
 			GitDiff()
 		}
 
-		return errors.Errorf("some files are not up-to-date. "+
+		return fmt.Errorf("some files are not up-to-date. "+
 			"Run 'make update' then review and commit the changes. "+
 			"Modified: %v", changes)
 	}
@@ -97,7 +98,7 @@ func GitDiffIndex() ([]string, error) {
 	for s.Scan() {
 		m, err := d.Dissect(s.Text())
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to dissect git diff-index output")
+			return nil, fmt.Errorf("failed to dissect git diff-index output: %w", err)
 		}
 
 		paths := strings.Split(m["paths"], "\t")
@@ -151,7 +152,7 @@ func CheckPythonTestNotExecutable() error {
 	}
 
 	if len(executableTestFiles) > 0 {
-		return errors.Errorf("python test files cannot be executable because "+
+		return fmt.Errorf("python test files cannot be executable because "+
 			"they will be skipped. Fix permissions of %v", executableTestFiles)
 	}
 	return nil
@@ -173,11 +174,11 @@ func CheckYAMLNotExecutable() error {
 		}
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed search for YAML files")
+		return fmt.Errorf("failed search for YAML files: %w", err)
 	}
 
 	if len(executableYAMLFiles) > 0 {
-		return errors.Errorf("YAML files cannot be executable. Fix "+
+		return fmt.Errorf("YAML files cannot be executable. Fix "+
 			"permissions of %v", executableYAMLFiles)
 
 	}
@@ -187,7 +188,10 @@ func CheckYAMLNotExecutable() error {
 // GoVet vets the .go source code using 'go vet'.
 func GoVet() error {
 	err := sh.RunV("go", "vet", "./...")
-	return errors.Wrap(err, "failed running go vet, please fix the issues reported")
+	if err == nil {
+		return nil
+	}
+	return fmt.Errorf("failed running go vet, please fix the issues reported: %w", err)
 }
 
 // CheckLicenseHeaders checks license headers in .go files.
@@ -203,7 +207,7 @@ func CheckLicenseHeaders() error {
 	case "Elastic", "Elastic License":
 		license = "Elastic"
 	default:
-		return errors.Errorf("unknown license type %v", BeatLicense)
+		return fmt.Errorf("unknown license type %v", BeatLicense)
 	}
 
 	licenser := gotool.Licenser
@@ -220,14 +224,14 @@ func CheckDashboardsFormat() error {
 		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to find dashboards")
+		return fmt.Errorf("failed to find dashboards: %w", err)
 	}
 
 	hasErrors := false
 	for _, file := range dashboardFiles {
 		d, err := ioutil.ReadFile(file)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read dashboard file %s", file)
+			return fmt.Errorf("failed to read dashboard file %s: %w", file, err)
 		}
 
 		if checkDashboardForErrors(file, d) {
@@ -249,7 +253,7 @@ func checkDashboardForErrors(file string, d []byte) bool {
 	var dashboard DashboardObject
 	err := json.Unmarshal(d, &dashboard)
 	if err != nil {
-		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s", file).Error())
+		fmt.Println(fmt.Sprintf("failed to parse dashboard from %s: %s", file, err))
 		return true
 	}
 
@@ -314,20 +318,20 @@ func (d *DashboardObject) CheckFormat(module string) error {
 	switch d.Type {
 	case "dashboard":
 		if d.Attributes.Description == "" {
-			return errors.Errorf("empty description on dashboard '%s'", d.Attributes.Title)
+			return fmt.Errorf("empty description on dashboard '%s'", d.Attributes.Title)
 		}
 		if err := checkTitle(dashboardTitleRegexp, d.Attributes.Title, module); err != nil {
-			return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", strings.Title(BeatName), d.Attributes.Title)
+			return fmt.Errorf("expected title with format '[%s Module] Some title', found '%s': %w", strings.Title(BeatName), d.Attributes.Title, err)
 		}
 	case "visualization":
 		if err := checkTitle(visualizationTitleRegexp, d.Attributes.Title, module); err != nil {
-			return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), d.Attributes.Title)
+			return fmt.Errorf("expected title with format 'Some title [%s Module]', found '%s': %w", strings.Title(BeatName), d.Attributes.Title, err)
 		}
 	}
 
 	expectedIndexPattern := strings.ToLower(BeatName) + "-*"
 	if err := checkDashboardIndexPattern(expectedIndexPattern, d); err != nil {
-		return errors.Wrapf(err, "expected index pattern reference '%s'", expectedIndexPattern)
+		return fmt.Errorf("expected index pattern reference '%s': %w", expectedIndexPattern, err)
 	}
 	return nil
 }
@@ -339,7 +343,7 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 	}
 	beatTitle := strings.Title(BeatName)
 	if match[1] != beatTitle {
-		return errors.Errorf("expected: '%s', found: '%s'", beatTitle, match[1])
+		return fmt.Errorf("expected: '%s', found: '%s'", beatTitle, match[1])
 	}
 
 	// Compare case insensitive, and ignore spaces and underscores in module names
@@ -347,7 +351,7 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 	expectedModule := replacer.Replace(strings.ToLower(module))
 	foundModule := replacer.Replace(strings.ToLower(match[2]))
 	if expectedModule != foundModule {
-		return errors.Errorf("expected module name (%s), found '%s'", module, match[2])
+		return fmt.Errorf("expected module name (%s), found '%s'", module, match[2])
 	}
 	return nil
 }
@@ -355,22 +359,22 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 func checkDashboardIndexPattern(expectedIndex string, o *DashboardObject) error {
 	if objectMeta := o.Attributes.KibanaSavedObjectMeta; objectMeta != nil {
 		if index := objectMeta.SearchSourceJSON.Index; index != nil && *index != expectedIndex {
-			return errors.Errorf("unexpected index pattern reference found in object meta: `%s` in visualization `%s`", *index, o.Attributes.Title)
+			return fmt.Errorf("unexpected index pattern reference found in object meta: `%s` in visualization `%s`", *index, o.Attributes.Title)
 		}
 	}
 	if visState := o.Attributes.VisState; visState != nil {
 		for _, control := range visState.Params.Controls {
 			if index := control.IndexPattern; index != nil && *index != expectedIndex {
-				return errors.Errorf("unexpected index pattern reference found in visualization state: `%s` in visualization `%s`", *index, o.Attributes.Title)
+				return fmt.Errorf("unexpected index pattern reference found in visualization state: `%s` in visualization `%s`", *index, o.Attributes.Title)
 			}
 		}
 		if index := visState.Params.IndexPattern; index != nil && *index != expectedIndex {
-			return errors.Errorf("unexpected index pattern reference found in visualization state params: `%s` in visualization `%s`", *index, o.Attributes.Title)
+			return fmt.Errorf("unexpected index pattern reference found in visualization state params: `%s` in visualization `%s`", *index, o.Attributes.Title)
 		}
 	}
 	for _, reference := range o.References {
 		if reference.Type == "index-pattern" && reference.ID != expectedIndex {
-			return errors.Errorf("unexpected reference to index pattern `%s`", reference.ID)
+			return fmt.Errorf("unexpected reference to index pattern `%s`", reference.ID)
 		}
 	}
 	return nil

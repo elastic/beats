@@ -153,7 +153,7 @@ func TestParseRFC5424(t *testing.T) {
 				msgID:      "ID47",
 				rawSDValue: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
 			},
-			wantErr: `validation error at position 8: parsing time "10-11-2003T22:14:15.003Z" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "1-2003T22:14:15.003Z" as "2006"`,
+			wantErr: "validation error at position 8: parsing time \"10-11-2003T22:14:15.003Z\" as \"2006-01-02T15:04:05.999999999Z07:00\": cannot parse \"10-11-2003T22:14:15.003Z\" as \"2006\"",
 		},
 		"err-eof": {
 			in: `<13>1 2003-08-24T05:14:15.000003-07:00 test-host su 1234 msg-`,

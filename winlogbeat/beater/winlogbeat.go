@@ -162,6 +162,18 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		}
 	}
 
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON()
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
+
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {
 		state := persistedState[log.source.Name()]

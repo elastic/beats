@@ -59,13 +59,13 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	log := logp.NewLogger("")
 	ctx := context.Background()
-	client, err := newHTTPClient(ctx, config, log)
+	client, err := newHTTPClient(ctx, config, log, nil)
 	assert.NoError(t, err)
 
-	requestFactory, err := newRequestFactory(ctx, config, log)
+	requestFactory, err := newRequestFactory(ctx, config, log, nil, nil)
 	assert.NoError(t, err)
 	pagination := newPagination(config, client, log)
-	responseProcessor := newResponseProcessor(config, pagination, log)
+	responseProcessor := newResponseProcessor(config, pagination, nil, nil, log)
 
 	requester := newRequester(client, requestFactory, responseProcessor, log)
 

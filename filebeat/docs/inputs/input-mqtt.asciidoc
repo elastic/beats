@@ -50,7 +50,7 @@ A list of topics to subscribe to and read from.
 
 An agreement level between the sender of a message and the receiver of a message that defines the guarantee of delivery.
 
-There are 3 QoS levels in MQTT:
+There are 3 QoS levels in MQTT. Defaults to `0`:
 
 * At most once (`0`),
 * At least once (`1`),
@@ -67,6 +67,17 @@ A client username used for authentication provided on the application level by t
 ===== `password`
 
 A client password used for authentication provided on the application level by the MQTT protocol.
+
+===== `clean_session`
+
+The `clean_session` flag indicates whether the client wants to establish a persistent session with the broker. 
+The default is `true`.
+
+When `clean_session` is set to false, the session is considered to be persistent. The broker stores all subscriptions for 
+the client and all missed messages for the client that subscribed with a Quality of Service (QoS) level 1 or 2. 
+
+In contrast, when `clean_session` is set to true, the broker doesn’t retain any information for the client 
+and discards any previous state from any persistent session.
 
 ===== `ssl`
 
