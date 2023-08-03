@@ -123,31 +123,27 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		if !t.Failed() {
 			return
 		}
-		stderr, err := os.ReadFile(filepath.Join(tempDir, "stderr"))
+		var maxlen int64 = 2048
+		stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
 		if err != nil {
 			t.Logf("error reading stderr: %s", err)
 		}
-		t.Logf("stderr was: %s", string(stderr))
+		t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
 
-		stdout, err := os.ReadFile(filepath.Join(tempDir, "stdout"))
+		stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
 		if err != nil {
 			t.Logf("error reading stdout: %s", err)
 		}
-		t.Logf("stdout was: %s", string(stdout))
+		t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
 
 		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
 		files, err := filepath.Glob(glob)
 		for _, f := range files {
-			contents, err := os.ReadFile(f)
+			contents, err := readLastNBytes(f, maxlen)
 			if err != nil {
 				t.Logf("error reading %s: %s", f, err)
 			}
-			maxlen := 2048
-			if len(contents) >= maxlen {
-				t.Logf("Last %d bytes of %s:\n%s", maxlen, f, string(contents[len(contents)-maxlen:]))
-			} else {
-				t.Logf("%s\n%s", string(contents), f)
-			}
+			t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
 		}
 	})
 	return &p
@@ -636,4 +632,26 @@ func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) 
 	}
 	srcURL.Path = path
 	return srcURL, nil
+}
+
+func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("error opening %s: %w", filename, err)
+	}
+	fInfo, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("error stating %s: %w", filename, err)
+	}
+	var startPosition int64
+	if fInfo.Size() >= numBytes {
+		startPosition = fInfo.Size() - numBytes
+	} else {
+		startPosition = 0
+	}
+	_, err = f.Seek(startPosition, io.SeekStart)
+	if err != nil {
+		return nil, fmt.Errorf("error seeking to %d in %s: %w", startPosition, filename, err)
+	}
+	return io.ReadAll(f)
 }
