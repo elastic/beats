@@ -9,8 +9,9 @@ changes, but there are breaking changes between major versions (e.g. 7.x to
 8.y). Migrating directly between non consecutive major versions (e.g. 6.x to
 8.x) is not recommended.
 
-See the following topics for a description of breaking changes:
+See the following topics for a description of breaking changes between major versions:
 
+<<<<<<< HEAD
 * <<breaking-changes-8.4>>
 * <<breaking-changes-8.3>>
 * <<breaking-changes-8.2>>
@@ -24,5 +25,10 @@ include::breaking-8.3.asciidoc[]
 include::breaking-8.2.asciidoc[]
 
 include::breaking-8.1.asciidoc[]
+=======
+* <<breaking-changes-8.0>>
+
+For breaking changes between minor versions, see the <<release-notes,release notes>>.
+>>>>>>> 78fc965b62 ([DOCS] Remove unneeded breaking changes pages (#36204))
 
 include::breaking-8.0.asciidoc[]
