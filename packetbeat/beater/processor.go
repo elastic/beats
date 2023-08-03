@@ -123,6 +123,24 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		logp.Err("Failed to generate ID from config: %v, %v", err, config)
 		return nil, err
 	}
+	if len(config.Interfaces) != 0 {
+		// Install Npcap if needed. This needs to happen before any other
+		// work on Windows, including config checking, because that involves
+		// probing interfaces.
+		//
+		// Users may block installation of Npcap, so we defer the install
+		// until we have a configuration that will tell us if it has been
+		// blocked. To do this we must have a valid config.
+		//
+		// When Packetbeat is managed by fleet we will only have this if
+		// Create has been called via the agent Reload process. We take
+		// the opportunity to not install the DLL if there is no configured
+		// interface.
+		err := installNpcap(p.beat, cfg)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	publisher, err := publish.NewTransactionPublisher(
 		p.beat.Info.Name,
