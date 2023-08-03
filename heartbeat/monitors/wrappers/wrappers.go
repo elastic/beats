@@ -49,8 +49,8 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoa
 		wrapped = WrapBrowser(js, stdMonFields, mst)
 	}
 	for i, j := range wrapped {
+		j := j
 		wrapped[i] = func(event *beat.Event) ([]jobs.Job, error) {
-			logp.L().Warnf("ROOT EXEC")
 			s := summarizer.NewSummarizer(j, stdMonFields, mst)
 			return s.Wrap(j)(event)
 		}

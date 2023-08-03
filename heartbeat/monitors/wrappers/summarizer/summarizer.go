@@ -91,7 +91,6 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 		js := s.jobSummary
 
-		logp.L().Warnf("CREM %d (%d)", s.contsRemaining, len(conts))
 		s.contsRemaining-- // we just ran one cont, discount it
 		// these many still need to be processed
 		s.contsRemaining += uint16(len(conts))
@@ -107,7 +106,6 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			}
 		}
 
-		logp.L().Warnf("CONTS: %d", s.contsRemaining)
 		if s.contsRemaining == 0 {
 			if js.Down > 0 {
 				js.Status = monitorstate.StatusDown
@@ -118,9 +116,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			// Time to retry, perhaps
 			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
 			js.FinalAttempt = js.Status == lastStatus || js.Attempt >= js.MaxAttempts
-			logp.L().Warnf("FA: %s == %s || %d >= %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
 			ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
-			logp.L().Warn("MERGE SUMMARY")
 			eventext.MergeEventFields(event, mapstr.M{
 				"summary": js,
 				"state":   ms,
@@ -128,18 +124,15 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 			logp.L().Debugf("retry info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
 			if !js.FinalAttempt {
-				logp.L().Warnf("RESET (final attempt)")
 				// Reset the job summary for the next attempt
 				s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 				s.contsRemaining = 1
 				s.checkGroup = fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt)
-				return []jobs.Job{s.rootJob}, jobErr
+				conts = []jobs.Job{s.rootJob}
 			}
-		} else {
-			logp.L().Warnf("NO SUMMARY %d", s.contsRemaining)
-
 		}
 
+		// Wrap downstream jobs using the same state object
 		for i, cont := range conts {
 			conts[i] = s.Wrap(cont)
 		}

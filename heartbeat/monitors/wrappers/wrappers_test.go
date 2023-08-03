@@ -43,6 +43,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -58,11 +60,12 @@ type testDef struct {
 }
 
 var testMonFields = stdfields.StdMonitorFields{
-	ID:       "myid",
-	Name:     "myname",
-	Type:     "mytype",
-	Schedule: schedule.MustParse("@every 1s"),
-	Timeout:  1,
+	ID:          "myid",
+	Name:        "myname",
+	Type:        "mytype",
+	Schedule:    schedule.MustParse("@every 1s"),
+	Timeout:     1,
+	MaxAttempts: 1,
 }
 
 var testBrowserMonFields = stdfields.StdMonitorFields{
@@ -84,7 +87,7 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
 
-		require.Equal(t, len(results), len(tt.want), "Expected test def wants to correspond exactly to number results.")
+		require.Len(t, results, len(tt.want), "Expected test def wants to correspond exactly to number results.")
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
 
@@ -321,7 +324,10 @@ func TestMultiJobConts(t *testing.T) {
 	testCommonWrap(t, testDef{
 		"multi-job-continuations",
 		testMonFields,
-		[]jobs.Job{makeContJob(t, "http://foo.com"), makeContJob(t, "http://bar.com")},
+		[]jobs.Job{
+			makeContJob(t, "http://foo.com"),
+			makeContJob(t, "http://bar.com"),
+		},
 		[]validator.Validator{
 			contJobValidator("http://foo.com", "1st"),
 			lookslike.Compose(
@@ -337,6 +343,101 @@ func TestMultiJobConts(t *testing.T) {
 		nil,
 		nil,
 	})
+}
+
+func TestRetryMultiCont(t *testing.T) {
+	uniqScope := isdef.ScopedIsUnique()
+
+	expected := []struct {
+		monStatus string
+		js        summarizer.JobSummary
+		state     monitorstate.State
+	}{
+		{
+			"up",
+			summarizer.JobSummary{
+				Status:       "up",
+				FinalAttempt: true,
+				Up:           1,
+				Down:         0,
+				Attempt:      1,
+				MaxAttempts:  2,
+			},
+			monitorstate.State{
+				Status: "up",
+				Up:     1,
+				Down:   0,
+				Checks: 1,
+			},
+		},
+	}
+
+	makeContJob := func(t *testing.T, u string) jobs.Job {
+		expIdx := 0
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			eventext.MergeEventFields(event, mapstr.M{"cont": "1st"})
+			u, err := url.Parse(u)
+			require.NoError(t, err)
+			eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
+			return []jobs.Job{
+				func(event *beat.Event) ([]jobs.Job, error) {
+
+					eventext.MergeEventFields(event, mapstr.M{"cont": "2nd"})
+					eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
+
+					expIdx++
+					if expIdx >= len(expected)-1 {
+						expIdx = 0
+					}
+					exp := expected[expIdx]
+					if exp.js.Status == "down" {
+						return nil, fmt.Errorf("got a down status")
+					}
+
+					return nil, nil
+				},
+			}, nil
+		}
+	}
+
+	contJobValidator := func(u string, msg string) validator.Validator {
+		return lookslike.Compose(
+			urlValidator(t, u),
+			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
+			lookslike.MustCompile(map[string]interface{}{
+				"monitor": map[string]interface{}{
+					"duration.us": hbtestllext.IsInt64,
+					"id":          uniqScope.IsUniqueTo(u),
+					"name":        testMonFields.Name,
+					"type":        testMonFields.Type,
+					"status":      "up",
+					"check_group": uniqScope.IsUniqueTo(u),
+				},
+				"state": isdef.Optional(hbtestllext.IsMonitorState),
+			}),
+			hbtestllext.MonitorTimespanValidator,
+		)
+	}
+
+	retryMonFields := testMonFields
+	retryMonFields.MaxAttempts = 2
+
+	for _, expected := range expected {
+		testCommonWrap(t, testDef{
+			"multi-job-continuations-retry",
+			retryMonFields,
+			[]jobs.Job{makeContJob(t, "http://foo.com")},
+			[]validator.Validator{
+				contJobValidator("http://foo.com", "1st"),
+				lookslike.Compose(
+					contJobValidator("http://foo.com", "2nd"),
+					summarizertesthelper.SummaryValidator(expected.js.Up, expected.js.Down),
+				),
+			},
+			nil,
+			nil,
+		})
+	}
 }
 
 func TestMultiJobContsCancelledEvents(t *testing.T) {
