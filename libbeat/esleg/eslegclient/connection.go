@@ -18,11 +18,11 @@
 package eslegclient
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -452,7 +452,9 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body, conn.log)
 
 	status := resp.StatusCode
-	obj, err := ioutil.ReadAll(resp.Body)
+	obj := new(bytes.Buffer)
+	_, err = io.Copy(obj, resp.Body)
+	// obj, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return status, nil, err
 	}
@@ -462,7 +464,7 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		err = fmt.Errorf("%v: %s", resp.Status, obj)
 	}
 
-	return status, obj, err
+	return status, obj.Bytes(), err
 }
 
 func closing(c io.Closer, logger *logp.Logger) {
