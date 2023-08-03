@@ -7,6 +7,7 @@ If you have issues installing or running {beatname_uc}, read the following tips:
 
 * <<getting-help>>
 * <<enable-metricbeat-debugging>>
+* <<understand-{beatname_lc}-logs>>
 * <<faq>>
 
 //sets block macro for getting-help.asciidoc included in next section
@@ -24,3 +25,15 @@ include::{libbeat-dir}/getting-help.asciidoc[]
 == Debug
 
 include::{libbeat-dir}/debugging.asciidoc[]
+
+//sets block macro for metrics-in-logs.asciidoc included in next section
+
+[id="understand-{beatname_lc}-logs"]
+[role="xpack"]
+== Understand metrics in {beatname_uc} logs
+
+++++
+<titleabbrev>Understand logged metrics</titleabbrev>
+++++
+
+include::{libbeat-dir}/metrics-in-logs.asciidoc[]
