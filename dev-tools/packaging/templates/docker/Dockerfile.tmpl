@@ -121,6 +121,7 @@ RUN echo \
 
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV TZ=UTC
 ENV SUITES_DIR={{ $beatHome }}/suites
 ENV NODE_VERSION=18.16.0
 ENV PATH="$NODE_PATH/node/bin:$PATH"
