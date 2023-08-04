@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM golang:1.19.10
-=======
-FROM golang:1.20.7
->>>>>>> a88f111fc6 ([Automation] Bump Golang version to 1.20.7 (#36241))
+FROM golang:1.19.12
 
 RUN \
     apt update \
