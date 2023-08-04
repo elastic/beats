@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:alpine3.15 as builder
+=======
+FROM golang:1.20.7 as builder
+>>>>>>> a88f111fc6 ([Automation] Bump Golang version to 1.20.7 (#36241))
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 

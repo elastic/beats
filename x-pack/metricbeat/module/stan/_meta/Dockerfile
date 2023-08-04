@@ -2,10 +2,17 @@ ARG STAN_VERSION=0.15.1
 FROM nats-streaming:$STAN_VERSION
 
 # build stage
+<<<<<<< HEAD
 FROM golang:1.13-alpine3.11 AS build-env
 RUN apk --no-cache add build-base git mercurial gcc
 RUN cd src && go get -d github.com/nats-io/stan.go/
 RUN cd src/github.com/nats-io/stan.go/examples/stan-bench && git checkout tags/v0.5.2 && go build .
+=======
+FROM golang:1.20.7 AS build-env
+RUN apt-get install git mercurial gcc
+RUN git clone https://github.com/nats-io/stan.go.git /stan-go
+RUN cd /stan-go/examples/stan-bench && git checkout tags/v0.5.2 && go build .
+>>>>>>> a88f111fc6 ([Automation] Bump Golang version to 1.20.7 (#36241))
 
 # create an enhanced container with nc command available since nats is based
 # on scratch image making healthcheck impossible
