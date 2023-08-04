@@ -12,7 +12,7 @@ scms:
       repository: beats
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
-      branch: 7.17
+      branch: "7.17"
 
 actions:
   beats:
