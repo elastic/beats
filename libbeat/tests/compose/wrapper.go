@@ -80,6 +80,9 @@ func (c *wrapperContainer) Running() bool {
 
 var statusOldRe = regexp.MustCompile(`(\d+) (minute|hour)s?`)
 
+// Old returns true when info.Status indicates that container is more than
+// 3 minutes old.
+// Else, it returns false even when status is not in the expected format.
 func (c *wrapperContainer) Old() bool {
 	match := statusOldRe.FindStringSubmatch(c.info.Status)
 	if len(match) < 3 {
@@ -277,6 +280,20 @@ func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string)
 	return d.cmd(ctx, "kill", args...).Run()
 }
 
+func (d *wrapperDriver) Remove(ctx context.Context, service string, force bool) error {
+	var args []string
+
+	if force {
+		args = append(args, "-f")
+	}
+
+	if service != "" {
+		args = append(args, service)
+	}
+
+	return d.cmd(ctx, "rm", args...).Run()
+}
+
 func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error) {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, filter...)
 	if err != nil {
@@ -344,7 +361,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 // KillOld is a workaround for issues in CI with heavy load caused by having too many
 // running containers.
-// It kills all containers not related to services in `except`.
+// It kills and removes all containers except the excluded services in 'except'.
 func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
 	if err != nil {
@@ -358,7 +375,11 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		}
 
 		if container.Running() && container.Old() {
-			d.client.ContainerKill(ctx, container.info.ID, "KILL")
+			d.client.ContainerRemove(ctx, container.info.ID, types.ContainerRemoveOptions{
+				RemoveVolumes: true,
+				Force:         true,
+				RemoveLinks:   true,
+			})
 		}
 	}
 	return nil
