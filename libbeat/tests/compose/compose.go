@@ -76,7 +76,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		// Start container
 		err := compose.Start(service, upOptions)
 		if err != nil {
-			return fmt.Errorf("failed to start service '%s': %v", service, err)
+			return fmt.Errorf("failed to start service '%s': %w", service, err)
 		}
 
 		// Wait for health
@@ -104,8 +104,8 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		t.Log(err)
 
 		// Ignore errors here
-		compose.Kill(service)
-		compose.Remove(service, true)
+		_ = compose.Kill(service)
+		_ = compose.Remove(service, true)
 	}
 	if err != nil {
 		t.FailNow()

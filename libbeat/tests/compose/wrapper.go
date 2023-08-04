@@ -159,7 +159,7 @@ func (d *wrapperDriver) Close() error {
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
-	var args []string
+	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
 	args = append(args, "--no-ansi", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
@@ -367,6 +367,13 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 	if err != nil {
 		return fmt.Errorf("listing containers to be killed: %w", err)
 	}
+
+	rmOpts := types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+		RemoveLinks:   true,
+	}
+
 	for _, container := range list {
 		container := wrapperContainer{info: container}
 		serviceName, ok := container.info.Labels[labelComposeService]
@@ -375,13 +382,10 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		}
 
 		if container.Running() && container.Old() {
-			d.client.ContainerRemove(ctx, container.info.ID, types.ContainerRemoveOptions{
-				RemoveVolumes: true,
-				Force:         true,
-				RemoveLinks:   true,
-			})
+			_ = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
 		}
 	}
+
 	return nil
 }
 
