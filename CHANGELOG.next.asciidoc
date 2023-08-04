@@ -9,6 +9,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Upgrade Go to 1.19.12 {pull}36246[36246]
 
 *Auditbeat*
 
