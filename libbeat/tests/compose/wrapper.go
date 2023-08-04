@@ -266,6 +266,10 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string,
 	return nil
 }
 
+// Kill force stops the service containers based on the SIGNAL provided.
+// If SIGKILL is used, then termination happens immediately whereas SIGTERM
+// is used for graceful termination.
+// See: https://docs.docker.com/engine/reference/commandline/compose_kill/
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
 	var args []string
 
@@ -280,6 +284,9 @@ func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string)
 	return d.cmd(ctx, "kill", args...).Run()
 }
 
+// Remove removes the stopped service containers. Removal of the containers can be forced as
+// well where no confirmation of removal is required.
+// See: https://docs.docker.com/engine/reference/commandline/compose_rm/
 func (d *wrapperDriver) Remove(ctx context.Context, service string, force bool) error {
 	var args []string
 
