@@ -137,6 +137,16 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
+
+			// If InputUnitID is not empty, then we're running under Elastic-Agent
+			// and we need to report the errors per unit.
+			if config.InputUnitID != "" {
+				err = UnitError{
+					Err:    err,
+					UnitID: config.InputUnitID,
+				}
+			}
+
 			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
@@ -225,4 +235,17 @@ func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *r
 	// that doesn't affect the hash of the original one.
 	c, _ := config.NewConfigFrom(cfg.Config)
 	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
+}
+
+type UnitError struct {
+	UnitID string
+	Err    error
+}
+
+func (u UnitError) Error() string {
+	return u.Err.Error()
+}
+
+func (u UnitError) Unwrap() error {
+	return u.Err
 }
