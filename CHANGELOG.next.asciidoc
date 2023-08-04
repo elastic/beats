@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Eliminate cloning of event in deepUpdate {pull}35945[35945]
 - Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
 - Support build of projects outside of beats directory {pull}36126[36126]
+- After upgrade the deb package now restarts the Beat service {issue}34089[34089] {pull}36201[36201]
 
 
 
@@ -104,6 +105,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
 - Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
 - Fix handling of region name configuration in awss3 input {pull}36034[36034]
+- Fixed concurrency and flakey tests issue in azure blob storage input. {issue}35983[35983] {pull}36124[36124]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
 - Update mito CEL extension library to v1.5.0. {pull}36146[36146]
@@ -134,6 +136,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix temp dir running out of space with project monitors. {issue}35843[35843]
 - Fixing the grok expression outputs of log files {pull}35221[35221]
 - Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
+- Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
 
 *Heartbeat*
 
@@ -206,6 +209,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Affecting all Beats*
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
+- When running under Elastic-Agent the status is now reported per Unit instead of the whole Beat {issue}35874[35874] {pull}36183[36183]
 
 *Auditbeat*
 

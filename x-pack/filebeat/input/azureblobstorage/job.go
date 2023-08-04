@@ -86,10 +86,13 @@ func (j *job) do(ctx context.Context, id string) {
 			Fields:    fields,
 		}
 		event.SetID(objectID(j.hash, 0))
-		j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
-		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+		// locks while data is being saved to avoid concurrent map read/writes
+		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorf(jobErrString, id, err)
 		}
+		// unlocks after data is saved
+		done()
 	}
 }
 
@@ -186,16 +189,21 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
+		var (
+			cp   *Checkpoint
+			done func()
+		)
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
-			j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
+			cp, done = j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
 		} else {
 			// partially saves read state using offset
-			j.state.savePartial(*j.blob.Name, offset+relativeOffset, j.blob.Properties.LastModified)
+			cp, done = j.state.savePartialForTx(*j.blob.Name, offset+relativeOffset)
 		}
-		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
+		if err := j.publisher.Publish(evt, cp); err != nil {
 			j.log.Errorf(jobErrString, id, err)
 		}
+		done()
 	}
 	return nil
 }
