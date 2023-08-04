@@ -5,54 +5,18 @@
 package scenarios
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"sync"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
 var scenarioDB = framework.NewScenarioDB()
 var testWs *httptest.Server
-
-var testWsOnce = &sync.Once{}
-
-// Starting this thing up is expensive, let's just do it once
-func startTestWebserver(t *testing.T) *httptest.Server {
-	testWsOnce.Do(func() {
-		testWs = httptest.NewServer(hbtest.HelloWorldHandler(200))
-		var err error
-		for i := 0; i < 20; i++ {
-			var resp *http.Response
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, testWs.URL, nil)
-			resp, err = http.DefaultClient.Do(req)
-			if err == nil {
-				resp.Body.Close()
-				if resp.StatusCode == 200 {
-					break
-				}
-			}
-
-			time.Sleep(time.Millisecond * 250)
-		}
-
-		if err != nil {
-			require.NoError(t, err, "could not retrieve successful response from test webserver")
-		}
-	})
-
-	return testWs
-}
 
 // Note, no browser scenarios here, those all go in browserscenarios.go
 // since they have different build tags

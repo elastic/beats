@@ -40,24 +40,32 @@ type Scenario struct {
 	NumberOfRuns int
 }
 
-type Twist func(Scenario) Scenario
+type Twist struct {
+	Name string
+	Fn   func(Scenario) Scenario
+}
 
-func MakeTwist(name string, fn Twist) Twist {
-	return func(s Scenario) Scenario {
-		newS := s.clone()
-		newS.Name = fmt.Sprintf("%s~<%s>", s.Name, name)
-		return fn(newS)
+func MakeTwist(name string, fn func(Scenario) Scenario) *Twist {
+	return &Twist{
+		Name: name,
+		Fn: func(s Scenario) Scenario {
+			newS := s.clone()
+			newS.Name = fmt.Sprintf("%s~<%s>", s.Name, name)
+			return fn(newS)
+		},
 	}
 }
 
-func MultiTwist(twists ...Twist) Twist {
-	return func(s Scenario) Scenario {
-		res := s
-		for _, twist := range twists {
-			res = twist(res)
-		}
-		return res
-	}
+func MultiTwist(twists ...*Twist) *Twist {
+	return MakeTwist(
+		"<~MULTI-TWIST~[",
+		func(s Scenario) Scenario {
+			res := s
+			for _, twist := range twists {
+				res = twist.Fn(res)
+			}
+			return res
+		})
 }
 
 func (s Scenario) clone() Scenario {
@@ -69,10 +77,10 @@ func (s Scenario) clone() Scenario {
 	return copy
 }
 
-func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
+func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
 	runS := s
 	if twist != nil {
-		runS = twist(s.clone())
+		runS = twist.Fn(s.clone())
 	}
 
 	cfgMap, rClose, err := runS.Runner(t)
@@ -143,10 +151,10 @@ func NewScenarioDB() *ScenarioDB {
 }
 
 func (sdb *ScenarioDB) Init() {
-	var prunedList []Scenario
-	browserCapable := os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") == "true"
-	icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
 	sdb.initOnce.Do(func() {
+		var prunedList []Scenario
+		browserCapable := os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") == "true"
+		icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
 		for _, s := range sdb.All {
 			if s.Type == "browser" && !browserCapable {
 				continue
@@ -160,8 +168,8 @@ func (sdb *ScenarioDB) Init() {
 				sdb.ByTag[t] = append(sdb.ByTag[t], s)
 			}
 		}
+		sdb.All = prunedList
 	})
-	sdb.All = prunedList
 }
 
 func (sdb *ScenarioDB) Add(s ...Scenario) {
@@ -172,7 +180,14 @@ func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*testing.T, *MonitorTe
 	sdb.RunAllWithATwist(t, nil, callback)
 }
 
-func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunAllWithTwistMatrix(t *testing.T, twists []*Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+	for _, twist := range twists {
+		sdb.RunAllWithATwist(t, twist, callback)
+	}
+	sdb.RunAllWithATwist(t, nil, callback)
+}
+
+func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	for _, s := range sdb.All {
 		s.Run(t, twist, callback)
@@ -183,7 +198,7 @@ func (sdb *ScenarioDB) RunTag(t *testing.T, tagName string, callback func(*testi
 	sdb.RunTagWithATwist(t, tagName, nil, callback)
 }
 
-func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	if len(sdb.ByTag[tagName]) < 1 {
 		require.Failf(t, "no scenarios have tags matching %s", tagName)

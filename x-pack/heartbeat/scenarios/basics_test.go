@@ -17,15 +17,21 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
+type CheckHistItem struct {
+	cg      string
+	summary *summarizer.JobSummary
+}
+
 func TestSimpleScenariosBasicFields(t *testing.T) {
-	scenarioDB.RunAll(t, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+	runner := func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		require.GreaterOrEqual(t, len(mtr.Events()), 1)
-		lastCg := ""
-		for i, e := range mtr.Events() {
+		var checkHist []*CheckHistItem
+		for _, e := range mtr.Events() {
 			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
 					"id":          mtr.StdFields.ID,
@@ -35,17 +41,41 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 				},
 			}), e.Fields)
 
-			// Ensure that all check groups are equal and don't change
-			cg, err := e.GetValue("monitor.check_group")
+			// Ensure that all check groups are equal and don't except across retries
+			cgIface, err := e.GetValue("monitor.check_group")
 			require.NoError(t, err)
-			cgStr := cg.(string)
-			if i == 0 {
-				lastCg = cgStr
-			} else {
-				require.Equal(t, lastCg, cgStr)
+			cg := cgIface.(string)
+
+			var summary *summarizer.JobSummary
+			summaryIface, err := e.GetValue("summary")
+			if err == nil {
+				summary = summaryIface.(*summarizer.JobSummary)
+			}
+
+			var lastCheck *CheckHistItem
+			if len(checkHist) > 0 {
+				lastCheck = checkHist[len(checkHist)-1]
+			}
+
+			curCheck := &CheckHistItem{cg: cg, summary: summary}
+
+			checkHist = append(checkHist, curCheck)
+
+			// If we have a prior check
+			if lastCheck != nil {
+				// If the last event was a summary, meaningc this one is a retry
+				if lastCheck.summary != nil {
+					// then we expect a new check group
+					require.NotEqual(t, lastCheck.cg, curCheck.cg)
+				} else {
+					// If we're within the same check due to multiple continuations
+					// we expect equality
+					require.Equal(t, lastCheck.cg, curCheck.cg)
+				}
 			}
 		}
-	})
+	}
+	scenarioDB.RunAllWithTwistMatrix(t, []*framework.Twist{TwistMaxAttempts(2)}, runner)
 }
 
 func TestLightweightUrls(t *testing.T) {

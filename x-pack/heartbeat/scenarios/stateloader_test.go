@@ -7,7 +7,7 @@ package scenarios
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
@@ -19,11 +19,11 @@ func TestStateContinuity(t *testing.T) {
 	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		lastSS := framework.LastState(mtr.Events())
 
-		require.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
+		assert.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
 
 		allSS := framework.AllStates(mtr.Events())
-		require.Len(t, allSS, 3)
+		assert.Len(t, allSS, 3)
 
-		require.Equal(t, 3, lastSS.State.Checks)
+		assert.Equal(t, 3, lastSS.State.Checks)
 	})
 }
