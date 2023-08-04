@@ -222,7 +222,7 @@ func (c *Project) Remove(service string, force bool) error {
 	return c.Driver.Remove(context.Background(), service, force)
 }
 
-// KillOld kills old containers.
+// KillOld kills and removes old containers.
 func (c *Project) KillOld(except []string) error {
 	// Do not kill ourselves ;)
 	except = append(except, "beat")
