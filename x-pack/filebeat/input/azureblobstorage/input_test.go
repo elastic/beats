@@ -399,87 +399,24 @@ func Test_StorageClient(t *testing.T) {
 }
 
 func Test_Concurrency(t *testing.T) {
-	tests := []struct {
-		name        string
-		baseConfig  map[string]interface{}
-		mockHandler func() http.Handler
-		expectedLen int
-	}{
-		{
-			name: "TestConcurrency_100_Workers",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         100,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name": mock.ConcurrencyContainer,
-					},
-				},
-			},
-			mockHandler: mock.AzureConcurrencyServer,
-			expectedLen: mock.TotalRandomDataSets,
-		},
-		{
-			name: "TestConcurrency_1000_Workers",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         1000,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name": mock.ConcurrencyContainer,
-					},
-				},
-			},
-			mockHandler: mock.AzureConcurrencyServer,
-			expectedLen: mock.TotalRandomDataSets,
-		},
-		{
-			name: "TestConcurrency_2000_Workers",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         2000,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name": mock.ConcurrencyContainer,
-					},
-				},
-			},
-			mockHandler: mock.AzureConcurrencyServer,
-			expectedLen: mock.TotalRandomDataSets,
-		},
-		{
-			name: "TestConcurrency_3000_Workers",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         3000,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name": mock.ConcurrencyContainer,
-					},
-				},
-			},
-			mockHandler: mock.AzureConcurrencyServer,
-			expectedLen: mock.TotalRandomDataSets,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			serv := httptest.NewServer(tt.mockHandler())
+	for _, workers := range []int{100, 1000, 2000, 3000} {
+		t.Run(fmt.Sprintf("TestConcurrency_%d_Workers", workers), func(t *testing.T) {
+			const expectedLen = mock.TotalRandomDataSets
+			serv := httptest.NewServer(mock.AzureConcurrencyServer())
 			t.Cleanup(serv.Close)
 
-			cfg := conf.MustNewConfigFrom(tt.baseConfig)
+			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         workers,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": mock.ConcurrencyContainer,
+					},
+				},
+			})
 			conf := config{}
 			err := cfg.Unpack(&conf)
 			assert.NoError(t, err)
@@ -506,10 +443,10 @@ func Test_Concurrency(t *testing.T) {
 			}
 			v2Ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
-			v2Ctx.ID += tt.name
+			v2Ctx.ID += t.Name()
 			client := publisher{
 				stop: func(e []beat.Event) {
-					if len(e) >= tt.expectedLen {
+					if len(e) >= expectedLen {
 						cancel()
 					}
 				},
@@ -523,14 +460,14 @@ func Test_Concurrency(t *testing.T) {
 			t.Cleanup(func() { timeout.Stop() })
 			select {
 			case <-timeout.C:
-				t.Errorf("timed out waiting for %d events", tt.expectedLen)
+				t.Errorf("timed out waiting for %d events", expectedLen)
 				cancel()
 			case <-v2Ctx.Cancelation.Done():
 			}
 			//nolint:errcheck // We can ignore as the error will always be context canceled, which is expected in this case
 			g.Wait()
-			if len(client.events) < tt.expectedLen {
-				t.Errorf("failed to get all events: got:%d want:%d", len(client.events), tt.expectedLen)
+			if len(client.events) < expectedLen {
+				t.Errorf("failed to get all events: got:%d want:%d", len(client.events), expectedLen)
 			}
 		})
 	}
