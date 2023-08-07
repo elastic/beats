@@ -56,17 +56,6 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 		}
 	}
 
-	if beatsConfig.Endpoint != "" {
-		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
-		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				PartitionID:   "aws",
-				URL:           beatsConfig.Endpoint,
-				SigningRegion: awsConfig.Region,
-			}, nil
-		})
-	}
-
 	// Assume IAM role if iam_role config parameter is given
 	if beatsConfig.RoleArn != "" {
 		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig)

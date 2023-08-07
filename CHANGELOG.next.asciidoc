@@ -252,11 +252,11 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for localstack based input integration testing {pull}35727[35727]
 - Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
+- Add support for endpoint resolver in AWS config {pull}36208[36208]
 
 *Auditbeat*
 
 *Libbeat*
-- Add support for endpoint resolver in AWS config {pull}36208[36208]
 
 *Heartbeat*
 - Added status to monitor run log report.
