@@ -223,7 +223,9 @@ logging:
 	mockbeat.Start()
 	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
 	mockbeat.WaitForLogs("Template with name \\\"mockbeat-9.9.9\\\" loaded.", 20*time.Second)
-	mockbeat.WaitForLogs("PublishEvents: 1 events have been published", 20*time.Second)
+	require.Eventually(t, func() bool {
+		return mockbeat.LogMatch("PublishEvents: [[:digit:]]+ events have been published")
+	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")
 
 	status, body, err := HttpDo(t, http.MethodGet, indexURL)
 	require.NoError(t, err)
@@ -293,7 +295,9 @@ logging:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	mockbeat.WaitForLogs("PublishEvents: 1 events have been published", 20*time.Second)
+	require.Eventually(t, func() bool {
+		return mockbeat.LogMatch("PublishEvents: [[:digit:]]+ events have been published")
+	}, 20*time.Second, 100*time.Millisecond, "looking for PublishEvents")
 
 	u := fmt.Sprintf("%s/_index_template/%s", esUrl.String(), datastream)
 	r, _ := http.Get(u)

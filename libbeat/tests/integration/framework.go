@@ -31,6 +31,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
@@ -118,6 +119,33 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		stdout:     stdoutFile,
 		stderr:     stderrFile,
 	}
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
+		}
+		var maxlen int64 = 2048
+		stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
+		if err != nil {
+			t.Logf("error reading stderr: %s", err)
+		}
+		t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+
+		stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
+		if err != nil {
+			t.Logf("error reading stdout: %s", err)
+		}
+		t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+
+		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
+		files, err := filepath.Glob(glob)
+		for _, f := range files {
+			contents, err := readLastNBytes(f, maxlen)
+			if err != nil {
+				t.Logf("error reading %s: %s", f, err)
+			}
+			t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
+		}
+	})
 	return &p
 }
 
@@ -219,6 +247,47 @@ func (b *BeatProc) Stop() {
 	}
 }
 
+// LogMatch tests each line of the logfile to see if contains any
+// match of the provided regular expression.  It will open the log
+// file on every call, read until EOF, then close it.  LogContains
+// will be faster so use that if possible.
+func (b *BeatProc) LogMatch(match string) bool {
+	re := regexp.MustCompile(match)
+	logFile := b.openLogFile()
+	_, err := logFile.Seek(b.logFileOffset, os.SEEK_SET)
+	if err != nil {
+		b.t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
+	}
+
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			b.t.Errorf("could not close log file: %s", err)
+		}
+	}()
+
+	r := bufio.NewReader(logFile)
+	for {
+		data, err := r.ReadBytes('\n')
+		line := string(data)
+		b.logFileOffset += int64(len(data))
+
+		if err != nil {
+			if err != io.EOF {
+				b.t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
+
+		if re.MatchString(line) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // LogContains looks for `s` as a substring of every log line,
 // it will open the log file on every call, read it until EOF,
 // then close it.
@@ -242,7 +311,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		b.logFileOffset += int64(len(line))
+		b.logFileOffset += int64(len(data))
 
 		if err != nil {
 			if err != io.EOF {
@@ -563,4 +632,26 @@ func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) 
 	}
 	srcURL.Path = path
 	return srcURL, nil
+}
+
+func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("error opening %s: %w", filename, err)
+	}
+	fInfo, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("error stating %s: %w", filename, err)
+	}
+	var startPosition int64
+	if fInfo.Size() >= numBytes {
+		startPosition = fInfo.Size() - numBytes
+	} else {
+		startPosition = 0
+	}
+	_, err = f.Seek(startPosition, io.SeekStart)
+	if err != nil {
+		return nil, fmt.Errorf("error seeking to %d in %s: %w", startPosition, filename, err)
+	}
+	return io.ReadAll(f)
 }
