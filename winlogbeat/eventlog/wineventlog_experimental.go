@@ -256,7 +256,8 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 }
 
 func (l *winEventLogExp) Read() ([]Record, error) {
-	records := make([]Record, 0, l.maxRead)
+	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
+	var records []Record
 	defer func() {
 		l.metrics.log(records)
 	}()

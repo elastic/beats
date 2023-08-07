@@ -424,7 +424,8 @@ func (l *winEventLog) Read() ([]Record, error) {
 		return nil, err
 	}
 
-	records := make([]Record, 0, len(handles))
+	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
+	var records []Record
 	defer func() {
 		l.metrics.log(records)
 		for _, h := range handles {
