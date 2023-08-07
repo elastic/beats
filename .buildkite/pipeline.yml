@@ -21,7 +21,7 @@ steps:
     agents:
       image: "${LINUX_AGENT_IMAGE}"
       cpu: "2"
-      memory: "1G"
+      memory: "2G"
     artifact_paths: "*.xml"
 
   - label: ":windows: Tests on Windows"
