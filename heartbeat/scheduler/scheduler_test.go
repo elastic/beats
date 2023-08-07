@@ -93,7 +93,7 @@ func TestSchedulerRun(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}), "http", nil)
+	}), "http")
 	require.NoError(t, err)
 
 	removedEvents := uint32(1)
@@ -109,7 +109,7 @@ func TestSchedulerRun(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err = s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http", nil)
+	remove, err = s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http")
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
@@ -122,7 +122,7 @@ func TestSchedulerRun(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}), "http", nil)
+	}), "http")
 	require.NoError(t, err)
 
 	received := make([]string, 0)
@@ -160,7 +160,6 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 	defer s.Stop()
 
 	executed := new(uint32)
-	waits := new(uint32)
 
 	_, err := s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
 		cont := func(_ context.Context) []TaskFunc {
@@ -170,12 +169,11 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}, "http", func() { atomic.AddUint32(waits, 1) })
+	}, "http")
 	require.NoError(t, err)
 
 	s.WaitForRunOnce()
 	require.Equal(t, uint32(1), atomic.LoadUint32(executed))
-	require.Equal(t, uint32(1), atomic.LoadUint32(waits))
 }
 
 func TestScheduler_Stop(t *testing.T) {
@@ -188,7 +186,7 @@ func TestScheduler_Stop(t *testing.T) {
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
-	}), "http", nil)
+	}), "http")
 
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
@@ -287,7 +285,7 @@ func BenchmarkScheduler(b *testing.B) {
 		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
-		}, "http", nil)
+		}, "http")
 		assert.NoError(b, err)
 	}
 
