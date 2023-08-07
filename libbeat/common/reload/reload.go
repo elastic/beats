@@ -44,6 +44,9 @@ type ConfigWithMeta struct {
 
 	// DiagCallback is a diagnostic handler associated with the underlying unit that maps to the config
 	DiagCallback DiagnosticHandler
+
+	// InputUnitID is the unit's ID that generated this ConfigWithMeta
+	InputUnitID string
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities
