@@ -4,11 +4,6 @@
 
 import groovy.transform.Field
 
-/**
- This is required to store the test suites we will use to trigger the E2E tests.
-*/
-@Field def e2eTestSuites = []
-
 pipeline {
   agent none
   environment {
@@ -20,7 +15,6 @@ pipeline {
     JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
-    GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     PIPELINE_LOG_LEVEL = "INFO"
     SLACK_CHANNEL = '#ingest-notifications'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
@@ -39,9 +33,6 @@ pipeline {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
-  }
-  parameters {
-    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets. This workaround will generate broken/buggy binaries.')
   }
   stages {
     stage('Filter build') {
@@ -101,15 +92,6 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             generateSteps()
-          }
-        }
-        stage('Run E2E Tests for Packages'){
-          options { skipDefaultCheckout() }
-          when {
-            expression { return params.run_e2e }
-          }
-          steps {
-            runE2ETests()
           }
         }
         stage('DRA Snapshot') {
@@ -295,7 +277,6 @@ def generateLinuxStep(beat) {
             pushCIDockerImages(arch: 'amd64')
           }
         }
-        prepareE2ETestForPackage("${beat}")
 
         // Staging is only needed from branches (main or release branches)
         if (isBranch()) {
@@ -393,6 +374,7 @@ def tagAndPush(Map args = [:]) {
   )
 }
 
+<<<<<<< HEAD
 def prepareE2ETestForPackage(String beat){
   if ("${beat}" == "filebeat" || "${beat}" == "x-pack/filebeat") {
     e2eTestSuites.push('fleet')
@@ -408,6 +390,8 @@ def prepareE2ETestForPackage(String beat){
   }
 }
 
+=======
+>>>>>>> e194656f70 (Removing e2e tests from packaging as it has been removed (#36266))
 def release(type){
   withBeatsEnv(type){
     // As agreed DEV=false for staging otherwise DEV=true
@@ -444,6 +428,7 @@ def release(type){
   }
 }
 
+<<<<<<< HEAD
 def runE2ETests(){
   if (e2eTestSuites.size() == 0) {
     echo("Not triggering E2E tests for PR-${env.CHANGE_ID} because the changes does not affect the E2E.")
@@ -472,6 +457,8 @@ def runE2ETests(){
   }
 }
 
+=======
+>>>>>>> e194656f70 (Removing e2e tests from packaging as it has been removed (#36266))
 /**
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
 * therefore the storage bucket in GCP should follow the same folder structure.
