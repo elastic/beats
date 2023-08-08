@@ -75,6 +75,7 @@ type AgentPolicy struct {
 	UnenrollTimeout    int                       `json:"unenroll_timeout,omitempty"`
 	InactivityTImeout  int                       `json:"inactivity_timeout,omitempty"`
 	AgentFeatures      []map[string]interface{}  `json:"agent_features,omitempty"`
+	IsProtected        bool                      `json:"is_protected"`
 }
 
 // PolicyResponse is the response JSON from a policy request
@@ -118,83 +119,60 @@ var (
 	FALSE *bool = &bf
 )
 
+type policyResp struct {
+	Item PolicyResponse `json:"item"`
+}
+
 // CreatePolicy creates a new agent policy with the given config
-func (client *Client) CreatePolicy(request AgentPolicy) (*PolicyResponse, error) {
+func (client *Client) CreatePolicy(ctx context.Context, request AgentPolicy) (r PolicyResponse, err error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal create policy request into JSON: %w", err)
+		return r, fmt.Errorf("unable to marshal create policy request into JSON: %w", err)
 	}
 
-	statusCode, respBody, err := client.Request(http.MethodPost, fleetAgentPoliciesAPI, nil, nil, bytes.NewReader(reqBody))
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodPost, fleetAgentPoliciesAPI, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, fmt.Errorf("error calling create policy API: %w", err)
+		return r, fmt.Errorf("error calling create policy API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to create policy; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
-
-	var resp struct {
-		Item PolicyResponse `json:"item"`
-	}
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse create policy API response: %w", err)
-	}
-
-	return &resp.Item, nil
+	defer resp.Body.Close()
+	var polResp policyResp
+	err = readJSONResponse(resp, &polResp)
+	return polResp.Item, err
 }
 
 // GetPolicy returns the requested ID
-func (client *Client) GetPolicy(id string) (*PolicyResponse, error) {
+func (client *Client) GetPolicy(ctx context.Context, id string) (r PolicyResponse, err error) {
 	apiURL := fmt.Sprintf(fleetAgentPolicyAPI, id)
-	statusCode, respBody, err := client.Request(http.MethodGet, apiURL, nil, nil, nil)
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodGet, apiURL, nil, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error calling get policy API: %w", err)
+		return r, fmt.Errorf("error calling get policy API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to get policy; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
-
-	var resp struct {
-		Item PolicyResponse `json:"item"`
-	}
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse get policy API response: %w", err)
-	}
-
-	return &resp.Item, nil
+	defer resp.Body.Close()
+	var polResp policyResp
+	err = readJSONResponse(resp, &polResp)
+	return polResp.Item, err
 }
 
 // UpdatePolicy updates an existing agent policy.
-func (client *Client) UpdatePolicy(ID string, request AgentPolicyUpdateRequest) (*PolicyResponse, error) {
+func (client *Client) UpdatePolicy(ctx context.Context, id string, request AgentPolicyUpdateRequest) (r PolicyResponse, err error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal update policy request into JSON: %w", err)
+		return r, fmt.Errorf("unable to marshal update policy request into JSON: %w", err)
 	}
 
-	apiURL := fmt.Sprintf(fleetAgentPolicyAPI, ID)
-	statusCode, respBody, err := client.Request(http.MethodPut, apiURL, nil, nil, bytes.NewReader(reqBody))
+	apiURL := fmt.Sprintf(fleetAgentPolicyAPI, id)
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodPut, apiURL, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, fmt.Errorf("error calling update policy API: %w", err)
+		return r, fmt.Errorf("error calling update policy API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to update policy; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
-
-	var resp struct {
-		Item PolicyResponse `json:"item"`
-	}
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse update policy API response: %w", err)
-	}
-
-	return &resp.Item, nil
+	defer resp.Body.Close()
+	var polResp policyResp
+	err = readJSONResponse(resp, &polResp)
+	return polResp.Item, err
 }
 
 // DeletePolicy deletes the policy with the given ID
-func (client *Client) DeletePolicy(id string) error {
+func (client *Client) DeletePolicy(ctx context.Context, id string) error {
 	var delRequest = struct {
 		AgentPolicyID string `json:"agentPolicyId"`
 	}{
@@ -203,17 +181,21 @@ func (client *Client) DeletePolicy(id string) error {
 
 	reqBody, err := json.Marshal(delRequest)
 	if err != nil {
-		return fmt.Errorf("unable to marshal update policy request into JSON: %w", err)
+		return fmt.Errorf("unable to marshal delete policy request into JSON: %w", err)
 	}
 
-	statusCode, respBody, err := client.Request(http.MethodPost, fleetAgentsDeleteAPI, nil, nil, bytes.NewReader(reqBody))
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodPost, fleetAgentsDeleteAPI, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
-		return fmt.Errorf("error calling update policy API: %w", err)
+		return fmt.Errorf("error calling delete policy API: %w", err)
 	}
-	if statusCode != 200 {
-		return fmt.Errorf("unable to update policy; API returned status code [%d] and body [%s]", statusCode, string(respBody))
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("unable to delete policy; API returned status code [%d] and error reading response: %w", resp.StatusCode, err)
+		}
+		return fmt.Errorf("unable to delete policy; API returned status code [%d] and body [%s]", resp.StatusCode, string(respBody))
 	}
-
 	return nil
 }
 
@@ -238,29 +220,23 @@ type CreateEnrollmentAPIKeyResponse struct {
 }
 
 // CreateEnrollmentAPIKey creates an enrollment API key
-func (client *Client) CreateEnrollmentAPIKey(request CreateEnrollmentAPIKeyRequest) (*CreateEnrollmentAPIKeyResponse, error) {
+func (client *Client) CreateEnrollmentAPIKey(ctx context.Context, request CreateEnrollmentAPIKeyRequest) (r CreateEnrollmentAPIKeyResponse, err error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal create enrollment API key request into JSON: %w", err)
+		return r, fmt.Errorf("unable to marshal create enrollment API key request into JSON: %w", err)
 	}
 
-	statusCode, respBody, err := client.Request(http.MethodPost, fleetEnrollmentAPIKeysAPI, nil, nil, bytes.NewReader(reqBody))
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodPost, fleetEnrollmentAPIKeysAPI, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, fmt.Errorf("error calling create enrollment API key API: %w", err)
+		return r, fmt.Errorf("error calling create enrollment API key API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to create enrollment API key; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
+	defer resp.Body.Close()
 
-	var resp struct {
+	var enrollResp struct {
 		Item CreateEnrollmentAPIKeyResponse `json:"item"`
 	}
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse create enrollment API key API response: %w", err)
-	}
-
-	return &resp.Item, nil
+	err = readJSONResponse(resp, &enrollResp)
+	return enrollResp.Item, err
 }
 
 //
@@ -301,22 +277,15 @@ type ListAgentsResponse struct {
 }
 
 // ListAgents returns a list of agents known to Kibana
-func (client *Client) ListAgents(_ ListAgentsRequest) (*ListAgentsResponse, error) {
-	statusCode, respBody, err := client.Request(http.MethodGet, fleetAgentsAPI, nil, nil, nil)
+func (client *Client) ListAgents(ctx context.Context, _ ListAgentsRequest) (r ListAgentsResponse, err error) {
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodGet, fleetAgentsAPI, nil, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error calling list agents API: %w", err)
+		return r, fmt.Errorf("error calling list agents API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to list agents; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
+	defer resp.Body.Close()
 
-	var resp ListAgentsResponse
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse list agents API response: %w", err)
-	}
-
-	return &resp, nil
+	err = readJSONResponse(resp, &r)
+	return r, err
 }
 
 //
@@ -332,25 +301,20 @@ type GetAgentRequest struct {
 type GetAgentResponse AgentExisting
 
 // GetAgent fetches data for an agent
-func (client *Client) GetAgent(request GetAgentRequest) (*GetAgentResponse, error) {
+func (client *Client) GetAgent(ctx context.Context, request GetAgentRequest) (r GetAgentResponse, err error) {
 	apiURL := fmt.Sprintf(fleetAgentAPI, request.ID)
-	statusCode, respBody, err := client.Request(http.MethodGet, apiURL, nil, nil, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error calling get agent API: %w", err)
-	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to get agent; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
 
-	var resp struct {
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodGet, apiURL, nil, nil, nil)
+	if err != nil {
+		return r, fmt.Errorf("error calling get agent API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	var agentResp struct {
 		Item GetAgentResponse `json:"item"`
 	}
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse get agent API response: %w", err)
-	}
-
-	return &resp.Item, nil
+	err = readJSONResponse(resp, &agentResp)
+	return agentResp.Item, err
 }
 
 //
@@ -369,28 +333,21 @@ type UnEnrollAgentResponse struct {
 }
 
 // UnEnrollAgent removes the agent from fleet
-func (client *Client) UnEnrollAgent(request UnEnrollAgentRequest) (*UnEnrollAgentResponse, error) {
+func (client *Client) UnEnrollAgent(ctx context.Context, request UnEnrollAgentRequest) (r UnEnrollAgentResponse, err error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal unenroll agent request into JSON: %w", err)
+		return r, fmt.Errorf("unable to marshal unenroll agent request into JSON: %w", err)
 	}
-
 	apiURL := fmt.Sprintf(fleetUnEnrollAgentAPI, request.ID)
-	statusCode, respBody, err := client.Request(http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
+
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, fmt.Errorf("error calling unenroll agent API: %w", err)
+		return r, fmt.Errorf("error calling unenroll agent API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to unenroll agent; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
+	defer resp.Body.Close()
 
-	var resp UnEnrollAgentResponse
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse unenroll agent API response: %w", err)
-	}
-
-	return &resp, nil
+	err = readJSONResponse(resp, &r)
+	return r, err
 }
 
 //
@@ -409,28 +366,21 @@ type UpgradeAgentResponse struct {
 }
 
 // UpgradeAgent upgrades the requested agent
-func (client *Client) UpgradeAgent(request UpgradeAgentRequest) (*UpgradeAgentResponse, error) {
+func (client *Client) UpgradeAgent(ctx context.Context, request UpgradeAgentRequest) (r UpgradeAgentResponse, err error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal upgrade agent request into JSON: %w", err)
+		return r, fmt.Errorf("unable to marshal upgrade agent request into JSON: %w", err)
 	}
 
 	apiURL := fmt.Sprintf(fleetUpgradeAgentAPI, request.ID)
-	statusCode, respBody, err := client.Request(http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
-		return nil, fmt.Errorf("error calling upgrade agent API: %w", err)
+		return r, fmt.Errorf("error calling upgrade agent API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to upgrade agent; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
+	defer resp.Body.Close()
 
-	var resp UpgradeAgentResponse
-
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse upgrade agent API response: %w", err)
-	}
-
-	return &resp, nil
+	err = readJSONResponse(resp, &r)
+	return r, err
 }
 
 //
@@ -457,22 +407,16 @@ type ListFleetServerHostsResponse struct {
 }
 
 // ListFleetServerHosts returns a list of fleet server hosts
-func (client *Client) ListFleetServerHosts(_ ListFleetServerHostsRequest) (*ListFleetServerHostsResponse, error) {
-	statusCode, respBody, err := client.Request(http.MethodGet, fleetFleetServerHostsAPI, nil, nil, nil)
+func (client *Client) ListFleetServerHosts(ctx context.Context, _ ListFleetServerHostsRequest) (r ListFleetServerHostsResponse, err error) {
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodGet, fleetFleetServerHostsAPI, nil, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error calling list fleet server hosts API: %w", err)
+		return r, fmt.Errorf("error calling list fleet server hosts API: %w", err)
 	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to list fleet server hosts; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
+	defer resp.Body.Close()
 
-	var resp ListFleetServerHostsResponse
+	err = readJSONResponse(resp, &r)
 
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse list fleet server hosts API response: %w", err)
-	}
-
-	return &resp, nil
+	return r, err
 }
 
 //
@@ -488,25 +432,21 @@ type GetFleetServerHostRequest struct {
 type GetFleetServerHostResponse FleetServerHost
 
 // GetFleetServerHost returns data on a fleet server
-func (client *Client) GetFleetServerHost(request GetFleetServerHostRequest) (*GetFleetServerHostResponse, error) {
+func (client *Client) GetFleetServerHost(ctx context.Context, request GetFleetServerHostRequest) (r GetFleetServerHostResponse, err error) {
 	apiURL := fmt.Sprintf(fleetFleetServerHostAPI, request.ID)
-	statusCode, respBody, err := client.Request(http.MethodGet, apiURL, nil, nil, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error calling get fleet server host API: %w", err)
-	}
-	if statusCode != 200 {
-		return nil, fmt.Errorf("unable to get fleet server host; API returned status code [%d] and body [%s]", statusCode, string(respBody))
-	}
 
-	var resp struct {
+	resp, err := client.Connection.SendWithContext(ctx, http.MethodGet, apiURL, nil, nil, nil)
+	if err != nil {
+		return r, fmt.Errorf("error calling get fleet server hosts API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	var fleetResp struct {
 		Item GetFleetServerHostResponse `json:"item"`
 	}
+	err = readJSONResponse(resp, &fleetResp)
 
-	if err := json.Unmarshal(respBody, &resp); err != nil {
-		return nil, fmt.Errorf("unable to parse get fleet server host API response: %w", err)
-	}
-
-	return &resp.Item, nil
+	return fleetResp.Item, err
 }
 
 //

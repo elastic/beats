@@ -18,6 +18,7 @@
 package kibana
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"net/http"
@@ -61,6 +62,9 @@ func TestFleetCreatePolicy(t *testing.T) {
 		policyDescription = "a policy used for testing"
 	)
 
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fleetAgentPoliciesAPI:
@@ -80,7 +84,7 @@ func TestFleetCreatePolicy(t *testing.T) {
 			MonitoringEnabledMetrics,
 		},
 	}
-	resp, err := client.CreatePolicy(req)
+	resp, err := client.CreatePolicy(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -95,6 +99,10 @@ func TestFleetCreatePolicy(t *testing.T) {
 
 func TestFleetGetPolicy(t *testing.T) {
 	const id = "elastic-agent-managed-ep"
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fmt.Sprintf(fleetAgentPolicyAPI, id):
@@ -106,7 +114,7 @@ func TestFleetGetPolicy(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
-	resp, err := client.GetPolicy(id)
+	resp, err := client.GetPolicy(ctx, id)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -123,6 +131,9 @@ func TestFleetUpdatePolicy(t *testing.T) {
 		id         = "b4cd25b0-f040-11ed-a1b3-373f5d648cd4"
 		policyName = "test-fqdn"
 	)
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
@@ -150,7 +161,8 @@ func TestFleetUpdatePolicy(t *testing.T) {
 		},
 		AgentFeatures: agentFeatures,
 	}
-	resp, err := client.UpdatePolicy(id, req)
+
+	resp, err := client.UpdatePolicy(ctx, id, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -170,6 +182,9 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 		policyID = "a580c680-ea40-11ed-aae7-4b4fd4906b3d"
 	)
 
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fleetEnrollmentAPIKeysAPI:
@@ -185,7 +200,7 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 		Name:     name,
 		PolicyID: policyID,
 	}
-	resp, err := client.CreateEnrollmentAPIKey(req)
+	resp, err := client.CreateEnrollmentAPIKey(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -197,6 +212,9 @@ func TestFleetCreateEnrollmentAPIKey(t *testing.T) {
 }
 
 func TestFleetListAgents(t *testing.T) {
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fleetAgentsAPI:
@@ -209,7 +227,7 @@ func TestFleetListAgents(t *testing.T) {
 	require.NotNil(t, client)
 
 	req := ListAgentsRequest{}
-	resp, err := client.ListAgents(req)
+	resp, err := client.ListAgents(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -222,6 +240,10 @@ func TestFleetListAgents(t *testing.T) {
 
 func TestFleetGetAgent(t *testing.T) {
 	const id = "26802301-8996-457a-ab6a-8ea955ef2723"
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fmt.Sprintf(fleetAgentAPI, id):
@@ -236,7 +258,7 @@ func TestFleetGetAgent(t *testing.T) {
 	req := GetAgentRequest{
 		ID: id,
 	}
-	resp, err := client.GetAgent(req)
+	resp, err := client.GetAgent(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -252,6 +274,10 @@ func TestFleetGetAgent(t *testing.T) {
 
 func TestFleetUnEnrollAgent(t *testing.T) {
 	const agentID = "f512f36f-bf78-4285-aff0-baeafbcdf21e"
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fmt.Sprintf(fleetUnEnrollAgentAPI, agentID):
@@ -267,13 +293,17 @@ func TestFleetUnEnrollAgent(t *testing.T) {
 		ID:     agentID,
 		Revoke: true,
 	}
-	resp, err := client.UnEnrollAgent(req)
+	resp, err := client.UnEnrollAgent(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 }
 
 func TestFleetUpgradeAgent(t *testing.T) {
 	const agentID = "f512f36f-bf78-4285-aff0-baeafbcdf21e"
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fmt.Sprintf(fleetUpgradeAgentAPI, agentID):
@@ -289,12 +319,15 @@ func TestFleetUpgradeAgent(t *testing.T) {
 		ID:      agentID,
 		Version: "8.8.0",
 	}
-	resp, err := client.UpgradeAgent(req)
+	resp, err := client.UpgradeAgent(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 }
 
 func TestFleetListFleetServerHosts(t *testing.T) {
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fleetFleetServerHostsAPI:
@@ -307,7 +340,7 @@ func TestFleetListFleetServerHosts(t *testing.T) {
 	require.NotNil(t, client)
 
 	req := ListFleetServerHostsRequest{}
-	resp, err := client.ListFleetServerHosts(req)
+	resp, err := client.ListFleetServerHosts(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
@@ -322,6 +355,10 @@ func TestFleetListFleetServerHosts(t *testing.T) {
 
 func TestFleetGetFleetServerHost(t *testing.T) {
 	const id = "fleet-default-fleet-server-host"
+
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case fmt.Sprintf(fleetFleetServerHostAPI, id):
@@ -336,7 +373,7 @@ func TestFleetGetFleetServerHost(t *testing.T) {
 	req := GetFleetServerHostRequest{
 		ID: id,
 	}
-	resp, err := client.GetFleetServerHost(req)
+	resp, err := client.GetFleetServerHost(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
