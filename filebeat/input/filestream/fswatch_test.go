@@ -385,7 +385,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: firstFilename,
-				Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
+				Info:     testFileInfo{path: firstBasename, size: 5}, // "line\n"
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -396,7 +396,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: secondFilename,
-				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
+				Info:     testFileInfo{path: secondBasename, size: 5}, // "line\n"
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
