@@ -347,6 +347,63 @@ scanner:
 		// means no event
 		require.Equal(t, loginp.OpDone, e.Op)
 	})
+
+	t.Run("does not log warnings on duplicate globs and filters out duplicates", func(t *testing.T) {
+		dir := t.TempDir()
+		firstBasename := "file-123.ndjson"
+		secondBasename := "file-watcher-123.ndjson"
+		firstFilename := filepath.Join(dir, firstBasename)
+		secondFilename := filepath.Join(dir, secondBasename)
+		err := os.WriteFile(firstFilename, []byte("line\n"), 0777)
+		require.NoError(t, err)
+		err = os.WriteFile(secondFilename, []byte("line\n"), 0777)
+		require.NoError(t, err)
+
+		paths := []string{
+			// to emulate the case we have in the agent monitoring
+			filepath.Join(dir, "file-*.ndjson"),
+			filepath.Join(dir, "file-watcher-*.ndjson"),
+		}
+		cfgStr := `
+scanner:
+  check_interval: 100ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		err = logp.DevelopmentSetup(logp.ToObserverOutput())
+		require.NoError(t, err)
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+
+		go fw.Run(ctx)
+
+		e := fw.Event()
+		expEvent := loginp.FSEvent{
+			NewPath: firstFilename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename: firstFilename,
+				Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+
+		e = fw.Event()
+		expEvent = loginp.FSEvent{
+			NewPath: secondFilename,
+			Op:      loginp.OpCreate,
+			Descriptor: loginp.FileDescriptor{
+				Filename: secondFilename,
+				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
+			},
+		}
+		requireEqualEvents(t, expEvent, e)
+
+		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)
+	})
 }
 
 func TestFileScanner(t *testing.T) {
