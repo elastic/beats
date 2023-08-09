@@ -135,6 +135,17 @@ file_selectors:
 `, queueURL))
 }
 
+func makeTestConfigSQSForLocalstack(queueURL string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
+queue_url: %s
+max_number_of_messages: 1
+visibility_timeout: 30s
+region: us-east-1
+endpoint: http://localhost:4566
+path_style: true
+`, queueURL))
+}
+
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
@@ -151,24 +162,6 @@ func newV2Context() (v2.Context, func()) {
 		ID:          inputID,
 		Cancelation: ctx,
 	}, cancel
-}
-
-// Creates a default config for Localstack based tests
-func defaultTestConfig(region, queueURL string) config {
-	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           true,
-		RegionName:          region,
-		QueueURL:            queueURL,
-	}
-	c.ReaderConfig.InitDefaults()
-	return c
 }
 
 // Create an aws config for Localstack based tests
@@ -204,7 +197,6 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	queueUrl := tfConfig.QueueURL
 
 	// Create a default config for the awss3 input
-	config := defaultTestConfig(region, queueUrl)
 	awsCfg, err := makeLocalstackConfig(region)
 	if err != nil {
 		t.Fatal(err)
@@ -234,12 +226,8 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 		cancel()
 	})
 
-	// Initialize s3Input with the test config
-	s3Input := &s3Input{
-		config:    config,
-		awsConfig: awsCfg,
-		store:     openTestStatestore(),
-	}
+	s3Input := createInput(t, makeTestConfigSQSForLocalstack(tfConfig.QueueURL))
+
 	// Run S3 Input with desired context
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {

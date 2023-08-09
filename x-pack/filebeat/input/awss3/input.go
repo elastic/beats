@@ -74,6 +74,7 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
 		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 			return awssdk.Endpoint{
+				PartitionID:   "aws",
 				URL:           config.AWSConfig.Endpoint,
 				SigningRegion: awsConfig.Region,
 			}, nil
