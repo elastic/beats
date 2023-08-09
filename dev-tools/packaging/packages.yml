@@ -19,7 +19,7 @@ shared:
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
-    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/deb/postinstall.sh.tmpl'
+    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/files/linux/systemd-daemon-reload.sh'
     files:
       /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
