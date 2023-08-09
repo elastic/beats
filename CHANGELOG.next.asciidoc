@@ -320,6 +320,8 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Heartbeat*
 
+- Deprecate aws_elb autodiscover provider. {pull}36191[36191]
+
 
 *Metricbeat*
 
