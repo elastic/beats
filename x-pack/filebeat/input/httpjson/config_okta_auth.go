@@ -23,8 +23,6 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-const errStr = "error decoding JWK component: %w"
-
 // customTokenSource is a custom implementation of the oauth2.TokenSource interface.
 type customTokenSource struct {
 	mu      sync.Mutex
