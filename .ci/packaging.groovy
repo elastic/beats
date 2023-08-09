@@ -374,24 +374,6 @@ def tagAndPush(Map args = [:]) {
   )
 }
 
-<<<<<<< HEAD
-def prepareE2ETestForPackage(String beat){
-  if ("${beat}" == "filebeat" || "${beat}" == "x-pack/filebeat") {
-    e2eTestSuites.push('fleet')
-    e2eTestSuites.push('helm')
-  } else if ("${beat}" == "metricbeat" || "${beat}" == "x-pack/metricbeat") {
-    e2eTestSuites.push('ALL')
-    echo("${beat} adds all test suites to the E2E tests job.")
-  } else if ("${beat}" == "x-pack/elastic-agent") {
-    e2eTestSuites.push('fleet')
-  } else {
-    echo("${beat} does not add any test suite to the E2E tests job.")
-    return
-  }
-}
-
-=======
->>>>>>> e194656f70 (Removing e2e tests from packaging as it has been removed (#36266))
 def release(type){
   withBeatsEnv(type){
     // As agreed DEV=false for staging otherwise DEV=true
@@ -428,37 +410,6 @@ def release(type){
   }
 }
 
-<<<<<<< HEAD
-def runE2ETests(){
-  if (e2eTestSuites.size() == 0) {
-    echo("Not triggering E2E tests for PR-${env.CHANGE_ID} because the changes does not affect the E2E.")
-    return
-  }
-
-  def suites = '' // empty value represents all suites in the E2E tests
-
-  catchError(buildResult: 'UNSTABLE', message: 'Unable to run e2e tests', stageResult: 'FAILURE') {
-    def suitesSet = e2eTestSuites.toSet()
-
-    if (!suitesSet.contains('ALL')) {
-      suitesSet.each { suite ->
-        suites += "${suite},"
-      };
-    }
-    echo 'runE2E will run now in a sync mode to validate packages can be published.'
-    runE2E(runTestsSuites: suites,
-          testMatrixFile: '.ci/.e2e-tests-beats.yaml',
-          beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-          gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
-          gitHubCheckRepo: env.REPO,
-          gitHubCheckSha1: env.GIT_BASE_COMMIT,
-          propagate: true,
-          wait: true)
-  }
-}
-
-=======
->>>>>>> e194656f70 (Removing e2e tests from packaging as it has been removed (#36266))
 /**
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
 * therefore the storage bucket in GCP should follow the same folder structure.
