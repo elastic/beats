@@ -98,7 +98,7 @@ func TestFetch(t *testing.T) {
 			case "/":
 				apiKey := r.Header.Get("Authorization")
 				if apiKey != expectedHeader {
-					t.Errorf("expected api key to be foo:bar but got %s", expectedHeader, apiKey)
+					t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
 				}
 
 				w.WriteHeader(200)
