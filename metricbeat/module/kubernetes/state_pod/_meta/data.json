@@ -6,17 +6,17 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-system",
+        "namespace": "default",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
             "host_ip": "172.18.0.2",
-            "ip": "172.18.0.2",
-            "name": "metricbeat-6xfvl",
+            "ip": "10.244.0.22",
+            "name": "hello-28192809-jbn5z",
             "status": {
-                "phase": "running",
-                "ready": "true",
+                "phase": "succeeded",
+                "ready": "false",
                 "scheduled": "true"
             }
         }

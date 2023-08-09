@@ -7,12 +7,12 @@
     },
     "kubernetes": {
         "labels": {
-            "uid": "e9b08fcb-fb13-463f-8a59-6a1236a666a8"
+            "uid": "057e71cd-9a20-4382-85d1-04e087a20354"
         },
         "namespace": "kube-system",
         "service": {
             "cluster_ip": "10.96.0.10",
-            "created": "2023-01-16T14:32:42.000Z",
+            "created": "2023-08-09T07:32:20.000Z",
             "name": "kube-dns",
             "type": "ClusterIP"
         }

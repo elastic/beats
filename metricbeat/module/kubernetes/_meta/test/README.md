@@ -16,3 +16,18 @@ path: "../_meta/test"
 ```
 
 Since all metricsets use a `data.json` file for the documentation - this file contains an example of the metrics fields -, **it is necessary that one of these files has the name `docs.plain`**. This file should have the **same content as one of the metrics file of a KSM version** we support. This means that one of the files is duplicated, for example: `ksm.v2.7.0.plain` has the same content as `docs.plain`. This is not a mistake, as having the `ksm.v2.7.0.plain` tells us the metrics of that specific version.
+
+
+
+
+ERROR
+
+```
+--- FAIL: TestData (0.16s)
+    --- FAIL: TestData/docs.plain (0.16s)
+        testdata.go:238: Testing ../_meta/test/docs.plain file
+        testdata.go:307: Expected _meta/testdata/docs.plain-expected.json file
+panic: runtime error: index out of range [0] with length 0 [recovered]
+        panic: runtime error: index out of range [0] with length 0
+
+```
