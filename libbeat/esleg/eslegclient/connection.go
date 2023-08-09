@@ -153,7 +153,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		if err != nil {
 			return nil, err
 		}
-		logp.Info("kerberos client created")
+		logger.Info("kerberos client created")
 	}
 
 	conn := Connection{
