@@ -104,7 +104,7 @@ func newBulkRequest(
 		return nil, err
 	}
 
-	return newBulkRequestWithPath(urlStr, path, params, body)
+	return newBulkRequestWithPathFiltered(urlStr, path, params, body)
 }
 
 func newBulkRequestWithPath(
@@ -135,6 +135,24 @@ func newBulkRequestWithPath(
 	r.reset(body)
 
 	return &r, nil
+}
+
+// newBulkRequestWithPathFiltered Create a new BulkRequest while appending the filter_path option
+// which is going to reduce the amount of data we collect back from ES.
+// TODO: We might want to do some more testing to make sure we are omitting any fields, or make this usage opt-in vs default
+func newBulkRequestWithPathFiltered(
+	urlStr string,
+	path string,
+	params map[string]string,
+	body BodyEncoder,
+) (*bulkRequest, error) {
+	filteredFields := "errors,items.index.status,items.index.error,items.create.status,items.create.error,items.update.status,items.update.error"
+	if len(params) == 0 {
+		params = map[string]string{"filter_path": filteredFields}
+	} else {
+		params["filter_path"] = filteredFields
+	}
+	return newBulkRequestWithPath(urlStr, path, params, body)
 }
 
 func (r *bulkRequest) reset(body BodyEncoder) {
