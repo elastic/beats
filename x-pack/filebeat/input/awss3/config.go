@@ -102,6 +102,9 @@ func (c *config) Validate() error {
 	if c.AWSConfig.FIPSEnabled && c.NonAWSBucketName != "" {
 		return errors.New("fips_enabled cannot be used with a non-AWS S3 bucket")
 	}
+	if c.PathStyle && c.NonAWSBucketName == "" && c.QueueURL == "" {
+		return errors.New("path_style can only be used when polling non-AWS S3 services")
+	}
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
 		return errors.New("provider can only be overridden when polling non-AWS S3 services")
 	}

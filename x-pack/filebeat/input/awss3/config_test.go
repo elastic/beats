@@ -396,6 +396,19 @@ func TestConfig(t *testing.T) {
 			expectedCfg: nil,
 		},
 		{
+			name:           "error on path_style with AWS native S3 Bucket",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"bucket_arn":        s3Bucket,
+				"number_of_workers": 5,
+				"path_style":        true,
+			},
+			expectedErr: "path_style can only be used when polling non-AWS S3 services",
+			expectedCfg: nil,
+		},
+		{
 			name:           "error on provider with AWS native S3 Bucket",
 			queueURL:       "",
 			s3Bucket:       s3Bucket,
