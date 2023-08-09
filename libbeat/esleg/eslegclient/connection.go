@@ -18,11 +18,11 @@
 package eslegclient
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -58,6 +58,7 @@ type Connection struct {
 	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
 	version          libversion.V
 	log              *logp.Logger
+	responseBuffer   *bytes.Buffer
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -160,6 +161,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
+		responseBuffer:     bytes.NewBuffer(nil),
 	}
 
 	if s.APIKey != "" {
@@ -452,17 +454,18 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body, conn.log)
 
 	status := resp.StatusCode
-	obj, err := ioutil.ReadAll(resp.Body)
+	conn.responseBuffer.Reset()
+	_, err = io.Copy(conn.responseBuffer, resp.Body)
 	if err != nil {
 		return status, nil, err
 	}
 
 	if status >= 300 {
 		// add the response body with the error returned by Elasticsearch
-		err = fmt.Errorf("%v: %s", resp.Status, obj)
+		err = fmt.Errorf("%v: %s", resp.Status, conn.responseBuffer.Bytes())
 	}
 
-	return status, obj, err
+	return status, conn.responseBuffer.Bytes(), err
 }
 
 func closing(c io.Closer, logger *logp.Logger) {
