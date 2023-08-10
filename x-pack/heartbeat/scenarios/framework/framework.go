@@ -78,7 +78,6 @@ func (s Scenario) clone() Scenario {
 }
 
 func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
-	fmt.Println("FRAMEWORK RUN")
 	runS := s
 	if twist != nil {
 		runS = twist.Fn(s.clone())
@@ -94,7 +93,6 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 	}
 
 	t.Run(runS.Name, func(t *testing.T) {
-		fmt.Println("FRAMEWORK RUN PAR", runS.Name)
 		t.Parallel()
 
 		numberRuns := runS.NumberOfRuns
@@ -119,9 +117,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 			sf = mtr.StdFields
 			conf = mtr.Config
 
-			fmt.Println("FRAMEWORK RUN ADDSTATE", s.RunFrom, sf.RunFrom, loaderDB, LastState(events).State)
 			if lse := LastState(events).State; lse != nil {
-				fmt.Println("FRAMEWORK RUN ADDSTATE EXEC", loaderDB)
 				loaderDB.AddState(mtr.StdFields, lse)
 			}
 
@@ -189,8 +185,7 @@ func (sdb *ScenarioDB) RunAllWithTwistMatrix(t *testing.T, twists []*Twist, call
 	for _, twist := range twists {
 		sdb.RunAllWithATwist(t, twist, callback)
 	}
-	// TODO: REENABLE
-	//sdb.RunAllWithATwist(t, nil, callback)
+	sdb.RunAllWithATwist(t, nil, callback)
 }
 
 // RunOneWithATwist just runs the first scenario, useful for debugging
@@ -231,7 +226,6 @@ type MonitorTestRun struct {
 }
 
 func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
-	fmt.Println("FRAMEWORK RMO", monitorConfig, location)
 	mtr = &MonitorTestRun{
 		Config: monitorConfig,
 		StdFields: stdfields.StdMonitorFields{

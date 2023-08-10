@@ -5,7 +5,6 @@
 package scenarios
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,9 +24,6 @@ func TestStateContinuity(t *testing.T) {
 		allSS := framework.AllStates(mtr.Events())
 		assert.Len(t, allSS, 3)
 
-		for _, s := range allSS {
-			fmt.Println("state", s.State)
-		}
 		assert.Equal(t, 3, lastSS.State.Checks)
 	})
 }
