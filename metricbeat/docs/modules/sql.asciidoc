@@ -11,7 +11,7 @@ This file is generated! See scripts/mage/docs_collector.go
 == SQL module
 
 The SQL module allows you to execute custom queries against an SQL database and
-store the results in {es}. It also enables developing various SQL metrics integrations, using sql query as input.
+store the results in {es}. It also enables the development of various SQL metrics integrations, using SQL query as input.
 
 This module supports the databases that you can monitor with {metricbeat},
 including:
@@ -35,20 +35,21 @@ fields:
 `driver`:: The driver can be any driver that has a {metricbeat} module, such as
 `mssql` or `postgres`.
 
-`raw_data.enabled`:: Expects either true or false. By default false. Marking as true will generate event results in new field format.
+`fetch_from_all_databases`:: Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will enable execution `sql_queries` or `sql_query` for all databases in a server. Currently only `mssql` driver supports this feature. For other drivers, if enabled, "fetch from all databases feature is not supported for driver: <driver_name>" error would be logged.
 
-Expects either `sql_queries` or `sql_query`.
+`raw_data.enabled`:: Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will generate event results in a new field format.
 
-`sql_queries`:: Receives the list of queries to execute. `query` and `response_format` is repeated to get multiple query inputs.
-`query`::: Expects sql query.
-`response_format`::: Either `variables` or `table`:
-`variables`:::: Expects a two-column table that looks like a key/value result.
-The left column is considered a key and the right column the value. This mode
-generates a single event on each fetch operation.
-`table`:::: Expects any number of columns. This mode generates a single event for
-each row.
+Use `sql_queries` or `sql_query` depending on the use-case.
 
-`sql_query`:: The single query you want to run. (`Backward Compatibility`). Also provide corresponding  `sql_response_format`: either `variables` or `table`
+`sql_queries`:: List of queries to execute. `query` and `response_format` fields are repeated to get multiple query inputs.
+
+`query`::: Single SQL query.
+
+`response_format`::: Either `variables` or `table`.
+`variables`:::: Expects a two-column table that looks like a key-value result. The left column is considered a key and the right column is the value. This mode generates a single event on each fetch operation.
+`table`:::: Expects any number of columns. This mode generates a single event for each row.
+
+`sql_query` (`Backward Compatibility`):: Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
 
 [float]
 == Example
@@ -56,7 +57,7 @@ each row.
 Examples of configurations in `sql.yml` to connect with supported databases are mentioned below. 
 
 [float]
-=== Example: capture Innodb-related metrics
+=== Example: Capture Innodb-related metrics
 
 This `sql.yml` configuration shows how to capture Innodb-related metrics that
 result from the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL
@@ -143,7 +144,7 @@ The example shown earlier generates this event:
 ----
 
 [float]
-=== Example: query PostgreSQL and generate a "table" result
+=== Example: Query PostgreSQL and generate a "table" result
 
 This `sql.yml` configuration shows how to query PostgreSQL and generate
 a "table" result. This configuration generates a single event for each row
@@ -231,7 +232,7 @@ for each row. For example, this event is created for the first row:
 ----
 
 [float]
-=== Example: get the buffer catch hit ratio in Oracle
+=== Example: Get the buffer catch hit ratio in Oracle
 
 This `sql.yml` configuration shows how to get the buffer cache hit ratio:
 
@@ -306,7 +307,7 @@ The example generates this event:
 ----
 
 [float]
-=== Example: get the buffer cache hit ratio for MSSQL
+=== Example: Get the buffer cache hit ratio for MSSQL
 
 This `sql.yml` configuration gets the buffer cache hit ratio:
 
@@ -356,7 +357,7 @@ The example generates this event:
 ----
 
 [float]
-=== Example: launch two or more queries.
+=== Example: Launch two or more queries.
 
 
 To launch two or more queries, specify the full configuration for each query.
@@ -420,14 +421,14 @@ The example generates this event: The response event is generated in new format 
     "version": "8.0.0"
   },
   "host": {
-    "name": "Muthu-mps"
+    "name": "mps"
   },
   "agent": {
     "type": "metricbeat",
     "version": "8.3.0",
     "ephemeral_id": "8decc9eb-5ea5-47d8-8a22-fac507a5521b",
     "id": "6bbf5058-afed-44c6-aa05-775ee14a2da4",
-    "name": "Muthu-mps"
+    "name": "mps"
   }
 }
 ----
@@ -477,26 +478,26 @@ The example generates this event: By disabling the flag `raw_data.enabled`, whic
     "version": "8.0.0"
   },
   "host": {
-        "name": "Muthu-mps"
+        "name": "mps"
     },
   "agent": {
     "version": "8.3.0",
     "ephemeral_id": "bc09584b-62db-4b45-bfe9-6b7e8e982361",
     "id": "6bbf5058-afed-44c6-aa05-775ee14a2da4",
-    "name": "Muthu-mps",
+    "name": "mps",
     "type": "metricbeat"
   }
 }
 ----
 
 [float]
-=== Example: Merge multiple queries to single event.
+=== Example: Merge multiple queries into a single event.
 
-Multiple queries will create multiple events, one for each query.  It may be preferrable to create a single event by combining the metrics together in a single event.
+Multiple queries will create multiple events, one for each query.  It may be preferable to create a single event by combining the metrics together in a single event.
 
 This feature can be enabled using the `merge_results` config.
 
-However, such a merge is possible only if the table queries being merged, each produce a single row.
+However, such a merge is possible only if the table queries are merged, each produces a single row.
 
 For example:
 
@@ -525,7 +526,7 @@ This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoi
 {
   "@timestamp": "2022-07-21T07:07:06.747Z",
   "agent": {
-    "name": "Lalits-MBP-2",
+    "name": "MBP-2",
     "type": "metricbeat",
     "version": "8.4.0",
     "ephemeral_id": "b0867287-e56a-492f-b421-0ac870c426f9",
@@ -556,6 +557,276 @@ This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoi
 }
 ----
 
+[float]
+=== Example: Execute given queries for all database(s) present in a server
+
+Assuming a user could have 100s of databases on their server and then it becomes cumbersome to add them manually to the query. If `fetch_from_all_databases` is set to `true` then SQL module would fetch the databases names automatically and prefix
+the database selector statement to the queries so that the queries can run against
+the database provided.
+
+Currently, this feature only works with `mssql` driver. For example:
+
+[source,yaml]
+----
+- module: sql
+  metricsets:
+    - query
+  period: 50s
+  hosts: ["sqlserver://<user>:<password>@<host>"]
+  raw_data.enabled: true
+
+  fetch_from_all_databases: true
+
+  driver: "mssql"
+  sql_queries:
+    - query: SELECT DB_NAME() AS 'database_name';
+      response_format: table
+----
+
+For an mssql instance, by default only four databases are present namely — `master`, `model`, `msdb`, `tempdb`. So, if `fetch_from_all_databases` is enabled then query `SELECT DB_NAME() AS 'database_name'` runs for each one of them i.e., there would be in total 4 documents (one each for 4 databases) for every scrape.
+
+
+[source,json]
+----
+{
+    "@timestamp": "2023-07-16T22:05:26.976Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.10.0"
+    },
+    "service": {
+        "type": "sql",
+        "address": "localhost"
+    },
+    "event": {
+        "dataset": "sql.query",
+        "module": "sql",
+        "duration": 40346375
+    },
+    "metricset": {
+        "name": "query",
+        "period": 50000
+    },
+    "sql": {
+        "metrics": {
+            "database_name": "master"
+        },
+        "driver": "mssql",
+        "query": "USE [master]; SELECT DB_NAME() AS 'database_name';"
+    },
+    "host": {
+        "os": {
+            "type": "macos",
+            "platform": "darwin",
+            "version": "13.3.1",
+            "family": "darwin",
+            "name": "macOS",
+            "kernel": "<redacted>",
+            "build": "<redacted>"
+        },
+        "name": "<redacted>",
+        "id": "<redacted>",
+        "ip": [
+            "<redacted>"
+        ],
+        "mac": [
+            "<redacted>"
+        ],
+        "hostname": "<redacted>",
+        "architecture": "arm64"
+    },
+    "agent": {
+        "name": "<redacted>",
+        "type": "metricbeat",
+        "version": "8.10.0",
+        "ephemeral_id": "<redacted>",
+        "id": "<redacted>"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    }
+}
+{
+    "@timestamp": "2023-07-16T22:05:26.976Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.10.0"
+    },
+    "agent": {
+        "ephemeral_id": "<redacted>",
+        "id": "<redacted>",
+        "name": "<redacted>",
+        "type": "metricbeat",
+        "version": "8.10.0"
+    },
+    "event": {
+        "module": "sql",
+        "duration": 43147875,
+        "dataset": "sql.query"
+    },
+    "metricset": {
+        "period": 50000,
+        "name": "query"
+    },
+    "service": {
+        "address": "localhost",
+        "type": "sql"
+    },
+    "sql": {
+        "metrics": {
+            "database_name": "tempdb"
+        },
+        "driver": "mssql",
+        "query": "USE [tempdb]; SELECT DB_NAME() AS 'database_name';"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    },
+    "host": {
+        "name": "<redacted>",
+        "architecture": "arm64",
+        "os": {
+            "platform": "darwin",
+            "version": "13.3.1",
+            "family": "darwin",
+            "name": "macOS",
+            "kernel": "<redacted>",
+            "build": "<redacted>",
+            "type": "macos"
+        },
+        "id": "<redacted>",
+        "ip": [
+            "<redacted>"
+        ],
+        "mac": [
+            "<redacted>"
+        ],
+        "hostname": "<redacted>"
+    }
+}
+{
+    "@timestamp": "2023-07-16T22:05:26.976Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.10.0"
+    },
+    "host": {
+        "os": {
+            "build": "<redacted>",
+            "type": "macos",
+            "platform": "darwin",
+            "version": "13.3.1",
+            "family": "darwin",
+            "name": "macOS",
+            "kernel": "<redacted>"
+        },
+        "id": "<redacted>",
+        "ip": [
+            "<redacted>"
+        ],
+        "mac": [
+            "<redacted>"
+        ],
+        "hostname": "<redacted>",
+        "name": "<redacted>",
+        "architecture": "arm64"
+    },
+    "agent": {
+        "ephemeral_id": "<redacted>",
+        "id": "<redacted>",
+        "name": "<redacted>",
+        "type": "metricbeat",
+        "version": "8.10.0"
+    },
+    "service": {
+        "address": "localhost",
+        "type": "sql"
+    },
+    "sql": {
+        "metrics": {
+            "database_name": "model"
+        },
+        "driver": "mssql",
+        "query": "USE [model]; SELECT DB_NAME() AS 'database_name';"
+    },
+    "event": {
+        "dataset": "sql.query",
+        "module": "sql",
+        "duration": 46623125
+    },
+    "metricset": {
+        "name": "query",
+        "period": 50000
+    },
+    "ecs": {
+        "version": "8.0.0"
+    }
+}
+{
+    "@timestamp": "2023-07-16T22:05:26.976Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.10.0"
+    },
+    "host": {
+        "architecture": "arm64",
+        "os": {
+            "kernel": "<redacted>",
+            "build": "<redacted>",
+            "type": "macos",
+            "platform": "darwin",
+            "version": "13.3.1",
+            "family": "darwin",
+            "name": "macOS"
+        },
+        "name": "<redacted>",
+        "id": "<redacted>",
+        "ip": [
+            "<redacted>"
+        ],
+        "mac": [
+            "<redacted>"
+        ],
+        "hostname": "<redacted>"
+    },
+    "agent": {
+        "type": "metricbeat",
+        "version": "8.10.0",
+        "ephemeral_id": "<redacted>",
+        "id": "<redacted>",
+        "name": "<redacted>"
+    },
+    "event": {
+        "dataset": "sql.query",
+        "module": "sql",
+        "duration": 49649250
+    },
+    "metricset": {
+        "name": "query",
+        "period": 50000
+    },
+    "service": {
+        "address": "localhost",
+        "type": "sql"
+    },
+    "sql": {
+        "metrics": {
+            "database_name": "msdb"
+        },
+        "driver": "mssql",
+        "query": "USE [msdb]; SELECT DB_NAME() AS 'database_name';"
+    },
+    "ecs": {
+        "version": "8.0.0"
+    }
+}
+----
+
+
 === Host Setup
 
 Some drivers require additional configuration to work. Find here instructions for these drivers.
@@ -575,9 +846,9 @@ Also, add `ORACLE_HOME/bin` to the `PATH` environment variable.
 
 ===== Oracle Instant Client Installation
 
-Oracle Instant Client enables development and deployment of applications that connect to Oracle Database. The Instant Client libraries provide the necessary network connectivity and advanced data features to make full use of Oracle Database. If you have OCI Oracle server which comes with these libraries pre-installed, you don't need a separate client installation.
+Oracle Instant Client enables the development and deployment of applications that connect to the Oracle Database. The Instant Client libraries provide the necessary network connectivity and advanced data features to make full use of the Oracle Database. If you have an OCI Oracle server which comes with these libraries pre-installed, you don't need a separate client installation.
 
-The OCI library install few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. Please follow https://docs.oracle.com/en/database/oracle/oracle-database/21/lacli/install-instant-client-using-zip.html#GUID-D3DCB4FB-D3CA-4C25-BE48-3A1FB5A22E84[this] link for OCI Instant Client set up. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found https://www.oracle.com/database/technologies/instant-client/downloads.html[here].
+The OCI library installs a few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. Please follow https://docs.oracle.com/en/database/oracle/oracle-database/21/lacli/install-instant-client-using-zip.html#GUID-D3DCB4FB-D3CA-4C25-BE48-3A1FB5A22E84[this] link for OCI Instant Client set up. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found at https://www.oracle.com/database/technologies/instant-client/downloads.html[here].
 
 ===== Enable Oracle Listener
 
@@ -612,7 +883,7 @@ The following two types of host configurations are supported:
 
 Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
 
-Username and Password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`. 
+The username and password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`. 
 
 [source,yml]
 ----

@@ -44,14 +44,17 @@ type sqlRow interface {
 
 // NewDBClient gets a client ready to query the database
 func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
-	dbx, err := sql.Open(switchDriverName(driver), uri)
+	dbx, err := sql.Open(SwitchDriverName(driver), uri)
 	if err != nil {
 		return nil, fmt.Errorf("opening connection: %w", err)
 	}
 	err = dbx.Ping()
 	if err != nil {
 		if closeErr := dbx.Close(); closeErr != nil {
-			return nil, fmt.Errorf("failed to close with %s, after connection test failed: %w", closeErr, err)
+			// NOTE(SS): Support for wrapping multiple errors is there in Go 1.20+.
+			// TODO(SS): When beats module starts using Go 1.20+, use: https://pkg.go.dev/errors#Join
+			// and until then, let's use the following workaround.
+			return nil, fmt.Errorf(fmt.Sprintf("failed to close with: %s", closeErr.Error())+" after connection test failed: %w", err)
 		}
 		return nil, fmt.Errorf("testing connection: %w", err)
 	}
@@ -59,7 +62,7 @@ func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
 	return &DbClient{DB: dbx, logger: l}, nil
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+// FetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
 func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
@@ -144,7 +147,8 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	r := mapstr.M{}
 
 	for key, value := range data {
-		value := getValue(&value)
+		value := value
+		value = getValue(&value)
 		r.Put(key, value)
 	}
 
@@ -187,9 +191,9 @@ func getValue(pval *interface{}) interface{} {
 	}
 }
 
-// switchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
+// SwitchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
 // 'godror' so this detail implementation must be hidden to the user, that should only choose and see 'oracle' as driver
-func switchDriverName(d string) string {
+func SwitchDriverName(d string) string {
 	switch d {
 	case "oracle":
 		return "godror"
