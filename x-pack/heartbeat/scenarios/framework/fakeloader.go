@@ -7,13 +7,10 @@ package framework
 import (
 	"fmt"
 	"sync"
-	"sync/atomic"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 )
-
-var id atomic.Int64
 
 // Simulated state loader, close enough to test logic related to loading state from ES
 // without actually using ES

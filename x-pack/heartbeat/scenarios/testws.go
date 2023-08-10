@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package scenarios
 
 import (
@@ -9,8 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
 )
 
 var testWsOnce = &sync.Once{}
@@ -58,8 +63,7 @@ func startStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
 
 		status := statuses[statusIdx]
 		w.WriteHeader(status)
-		w.Write([]byte(fmt.Sprintf("Status: %d", status)))
-
+		_, _ = w.Write([]byte(fmt.Sprintf("Status: %d", status)))
 	}))
 
 	// wait for ws to become available
