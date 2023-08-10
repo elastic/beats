@@ -270,6 +270,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 		assert.Equal(t, totalEvents, eventCount)
 	})
 
+	// Test reading .evtx file without any query filters
 	t.Run("evtx_file", func(t *testing.T) {
 		path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
 		if err != nil {
@@ -294,6 +295,34 @@ func testWindowsEventLog(t *testing.T, api string) {
 		}
 
 		assert.Len(t, records, 32)
+	})
+
+	// Test reading .evtx file with event_id filter
+	t.Run("evtx_file_with_query", func(t *testing.T) {
+		path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		log := openLog(t, map[string]interface{}{
+			"name":           path,
+			"no_more_events": "stop",
+			"event_id":       "3, 5",
+		})
+		defer log.Close()
+
+		records, err := log.Read()
+
+		// This implementation returns the EOF on the next call.
+		if err == nil && api == winEventLogAPIName {
+			_, err = log.Read()
+		}
+
+		if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
+			assert.Equal(t, io.EOF, err)
+		}
+
+		assert.Len(t, records, 21)
 	})
 }
 
