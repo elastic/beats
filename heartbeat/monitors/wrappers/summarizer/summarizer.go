@@ -80,6 +80,9 @@ func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSu
 	}
 }
 
+// Wrap wraps the given job in such a way that the last event summarizes all previous events
+// and additionally adds some common fields like monitor.check_group to all events.
+// This adds the state and summary top level fields.
 func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		conts, jobErr := j(event)
@@ -97,9 +100,9 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 		monitorStatus, err := event.GetValue("monitor.status")
 		if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
-			msss := monitorstate.StateStatus(monitorStatus.(string))
+			mss := monitorstate.StateStatus(monitorStatus.(string))
 
-			if msss == monitorstate.StatusUp {
+			if mss == monitorstate.StatusUp {
 				js.Up++
 			} else {
 				js.Down++
@@ -113,11 +116,15 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				js.Status = monitorstate.StatusUp
 			}
 
-			// Time to retry, perhaps
+			// Get the last status of this monitor, we use this later to
+			// determine if a retry is needed
 			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
 
+			// FinalAttempt is true if no retries will occur
 			js.FinalAttempt = js.Status == lastStatus || js.Attempt >= js.MaxAttempts
+
 			ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
+
 			eventext.MergeEventFields(event, mapstr.M{
 				"summary": js,
 				"state":   ms,
@@ -126,6 +133,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			logp.L().Debugf("retry info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
 			if !js.FinalAttempt {
 				// Reset the job summary for the next attempt
+				// We preserve `s` across attempts
 				s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 				s.contsRemaining = 1
 				s.checkGroup = fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt)
@@ -133,7 +141,8 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			}
 		}
 
-		// Wrap downstream jobs using the same state object
+		// Wrap downstream jobs using the same state object this lets us create new state
+		// on the first job, but re-use that same object on continuations.
 		for i, cont := range conts {
 			conts[i] = s.Wrap(cont)
 		}
