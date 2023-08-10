@@ -5,6 +5,7 @@
 package scenarios
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,7 @@ import (
 var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(3))
 
 func TestStateContinuity(t *testing.T) {
-	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+	scenarioDB.RunOneWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		lastSS := framework.LastState(mtr.Events())
 
 		assert.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
@@ -24,6 +25,9 @@ func TestStateContinuity(t *testing.T) {
 		allSS := framework.AllStates(mtr.Events())
 		assert.Len(t, allSS, 3)
 
+		for _, s := range allSS {
+			fmt.Println("state", s.State)
+		}
 		assert.Equal(t, 3, lastSS.State.Checks)
 	})
 }

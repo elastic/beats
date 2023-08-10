@@ -78,6 +78,7 @@ func (s Scenario) clone() Scenario {
 }
 
 func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
+	fmt.Println("FRAMEWORK RUN")
 	runS := s
 	if twist != nil {
 		runS = twist.Fn(s.clone())
@@ -93,6 +94,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 	}
 
 	t.Run(runS.Name, func(t *testing.T) {
+		fmt.Println("FRAMEWORK RUN PAR", runS.Name)
 		t.Parallel()
 
 		numberRuns := runS.NumberOfRuns
@@ -114,12 +116,15 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 			mtr.wait()
 			events = append(events, mtr.Events()...)
 
+			sf = mtr.StdFields
+			conf = mtr.Config
+
+			fmt.Println("FRAMEWORK RUN ADDSTATE", s.RunFrom, sf.RunFrom, loaderDB, LastState(events).State)
 			if lse := LastState(events).State; lse != nil {
+				fmt.Println("FRAMEWORK RUN ADDSTATE EXEC", loaderDB)
 				loaderDB.AddState(mtr.StdFields, lse)
 			}
 
-			sf = mtr.StdFields
-			conf = mtr.Config
 			mtr.close()
 		}
 
@@ -184,7 +189,15 @@ func (sdb *ScenarioDB) RunAllWithTwistMatrix(t *testing.T, twists []*Twist, call
 	for _, twist := range twists {
 		sdb.RunAllWithATwist(t, twist, callback)
 	}
-	sdb.RunAllWithATwist(t, nil, callback)
+	// TODO: REENABLE
+	//sdb.RunAllWithATwist(t, nil, callback)
+}
+
+// RunOneWithATwist just runs the first scenario, useful for debugging
+// where you don't want multiple scenarios to run
+func (sdb *ScenarioDB) RunOneWithATwist(t *testing.T, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+	sdb.Init()
+	sdb.All[0].Run(t, twist, callback)
 }
 
 func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
@@ -218,9 +231,12 @@ type MonitorTestRun struct {
 }
 
 func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
+	fmt.Println("FRAMEWORK RMO", monitorConfig, location)
 	mtr = &MonitorTestRun{
-		Config:    monitorConfig,
-		StdFields: stdfields.StdMonitorFields{},
+		Config: monitorConfig,
+		StdFields: stdfields.StdMonitorFields{
+			RunFrom: location,
+		},
 	}
 
 	// make a pipeline

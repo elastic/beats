@@ -115,6 +115,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 			// Time to retry, perhaps
 			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
+
 			js.FinalAttempt = js.Status == lastStatus || js.Attempt >= js.MaxAttempts
 			ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
 			eventext.MergeEventFields(event, mapstr.M{

@@ -20,6 +20,7 @@ package monitorstate
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -34,6 +35,7 @@ import (
 // it will use ES if configured, otherwise it will only track state from
 // memory.
 func NewTracker(sl StateLoader, flappingEnabled bool) *Tracker {
+	fmt.Println("NEW TRACKER", sl)
 	if sl == nil {
 		sl = NilStateLoader
 	}
@@ -57,12 +59,14 @@ type Tracker struct {
 type StateLoader func(stdfields.StdMonitorFields) (*State, error)
 
 func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateStatus, isFinalAttempt bool) (ms *State) {
+	fmt.Println("TRACKER RECORDSTATUS", sf.ID, newStatus, isFinalAttempt)
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
 	state := t.GetCurrentState(sf)
+	fmt.Println("TRACKER GOT STATE", state)
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
 		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
@@ -83,7 +87,9 @@ func (t *Tracker) GetCurrentStatus(sf stdfields.StdMonitorFields) StateStatus {
 }
 
 func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) {
+	fmt.Println("TRACKER GET STATE", sf.ID, t.states)
 	if state, ok := t.states[sf.ID]; ok {
+		fmt.Println("TRACKER GET STATE EXIT STATE FOUND")
 		return state
 	}
 
@@ -92,6 +98,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 	var err error
 	for i := 0; i < tries; i++ {
 		loadedState, err = t.stateLoader(sf)
+		fmt.Println("TRACKER GET LOAD LOOP", t.stateLoader, loadedState, err)
 		if err == nil {
 			if loadedState != nil {
 				logp.L().Infof("loaded previous state for monitor %s: %s", sf.ID, loadedState.String())
@@ -103,15 +110,18 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
 		time.Sleep(sleepFor)
 	}
+	fmt.Println("TRACKER GET LOAD LOOP EXIT", loadedState)
 	if err != nil {
 		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", tries, sf.ID)
 	}
 
 	if loadedState != nil {
+		fmt.Println("TRACKER GET CACHESTATE")
 		t.states[sf.ID] = loadedState
 	}
 
 	// Return what we found, even if nil
+	fmt.Println("TRACKER GET RETURN STATE", loadedState)
 	return loadedState
 }
 

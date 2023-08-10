@@ -182,5 +182,6 @@ func LoaderDBKey(sf stdfields.StdMonitorFields, at time.Time, ctr int) string {
 		rfid = normalizeRunFromIDRegexp.ReplaceAllString(sf.RunFrom.ID, "_")
 
 	}
-	return fmt.Sprintf("%s-%x-%x", rfid, at.UnixMilli(), ctr)
+	key := fmt.Sprintf("%s-%x-%x", rfid, at.UnixMilli(), ctr)
+	return key
 }
