@@ -974,7 +974,7 @@ func test(url *url.URL) error {
 
 	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
 	if err != nil {
-		return fmt.Errorf("url %q is unreachable", url)
+		return fmt.Errorf("url %q is unreachable: %w", url, err)
 	}
 
 	return nil
