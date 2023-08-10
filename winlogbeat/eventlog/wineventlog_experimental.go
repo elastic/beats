@@ -152,7 +152,7 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
 	path := l.channelName
 
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
 		return win.NilHandle, fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
@@ -187,7 +187,7 @@ func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.B
 }
 
 func (l *winEventLogExp) Read() ([]Record, error) {
-	var records []Record
+	var records []Record //nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)

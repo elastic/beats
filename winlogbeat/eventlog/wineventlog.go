@@ -279,7 +279,7 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
 	path := l.channelName
 
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
 		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
