@@ -30,11 +30,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
-
-
+- Upgrade Go to 1.19.12 {pull}36247[36247]
 
 *Filebeat*
-
+- Filter out duplicate paths resolved from matching globs. {issue}36253[36253] {pull}36256[36256]
 
 *Auditbeat*
 
@@ -64,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 
+- Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
 
 *Auditbeat*
 
