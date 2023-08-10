@@ -358,14 +358,34 @@ func TestRetryMultiCont(t *testing.T) {
 			summarizer.JobSummary{
 				Status:       "up",
 				FinalAttempt: true,
-				Up:           1,
+				// we expect two up since this is a lightweight
+				// job and all events get a monitor status
+				// since no errors are returned that's 2
+				Up:          2,
+				Down:        0,
+				Attempt:     1,
+				MaxAttempts: 2,
+			},
+			monitorstate.State{
+				Status: "up",
+				Up:     2,
+				Down:   0,
+				Checks: 1,
+			},
+		},
+		{
+			"up",
+			summarizer.JobSummary{
+				Status:       "up",
+				FinalAttempt: true,
+				Up:           2,
 				Down:         0,
 				Attempt:      1,
 				MaxAttempts:  2,
 			},
 			monitorstate.State{
 				Status: "up",
-				Up:     1,
+				Up:     2,
 				Down:   0,
 				Checks: 1,
 			},
@@ -428,6 +448,11 @@ func TestRetryMultiCont(t *testing.T) {
 			retryMonFields,
 			[]jobs.Job{makeContJob(t, "http://foo.com")},
 			[]validator.Validator{
+				contJobValidator("http://foo.com", "1st"),
+				lookslike.Compose(
+					contJobValidator("http://foo.com", "2nd"),
+					summarizertesthelper.SummaryValidator(expected.js.Up, expected.js.Down),
+				),
 				contJobValidator("http://foo.com", "1st"),
 				lookslike.Compose(
 					contJobValidator("http://foo.com", "2nd"),
