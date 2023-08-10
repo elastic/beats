@@ -226,7 +226,13 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 		cancel()
 	})
 
+	t.Logf("Terraform BucketName %s", tfConfig.BucketName)
+	t.Logf("Terraform QueueURL %s", tfConfig.QueueURL)
+
 	s3Input := createInput(t, makeTestConfigSQSForLocalstack(tfConfig.QueueURL))
+
+	t.Logf("s3Input name %s", s3Input.Name())
+	t.Logf("s3Input queue_url %s", s3Input.config.QueueURL)
 
 	// Run S3 Input with desired context
 	var errGroup errgroup.Group
