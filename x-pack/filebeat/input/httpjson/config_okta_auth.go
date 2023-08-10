@@ -24,6 +24,7 @@ import (
 )
 
 // customTokenSource is a custom implementation of the oauth2.TokenSource interface.
+// for more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource
 type customTokenSource struct {
 	mu      sync.Mutex
 	ctx     context.Context
@@ -71,6 +72,8 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 // parent context is passed via the customTokenSource struct since we cannot modify the function signature here.
 func (ts *customTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
+	defer ts.mu.Unlock()
+
 	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)
@@ -80,7 +83,7 @@ func (ts *customTokenSource) Token() (*oauth2.Token, error) {
 		return nil, fmt.Errorf("error exchanging Okta JWT for bearer token: %w", err)
 
 	}
-	ts.mu.Unlock()
+
 	return token, nil
 }
 
