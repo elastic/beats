@@ -48,6 +48,8 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoa
 	} else {
 		wrapped = WrapBrowser(js, stdMonFields, mst)
 	}
+	// Wrap just the root jobs with the summarizer
+	// The summarizer itself wraps the continuations in a stateful way
 	for i, j := range wrapped {
 		j := j
 		wrapped[i] = func(event *beat.Event) ([]jobs.Job, error) {

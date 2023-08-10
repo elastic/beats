@@ -181,11 +181,13 @@ func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*testing.T, *MonitorTe
 	sdb.RunAllWithATwist(t, nil, callback)
 }
 
-func (sdb *ScenarioDB) RunAllWithTwistMatrix(t *testing.T, twists []*Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+// RunAllWithSeparateTwists runs a list of twists separately, but not chained together.
+// This is helpful for building up a test matrix by composing twists.
+func (sdb *ScenarioDB) RunAllWithSeparateTwists(t *testing.T, twists []*Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+	twists = append(twists, nil) // we also run once with no twists
 	for _, twist := range twists {
 		sdb.RunAllWithATwist(t, twist, callback)
 	}
-	sdb.RunAllWithATwist(t, nil, callback)
 }
 
 // RunOneWithATwist just runs the first scenario, useful for debugging

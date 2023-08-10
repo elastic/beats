@@ -63,7 +63,7 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 
 			// If we have a prior check
 			if lastCheck != nil {
-				// If the last event was a summary, meaningc this one is a retry
+				// If the last event was a summary, meaning this one is a retry
 				if lastCheck.summary != nil {
 					// then we expect a new check group
 					require.NotEqual(t, lastCheck.cg, curCheck.cg)
@@ -75,7 +75,7 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 			}
 		}
 	}
-	scenarioDB.RunAllWithTwistMatrix(t, []*framework.Twist{TwistMaxAttempts(2)}, runner)
+	scenarioDB.RunAllWithSeparateTwists(t, []*framework.Twist{TwistMaxAttempts(2)}, runner)
 }
 
 func TestLightweightUrls(t *testing.T) {
