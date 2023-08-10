@@ -49,7 +49,7 @@ func startTestWebserver(t *testing.T) *httptest.Server {
 	return testWs
 }
 
-func startStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
+func StartStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
 	mtx := sync.Mutex{}
 	statusIdx := 0
 	testWs = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

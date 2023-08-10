@@ -24,10 +24,9 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je           *journeyEnricher
-	journeyCount int
-	sFields      stdfields.StdMonitorFields
-	checkGroup   string
+	je         *journeyEnricher
+	sFields    stdfields.StdMonitorFields
+	checkGroup string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
