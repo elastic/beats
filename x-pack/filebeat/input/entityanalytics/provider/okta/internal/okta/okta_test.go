@@ -16,6 +16,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var logUsers = flag.Bool("log_user_response", false, "use to allow log users returned from the API")
+var logResponses = flag.Bool("log_response", false, "use to log users/devices returned from the API")
 
 func Test(t *testing.T) {
 	// https://developer.okta.com/docs/reference/core-okta-api/
@@ -72,7 +73,7 @@ func Test(t *testing.T) {
 					t.Errorf("unexpected credentials with %s: %#v", omit, me.Credentials)
 				}
 
-				if !*logUsers {
+				if !*logResponses {
 					return
 				}
 				b, err := json.Marshal(me)
@@ -122,7 +123,7 @@ func Test(t *testing.T) {
 					t.Error("failed to find 'me' in user list")
 				}
 
-				if !*logUsers {
+				if !*logResponses {
 					return
 				}
 				b, err := json.Marshal(users)
@@ -148,85 +149,166 @@ func Test(t *testing.T) {
 			})
 		})
 	}
+
+	t.Run("device", func(t *testing.T) {
+		query := make(url.Values)
+		query.Set("limit", "200")
+		devices, _, err := GetDeviceDetails(context.Background(), http.DefaultClient, host, key, "", query, limiter, window)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if *logResponses {
+			b, err := json.Marshal(devices)
+			if err != nil {
+				t.Errorf("failed to marshal devices for logging: %v", err)
+			}
+			t.Logf("devices: %s", b)
+		}
+		for _, d := range devices {
+			users, _, err := GetDeviceUsers(context.Background(), http.DefaultClient, host, key, d.ID, query, OmitCredentials, limiter, window)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			b, err := json.Marshal(users)
+			if err != nil {
+				t.Errorf("failed to marshal users for logging: %v", err)
+			}
+			t.Logf("users: %s", b)
+		}
+	})
+}
+
+var localTests = []struct {
+	name   string
+	msg    string
+	id     string
+	fn     func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error)
+	mkWant func(string) (any, error)
+}{
+	{
+		// Test case constructed from API-returned value with details anonymised.
+		name: "users",
+		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
+		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error) {
+			return GetUserDetails(context.Background(), cli, host, key, user, query, OmitNone, lim, window)
+		},
+		mkWant: mkWant[User],
+	},
+	{
+		// Test case from https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices
+		name: "devices",
+		msg:  `[{"id":"devid","status":"CREATED","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5u7YAHhjXrMK0g4","_links":{"activate":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/users","hints":{"allow":["GET"]}}}},{"id":"guo4a5u7YAHhjXrMK0g5","status":"ACTIVE","created":"2023-06-21T23:24:02.000Z","lastUpdated":"2023-06-21T23:24:02.000Z","profile":{"displayName":"Example Device name 2","platform":"ANDROID","manufacturer":"Google","model":"Pixel 6","osVersion":"13:2023-05-05","registered":true,"secureHardwarePresent":true,"diskEncryptionType":"USER"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 2","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5u7YAHhjXrMK0g5","_links":{"activate":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/users","hints":{"allow":["GET"]}}}}]`,
+		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error) {
+			return GetDeviceDetails(context.Background(), cli, host, key, device, query, lim, window)
+		},
+		mkWant: mkWant[Device],
+	},
+	{
+		// Test case constructed from API-returned value with details anonymised.
+		name: "devices_users",
+		msg:  `[{"created":"2023-08-07T21:48:27.000Z","managementStatus":"NOT_MANAGED","user":{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}}]`,
+		id:   "devid",
+		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error) {
+			return GetDeviceUsers(context.Background(), cli, host, key, device, query, OmitNone, lim, window)
+		},
+		mkWant: mkWant[devUser],
+	},
+}
+
+func mkWant[E entity](data string) (any, error) {
+	var v []E
+	err := json.Unmarshal([]byte(data), &v)
+	if v, ok := any(v).([]devUser); ok {
+		users := make([]User, len(v))
+		for i, u := range v {
+			users[i] = u.User
+		}
+		return users, nil
+	}
+	return v, err
 }
 
 func TestLocal(t *testing.T) {
-	// Make a global limiter with more capacity than will be set by the mock API.
-	// This will show the burst drop.
-	limiter := rate.NewLimiter(10, 10)
+	for _, test := range localTests {
+		t.Run(test.name, func(t *testing.T) {
+			// Make a global limiter with more capacity than will be set by the mock API.
+			// This will show the burst drop.
+			limiter := rate.NewLimiter(10, 10)
 
-	// There are a variety of windows, the most conservative is one minute.
-	// The rate limit will be adjusted on the second call to the API if
-	// window is actually used to rate limit calculations.
-	const window = time.Minute
+			// There are a variety of windows, the most conservative is one minute.
+			// The rate limit will be adjusted on the second call to the API if
+			// window is actually used to rate limit calculations.
+			const window = time.Minute
 
-	const (
-		key = "token"
-		msg = `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`
-	)
-	var wantUsers []User
-	err := json.Unmarshal([]byte(msg), &wantUsers)
-	if err != nil {
-		t.Fatalf("failed to unmarshal user data: %v", err)
-	}
+			const key = "token"
+			want, err := test.mkWant(test.msg)
+			if err != nil {
+				t.Fatalf("failed to unmarshal entity data: %v", err)
+			}
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		u, err := url.Parse(r.RequestURI)
-		if err != nil {
-			t.Errorf("unexpected error parsing request URI: %v", err)
-		}
-		if u.Path != "/api/v1/users" {
-			t.Errorf("unexpected API endpoint: got:%s want:%s", u.Path, "/api/v1/users")
-		}
-		if got := r.Header.Get("accept"); got != "application/json" {
-			t.Errorf("unexpected Accept header: got:%s want:%s", got, "application/json")
-		}
-		if got := r.Header.Get("authorization"); got != "SSWS "+key {
-			t.Errorf("unexpected Authorization header: got:%s want:%s", got, "SSWS "+key)
-		}
+			ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				u, err := url.Parse(r.RequestURI)
+				if err != nil {
+					t.Errorf("unexpected error parsing request URI: %v", err)
+				}
+				name, _, ok := strings.Cut(test.name, "_")
+				endpoint := "/api/v1/" + name
+				if ok {
+					endpoint += "/" + test.id + "/users"
+				}
+				if u.Path != endpoint {
+					t.Errorf("unexpected API endpoint: got:%s want:%s", u.Path, endpoint)
+				}
+				if got := r.Header.Get("accept"); got != "application/json" {
+					t.Errorf("unexpected Accept header: got:%s want:%s", got, "application/json")
+				}
+				if got := r.Header.Get("authorization"); got != "SSWS "+key {
+					t.Errorf("unexpected Authorization header: got:%s want:%s", got, "SSWS "+key)
+				}
 
-		// Leave 49 remaining, reset in one minute.
-		w.Header().Add("x-rate-limit-limit", "50")
-		w.Header().Add("x-rate-limit-remaining", "49")
-		w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
+				// Leave 49 remaining, reset in one minute.
+				w.Header().Add("x-rate-limit-limit", "50")
+				w.Header().Add("x-rate-limit-remaining", "49")
+				w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
 
-		// Set next link.
-		w.Header().Add("link", `<https://localhost/api/v1/users?limit=200&after=opaquevalue>; rel="next"`)
+				// Set next link.
+				w.Header().Add("link", fmt.Sprintf(`<https://localhost/api/v1/%s?limit=200&after=opaquevalue>; rel="next"`, test.name))
+				fmt.Fprintln(w, test.msg)
+			}))
+			defer ts.Close()
+			u, err := url.Parse(ts.URL)
+			if err != nil {
+				t.Errorf("failed to parse server URL: %v", err)
+			}
+			host := u.Host
 
-		fmt.Fprintln(w, msg)
-	}))
-	defer ts.Close()
-	u, err := url.Parse(ts.URL)
-	if err != nil {
-		t.Errorf("failed to parse server URL: %v", err)
-	}
-	host := u.Host
+			query := make(url.Values)
+			query.Set("limit", "200")
+			got, h, err := test.fn(context.Background(), ts.Client(), host, key, test.id, query, limiter, window)
+			if err != nil {
+				t.Fatalf("unexpected error from Get_Details: %v", err)
+			}
 
-	query := make(url.Values)
-	query.Set("limit", "200")
-	users, h, err := GetUserDetails(context.Background(), ts.Client(), host, key, "", query, OmitNone, limiter, window)
-	if err != nil {
-		t.Fatalf("unexpected error from GetUserDetails: %v", err)
-	}
+			if !cmp.Equal(want, got) {
+				t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, got))
+			}
 
-	if !cmp.Equal(wantUsers, users) {
-		t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(wantUsers, users))
-	}
+			lim := limiter.Limit()
+			if lim < 49.0/60.0 || 50.0/60.0 < lim {
+				t.Errorf("unexpected rate limit (outside [49/60, 50/60]: %f", lim)
+			}
+			if limiter.Burst() != 1 { // Set in GetUserDetails.
+				t.Errorf("unexpected burst: got:%d want:1", limiter.Burst())
+			}
 
-	lim := limiter.Limit()
-	if lim < 49.0/60.0 || 50.0/60.0 < lim {
-		t.Errorf("unexpected rate limit (outside [49/60, 50/60]: %f", lim)
-	}
-	if limiter.Burst() != 1 { // Set in GetUserDetails.
-		t.Errorf("unexpected burst: got:%d want:1", limiter.Burst())
-	}
-
-	next, err := Next(h)
-	if err != nil {
-		t.Errorf("unexpected error from Next: %v", err)
-	}
-	if query := next.Encode(); query != "after=opaquevalue&limit=200" {
-		t.Errorf("unexpected next query: got:%s want:%s", query, "after=opaquevalue&limit=200")
+			next, err := Next(h)
+			if err != nil {
+				t.Errorf("unexpected error from Next: %v", err)
+			}
+			if query := next.Encode(); query != "after=opaquevalue&limit=200" {
+				t.Errorf("unexpected next query: got:%s want:%s", query, "after=opaquevalue&limit=200")
+			}
+		})
 	}
 }
 
