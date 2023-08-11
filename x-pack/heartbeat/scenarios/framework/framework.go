@@ -154,12 +154,8 @@ func NewScenarioDB() *ScenarioDB {
 func (sdb *ScenarioDB) Init() {
 	sdb.initOnce.Do(func() {
 		var prunedList []Scenario
-		browserCapable := os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") == "true"
 		icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
 		for _, s := range sdb.All {
-			if s.Type == "browser" && !browserCapable {
-				continue
-			}
 			if s.Type == "icmp" && !icmpCapable {
 				continue
 			}

@@ -109,16 +109,23 @@ func TestLightweightSummaries(t *testing.T) {
 
 func TestRunFromOverride(t *testing.T) {
 	scenarioDB.RunAllWithATwist(t, TwistAddRunFrom, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
-		for _, e := range mtr.Events() {
-			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
-				"state": hbtestllext.IsMonitorStateInLocation(TestLocationDefault.ID),
+		for idx, e := range mtr.Events() {
+			stateIsDef := isdef.KeyMissing
+			isLast := idx+1 == len(mtr.Events())
+			if isLast {
+				stateIsDef = hbtestllext.IsMonitorStateInLocation(TestLocationDefault.ID)
+			}
+			validator := lookslike.MustCompile(map[string]interface{}{
+				"state": stateIsDef,
 				"observer": map[string]interface{}{
 					"name": TestLocationDefault.ID,
 					"geo": map[string]interface{}{
 						"name": TestLocationDefault.Geo.Name,
 					},
 				},
-			}), e.Fields)
+			})
+
+			testslike.Test(t, validator, e.Fields)
 		}
 	})
 }
