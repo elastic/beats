@@ -146,7 +146,7 @@ func newBulkRequestWithPathFiltered(
 	params map[string]string,
 	body BodyEncoder,
 ) (*bulkRequest, error) {
-	filteredFields := "errors,items.index.status,items.index.error,items.create.status,items.create.error,items.update.status,items.update.error"
+	filteredFields := "errors,items.*.error,items.*.status"
 	if len(params) == 0 {
 		params = map[string]string{"filter_path": filteredFields}
 	} else {
