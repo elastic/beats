@@ -2,7 +2,7 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
-  build-tags: synthetics
+  build-tags: synthetics integration
 
 issues:
   # Maximum count of issues with the same text.
