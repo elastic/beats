@@ -107,6 +107,13 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 func DefaultGoTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
+
+	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	if synth.Run() == nil {
+		fmt.Printf("npx @elastic/synthetics found, will run with synthetics tags")
+		args.Tags = append(args.Tags, "synthetics")
+	}
+
 	// Use the non-cachable -count=1 flag to disable test caching when running integration tests.
 	// There are reasons to re-run tests even if the code is unchanged (e.g. Dockerfile changes).
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
@@ -125,12 +132,6 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // module integration tests. We tag integration test files with 'integration'.
 func GoTestIntegrationArgsForModule(module string) GoTestArgs {
 	args := makeGoTestArgsForModule("Integration", module)
-
-	synth := exec.Command("npx", "@elastic/synthetics", "-h")
-	if synth.Run() == nil {
-		fmt.Printf("npx @elastic/synthetics found, will run with synthetics tags")
-		args.Tags = append(args.Tags, "synthetics")
-	}
 
 	args.Tags = append(args.Tags, "integration")
 	return args
