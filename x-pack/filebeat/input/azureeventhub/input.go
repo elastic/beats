@@ -168,6 +168,7 @@ func (a *azureInput) Run() {
 
 // Stop stops `azure-eventhub` input.
 func (a *azureInput) Stop() {
+	a.log.Infof("%s input worker is stopping.", inputName)
 	if a.processor != nil {
 		// Tells the processor to stop processing events and release all
 		// resources (like scheduler, leaser, checkpointer, and client).
@@ -182,6 +183,7 @@ func (a *azureInput) Stop() {
 	}
 
 	a.workerCancel()
+	a.log.Infof("%s input worker has stopped.", inputName)
 }
 
 // Wait stop the current server
