@@ -58,7 +58,7 @@ setup.kibana:
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 
 	err := cp.Copy("../../module", filepath.Join(filebeat.TempDir(), "module"))
-	require.NoError(t, err, "error copying module direcotry")
+	require.NoError(t, err, "error copying module directory")
 
 	err = cp.Copy("../../modules.d", filepath.Join(filebeat.TempDir(), "modules.d"))
 	require.NoError(t, err, "error copying modules.d directory")
@@ -97,7 +97,7 @@ logging.level: debug
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 
 	err := cp.Copy("../../module", filepath.Join(filebeat.TempDir(), "module"))
-	require.NoError(t, err, "error copying module direcotry")
+	require.NoError(t, err, "error copying module directory")
 
 	err = cp.Copy("../../modules.d", filepath.Join(filebeat.TempDir(), "modules.d"))
 	require.NoError(t, err, "error copying modules.d directory")
@@ -136,7 +136,7 @@ logging.level: debug
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 
 	err := cp.Copy("../../module", filepath.Join(filebeat.TempDir(), "module"))
-	require.NoError(t, err, "error copying module direcotry")
+	require.NoError(t, err, "error copying module directory")
 
 	err = cp.Copy("../../modules.d", filepath.Join(filebeat.TempDir(), "modules.d"))
 	require.NoError(t, err, "error copying modules.d directory")
@@ -175,7 +175,7 @@ logging.level: debug
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 
 	err := cp.Copy("../../module", filepath.Join(filebeat.TempDir(), "module"))
-	require.NoError(t, err, "error copying module direcotry")
+	require.NoError(t, err, "error copying module directory")
 
 	err = cp.Copy("../../modules.d", filepath.Join(filebeat.TempDir(), "modules.d"))
 	require.NoError(t, err, "error copying modules.d directory")

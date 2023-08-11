@@ -105,8 +105,8 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		return template.ApplyConfigTemplate(event, configs)
 	}
 
+	var configs []*conf.C //nolint:prealloc //breaks tests
 	inputs := l.getInputs(hints)
-	configs := make([]*conf.C, len(inputs))
 	for _, h := range inputs {
 		// Clone original config, enable it if disabled
 		config, _ := conf.NewConfigFrom(l.config.DefaultConfig)
@@ -262,7 +262,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 
 func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
 	modules := utils.GetHintsAsList(hints, l.config.Key)
-	output := make([]mapstr.M, len(modules))
+	var output []mapstr.M //nolint:prealloc //breaks tests
 
 	for _, mod := range modules {
 		output = append(output, mapstr.M{
