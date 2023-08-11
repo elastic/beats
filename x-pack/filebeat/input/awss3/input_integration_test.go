@@ -143,6 +143,25 @@ visibility_timeout: 30s
 region: us-east-1
 endpoint: http://localhost:4566
 path_style: true
+file_selectors:
+-
+  regex: 'events-array.json$'
+  expand_event_list_from_field: Events
+  include_s3_metadata:
+    - last-modified
+    - x-amz-version-id
+    - x-amz-storage-class
+    - Content-Length
+    - Content-Type
+-
+  regex: '\.(?:nd)?json(\.gz)?$'
+-
+  regex: 'multiline.txt$'
+  parsers:
+    - multiline:
+        pattern: "^<Event"
+        negate:  true
+        match:   after
 `, queueURL))
 }
 
@@ -226,13 +245,7 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 		cancel()
 	})
 
-	t.Logf("Terraform BucketName %s", tfConfig.BucketName)
-	t.Logf("Terraform QueueURL %s", tfConfig.QueueURL)
-
 	s3Input := createInput(t, makeTestConfigSQSForLocalstack(tfConfig.QueueURL))
-
-	t.Logf("s3Input name %s", s3Input.Name())
-	t.Logf("s3Input queue_url %s", s3Input.config.QueueURL)
 
 	// Run S3 Input with desired context
 	var errGroup errgroup.Group
@@ -250,8 +263,8 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 8)
-	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), uint64(0x13))
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
 	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
