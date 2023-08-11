@@ -125,6 +125,13 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // module integration tests. We tag integration test files with 'integration'.
 func GoTestIntegrationArgsForModule(module string) GoTestArgs {
 	args := makeGoTestArgsForModule("Integration", module)
+
+	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	if synth.Run() == nil {
+		fmt.Printf("npx @elastic/synthetics found, will run with synthetics tags")
+		args.Tags = append(args.Tags, "synthetics")
+	}
+
 	args.Tags = append(args.Tags, "integration")
 	return args
 }
