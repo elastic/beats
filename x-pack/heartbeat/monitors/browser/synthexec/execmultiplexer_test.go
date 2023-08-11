@@ -16,7 +16,7 @@ func TestExecMultiplexer(t *testing.T) {
 	em := NewExecMultiplexer()
 
 	// Generate three fake journeys with three fake steps
-	var testEvents []*SynthEvent = make([]*SynthEvent, 0, 3)
+	testEvents := make([]*SynthEvent, 0, 3)
 	time := float64(0)
 	for jIdx := 0; jIdx < 3; jIdx++ {
 		time++ // fake time to make events seem spaced out

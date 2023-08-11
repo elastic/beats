@@ -170,7 +170,7 @@ func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int, podEvent bo
 		return nil, fmt.Errorf("no hosts selected for port %d with hints: %+v", port, thosts)
 	}
 
-	var result []string
+	result := make([]string, 0, len(hostSet))
 	for host := range hostSet {
 		result = append(result, host)
 	}
