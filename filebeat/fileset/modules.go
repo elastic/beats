@@ -150,7 +150,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 	if err != nil || !stat.IsDir() {
 		log := logp.NewLogger(logName)
 		log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
-		return &ModuleRegistry{log: log}, nil // empty registry, no error
+		return &ModuleRegistry{log: log}, nil //nolint:nilerr // empty registry, no error
 	}
 
 	var modulesCLIList []string
@@ -161,7 +161,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 			return nil, err
 		}
 	}
-	var mcfgs []*ModuleConfig
+	mcfgs := make([]*ModuleConfig, len(moduleConfigs))
 	for _, cfg := range moduleConfigs {
 		cfg, err = mergePathDefaults(cfg)
 		if err != nil {
@@ -316,7 +316,7 @@ func applyOverrides(fcfg *FilesetConfig,
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking configs: %w", err)
 	}
-
+	p
 	return res, nil
 }
 
@@ -448,7 +448,7 @@ func (reg *ModuleRegistry) Empty() bool {
 
 // ModuleNames returns the names of modules in the ModuleRegistry.
 func (reg *ModuleRegistry) ModuleNames() []string {
-	var modules []string
+	modules := make([]string, len(reg.registry))
 	for _, m := range reg.registry {
 		modules = append(modules, m.config.Module)
 	}
