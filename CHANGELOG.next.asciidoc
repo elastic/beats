@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of region name configuration in awss3 input {pull}36034[36034]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
+- Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
 
 *Heartbeat*
 
