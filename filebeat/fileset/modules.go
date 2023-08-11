@@ -316,7 +316,7 @@ func applyOverrides(fcfg *FilesetConfig,
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking configs: %w", err)
 	}
-	p
+
 	return res, nil
 }
 
