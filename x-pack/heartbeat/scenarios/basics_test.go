@@ -28,6 +28,7 @@ type CheckHistItem struct {
 }
 
 func TestSimpleScenariosBasicFields(t *testing.T) {
+	t.Parallel()
 	runner := func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		require.GreaterOrEqual(t, len(mtr.Events()), 1)
 		var checkHist []*CheckHistItem
@@ -79,6 +80,7 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 }
 
 func TestLightweightUrls(t *testing.T) {
+	t.Parallel()
 	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		for _, e := range mtr.Events() {
 			testslike.Test(t, lookslike.MustCompile(map[string]interface{}{
@@ -93,6 +95,7 @@ func TestLightweightUrls(t *testing.T) {
 }
 
 func TestLightweightSummaries(t *testing.T) {
+	t.Parallel()
 	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
@@ -108,6 +111,7 @@ func TestLightweightSummaries(t *testing.T) {
 }
 
 func TestRunFromOverride(t *testing.T) {
+	t.Parallel()
 	scenarioDB.RunAllWithATwist(t, TwistAddRunFrom, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		for idx, e := range mtr.Events() {
 			stateIsDef := isdef.KeyMissing

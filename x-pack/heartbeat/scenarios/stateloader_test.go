@@ -16,6 +16,7 @@ import (
 var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(3))
 
 func TestStateContinuity(t *testing.T) {
+	t.Parallel()
 	scenarioDB.RunOneWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		lastSS := framework.LastState(mtr.Events())
 
