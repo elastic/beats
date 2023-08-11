@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestParsersConfigSuffix(t *testing.T) {
+func BenchmarkTestParsersConfigSuffix(b *testing.B) {
 	tests := map[string]struct {
 		parsers        map[string]interface{}
 		expectedSuffix string
@@ -83,26 +83,26 @@ func TestParsersConfigSuffix(t *testing.T) {
 
 	for name, test := range tests {
 		test := test
-		t.Run(name, func(t *testing.T) {
+		b.Run(name, func(b *testing.B) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
-			require.NoError(t, err)
+			require.NoError(b, err)
 			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 
 			if test.expectedError == "" {
-				require.NoError(t, err)
+				require.NoError(b, err)
 			} else {
-				require.Contains(t, err.Error(), test.expectedError)
+				require.Contains(b, err.Error(), test.expectedError)
 				return
 			}
-			require.Equal(t, c.Suffix, test.expectedSuffix)
+			require.Equal(b, c.Suffix, test.expectedSuffix)
 		})
 	}
 
 }
 
-func TestParsersConfigAndReading(t *testing.T) {
+func BenchmarkTestParsersConfigAndReading(b *testing.B) {
 	tests := map[string]struct {
 		lines            string
 		parsers          map[string]interface{}
@@ -305,16 +305,16 @@ func TestParsersConfigAndReading(t *testing.T) {
 
 	for name, test := range tests {
 		test := test
-		t.Run(name, func(t *testing.T) {
+		b.Run(name, func(b *testing.B) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
-			require.NoError(t, err)
+			require.NoError(b, err)
 			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
 			if test.expectedError == "" {
-				require.NoError(t, err)
+				require.NoError(b, err)
 			} else {
-				require.Contains(t, err.Error(), test.expectedError)
+				require.Contains(b, err.Error(), test.expectedError)
 				return
 			}
 
@@ -323,7 +323,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 			i := 0
 			msg, err := p.Next()
 			for err == nil {
-				require.Equal(t, test.expectedMessages[i], string(msg.Content))
+				require.Equal(b, test.expectedMessages[i], string(msg.Content))
 				i++
 				msg, err = p.Next()
 			}
@@ -331,7 +331,7 @@ func TestParsersConfigAndReading(t *testing.T) {
 	}
 }
 
-func TestJSONParsersWithFields(t *testing.T) {
+func BenchmarkTestJSONParsersWithFields(b *testing.B) {
 	tests := map[string]struct {
 		message         reader.Message
 		config          map[string]interface{}
@@ -599,23 +599,23 @@ func TestJSONParsersWithFields(t *testing.T) {
 
 	for name, test := range tests {
 		test := test
-		t.Run(name, func(t *testing.T) {
+		b.Run(name, func(b *testing.B) {
 			cfg := config.MustNewConfigFrom(test.config)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
-			require.NoError(t, err)
+			require.NoError(b, err)
 			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
-			require.NoError(t, err)
+			require.NoError(b, err)
 			p := c.Create(msgReader(test.message))
 
 			msg, _ := p.Next()
-			require.Equal(t, test.expectedMessage, msg)
+			require.Equal(b, test.expectedMessage, msg)
 		})
 	}
 
 }
 
-func TestContainerParser(t *testing.T) {
+func BenchmarkTestContainerParser(b *testing.B) {
 	tests := map[string]struct {
 		lines            string
 		parsers          map[string]interface{}
@@ -713,20 +713,20 @@ func TestContainerParser(t *testing.T) {
 
 	for name, test := range tests {
 		test := test
-		t.Run(name, func(t *testing.T) {
+		b.Run(name, func(b *testing.B) {
 			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
-			require.NoError(t, err)
+			require.NoError(b, err)
 			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
-			require.NoError(t, err)
+			require.NoError(b, err)
 			p := c.Create(testReader(test.lines))
 
 			i := 0
 			msg, err := p.Next()
 			for err == nil {
-				require.Equal(t, test.expectedMessages[i].Content, msg.Content)
-				require.Equal(t, test.expectedMessages[i].Fields, msg.Fields)
+				require.Equal(b, test.expectedMessages[i].Content, msg.Content)
+				require.Equal(b, test.expectedMessages[i].Fields, msg.Fields)
 				i++
 				msg, err = p.Next()
 			}
@@ -734,7 +734,7 @@ func TestContainerParser(t *testing.T) {
 	}
 }
 
-func TestParserIncludeMessages(t *testing.T) {
+func BenchmarkTestParserIncludeMessages(b *testing.B) {
 	parserConfig := map[string]interface{}{
 		"parsers": []map[string]interface{}{
 			{
@@ -754,7 +754,7 @@ func TestParserIncludeMessages(t *testing.T) {
 	cfg := config.MustNewConfigFrom(parserConfig)
 	var c inputParsersConfig
 	err := cfg.Unpack(&c)
-	require.NoError(t, err)
+	require.NoError(b, err)
 
 	p := c.Parsers.Create(testReader(lines))
 
@@ -765,7 +765,7 @@ func TestParserIncludeMessages(t *testing.T) {
 		msg, err = p.Next()
 	}
 
-	require.Equal(t, expectedMessages, readMsgs, "fii")
+	require.Equal(b, expectedMessages, readMsgs, "fii")
 }
 
 type testParsersConfig struct {
