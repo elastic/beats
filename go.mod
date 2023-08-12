@@ -71,7 +71,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.2.0
 	github.com/elastic/go-concert v0.2.0
-	github.com/elastic/go-libaudit/v2 v2.3.2
+	github.com/elastic/go-libaudit/v2 v2.3.3
 	github.com/elastic/go-licenser v0.4.1
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
@@ -202,7 +202,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.2
-	github.com/elastic/elastic-agent-libs v0.3.10
+	github.com/elastic/elastic-agent-libs v0.3.11
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
