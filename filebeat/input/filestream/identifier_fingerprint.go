@@ -35,7 +35,7 @@ func newFingerprintIdentifier(cfg *common.Config) (fileIdentifier, error) {
 
 func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	return fileSource{
-		info:                e.Descriptor,
+		desc:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
