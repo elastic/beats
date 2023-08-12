@@ -23,19 +23,18 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-// customTokenSource is a custom implementation of the oauth2.TokenSource interface.
+// oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // for more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource
-type customTokenSource struct {
+type oktaTokenSource struct {
 	mu      sync.Mutex
 	ctx     context.Context
 	conf    *oauth2.Config
 	token   *oauth2.Token
-	oktaJWK string
+	oktaJWK []byte
 }
 
 // fetchOktaOauthClient fetches an OAuth2 client using the Okta JWK credentials.
 func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client) (*http.Client, error) {
-	oktaJWK := string(o.OktaJWKJSON)
 	conf := &oauth2.Config{
 		ClientID: o.ClientID,
 		Scopes:   o.Scopes,
@@ -44,7 +43,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 		},
 	}
 
-	oktaJWT, err := generateOktaJWT(oktaJWK, conf)
+	oktaJWT, err := generateOktaJWT(o.OktaJWKJSON, conf)
 	if err != nil {
 		return nil, fmt.Errorf("oauth2 client: error generating Okta JWT: %w", err)
 	}
@@ -54,13 +53,11 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 		return nil, fmt.Errorf("oauth2 client: error exchanging Okta JWT for bearer token: %w", err)
 	}
 
-	tokenSource := &customTokenSource{
+	tokenSource := &oktaTokenSource{
 		conf:    conf,
 		ctx:     ctx,
-		oktaJWK: oktaJWK,
-		token: &oauth2.Token{
-			AccessToken: token.AccessToken,
-		},
+		oktaJWK: o.OktaJWKJSON,
+		token:   token,
 	}
 	// reuse the tokenSource to refresh the token (automatically calls the custom Token() method when token is no longer valid).
 	client := oauth2.NewClient(ctx, oauth2.ReuseTokenSource(token, tokenSource))
@@ -70,7 +67,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 
 // Token implements the oauth2.TokenSource interface and helps to implement custom token refresh logic.
 // parent context is passed via the customTokenSource struct since we cannot modify the function signature here.
-func (ts *customTokenSource) Token() (*oauth2.Token, error) {
+func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
@@ -87,15 +84,15 @@ func (ts *customTokenSource) Token() (*oauth2.Token, error) {
 	return token, nil
 }
 
-func generateOktaJWT(oktaJWK string, cnf *oauth2.Config) (string, error) {
+func generateOktaJWT(oktaJWK []byte, cnf *oauth2.Config) (string, error) {
 	// unmarshal the JWK into a map
 	var jwkData map[string]string
-	err := json.Unmarshal([]byte(oktaJWK), &jwkData)
+	err := json.Unmarshal(oktaJWK, &jwkData)
 	if err != nil {
 		return "", fmt.Errorf("error decoding JWK: %w", err)
 	}
 
-	// create a RSA private key from JWK components
+	// create an RSA private key from JWK components
 	decodeBase64 := func(key string) (*big.Int, error) {
 		data, err := base64.RawURLEncoding.DecodeString(jwkData[key])
 		if err != nil {
@@ -152,11 +149,12 @@ func generateOktaJWT(oktaJWK string, cnf *oauth2.Config) (string, error) {
 	}
 
 	// create a JWT token using required claims and sign it with the private key
+	now := time.Now()
 	tok, err := jwt.NewBuilder().Audience([]string{cnf.Endpoint.TokenURL}).
 		Issuer(cnf.ClientID).
 		Subject(cnf.ClientID).
-		IssuedAt(time.Now()).
-		Expiration(time.Now().Add(time.Hour)).
+		IssuedAt(now).
+		Expiration(now.Add(time.Hour)).
 		Build()
 	if err != nil {
 		return "", err
