@@ -186,13 +186,6 @@ func (sdb *ScenarioDB) RunAllWithSeparateTwists(t *testing.T, twists []*Twist, c
 	}
 }
 
-// RunOneWithATwist just runs the first scenario, useful for debugging
-// where you don't want multiple scenarios to run
-func (sdb *ScenarioDB) RunOneWithATwist(t *testing.T, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
-	sdb.Init()
-	sdb.All[0].Run(t, twist, callback)
-}
-
 func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	for _, s := range sdb.All {

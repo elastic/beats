@@ -13,18 +13,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
-var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(3))
+const numRuns = 2
+
+var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(numRuns))
 
 func TestStateContinuity(t *testing.T) {
 	t.Parallel()
-	scenarioDB.RunOneWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		lastSS := framework.LastState(mtr.Events())
 
 		assert.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
 
 		allSS := framework.AllStates(mtr.Events())
-		assert.Len(t, allSS, 3)
+		assert.Len(t, allSS, numRuns)
 
-		assert.Equal(t, 3, lastSS.State.Checks)
+		assert.Equal(t, numRuns, lastSS.State.Checks)
 	})
 }
