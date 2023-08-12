@@ -724,13 +724,13 @@ func TestOnRenameFileIdentity(t *testing.T) {
 }
 
 type testFileInfo struct {
-	path string
+	name string
 	size int64
 	time time.Time
 	sys  interface{}
 }
 
-func (t testFileInfo) Name() string       { return t.path }
+func (t testFileInfo) Name() string       { return t.name }
 func (t testFileInfo) Size() int64        { return t.size }
 func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
