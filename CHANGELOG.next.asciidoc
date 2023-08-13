@@ -67,6 +67,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- auditd: Expanded the bitmask applied to ECS file.mode so that the SUID, SGID, and sticky bits can be represented. {pull}36294[36294]
+
 *Filebeat*
 
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
@@ -186,6 +188,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Fix Azure Monitor empty metricnamespace. {pull}36295[36295]
+- Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 
 *Osquerybeat*
 
