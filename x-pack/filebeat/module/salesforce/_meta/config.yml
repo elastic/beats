@@ -125,3 +125,6 @@
 
     # URL, should include the instance_url
     #var.url: "https://instance_id.my.salesforce.com"
+
+    # Interval, should include the time interval
+    #var.interval: 1h
