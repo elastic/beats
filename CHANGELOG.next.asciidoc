@@ -232,7 +232,10 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
+- Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 - Reduce HTTPJSON metrics allocations. {pull}36282[36282]
+
+*Auditbeat*
 
 *Libbeat*
 
