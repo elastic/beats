@@ -161,7 +161,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 			return nil, err
 		}
 	}
-	mcfgs := make([]*ModuleConfig, len(moduleConfigs))
+	var mcfgs []*ModuleConfig //nolint:prealloc  //breaks tests
 	for _, cfg := range moduleConfigs {
 		cfg, err = mergePathDefaults(cfg)
 		if err != nil {
@@ -448,7 +448,7 @@ func (reg *ModuleRegistry) Empty() bool {
 
 // ModuleNames returns the names of modules in the ModuleRegistry.
 func (reg *ModuleRegistry) ModuleNames() []string {
-	modules := make([]string, len(reg.registry))
+	var modules []string //nolint:prealloc  //breaks tests
 	for _, m := range reg.registry {
 		modules = append(modules, m.config.Module)
 	}
