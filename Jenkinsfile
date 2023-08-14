@@ -608,7 +608,6 @@ def targetWithoutNode(Map args = [:]) {
         }
       }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
-        try{
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
@@ -621,12 +620,6 @@ def targetWithoutNode(Map args = [:]) {
           } else {
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
-        }
-        } catch(err) {
-          // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
-          error("Error '${err.toString()}'")
-        } finally {
-            archiveArtifacts(allowEmptyArchive: true, artifacts: "**/filebeat/build/*")
         }
       }
       }
@@ -641,7 +634,6 @@ def targetWithoutNode(Map args = [:]) {
       }
     }
   }
-
 
 /**
 * This method wraps all the environment setup and pre-requirements to run any commands.
