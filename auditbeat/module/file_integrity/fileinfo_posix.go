@@ -27,6 +27,7 @@ import (
 	"syscall"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/xattr"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is
@@ -67,6 +68,11 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		fileInfo.Owner = owner.Username
 	}
 
+	getExtendedAttributes(path, map[string]*string{
+		"security.selinux":        &fileInfo.SELinux,
+		"system.posix_acl_access": &fileInfo.POSIXACLAccess,
+	})
+
 	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
 	if err != nil {
 		errs = append(errs, err)
@@ -77,4 +83,20 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		errs = append(errs, err)
 	}
 	return fileInfo, errs.Err()
+}
+
+func getExtendedAttributes(path string, dst map[string]*string) {
+	f, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	for n, d := range dst {
+		att, err := xattr.FGet(f, n)
+		if err != nil {
+			continue
+		}
+		*d = string(att)
+	}
 }

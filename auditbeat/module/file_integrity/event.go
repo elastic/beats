@@ -127,20 +127,22 @@ type Event struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode  uint64      `json:"inode"`
-	UID    uint32      `json:"uid"`
-	GID    uint32      `json:"gid"`
-	SID    string      `json:"sid"`
-	Owner  string      `json:"owner"`
-	Group  string      `json:"group"`
-	Size   uint64      `json:"size"`
-	MTime  time.Time   `json:"mtime"`  // Last modification time.
-	CTime  time.Time   `json:"ctime"`  // Last metadata change time.
-	Type   Type        `json:"type"`   // File type (dir, file, symlink).
-	Mode   os.FileMode `json:"mode"`   // Permissions
-	SetUID bool        `json:"setuid"` // setuid bit (POSIX only)
-	SetGID bool        `json:"setgid"` // setgid bit (POSIX only)
-	Origin []string    `json:"origin"` // External origin info for the file (MacOS only)
+	Inode          uint64      `json:"inode"`
+	UID            uint32      `json:"uid"`
+	GID            uint32      `json:"gid"`
+	SID            string      `json:"sid"`
+	Owner          string      `json:"owner"`
+	Group          string      `json:"group"`
+	Size           uint64      `json:"size"`
+	MTime          time.Time   `json:"mtime"`            // Last modification time.
+	CTime          time.Time   `json:"ctime"`            // Last metadata change time.
+	Type           Type        `json:"type"`             // File type (dir, file, symlink).
+	Mode           os.FileMode `json:"mode"`             // Permissions
+	SetUID         bool        `json:"setuid"`           // setuid bit (POSIX only)
+	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
+	Origin         []string    `json:"origin"`           // External origin info for the file (MacOS only)
+	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
+	POSIXACLAccess string      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -332,14 +334,14 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file[k] = v
 	}
 
-	out.MetricSetFields.Put("event.kind", "event")              //nolint:errcheck // Will not error.
-	out.MetricSetFields.Put("event.category", []string{"file"}) //nolint:errcheck // Will not error.
+	out.MetricSetFields.Put("event.kind", "event")
+	out.MetricSetFields.Put("event.category", []string{"file"})
 	if e.Action > 0 {
 		actions := e.Action.InOrder(existedBefore, e.Info != nil)
-		out.MetricSetFields.Put("event.type", actions.ECSTypes())      //nolint:errcheck // Will not error.
-		out.MetricSetFields.Put("event.action", actions.StringArray()) //nolint:errcheck // Will not error.
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())
+		out.MetricSetFields.Put("event.action", actions.StringArray())
 	} else {
-		out.MetricSetFields.Put("event.type", None.ECSTypes()) //nolint:errcheck // Will not error.
+		out.MetricSetFields.Put("event.type", None.ECSTypes())
 	}
 
 	if n := len(e.errors); n > 0 {
@@ -348,9 +350,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			errors[idx] = err.Error()
 		}
 		if n == 1 {
-			out.MetricSetFields.Put("error.message", errors[0]) //nolint:errcheck // Will not error.
+			out.MetricSetFields.Put("error.message", errors[0])
 		} else {
-			out.MetricSetFields.Put("error.message", errors) //nolint:errcheck // Will not error.
+			out.MetricSetFields.Put("error.message", errors)
 		}
 	}
 	return out

@@ -125,11 +125,16 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 		return 0
 	}
 
-	var sidOffset flatbuffers.UOffsetT
+	var sidOffset, selinuxOffset, aclAccessOffset flatbuffers.UOffsetT
 	if m.SID != "" {
 		sidOffset = b.CreateString(m.SID)
 	}
-
+	if m.SELinux != "" {
+		selinuxOffset = b.CreateString(m.SELinux)
+	}
+	if m.POSIXACLAccess != "" {
+		aclAccessOffset = b.CreateString(m.POSIXACLAccess)
+	}
 	schema.MetadataStart(b)
 	schema.MetadataAddInode(b, m.Inode)
 	schema.MetadataAddUid(b, m.UID)
@@ -159,6 +164,12 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 		schema.MetadataAddType(b, schema.TypeDir)
 	case SymlinkType:
 		schema.MetadataAddType(b, schema.TypeSymlink)
+	}
+	if selinuxOffset > 0 {
+		schema.MetadataAddSelinux(b, selinuxOffset)
+	}
+	if aclAccessOffset > 0 {
+		schema.MetadataAddPosixAclAccess(b, aclAccessOffset)
 	}
 	return schema.MetadataEnd(b)
 }
