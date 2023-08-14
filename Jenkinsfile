@@ -622,7 +622,6 @@ def targetWithoutNode(Map args = [:]) {
           }
         }
       }
-      }
       // Publish packages should happen always to easily consume those artifacts if the
       // e2e were triggered and failed.
       if (isPackaging) {
@@ -634,6 +633,7 @@ def targetWithoutNode(Map args = [:]) {
       }
     }
   }
+}
 
 /**
 * This method wraps all the environment setup and pre-requirements to run any commands.
