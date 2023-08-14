@@ -218,6 +218,7 @@ Example config:
     var.user: "my.email@here.com"
     var.password: "password"
     var.url: "https://instance-url.salesforce.com"
+    var.interval: 1h
 ----
 
 include::../include/var-paths.asciidoc[]
@@ -245,6 +246,12 @@ The password used as part of the authentication flow. It is required for authent
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.interval`*::
+
+Period of fetching logs, i.e. 1s/1m/1h. 
+
+Note: The default value of `var.interval` is 1h. It is important to exercise caution when reducing the interval, as it directly affects the API rate limit of the Salesforce instance. Salesforce API rate limit is ~1000 API calls per hour. Hence if user goes with lower limit of var.interval, the Salesforce API rate limit will exceed and any additional API requests beyond the limit will result in an error response from the Salesforce API. The error message will typically indicate that the rate limit has been exceeded. Please refer to the following link for the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit].
 
 [float]
 ==== `apex-rest` fileset settings
