@@ -233,6 +233,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
+- Add device handling to Okta input package for entity analytics. {pull}36049[36049]
 
 *Auditbeat*
 
