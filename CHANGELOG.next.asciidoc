@@ -179,6 +179,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Add oracle authentication messages parsing {pull}35127[35127]
+- Add support for endpoint resolver in AWS config {pull}36208[36208]
 
 *Auditbeat*
 
