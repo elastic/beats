@@ -44,7 +44,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -117,17 +116,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
-	pipelineClientFactory := func(p beat.Pipeline) (pipeline.ISyncClient, error) {
-		if parsedConfig.RunOnce {
-			client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
-			if err != nil {
-				return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
-			}
-			return client, nil
-		} else {
-			client, err := p.Connect()
-			return monitors.SyncPipelineClientAdaptor{C: client}, err
-		}
+	pipelineClientFactory := func(p beat.Pipeline) (beat.Client, error) {
+		return p.Connect()
 	}
 
 	bt := &Heartbeat{
@@ -160,23 +150,33 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.trace.Start()
 	defer bt.trace.Close()
 
+	// Adapt local pipeline to synchronized mode if run_once is enabled
+	pipeline := b.Publisher
+	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
+	if bt.config.RunOnce {
+		sync := &monitors.SyncPipelineWrapper{}
+
+		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
+		pipelineWrapper = sync
+	}
+
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
+	waitMonitors := monitors.NewSignalWait()
+
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
 	// dynamic types.
-	stopStaticMonitors, err := bt.RunStaticMonitors(b)
+	stopStaticMonitors, err := bt.RunStaticMonitors(b, pipeline)
 	if err != nil {
 		return err
 	}
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		bt.scheduler.WaitForRunOnce()
-		logp.L().Info("Ending run_once run")
-		return nil
+		waitMonitors.Add(monitors.WithLog(bt.scheduler.WaitForRunOnce, "Ending run_once run."))
 	}
 
 	if b.Manager.Enabled() {
@@ -211,20 +211,34 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	defer bt.scheduler.Stop()
 
-	<-bt.done
+	// Wait until run_once ends or bt is being shut down
+	waitMonitors.AddChan(bt.done)
+	waitMonitors.Wait()
 
-	if err != nil {
-		logp.L().Errorf("could not write trace stop event: %s", err)
+	logp.L().Info("Shutting down, waiting for output to complete")
+
+	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
+	// located _after_ b.Manager.Stop() or else it will exit early
+	waitPublished := monitors.NewSignalWait()
+	defer waitPublished.Wait()
+
+	// Three possible events: global beat, run_once pipeline done and publish timeout
+	waitPublished.AddChan(bt.done)
+	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
+	if bt.config.PublishTimeout > 0 {
+		logp.Info("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
+		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
+			"shutdown: timed out waiting for pipeline to publish events."))
 	}
-	logp.L().Info("Shutting down.")
+
 	return nil
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
+func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.monitorFactory.Create(b.Publisher, cfg)
+		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				logp.L().Info("skipping disabled monitor: %s", err)

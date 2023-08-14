@@ -374,7 +374,7 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	src := identifier.GetSource(loginp.FSEvent{Descriptor: loginp.FileDescriptor{Info: fi}, Op: loginp.OpCreate, NewPath: filepath})
 	return "filestream::" + inputID + "::" + src.Name()
 }
 

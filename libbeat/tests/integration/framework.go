@@ -22,41 +22,90 @@ package integration
 import (
 	"bufio"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
-	Binary        string
-	Args          []string
-	Cmd           *exec.Cmd
-	t             *testing.T
-	tempDir       string
-	configFile    string
-	beatName      string
-	logFileOffset int64
+	Args                []string
+	baseArgs            []string
+	Binary              string
+	RestartOnBeatOnExit bool
+	beatName            string
+	cmdMutex            sync.Mutex
+	configFile          string
+	fullPath            string
+	logFileOffset       int64
+	t                   *testing.T
+	tempDir             string
+	stdout              *os.File
+	stderr              *os.File
+	Process             *os.Process
+}
+
+type Meta struct {
+	UUID       uuid.UUID `json:"uuid"`
+	FirstStart time.Time `json:"first_start"`
+}
+
+type IndexTemplateResult struct {
+	IndexTemplates []IndexTemplateEntry `json:"index_templates"`
+}
+
+type IndexTemplateEntry struct {
+	Name          string        `json:"name"`
+	IndexTemplate IndexTemplate `json:"index_template"`
+}
+
+type IndexTemplate struct {
+	IndexPatterns []string `json:"index_patterns"`
+}
+
+type SearchResult struct {
+	Hits Hits `json:"hits"`
+}
+
+type Hits struct {
+	Total Total `json:"total"`
+}
+
+type Total struct {
+	Value int `json:"value"`
 }
 
 // NewBeat createa a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
-func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
+func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	require.FileExistsf(t, binary, "beat binary must exists")
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
+	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
+	require.NoError(t, err, "error creating stdout file")
+	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
+	require.NoError(t, err, "error creating stderr file")
 	p := BeatProc{
 		Binary: binary,
-		Args: append([]string{
+		baseArgs: append([]string{
+			beatName,
 			"--systemTest",
 			"--path.home", tempDir,
 			"--path.logs", tempDir,
@@ -67,30 +116,176 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) BeatProc {
 		beatName:   beatName,
 		configFile: configFile,
 		t:          t,
+		stdout:     stdoutFile,
+		stderr:     stderrFile,
 	}
-	return p
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
+		}
+		var maxlen int64 = 2048
+		stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
+		if err != nil {
+			t.Logf("error reading stderr: %s", err)
+		}
+		t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+
+		stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
+		if err != nil {
+			t.Logf("error reading stdout: %s", err)
+		}
+		t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+
+		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
+		files, err := filepath.Glob(glob)
+		for _, f := range files {
+			contents, err := readLastNBytes(f, maxlen)
+			if err != nil {
+				t.Logf("error reading %s: %s", f, err)
+			}
+			t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
+		}
+	})
+	return &p
 }
 
 // Start starts the Beat process
-// args are extra arguments to be passed to the Beat
+// args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
 	t := b.t
-	b.Args = append(b.Args, args...)
 	fullPath, err := filepath.Abs(b.Binary)
 	if err != nil {
 		t.Fatalf("could not get full path from %q, err: %s", b.Binary, err)
 	}
-	b.Cmd = exec.Command(fullPath, b.Args...)
 
-	if err := b.Cmd.Start(); err != nil {
-		t.Fatalf("could not start process: %s", err)
+	b.fullPath = fullPath
+	b.Args = append(b.baseArgs, args...)
+
+	done := atomic.MakeBool(false)
+	wg := sync.WaitGroup{}
+	if b.RestartOnBeatOnExit {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for !done.Load() {
+				b.startBeat()
+				b.waitBeatToExit()
+			}
+		}()
+	} else {
+		b.startBeat()
 	}
+
 	t.Cleanup(func() {
-		pid := b.Cmd.Process.Pid
-		if err := b.Cmd.Process.Signal(os.Interrupt); err != nil {
-			t.Fatalf("could not stop process with PID: %d, err: %s", pid, err)
+		b.cmdMutex.Lock()
+		// 1. Kill the Beat
+		if err := b.Process.Signal(os.Interrupt); err != nil {
+			if !errors.Is(err, os.ErrProcessDone) {
+				t.Fatalf("could not stop process with PID: %d, err: %s",
+					b.Process.Pid, err)
+			}
+		}
+
+		// Make sure the goroutine restarting the Beat has exited
+		if b.RestartOnBeatOnExit {
+			// 2. Set the done flag so the goroutine loop can exit
+			done.Store(true)
+			// 3. Release the mutex, keeping it locked
+			// until now ensures a new process won't
+			// start.  Lock must be released before
+			// wg.Wait() or there is a possibility of
+			// deadlock.
+			b.cmdMutex.Unlock()
+			// 4. Wait for the goroutine to finish, this helps ensuring
+			// no other Beat process was started
+			wg.Wait()
+		} else {
+			b.cmdMutex.Unlock()
 		}
 	})
+}
+
+// startBeat starts the Beat process. This method
+// does not block nor waits the Beat to finish.
+func (b *BeatProc) startBeat() {
+	b.cmdMutex.Lock()
+	defer b.cmdMutex.Unlock()
+	b.stdout.Seek(0, 0)
+	b.stdout.Truncate(0)
+	b.stderr.Seek(0, 0)
+	b.stderr.Truncate(0)
+	var procAttr os.ProcAttr
+	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
+	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
+	require.NoError(b.t, err, "error starting beat process")
+	b.Process = process
+}
+
+// waitBeatToExit blocks until the Beat exits, it returns
+// the process' exit code.
+// `startBeat` must be called before this method.
+func (b *BeatProc) waitBeatToExit() int {
+	processState, err := b.Process.Wait()
+	if err != nil {
+		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
+			b.beatName, err, processState.ExitCode())
+	}
+
+	return processState.ExitCode()
+}
+
+// Stop stops the Beat process
+// Start adds Cleanup function to stop when test ends, only run this if you want to inspect logs after beat shutsdown
+func (b *BeatProc) Stop() {
+	b.cmdMutex.Lock()
+	defer b.cmdMutex.Unlock()
+	if err := b.Process.Signal(os.Interrupt); err != nil {
+		if errors.Is(err, os.ErrProcessDone) {
+			return
+		}
+		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
+	}
+}
+
+// LogMatch tests each line of the logfile to see if contains any
+// match of the provided regular expression.  It will open the log
+// file on every call, read until EOF, then close it.  LogContains
+// will be faster so use that if possible.
+func (b *BeatProc) LogMatch(match string) bool {
+	re := regexp.MustCompile(match)
+	logFile := b.openLogFile()
+	_, err := logFile.Seek(b.logFileOffset, os.SEEK_SET)
+	if err != nil {
+		b.t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
+	}
+
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			b.t.Errorf("could not close log file: %s", err)
+		}
+	}()
+
+	r := bufio.NewReader(logFile)
+	for {
+		data, err := r.ReadBytes('\n')
+		line := string(data)
+		b.logFileOffset += int64(len(data))
+
+		if err != nil {
+			if err != io.EOF {
+				b.t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
+
+		if re.MatchString(line) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // LogContains looks for `s` as a substring of every log line,
@@ -105,11 +300,6 @@ func (b *BeatProc) LogContains(s string) bool {
 	}
 
 	defer func() {
-		offset, err := logFile.Seek(0, os.SEEK_CUR)
-		if err != nil {
-			t.Fatalf("could not read offset for '%s': %s", logFile.Name(), err)
-		}
-		b.logFileOffset = offset
 		if err := logFile.Close(); err != nil {
 			// That's not quite a test error, but it can impact
 			// next executions of LogContains, so treat it as an error
@@ -119,13 +309,17 @@ func (b *BeatProc) LogContains(s string) bool {
 
 	r := bufio.NewReader(logFile)
 	for {
-		line, err := r.ReadString('\n')
+		data, err := r.ReadBytes('\n')
+		line := string(data)
+		b.logFileOffset += int64(len(data))
+
 		if err != nil {
 			if err != io.EOF {
 				t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
 			}
 			break
 		}
+
 		if strings.Contains(line, s) {
 			return true
 		}
@@ -156,11 +350,12 @@ func (b *BeatProc) TempDir() string {
 // WriteConfigFile writes the provided configuration string cfg to a file.
 // This file will be used as the configuration file for the Beat.
 func (b *BeatProc) WriteConfigFile(cfg string) {
-	if err := os.WriteFile(b.configFile, []byte(cfg), 0644); err != nil {
+	if err := os.WriteFile(b.configFile, []byte(cfg), 0o644); err != nil {
 		b.t.Fatalf("cannot create config file '%s': %s", b.configFile, err)
 	}
 
 	b.Args = append(b.Args, "-c", b.configFile)
+	b.baseArgs = append(b.baseArgs, "-c", b.configFile)
 }
 
 // openLogFile opens the log file for reading and returns it.
@@ -213,17 +408,17 @@ func createTempDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 
-	if err := os.MkdirAll(tempDir, 0766); err != nil {
+	if err := os.MkdirAll(tempDir, 0o766); err != nil {
 		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
 	}
-	t.Logf("Temporary directory: %s", tempDir)
 
 	cleanup := func() {
 		if !t.Failed() {
 			if err := os.RemoveAll(tempDir); err != nil {
 				t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
 			}
-			t.Logf("Temporary directory '%s' removed", tempDir)
+		} else {
+			t.Logf("Temporary directory saved: %s", tempDir)
 		}
 	}
 	t.Cleanup(cleanup)
@@ -235,6 +430,85 @@ func createTempDir(t *testing.T) string {
 // using the default test credentials or the corresponding environment
 // variables.
 func EnsureESIsRunning(t *testing.T) {
+	esURL := GetESURL(t, "http")
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, esURL.String(), nil)
+	if err != nil {
+		t.Fatalf("cannot create request to ensure ES is running: %s", err)
+	}
+
+	u := esURL.User.Username()
+	p, _ := esURL.User.Password()
+	req.SetBasicAuth(u, p)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// If you're reading this message, you probably forgot to start ES
+		// run `mage compose:Up` from Filebeat's folder to start all
+		// containers required for integration tests
+		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage compose:Up)", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
+	}
+}
+
+func (b *BeatProc) FileContains(filename string, match string) string {
+	file, err := os.Open(filename)
+	require.NoErrorf(b.t, err, "error opening: %s", filename)
+	r := bufio.NewReader(file)
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				b.t.Fatalf("error reading log file '%s': %s", file.Name(), err)
+			}
+			break
+		}
+		if strings.Contains(line, match) {
+			return line
+		}
+	}
+	return ""
+}
+
+func (b *BeatProc) WaitFileContains(filename string, match string, waitFor time.Duration) string {
+	var returnValue string
+	require.Eventuallyf(b.t,
+		func() bool {
+			returnValue = b.FileContains(filename, match)
+			return returnValue != ""
+		}, waitFor, 100*time.Millisecond, "match string '%s' not found in %s", match, filename)
+
+	return returnValue
+}
+
+func (b *BeatProc) WaitStdErrContains(match string, waitFor time.Duration) string {
+	return b.WaitFileContains(b.stderr.Name(), match, waitFor)
+}
+
+func (b *BeatProc) WaitStdOutContains(match string, waitFor time.Duration) string {
+	return b.WaitFileContains(b.stdout.Name(), match, waitFor)
+}
+
+func (b *BeatProc) LoadMeta() (Meta, error) {
+	m := Meta{}
+	metaFile, err := os.Open(filepath.Join(b.TempDir(), "data", "meta.json"))
+	if err != nil {
+		return m, err
+	}
+	defer metaFile.Close()
+
+	metaBytes, err := ioutil.ReadAll(metaFile)
+	require.NoError(b.t, err, "error reading meta file")
+	err = json.Unmarshal(metaBytes, &m)
+	require.NoError(b.t, err, "error unmarshalling meta data")
+	return m, nil
+}
+
+func GetESURL(t *testing.T, scheme string) url.URL {
 	t.Helper()
 
 	esHost := os.Getenv("ES_HOST")
@@ -244,19 +518,14 @@ func EnsureESIsRunning(t *testing.T) {
 
 	esPort := os.Getenv("ES_PORT")
 	if esPort == "" {
-		esPort = "9200"
-	}
-
-	esURL := url.URL{
-		Scheme: "http",
-		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
-	}
-
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, esURL.String(), nil)
-	if err != nil {
-		t.Fatalf("cannot create request to ensure ES is running: %s", err)
+		switch scheme {
+		case "http":
+			esPort = "9200"
+		case "https":
+			esPort = "9201"
+		default:
+			t.Fatalf("could not determine port from env variable: ES_PORT=%s", esPort)
+		}
 	}
 
 	user := os.Getenv("ES_USER")
@@ -269,16 +538,120 @@ func EnsureESIsRunning(t *testing.T) {
 		pass = "testing"
 	}
 
-	req.SetBasicAuth(user, pass)
+	esURL := url.URL{
+		Scheme: scheme,
+		Host:   fmt.Sprintf("%s:%s", esHost, esPort),
+		User:   url.UserPassword(user, pass),
+	}
+	return esURL
+}
 
-	resp, err := http.DefaultClient.Do(req)
+func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
+	t.Helper()
+
+	kibanaHost := os.Getenv("KIBANA_HOST")
+	if kibanaHost == "" {
+		kibanaHost = "localhost"
+	}
+
+	kibanaPort := os.Getenv("KIBANA_PORT")
+	if kibanaPort == "" {
+		kibanaPort = "5601"
+	}
+
+	kibanaURL := url.URL{
+		Scheme: "http",
+		Host:   fmt.Sprintf("%s:%s", kibanaHost, kibanaPort),
+	}
+	kibanaUser := url.UserPassword("beats", "testing")
+	return kibanaURL, kibanaUser
+}
+
+func HttpDo(t *testing.T, method string, targetURL url.URL) (statusCode int, body []byte, err error) {
+	t.Helper()
+	client := &http.Client{}
+	req, err := http.NewRequest(method, targetURL.String(), nil)
 	if err != nil {
-		// If you're reading this message, you probably forgot to start ES
-		// run `mage compose:Up` from Filebeat's folder to start all
-		// containers required for integration tests
-		t.Fatalf("cannot execute HTTP request to ES: %s", err)
+		return 0, nil, fmt.Errorf("error making request, method: %s, url: %s, error: %w", method, targetURL.String(), err)
 	}
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, nil, fmt.Errorf("error doing request, method: %s, url: %s, error: %w", method, targetURL.String(), err)
 	}
+	defer resp.Body.Close()
+	body, err = io.ReadAll(resp.Body)
+
+	if err != nil {
+		return resp.StatusCode, nil, fmt.Errorf("error reading request, method: %s, url: %s, status code: %d", method, targetURL.String(), resp.StatusCode)
+	}
+	return resp.StatusCode, body, nil
+}
+
+func FormatDatastreamURL(t *testing.T, srcURL url.URL, dataStream string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/_data_stream", dataStream)
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining data_stream path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func FormatIndexTemplateURL(t *testing.T, srcURL url.URL, template string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/_index_template", template)
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining index_template path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func FormatPolicyURL(t *testing.T, srcURL url.URL, policy string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/_ilm/policy", policy)
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining ilm policy path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func FormatRefreshURL(t *testing.T, srcURL url.URL) url.URL {
+	t.Helper()
+	srcURL.Path = "/_refresh"
+	return srcURL
+}
+
+func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) (url.URL, error) {
+	t.Helper()
+	path, err := url.JoinPath("/", dataStream, "_search")
+	if err != nil {
+		return url.URL{}, fmt.Errorf("error joining ilm policy path: %w", err)
+	}
+	srcURL.Path = path
+	return srcURL, nil
+}
+
+func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("error opening %s: %w", filename, err)
+	}
+	fInfo, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("error stating %s: %w", filename, err)
+	}
+	var startPosition int64
+	if fInfo.Size() >= numBytes {
+		startPosition = fInfo.Size() - numBytes
+	} else {
+		startPosition = 0
+	}
+	_, err = f.Seek(startPosition, io.SeekStart)
+	if err != nil {
+		return nil, fmt.Errorf("error seeking to %d in %s: %w", startPosition, filename, err)
+	}
+	return io.ReadAll(f)
 }
