@@ -67,6 +67,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- auditd: Expanded the bitmask applied to ECS file.mode so that the SUID, SGID, and sticky bits can be represented. {pull}36294[36294]
+
 *Filebeat*
 
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
@@ -111,6 +113,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update mito CEL extension library to v1.5.0. {pull}36146[36146]
 - Filter out duplicate paths resolved from matching globs. {issue}36253[36253] {pull}36256[36256]
 - Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
+- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 
 *Heartbeat*
 
@@ -140,33 +143,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
 - Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
 
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
 *Metricbeat*
 
 - in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
@@ -185,6 +161,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
+- Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 
 *Osquerybeat*
 
@@ -196,13 +173,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Winlogbeat*
 
 - Fix powershell details regexp to prevent excessive backtracking when processing command invocations. {pull}36178[36178]
-
-*Functionbeat*
-
-
-*Functionbeat*
-
-
 
 *Elastic Logging Plugin*
 
@@ -261,6 +231,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for localstack based input integration testing {pull}35727[35727]
 - Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
+- Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Reduce HTTPJSON metrics allocations. {pull}36282[36282]
 
 *Libbeat*
