@@ -69,7 +69,7 @@ func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false, false)
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false, fileset.FilesetOverrides{})
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		return template.ApplyConfigTemplate(event, configs)
 	}
 
-	var configs []*conf.C
+	var configs []*conf.C //nolint:prealloc //breaks tests
 	inputs := l.getInputs(hints)
 	for _, h := range inputs {
 		// Clone original config, enable it if disabled
@@ -262,7 +262,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 
 func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
 	modules := utils.GetHintsAsList(hints, l.config.Key)
-	var output []mapstr.M
+	var output []mapstr.M //nolint:prealloc //breaks tests
 
 	for _, mod := range modules {
 		output = append(output, mapstr.M{
