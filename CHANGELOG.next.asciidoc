@@ -232,6 +232,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add support for localstack based input integration testing {pull}35727[35727]
 - Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
 - Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
+- Add support for endpoint resolver in AWS config {pull}36208[36208]
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 - Add device handling to Okta input package for entity analytics. {pull}36049[36049]
