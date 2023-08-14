@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
 - Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
+- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 
 *Heartbeat*
 
@@ -123,33 +124,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Fixing the grok expression outputs of log files {pull}35221[35221]
 - Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
 - Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
 
 *Metricbeat*
 
