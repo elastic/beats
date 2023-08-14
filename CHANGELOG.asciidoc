@@ -378,7 +378,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Improve CEL input documentation {pull}34831[34831]
 - Add metrics documentation for CEL and AWS CloudWatch inputs. {issue}34887[34887] {pull}34889[34889]
 - Metrics hosted by the HTTP monitoring endpoint for the `aws-cloudwatch`, `aws-s3`, `cel`, and `lumberjack` inputs are now available under `/inputs/` instead of `/dataset`.
-- Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 
 *Heartbeat*
 
