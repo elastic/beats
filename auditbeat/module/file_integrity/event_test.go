@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"os/user"
+	"reflect"
 	"runtime"
 	"testing"
 	"time"
@@ -552,4 +554,41 @@ func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 		return false
 	}
 	return true
+}
+
+func TestACLText(t *testing.T) {
+	// Depending on the system we are running this test on, we may or may not
+	// have a username associated with the user's UID in the xattr string, so
+	// dynamically determine the username here.
+	tests := []struct {
+		encoded string
+		want    []string
+	}{
+		0: {
+			encoded: "0sAgAAAAEABgD/////AgAGAG8AAAAEAAQA/////xAABgD/////IAAEAP////8=",
+			want:    []string{"user::rw-", "user:" + userNameOrUID("111") + ":rw-", "group::r--", "mask::rw-", "other::r--"},
+		},
+		1: { // Encoded string from https://www.bityard.org/wiki/tech/os/linux/xattrs.
+			encoded: "0sAgAAAAEABgD/////AgAHAHwAAAAEAAQA/////xAABwD/////IAAEAP////8=",
+			want:    []string{"user::rw-", "user:" + userNameOrUID("124") + ":rwx", "group::r--", "mask::rwx", "other::r--"},
+		},
+	}
+	for i, test := range tests {
+		got, err := aclText(test.encoded)
+		if err != nil {
+			t.Errorf("unexpected error for test %d: %v", i, err)
+			continue
+		}
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("unexpected result for test %d:\ngot: %#v\nwant:%#v", i, got, test.want)
+		}
+	}
+}
+
+func userNameOrUID(uid string) string {
+	u, err := user.LookupId(uid)
+	if err != nil {
+		return uid
+	}
+	return u.Username
 }

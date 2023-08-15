@@ -23,12 +23,15 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base64"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
 	"math"
 	"os"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -321,6 +324,15 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		if len(info.Origin) > 0 {
 			file["origin"] = info.Origin
 		}
+		if info.SELinux != "" {
+			file["selinux"] = info.SELinux
+		}
+		if info.POSIXACLAccess != "" {
+			a, err := aclText(info.POSIXACLAccess)
+			if err == nil {
+				file["posix_acl_access"] = a
+			}
+		}
 	}
 
 	if len(e.Hashes) > 0 {
@@ -356,6 +368,78 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 	}
 	return out
+}
+
+func aclText(s string) ([]string, error) {
+	b, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(s, "0s"))
+	if err != nil {
+		return nil, err
+	}
+	if (len(b)-4)%8 != 0 {
+		return nil, fmt.Errorf("unexpected ACL length: %d", len(b))
+	}
+	b = b[4:] // The first four bytes is the version, discard it.
+	a := make([]string, 0, len(b)/8)
+	for len(b) != 0 {
+		tag := binary.LittleEndian.Uint16(b)
+		perm := binary.LittleEndian.Uint16(b[2:])
+		qual := binary.LittleEndian.Uint32(b[4:])
+		a = append(a, fmt.Sprintf("%s:%s:%s", tags[tag], qualString(qual, tag), modeString(perm)))
+		b = b[8:]
+	}
+	return a, nil
+}
+
+var tags = map[uint16]string{
+	0x00: "undefined",
+	0x01: "user",
+	0x02: "user",
+	0x04: "group",
+	0x08: "group",
+	0x10: "mask",
+	0x20: "other",
+}
+
+func qualString(qual uint32, tag uint16) string {
+	if qual == math.MaxUint32 {
+		// 0xffffffff is undefined ID, so return zero.
+		return ""
+	}
+	const (
+		tagUser  = 0x02
+		tagGroup = 0x08
+	)
+	id := strconv.Itoa(int(qual))
+	switch tag {
+	case tagUser:
+		u, err := user.LookupId(id)
+		if err == nil {
+			return u.Username
+		}
+	case tagGroup:
+		g, err := user.LookupGroupId(id)
+		if err == nil {
+			return g.Name
+		}
+	}
+	// Fallback to the numeric ID if we can't get a name
+	// or the tag is other than user/group.
+	return id
+}
+
+func modeString(perm uint16) string {
+	var buf [3]byte
+	w := 0
+	const rwx = "rwx"
+	for i, c := range rwx {
+		if perm&(1<<uint(len(rwx)-1-i)) != 0 {
+			buf[w] = byte(c)
+		} else {
+			buf[w] = '-'
+		}
+		w++
+	}
+	return string(buf[:w])
 }
 
 // diffEvents returns true if the file info differs between the old event and
@@ -407,7 +491,8 @@ func diffEvents(old, new *Event) (Action, bool) {
 	if o, n := old.Info, new.Info; o != nil && n != nil {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
-			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID {
+			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID ||
+			o.SELinux != n.SELinux || o.POSIXACLAccess != n.POSIXACLAccess {
 			result |= AttributesModified
 		}
 

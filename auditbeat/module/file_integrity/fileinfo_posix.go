@@ -20,6 +20,7 @@
 package file_integrity
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/user"
@@ -97,6 +98,11 @@ func getExtendedAttributes(path string, dst map[string]*string) {
 		if err != nil {
 			continue
 		}
-		*d = string(att)
+		*d = string(trimNull(att))
 	}
+}
+
+func trimNull(b []byte) []byte {
+	b, _, _ = bytes.Cut(b, []byte{0})
+	return b
 }
