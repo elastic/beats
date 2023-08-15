@@ -20,11 +20,11 @@
 package file_integrity
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/user"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/joeshaw/multierror"
@@ -73,6 +73,12 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		"security.selinux":        &fileInfo.SELinux,
 		"system.posix_acl_access": &fileInfo.POSIXACLAccess,
 	})
+	// The selinux attr may be null terminated. It would be cheaper
+	// to use strings.TrimRight, but absent documentation saying
+	// that there is only ever a final null terminator, take the
+	// guaranteed correct path of terminating at the first found
+	// null byte.
+	fileInfo.SELinux, _, _ = strings.Cut(fileInfo.SELinux, "\x00")
 
 	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
 	if err != nil {
@@ -98,11 +104,6 @@ func getExtendedAttributes(path string, dst map[string]*string) {
 		if err != nil {
 			continue
 		}
-		*d = string(trimNull(att))
+		*d = string(att)
 	}
-}
-
-func trimNull(b []byte) []byte {
-	b, _, _ = bytes.Cut(b, []byte{0})
-	return b
 }

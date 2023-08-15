@@ -23,7 +23,6 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -328,7 +327,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			file["selinux"] = info.SELinux
 		}
 		if info.POSIXACLAccess != "" {
-			a, err := aclText(info.POSIXACLAccess)
+			a, err := aclText([]byte(info.POSIXACLAccess))
 			if err == nil {
 				file["posix_acl_access"] = a
 			}
@@ -370,11 +369,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	return out
 }
 
-func aclText(s string) ([]string, error) {
-	b, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(s, "0s"))
-	if err != nil {
-		return nil, err
-	}
+func aclText(b []byte) ([]string, error) {
 	if (len(b)-4)%8 != 0 {
 		return nil, fmt.Errorf("unexpected ACL length: %d", len(b))
 	}

@@ -19,6 +19,7 @@ package file_integrity
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -27,6 +28,7 @@ import (
 	"os/user"
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -557,6 +559,10 @@ func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 }
 
 func TestACLText(t *testing.T) {
+	// The xattr package returns raw bytes, but command line tools such as getfattr
+	// return a base64-encoded format, so use that here to make test validation
+	// easier.
+	//
 	// Depending on the system we are running this test on, we may or may not
 	// have a username associated with the user's UID in the xattr string, so
 	// dynamically determine the username here.
@@ -574,7 +580,12 @@ func TestACLText(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		got, err := aclText(test.encoded)
+		b, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(test.encoded, "0s"))
+		if err != nil {
+			t.Errorf("invalid test: unexpected base64 encoding error for test %d: %v", i, err)
+			continue
+		}
+		got, err := aclText(b)
 		if err != nil {
 			t.Errorf("unexpected error for test %d: %v", i, err)
 			continue
