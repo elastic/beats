@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
@@ -20,9 +21,21 @@ var esIntegTwists = framework.MultiTwist(TwistAddRunFrom, TwistMultiRun(numRuns)
 func TestStateContinuity(t *testing.T) {
 	t.Parallel()
 	scenarioDB.RunAllWithATwist(t, esIntegTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+		events := mtr.Events()
+		var errors = []*beat.Event{}
+		var sout string
+		for _, e := range events {
+			if message, ok := e.GetValue("synthetics.payload.message"); ok == nil {
+				sout = sout + "\n" + message.(string)
+			}
+			if _, ok := e.GetValue("error"); ok == nil {
+				errors = append(errors, e)
+			}
+		}
+
 		lastSS := framework.LastState(mtr.Events())
 
-		assert.Equal(t, monitorstate.StatusUp, lastSS.State.Status)
+		assert.Equal(t, monitorstate.StatusUp, lastSS.State.Status, "monitor was unexpectedly down, synthetics console output: %s, errors", sout, errors)
 
 		allSS := framework.AllStates(mtr.Events())
 		assert.Len(t, allSS, numRuns)
