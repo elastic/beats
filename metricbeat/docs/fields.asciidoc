@@ -38162,7 +38162,7 @@ format: percent
 *`haproxy.stat.selected.total`*::
 +
 --
-Total number of times a server was selected, either for new sessions, or when re-dispatching. For servers, this field reports the number of times the server was selected.
+Total number of times a server was selected, either for new sessions, or when re-dispatching. For servers, this field reports the the number of times the server was selected.
 
 
 type: long
