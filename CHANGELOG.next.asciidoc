@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Mark `translate_sid` processor is GA. {issue}36279[36279] {pull}36280[36280]
 - dns processor: Add support for forward lookups (`A`, `AAAA`, and `TXT`). {issue}11416[11416] {pull}36394[36394]
 - Mark `syslog` processor as GA, improve docs about how processor handles syslog messages. {issue}36416[36416] {pull}36417[36417]
+- Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 
 *Auditbeat*
 
