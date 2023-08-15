@@ -110,7 +110,18 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 
 	synth := exec.Command("npx", "@elastic/synthetics", "-h")
 	if synth.Run() == nil {
-		fmt.Printf("npx @elastic/synthetics found, will run with synthetics tags")
+		// Run an empty journey to ensure playwright can be loaded
+		// catches situations like missing playwright deps
+		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		var out strings.Builder
+		cmd.Stdout = &out
+		cmd.Stderr = &out
+		err := cmd.Run()
+		if err != nil || cmd.ProcessState.ExitCode() != 0 {
+			fmt.Printf("synthetics is available, but not invokable, command exited with bad code: %s\n", out.String())
+		}
+
+		fmt.Println("npx @elastic/synthetics found, will run with synthetics tags")
 		args.Tags = append(args.Tags, "synthetics")
 	}
 
