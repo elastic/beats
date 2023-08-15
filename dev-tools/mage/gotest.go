@@ -122,6 +122,7 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 		}
 
 		fmt.Println("npx @elastic/synthetics found, will run with synthetics tags")
+		os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
 		args.Tags = append(args.Tags, "synthetics")
 	}
 
