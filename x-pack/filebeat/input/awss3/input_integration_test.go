@@ -135,6 +135,41 @@ file_selectors:
 `, queueURL))
 }
 
+func makeTestConfigSQSForLocalstack(queueURL string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
+queue_url: %s
+max_number_of_messages: 1
+visibility_timeout: 300s
+api_timeout: 120s
+bucket_list_interval: 120s
+bucket_list_prefix: ""
+sqs.wait_time: 20s
+sqs.max_receive_count: 5
+region: us-east-1
+endpoint: http://localhost:4566
+path_style: true
+file_selectors:
+-
+  regex: 'events-array.json$'
+  expand_event_list_from_field: Events
+  include_s3_metadata:
+    - last-modified
+    - x-amz-version-id
+    - x-amz-storage-class
+    - Content-Length
+    - Content-Type
+-
+  regex: '\.(?:nd)?json(\.gz)?$'
+-
+  regex: 'multiline.txt$'
+  parsers:
+    - multiline:
+        pattern: "^<Event"
+        negate:  true
+        match:   after
+`, queueURL))
+}
+
 func createInput(t *testing.T, cfg *conf.C) *s3Input {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
@@ -151,24 +186,6 @@ func newV2Context() (v2.Context, func()) {
 		ID:          inputID,
 		Cancelation: ctx,
 	}, cancel
-}
-
-// Creates a default config for Localstack based tests
-func defaultTestConfig(region, queueURL string) config {
-	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           true,
-		RegionName:          region,
-		QueueURL:            queueURL,
-	}
-	c.ReaderConfig.InitDefaults()
-	return c
 }
 
 // Create an aws config for Localstack based tests
@@ -204,7 +221,6 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	queueUrl := tfConfig.QueueURL
 
 	// Create a default config for the awss3 input
-	config := defaultTestConfig(region, queueUrl)
 	awsCfg, err := makeLocalstackConfig(region)
 	if err != nil {
 		t.Fatal(err)
@@ -234,12 +250,8 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 		cancel()
 	})
 
-	// Initialize s3Input with the test config
-	s3Input := &s3Input{
-		config:    config,
-		awsConfig: awsCfg,
-		store:     openTestStatestore(),
-	}
+	s3Input := createInput(t, makeTestConfigSQSForLocalstack(tfConfig.QueueURL))
+
 	// Run S3 Input with desired context
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
@@ -256,8 +268,8 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
 	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 8)
-	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), uint64(0x13))
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), uint64(0xc))
 	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
 	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
