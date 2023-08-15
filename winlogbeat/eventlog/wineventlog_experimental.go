@@ -135,6 +135,11 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 	return l, nil
 }
 
+func (l *winEventLogExp) isForwarded() bool {
+	c := l.config
+	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
+}
+
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLogExp) Name() string {
 	return l.id
@@ -227,9 +232,12 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
-		// subscribe again from the beginning.
-		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
+		flags = win.EvtSubscribeStartAfterBookmark
+		if !l.isForwarded() {
+			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+			// subscribe again from the beginning.
+			flags |= win.EvtSubscribeStrict
+		}
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
