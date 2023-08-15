@@ -154,9 +154,6 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*c
 		return computeInstance, nil
 	}
 
-	// Remake the compute instances map to avoid having stale data.
-	s.computeInstances = make(map[uint64]*computepb.Instance)
-
 	return nil, nil
 }
 
