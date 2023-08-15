@@ -20,6 +20,7 @@ func TestElasticSyntheticsRunnable(t *testing.T) {
 	var out strings.Builder
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Run()
+	err = cmd.Run()
 	require.Equal(t, 0, cmd.ProcessState.ExitCode(), "command exited with bad code: %s", out.String())
+	require.NoError(t, err)
 }
