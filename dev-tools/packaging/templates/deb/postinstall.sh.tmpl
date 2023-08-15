@@ -1,6 +1,0 @@
-#!/usr/bin/sh
-
-systemctl daemon-reload 2> /dev/null
-systemctl is-active {{.BeatName}} --quiet && systemctl restart {{.BeatName}}
-exit 0
-
