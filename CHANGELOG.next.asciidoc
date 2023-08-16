@@ -149,6 +149,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Add support for `security.selinux` and `system.posix_acl_access` extended attributes to FIM. {issue}36265[36265] {pull}36310[36310]
 
 *Filebeat*
 
