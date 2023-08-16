@@ -69,10 +69,7 @@ func newMockClient() *mockClient {
 }
 
 func newRequestWithContext(method string, url string, body io.Reader) (*http.Request, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	return http.NewRequestWithContext(ctx, method, url, body)
+	return http.NewRequestWithContext(context.Background(), method, url, body)
 }
 
 func TestHeaders(t *testing.T) {
