@@ -402,14 +402,13 @@ func (b *BeatProc) openLogFile() *os.File {
 // If the tests are run with -v, the temporary directory will
 // be logged.
 func createTempDir(t *testing.T) string {
-	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
-		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
+	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
 	}
-
-	if err := os.MkdirAll(tempDir, 0o766); err != nil {
-		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
+	tempDir, err := os.MkdirTemp(rootDir, t.Name())
+	if err != nil {
+		t.Fatalf("failed to make temp directory: %s", err)
 	}
 
 	cleanup := func() {
