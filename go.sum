@@ -1036,7 +1036,6 @@ github.com/influxdata/tdigest v0.0.2-0.20210216194612-fc98d27c9e8b/go.mod h1:Z0k
 github.com/influxdata/usage-client v0.0.0-20160829180054-6d3895376368/go.mod h1:Wbbw6tYNvwa5dlB6304Sd+82Z3f7PmVZHVKU637d4po=
 github.com/jarcoal/httpmock v1.0.4 h1:jp+dy/+nonJE4g4xbVtl9QdrUNbn6/3hDT5R4nDIZnA=
 github.com/jarcoal/httpmock v1.0.4/go.mod h1:ATjnClrvW/3tijVmpL/va5Z3aAyGvqU3gCT8nX0Txik=
-github.com/jcchavezs/porto v0.1.0 h1:Xmxxn25zQMmgE7/yHYmh19KcItG81hIwfbEEFnd6w/Q=
 github.com/jcchavezs/porto v0.1.0/go.mod h1:fESH0gzDHiutHRdX2hv27ojnOVFco37hg1W6E9EZF4A=
 github.com/jcmturner/aescts/v2 v2.0.0 h1:9YKLH6ey7H4eDBXW8khjYslgyqG2xZikXP0EQFKrle8=
 github.com/jcmturner/aescts/v2 v2.0.0/go.mod h1:AiaICIRyfYg35RUkr8yESTqvSy7csK90qZ5xfvvsoNs=
@@ -1452,7 +1451,6 @@ github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b/go.mod h1:8458kAa
 github.com/sanathkr/yaml v0.0.0-20170819201035-0056894fa522/go.mod h1:tQTYKOQgxoH3v6dEmdHiz4JG+nbxWwM5fgPQUpSZqVQ=
 github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 h1:39BJIaZIhIBmXATIhdlTBlTQpAiGXHnz17CrO7vF2Ss=
 github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522/go.mod h1:tQTYKOQgxoH3v6dEmdHiz4JG+nbxWwM5fgPQUpSZqVQ=
-github.com/santhosh-tekuri/jsonschema v1.2.4 h1:hNhW8e7t+H1vgY+1QeEQpveR6D4+OwKPXCfD2aieJis=
 github.com/santhosh-tekuri/jsonschema v1.2.4/go.mod h1:TEAUOeZSmIxTTuHatJzrvARHiuO9LYd+cIxzgEHCQI4=
 github.com/satori/go.uuid v0.0.0-20160603004225-b111a074d5ef/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
@@ -1618,8 +1616,9 @@ go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0 h1:5UaI4agfuGoGRhpFVb6s63Hj/
 go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0/go.mod h1:GmYz+KDp2LDAa2nd/qJ+OkrjWVEoCRIPAWarbUvyt6Y=
 go.elastic.co/apm/module/apmhttp/v2 v2.0.0 h1:GNfmK1LD4nE5fYqbLxROCpg1ucyjSFG5iwulxwAJ+3o=
 go.elastic.co/apm/module/apmhttp/v2 v2.0.0/go.mod h1:5KmxcNN7hkJh8sVW3Ggl/pYgnwiNenygE46bZoUb9RE=
-go.elastic.co/apm/v2 v2.0.0 h1:5BeBh+oIrVbMwPrW3uO9Uxm4w7HpKy92lYl5Rfj69Kg=
 go.elastic.co/apm/v2 v2.0.0/go.mod h1:KGQn56LtRmkQjt2qw4+c1Jz8gv9rCBUU/m21uxrqcps=
+go.elastic.co/apm/v2 v2.4.3 h1:k6mj63O7IIyqqn3S52C2vBXvaSK9M5FHp0aZHpPH/as=
+go.elastic.co/apm/v2 v2.4.3/go.mod h1:+CiBUdrrAGnGCL9TNx7tQz3BrfYV23L8Ljvotoc87so=
 go.elastic.co/ecszap v1.0.1 h1:mBxqEJAEXBlpi5+scXdzL7LTFGogbuxipJC0KTZicyA=
 go.elastic.co/ecszap v1.0.1/go.mod h1:SVjazT+QgNeHSGOCUHvRgN+ZRj5FkB7IXQQsncdF57A=
 go.elastic.co/fastjson v1.1.0 h1:3MrGBWWVIxe/xvsbpghtkFoPciPhOCmjsR/HfwEeQR4=
