@@ -410,7 +410,7 @@ func createTempDir(t *testing.T) string {
 	if err != nil {
 		t.Fatalf("error making test dir: %s: %s", rootDir, err)
 	}
-	tempDir, err := os.MkdirTemp(rootDir, t.Name())
+	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))
 	if err != nil {
 		t.Fatalf("failed to make temp directory: %s", err)
 	}
