@@ -15,7 +15,6 @@ https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
 
 *Filebeat*
 
-- Fixing the grok expression outputs of log files {pull}35221[35221]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
 - Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
@@ -25,8 +24,6 @@ https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
 
 *Heartbeat*
 
-- Fix output pipeline exit on run_once. {pull}35376[35376]
-- Fixing the grok expression outputs of log files {pull}35221[35221]
 - Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
 - Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
 
