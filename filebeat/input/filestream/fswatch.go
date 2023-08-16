@@ -357,7 +357,8 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
 	uniqueIDs := map[string]string{}
-
+	// used to filter out duplicate matches
+	uniqueFiles := map[string]struct{}{}
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -366,6 +367,12 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 
 		for _, filename := range matches {
+			// in case multiple globs match on the same file we filter out duplicates
+			if _, knownFile := uniqueFiles[filename]; knownFile {
+				continue
+			}
+			uniqueFiles[filename] = struct{}{}
+
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
 				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
