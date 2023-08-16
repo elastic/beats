@@ -20,11 +20,11 @@
 package file_integrity
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/user"
 	"strconv"
-	"strings"
 	"syscall"
 
 	"github.com/joeshaw/multierror"
@@ -69,8 +69,9 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		fileInfo.Owner = owner.Username
 	}
 
-	getExtendedAttributes(path, map[string]*string{
-		"security.selinux":        &fileInfo.SELinux,
+	var selinux []byte
+	getExtendedAttributes(path, map[string]*[]byte{
+		"security.selinux":        &selinux,
 		"system.posix_acl_access": &fileInfo.POSIXACLAccess,
 	})
 	// The selinux attr may be null terminated. It would be cheaper
@@ -78,7 +79,8 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	// that there is only ever a final null terminator, take the
 	// guaranteed correct path of terminating at the first found
 	// null byte.
-	fileInfo.SELinux, _, _ = strings.Cut(fileInfo.SELinux, "\x00")
+	selinux, _, _ = bytes.Cut(selinux, []byte{0})
+	fileInfo.SELinux = string(selinux)
 
 	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
 	if err != nil {
@@ -92,7 +94,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	return fileInfo, errs.Err()
 }
 
-func getExtendedAttributes(path string, dst map[string]*string) {
+func getExtendedAttributes(path string, dst map[string]*[]byte) {
 	f, err := os.Open(path)
 	if err != nil {
 		return
@@ -104,6 +106,6 @@ func getExtendedAttributes(path string, dst map[string]*string) {
 		if err != nil {
 			continue
 		}
-		*d = string(att)
+		*d = att
 	}
 }
