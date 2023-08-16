@@ -144,7 +144,7 @@ type Metadata struct {
 	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
 	Origin         []string    `json:"origin"`           // External origin info for the file (MacOS only)
 	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
-	POSIXACLAccess string      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
+	POSIXACLAccess []byte      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -326,8 +326,8 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		if info.SELinux != "" {
 			file["selinux"] = info.SELinux
 		}
-		if info.POSIXACLAccess != "" {
-			a, err := aclText([]byte(info.POSIXACLAccess))
+		if len(info.POSIXACLAccess) != 0 {
+			a, err := aclText(info.POSIXACLAccess)
 			if err == nil {
 				file["posix_acl_access"] = a
 			}
@@ -487,7 +487,7 @@ func diffEvents(old, new *Event) (Action, bool) {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
 			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID ||
-			o.SELinux != n.SELinux || o.POSIXACLAccess != n.POSIXACLAccess {
+			o.SELinux != n.SELinux || !bytes.Equal(o.POSIXACLAccess, n.POSIXACLAccess) {
 			result |= AttributesModified
 		}
 

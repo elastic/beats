@@ -132,8 +132,8 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 	if m.SELinux != "" {
 		selinuxOffset = b.CreateString(m.SELinux)
 	}
-	if m.POSIXACLAccess != "" {
-		aclAccessOffset = b.CreateString(m.POSIXACLAccess)
+	if len(m.POSIXACLAccess) != 0 {
+		aclAccessOffset = b.CreateByteVector(m.POSIXACLAccess)
 	}
 	schema.MetadataStart(b)
 	schema.MetadataAddInode(b, m.Inode)
@@ -256,6 +256,13 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 		return nil
 	}
 	mode := os.FileMode(info.Mode())
+	var posixACLAccess []byte
+	if n := info.PosixAclAccessLength(); n != 0 {
+		posixACLAccess = make([]byte, n)
+		for i := range posixACLAccess {
+			posixACLAccess[i] = byte(info.PosixAclAccess(i))
+		}
+	}
 	rtn := &Metadata{
 		Inode:          info.Inode(),
 		UID:            info.Uid(),
@@ -268,7 +275,7 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 		SetUID:         mode&os.ModeSetuid != 0,
 		SetGID:         mode&os.ModeSetgid != 0,
 		SELinux:        string(info.Selinux()),
-		POSIXACLAccess: string(info.PosixAclAccess()),
+		POSIXACLAccess: posixACLAccess,
 	}
 
 	switch info.Type() {
