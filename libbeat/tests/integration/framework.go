@@ -406,6 +406,10 @@ func createTempDir(t *testing.T) string {
 	if err != nil {
 		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
 	}
+	err = os.MkdirAll(rootDir, 0o750)
+	if err != nil {
+		t.Fatalf("error making test dir: %s: %s", rootDir, err)
+	}
 	tempDir, err := os.MkdirTemp(rootDir, t.Name())
 	if err != nil {
 		t.Fatalf("failed to make temp directory: %s", err)
