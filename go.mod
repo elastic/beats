@@ -216,6 +216,7 @@ require (
 	github.com/lestrrat-go/jwx/v2 v2.0.11
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/pkg/xattr v0.4.9
 	github.com/shirou/gopsutil/v3 v3.22.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.3

@@ -191,6 +191,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Auditbeat*
 
+- Add support for `security.selinux` and `system.posix_acl_access` extended attributes to FIM. {issue}36265[36265] {pull}36310[36310]
 
 *Filebeat*
 
