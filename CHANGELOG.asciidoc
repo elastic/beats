@@ -15,12 +15,12 @@ https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
 
 *Filebeat*
 
-- Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
+- Fix panic when SQS input metrics getter is invoked. {pull}36101[36101] {issue}36077[36077]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
 - Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
-- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
+- Fix handling of Juniper SRX structured data when there is no leading Junos element. {issue}36270[36270] {pull}36308[36308]
 - Remove erroneous error log in GCPPubSub input. {pull}36296[36296]
-- Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
+- Fix Filebeat Cisco module with missing escape character. {issue}36325[36325] {pull}36326[36326]
 
 *Heartbeat*
 
