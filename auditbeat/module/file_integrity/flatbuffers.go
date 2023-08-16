@@ -257,16 +257,18 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 	}
 	mode := os.FileMode(info.Mode())
 	rtn := &Metadata{
-		Inode:  info.Inode(),
-		UID:    info.Uid(),
-		GID:    info.Gid(),
-		SID:    string(info.Sid()),
-		Mode:   mode & ^(os.ModeSetuid | os.ModeSetgid),
-		Size:   info.Size(),
-		MTime:  time.Unix(0, info.MtimeNs()).UTC(),
-		CTime:  time.Unix(0, info.CtimeNs()).UTC(),
-		SetUID: mode&os.ModeSetuid != 0,
-		SetGID: mode&os.ModeSetgid != 0,
+		Inode:          info.Inode(),
+		UID:            info.Uid(),
+		GID:            info.Gid(),
+		SID:            string(info.Sid()),
+		Mode:           mode & ^(os.ModeSetuid | os.ModeSetgid),
+		Size:           info.Size(),
+		MTime:          time.Unix(0, info.MtimeNs()).UTC(),
+		CTime:          time.Unix(0, info.CtimeNs()).UTC(),
+		SetUID:         mode&os.ModeSetuid != 0,
+		SetGID:         mode&os.ModeSetgid != 0,
+		SELinux:        string(info.Selinux()),
+		POSIXACLAccess: string(info.PosixAclAccess()),
 	}
 
 	switch info.Type() {
