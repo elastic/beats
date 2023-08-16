@@ -32,7 +32,7 @@ table Metadata {
   ctime_ns:long;
   type:Type = 1;
   selinux:string;
-  posix_acl_access:string;
+  posix_acl_access:[byte];
 }
 
 table Hash {
