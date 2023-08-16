@@ -82,7 +82,8 @@ type ConnectionSettings struct {
 
 	IdleConnTimeout time.Duration
 
-	Transport httpcommon.HTTPTransportSettings
+	Transport             httpcommon.HTTPTransportSettings
+	BulkResponseFiltering bool
 }
 
 // NewConnection returns a new Elasticsearch client
@@ -200,16 +201,17 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 		}
 
 		client, err := NewConnection(ConnectionSettings{
-			URL:              esURL,
-			Beatname:         beatname,
-			Kerberos:         config.Kerberos,
-			Username:         config.Username,
-			Password:         config.Password,
-			APIKey:           config.APIKey,
-			Parameters:       params,
-			Headers:          config.Headers,
-			CompressionLevel: config.CompressionLevel,
-			Transport:        config.Transport,
+			URL:                   esURL,
+			Beatname:              beatname,
+			Kerberos:              config.Kerberos,
+			Username:              config.Username,
+			Password:              config.Password,
+			APIKey:                config.APIKey,
+			Parameters:            params,
+			Headers:               config.Headers,
+			CompressionLevel:      config.CompressionLevel,
+			Transport:             config.Transport,
+			BulkResponseFiltering: config.BulkResponseFiltering,
 		})
 		if err != nil {
 			return clients, err

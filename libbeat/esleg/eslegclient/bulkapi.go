@@ -81,6 +81,14 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 
+	if conn.BulkResponseFiltering {
+		filteredFields := "errors,items.*.error,items.*.status"
+		if len(params) == 0 {
+			params = map[string]string{"filter_path": filteredFields}
+		} else {
+			params["filter_path"] = filteredFields
+		}
+	}
 	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
 
 	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
@@ -104,7 +112,7 @@ func newBulkRequest(
 		return nil, err
 	}
 
-	return newBulkRequestWithPathFiltered(urlStr, path, params, body)
+	return newBulkRequestWithPath(urlStr, path, params, body)
 }
 
 func newBulkRequestWithPath(
@@ -135,24 +143,6 @@ func newBulkRequestWithPath(
 	r.reset(body)
 
 	return &r, nil
-}
-
-// newBulkRequestWithPathFiltered Create a new BulkRequest while appending the filter_path option
-// which is going to reduce the amount of data we collect back from ES.
-// TODO: We might want to do some more testing to make sure we are omitting any fields, or make this usage opt-in vs default
-func newBulkRequestWithPathFiltered(
-	urlStr string,
-	path string,
-	params map[string]string,
-	body BodyEncoder,
-) (*bulkRequest, error) {
-	filteredFields := "errors,items.*.error,items.*.status"
-	if len(params) == 0 {
-		params = map[string]string{"filter_path": filteredFields}
-	} else {
-		params["filter_path"] = filteredFields
-	}
-	return newBulkRequestWithPath(urlStr, path, params, body)
 }
 
 func (r *bulkRequest) reset(body BodyEncoder) {
