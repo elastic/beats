@@ -22,10 +22,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"github.com/stretchr/testify/require"
-	"io"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 )
@@ -42,7 +42,7 @@ func TestAPIKeyEncoding(t *testing.T) {
 	httpClient := newMockClient()
 	conn.HTTP = httpClient
 
-	req, err := newRequestWithContext("GET", "http://fakehost/some/path", nil)
+	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 	require.NoError(t, err)
 
 	_, _, err = conn.execHTTPRequest(req)
@@ -66,10 +66,6 @@ func (c *mockClient) CloseIdleConnections() {}
 
 func newMockClient() *mockClient {
 	return &mockClient{}
-}
-
-func newRequestWithContext(method string, url string, body io.Reader) (*http.Request, error) {
-	return http.NewRequestWithContext(context.Background(), method, url, body)
 }
 
 func TestHeaders(t *testing.T) {
@@ -102,7 +98,7 @@ func TestHeaders(t *testing.T) {
 		httpClient := newMockClient()
 		conn.HTTP = httpClient
 
-		req, err := newRequestWithContext("GET", "http://fakehost/some/path", nil)
+		req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 		require.NoError(t, err)
 		_, _, err = conn.execHTTPRequest(req)
 		require.NoError(t, err)
@@ -153,7 +149,7 @@ func BenchmarkExecHTTPRequest(b *testing.B) {
 		b.ReportAllocs()
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			req, err := newRequestWithContext("GET", "http://fakehost/some/path", nil)
+			req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 			require.NoError(b, err)
 			_, bb, err = conn.execHTTPRequest(req)
 			require.NoError(b, err)
