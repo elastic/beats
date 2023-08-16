@@ -218,8 +218,8 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.22.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
-	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
-	go.elastic.co/apm/v2 v2.0.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.4.3
+	go.elastic.co/apm/v2 v2.4.3
 	go.mongodb.org/mongo-driver v1.5.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
@@ -296,7 +296,6 @@ require (
 	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jcchavezs/porto v0.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.0.0 // indirect
@@ -338,7 +337,6 @@ require (
 	github.com/prometheus/client_golang v1.11.1 // indirect
 	github.com/rootless-containers/rootlesskit v1.1.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
-	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
