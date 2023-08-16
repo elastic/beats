@@ -28,7 +28,10 @@ func TestStateStore(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to parse lastUpdate")
 	}
-	const usersLink = "users-link"
+	const (
+		usersLink   = "users-link"
+		devicesLink = "devices-link"
+	)
 
 	t.Run("new", func(t *testing.T) {
 		dbFilename := "TestStateStore_New.db"
@@ -45,6 +48,7 @@ func TestStateStore(t *testing.T) {
 			{key: lastSyncKey, val: lastSync},
 			{key: lastUpdateKey, val: lastUpdate},
 			{key: usersLinkKey, val: usersLink},
+			{key: devicesLinkKey, val: devicesLink},
 		}
 		for _, kv := range data {
 			err := store.RunTransaction(true, func(tx *kvstore.Transaction) error {
@@ -67,7 +71,8 @@ func TestStateStore(t *testing.T) {
 		}{
 			{name: "lastSync", got: ss.lastSync, want: lastSync},
 			{name: "lastUpdate", got: ss.lastUpdate, want: lastUpdate},
-			{name: "usersLink", got: ss.next, want: usersLink},
+			{name: "usersLink", got: ss.nextUsers, want: usersLink},
+			{name: "devicesLink", got: ss.nextDevices, want: devicesLink},
 		}
 		for _, c := range checks {
 			if !cmp.Equal(c.got, c.want) {
@@ -83,7 +88,7 @@ func TestStateStore(t *testing.T) {
 			testCleanupStore(store, dbFilename)
 		})
 
-		want := map[string]*User{
+		wantUsers := map[string]*User{
 			"userid": {
 				State: Discovered,
 				User: okta.User{
@@ -118,6 +123,22 @@ func TestStateStore(t *testing.T) {
 				},
 			},
 		}
+		wantDevices := map[string]*Device{
+			"deviceid": {
+				State: Discovered,
+				Device: okta.Device{
+					ID:          "deviceid",
+					Status:      "STATUS",
+					Created:     time.Now(),
+					LastUpdated: time.Now(),
+					Links: okta.HAL{
+						"self": map[string]interface{}{
+							"href": "https://localhost/api/v1/devices/deviceid",
+						},
+					},
+				},
+			},
+		}
 
 		ss, err := newStateStore(store)
 		if err != nil {
@@ -125,8 +146,10 @@ func TestStateStore(t *testing.T) {
 		}
 		ss.lastSync = lastSync
 		ss.lastUpdate = lastUpdate
-		ss.next = usersLink
-		ss.users = want
+		ss.nextUsers = usersLink
+		ss.nextDevices = devicesLink
+		ss.users = wantUsers
+		ss.devices = wantDevices
 
 		err = ss.close(true)
 		if err != nil {
@@ -140,7 +163,8 @@ func TestStateStore(t *testing.T) {
 		}{
 			{name: "lastSyncKey", key: lastSyncKey, val: &ss.lastSync},
 			{name: "lastUpdateKey", key: lastUpdateKey, val: &ss.lastUpdate},
-			{name: "usersLinkKey", key: usersLinkKey, val: &ss.next},
+			{name: "usersLinkKey", key: usersLinkKey, val: &ss.nextUsers},
+			{name: "devicesLinkKey", key: devicesLinkKey, val: &ss.nextDevices},
 		}
 		for _, check := range roundTripChecks {
 			want, err := json.Marshal(check.val)
@@ -175,8 +199,8 @@ func TestStateStore(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error from store run transaction: %v", err)
 		}
-		if !cmp.Equal(want, users) {
-			t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, users))
+		if !cmp.Equal(wantUsers, users) {
+			t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(wantUsers, users))
 		}
 	})
 
