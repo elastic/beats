@@ -12,38 +12,7 @@ https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
 *Affecting all Beats*
 - Upgrade Go to 1.19.12 {pull}36246[36246]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
 
 *Auditbeat*
 
@@ -66,12 +35,6 @@ https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
 - Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
 - Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
 
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
 *Packetbeat*
 
 - Fix handling of Npcap installation options from Fleet. {pull}35541[35541] {pull}35935[35935]
@@ -80,89 +43,15 @@ https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
 
 - Fix powershell details regexp to prevent excessive backtracking when processing command invocations. {pull}36178[36178]
 
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
 
 - Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Add support for endpoint resolver in AWS config {pull}36208[36208]
-
-*Auditbeat*
-
-*Libbeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
 
 
 [[release-notes-8.9.0]]
