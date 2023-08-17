@@ -9,7 +9,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Upgrade Go to 1.19.12 {pull}36246[36246]
 
 *Auditbeat*
 
@@ -53,7 +52,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- auditd: Expanded the bitmask applied to ECS file.mode so that the SUID, SGID, and sticky bits can be represented. {pull}36294[36294]
 
 *Filebeat*
 
@@ -61,71 +59,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
 - Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
-- Fix panic in TCP and UDP inputs on Linux when collecting socket metrics from OS. {issue}35064[35064]
-- Correctly collect TCP and UDP metrics for unspecified address values. {pull}35111[35111]
-- Fix base for UDP and TCP queue metrics and UDP drops metric. {pull}35123[35123]
-- Sanitize filenames for request tracer in httpjson input. {pull}35143[35143]
-- decode_cef processor: Fix ECS output by making `observer.ip` into an array of strings instead of string. {issue}35140[35140] {pull}35149[35149]
-- Fix handling of MySQL audit logs with strict JSON parser. {issue}35158[35158] {pull}35160[35160]
-- Sanitize filenames for request tracer in cel input. {pull}35154[35154]
-- Fix accidental error overwrite in defer statement in entityanalytics Azure AD input. {issue}35153[35153] {pull}35169[35169]
-- Fixing the grok expression outputs of log files {pull}35221[35221]
 - Fixes "Can only start an input when all related states are finished" error when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
-- Move repeated Windows event channel not found errors in winlog input to debug level.  {issue}35314[35314] {pull}35317[35317]
-- Fix crash when processing forwarded logs missing a message. {issue}34705[34705] {pull}34865[34865]
-- Fix crash when loading azurewebstorage cursor with no partially processed data. {pull}35433[35433]
-- Add support in s3 input for JSON with array of objects. {pull}35475[35475]
-- RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
-- Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
 - [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
 - [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
-- Fix filestream false positive log error "filestream input with ID 'xyz' already exists" {issue}31767[31767]
-- Fix error when trying to use `include_message` parser {issue}35440[35440]
-- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
-- Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
-- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
-- Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
-- Fix metric collection in GCPPubSub input. {pull}35773[35773]
-- Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
-- Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}35972[35972]
-- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35996[35996]
-- Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
-- Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
-- Fix handling of region name configuration in awss3 input {pull}36034[36034]
-- Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
-- Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
-- Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
-- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
-- Remove erroneous error log in GCPPubSub input. {pull}36296[36296]
-- Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
-- Fix broken zip URL monitors. NOTE: Zip URL Monitors will be removed in version 8.7 and replaced with project monitors. {pull}33723[33723]
-- Fix integration hashing to prevent reloading all when updated. {pull}34697[34697]
-- Fix release of job limit semaphore when context is cancelled. {pull}34697[34697]
-- Fix bug where states.duration_ms was incorrect type. {pull}33563[33563]
-- Fix handling of long UDP messages in UDP input. {issue}33836[33836] {pull}33837[33837]
-- Fix browser monitor summary reporting as up when monitor is down. {issue}33374[33374] {pull}33819[33819]
-- Fix beat capabilities on Docker image. {pull}33584[33584]
-- Fix serialization of state duration to avoid scientific notation. {pull}34280[34280]
-- Enable nodejs engine strict validation when bundling synthetics. {pull}34470[34470]
-with the ecs field name `container`. {pull}34403[34403]
-automatic splitting at root level, if root level element is an array. {pull}34155[34155]
-- Fix broken mapping for state.ends field. {pull}34891[34891]
-- Fix issue using projects in airgapped environments by disabling npm audit. {pull}34936[34936]
-- Fix broken state ID location naming. {pull}35336[35336]
-- Fix project monitor temp directories permission to include group access. {pull}35398[35398]
-- Fix output pipeline exit on run_once. {pull}35376[35376]
-- Fix formatting issue with socket trace timeout. {pull}35434[35434]
-- Update gval version. {pull}35636[35636]
-- Fix serialization of processors when running diagnostics. {pull}35698[35698]
-- Filter dev flags for ui monitors inside synthetics_args. {pull}35788[35788]
-- Fix temp dir running out of space with project monitors. {issue}35843[35843]
-- Fixing the grok expression outputs of log files {pull}35221[35221]
-- Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
-- Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
 
 *Metricbeat*
 
@@ -143,11 +83,9 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 *Packetbeat*
 
-- Fix handling of Npcap installation options from Fleet. {pull}35541[35541] {pull}35935[35935]
 
 *Winlogbeat*
 
-- Fix powershell details regexp to prevent excessive backtracking when processing command invocations. {pull}36178[36178]
 
 *Functionbeat*
 
@@ -160,7 +98,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 *Affecting all Beats*
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
-- Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
 
 *Auditbeat*
 
@@ -180,7 +117,6 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Add oracle authentication messages parsing {pull}35127[35127]
-- Add support for endpoint resolver in AWS config {pull}36208[36208]
 
 *Auditbeat*
 
@@ -248,6 +184,9 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 
 
 ==== Known Issues
+
+
+
 
 
 
