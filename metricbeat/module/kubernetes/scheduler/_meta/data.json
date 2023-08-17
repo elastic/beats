@@ -7,10 +7,10 @@
     },
     "kubernetes": {
         "scheduler": {
-            "name": "RequestHeaderAuthRequestController",
+            "name": "DynamicServingCertificateController",
             "workqueue": {
                 "adds": {
-                    "count": 0
+                    "count": 21
                 },
                 "depth": {
                     "count": 0

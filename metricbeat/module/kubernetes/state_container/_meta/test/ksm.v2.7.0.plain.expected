@@ -312,46 +312,6 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "f8e2e2fe9a308d4e81707c0a2daa53424a862e8889601ac7307a54e6aae03612",
-				"image": {
-					"name": "docker.io/library/busybox:1.28"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "hello-cronjob-27900585-6zngl"
-			}
-		},
-		"MetricSetFields": {
-			"id": "f8e2e2fe9a308d4e81707c0a2daa53424a862e8889601ac7307a54e6aae03612",
-			"name": "hello-cronjob",
-			"status": {
-				"phase": "terminated",
-				"ready": false,
-				"reason": "Completed",
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
 				"id": "6f8e923de52f2af9aa23e91b97bf5f45dc6c631aa950c0a3782f847634bbe60b",
 				"image": {
 					"name": "registry.k8s.io/coredns/coredns:v1.9.3"
@@ -387,6 +347,46 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "f8e2e2fe9a308d4e81707c0a2daa53424a862e8889601ac7307a54e6aae03612",
+				"image": {
+					"name": "docker.io/library/busybox:1.28"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "hello-cronjob-27900585-6zngl"
+			}
+		},
+		"MetricSetFields": {
+			"id": "f8e2e2fe9a308d4e81707c0a2daa53424a862e8889601ac7307a54e6aae03612",
+			"name": "hello-cronjob",
+			"status": {
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
 				"restarts": 0
 			}
 		},

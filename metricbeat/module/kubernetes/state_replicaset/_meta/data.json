@@ -8,13 +8,13 @@
     "kubernetes": {
         "namespace": "kube-system",
         "replicaset": {
-            "name": "kube-state-metrics-548546fc89",
+            "name": "coredns-787d4945fb",
             "replicas": {
-                "available": 1,
-                "desired": 1,
-                "labeled": 1,
+                "available": 2,
+                "desired": 2,
+                "labeled": 2,
                 "observed": 1,
-                "ready": 1
+                "ready": 2
             }
         }
     },
