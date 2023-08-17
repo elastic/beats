@@ -9,15 +9,18 @@ package integration
 import (
 	"context"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/core/search"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
@@ -75,13 +78,29 @@ setup.kibana:
   username: %s
   password: %s
 logging.level: debug
+
 queue.mem:
   events: 100
   flush.min_events: 0
+processors:
+- add_fields:
+    target: data_stream
+    fields:
+      type: logs
+      namespace: generic
+      dataset: generic
+- add_fields:
+    target: host
+    fields:
+      name: %s
+- add_fields:
+    target: agent
+    fields:
+      type: metricbeat
 `
 	// check that file can be ingested normally and found in elasticsearch
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
-	filebeat.WriteConfigFile(fmt.Sprintf(cfg, inputFilePath, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
+	filebeat.WriteConfigFile(fmt.Sprintf(cfg, inputFilePath, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword, uniqMsg))
 	filebeat.Start()
 	filebeat.WaitForLogs("Publish event: ", 10*time.Second)
 	filebeat.WaitForLogs("PublishEvents: ", 10*time.Second)
@@ -162,10 +181,18 @@ processors:
       type: logs
       namespace: generic
       dataset: generic
+- add_fields:
+    target: host
+    fields:
+      name: %s
+- add_fields:
+    target: agent
+    fields:
+      type: metricbeat
 `
 	// start filebeat with shipper output, make doc is ingested into elasticsearch
 	fb2shipper := integration.NewBeat(t, "filebeat", "../../filebeat.test")
-	fb2shipper.WriteConfigFile(fmt.Sprintf(fb2shipperCfg, inputFilePath, gRpcPath, kURL.Host, kUserInfo.Username(), kPassword))
+	fb2shipper.WriteConfigFile(fmt.Sprintf(fb2shipperCfg, inputFilePath, gRpcPath, kURL.Host, kUserInfo.Username(), kPassword, uniqMsg))
 	fb2shipper.Start()
 	fb2shipper.WaitForLogs("Publish event: ", 10*time.Second)
 	fb2shipper.WaitForLogs("events to protobuf", 10*time.Second)
@@ -185,6 +212,61 @@ processors:
 		require.NoError(t, err, "error doing search request: %s", err)
 		return res.Hits.Total.Value == 2
 	}, 30*time.Second, 250*time.Millisecond, "never found 2 documents")
-	// ToDo add comparison of docs to make sure they are the same
-	// for example right now input.type is being overwritten with shipper
+
+	res, err := es.Search().
+		Index(".ds-filebeat-*").
+		Request(&search.Request{
+			Query: &types.Query{
+				Match: map[string]types.MatchQuery{
+					"message": {
+						Query:    uniqMsg,
+						Operator: &operator.And,
+					},
+				},
+			},
+		}).Do(context.Background())
+	require.Equal(t, int64(2), res.Hits.Total.Value)
+	diff, err := diffDocs(res.Hits.Hits[0].Source_,
+		res.Hits.Hits[1].Source_)
+	require.NoError(t, err, "error diffing docs")
+	if len(diff) != 0 {
+		t.Fatalf("docs differ:\n:%s\n", diff)
+	}
+}
+
+func diffDocs(doc1 json.RawMessage, doc2 json.RawMessage) (string, error) {
+	fieldsToDrop := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"elastic_agent.id",
+	}
+	var d1 map[string]interface{}
+	var d2 map[string]interface{}
+
+	if err := json.Unmarshal(doc1, &d1); err != nil {
+		return "", err
+	}
+
+	if err := json.Unmarshal(doc2, &d2); err != nil {
+		return "", err
+	}
+	f1 := mapstr.M(d1).Flatten()
+	f2 := mapstr.M(d2).Flatten()
+
+	for _, key := range fieldsToDrop {
+		_ = f1.Delete(key)
+	}
+
+	for _, key := range fieldsToDrop {
+		_ = f2.Delete(key)
+	}
+
+	dmp := diffmatchpatch.New()
+	diffs := dmp.DiffMain(f1.StringToPrint(), f2.StringToPrint(), false)
+
+	if len(diffs) != 1 {
+		return dmp.DiffPrettyText(diffs), nil
+	}
+	return "", nil
 }

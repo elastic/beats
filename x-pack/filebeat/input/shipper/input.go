@@ -52,7 +52,6 @@ type InputManager struct {
 
 // NewInputManager creates a new shipper input manager
 func NewInputManager(log *logp.Logger) *InputManager {
-
 	log.Infof("creating new InputManager")
 	return &InputManager{
 		log: log.Named("shipper-beat"),
@@ -68,7 +67,6 @@ func (im *InputManager) Init(_ unison.Group, _ v2.Mode) error {
 // Create creates the input from a given config
 // in an attempt to speed things up, this will create the processors from the config before we have access to the pipeline to create the clients
 func (im *InputManager) Create(cfg *config.C) (v2.Input, error) {
-
 	config := Instance{}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error unpacking config: %w", err)
@@ -135,7 +133,7 @@ func (in *shipperInput) Test(ctx v2.TestContext) error {
 // Stop the shipper
 func (in *shipperInput) Stop() {
 	in.log.Infof("shipper shutting down")
-	//stop individual clients
+	// stop individual clients
 	for streamID, stream := range in.streams {
 		err := stream.client.Close()
 		if err != nil {
@@ -171,8 +169,11 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 			PublishMode:   beat.GuaranteedSend,
 			EventListener: acker.TrackingCounter(in.acker.Track),
 			Processing: beat.ProcessingConfig{
-				Processor: streamProc.processors,
+				Processor:   streamProc.processors,
+				DisableHost: true,
+				DisableType: true,
 			},
+
 			CloseRef: inputContext.Cancelation,
 		})
 		if err != nil {
@@ -184,7 +185,7 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 		in.streams[streamID] = newStreamData
 	}
 
-	//setup gRPC
+	// setup gRPC
 	err := in.setupgRPC(pipeline)
 	if err != nil {
 		return fmt.Errorf("error starting shipper gRPC server: %w", err)
@@ -264,7 +265,7 @@ func (in *shipperInput) setupgRPC(pipeline beat.Pipeline) error {
 }
 
 func (in *shipperInput) sendEvent(event *messages.Event) (uint64, error) {
-	//look for matching processor config
+	// look for matching processor config
 	stream, ok := in.streams[event.Source.StreamId]
 	if !ok {
 		return 0, fmt.Errorf("could not find data stream associated with ID '%s'", event.Source.StreamId)
