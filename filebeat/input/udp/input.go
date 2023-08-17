@@ -32,6 +32,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/filebeat/input/internal/procnet"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
@@ -188,54 +189,16 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 	out.bufferLen.Set(buflen)
 
 	if poll > 0 && runtime.GOOS == "linux" {
-		host, port, err := net.SplitHostPort(device)
+		addr, addr6, err := procnet.Addrs(device, log)
 		if err != nil {
-			log.Warnf("failed to get address for %s: could not split host and port:", err)
+			log.Warn(err)
 			return out
-		}
-		ip, err := net.LookupIP(host)
-		if err != nil {
-			log.Warnf("failed to get address for %s: %v", device, err)
-			return out
-		}
-		pn, err := strconv.ParseInt(port, 10, 16)
-		if err != nil {
-			log.Warnf("failed to get port for %s: %v", device, err)
-			return out
-		}
-		addr := make([]string, 0, len(ip))
-		addr6 := make([]string, 0, len(ip))
-		for _, p := range ip {
-			switch len(p) {
-			case net.IPv4len:
-				addr = append(addr, ipv4KernelAddr(p, int(pn)))
-			case net.IPv6len:
-				addr6 = append(addr6, ipv6KernelAddr(p, int(pn)))
-			default:
-				log.Warnf("unexpected addr length %d for %s", len(p), p)
-			}
 		}
 		out.done = make(chan struct{})
 		go out.poll(addr, addr6, poll, log)
 	}
 
 	return out
-}
-
-func ipv4KernelAddr(ip net.IP, port int) string {
-	return fmt.Sprintf("%08X:%04X", reverse(ip.To4()), port)
-}
-
-func ipv6KernelAddr(ip net.IP, port int) string {
-	return fmt.Sprintf("%032X:%04X", reverse(ip.To16()), port)
-}
-
-func reverse(b []byte) []byte {
-	c := make([]byte, len(b))
-	for i, e := range b {
-		c[len(b)-1-i] = e
-	}
-	return c
 }
 
 // log logs metric for the given packet.

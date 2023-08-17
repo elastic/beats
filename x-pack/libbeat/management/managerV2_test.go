@@ -8,9 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -21,6 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -347,6 +350,165 @@ func TestOutputError(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return stateReached
 	}, 10*time.Second, 100*time.Millisecond, "desired state, output failed, was not reached")
+}
+
+func TestErrorPerUnit(t *testing.T) {
+	// Uncomment the line below to see the debug logs for this test
+	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
+
+	errorMessages := map[string]string{
+		"input-unit1": "some error from input-unit1",
+		"input-unit2": "some error from input-unit2",
+	}
+	r := reload.NewRegistry()
+
+	output := &mockOutput{
+		ReloadFn: func(config *reload.ConfigWithMeta) error {
+			return nil
+		},
+	}
+	r.MustRegisterOutput(output)
+	inputs := &mockReloadable{
+		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
+			errs := multierror.Errors{}
+			for _, input := range configs {
+				errs = append(errs, cfgfile.UnitError{
+					UnitID: input.InputUnitID,
+					Err:    errors.New(errorMessages[input.InputUnitID]),
+				})
+			}
+			return errs.Err()
+		},
+	}
+	r.MustRegisterInput(inputs)
+
+	stateReached := atomic.Bool{}
+
+	outputUnit := proto.UnitExpected{
+		Id:             "output-unit",
+		Type:           proto.UnitType_OUTPUT,
+		State:          proto.State_HEALTHY,
+		ConfigStateIdx: 1,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "mock",
+			Name: "mock",
+			Source: integration.RequireNewStruct(t,
+				map[string]interface{}{
+					"Is":        "this",
+					"required?": "Yes!",
+				}),
+		},
+	}
+
+	inputUnit1 := proto.UnitExpected{
+		Id:             "input-unit1",
+		Type:           proto.UnitType_INPUT,
+		State:          proto.State_FAILED,
+		ConfigStateIdx: 1,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "input-unit-config-id",
+			Type: "filestream",
+			Name: "foo",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-id",
+					Source: integration.RequireNewStruct(t, map[string]interface{}{
+						"id": "input-unit1",
+					}),
+				},
+			},
+		},
+	}
+	inputUnit2 := proto.UnitExpected{
+		Id:             "input-unit2",
+		Type:           proto.UnitType_INPUT,
+		State:          proto.State_FAILED,
+		ConfigStateIdx: 1,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "input-unit-config-id",
+			Type: "filestream",
+			Name: "foo",
+			Streams: []*proto.Stream{
+				{
+					Id: "filestream-id",
+					Source: integration.RequireNewStruct(t, map[string]interface{}{
+						"id": "input-unit2",
+					}),
+				},
+			},
+		},
+	}
+
+	units := []*proto.UnitExpected{
+		&outputUnit,
+		&inputUnit1,
+		&inputUnit2,
+	}
+	desiredState := []*proto.UnitExpected{
+		&outputUnit,
+		&inputUnit1,
+		&inputUnit2,
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if DoesStateMatch(observed, desiredState, 0) {
+				// Ensures the error messages are correctly set
+				failed := false
+				for _, unit := range observed.Units {
+					if unit.Type != proto.UnitType_INPUT {
+						continue
+					}
+					if unit.Message != errorMessages[unit.Id] {
+						t.Errorf("expecting error message %q, got %q", errorMessages[unit.Id], unit.Message)
+						failed = true
+					}
+				}
+				if !failed {
+					stateReached.Store(true)
+				}
+			}
+			return &proto.CheckinExpected{
+				Units: units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	if err := server.Start(); err != nil {
+		t.Fatalf("could not start mock Elastic-Agent server: %s", err)
+	}
+	defer server.Stop()
+
+	client := client.NewV2(
+		fmt.Sprintf(":%d", server.Port),
+		"",
+		client.VersionInfo{},
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{
+			Enabled: true,
+		},
+		r,
+		client,
+	)
+	if err != nil {
+		t.Fatalf("could not instantiate ManagerV2: %s", err)
+	}
+
+	if err := m.Start(); err != nil {
+		t.Fatalf("could not start ManagerV2: %s", err)
+	}
+	defer m.Stop()
+
+	require.Eventually(t, func() bool {
+		return stateReached.Load()
+	}, 10*time.Second, 100*time.Millisecond, "desired state, was not reached")
 }
 
 type reloadable struct {
