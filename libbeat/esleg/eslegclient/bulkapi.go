@@ -81,14 +81,6 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 
-	if conn.BulkResponseFiltering {
-		filteredFields := "errors,items.*.error,items.*.status"
-		if len(params) == 0 {
-			params = map[string]string{"filter_path": filteredFields}
-		} else {
-			params["filter_path"] = filteredFields
-		}
-	}
 	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
 
 	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
