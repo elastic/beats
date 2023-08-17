@@ -95,15 +95,29 @@ func (s *scheduler) schedule(ctx context.Context) error {
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
 	for pager.More() {
-		_, err := pager.NextPage(ctx)
+		resp, err := pager.NextPage(ctx)
 		if err != nil {
 			return err
 		}
 
-		jobs, err := s.createJobs(pager)
-		if err != nil {
-			s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
-			return err
+		var jobs []*job
+		for _, v := range resp.Segment.BlobItems {
+
+			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
+			blobCreds := &blobCredentials{
+				serviceCreds:  s.credential,
+				blobName:      *v.Name,
+				containerName: s.src.ContainerName,
+			}
+
+			blobClient, err := fetchBlobClient(blobURL, blobCreds, s.log)
+			if err != nil {
+				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
+				return err
+			}
+
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
+			jobs = append(jobs, job)
 		}
 
 		// If previous checkpoint was saved then look up starting point for new jobs
@@ -131,37 +145,6 @@ func fetchJobID(workerId int, containerName string, blobName string) string {
 	jobID := fmt.Sprintf("%s-%s-worker-%d", containerName, blobName, workerId)
 
 	return jobID
-}
-
-func (s *scheduler) createJobs(pager *azruntime.Pager[azblob.ListBlobsFlatResponse]) ([]*job, error) {
-	var jobs []*job
-
-	//	for _, v := range pager.Segment.BlobItems {
-	for pager.More() {
-		p, err := pager.NextPage(context.Background())
-		if err != nil {
-			return nil, err
-		}
-		for _, v := range p.Segment.BlobItems {
-
-			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
-			blobCreds := &blobCredentials{
-				serviceCreds:  s.credential,
-				blobName:      *v.Name,
-				containerName: s.src.ContainerName,
-			}
-
-			blobClient, err := fetchBlobClient(blobURL, blobCreds, s.log)
-			if err != nil {
-				return nil, err
-			}
-
-			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
-			jobs = append(jobs, job)
-		}
-	}
-
-	return jobs, nil
 }
 
 // fetchBlobPager fetches the current blob page object given a batch size & a page marker.
