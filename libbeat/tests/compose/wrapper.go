@@ -38,6 +38,7 @@ import (
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -389,7 +390,10 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		}
 
 		if container.Running() && container.Old() {
-			_ = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
+			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
+			if err != nil {
+				logp.Err("container remove: %v", err)
+			}
 		}
 	}
 

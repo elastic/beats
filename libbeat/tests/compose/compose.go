@@ -104,8 +104,14 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		t.Log(err)
 
 		// Ignore errors here
-		_ = compose.Kill(service)
-		_ = compose.Remove(service, true)
+		err = compose.Kill(service)
+		if err != nil {
+			t.Logf("kill container error: %v", err)
+		}
+		err = compose.Remove(service, true)
+		if err != nil {
+			t.Logf("remove container error: %v", err)
+		}
 	}
 	if err != nil {
 		t.FailNow()
