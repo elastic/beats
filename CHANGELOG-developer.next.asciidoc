@@ -165,6 +165,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add AUTH (username) and SSL/TLS support for Redis module {pull}35240[35240]
 - Pin PyYAML version to 5.3.1 to avoid CI errors temporarily {pull}36091[36091]
 - Skip dependabot updates for github.com/elastic/mito. {pull}36158[36158]
+- Add device handling to Okta API package for entity analytics. {pull}35980[35980]
 
 ==== Deprecated
 
