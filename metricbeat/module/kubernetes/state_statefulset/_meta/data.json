@@ -8,16 +8,16 @@
     "kubernetes": {
         "namespace": "default",
         "statefulset": {
-            "created": 1673969356,
+            "created": 1691568526,
             "generation": {
                 "desired": 1,
                 "observed": 1
             },
             "name": "web",
             "replicas": {
-                "desired": 3,
+                "desired": 1,
                 "observed": 1,
-                "ready": 0
+                "ready": 1
             }
         }
     },
