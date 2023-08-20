@@ -100,7 +100,7 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 * [apm-beats-tester][]
   * `/beats-tester` will kick of a build to validate the generated packages.
 
-### PR Labels
+### PR Labels 
 
 It's possible to configure the build on a GitHub PR by labelling the PR with the below labels
 
