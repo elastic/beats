@@ -47,7 +47,8 @@ func CheckNoChanges() error {
 		}
 
 		return fmt.Errorf("some files are not up-to-date. "+
-			"Run 'mage update' then review and commit the changes. "+
+			"Usually running 'mage update' or 'mage addLicenseHeaders' "+
+			"fixes the issues. Fix the issues, review and commit the changes. "+
 			"Modified: %v", changes)
 	}
 	return nil
