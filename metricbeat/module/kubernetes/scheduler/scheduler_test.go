@@ -21,6 +21,7 @@
 package scheduler
 
 import (
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
@@ -29,25 +30,27 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
+var files = []string{
+	"./_meta/test/metrics.1.25",
+	"./_meta/test/metrics.1.26",
+	"./_meta/test/metrics.1.27",
+}
+
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "scheduler",
-		ptest.TestCases{
-			{
-				MetricsFile:  "./_meta/test/metrics.1.25",
-				ExpectedFile: "./_meta/test/metrics.1.25.expected",
-			},
-			{
-				MetricsFile:  "./_meta/test/metrics.1.26",
-				ExpectedFile: "./_meta/test/metrics.1.26.expected",
-			},
-			ptest.TestCase{
-				MetricsFile:  "./_meta/test/metrics.1.27",
-				ExpectedFile: "./_meta/test/metrics.1.27.expected",
-			},
-		},
-	)
+	var testCases ptest.TestCases
+	for _, file := range files {
+		testCases = append(testCases, ptest.TestCase{
+			MetricsFile:  file,
+			ExpectedFile: file + ".expected",
+		})
+	}
+	ptest.TestMetricSet(t, "kubernetes", "scheduler", testCases)
 }
 
 func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "kubernetes", "scheduler")
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestStateMetricsFamily(t, files, mapping)
 }
