@@ -327,17 +327,9 @@ func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 
 	rt.monitorByMethod(req.Method)
 
-	var (
-		body []byte
-		err  error
-	)
-
-	req.Body, body, err = copyBody(req.Body)
-	if err != nil {
-		rt.metrics.reqErrs.Add(1)
-	} else {
-		rt.metrics.reqsAccSize.Add(uint64(len(body)))
-		rt.metrics.reqsSize.Update(int64(len(body)))
+	if req.ContentLength >= 0 {
+		rt.metrics.reqsAccSize.Add(uint64(req.ContentLength))
+		rt.metrics.reqsSize.Update(req.ContentLength)
 	}
 
 	reqStart := time.Now()
@@ -355,12 +347,9 @@ func (rt *MetricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 
 	rt.monitorByStatusCode(resp.StatusCode)
 
-	resp.Body, body, err = copyBody(resp.Body)
-	if err != nil {
-		rt.metrics.respErrs.Add(1)
-	} else {
-		rt.metrics.respsAccSize.Add(uint64(len(body)))
-		rt.metrics.respsSize.Update(int64(len(body)))
+	if resp.ContentLength >= 0 {
+		rt.metrics.respsAccSize.Add(uint64(resp.ContentLength))
+		rt.metrics.respsSize.Update(resp.ContentLength)
 	}
 
 	return resp, err
