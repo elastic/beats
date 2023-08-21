@@ -32,8 +32,10 @@ import (
 )
 
 func TestDNSProcessorRun(t *testing.T) {
+	c := defaultConfig()
+	c.Type = typePTR
 	p := &processor{
-		Config:   defaultConfig,
+		Config:   c,
 		resolver: &stubResolver{},
 		log:      logp.NewLogger(logName),
 	}
@@ -94,7 +96,8 @@ func TestDNSProcessorRun(t *testing.T) {
 	})
 
 	t.Run("metadata target", func(t *testing.T) {
-		config := defaultConfig
+		config := defaultConfig()
+		config.Type = typePTR
 		config.reverseFlat = map[string]string{
 			"@metadata.ip": "@metadata.domain",
 		}
@@ -121,12 +124,11 @@ func TestDNSProcessorRun(t *testing.T) {
 		assert.Equal(t, expMeta, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
-
 }
 
 func TestDNSProcessorTagOnFailure(t *testing.T) {
 	p := &processor{
-		Config:   defaultConfig,
+		Config:   defaultConfig(),
 		resolver: &stubResolver{},
 		log:      logp.NewLogger(logName),
 	}
@@ -157,9 +159,9 @@ func TestDNSProcessorRunInParallel(t *testing.T) {
 	// This is a simple smoke test to make sure that there are no concurrency
 	// issues. It is most effective when run with the race detector.
 
-	conf := defaultConfig
+	conf := defaultConfig()
 	reg := monitoring.NewRegistry()
-	cache, err := NewPTRLookupCache(reg, conf.CacheConfig, &stubResolver{})
+	cache, err := NewLookupCache(reg, conf.CacheConfig, &stubResolver{})
 	if err != nil {
 		t.Fatal(err)
 	}

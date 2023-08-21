@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-var _ PTRResolver = (*MiekgResolver)(nil)
+var _ resolver = (*MiekgResolver)(nil)
 
 func TestMiekgResolverLookupPTR(t *testing.T) {
 	stop, addr, err := ServeDNS(FakeDNSHandler)
@@ -45,15 +45,15 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 	}
 
 	// Success
-	ptr, err := res.LookupPTR("8.8.8.8")
+	ptr, err := res.Lookup("8.8.8.8", typePTR)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Host)
+	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Data[0])
 	assert.EqualValues(t, 19273, ptr.TTL)
 
 	// NXDOMAIN
-	_, err = res.LookupPTR("1.1.1.1")
+	_, err = res.Lookup("1.1.1.1", typePTR)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "NXDOMAIN")
 	}
@@ -91,21 +91,21 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// we use a self signed certificate for localhost
+	// we use a self-signed certificate for localhost
 	// we have to pass InsecureSSL to the DNS resolver
 	res.client.TLSConfig = &tls.Config{
 		InsecureSkipVerify: true,
 	}
 	// Success
-	ptr, err := res.LookupPTR("8.8.8.8")
+	ptr, err := res.Lookup("8.8.8.8", typePTR)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Host)
+	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Data[0])
 	assert.EqualValues(t, 19273, ptr.TTL)
 
 	// NXDOMAIN
-	_, err = res.LookupPTR("1.1.1.1")
+	_, err = res.Lookup("1.1.1.1", typePTR)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "NXDOMAIN")
 	}

@@ -23,6 +23,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miekg/dns"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -31,7 +33,7 @@ type Config struct {
 	CacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
 	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
-	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
+	Type         queryType     `config:"type" validate:"required"` // Reverse is the only supported type currently.
 	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
 	Fields       mapstr.M      `config:"fields"`                   // Mapping of source fields to target fields.
@@ -75,6 +77,41 @@ func (fa *FieldAction) Unpack(v string) error {
 	return nil
 }
 
+// queryType represents a DNS query type.
+type queryType uint16
+
+const (
+	typePTR  = queryType(dns.TypePTR)
+	typeA    = queryType(dns.TypeA)
+	typeAAAA = queryType(dns.TypeAAAA)
+	typeTXT  = queryType(dns.TypeTXT)
+)
+
+func (qt queryType) String() string {
+	if name := dns.TypeToString[uint16(qt)]; name != "" {
+		return name
+	}
+	return strconv.FormatUint(uint64(qt), 10)
+}
+
+// Unpack unpacks a string to a queryType.
+func (qt *queryType) Unpack(v string) error {
+	switch strings.ToLower(v) {
+	case "a":
+		*qt = typeA
+	case "aaaa":
+		*qt = typeAAAA
+	case "reverse", "ptr":
+		*qt = typePTR
+	case "txt":
+		*qt = typeTXT
+	default:
+		return fmt.Errorf("invalid dns lookup type '%v' specified in "+
+			"config (valid values are: A, AAAA, PTR, reverse, TXT)", v)
+	}
+	return nil
+}
+
 // CacheConfig defines the success and failure caching parameters.
 type CacheConfig struct {
 	SuccessCache CacheSettings `config:"success_cache"`
@@ -100,15 +137,6 @@ type CacheSettings struct {
 
 // Validate validates the data contained in the config.
 func (c *Config) Validate() error {
-	// Validate lookup type.
-	c.Type = strings.ToLower(c.Type)
-	switch c.Type {
-	case "reverse":
-	default:
-		return fmt.Errorf("invalid dns lookup type '%v' specified in "+
-			"config (valid values are: reverse)", c.Type)
-	}
-
 	// Flatten the mapping of source fields to target fields.
 	c.reverseFlat = map[string]string{}
 	for k, v := range c.Fields.Flatten() {
@@ -157,20 +185,22 @@ func (c *CacheConfig) Validate() error {
 	return nil
 }
 
-var defaultConfig = Config{
-	CacheConfig: CacheConfig{
-		SuccessCache: CacheSettings{
-			MinTTL:          time.Minute,
-			InitialCapacity: 1000,
-			MaxCapacity:     10000,
+func defaultConfig() Config {
+	return Config{
+		CacheConfig: CacheConfig{
+			SuccessCache: CacheSettings{
+				MinTTL:          time.Minute,
+				InitialCapacity: 1000,
+				MaxCapacity:     10000,
+			},
+			FailureCache: CacheSettings{
+				MinTTL:          time.Minute,
+				TTL:             time.Minute,
+				InitialCapacity: 1000,
+				MaxCapacity:     10000,
+			},
 		},
-		FailureCache: CacheSettings{
-			MinTTL:          time.Minute,
-			TTL:             time.Minute,
-			InitialCapacity: 1000,
-			MaxCapacity:     10000,
-		},
-	},
-	Transport: "udp",
-	Timeout:   500 * time.Millisecond,
+		Transport: "udp",
+		Timeout:   500 * time.Millisecond,
+	}
 }

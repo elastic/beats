@@ -45,13 +45,13 @@ func init() {
 
 type processor struct {
 	Config
-	resolver PTRResolver
+	resolver resolver
 	log      *logp.Logger
 }
 
 // New constructs a new DNS processor.
 func New(cfg *config.C) (beat.Processor, error) {
-	c := defaultConfig
+	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the dns configuration: %w", err)
 	}
@@ -69,7 +69,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 		return nil, err
 	}
 
-	cache, err := NewPTRLookupCache(metrics.NewRegistry("cache"), c.CacheConfig, resolver)
+	cache, err := NewLookupCache(metrics.NewRegistry("cache"), c.CacheConfig, resolver)
 	if err != nil {
 		return nil, err
 	}
@@ -95,17 +95,21 @@ func (p *processor) processField(source, target string, action FieldAction, even
 		return nil
 	}
 
-	maybeIP, ok := v.(string)
+	strVal, ok := v.(string)
 	if !ok {
 		return nil
 	}
 
-	ptrRecord, err := p.resolver.LookupPTR(maybeIP)
+	result, err := p.resolver.Lookup(strVal, p.Type)
 	if err != nil {
-		return fmt.Errorf("reverse lookup of %v value '%v' failed: %w", source, maybeIP, err)
+		return fmt.Errorf("dns lookup (%v) of %v value '%v' failed: %w", p.Type, source, strVal, err)
 	}
 
-	return setFieldValue(action, event, target, ptrRecord.Host)
+	// PTR lookups return a scalar. All other lookup types return a string slice.
+	if p.Type == typePTR {
+		return setFieldValue(action, event, target, result.Data[0])
+	}
+	return setFieldSliceValue(action, event, target, result.Data)
 }
 
 func setFieldValue(action FieldAction, event *beat.Event, key string, value string) error {
@@ -129,7 +133,32 @@ func setFieldValue(action FieldAction, event *beat.Event, key string, value stri
 		}
 		return err
 	default:
-		panic(fmt.Errorf("Unexpected dns field action value encountered: %v", action))
+		panic(fmt.Errorf("unexpected dns field action value encountered: %v", action))
+	}
+}
+
+func setFieldSliceValue(action FieldAction, event *beat.Event, key string, value []string) error {
+	switch action {
+	case ActionReplace:
+		_, err := event.PutValue(key, value)
+		return err
+	case ActionAppend:
+		old, err := event.PutValue(key, value)
+		if err != nil {
+			return err
+		}
+
+		if old != nil {
+			switch v := old.(type) {
+			case string:
+				_, err = event.PutValue(key, append([]string{v}, value...))
+			case []string:
+				_, err = event.PutValue(key, append(v, value...))
+			}
+		}
+		return err
+	default:
+		panic(fmt.Errorf("unexpected dns field action value encountered: %v", action))
 	}
 }
 
