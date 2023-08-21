@@ -804,14 +804,13 @@ func TestClientWithAPIKey(t *testing.T) {
 }
 
 func TestPublishEventsWithBulkFiltering(t *testing.T) {
-	makePublishTestClient := func(t *testing.T, url string, configParams map[string]string, bulkFiltering bool) *Client {
+	makePublishTestClient := func(t *testing.T, url string, configParams map[string]string) *Client {
 		client, err := NewClient(
 			ClientSettings{
 				Observer: outputs.NewNilObserver(),
 				ConnectionSettings: eslegclient.ConnectionSettings{
-					URL:                   url,
-					Parameters:            configParams,
-					BulkResponseFiltering: bulkFiltering,
+					URL:        url,
+					Parameters: configParams,
 				},
 				Index: testIndexSelector{},
 			},
@@ -826,7 +825,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 
 	event1 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 
-	t.Run("Single event with bulk filtering", func(t *testing.T) {
+	t.Run("Single event with response filtering", func(t *testing.T) {
 		var expectedFilteringParams = map[string]string{
 			"filter_path": "errors,items.*.error,items.*.status",
 		}
@@ -845,7 +844,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 			}
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL, nil, true)
+		client := makePublishTestClient(t, esMock.URL, nil)
 
 		// Try publishing a batch that can be split
 		events := []publisher.Event{event1}
@@ -854,7 +853,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		require.Equal(t, len(recParams), len(expectedFilteringParams))
 		require.Nil(t, evt)
 	})
-	t.Run("Single event with bulk filtering and preconfigured client params", func(t *testing.T) {
+	t.Run("Single event with response filtering and preconfigured client params", func(t *testing.T) {
 		var configParams = map[string]string{
 			"hardcoded": "yes",
 		}
@@ -876,7 +875,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 			}
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL, configParams, true)
+		client := makePublishTestClient(t, esMock.URL, configParams)
 
 		// Try publishing a batch that can be split
 		events := []publisher.Event{event1}
@@ -885,7 +884,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		require.Equal(t, len(recParams), len(expectedFilteringParams)+len(configParams))
 		require.Nil(t, evt)
 	})
-	t.Run("Single event without bulk filtering", func(t *testing.T) {
+	t.Run("Single event without response filtering", func(t *testing.T) {
 		var recParams url.Values
 
 		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -918,12 +917,12 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL, nil, false)
+		client := makePublishTestClient(t, esMock.URL, nil)
 
 		// Try publishing a batch that can be split
 		events := []publisher.Event{event1}
 		_, err := client.publishEvents(ctx, events)
 		require.NoError(t, err)
-		require.Equal(t, len(recParams), 0)
+		require.Equal(t, len(recParams), 1)
 	})
 }

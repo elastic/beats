@@ -41,22 +41,19 @@ type config struct {
 	EscapeHTML       bool `config:"escape_html"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
-
-	BulkResponseFiltering bool `config:"bulk_response_filtering"`
 }
 
 func defaultConfig() config {
 	return config{
-		Protocol:              "",
-		Path:                  "",
-		Params:                nil,
-		Username:              "",
-		Password:              "",
-		APIKey:                "",
-		CompressionLevel:      0,
-		EscapeHTML:            false,
-		Transport:             httpcommon.DefaultHTTPTransportSettings(),
-		BulkResponseFiltering: true,
+		Protocol:         "",
+		Path:             "",
+		Params:           nil,
+		Username:         "",
+		Password:         "",
+		APIKey:           "",
+		CompressionLevel: 0,
+		EscapeHTML:       false,
+		Transport:        httpcommon.DefaultHTTPTransportSettings(),
 	}
 }
 

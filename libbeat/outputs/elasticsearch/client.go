@@ -90,19 +90,18 @@ func NewClient(
 	}
 
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:                   s.URL,
-		Beatname:              s.Beatname,
-		Username:              s.Username,
-		Password:              s.Password,
-		APIKey:                s.APIKey,
-		Headers:               s.Headers,
-		Kerberos:              s.Kerberos,
-		Observer:              s.Observer,
-		Parameters:            s.Parameters,
-		CompressionLevel:      s.CompressionLevel,
-		EscapeHTML:            s.EscapeHTML,
-		Transport:             s.Transport,
-		BulkResponseFiltering: s.BulkResponseFiltering,
+		URL:              s.URL,
+		Beatname:         s.Beatname,
+		Username:         s.Username,
+		Password:         s.Password,
+		APIKey:           s.APIKey,
+		Headers:          s.Headers,
+		Kerberos:         s.Kerberos,
+		Observer:         s.Observer,
+		Parameters:       s.Parameters,
+		CompressionLevel: s.CompressionLevel,
+		EscapeHTML:       s.EscapeHTML,
+		Transport:        s.Transport,
 	})
 	if err != nil {
 		return nil, err
@@ -153,20 +152,19 @@ func (client *Client) Clone() *Client {
 	// most likely containing the ingest node pipeline and default callback trying to
 	// create install a template, we don't want these to be included in the clone.
 	connection := eslegclient.ConnectionSettings{
-		URL:                   client.conn.URL,
-		Beatname:              client.conn.Beatname,
-		Kerberos:              client.conn.Kerberos,
-		Username:              client.conn.Username,
-		Password:              client.conn.Password,
-		APIKey:                client.conn.APIKey,
-		Parameters:            nil, // XXX: do not pass params?
-		Headers:               client.conn.Headers,
-		CompressionLevel:      client.conn.CompressionLevel,
-		OnConnectCallback:     nil,
-		Observer:              nil,
-		EscapeHTML:            false,
-		Transport:             client.conn.Transport,
-		BulkResponseFiltering: client.conn.BulkResponseFiltering,
+		URL:               client.conn.URL,
+		Beatname:          client.conn.Beatname,
+		Kerberos:          client.conn.Kerberos,
+		Username:          client.conn.Username,
+		Password:          client.conn.Password,
+		APIKey:            client.conn.APIKey,
+		Parameters:        nil, // XXX: do not pass params?
+		Headers:           client.conn.Headers,
+		CompressionLevel:  client.conn.CompressionLevel,
+		OnConnectCallback: nil,
+		Observer:          nil,
+		EscapeHTML:        false,
+		Transport:         client.conn.Transport,
 	}
 
 	// Without the following nil check on proxyURL, a nil Proxy field will try
@@ -247,10 +245,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		return nil, nil
 	}
 
-	params := map[string]string{}
-	if client.conn.BulkResponseFiltering {
-		params = map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
-	}
+	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
 	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
 
 	if sendErr != nil {

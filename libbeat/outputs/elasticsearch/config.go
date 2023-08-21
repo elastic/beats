@@ -45,8 +45,6 @@ type elasticsearchConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
-
-	BulkResponseFiltering bool `config:"bulk_response_filtering"`
 }
 
 type Backoff struct {
@@ -75,8 +73,7 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Transport:             httpcommon.DefaultHTTPTransportSettings(),
-		BulkResponseFiltering: true,
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	}
 )
 
