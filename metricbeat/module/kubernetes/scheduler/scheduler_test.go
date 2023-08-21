@@ -22,12 +22,10 @@ package scheduler
 
 import (
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
-	"testing"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
-
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"testing"
 )
 
 var files = []string{
