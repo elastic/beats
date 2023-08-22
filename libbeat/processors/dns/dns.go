@@ -112,7 +112,7 @@ func (p *processor) processField(source, target string, action FieldAction, even
 	return setFieldSliceValue(action, event, target, result.Data)
 }
 
-func setFieldValue(action FieldAction, event *beat.Event, key string, value string) error {
+func setFieldValue(action FieldAction, event *beat.Event, key, value string) error {
 	switch action {
 	case ActionReplace:
 		_, err := event.PutValue(key, value)

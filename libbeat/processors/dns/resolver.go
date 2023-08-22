@@ -19,7 +19,6 @@ package dns
 
 import (
 	"errors"
-	"golang.org/x/exp/constraints"
 	"math"
 	"net"
 	"strconv"

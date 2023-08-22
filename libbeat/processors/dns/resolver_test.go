@@ -70,7 +70,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 }
 
 func TestMiekgResolverLookupPTRTLS(t *testing.T) {
-	//Build Cert
+	// Build Cert
 	cert, err := tls.X509KeyPair(CertPEMBlock, KeyPEMBlock)
 	if err != nil {
 		t.Fatalf("unable to build certificate: %v", err)
