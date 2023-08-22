@@ -243,6 +243,8 @@ func (res *MiekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 		failure:         monitoring.NewInt(reg, "failure"),
 		requestDuration: metrics.NewUniformSample(1028),
 	}
+
+	//nolint:errcheck // Register should never fail because this is a new empty registry.
 	adapter.NewGoMetrics(reg, "request_duration", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(stats.requestDuration))
 	res.nsStats[ns] = stats
