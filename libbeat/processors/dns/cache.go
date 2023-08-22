@@ -132,10 +132,10 @@ type cachedError struct {
 func (ce *cachedError) Error() string { return ce.err.Error() + " (from failure cache)" }
 func (ce *cachedError) Cause() error  { return ce.err }
 
-// LookupCache is a cache for storing and retrieving the results of
+// lookupCache is a cache for storing and retrieving the results of
 // DNS queries. It caches the results of queries regardless of their
 // outcome (success or failure).
-type LookupCache struct {
+type lookupCache struct {
 	success  *successCache
 	failure  *failureCache
 	resolver resolver
@@ -147,13 +147,13 @@ type cacheStats struct {
 	Miss *monitoring.Int
 }
 
-// NewLookupCache returns a new cache.
-func NewLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver resolver) (*LookupCache, error) {
+// newLookupCache returns a new cache.
+func newLookupCache(reg *monitoring.Registry, conf cacheConfig, resolver resolver) (*lookupCache, error) {
 	if err := conf.Validate(); err != nil {
 		return nil, err
 	}
 
-	c := &LookupCache{
+	c := &lookupCache{
 		success: &successCache{
 			data:          make(map[string]successRecord, conf.SuccessCache.InitialCapacity),
 			maxSize:       conf.SuccessCache.MaxCapacity,
@@ -177,7 +177,7 @@ func NewLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver resolve
 // Lookup performs a lookup on the given query string. A cached result
 // will be returned if it is contained in the cache, otherwise a lookup is
 // performed.
-func (c LookupCache) Lookup(q string, qt queryType) (*result, error) {
+func (c lookupCache) Lookup(q string, qt queryType) (*result, error) {
 	now := time.Now()
 
 	r := c.success.get(now, q)

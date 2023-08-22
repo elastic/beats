@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-var _ resolver = (*MiekgResolver)(nil)
+var _ resolver = (*miekgResolver)(nil)
 
 func TestMiekgResolverLookupPTR(t *testing.T) {
 	stop, addr, err := serveDNS(fakeDNSHandler)
@@ -43,7 +43,7 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 	}()
 
 	reg := monitoring.NewRegistry()
-	res, err := NewMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 
 	reg := monitoring.NewRegistry()
 
-	res, err := NewMiekgResolver(reg.NewRegistry(logName), 0, "tls", addr)
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", addr)
 	if err != nil {
 		t.Fatal(err)
 	}

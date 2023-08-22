@@ -46,9 +46,9 @@ type resolver interface {
 	Lookup(q string, qt queryType) (*result, error)
 }
 
-// MiekgResolver is a resolver that is implemented using github.com/miekg/dns
+// miekgResolver is a resolver that is implemented using github.com/miekg/dns
 // to send requests to DNS servers. It does not use the Go resolver.
-type MiekgResolver struct {
+type miekgResolver struct {
 	client  *dns.Client
 	servers []string
 
@@ -63,9 +63,9 @@ type nameserverStats struct {
 	requestDuration metrics.Sample  // Histogram of response times.
 }
 
-// NewMiekgResolver returns a new MiekgResolver. It returns an error if no
+// newMiekgResolver returns a new miekgResolver. It returns an error if no
 // nameserver are given and none can be read from /etc/resolv.conf.
-func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, servers ...string) (*MiekgResolver, error) {
+func newMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport string, servers ...string) (*miekgResolver, error) {
 	// Use /etc/resolv.conf if no nameservers are given. (Won't work for Windows).
 	if len(servers) == 0 {
 		config, err := dns.ClientConfigFromFile(etcResolvConf)
@@ -106,7 +106,7 @@ func NewMiekgResolver(reg *monitoring.Registry, timeout time.Duration, transport
 		clientTransferType = "udp"
 	}
 
-	return &MiekgResolver{
+	return &miekgResolver{
 		client: &dns.Client{
 			Net:     clientTransferType,
 			Timeout: timeout,
@@ -131,7 +131,7 @@ func (e *dnsError) Error() string {
 }
 
 // Lookup performs a DNS query.
-func (res *MiekgResolver) Lookup(q string, qt queryType) (*result, error) {
+func (res *miekgResolver) Lookup(q string, qt queryType) (*result, error) {
 	if len(res.servers) == 0 {
 		return nil, errors.New("no dns servers configured")
 	}
@@ -215,7 +215,7 @@ func (res *MiekgResolver) Lookup(q string, qt queryType) (*result, error) {
 	panic("dns resolver Lookup() should have returned a response.")
 }
 
-func (res *MiekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats {
+func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats {
 	// Trim port.
 	ns = ns[:strings.LastIndex(ns, ":")]
 

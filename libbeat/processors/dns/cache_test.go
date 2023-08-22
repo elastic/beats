@@ -42,9 +42,9 @@ func (r *stubResolver) Lookup(ip string, _ queryType) (*result, error) {
 }
 
 func TestCache(t *testing.T) {
-	c, err := NewLookupCache(
+	c, err := newLookupCache(
 		monitoring.NewRegistry(),
-		defaultConfig().CacheConfig,
+		defaultConfig().cacheConfig,
 		&stubResolver{})
 	if err != nil {
 		t.Fatal(err)
@@ -101,7 +101,7 @@ func TestCache(t *testing.T) {
 		assert.EqualValues(t, 3, c.stats.Miss.Get()) // Cache miss.
 	}
 
-	minTTL := defaultConfig().CacheConfig.SuccessCache.MinTTL
+	minTTL := defaultConfig().cacheConfig.SuccessCache.MinTTL
 	// Initial success returned TTL=0 with MinTTL.
 	r, err = c.Lookup(gatewayIP+"2", typePTR)
 	if assert.NoError(t, err) {
