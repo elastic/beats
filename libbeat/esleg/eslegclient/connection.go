@@ -48,7 +48,8 @@ type esHTTPClient interface {
 	CloseIdleConnections()
 }
 
-// Connection manages the connection for a given client.
+// Connection manages the connection for a given client. Each connection is not-thread-safe and should not be shared
+// between 2 different goroutines.
 type Connection struct {
 	ConnectionSettings
 
@@ -175,6 +176,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // configuration. It accepts the same configuration parameters as the Elasticsearch
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
+// The returned Connection is a non-thread-safe connection.
 func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -222,6 +224,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	return clients, nil
 }
 
+// NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
 func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	clients, err := NewClients(cfg, beatname)
 	if err != nil {
@@ -420,6 +423,8 @@ func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]by
 	return body, nil
 }
 
+// execHTTPRequest executes the http request and consumes the response in a non-thread-safe way.
+// The return is a triple of status code, response as byte array, error if the request produced any error.
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 
