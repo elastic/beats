@@ -252,7 +252,7 @@ func (res *miekgResolver) getOrCreateNameserverStats(ns string) *nameserverStats
 	return stats
 }
 
-func min[T uint32](a, b T) T {
+func min(a, b uint32) uint32 {
 	if a < b {
 		return a
 	}
