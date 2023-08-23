@@ -157,7 +157,7 @@ func (res *miekgResolver) Lookup(q string, qt queryType) (*result, error) {
 
 		r, rtt, err := res.client.Exchange(m, server)
 		if err != nil {
-			// Try next server if any. Otherwise, return retErr.
+			// Try next server if any. Otherwise, return nameserverErr.
 			nameserverErr = err
 			stats.failure.Inc()
 			continue

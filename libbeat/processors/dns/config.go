@@ -33,7 +33,7 @@ type config struct {
 	cacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
 	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
-	Type         queryType     `config:"type" validate:"required"` // Reverse is the only supported type currently.
+	Type         queryType     `config:"type" validate:"required"` // One of A, AAAA, TXT or PTR (or reverse).
 	Action       fieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
 	Fields       mapstr.M      `config:"fields"`                   // Mapping of source fields to target fields.
@@ -106,7 +106,7 @@ func (qt *queryType) Unpack(v string) error {
 	case "txt":
 		*qt = typeTXT
 	default:
-		return fmt.Errorf("invalid dns lookup type '%v' specified in "+
+		return fmt.Errorf("invalid dns lookup type '%s' specified in "+
 			"config (valid values are: A, AAAA, PTR, reverse, TXT)", v)
 	}
 	return nil

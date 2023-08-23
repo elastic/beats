@@ -102,7 +102,7 @@ func (p *processor) processField(source, target string, action fieldAction, even
 
 	result, err := p.resolver.Lookup(strVal, p.Type)
 	if err != nil {
-		return fmt.Errorf("dns lookup (%v) of %v value '%v' failed: %w", p.Type, source, strVal, err)
+		return fmt.Errorf("dns lookup (%s) of %s value '%s' failed: %w", p.Type, source, strVal, err)
 	}
 
 	// PTR lookups return a scalar. All other lookup types return a string slice.
@@ -133,7 +133,7 @@ func setFieldValue(action fieldAction, event *beat.Event, key, value string) err
 		}
 		return err
 	default:
-		panic(fmt.Errorf("unexpected dns field action value encountered: %v", action))
+		panic(fmt.Errorf("unexpected dns field action value encountered: %s", action))
 	}
 }
 
@@ -158,7 +158,7 @@ func setFieldSliceValue(action fieldAction, event *beat.Event, key string, value
 		}
 		return err
 	default:
-		panic(fmt.Errorf("unexpected dns field action value encountered: %v", action))
+		panic(fmt.Errorf("unexpected dns field action value encountered: %s", action))
 	}
 }
 
