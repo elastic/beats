@@ -18,11 +18,11 @@
 package eslegclient
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -48,7 +48,8 @@ type esHTTPClient interface {
 	CloseIdleConnections()
 }
 
-// Connection manages the connection for a given client.
+// Connection manages the connection for a given client. Each connection is not-thread-safe and should not be shared
+// between 2 different goroutines.
 type Connection struct {
 	ConnectionSettings
 
@@ -58,6 +59,7 @@ type Connection struct {
 	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
 	version          libversion.V
 	log              *logp.Logger
+	responseBuffer   *bytes.Buffer
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -152,7 +154,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		if err != nil {
 			return nil, err
 		}
-		logp.Info("kerberos client created")
+		logger.Info("kerberos client created")
 	}
 
 	conn := Connection{
@@ -160,6 +162,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
+		responseBuffer:     bytes.NewBuffer(nil),
 	}
 
 	if s.APIKey != "" {
@@ -173,6 +176,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // configuration. It accepts the same configuration parameters as the Elasticsearch
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
+// The returned Connection is a non-thread-safe connection.
 func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -220,6 +224,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	return clients, nil
 }
 
+// NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
 func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	clients, err := NewClients(cfg, beatname)
 	if err != nil {
@@ -418,6 +423,8 @@ func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]by
 	return body, nil
 }
 
+// execHTTPRequest executes the http request and consumes the response in a non-thread-safe way.
+// The return is a triple of status code, response as byte array, error if the request produced any error.
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 
@@ -452,17 +459,18 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body, conn.log)
 
 	status := resp.StatusCode
-	obj, err := ioutil.ReadAll(resp.Body)
+	conn.responseBuffer.Reset()
+	_, err = io.Copy(conn.responseBuffer, resp.Body)
 	if err != nil {
 		return status, nil, err
 	}
 
 	if status >= 300 {
 		// add the response body with the error returned by Elasticsearch
-		err = fmt.Errorf("%v: %s", resp.Status, obj)
+		err = fmt.Errorf("%v: %s", resp.Status, conn.responseBuffer.Bytes())
 	}
 
-	return status, obj, err
+	return status, conn.responseBuffer.Bytes(), err
 }
 
 func closing(c io.Closer, logger *logp.Logger) {
