@@ -37,7 +37,7 @@ var mapping = &p.MetricsMapping{
 	},
 
 	Labels: map[string]p.LabelMap{
-		"namespace": p.Label("name"),
+		"namespace": p.KeyLabel("name"),
 	},
 }
 

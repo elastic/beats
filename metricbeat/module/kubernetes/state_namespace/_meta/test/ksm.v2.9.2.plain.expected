@@ -6,7 +6,103 @@
 			"created": {
 				"sec": 1691566342
 			},
+			"name": "local-path-storage",
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"created": {
+				"sec": 1691566338
+			},
 			"name": "default",
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"created": {
+				"sec": 1691566337
+			},
+			"name": "kube-public",
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"created": {
+				"sec": 1691566337
+			},
+			"name": "kube-node-lease",
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"created": {
+				"sec": 1691566337
+			},
+			"name": "kube-system",
 			"status": {
 				"active": true,
 				"terminating": false

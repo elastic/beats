@@ -8,9 +8,9 @@
     "kubernetes": {
         "state_namespace": {
             "created": {
-                "sec": 1691566342
+                "sec": 1691566337
             },
-            "name": "local-path-storage",
+            "name": "kube-node-lease",
             "status": {
                 "active": true,
                 "terminating": false
