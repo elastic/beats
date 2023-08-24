@@ -232,7 +232,6 @@ func NewResourceMetadataEnricher(
 
 			case *kubernetes.Deployment:
 				m[id] = metaGen.Generate(DeploymentResource, r)
-				fmt.Println("\nAFTER deployment: ", m[id], "\n")
 			case *kubernetes.Job:
 				m[id] = metaGen.Generate(JobResource, r)
 			case *kubernetes.CronJob:
@@ -243,7 +242,6 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate(StatefulSetResource, r)
 			case *kubernetes.Namespace:
 				m[id] = metaGen.Generate(NamespaceResource, r)
-				fmt.Println("\nAFTER namespace: ", m[id], "\n")
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate(ReplicaSetResource, r)
 			case *kubernetes.DaemonSet:
