@@ -121,7 +121,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
 
 			// FinalAttempt is true if no retries will occur
-			js.FinalAttempt = js.Status == lastStatus || js.Attempt >= js.MaxAttempts
+			js.FinalAttempt = js.Status != monitorstate.StatusDown || js.Attempt >= js.MaxAttempts
 
 			ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
 
