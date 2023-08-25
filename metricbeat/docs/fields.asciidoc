@@ -46042,16 +46042,6 @@ Kubernetes namespace metrics.
 
 
 
-*`kubernetes.state_namespace.name`*::
-+
---
-The name of the namespace resource.
-
-
-type: keyword
-
---
-
 *`kubernetes.state_namespace.created.sec`*::
 +
 --

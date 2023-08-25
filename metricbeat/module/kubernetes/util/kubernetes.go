@@ -241,7 +241,7 @@ func NewResourceMetadataEnricher(
 			case *kubernetes.StatefulSet:
 				m[id] = metaGen.Generate(StatefulSetResource, r)
 			case *kubernetes.Namespace:
-				m[id] = namespaceMeta.Generate(r)
+				m[id] = metaGen.Generate(NamespaceResource, r)
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate(ReplicaSetResource, r)
 			case *kubernetes.DaemonSet:

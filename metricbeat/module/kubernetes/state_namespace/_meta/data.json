@@ -6,11 +6,11 @@
         "module": "kubernetes"
     },
     "kubernetes": {
+        "namespace": "default",
         "state_namespace": {
             "created": {
-                "sec": 1691566337
+                "sec": 1691566338
             },
-            "name": "kube-node-lease",
             "status": {
                 "active": true,
                 "terminating": false

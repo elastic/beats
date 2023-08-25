@@ -20,6 +20,7 @@ package state_namespace
 import (
 	"github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -37,7 +38,7 @@ var mapping = &p.MetricsMapping{
 	},
 
 	Labels: map[string]p.LabelMap{
-		"namespace": p.KeyLabel("name"),
+		"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 	},
 }
 
