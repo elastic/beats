@@ -20,7 +20,6 @@ package jobs
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -29,67 +28,6 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
-
-type TestSWrapper struct {
-	rootCounter int
-	contCounter int
-}
-
-func (tsw *TestSWrapper) Wrap(j Job) Job {
-	return func(event *beat.Event) ([]Job, error) {
-		tsw.contCounter++
-		eventext.MergeEventFields(event, mapstr.M{"cont_counter": tsw.contCounter, "root_counter": tsw.rootCounter})
-		return j(event)
-	}
-}
-
-func TestStatefulWrapper(t *testing.T) {
-	innerj1Fields := mapstr.M{
-		"innerjob":   "innervalue",
-		"innercount": 1,
-	}
-	innerj2Fields := mapstr.M{
-		"innerjob":   "innervalue",
-		"innercount": 2,
-	}
-
-	var j Job = func(event *beat.Event) ([]Job, error) {
-		eventext.MergeEventFields(event, innerj1Fields)
-
-		return []Job{
-			func(event *beat.Event) ([]Job, error) {
-				eventext.MergeEventFields(event, innerj2Fields)
-				return nil, nil
-			},
-		}, nil
-	}
-
-	wrapper := WrapStateful[*TestSWrapper](func(rootJob Job) StatefulWrapper[*TestSWrapper] { return &TestSWrapper{rootCounter: 1} })
-
-	// Run this ten times to ensure state is not carried across retries
-	for i := 0; i < 10; i++ {
-		events, err := ExecJobAndConts(t, wrapper(j))
-		assert.NoError(t, err)
-		assert.Len(t, events, 2)
-		testslike.Test(
-			t,
-			lookslike.Compose(
-				lookslike.MustCompile(innerj1Fields),
-				lookslike.MustCompile(mapstr.M{"cont_counter": 1, "root_counter": 1}),
-			),
-			events[0].Fields,
-		)
-		testslike.Test(
-			t,
-			lookslike.Compose(
-				lookslike.MustCompile(innerj2Fields),
-				lookslike.MustCompile(mapstr.M{"cont_counter": 2, "root_counter": 1}),
-			),
-			events[1].Fields,
-		)
-	}
-
-}
 
 func TestWrapAll(t *testing.T) {
 	type args struct {

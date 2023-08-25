@@ -48,44 +48,10 @@ func WrapAll(jobs []Job, wrappers ...JobWrapper) []Job {
 	return wrapped
 }
 
-// JobWrapperFactory can be used to created new instances of JobWrappers.
-type JobWrapperFactory func(rootJob Job) JobWrapper
-
-// WrapAllSeparately wraps the given jobs using the given JobWrapperFactory instances.
-// This enables us to use a different JobWrapper for the jobs passed in, but recursively apply
-// the same wrapper to their children.
-func WrapAllSeparately(jobs []Job, factories ...JobWrapperFactory) []Job {
-	var wrapped = make([]Job, 0, len(jobs))
-	for _, rootJob := range jobs {
-		for _, factory := range factories {
-			wrapper := factory(rootJob)
-			rootJob = Wrap(rootJob, wrapper)
-		}
-		wrapped = append(wrapped, rootJob)
-	}
-	return wrapped
-}
-
 // Wrap wraps the given Job and also any continuations with the given JobWrapper.
 func Wrap(job Job, wrapper JobWrapper) Job {
 	return func(event *beat.Event) ([]Job, error) {
 		cont, err := wrapper(job)(event)
 		return WrapAll(cont, wrapper), err
-	}
-}
-
-type StatefulWrapper[T any] interface {
-	Wrap(j Job) Job
-}
-
-type StatefulWrapperFactory[T any] func(rootJob Job) StatefulWrapper[T]
-
-func WrapStateful[T StatefulWrapper[T]](makeSW StatefulWrapperFactory[T]) JobWrapper {
-	return func(j Job) Job {
-		return func(event *beat.Event) ([]Job, error) {
-			sw := makeSW(j)
-			conts, err := sw.Wrap(j)(event)
-			return WrapAll(conts, sw.Wrap), err
-		}
 	}
 }
