@@ -24,23 +24,23 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type ptrRecord struct {
-	host    string
+type successRecord struct {
+	data    []string
 	expires time.Time
 }
 
-func (r ptrRecord) IsExpired(now time.Time) bool {
+func (r successRecord) IsExpired(now time.Time) bool {
 	return now.After(r.expires)
 }
 
-type ptrCache struct {
+type successCache struct {
 	sync.RWMutex
-	data          map[string]ptrRecord
+	data          map[string]successRecord
 	maxSize       int
 	minSuccessTTL time.Duration
 }
 
-func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
+func (c *successCache) set(now time.Time, key string, result *result) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -48,14 +48,14 @@ func (c *ptrCache) set(now time.Time, key string, ptr *PTR) {
 		c.evict()
 	}
 
-	c.data[key] = ptrRecord{
-		host:    ptr.Host,
-		expires: now.Add(time.Duration(ptr.TTL) * time.Second),
+	c.data[key] = successRecord{
+		data:    result.Data,
+		expires: now.Add(time.Duration(result.TTL) * time.Second),
 	}
 }
 
 // evict removes a single random key from the cache.
-func (c *ptrCache) evict() {
+func (c *successCache) evict() {
 	var key string
 	for k := range c.data {
 		key = k
@@ -64,13 +64,13 @@ func (c *ptrCache) evict() {
 	delete(c.data, key)
 }
 
-func (c *ptrCache) get(now time.Time, key string) *PTR {
+func (c *successCache) get(now time.Time, key string) *result {
 	c.RLock()
 	defer c.RUnlock()
 
 	r, found := c.data[key]
 	if found && !r.IsExpired(now) {
-		return &PTR{r.host, uint32(r.expires.Sub(now) / time.Second)}
+		return &result{r.data, uint32(r.expires.Sub(now) / time.Second)}
 	}
 	return nil
 }
@@ -132,13 +132,13 @@ type cachedError struct {
 func (ce *cachedError) Error() string { return ce.err.Error() + " (from failure cache)" }
 func (ce *cachedError) Cause() error  { return ce.err }
 
-// PTRLookupCache is a cache for storing and retrieving the results of
-// reverse DNS queries. It caches the results of queries regardless of their
+// lookupCache is a cache for storing and retrieving the results of
+// DNS queries. It caches the results of queries regardless of their
 // outcome (success or failure).
-type PTRLookupCache struct {
-	success  *ptrCache
+type lookupCache struct {
+	success  *successCache
 	failure  *failureCache
-	resolver PTRResolver
+	resolver resolver
 	stats    cacheStats
 }
 
@@ -147,15 +147,15 @@ type cacheStats struct {
 	Miss *monitoring.Int
 }
 
-// NewPTRLookupCache returns a new cache.
-func NewPTRLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver PTRResolver) (*PTRLookupCache, error) {
+// newLookupCache returns a new cache.
+func newLookupCache(reg *monitoring.Registry, conf cacheConfig, resolver resolver) (*lookupCache, error) {
 	if err := conf.Validate(); err != nil {
 		return nil, err
 	}
 
-	c := &PTRLookupCache{
-		success: &ptrCache{
-			data:          make(map[string]ptrRecord, conf.SuccessCache.InitialCapacity),
+	c := &lookupCache{
+		success: &successCache{
+			data:          make(map[string]successRecord, conf.SuccessCache.InitialCapacity),
 			maxSize:       conf.SuccessCache.MaxCapacity,
 			minSuccessTTL: conf.SuccessCache.MinTTL,
 		},
@@ -174,36 +174,36 @@ func NewPTRLookupCache(reg *monitoring.Registry, conf CacheConfig, resolver PTRR
 	return c, nil
 }
 
-// LookupPTR performs a reverse lookup on the given IP address. A cached result
+// Lookup performs a lookup on the given query string. A cached result
 // will be returned if it is contained in the cache, otherwise a lookup is
 // performed.
-func (c PTRLookupCache) LookupPTR(ip string) (*PTR, error) {
+func (c lookupCache) Lookup(q string, qt queryType) (*result, error) {
 	now := time.Now()
 
-	ptr := c.success.get(now, ip)
-	if ptr != nil {
+	r := c.success.get(now, q)
+	if r != nil {
 		c.stats.Hit.Inc()
-		return ptr, nil
+		return r, nil
 	}
 
-	err := c.failure.get(now, ip)
+	err := c.failure.get(now, q)
 	if err != nil {
 		c.stats.Hit.Inc()
 		return nil, err
 	}
 	c.stats.Miss.Inc()
 
-	ptr, err = c.resolver.LookupPTR(ip)
+	r, err = c.resolver.Lookup(q, qt)
 	if err != nil {
-		c.failure.set(now, ip, &cachedError{err})
+		c.failure.set(now, q, &cachedError{err})
 		return nil, err
 	}
 
-	// We set the ptr.TTL to the minimum TTL in case it is less than that.
-	ptr.TTL = max(ptr.TTL, uint32(c.success.minSuccessTTL/time.Second))
+	// We set the result TTL to the minimum TTL in case it is less than that.
+	r.TTL = max(r.TTL, uint32(c.success.minSuccessTTL/time.Second))
 
-	c.success.set(now, ip, ptr)
-	return ptr, nil
+	c.success.set(now, q, r)
+	return r, nil
 }
 
 func max(a, b uint32) uint32 {

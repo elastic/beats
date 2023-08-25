@@ -23,38 +23,40 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miekg/dns"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Config defines the configuration options for the DNS processor.
-type Config struct {
-	CacheConfig  `config:",inline"`
+// config defines the configuration options for the DNS processor.
+type config struct {
+	cacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
 	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
-	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
-	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
+	Type         queryType     `config:"type" validate:"required"` // One of A, AAAA, TXT or PTR (or reverse).
+	Action       fieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
 	Fields       mapstr.M      `config:"fields"`                   // Mapping of source fields to target fields.
 	Transport    string        `config:"transport"`                // Can be tls or udp.
 	reverseFlat  map[string]string
 }
 
-// FieldAction defines the behavior when the target field exists.
-type FieldAction uint8
+// fieldAction defines the behavior when the target field exists.
+type fieldAction uint8
 
-// List of FieldAction types.
+// List of fieldAction types.
 const (
-	ActionAppend FieldAction = iota
-	ActionReplace
+	actionAppend fieldAction = iota
+	actionReplace
 )
 
-var fieldActionNames = map[FieldAction]string{
-	ActionAppend:  "append",
-	ActionReplace: "replace",
+var fieldActionNames = map[fieldAction]string{
+	actionAppend:  "append",
+	actionReplace: "replace",
 }
 
 // String returns a field action name.
-func (fa FieldAction) String() string {
+func (fa fieldAction) String() string {
 	name, found := fieldActionNames[fa]
 	if found {
 		return name
@@ -62,27 +64,62 @@ func (fa FieldAction) String() string {
 	return "unknown (" + strconv.Itoa(int(fa)) + ")"
 }
 
-// Unpack unpacks a string to a FieldAction.
-func (fa *FieldAction) Unpack(v string) error {
+// Unpack unpacks a string to a fieldAction.
+func (fa *fieldAction) Unpack(v string) error {
 	switch strings.ToLower(v) {
 	case "", "append":
-		*fa = ActionAppend
+		*fa = actionAppend
 	case "replace":
-		*fa = ActionReplace
+		*fa = actionReplace
 	default:
 		return fmt.Errorf("invalid dns field action value '%v'", v)
 	}
 	return nil
 }
 
-// CacheConfig defines the success and failure caching parameters.
-type CacheConfig struct {
-	SuccessCache CacheSettings `config:"success_cache"`
-	FailureCache CacheSettings `config:"failure_cache"`
+// queryType represents a DNS query type.
+type queryType uint16
+
+const (
+	typePTR  = queryType(dns.TypePTR)
+	typeA    = queryType(dns.TypeA)
+	typeAAAA = queryType(dns.TypeAAAA)
+	typeTXT  = queryType(dns.TypeTXT)
+)
+
+func (qt queryType) String() string {
+	if name := dns.TypeToString[uint16(qt)]; name != "" {
+		return name
+	}
+	return strconv.FormatUint(uint64(qt), 10)
 }
 
-// CacheSettings define the caching behavior for an individual cache.
-type CacheSettings struct {
+// Unpack unpacks a string to a queryType.
+func (qt *queryType) Unpack(v string) error {
+	switch strings.ToLower(v) {
+	case "a":
+		*qt = typeA
+	case "aaaa":
+		*qt = typeAAAA
+	case "reverse", "ptr":
+		*qt = typePTR
+	case "txt":
+		*qt = typeTXT
+	default:
+		return fmt.Errorf("invalid dns lookup type '%s' specified in "+
+			"config (valid values are: A, AAAA, PTR, reverse, TXT)", v)
+	}
+	return nil
+}
+
+// cacheConfig defines the success and failure caching parameters.
+type cacheConfig struct {
+	SuccessCache cacheSettings `config:"success_cache"`
+	FailureCache cacheSettings `config:"failure_cache"`
+}
+
+// cacheSettings define the caching behavior for an individual cache.
+type cacheSettings struct {
 	// TTL value for items in cache. Not used for success because we use TTL
 	// from the DNS record.
 	TTL time.Duration `config:"ttl"`
@@ -99,16 +136,7 @@ type CacheSettings struct {
 }
 
 // Validate validates the data contained in the config.
-func (c *Config) Validate() error {
-	// Validate lookup type.
-	c.Type = strings.ToLower(c.Type)
-	switch c.Type {
-	case "reverse":
-	default:
-		return fmt.Errorf("invalid dns lookup type '%v' specified in "+
-			"config (valid values are: reverse)", c.Type)
-	}
-
+func (c *config) Validate() error {
 	// Flatten the mapping of source fields to target fields.
 	c.reverseFlat = map[string]string{}
 	for k, v := range c.Fields.Flatten() {
@@ -131,8 +159,8 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// Validate validates the data contained in the CacheConfig.
-func (c *CacheConfig) Validate() error {
+// Validate validates the data contained in the cacheConfig.
+func (c *cacheConfig) Validate() error {
 	if c.SuccessCache.MinTTL <= 0 {
 		return fmt.Errorf("success_cache.min_ttl must be > 0")
 	}
@@ -157,20 +185,22 @@ func (c *CacheConfig) Validate() error {
 	return nil
 }
 
-var defaultConfig = Config{
-	CacheConfig: CacheConfig{
-		SuccessCache: CacheSettings{
-			MinTTL:          time.Minute,
-			InitialCapacity: 1000,
-			MaxCapacity:     10000,
+func defaultConfig() config {
+	return config{
+		cacheConfig: cacheConfig{
+			SuccessCache: cacheSettings{
+				MinTTL:          time.Minute,
+				InitialCapacity: 1000,
+				MaxCapacity:     10000,
+			},
+			FailureCache: cacheSettings{
+				MinTTL:          time.Minute,
+				TTL:             time.Minute,
+				InitialCapacity: 1000,
+				MaxCapacity:     10000,
+			},
 		},
-		FailureCache: CacheSettings{
-			MinTTL:          time.Minute,
-			TTL:             time.Minute,
-			InitialCapacity: 1000,
-			MaxCapacity:     10000,
-		},
-	},
-	Transport: "udp",
-	Timeout:   500 * time.Millisecond,
+		Transport: "udp",
+		Timeout:   500 * time.Millisecond,
+	}
 }
