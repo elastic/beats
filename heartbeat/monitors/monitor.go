@@ -182,6 +182,8 @@ func newMonitorUnsafe(
 		// since browser wrapping won't write summaries, but the fake job here is
 		// effectively a lightweight job
 		m.stdFields.BadConfig = true
+		// No need to retry bad configs
+		m.stdFields.MaxAttempts = 1
 		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	}
 

@@ -130,7 +130,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				"state":   ms,
 			})
 
-			logp.L().Debugf("retry info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
+			logp.L().Debugf("attempt info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
 			if !js.FinalAttempt {
 				// Reset the job summary for the next attempt
 				// We preserve `s` across attempts
