@@ -147,7 +147,6 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 						in.metrics.ackedMessageCount.Inc()
 						in.metrics.bytesProcessedTotal.Add(uint64(len(msg.Data)))
 						in.metrics.processingTime.Update(time.Since(msg.PublishTime).Nanoseconds())
-						in.log.Error("ACKing pub/sub event")
 					} else {
 						in.metrics.failedAckedMessageCount.Inc()
 						in.log.Error("Failed ACKing pub/sub event")

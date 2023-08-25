@@ -5,10 +5,10 @@
 <titleabbrev>dns</titleabbrev>
 ++++
 
-The `dns` processor performs reverse DNS lookups of IP addresses. It caches the
-responses that it receives in accordance to the time-to-live (TTL) value
-contained in the response. It also caches failures that occur during lookups.
-Each instance of this processor maintains its own independent cache.
+The `dns` processor performs DNS queries. It caches the responses that it
+receives in accordance to the time-to-live (TTL) value contained in the
+response. It also caches failures that occur during lookups. Each instance
+of this processor maintains its own independent cache.
 
 The processor uses its own DNS resolver to send requests to nameservers and does
 not use the operating system's resolver. It does not read any values contained
@@ -24,6 +24,16 @@ throughput you can achieve is 500 events per second (1000 milliseconds / 2
 milliseconds). If you have a high cache hit ratio then your throughput can be
 higher.
 
+The processor can send the following query types:
+
+- `A` - IPv4 addresses
+- `AAAA` - IPv6 addresses
+- `TXT` - arbitrary human-readable text data
+- `PTR` - reverse IP address lookups
+
+The output value is a list of strings for all query types except `PTR`. For
+`PTR` queries the output value is a string.
+
 This is a minimal configuration example that resolves the IP addresses contained
 in two fields.
 
@@ -33,8 +43,8 @@ processors:
   - dns:
       type: reverse
       fields:
-        source.ip: source.hostname
-        destination.ip: destination.hostname
+        source.ip: source.domain
+        destination.ip: destination.domain
 ----
 
 Next is a configuration example showing all options.
@@ -47,8 +57,8 @@ processors:
     action: append
     transport: tls
     fields:
-      server.ip: server.hostname
-      client.ip: client.hostname
+      server.ip: server.domain
+      client.ip: client.domain
     success_cache:
       capacity.initial: 1000
       capacity.max: 10000
@@ -64,8 +74,8 @@ processors:
 
 The `dns` processor has the following configuration settings:
 
-`type`:: The type of DNS lookup to perform. The only supported type is
-`reverse` which queries for a PTR record.
+`type`:: The type of DNS query to perform. The supported types are `A`, `AAAA`,
+`PTR` (or `reverse`), and `TXT`.
 
 `action`:: This defines the behavior of the processor when the target field
 already exists in the event. The options are `append` (default) and `replace`.
@@ -82,8 +92,10 @@ the memory for this number of items. Default value is `1000`.
 cache can hold. When the maximum capacity is reached a random item is evicted.
 Default value is `10000`.
 
-`success_cache.min_ttl`:: The duration of the minimum alternative cache TTL for successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses can be cached.
-Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
+`success_cache.min_ttl`:: The duration of the minimum alternative cache TTL for
+successful DNS responses. Ensures that `TTL=0` successful reverse DNS responses
+can be cached. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+Default value is `1m`.
 
 `failure_cache.capacity.initial`:: The initial number of items that the failure
 cache will be allocated to hold. When initialized the processor will allocate
@@ -107,7 +119,7 @@ for each DNS request so if you have 2 nameservers then the total timeout will be
 "h". Default value is `500ms`.
 
 `tag_on_failure`:: A list of tags to add to the event when any lookup fails. The
-tags are only added once even if multiple lookups fail. By default no tags are
+tags are only added once even if multiple lookups fail. By default, no tags are
 added upon failure.
 
 `transport`:: The type of transport connection that should be used can either be

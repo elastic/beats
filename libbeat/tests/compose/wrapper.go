@@ -38,6 +38,7 @@ import (
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -80,6 +81,9 @@ func (c *wrapperContainer) Running() bool {
 
 var statusOldRe = regexp.MustCompile(`(\d+) (minute|hour)s?`)
 
+// Old returns true when info.Status indicates that container is more than
+// 3 minutes old.
+// Else, it returns false even when status is not in the expected format.
 func (c *wrapperContainer) Old() bool {
 	match := statusOldRe.FindStringSubmatch(c.info.Status)
 	if len(match) < 3 {
@@ -156,7 +160,7 @@ func (d *wrapperDriver) Close() error {
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
-	var args []string
+	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
 	args = append(args, "--no-ansi", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
@@ -263,6 +267,10 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string,
 	return nil
 }
 
+// Kill force stops the service containers based on the SIGNAL provided.
+// If SIGKILL is used, then termination happens immediately whereas SIGTERM
+// is used for graceful termination.
+// See: https://docs.docker.com/engine/reference/commandline/compose_kill/
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
 	var args []string
 
@@ -275,6 +283,23 @@ func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string)
 	}
 
 	return d.cmd(ctx, "kill", args...).Run()
+}
+
+// Remove removes the stopped service containers. Removal of the containers can be forced as
+// well where no confirmation of removal is required.
+// See: https://docs.docker.com/engine/reference/commandline/compose_rm/
+func (d *wrapperDriver) Remove(ctx context.Context, service string, force bool) error {
+	var args []string
+
+	if force {
+		args = append(args, "-f")
+	}
+
+	if service != "" {
+		args = append(args, service)
+	}
+
+	return d.cmd(ctx, "rm", args...).Run()
 }
 
 func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error) {
@@ -344,12 +369,19 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 // KillOld is a workaround for issues in CI with heavy load caused by having too many
 // running containers.
-// It kills all containers not related to services in `except`.
+// It kills and removes all containers except the excluded services in 'except'.
 func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
 	if err != nil {
 		return fmt.Errorf("listing containers to be killed: %w", err)
 	}
+
+	rmOpts := types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+		RemoveLinks:   true,
+	}
+
 	for _, container := range list {
 		container := wrapperContainer{info: container}
 		serviceName, ok := container.info.Labels[labelComposeService]
@@ -358,9 +390,13 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		}
 
 		if container.Running() && container.Old() {
-			d.client.ContainerKill(ctx, container.info.ID, "KILL")
+			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
+			if err != nil {
+				logp.Err("container remove: %v", err)
+			}
 		}
 	}
+
 	return nil
 }
 

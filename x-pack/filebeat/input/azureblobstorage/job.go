@@ -17,6 +17,8 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
+	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -27,8 +29,8 @@ import (
 const jobErrString = "job with jobId %s encountered an error: %w"
 
 type job struct {
-	client       *azblob.BlobClient
-	blob         *azblob.BlobItemInternal
+	client       *blob.Client
+	blob         *azcontainer.BlobItem
 	blobURL      string
 	hash         string
 	offset       int64
@@ -40,7 +42,7 @@ type job struct {
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
-func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL string,
+func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger,
 ) *job {
 	return &job{
@@ -56,7 +58,7 @@ func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL st
 }
 
 // azureObjectHash returns a short sha256 hash of the container name + blob name.
-func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
+func azureObjectHash(src *Source, blob *azcontainer.BlobItem) string {
 	h := sha256.New()
 	h.Write([]byte(src.ContainerName))
 	h.Write([]byte((*blob.Name)))
@@ -106,17 +108,17 @@ func (j *job) timestamp() *time.Time {
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	var err error
-	downloadOptions := &azblob.BlobDownloadOptions{}
+	downloadOptions := &blob.DownloadStreamOptions{}
 	if !j.isCompressed {
-		downloadOptions.Offset = &j.offset
+		downloadOptions.Range.Offset = j.offset
 	}
 
-	get, err := j.client.Download(ctx, downloadOptions)
+	get, err := j.client.DownloadStream(ctx, downloadOptions)
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
 
-	reader := get.Body(&azblob.RetryReaderOptions{})
+	reader := get.NewRetryReader(context.Background(), &azblob.RetryReaderOptions{})
 	defer func() {
 		err = reader.Close()
 		if err != nil {

@@ -31,6 +31,8 @@ table Metadata {
   mtime_ns:long;
   ctime_ns:long;
   type:Type = 1;
+  selinux:string;
+  posix_acl_access:[byte];
 }
 
 table Hash {

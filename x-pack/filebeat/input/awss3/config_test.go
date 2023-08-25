@@ -392,7 +392,7 @@ func TestConfig(t *testing.T) {
 				"number_of_workers":   5,
 				"fips_enabled":        true,
 			},
-			expectedErr: "fips_enabled cannot be used with a non-AWS S3 bucket.",
+			expectedErr: "fips_enabled cannot be used with a non-AWS S3 bucket",
 			expectedCfg: nil,
 		},
 		{
@@ -402,19 +402,6 @@ func TestConfig(t *testing.T) {
 			nonAWSS3Bucket: "",
 			config: mapstr.M{
 				"bucket_arn":        s3Bucket,
-				"number_of_workers": 5,
-				"path_style":        true,
-			},
-			expectedErr: "path_style can only be used when polling non-AWS S3 services",
-			expectedCfg: nil,
-		},
-		{
-			name:           "error on path_style with AWS SQS Queue",
-			queueURL:       queueURL,
-			s3Bucket:       "",
-			nonAWSS3Bucket: "",
-			config: mapstr.M{
-				"queue_url":         queueURL,
 				"number_of_workers": 5,
 				"path_style":        true,
 			},

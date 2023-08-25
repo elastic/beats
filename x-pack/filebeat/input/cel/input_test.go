@@ -1571,14 +1571,26 @@ func paginationArrayHandler() http.HandlerFunc {
 }
 
 var redactorTests = []struct {
-	name   string
-	state  mapstr.M
-	mask   []string
-	delete bool
+	name  string
+	state mapstr.M
+	cfg   *redact
 
 	wantOrig   string
 	wantRedact string
 }{
+	{
+		name: "nil_redact",
+		state: mapstr.M{
+			"auth": mapstr.M{
+				"user": "fred",
+				"pass": "top_secret",
+			},
+			"other": "data",
+		},
+		cfg:        nil,
+		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
+		wantRedact: `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
+	},
 	{
 		name: "auth_no_delete",
 		state: mapstr.M{
@@ -1588,8 +1600,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth"},
-		delete:     false,
+		cfg: &redact{
+			Fields: []string{"auth"},
+			Delete: false,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"auth":"*","other":"data"}`,
 	},
@@ -1602,8 +1616,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth"},
-		delete:     true,
+		cfg: &redact{
+			Fields: []string{"auth"},
+			Delete: true,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"other":"data"}`,
 	},
@@ -1616,8 +1632,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth.pass"},
-		delete:     false,
+		cfg: &redact{
+			Fields: []string{"auth.pass"},
+			Delete: false,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"auth":{"pass":"*","user":"fred"},"other":"data"}`,
 	},
@@ -1630,8 +1648,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth.pass"},
-		delete:     true,
+		cfg: &redact{
+			Fields: []string{"auth.pass"},
+			Delete: true,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"auth":{"user":"fred"},"other":"data"}`,
 	},
@@ -1644,8 +1664,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"cursor.key"},
-		delete:     false,
+		cfg: &redact{
+			Fields: []string{"cursor.key"},
+			Delete: false,
+		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"key":"*","other":"data"},{"key":"*","other":"data"}],"other":"data"}`,
 	},
@@ -1658,8 +1680,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"cursor.key"},
-		delete:     true,
+		cfg: &redact{
+			Fields: []string{"cursor.key"},
+			Delete: true,
+		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"other":"data"},{"other":"data"}],"other":"data"}`,
 	},
@@ -1668,7 +1692,7 @@ var redactorTests = []struct {
 func TestRedactor(t *testing.T) {
 	for _, test := range redactorTests {
 		t.Run(test.name, func(t *testing.T) {
-			got := fmt.Sprint(redactor{state: test.state, mask: test.mask, delete: test.delete})
+			got := fmt.Sprint(redactor{state: test.state, cfg: test.cfg})
 			orig := fmt.Sprint(test.state)
 			if orig != test.wantOrig {
 				t.Errorf("unexpected original state after redaction:\n--- got\n--- want\n%s", cmp.Diff(orig, test.wantOrig))
