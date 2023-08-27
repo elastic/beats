@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
+// NON-SEMANTIC CHANGE
+
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
 // These services follow the standard <service name>-fips.<region>.amazonaws.com format.
 var OptionalGovCloudFIPS = map[string]bool{
