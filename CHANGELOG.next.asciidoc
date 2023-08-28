@@ -185,6 +185,7 @@ automatic splitting at root level, if root level element is an array. {pull}3415
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
+- Fix GCP compute metadata. {pull}36338[36338]
 
 *Osquerybeat*
 
