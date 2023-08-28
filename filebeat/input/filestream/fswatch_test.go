@@ -67,7 +67,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 5}, // 5 bytes written
+				Info:     testFileInfo{name: basename, size: 5}, // 5 bytes written
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -90,7 +90,7 @@ scanner:
 			Op:      loginp.OpWrite,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 10}, // +5 bytes appended
+				Info:     testFileInfo{name: basename, size: 10}, // +5 bytes appended
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -112,7 +112,7 @@ scanner:
 			Op:      loginp.OpRename,
 			Descriptor: loginp.FileDescriptor{
 				Filename: newFilename,
-				Info:     testFileInfo{path: newBasename, size: 10},
+				Info:     testFileInfo{name: newBasename, size: 10},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -132,7 +132,7 @@ scanner:
 			Op:      loginp.OpTruncate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 2},
+				Info:     testFileInfo{name: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -152,7 +152,7 @@ scanner:
 			Op:      loginp.OpTruncate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 2},
+				Info:     testFileInfo{name: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -171,7 +171,7 @@ scanner:
 			Op:      loginp.OpDelete,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 2},
+				Info:     testFileInfo{name: basename, size: 2},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -209,7 +209,7 @@ scanner:
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
 				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
-				Info:        testFileInfo{path: basename, size: 1024},
+				Info:        testFileInfo{name: basename, size: 1024},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -240,7 +240,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: filename,
-				Info:     testFileInfo{path: basename, size: 1024},
+				Info:     testFileInfo{name: basename, size: 1024},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -298,7 +298,7 @@ scanner:
 				Op:      loginp.OpCreate,
 				Descriptor: loginp.FileDescriptor{
 					Filename: filename,
-					Info:     testFileInfo{path: basename, size: 5}, // +5 bytes appended
+					Info:     testFileInfo{name: basename, size: 5}, // +5 bytes appended
 				},
 			}
 			requireEqualEvents(t, expEvent, e)
@@ -332,7 +332,7 @@ scanner:
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
 				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
-				Info:        testFileInfo{path: basename, size: 1024},
+				Info:        testFileInfo{name: basename, size: 1024},
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -385,7 +385,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: firstFilename,
-				Info:     testFileInfo{path: firstBasename, size: 5}, // "line\n"
+				Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -396,7 +396,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename: secondFilename,
-				Info:     testFileInfo{path: secondBasename, size: 5}, // "line\n"
+				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
 			},
 		}
 		requireEqualEvents(t, expEvent, e)
@@ -483,35 +483,35 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 				excludedFilename: {
 					Filename: excludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
 					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -532,28 +532,28 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 				excludedFilename: {
 					Filename: excludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 			},
@@ -575,21 +575,21 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
 					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -606,14 +606,14 @@ scanner:
 					Filename: normalFilename,
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: testFileInfo{
 						size: sizes[undersizedFilename],
-						path: undersizedBasename,
+						name: undersizedBasename,
 					},
 				},
 			},
@@ -635,7 +635,7 @@ scanner:
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 			},
@@ -652,7 +652,7 @@ scanner:
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 			},
@@ -669,14 +669,14 @@ scanner:
 					Filename: excludedIncludedFilename,
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
 					Filename: travelerSymlinkFilename,
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -698,7 +698,7 @@ scanner:
 					Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				excludedFilename: {
@@ -706,7 +706,7 @@ scanner:
 					Fingerprint: "bd151321c3bbdb44185414a1b56b5649a00206dd4792e7230db8904e43987336",
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
@@ -714,7 +714,7 @@ scanner:
 					Fingerprint: "bfdb99a65297062658c26dfcea816d76065df2a2da2594bfd9b96e9e405da1c2",
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
@@ -722,7 +722,7 @@ scanner:
 					Fingerprint: "c4058942bffcea08810a072d5966dfa5c06eb79b902bf0011890dd8d22e1a5f8",
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},
@@ -744,7 +744,7 @@ scanner:
 					Fingerprint: "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb",
 					Info: testFileInfo{
 						size: sizes[normalFilename],
-						path: normalBasename,
+						name: normalBasename,
 					},
 				},
 				// undersizedFilename got excluded because of the matching fingerprint
@@ -753,7 +753,7 @@ scanner:
 					Fingerprint: "9c225a1e6a7df9c869499e923565b93937e88382bb9188145f117195cd41dcd1",
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
-						path: excludedBasename,
+						name: excludedBasename,
 					},
 				},
 				excludedIncludedFilename: {
@@ -761,7 +761,7 @@ scanner:
 					Fingerprint: "7985b2b9750bdd3c76903db408aff3859204d6334279eaf516ecaeb618a218d5",
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
-						path: excludedIncludedBasename,
+						name: excludedIncludedBasename,
 					},
 				},
 				travelerSymlinkFilename: {
@@ -769,7 +769,7 @@ scanner:
 					Fingerprint: "da437600754a8eed6c194b7241b078679551c06c7dc89685a9a71be7829ad7e5",
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
-						path: travelerSymlinkBasename,
+						name: travelerSymlinkBasename,
 					},
 				},
 			},

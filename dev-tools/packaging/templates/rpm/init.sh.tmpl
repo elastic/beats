@@ -17,6 +17,13 @@
 #                    family. Please see: https://www.elastic.co/beats
 ### END INIT INFO
 
+# Exit with an informative message if functions does not exist.
+# This has been removed from RHEL9, but exists on other RPM-based
+# distributions in the support matrix.
+if [ ! -f /etc/rc.d/init.d/functions ]; then
+	echo "SysV-style init script service management is not supported on this system, use systemctl instead"
+	exit 1
+fi
 
 
 PATH=/usr/bin:/sbin:/bin:/usr/sbin

@@ -48,16 +48,16 @@ func newINodeMarkerIdentifier(cfg *common.Config) (fileIdentifier, error) {
 	}
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %v", err)
+		return nil, fmt.Errorf("error while reading configuration of INode + marker file configuration: %w", err)
 	}
 
 	fi, err := os.Stat(config.MarkerPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while opening marker file at %s: %v", config.MarkerPath, err)
+		return nil, fmt.Errorf("error while opening marker file at %s: %w", config.MarkerPath, err)
 	}
 	markerContent, err := ioutil.ReadFile(config.MarkerPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading marker file at %s: %v", config.MarkerPath, err)
+		return nil, fmt.Errorf("error while reading marker file at %s: %w", config.MarkerPath, err)
 	}
 	return &inodeMarkerIdentifier{
 		log:                       logp.NewLogger("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
@@ -71,20 +71,20 @@ func newINodeMarkerIdentifier(cfg *common.Config) (fileIdentifier, error) {
 func (i *inodeMarkerIdentifier) markerContents() string {
 	f, err := os.Open(i.markerPath)
 	if err != nil {
-		i.log.Errorf("Failed to open marker file %s: %v", i.markerPath, err)
+		i.log.Errorf("Failed to open marker file %s: %w", i.markerPath, err)
 		return ""
 	}
 	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
-		i.log.Errorf("Failed to fetch file information for %s: %v", i.markerPath, err)
+		i.log.Errorf("Failed to fetch file information for %s: %w", i.markerPath, err)
 		return ""
 	}
 	if i.markerFileLastModifitaion.Before(fi.ModTime()) {
 		contents, err := ioutil.ReadFile(i.markerPath)
 		if err != nil {
-			i.log.Errorf("Error while reading contents of marker file: %v", err)
+			i.log.Errorf("Error while reading contents of marker file: %w", err)
 			return ""
 		}
 		i.markerTxt = string(contents)
@@ -96,7 +96,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	osstate := file.GetOSState(e.Descriptor.Info)
 	return fileSource{
-		info:                e.Descriptor,
+		desc:                e.Descriptor,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
