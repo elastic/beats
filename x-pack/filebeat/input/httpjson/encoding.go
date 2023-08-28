@@ -14,56 +14,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/mito/lib/xml"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-type encoderFunc func(trReq transformable) ([]byte, error)
-
-type decoderFunc func(p []byte, dst *response) error
-
-var (
-	registeredEncoders             = map[string]encoderFunc{}
-	registeredDecoders             = map[string]decoderFunc{}
-	defaultEncoder     encoderFunc = encodeAsJSON
-	defaultDecoder     decoderFunc = decodeAsJSON
-)
-
-func registerEncoder(contentType string, enc encoderFunc) error {
-	if contentType == "" {
-		return errors.New("content-type can't be empty")
-	}
-
-	if enc == nil {
-		return errors.New("encoder can't be nil")
-	}
-
-	if _, found := registeredEncoders[contentType]; found {
-		return errors.New("already registered")
-	}
-
-	registeredEncoders[contentType] = enc
-
-	return nil
-}
-
-func registerDecoder(contentType string, dec decoderFunc) error {
-	if contentType == "" {
-		return errors.New("content-type can't be empty")
-	}
-
-	if dec == nil {
-		return errors.New("decoder can't be nil")
-	}
-
-	if _, found := registeredDecoders[contentType]; found {
-		return errors.New("already registered")
-	}
-
-	registeredDecoders[contentType] = dec
-
-	return nil
-}
 
 func encode(contentType string, trReq transformable) ([]byte, error) {
 	enc, found := registeredEncoders[contentType]
@@ -81,35 +32,34 @@ func decode(contentType string, p []byte, dst *response) error {
 	return dec(p, dst)
 }
 
-func registerEncoders() {
-	log := logp.L().Named(logName)
-	log.Debugf("registering encoder 'application/json': returned error: %#v",
-		registerEncoder("application/json", encodeAsJSON))
+var (
+	// registeredEncoders is the set of available encoders.
+	registeredEncoders = map[string]encoderFunc{
+		"application/json":                  encodeAsJSON,
+		"application/x-www-form-urlencoded": encodeAsForm,
+	}
+	// defaultEncoder is the decoder used when no registers
+	// encoder is available.
+	defaultEncoder = encodeAsJSON
 
-	log.Debugf("registering encoder 'application/x-www-form-urlencoded': returned error: %#v",
-		registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
-}
+	// registeredDecoders is the set of available decoders.
+	registeredDecoders = map[string]decoderFunc{
+		"application/json":        decodeAsJSON,
+		"application/x-ndjson":    decodeAsNdjson,
+		"text/csv":                decodeAsCSV,
+		"application/zip":         decodeAsZip,
+		"application/xml":         decodeAsXML,
+		"text/xml; charset=utf-8": decodeAsXML,
+	}
+	// defaultDecoder is the decoder used when no registers
+	// decoder is available.
+	defaultDecoder = decodeAsJSON
+)
 
-func registerDecoders() {
-	log := logp.L().Named(logName)
-	log.Debugf("registering decoder 'application/json': returned error: %#v",
-		registerDecoder("application/json", decodeAsJSON))
+type encoderFunc func(trReq transformable) ([]byte, error)
+type decoderFunc func(p []byte, dst *response) error
 
-	log.Debugf("registering decoder 'application/x-ndjson': returned error: %#v",
-		registerDecoder("application/x-ndjson", decodeAsNdjson))
-
-	log.Debugf("registering decoder 'text/csv': returned error: %#v",
-		registerDecoder("text/csv", decodeAsCSV))
-
-	log.Debugf("registering decoder 'application/zip': returned error: %#v",
-		registerDecoder("application/zip", decodeAsZip))
-
-	log.Debugf("registering decoder 'application/xml': returned error: %#v",
-		registerDecoder("application/xml", decodeAsXML))
-	log.Debugf("registering decoder 'text/xml': returned error: %#v",
-		registerDecoder("text/xml; charset=utf-8", decodeAsXML))
-}
-
+// encodeAsJSON encodes trReq as a JSON message.
 func encodeAsJSON(trReq transformable) ([]byte, error) {
 	if len(trReq.body()) == 0 {
 		return nil, nil
@@ -120,10 +70,12 @@ func encodeAsJSON(trReq transformable) ([]byte, error) {
 	return json.Marshal(trReq.body())
 }
 
+// decodeAsJSON decodes the JSON message in p into dst.
 func decodeAsJSON(p []byte, dst *response) error {
 	return json.Unmarshal(p, &dst.body)
 }
 
+// encodeAsForm encodes trReq as a URL encoded form.
 func encodeAsForm(trReq transformable) ([]byte, error) {
 	url := trReq.url()
 	body := []byte(url.RawQuery)
@@ -135,6 +87,8 @@ func encodeAsForm(trReq transformable) ([]byte, error) {
 	return body, nil
 }
 
+// decodeAsNdjson decodes the message in p as a JSON object stream
+// It is more relaxed than NDJSON.
 func decodeAsNdjson(p []byte, dst *response) error {
 	var results []interface{}
 	dec := json.NewDecoder(bytes.NewReader(p))
@@ -149,6 +103,7 @@ func decodeAsNdjson(p []byte, dst *response) error {
 	return nil
 }
 
+// decodeAsCSV decodes p as a headed CSV document into dst.
 func decodeAsCSV(p []byte, dst *response) error {
 	var results []interface{}
 
@@ -189,6 +144,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 	return nil
 }
 
+// decodeAsZip decodes p as a ZIP archive into dst.
 func decodeAsZip(p []byte, dst *response) error {
 	var results []interface{}
 	r, err := zip.NewReader(bytes.NewReader(p), int64(len(p)))
@@ -225,6 +181,7 @@ func decodeAsZip(p []byte, dst *response) error {
 	return nil
 }
 
+// decodeAsXML decodes p as an XML document into dst.
 func decodeAsXML(p []byte, dst *response) error {
 	cdata, body, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
 	if err != nil {

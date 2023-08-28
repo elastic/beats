@@ -1183,7 +1183,6 @@ var testCases = []struct {
 	{
 		name: "Test simple XML decode",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
-			registerDecoders()
 			registerRequestTransforms()
 			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				const text = `<?xml version="1.0" encoding="UTF-8"?>
