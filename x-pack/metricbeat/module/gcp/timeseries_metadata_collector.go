@@ -51,25 +51,23 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		accountID = in.Resource.Labels[TimeSeriesResponsePathForECSAccountID]
 	}
 
-	ecsCloud := mapstr.M{
-		ECSCloudAccount: mapstr.M{
-			ECSCloudAccountID:   accountID,
-			ECSCloudAccountName: accountID,
-		},
-		ECSCloudProvider: "gcp",
-	}
-
 	ecs := mapstr.M{
-		ECSCloud: ecsCloud,
+		ECSCloud: mapstr.M{
+			ECSCloudAccount: mapstr.M{
+				ECSCloudAccountID:   accountID,
+				ECSCloudAccountName: accountID,
+			},
+			ECSCloudProvider: "gcp",
+		},
 	}
 
 	if availabilityZone != "" {
-		_, _ = ecsCloud.Put(ECSCloudAvailabilityZone, availabilityZone)
+		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
 
 		// Get region name from availability zone name
 		region := getRegionName(availabilityZone)
 		if region != "" {
-			_, _ = ecsCloud.Put(ECSCloudRegion, region)
+			ecs[ECSCloud+"."+ECSCloudRegion] = region
 		}
 	}
 
