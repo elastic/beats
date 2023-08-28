@@ -6,6 +6,7 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -13,10 +14,10 @@ import (
 
 	"github.com/golang/protobuf/ptypes/duration"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -52,7 +53,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 	it := r.client.ListTimeSeries(ctx, req)
 	for {
 		resp, err := it.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
@@ -66,6 +67,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 
 	out.aligner = aligner
 	out.timeSeries = timeSeries
+	//nolint:nakedret // using named return value
 	return
 }
 
@@ -111,17 +113,13 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 
 		region := r.config.Region
 		if region != "" {
-			if strings.HasSuffix(region, "*") {
-				region = strings.TrimSuffix(region, "*")
-			}
+			region = strings.TrimSuffix(region, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
 			break
 		}
 		zone := r.config.Zone
 		if zone != "" {
-			if strings.HasSuffix(zone, "*") {
-				zone = strings.TrimSuffix(zone, "*")
-			}
+			zone = strings.TrimSuffix(zone, "*")
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		}
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
@@ -152,6 +150,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 		}
 	}
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
+	//nolint:nakedret // using named return value
 	return
 }
 

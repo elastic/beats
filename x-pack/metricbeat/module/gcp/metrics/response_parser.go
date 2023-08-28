@@ -5,12 +5,12 @@
 package metrics
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/pkg/errors"
-	"google.golang.org/genproto/googleapis/monitoring/v3"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -36,7 +36,7 @@ type KeyValuePoint struct {
 }
 
 // extractTimeSeriesMetricValues valuable to send to Elasticsearch. This includes, for example, metric values, labels and timestamps
-func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
+func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoringpb.TimeSeries, aligner string) (points []KeyValuePoint, err error) {
 	points = make([]KeyValuePoint, 0)
 
 	for _, point := range resp.Points {
@@ -59,11 +59,11 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 	return points, nil
 }
 
-func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time, err error) {
+func (e *incomingFieldExtractor) getTimestamp(p *monitoringpb.Point) (ts time.Time, err error) {
 	// Don't add point intervals that can't be "stated" at some timestamp.
 	if p.Interval != nil {
-		if ts, err = ptypes.Timestamp(p.Interval.EndTime); err != nil {
-			return time.Time{}, errors.Errorf("error trying to parse timestamp '%#v' from metric\n", p.Interval.EndTime)
+		if err = p.Interval.EndTime.CheckValid(); err != nil {
+			return time.Time{}, fmt.Errorf("end time timestamp '%#v' from metric is not valid: %w", p.Interval.EndTime, err)
 		}
 		return ts, nil
 	}
@@ -227,17 +227,17 @@ func remap(l *logp.Logger, s string) string {
 	return s
 }
 
-func getValueFromPoint(p *monitoring.Point) (out interface{}) {
+func getValueFromPoint(p *monitoringpb.Point) (out interface{}) {
 	switch v := p.Value.Value.(type) {
-	case *monitoring.TypedValue_DoubleValue:
+	case *monitoringpb.TypedValue_DoubleValue:
 		out = v.DoubleValue
-	case *monitoring.TypedValue_BoolValue:
+	case *monitoringpb.TypedValue_BoolValue:
 		out = v.BoolValue
-	case *monitoring.TypedValue_Int64Value:
+	case *monitoringpb.TypedValue_Int64Value:
 		out = v.Int64Value
-	case *monitoring.TypedValue_StringValue:
+	case *monitoringpb.TypedValue_StringValue:
 		out = v.StringValue
-	case *monitoring.TypedValue_DistributionValue:
+	case *monitoringpb.TypedValue_DistributionValue:
 		//TODO Distribution values aren't simple values. Take a look at this
 		out = v.DistributionValue
 	}
