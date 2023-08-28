@@ -30,7 +30,7 @@
 			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "metricbeat",
+			"name": "kube-proxy",
 			"replicas": {
 				"available": 1,
 				"desired": 1,
@@ -55,7 +55,7 @@
 			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "kube-proxy",
+			"name": "metricbeat",
 			"replicas": {
 				"available": 1,
 				"desired": 1,

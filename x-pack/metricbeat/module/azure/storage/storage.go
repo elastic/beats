@@ -15,7 +15,7 @@ const defaultStorageAccountNamespace = "Microsoft.Storage/storageAccounts"
 
 var (
 	storageServiceNamespaces = []string{"/blobServices", "/tableServices", "/queueServices", "/fileServices"}
-	allowedDimensions        = []string{"ResponseType", "ApiName"}
+	allowedDimensions        = []string{"ResponseType", "ApiName", "GeoType", "Authentication", "BlobType", "Tier", "FileShare", "TransactionType"}
 )
 
 // init registers the MetricSet with the central registry as soon as the program

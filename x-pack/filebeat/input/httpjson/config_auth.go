@@ -65,6 +65,7 @@ const (
 	oAuth2ProviderDefault oAuth2Provider = ""       // oAuth2ProviderDefault means no specific provider is set.
 	oAuth2ProviderAzure   oAuth2Provider = "azure"  // oAuth2ProviderAzure AzureAD.
 	oAuth2ProviderGoogle  oAuth2Provider = "google" // oAuth2ProviderGoogle Google.
+	oAuth2ProviderOkta    oAuth2Provider = "okta"   // oAuth2ProviderOkta Okta.
 )
 
 func (p *oAuth2Provider) Unpack(in string) error {
@@ -99,6 +100,10 @@ type oAuth2Config struct {
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
 	AzureResource string `config:"azure.resource"`
+
+	// okta specific RSA JWK private key
+	OktaJWKFile string          `config:"okta.jwk_file"`
+	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
@@ -159,6 +164,9 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
+	case oAuth2ProviderOkta:
+		return o.fetchOktaOauthClient(ctx, client)
+
 	default:
 		return nil, errors.New("oauth2 client: unknown provider")
 	}
@@ -215,6 +223,8 @@ func (o *oAuth2Config) Validate() error {
 		return o.validateAzureProvider()
 	case oAuth2ProviderGoogle:
 		return o.validateGoogleProvider()
+	case oAuth2ProviderOkta:
+		return o.validateOktaProvider()
 	case oAuth2ProviderDefault:
 		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == nil {
 			return errors.New("both token_url and client credentials must be provided")
@@ -276,6 +286,22 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 	}
 
 	return fmt.Errorf("no authentication credentials were configured or detected (ADC)")
+}
+
+func (o *oAuth2Config) validateOktaProvider() error {
+	if o.TokenURL == "" || o.ClientID == "" || len(o.Scopes) == 0 || (o.OktaJWKJSON == nil && o.OktaJWKFile == "") {
+		return errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided")
+	}
+	// jwk_file
+	if o.OktaJWKFile != "" {
+		return populateJSONFromFile(o.OktaJWKFile, &o.OktaJWKJSON)
+	}
+	// jwk_json
+	if len(o.OktaJWKJSON) != 0 {
+		return nil
+	}
+
+	return fmt.Errorf("okta validation error: no authentication credentials were configured or detected")
 }
 
 func populateJSONFromFile(file string, dst *common.JSONBlob) error {
