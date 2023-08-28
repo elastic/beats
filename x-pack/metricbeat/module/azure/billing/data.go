@@ -61,7 +61,7 @@ func EventsMapping(
 					},
 				}
 				if len(legacy.Tags) > 0 {
-					_, _ = event.ModuleFields.Put("tags", legacy.Tags)
+					_, _ = event.ModuleFields.Put("resource.tags", legacy.Tags)
 				}
 
 				event.MetricSetFields = mapstr.M{
@@ -101,7 +101,7 @@ func EventsMapping(
 					},
 				}
 				if len(modern.Tags) > 0 {
-					_, _ = event.ModuleFields.Put("tags", modern.Tags)
+					_, _ = event.ModuleFields.Put("resource.tags", modern.Tags)
 				}
 
 				event.MetricSetFields = mapstr.M{
