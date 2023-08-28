@@ -14,6 +14,42 @@
                     "desired": 1,
                     "unavailable": 0,
                     "updated": 1
+                },
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
+                }
+            },
+            "namespace": "kube-system"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "coredns",
+                "paused": false,
+                "replicas": {
+                    "available": 2,
+                    "desired": 2,
+                    "unavailable": 0,
+                    "updated": 2
+                },
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
                 }
             },
             "namespace": "kube-system"
@@ -42,37 +78,13 @@
                     "desired": 1,
                     "unavailable": 0,
                     "updated": 1
+                },
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
                 }
             },
             "namespace": "local-path-storage"
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "coredns",
-                "paused": false,
-                "replicas": {
-                    "available": 2,
-                    "desired": 2,
-                    "unavailable": 0,
-                    "updated": 2
-                }
-            },
-            "namespace": "kube-system"
         },
         "metricset": {
             "name": "state_deployment",

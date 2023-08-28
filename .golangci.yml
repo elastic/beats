@@ -62,6 +62,7 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
+    - prealloc # Finds slice declarations that could potentially be pre-allocated
 
 # all available settings of specific linters
 linters-settings:
@@ -108,7 +109,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.10"
+    go: "1.20.7"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -126,19 +127,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.10"
+    go: "1.20.7"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.10"
+    go: "1.20.7"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.10"
+    go: "1.20.7"
 
   gosec:
     excludes:
@@ -147,3 +148,17 @@ linters-settings:
     - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
     - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
     - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+
+  prealloc:
+    # IMPORTANT: we don't recommend using this linter before doing performance profiling.
+    # For most programs usage of prealloc will be a premature optimization.
+
+    # Report pre-allocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
+    # Default: true
+    simple: false
+    # Report pre-allocation suggestions on range loops.
+    # Default: true
+    range-loops: true
+    # Report pre-allocation suggestions on for loops.
+    # Default: false
+    for-loops: true

@@ -1,5 +1,5 @@
 # Module: mysql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-mysql.html
 
 - module: mysql
   #metricsets:

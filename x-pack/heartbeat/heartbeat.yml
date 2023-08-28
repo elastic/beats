@@ -9,7 +9,7 @@
 
 ############################# Heartbeat ######################################
 
-# Define a directory to load monitor definitions from. Definitions take the form
+# Define a directory from which to load monitor definitions. Definitions take the form
 # of individual yaml files.
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
@@ -22,13 +22,13 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
-  # Set enabled to true (or delete the following line) to enable this example monitor
+  # Set enabled to true (or delete the following line) to enable this monitor
   enabled: false
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  # ID used to uniquely identify this monitor in Elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere
   name: My Monitor
-  # List or urls to query
+  # List of URLs to query
   urls: ["http://localhost:9200"]
   # Configure task schedule
   schedule: '@every 10s'
@@ -53,7 +53,7 @@ setup.template.settings:
 # all the transactions sent by a single shipper in the web interface.
 #name:
 
-# The tags of the shipper are included in their own field with each
+# The tags of the shipper are included in their field with each
 # transaction published.
 #tags: ["service-X", "web-tier"]
 
@@ -144,7 +144,7 @@ processors:
 #logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
-# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# To enable all selectors, use ["*"]. Examples of other selectors are "beat",
 # "publisher", "service".
 #logging.selectors: ["*"]
 
@@ -162,7 +162,7 @@ processors:
 #monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well.
+# Elasticsearch outputs are accepted here as well.
 # Note that the settings should point to your Elasticsearch *monitoring* cluster.
 # Any setting that is not set is automatically inherited from the Elasticsearch
 # output configuration, so if you have the Elasticsearch output configured such

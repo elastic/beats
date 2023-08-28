@@ -1,7 +1,5 @@
 ---
 version: 2
-# This section is segmented by the responsible GitHub teams in order
-# to make it clear who is responsible for reviewing.
 updates:
   - package-ecosystem: gomod
     directory: /
@@ -10,8 +8,8 @@ updates:
     labels:
       - automation
       - dependabot
-      - Team:Elastic-Agent-Data-Plane
     allow:
+      # Team:Elastic-Agent-Data-Plane
       - dependency-name: github.com/elastic/elastic-agent-autodiscover
       - dependency-name: github.com/elastic/elastic-agent-client/*
       - dependency-name: github.com/elastic/elastic-agent-libs
@@ -29,36 +27,14 @@ updates:
       - dependency-name: go.elastic.co/apm/*
       - dependency-name: go.elastic.co/ecszap
       - dependency-name: go.elastic.co/go-licence-detector
-    reviewers:
-      - elastic/elastic-agent-data-plane
-    open-pull-requests-limit: 2
-  - package-ecosystem: gomod
-    directory: /
-    schedule:
-      interval: daily
-    labels:
-      - automation
-      - dependabot
-      - Team:Security-External Integrations
-    allow:
-      # Skip github.com/elastic/mito because it requires documentation updates.
+      # Team:Service-Integrations
+      - dependency-name: github.com/elastic/bayeux
+      # Team:Security-External Integrations
       - dependency-name: github.com/elastic/go-libaudit/*
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
-    reviewers:
-      - elastic/security-external-integrations
-    open-pull-requests-limit: 2
-  - package-ecosystem: gomod
-    directory: /
-    schedule:
-      interval: daily
-    labels:
-      - automation
-      - dependabot
-      - Team:Service-Integrations
-    allow:
-      - dependency-name: github.com/elastic/bayeux
-    reviewers:
-      - elastic/obs-infraobs-integrations
+    ignore:
+      # Skip github.com/elastic/mito because it requires documentation updates.
+      - dependency-name: github.com/elastic/mito
     open-pull-requests-limit: 2

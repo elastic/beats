@@ -245,7 +245,8 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		return nil, nil
 	}
 
-	status, result, sendErr := client.conn.Bulk(ctx, "", "", nil, bulkItems)
+	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
+	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
 
 	if sendErr != nil {
 		if status == http.StatusRequestEntityTooLarge {

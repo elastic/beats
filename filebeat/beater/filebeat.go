@@ -108,7 +108,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, false)
+	enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
+	forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
+	filesetOverrides := fileset.FilesetOverrides{
+		EnableAllFilesets:         enableAllFilesets,
+		ForceEnableModuleFilesets: forceEnableModuleFilesets,
+	}
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +132,18 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		if err = inputmon.AttachHandler(b.API.Router()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
+	}
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON()
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
 	}
 
 	// Add inputs created by the modules
@@ -187,7 +205,13 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
 		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, enableAllFilesets)
+		forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
+		filesetOverrides := fileset.FilesetOverrides{
+			EnableAllFilesets:         enableAllFilesets,
+			ForceEnableModuleFilesets: forceEnableModuleFilesets,
+		}
+
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
 				// All module configs need to be loaded to enable all the filesets

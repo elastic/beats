@@ -12,6 +12,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -48,6 +49,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		return nil, nil, err
 	}
 
+	//nolint:prealloc // No need to preallocate the slice here
 	var sources []cursor.Source
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
@@ -111,20 +113,22 @@ func (input *azurebsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cursor.Cursor, publisher cursor.Publisher) error {
-	currentSource := src.(*Source)
-
-	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
-	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
-
 	var cp *Checkpoint
 	st := newState()
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			return err
 		}
-
 		st.setCheckpoint(cp)
 	}
+	return input.run(inputCtx, src, st, publisher)
+}
+
+func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state, publisher cursor.Publisher) error {
+	currentSource := src.(*Source)
+
+	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
+	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {

@@ -16,7 +16,7 @@
 // under the License.
 
 // Package dns implements a processor that can perform DNS lookups by sending
-// a DNS request over UDP to a recursive nameserver. Each instance of the
+// a DNS request over UDP or TLS to a recursive nameserver. Each instance of the
 // processor is independent (no shared cache) so it's best to only define one
 // instance of the processor.
 //

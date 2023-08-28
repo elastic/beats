@@ -66,6 +66,7 @@ CHANGELOG*
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
 /metricbeat/module/ @elastic/integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
@@ -155,6 +156,7 @@ CHANGELOG*
 /x-pack/filebeat/module/proofpoint @elastic/security-external-integrations
 /x-pack/filebeat/module/rabbitmq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/radware @elastic/security-external-integrations
+/x-pack/filebeat/module/salesforce @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/snort @elastic/security-external-integrations
 /x-pack/filebeat/module/snyk @elastic/security-external-integrations
 /x-pack/filebeat/module/sonicwall @elastic/security-external-integrations

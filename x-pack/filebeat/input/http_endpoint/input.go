@@ -119,6 +119,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	if ok {
 		err = checkTLSConsistency(e.addr, s.tls, e.config.TLS)
 		if err != nil {
+			p.mu.Unlock()
 			return err
 		}
 
@@ -160,6 +161,9 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
 		err = s.srv.ListenAndServe()
 	}
+	p.mu.Lock()
+	delete(p.servers, e.addr)
+	p.mu.Unlock()
 	s.setErr(err)
 	s.cancel()
 	return err
