@@ -63,12 +63,6 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 			break
 		}
 
-		if projectID, ok := resp.Resource.Labels["project_id"]; ok {
-			if projectID != r.config.ProjectID {
-				continue
-			}
-		}
-
 		timeSeries = append(timeSeries, resp)
 	}
 
