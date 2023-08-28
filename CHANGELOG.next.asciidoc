@@ -229,6 +229,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 - Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
 - Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
+- Add Azure resource tags support to Azure Billing module {pull}36428[36428]
 
 
 *Osquerybeat*
