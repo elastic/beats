@@ -210,6 +210,8 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 }
 
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
+	serverName := cfg.ServerName
+
 	switch cfg.Verification {
 	case VerifyFull:
 		// Cert is trusted by CA
@@ -234,7 +236,8 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			if err != nil {
 				return err
 			}
-			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
+
+			return verifyHostname(cs.PeerCertificates[0], serverName)
 		}
 	case VerifyCertificate:
 		// Cert is trusted by CA

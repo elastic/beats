@@ -94,7 +94,7 @@ func TestCAPinning(t *testing.T) {
 				ca, err := genCA()
 				require.NoError(t, err)
 
-				serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false)
+				serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil)
 				require.NoError(t, err)
 
 				mux := http.NewServeMux()
@@ -172,10 +172,10 @@ func TestCAPinning(t *testing.T) {
 		ca, err := genCA()
 		require.NoError(t, err)
 
-		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true)
+		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil)
 		require.NoError(t, err)
 
-		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false)
+		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil)
 		require.NoError(t, err)
 
 		mux := http.NewServeMux()
@@ -246,10 +246,10 @@ func TestCAPinning(t *testing.T) {
 		ca, err := genCA()
 		require.NoError(t, err)
 
-		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true)
+		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil)
 		require.NoError(t, err)
 
-		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false)
+		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil)
 		require.NoError(t, err)
 
 		mux := http.NewServeMux()
@@ -353,13 +353,27 @@ func genCA() (tls.Certificate, error) {
 }
 
 // genSignedCert generates a CA and KeyPair and remove the need to depends on code of agent.
-func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.Certificate, error) {
+func genSignedCert(
+	ca tls.Certificate,
+	keyUsage x509.KeyUsage,
+	isCA bool,
+	commonName string,
+	dnsNames []string,
+	ips []net.IP,
+) (tls.Certificate, error) {
+	if commonName == "" {
+		commonName = "You know, for search"
+	}
 	// Create another Cert/key
 	cert := &x509.Certificate{
-		DNSNames:     []string{"localhost"},
 		SerialNumber: big.NewInt(2000),
+
+		// SNA - Subject Alternative Name fields
+		IPAddresses: ips,
+		DNSNames:    dnsNames,
+
 		Subject: pkix.Name{
-			CommonName:    "localhost",
+			CommonName:    commonName,
 			Organization:  []string{"TESTING"},
 			Country:       []string{"CANADA"},
 			Province:      []string{"QUEBEC"},
@@ -367,6 +381,7 @@ func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.C
 			StreetAddress: []string{"testing road"},
 			PostalCode:    []string{"HOH OHO"},
 		},
+
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(1 * time.Hour),
 		IsCA:                  isCA,
