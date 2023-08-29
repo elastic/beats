@@ -218,9 +218,9 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.16
 	github.com/pkg/xattr v0.4.9
 	github.com/shirou/gopsutil/v3 v3.22.10
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.3
-	go.elastic.co/apm/module/apmhttp/v2 v2.4.3
-	go.elastic.co/apm/v2 v2.4.3
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
+	go.elastic.co/apm/module/apmhttp/v2 v2.4.4
+	go.elastic.co/apm/v2 v2.4.4
 	go.mongodb.org/mongo-driver v1.5.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
