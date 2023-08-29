@@ -47,6 +47,51 @@ func (resp *response) clone() *response {
 	return clone
 }
 
+func (resp *response) asTransformables(log *logp.Logger) []transformable {
+	var ts []transformable
+
+	convertAndAppend := func(m map[string]interface{}) {
+		tr := transformable{}
+		tr.setHeader(resp.header.Clone())
+		tr.setURL(resp.url)
+		tr.setBody(mapstr.M(m).Clone())
+		ts = append(ts, tr)
+	}
+
+	switch tresp := resp.body.(type) {
+	case []interface{}:
+		for _, v := range tresp {
+			m, ok := v.(map[string]interface{})
+			if !ok {
+				log.Debugf("events must be JSON objects, but got %T: skipping", v)
+				continue
+			}
+			convertAndAppend(m)
+		}
+	case map[string]interface{}:
+		convertAndAppend(tresp)
+	default:
+		log.Debugf("response is not a valid JSON")
+	}
+
+	return ts
+}
+
+func (resp *response) templateValues() mapstr.M {
+	if resp == nil {
+		return mapstr.M{}
+	}
+	return mapstr.M{
+		"header": resp.header.Clone(),
+		"page":   resp.page,
+		"url": mapstr.M{
+			"value":  resp.url.String(),
+			"params": resp.url.Query(),
+		},
+		"body": resp.body,
+	}
+}
+
 type responseProcessor struct {
 	metrics    *inputMetrics
 	log        *logp.Logger
@@ -214,49 +259,4 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 	}()
 
 	return ch
-}
-
-func (resp *response) asTransformables(log *logp.Logger) []transformable {
-	var ts []transformable
-
-	convertAndAppend := func(m map[string]interface{}) {
-		tr := transformable{}
-		tr.setHeader(resp.header.Clone())
-		tr.setURL(resp.url)
-		tr.setBody(mapstr.M(m).Clone())
-		ts = append(ts, tr)
-	}
-
-	switch tresp := resp.body.(type) {
-	case []interface{}:
-		for _, v := range tresp {
-			m, ok := v.(map[string]interface{})
-			if !ok {
-				log.Debugf("events must be JSON objects, but got %T: skipping", v)
-				continue
-			}
-			convertAndAppend(m)
-		}
-	case map[string]interface{}:
-		convertAndAppend(tresp)
-	default:
-		log.Debugf("response is not a valid JSON")
-	}
-
-	return ts
-}
-
-func (resp *response) templateValues() mapstr.M {
-	if resp == nil {
-		return mapstr.M{}
-	}
-	return mapstr.M{
-		"header": resp.header.Clone(),
-		"page":   resp.page,
-		"url": mapstr.M{
-			"value":  resp.url.String(),
-			"params": resp.url.Query(),
-		},
-		"body": resp.body,
-	}
 }
