@@ -44376,6 +44376,42 @@ type: keyword
 --
 
 [float]
+=== namespace_state
+
+Kubernetes namespace metrics.
+
+
+
+*`kubernetes.namespace_state.created.sec`*::
++
+--
+Unix creation timestamp.
+
+
+type: double
+
+--
+
+
+*`kubernetes.namespace_state.status.active`*::
++
+--
+Whether the namespace is active (true or false).
+
+type: boolean
+
+--
+
+*`kubernetes.namespace_state.status.terminating`*::
++
+--
+Whether the namespace is terminating (true or false).
+
+type: boolean
+
+--
+
+[float]
 === node
 
 kubernetes node metrics
@@ -46032,42 +46068,6 @@ Whether the job failed ("true", "false", or "unknown")
 
 
 type: keyword
-
---
-
-[float]
-=== namespace_state
-
-Kubernetes namespace metrics.
-
-
-
-*`kubernetes.namespace_state.created.sec`*::
-+
---
-Unix creation timestamp.
-
-
-type: double
-
---
-
-
-*`kubernetes.namespace_state.status.active`*::
-+
---
-Whether the namespace is active (true or false).
-
-type: boolean
-
---
-
-*`kubernetes.namespace_state.status.terminating`*::
-+
---
-Whether the namespace is terminating (true or false).
-
-type: boolean
 
 --
 
