@@ -25,12 +25,6 @@ import (
 
 const requestNamespace = "request"
 
-func registerRequestTransforms() {
-	registerTransform(requestNamespace, appendName, newAppendRequest)
-	registerTransform(requestNamespace, deleteName, newDeleteRequest)
-	registerTransform(requestNamespace, setName, newSetRequestPagination)
-}
-
 type httpClient struct {
 	client  *http.Client
 	limiter *rateLimiter
@@ -114,7 +108,7 @@ type requestFactory struct {
 func newRequestFactory(ctx context.Context, config config, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
-	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
 		url:               *config.Request.URL.URL,
@@ -143,7 +137,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 		var rf *requestFactory
 		// chain calls requestFactory object
 		if ch.Step != nil {
-			ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
+			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.Step.Request.Transforms, requestNamespace, log)
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
 			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log, reg)
 			if err != nil {
@@ -170,7 +164,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				chainResponseProcessor: responseProcessor,
 			}
 		} else if ch.While != nil {
-			ts, _ := newBasicTransformsFromConfig(ch.While.Request.Transforms, requestNamespace, log)
+			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
 			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)

@@ -20,9 +20,6 @@ import (
 )
 
 func TestCtxAfterDoRequest(t *testing.T) {
-	registerRequestTransforms()
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
-
 	// mock timeNow func to return a fixed value
 	timeNow = func() time.Time {
 		t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")

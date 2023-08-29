@@ -228,7 +228,7 @@ func (e maybeMsg) failed() bool { return e.err != nil }
 func (e maybeMsg) Error() string { return e.err.Error() }
 
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
-func newTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
+func newTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
 	var trans transforms
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
@@ -246,7 +246,7 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 
 		constructor, found := registeredTransforms.get(namespace, actionName)
 		if !found {
-			return nil, fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms.String())
+			return nil, fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms)
 		}
 
 		common.PrintConfigDebugf(cfg, "Configure transform '%v' with:", actionName)
@@ -261,8 +261,8 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 	return trans, nil
 }
 
-func newBasicTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) ([]basicTransform, error) {
-	ts, err := newTransformsFromConfig(config, namespace, log)
+func newBasicTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) ([]basicTransform, error) {
+	ts, err := newTransformsFromConfig(registeredTransforms, config, namespace, log)
 	if err != nil {
 		return nil, err
 	}

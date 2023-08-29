@@ -66,7 +66,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		return nil, fmt.Errorf("invalid target type: %s", ti.Type)
 	}
 
-	ts, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, log)
+	ts, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, log)
 	if err != nil {
 		return nil, err
 	}

@@ -18,12 +18,6 @@ import (
 
 const responseNamespace = "response"
 
-func registerResponseTransforms() {
-	registerTransform(responseNamespace, appendName, newAppendResponse)
-	registerTransform(responseNamespace, deleteName, newDeleteResponse)
-	registerTransform(responseNamespace, setName, newSetResponse)
-}
-
 type response struct {
 	page       int64
 	url        url.URL
@@ -75,7 +69,7 @@ func newResponseProcessor(config config, pagination *pagination, xmlDetails map[
 		rps = append(rps, rp)
 		return rps
 	}
-	ts, _ := newBasicTransformsFromConfig(config.Response.Transforms, responseNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Transforms, responseNamespace, log)
 	rp.transforms = ts
 
 	split, _ := newSplitResponse(config.Response.Split, log)
@@ -119,7 +113,7 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 			return rp
 		}
 
-		ts, _ := newBasicTransformsFromConfig(config.Step.Response.Transforms, responseNamespace, log)
+		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Step.Response.Transforms, responseNamespace, log)
 		rp.transforms = ts
 
 		split, _ := newSplitResponse(config.Step.Response.Split, log)
@@ -130,7 +124,7 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 			return rp
 		}
 
-		ts, _ := newBasicTransformsFromConfig(config.While.Response.Transforms, responseNamespace, log)
+		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.While.Response.Transforms, responseNamespace, log)
 		rp.transforms = ts
 
 		split, _ := newSplitResponse(config.While.Response.Split, log)

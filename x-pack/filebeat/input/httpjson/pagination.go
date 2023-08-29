@@ -19,12 +19,6 @@ import (
 
 const paginationNamespace = "pagination"
 
-func registerPaginationTransforms() {
-	registerTransform(paginationNamespace, appendName, newAppendPagination)
-	registerTransform(paginationNamespace, deleteName, newDeletePagination)
-	registerTransform(paginationNamespace, setName, newSetRequestPagination)
-}
-
 type pagination struct {
 	log            *logp.Logger
 	httpClient     *httpClient
@@ -44,8 +38,8 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 		return pagination
 	}
 
-	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
-	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
+	rts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, log)
+	pts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Pagination, paginationNamespace, log)
 
 	body := func() *mapstr.M {
 		if config.Response.RequestBodyOnPagination {
