@@ -255,6 +255,7 @@ Example configuration:
   enabled: true
   id: azure-1
   provider: azure-ad
+  dataset: "all"
   sync_interval: "12h"
   update_interval: "30m"
   client_id: "CLIENT_ID"
@@ -278,6 +279,14 @@ The client/application ID. Used for authentication. Field is required.
 ===== `secret`
 
 The secret value, used for authentication. Field is required.
+
+[float]
+===== `dataset`
+
+The datasets to collect from the API. This can be one of "all", "users" or "devices",
+or may be left empty for the default behavior which is to collect all entities.
+When the `dataset` is set to "devices", some user entity data is collected in order
+to populate the registered users and registered owner fields for each device.
 
 [float]
 ===== `sync_interval`
