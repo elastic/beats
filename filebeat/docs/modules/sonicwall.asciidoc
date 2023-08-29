@@ -7,7 +7,7 @@ This file is generated! See scripts/docs_collector.py
 [[filebeat-module-sonicwall]]
 [role="xpack"]
 
-:modulename: sonicwall
+:modulename: sonicwall_firewall
 :has-dashboards: false
 
 == Sonicwall module
