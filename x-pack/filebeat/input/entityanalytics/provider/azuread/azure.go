@@ -293,7 +293,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		if err != nil {
 			return updatedUsers, updatedDevices, err
 		}
-		p.logger.Debugf("Received %d devices from API", len(changedUsers))
+		p.logger.Debugf("Received %d devices from API", len(changedDevices))
 	default:
 		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.conf.Dataset)
 	}
