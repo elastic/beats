@@ -1,13 +1,13 @@
 [
     {
         "event": {
-            "dataset": "kubernetes.state_namespace",
+            "dataset": "kubernetes.namespace_state",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "kube-system",
-            "state_namespace": {
+            "namespace_state": {
                 "created": {
                     "sec": 1673879559
                 },
@@ -18,7 +18,7 @@
             }
         },
         "metricset": {
-            "name": "state_namespace",
+            "name": "namespace_state",
             "period": 10000
         },
         "service": {
@@ -28,13 +28,13 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.state_namespace",
+            "dataset": "kubernetes.namespace_state",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "kube-node-lease",
-            "state_namespace": {
+            "namespace_state": {
                 "created": {
                     "sec": 1673879559
                 },
@@ -45,7 +45,7 @@
             }
         },
         "metricset": {
-            "name": "state_namespace",
+            "name": "namespace_state",
             "period": 10000
         },
         "service": {
@@ -55,13 +55,13 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.state_namespace",
+            "dataset": "kubernetes.namespace_state",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "kube-public",
-            "state_namespace": {
+            "namespace_state": {
                 "created": {
                     "sec": 1673879559
                 },
@@ -72,7 +72,7 @@
             }
         },
         "metricset": {
-            "name": "state_namespace",
+            "name": "namespace_state",
             "period": 10000
         },
         "service": {
@@ -82,13 +82,13 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.state_namespace",
+            "dataset": "kubernetes.namespace_state",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "default",
-            "state_namespace": {
+            "namespace_state": {
                 "created": {
                     "sec": 1673879561
                 },
@@ -99,7 +99,7 @@
             }
         },
         "metricset": {
-            "name": "state_namespace",
+            "name": "namespace_state",
             "period": 10000
         },
         "service": {
@@ -109,13 +109,13 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.state_namespace",
+            "dataset": "kubernetes.namespace_state",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "local-path-storage",
-            "state_namespace": {
+            "namespace_state": {
                 "created": {
                     "sec": 1673879567
                 },
@@ -126,7 +126,7 @@
             }
         },
         "metricset": {
-            "name": "state_namespace",
+            "name": "namespace_state",
             "period": 10000
         },
         "service": {

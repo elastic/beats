@@ -93,7 +93,7 @@ const (
 	PersistentVolumeResource      = "persistentvolume"
 	PersistentVolumeClaimResource = "persistentvolumeclaim"
 	StorageClassResource          = "storageclass"
-	NamespaceResource             = "state_namespace"
+	NamespaceResource             = "namespace_state"
 )
 
 func getResource(resourceName string) kubernetes.Resource {

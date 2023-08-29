@@ -40,7 +40,7 @@ data:
                     - state_persistentvolume
                     - state_persistentvolumeclaim
                     - state_storageclass
-                    - state_namespace
+                    - namespace_state
                 - module: kubernetes
                   metricsets:
                     - apiserver
