@@ -55,6 +55,8 @@ pipeline {
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
+        githubEnv()
+        githubPrCheckApproved()
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
         gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
