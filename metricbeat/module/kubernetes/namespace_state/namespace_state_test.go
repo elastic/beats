@@ -15,25 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration && linux
+//go:build !integration
 
-package state_namespace
+package namespace_state
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func TestFetchMetricset(t *testing.T) {
-	config := test.GetKubeStateMetricsConfig(t, "namespace_state")
-	metricSet := mbtest.NewFetcher(t, config)
-	events, errs := metricSet.FetchEvents()
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
+var files = []string{
+	"../_meta/test/ksm.v2.7.0.plain",
+	"../_meta/test/ksm.v2.8.2.plain",
+	"../_meta/test/ksm.v2.9.2.plain",
+}
+
+const name = util.NamespaceResource
+
+func TestEventMapping(t *testing.T) {
+	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
+}
+
+func TestData(t *testing.T) {
+	mbtest.TestDataFiles(t, "kubernetes", name)
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestMetricsFamily(t, files, mapping)
 }
