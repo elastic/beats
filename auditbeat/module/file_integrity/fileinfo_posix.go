@@ -20,6 +20,7 @@
 package file_integrity
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/user"
@@ -27,6 +28,7 @@ import (
 	"syscall"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/xattr"
 )
 
 // NewMetadata returns a new Metadata object. If an error is returned it is
@@ -67,6 +69,19 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		fileInfo.Owner = owner.Username
 	}
 
+	var selinux []byte
+	getExtendedAttributes(path, map[string]*[]byte{
+		"security.selinux":        &selinux,
+		"system.posix_acl_access": &fileInfo.POSIXACLAccess,
+	})
+	// The selinux attr may be null terminated. It would be cheaper
+	// to use strings.TrimRight, but absent documentation saying
+	// that there is only ever a final null terminator, take the
+	// guaranteed correct path of terminating at the first found
+	// null byte.
+	selinux, _, _ = bytes.Cut(selinux, []byte{0})
+	fileInfo.SELinux = string(selinux)
+
 	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
 	if err != nil {
 		errs = append(errs, err)
@@ -77,4 +92,20 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		errs = append(errs, err)
 	}
 	return fileInfo, errs.Err()
+}
+
+func getExtendedAttributes(path string, dst map[string]*[]byte) {
+	f, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	for n, d := range dst {
+		att, err := xattr.FGet(f, n)
+		if err != nil {
+			continue
+		}
+		*d = att
+	}
 }

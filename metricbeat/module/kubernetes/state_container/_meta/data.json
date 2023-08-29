@@ -1,9 +1,9 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "db273ae4a6486d1e52dda314a8d0ce84d9014ce5e0f9c94812119a73d579e2fc",
+        "id": "c260e83eedc09fc53e541d1ce22f4f75c3d316341ccb7b8f028abdfb9fc9945f",
         "image": {
-            "name": "docker.io/kindest/kindnetd:v20221004-44d545d1"
+            "name": "registry.k8s.io/kube-proxy:v1.26.3"
         },
         "runtime": "containerd"
     },
@@ -14,24 +14,8 @@
     },
     "kubernetes": {
         "container": {
-            "cpu": {
-                "limit": {
-                    "cores": 0.1
-                },
-                "request": {
-                    "cores": 0.1
-                }
-            },
-            "id": "db273ae4a6486d1e52dda314a8d0ce84d9014ce5e0f9c94812119a73d579e2fc",
-            "memory": {
-                "limit": {
-                    "bytes": 52428800
-                },
-                "request": {
-                    "bytes": 52428800
-                }
-            },
-            "name": "kindnet-cni",
+            "id": "c260e83eedc09fc53e541d1ce22f4f75c3d316341ccb7b8f028abdfb9fc9945f",
+            "name": "kube-proxy",
             "status": {
                 "phase": "running",
                 "ready": true,
@@ -43,7 +27,7 @@
             "name": "kind-control-plane"
         },
         "pod": {
-            "name": "kindnet-4tnzw"
+            "name": "kube-proxy-nw7gg"
         }
     },
     "metricset": {

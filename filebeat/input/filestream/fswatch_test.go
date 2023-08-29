@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -379,27 +380,41 @@ scanner:
 
 		go fw.Run(ctx)
 
-		e := fw.Event()
-		expEvent := loginp.FSEvent{
-			NewPath: firstFilename,
-			Op:      loginp.OpCreate,
-			Descriptor: loginp.FileDescriptor{
-				Filename: firstFilename,
-				Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
+		expectedEvents := []loginp.FSEvent{
+			{
+				NewPath: firstFilename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: firstFilename,
+					Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
+				},
+			},
+			{
+				NewPath: secondFilename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: secondFilename,
+					Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
+				},
 			},
 		}
-		requireEqualEvents(t, expEvent, e)
+		var actualEvents []loginp.FSEvent
+		actualEvents = append(actualEvents, fw.Event())
+		actualEvents = append(actualEvents, fw.Event())
 
-		e = fw.Event()
-		expEvent = loginp.FSEvent{
-			NewPath: secondFilename,
-			Op:      loginp.OpCreate,
-			Descriptor: loginp.FileDescriptor{
-				Filename: secondFilename,
-				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
-			},
+		// since this is coming from a map, the order is not deterministic
+		// we need to sort events based on paths first
+		// we expect only creation events for two different files, so it's alright.
+		sort.Slice(actualEvents, func(i, j int) bool {
+			return actualEvents[i].NewPath < actualEvents[j].NewPath
+		})
+		sort.Slice(expectedEvents, func(i, j int) bool {
+			return expectedEvents[i].NewPath < expectedEvents[j].NewPath
+		})
+
+		for i, actualEvent := range actualEvents {
+			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
-		requireEqualEvents(t, expEvent, e)
 
 		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
 		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)

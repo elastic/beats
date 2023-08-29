@@ -41,6 +41,11 @@ type conf struct {
 	OktaDomain string `config:"okta_domain" validate:"required"`
 	OktaToken  string `config:"okta_token" validate:"required"`
 
+	// WantDevices indicates that device details
+	// should be collected. This is optional as
+	// the devices API is not necessarily activated.
+	WantDevices bool `config:"collect_device_details"`
+
 	// SyncInterval is the time between full
 	// synchronisation operations.
 	SyncInterval time.Duration `config:"sync_interval"`

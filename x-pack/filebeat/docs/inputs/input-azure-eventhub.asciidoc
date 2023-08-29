@@ -72,3 +72,22 @@ https://management.azure.com/ for azure PublicCloud
 https://management.usgovcloudapi.net/ for azure USGovernmentCloud
 Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                       | Description
+| `received_messages_total`    | Number of messages received from the event hub.
+| `received_bytes_total`       | Number of bytes received from the event hub.
+| `sanitized_messages_total`   | Number of messages that were sanitized successfully.
+| `processed_messages_total`   | Number of messages that were processed successfully.
+| `received_events_total`      | Number of events received decoding messages.
+| `sent_events_total`          | Number of events that were sent successfully. 
+| `processing_time`            | Histogram of the elapsed processing times in nanoseconds.
+| `decode_errors_total`        | Number of errors that occurred while decoding a message.
+|=======

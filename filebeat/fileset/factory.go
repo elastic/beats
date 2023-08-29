@@ -129,7 +129,7 @@ func (f *Factory) CheckConfig(c *conf.C) error {
 // createRegistry starts a registry for a set of filesets, it returns the registry and
 // its input configurations
 func (f *Factory) createRegistry(c *conf.C) (*ModuleRegistry, []*conf.C, error) {
-	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, false)
+	m, err := NewModuleRegistry([]*conf.C{c}, f.beatInfo, false, FilesetOverrides{})
 	if err != nil {
 		return nil, nil, err
 	}

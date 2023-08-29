@@ -120,6 +120,15 @@ targets:
       content: ':go-version: {{ source "latestGoVersion" }}'
       file: libbeat/docs/version.asciidoc
       matchpattern: ':go-version: \d+.\d+.\d+'
+  update-devcontainer:
+    name: "Update .devcontainer/devcontainer.json"
+    sourceid: gomod
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: 'go:1-{{ source "gomod" }}'
+      file: ./.devcontainer/devcontainer.json
+      matchpattern: 'go:1-\d+.\d+'
   update-auditbeat-dockerfile:
     name: "Update Auditbeat Dockerfile"
     sourceid: latestGoVersion

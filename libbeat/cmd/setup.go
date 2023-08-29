@@ -28,14 +28,18 @@ import (
 )
 
 const (
-	//DashboardKey used for registering dashboards in setup cmd
+	// DashboardKey used for registering dashboards in setup cmd
 	DashboardKey = "dashboards"
-	//PipelineKey used for registering pipelines in setup cmd
+	// PipelineKey used for registering pipelines in setup cmd
 	PipelineKey = "pipelines"
-	//IndexManagementKey used for loading all components related to ES index management in setup cmd
+	// IndexManagementKey used for loading all components related to ES index management in setup cmd
 	IndexManagementKey = "index-management"
-	//EnableAllFilesetsKey enables all modules and filesets regardless of config
+	// EnableAllFilesetsKey enables all modules and filesets regardless of config
 	EnableAllFilesetsKey = "enable-all-filesets"
+	// ForceEnableModuleFilesets enables all the filesets contained
+	// in the modules that have been explicitly enabled.  The
+	// requires "modules" to be used.
+	ForceEnableModuleFilesets = "force-enable-module-filesets"
 )
 
 func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
@@ -56,32 +60,33 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 				os.Exit(1)
 			}
 
-			var registeredFlags = map[string]bool{
-				DashboardKey:         false,
-				PipelineKey:          false,
-				IndexManagementKey:   false,
-				EnableAllFilesetsKey: false,
+			registeredFlags := map[string]bool{
+				DashboardKey:              false,
+				PipelineKey:               false,
+				IndexManagementKey:        false,
+				EnableAllFilesetsKey:      false,
+				ForceEnableModuleFilesets: false,
 			}
-			var setupAll = true
+			setupAll := true
 
 			// create collection with registered flags and their values
 			for k := range registeredFlags {
 				val, err := cmd.Flags().GetBool(k)
-				//if flag is not registered, an error is thrown
+				// if flag is not registered, an error is thrown
 				if err != nil {
 					delete(registeredFlags, k)
 					continue
 				}
 				registeredFlags[k] = val
 
-				//if any flag is set via cmd line then only this flag should be run
+				// if any flag is set via cmd line then only this flag should be run
 				if val {
 					setupAll = false
 				}
 			}
 
-			//create the struct to pass on
-			var s = instance.SetupSettings{}
+			// create the struct to pass on
+			s := instance.SetupSettings{}
 			for k, v := range registeredFlags {
 				if setupAll || v {
 					switch k {
@@ -93,6 +98,8 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 						s.IndexManagement = true
 					case EnableAllFilesetsKey:
 						s.EnableAllFilesets = true
+					case ForceEnableModuleFilesets:
+						s.ForceEnableModuleFilesets = true
 					}
 				}
 			}
@@ -108,6 +115,7 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 	setup.Flags().Bool(IndexManagementKey, false,
 		"Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
 	setup.Flags().Bool("enable-all-filesets", false, "Behave as if all modules and filesets had been enabled")
+	setup.Flags().Bool("force-enable-module-filesets", false, "Behave as if all filesets, within enabled modules, are enabled")
 
 	return &setup
 }

@@ -226,11 +226,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			// Process a set of event requests.
-			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
+			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now()
 			state, err = evalWith(ctx, prg, state, start)
-			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
+			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
@@ -1021,21 +1021,20 @@ func (m *inputMetrics) Close() {
 
 // redactor implements lazy field redaction of sets of a mapstr.M.
 type redactor struct {
-	state  mapstr.M
-	mask   []string // mask is the set of dotted paths to redact from state.
-	delete bool     // if delete is true, delete redacted fields instead of showing a redaction.
+	state mapstr.M
+	cfg   *redact
 }
 
 // String renders the JSON corresponding to r.state after applying redaction
 // operations.
 func (r redactor) String() string {
-	if len(r.mask) == 0 {
+	if r.cfg == nil || len(r.cfg.Fields) == 0 {
 		return r.state.String()
 	}
 	c := make(mapstr.M, len(r.state))
 	cloneMap(c, r.state)
-	for _, mask := range r.mask {
-		if r.delete {
+	for _, mask := range r.cfg.Fields {
+		if r.cfg.Delete {
 			walkMap(c, mask, func(parent mapstr.M, key string) {
 				delete(parent, key)
 			})

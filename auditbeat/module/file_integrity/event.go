@@ -23,12 +23,14 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
 	"math"
 	"os"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -127,20 +129,22 @@ type Event struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode  uint64      `json:"inode"`
-	UID    uint32      `json:"uid"`
-	GID    uint32      `json:"gid"`
-	SID    string      `json:"sid"`
-	Owner  string      `json:"owner"`
-	Group  string      `json:"group"`
-	Size   uint64      `json:"size"`
-	MTime  time.Time   `json:"mtime"`  // Last modification time.
-	CTime  time.Time   `json:"ctime"`  // Last metadata change time.
-	Type   Type        `json:"type"`   // File type (dir, file, symlink).
-	Mode   os.FileMode `json:"mode"`   // Permissions
-	SetUID bool        `json:"setuid"` // setuid bit (POSIX only)
-	SetGID bool        `json:"setgid"` // setgid bit (POSIX only)
-	Origin []string    `json:"origin"` // External origin info for the file (MacOS only)
+	Inode          uint64      `json:"inode"`
+	UID            uint32      `json:"uid"`
+	GID            uint32      `json:"gid"`
+	SID            string      `json:"sid"`
+	Owner          string      `json:"owner"`
+	Group          string      `json:"group"`
+	Size           uint64      `json:"size"`
+	MTime          time.Time   `json:"mtime"`            // Last modification time.
+	CTime          time.Time   `json:"ctime"`            // Last metadata change time.
+	Type           Type        `json:"type"`             // File type (dir, file, symlink).
+	Mode           os.FileMode `json:"mode"`             // Permissions
+	SetUID         bool        `json:"setuid"`           // setuid bit (POSIX only)
+	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
+	Origin         []string    `json:"origin"`           // External origin info for the file (MacOS only)
+	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
+	POSIXACLAccess []byte      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -319,6 +323,15 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		if len(info.Origin) > 0 {
 			file["origin"] = info.Origin
 		}
+		if info.SELinux != "" {
+			file["selinux"] = info.SELinux
+		}
+		if len(info.POSIXACLAccess) != 0 {
+			a, err := aclText(info.POSIXACLAccess)
+			if err == nil {
+				file["posix_acl_access"] = a
+			}
+		}
 	}
 
 	if len(e.Hashes) > 0 {
@@ -332,14 +345,14 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file[k] = v
 	}
 
-	out.MetricSetFields.Put("event.kind", "event")              //nolint:errcheck // Will not error.
-	out.MetricSetFields.Put("event.category", []string{"file"}) //nolint:errcheck // Will not error.
+	out.MetricSetFields.Put("event.kind", "event")
+	out.MetricSetFields.Put("event.category", []string{"file"})
 	if e.Action > 0 {
 		actions := e.Action.InOrder(existedBefore, e.Info != nil)
-		out.MetricSetFields.Put("event.type", actions.ECSTypes())      //nolint:errcheck // Will not error.
-		out.MetricSetFields.Put("event.action", actions.StringArray()) //nolint:errcheck // Will not error.
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())
+		out.MetricSetFields.Put("event.action", actions.StringArray())
 	} else {
-		out.MetricSetFields.Put("event.type", None.ECSTypes()) //nolint:errcheck // Will not error.
+		out.MetricSetFields.Put("event.type", None.ECSTypes())
 	}
 
 	if n := len(e.errors); n > 0 {
@@ -348,12 +361,80 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			errors[idx] = err.Error()
 		}
 		if n == 1 {
-			out.MetricSetFields.Put("error.message", errors[0]) //nolint:errcheck // Will not error.
+			out.MetricSetFields.Put("error.message", errors[0])
 		} else {
-			out.MetricSetFields.Put("error.message", errors) //nolint:errcheck // Will not error.
+			out.MetricSetFields.Put("error.message", errors)
 		}
 	}
 	return out
+}
+
+func aclText(b []byte) ([]string, error) {
+	if (len(b)-4)%8 != 0 {
+		return nil, fmt.Errorf("unexpected ACL length: %d", len(b))
+	}
+	b = b[4:] // The first four bytes is the version, discard it.
+	a := make([]string, 0, len(b)/8)
+	for len(b) != 0 {
+		tag := binary.LittleEndian.Uint16(b)
+		perm := binary.LittleEndian.Uint16(b[2:])
+		qual := binary.LittleEndian.Uint32(b[4:])
+		a = append(a, fmt.Sprintf("%s:%s:%s", tags[tag], qualString(qual, tag), modeString(perm)))
+		b = b[8:]
+	}
+	return a, nil
+}
+
+var tags = map[uint16]string{
+	0x00: "undefined",
+	0x01: "user",
+	0x02: "user",
+	0x04: "group",
+	0x08: "group",
+	0x10: "mask",
+	0x20: "other",
+}
+
+func qualString(qual uint32, tag uint16) string {
+	if qual == math.MaxUint32 {
+		// 0xffffffff is undefined ID, so return zero.
+		return ""
+	}
+	const (
+		tagUser  = 0x02
+		tagGroup = 0x08
+	)
+	id := strconv.Itoa(int(qual))
+	switch tag {
+	case tagUser:
+		u, err := user.LookupId(id)
+		if err == nil {
+			return u.Username
+		}
+	case tagGroup:
+		g, err := user.LookupGroupId(id)
+		if err == nil {
+			return g.Name
+		}
+	}
+	// Fallback to the numeric ID if we can't get a name
+	// or the tag is other than user/group.
+	return id
+}
+
+func modeString(perm uint16) string {
+	var buf [3]byte
+	w := 0
+	const rwx = "rwx"
+	for i, c := range rwx {
+		if perm&(1<<uint(len(rwx)-1-i)) != 0 {
+			buf[w] = byte(c)
+		} else {
+			buf[w] = '-'
+		}
+		w++
+	}
+	return string(buf[:w])
 }
 
 // diffEvents returns true if the file info differs between the old event and
@@ -405,7 +486,8 @@ func diffEvents(old, new *Event) (Action, bool) {
 	if o, n := old.Info, new.Info; o != nil && n != nil {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
-			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID {
+			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID ||
+			o.SELinux != n.SELinux || !bytes.Equal(o.POSIXACLAccess, n.POSIXACLAccess) {
 			result |= AttributesModified
 		}
 
