@@ -19,6 +19,7 @@ package journalfield
 
 import (
 	"fmt"
+	"math/bits"
 	"regexp"
 	"strconv"
 	"strings"
@@ -116,6 +117,7 @@ func withECSEnrichment(fields mapstr.M) mapstr.M {
 	setGidUidFields("journald.object", fields)
 	setProcessFields("journald", fields)
 	setProcessFields("journald.object", fields)
+	expandCapabilities(fields)
 	return fields
 }
 
@@ -171,6 +173,87 @@ func setProcessFields(prefix string, fields mapstr.M) {
 		_, _ = fields.Put("process.args", args)
 		_, _ = fields.Put("process.args_count", len(args))
 	}
+}
+
+// expandCapabilites expands the hex string of capabilities bits in the
+// journald.process.capabilities field in-place into an array of conventional
+// capabilities names in process.thread.capabilities.effective. If a
+// capability is unknown it is rendered as the numeric value of the cap.
+// The original capabilities string is not altered. If any error is
+// encountered no modification is made to the fields.
+func expandCapabilities(fields mapstr.M) {
+	cs, err := fields.GetValue("journald.process.capabilities")
+	if err != nil {
+		return
+	}
+	c, ok := cs.(string)
+	if !ok {
+		return
+	}
+	w, err := strconv.ParseUint(c, 16, 64)
+	if err != nil {
+		return
+	}
+	if w == 0 {
+		return
+	}
+	caps := make([]string, 0, bits.OnesCount64(w))
+	for i := 0; w != 0; i++ {
+		if w&1 != 0 {
+			if i < len(capTable) {
+				caps = append(caps, capTable[i])
+			} else {
+				caps = append(caps, strconv.Itoa(i))
+			}
+		}
+		w >>= 1
+	}
+	fields.Put("process.thread.capabilities.effective", caps)
+}
+
+// include/uapi/linux/capability.h
+var capTable = [...]string{
+	0:  "cap_chown",
+	1:  "cap_dac_override",
+	2:  "cap_dac_read_search",
+	3:  "cap_fowner",
+	4:  "cap_fsetid",
+	5:  "cap_kill",
+	6:  "cap_setgid",
+	7:  "cap_setuid",
+	8:  "cap_setpcap",
+	9:  "cap_linux_immutable",
+	10: "cap_net_bind_service",
+	11: "cap_net_broadcast",
+	12: "cap_net_admin",
+	13: "cap_net_raw",
+	14: "cap_ipc_lock",
+	15: "cap_ipc_owner",
+	16: "cap_sys_module",
+	17: "cap_sys_rawio",
+	18: "cap_sys_chroot",
+	19: "cap_sys_ptrace",
+	20: "cap_sys_pacct",
+	21: "cap_sys_admin",
+	22: "cap_sys_boot",
+	23: "cap_sys_nice",
+	24: "cap_sys_resource",
+	25: "cap_sys_time",
+	26: "cap_sys_tty_config",
+	27: "cap_mknod",
+	28: "cap_lease",
+	29: "cap_audit_write",
+	30: "cap_audit_control",
+	31: "cap_setfcap",
+	32: "cap_mac_override",
+	33: "cap_mac_admin",
+	34: "cap_syslog",
+	35: "cap_wake_alarm",
+	36: "cap_block_suspend",
+	37: "cap_audit_read",
+	38: "cap_perfmon",
+	39: "cap_bpf",
+	40: "cap_checkpoint_restore",
 }
 
 func getStringFromFields(key string, fields mapstr.M) string {
