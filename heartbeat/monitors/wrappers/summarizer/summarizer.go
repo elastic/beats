@@ -45,7 +45,6 @@ type Summarizer struct {
 }
 
 type JobSummary struct {
-	Id           int
 	Attempt      uint16                   `json:"attempt"`
 	MaxAttempts  uint16                   `json:"max_attempts"`
 	FinalAttempt bool                     `json:"final_attempt"`
