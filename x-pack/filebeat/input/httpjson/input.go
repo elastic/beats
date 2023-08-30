@@ -265,6 +265,43 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	return netHTTPClient, nil
 }
 
+func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
+	// Make retryable HTTP client
+	netHTTPClient, err := newNetHTTPClient(ctx, requestCfg, log, reg)
+	if err != nil {
+		return nil, err
+	}
+
+	var retryPolicyFunc retryablehttp.CheckRetry
+	if len(p) != 0 {
+		retryPolicyFunc = p[0].CustomRetryPolicy
+	} else {
+		retryPolicyFunc = retryablehttp.DefaultRetryPolicy
+	}
+
+	client := &retryablehttp.Client{
+		HTTPClient:   netHTTPClient,
+		Logger:       newRetryLogger(log),
+		RetryWaitMin: requestCfg.Retry.getWaitMin(),
+		RetryWaitMax: requestCfg.Retry.getWaitMax(),
+		RetryMax:     requestCfg.Retry.getMaxAttempts(),
+		CheckRetry:   retryPolicyFunc,
+		Backoff:      retryablehttp.DefaultBackoff,
+	}
+
+	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, log)
+
+	if authCfg != nil && authCfg.OAuth2.isEnabled() {
+		authClient, err := authCfg.OAuth2.client(ctx, client.StandardClient())
+		if err != nil {
+			return nil, err
+		}
+		return &httpClient{client: authClient, limiter: limiter}, nil
+	}
+
+	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+}
+
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
 func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
