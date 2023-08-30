@@ -136,13 +136,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
-- Support collecting metrics from both the monitoring account and linked accounts from AWS CloudWatch. {pull}35540[35540]
-- Add new parameter `include_linked_accounts` to enable/disable metrics collection from multiple linked AWS Accounts {pull}35648[35648]
-- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
-- Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
-- Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
 - Add Azure resource tags support to Azure Billing module {pull}36428[36428]
-
 
 *Osquerybeat*
 
