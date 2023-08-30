@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_process_metadata
+package add_remote_metadata
 
 import (
 	"context"
@@ -69,7 +69,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	}
 	src, cancel, err := new(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the %s configuration for provider %s: %w", name, config.Provider, err)
+		return nil, fmt.Errorf("failed to unpack the %s configuration for provider %s: %w", name, config.Provider, err)
 	}
 
 	// Logging (each processor instance has a unique ID).
@@ -91,7 +91,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	return &p, nil
 }
 
-// MetadatGetter is the interface implemented by metadata providers.
+// MetadataGetter is the interface implemented by metadata providers.
 type MetadataGetter interface {
 	GetMetadata(key string) (interface{}, error)
 }
@@ -100,7 +100,7 @@ var providers = map[string]func(*conf.C) (MetadataGetter, context.CancelFunc, er
 	"map": newMapProvider,
 }
 
-// mapProvider is a simple providers based on a static map look-up.
+// mapProvider is a simple provider based on a static map look-up.
 type mapProvider map[string]interface{}
 
 func newMapProvider(cfg *conf.C) (MetadataGetter, context.CancelFunc, error) {
@@ -126,7 +126,7 @@ func (p mapProvider) GetMetadata(k string) (interface{}, error) {
 // noop is a no-op context.CancelFunc.
 func noop() {}
 
-// Run enriches the given event with the host meta data.
+// Run enriches the given event with the host metadata.
 func (p *addRemoteMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	for _, k := range p.config.MatchKeys {
 		result, err := p.enrich(event, k)

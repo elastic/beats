@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_process_metadata
+package add_remote_metadata
 
 import (
 	"errors"
