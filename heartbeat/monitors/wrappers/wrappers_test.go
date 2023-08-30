@@ -87,7 +87,7 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		results, err := jobs.ExecJobsAndConts(t, wrapped)
 		assert.NoError(t, err)
 
-		require.Len(t, results, len(tt.want), "Expected test def wants to correspond exactly to number results.")
+		assert.Len(t, results, len(tt.want), "Expected test def wants to correspond exactly to number results.")
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
 
@@ -354,43 +354,45 @@ func TestRetryMultiCont(t *testing.T) {
 		state     monitorstate.State
 	}{
 		{
-			"up",
+			"down",
 			summarizer.JobSummary{
-				Status:       "up",
+				Status:       "down",
 				FinalAttempt: true,
 				// we expect two up since this is a lightweight
 				// job and all events get a monitor status
 				// since no errors are returned that's 2
-				Up:          2,
-				Down:        0,
+				Up:          0,
+				Down:        2,
 				Attempt:     1,
 				MaxAttempts: 2,
 			},
 			monitorstate.State{
-				Status: "up",
-				Up:     2,
-				Down:   0,
-				Checks: 1,
+				Status: "down",
+				Up:     0,
+				Down:   2,
+				Checks: 2,
 			},
 		},
 		{
-			"up",
+			"down",
 			summarizer.JobSummary{
-				Status:       "up",
+				Status:       "down",
 				FinalAttempt: true,
-				Up:           2,
-				Down:         0,
-				Attempt:      1,
+				Up:           0,
+				Down:         2,
+				Attempt:      2,
 				MaxAttempts:  2,
 			},
 			monitorstate.State{
-				Status: "up",
-				Up:     2,
-				Down:   0,
-				Checks: 1,
+				Status: "down",
+				Up:     0,
+				Down:   2,
+				Checks: 2,
 			},
 		},
 	}
+
+	jobErr := fmt.Errorf("down")
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
 		expIdx := 0
@@ -399,9 +401,9 @@ func TestRetryMultiCont(t *testing.T) {
 			u, err := url.Parse(u)
 			require.NoError(t, err)
 			eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
+
 			return []jobs.Job{
 				func(event *beat.Event) ([]jobs.Job, error) {
-
 					eventext.MergeEventFields(event, mapstr.M{"cont": "2nd"})
 					eventext.MergeEventFields(event, mapstr.M{"url": URLFields(u)})
 
@@ -411,12 +413,12 @@ func TestRetryMultiCont(t *testing.T) {
 					}
 					exp := expected[expIdx]
 					if exp.js.Status == "down" {
-						return nil, fmt.Errorf("got a down status")
+						return nil, jobErr
 					}
 
 					return nil, nil
 				},
-			}, nil
+			}, jobErr
 		}
 	}
 
@@ -425,12 +427,16 @@ func TestRetryMultiCont(t *testing.T) {
 			urlValidator(t, u),
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
+				"error": map[string]interface{}{
+					"message": isdef.IsString,
+					"type":    isdef.IsString,
+				},
 				"monitor": map[string]interface{}{
 					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
-					"status":      "up",
+					"status":      "down",
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 				"state": isdef.Optional(hbtestllext.IsMonitorState),
