@@ -27,6 +27,19 @@ data:
                   period: 10s
                   add_metadata: true
                   metricsets:
+                    - state_node
+                    - state_deployment
+                    - state_daemonset
+                    - state_replicaset
+                    - state_pod
+                    - state_container
+                    - state_cronjob
+                    - state_resourcequota
+                    - state_statefulset
+                    - state_service
+                    - state_persistentvolume
+                    - state_persistentvolumeclaim
+                    - state_storageclass
                     - state_namespace
                 - module: kubernetes
                   metricsets:
@@ -52,11 +65,9 @@ data:
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
     output.elasticsearch:
-      hosts:  ["https://elasticsearch:9200"] #['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
-      ssl.verification_mode: "none"
-      allow_older_versions: true
 ---
 apiVersion: v1
 kind: ConfigMap
