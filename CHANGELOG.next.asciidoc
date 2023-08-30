@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Add Azure resource tags support to Azure Billing module {pull}36428[36428]
 
 *Osquerybeat*
 
