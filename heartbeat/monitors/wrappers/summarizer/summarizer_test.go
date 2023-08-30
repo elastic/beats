@@ -41,53 +41,66 @@ func TestSummarizer(t *testing.T) {
 		}
 	}
 
+	// these tests use strings to describe sequences of events
 	tests := []struct {
-		name           string
-		maxAttempts    int
+		name        string
+		maxAttempts int
+		// The sequence of up down states the monitor should emit
+		// Equivalent to monitor.status
 		statusSequence string
+		// The expected states on each event
 		expectedStates string
+		// the attempt number of the given event
+		expectedAttempts string
 	}{
 		{
 			"start down, transition to up",
 			2,
 			"du",
 			"du",
+			"12",
 		},
 		{
 			"start up, stay up",
 			2,
 			"uuuuuuuu",
 			"uuuuuuuu",
+			"11111111",
 		},
 		{
 			"start down, stay down",
 			2,
 			"dddddddd",
 			"dddddddd",
+			"12121212",
 		},
 		{
 			"start up - go down with one retry - thenrecover",
 			2,
 			"udddduuu",
 			"uuddduuu",
+			"11212111",
 		},
 		{
 			"start up, transient down, recover",
 			2,
 			"uuuduuuu",
 			"uuuuuuuu",
+			"11112111",
 		},
 		{
 			"start up, multiple transient down, recover",
 			2,
 			"uuudududu",
 			"uuuuuuuuu",
+			"111121212",
 		},
 		{
 			"no retries, single down",
 			1,
 			"uuuduuuu",
 			"uuuduuuu",
+			"11111111",
 		},
 	}
 
@@ -121,7 +134,9 @@ func TestSummarizer(t *testing.T) {
 
 			rcvdStatuses := ""
 			rcvdStates := ""
+			rcvdAttempts := ""
 			i := 0
+			var lastSummary *JobSummary
 			for {
 				s := NewSummarizer(job, sf, tracker)
 				// Shorten retry delay to make tests run faster
@@ -138,6 +153,20 @@ func TestSummarizer(t *testing.T) {
 					} else {
 						rcvdStates += "_"
 					}
+					summaryIface, _ := event.GetValue("summary")
+					summary := summaryIface.(*JobSummary)
+
+					if summary == nil {
+						rcvdAttempts += "!"
+					} else if lastSummary != nil {
+						if summary.Attempt > 1 {
+							require.Equal(t, lastSummary.RetryGroup, summary.RetryGroup)
+						} else {
+							require.NotEqual(t, lastSummary.RetryGroup, summary.RetryGroup)
+						}
+					}
+					rcvdAttempts += fmt.Sprintf("%d", summary.Attempt)
+					lastSummary = summary
 				}
 				i += len(events)
 				if i >= len(tt.statusSequence) {
@@ -146,6 +175,7 @@ func TestSummarizer(t *testing.T) {
 			}
 			require.Equal(t, tt.statusSequence, rcvdStatuses)
 			require.Equal(t, tt.expectedStates, rcvdStates)
+			require.Equal(t, tt.expectedAttempts, rcvdAttempts)
 		})
 	}
 }
