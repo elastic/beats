@@ -17,7 +17,7 @@
 
 //go:build !integration
 
-package namespace_state
+package state_namespace
 
 import (
 	"testing"

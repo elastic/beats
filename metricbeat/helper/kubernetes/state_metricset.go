@@ -99,11 +99,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	// The name of the metric state can be obtained by using m.BaseMetricSet.Name(). However, names that start with state_* (e.g. state_cronjob)
 	// need to have that prefix removed. So, for example, strings.ReplaceAll("state_cronjob", "state_", "") would result in just cronjob.
-	// Exception is namespace_state, as field kubernetes.namespace already exists, and we need to create a new object
-	// for the namespace_state metricset.
+	// Exception is state_namespace, as field kubernetes.namespace already exists, and we need to create a new object
+	// for the state_namespace metricset.
 	resourceName := m.BaseMetricSet.Name()
 	if resourceName != util.NamespaceResource {
 		resourceName = strings.ReplaceAll(resourceName, prefix, "")
+	} else {
+		resourceName = "namespace_state"
 	}
 
 	m.enricher.Start()

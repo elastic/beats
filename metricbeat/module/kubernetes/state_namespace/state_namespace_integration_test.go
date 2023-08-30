@@ -17,7 +17,7 @@
 
 //go:build integration && linux
 
-package namespace_state
+package state_namespace
 
 import (
 	"testing"
@@ -29,7 +29,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config := test.GetKubeStateMetricsConfig(t, "namespace_state")
+	config := test.GetKubeStateMetricsConfig(t, "state_namespace")
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
 	if len(errs) > 0 {

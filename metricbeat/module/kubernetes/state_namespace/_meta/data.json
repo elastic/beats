@@ -6,7 +6,7 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-system",
+        "namespace": "kube-node-lease",
         "namespace_state": {
             "created": {
                 "sec": 1691566337
@@ -18,7 +18,7 @@
         }
     },
     "metricset": {
-        "name": "namespace_state",
+        "name": "state_namespace",
         "period": 10000
     },
     "service": {

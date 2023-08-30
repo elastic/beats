@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package namespace_state
+package state_namespace
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
