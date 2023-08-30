@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -457,6 +458,18 @@ func TestIgnoreMissing(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestProcessorStringer(t *testing.T) {
+	testConfig, err := config.NewConfigFrom(mapstr.M{
+		"fields":   []string{"field1"},
+		"encoding": "hex",
+		"method":   "md5",
+	})
+	assert.NoError(t, err)
+	p, err := New(testConfig)
+	assert.NoError(t, err)
+	assert.Equal(t, `fingerprint={"Method":"md5","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
 }
 
 func BenchmarkHashMethods(b *testing.B) {
