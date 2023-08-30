@@ -45,17 +45,12 @@ func ExecJobAndConts(t *testing.T, j Job) ([]*beat.Event, error) {
 	event := &beat.Event{}
 	results = append(results, event)
 	cont, err := j(event)
-	if err != nil {
-		return nil, err
-	}
 
 	for _, cj := range cont {
-		cjResults, err := ExecJobAndConts(t, cj)
-		if err != nil {
-			return nil, err
-		}
+		var cjResults []*beat.Event
+		cjResults, err = ExecJobAndConts(t, cj)
 		results = append(results, cjResults...)
 	}
 
-	return results, nil
+	return results, err
 }

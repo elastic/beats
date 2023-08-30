@@ -20,6 +20,7 @@ package summarizer
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/gofrs/uuid"
 
@@ -40,9 +41,11 @@ type Summarizer struct {
 	checkGroup     string
 	stateTracker   *monitorstate.Tracker
 	sf             stdfields.StdMonitorFields
+	retryDelay     time.Duration
 }
 
 type JobSummary struct {
+	Id           int
 	Attempt      uint16                   `json:"attempt"`
 	MaxAttempts  uint16                   `json:"max_attempts"`
 	FinalAttempt bool                     `json:"final_attempt"`
@@ -65,15 +68,21 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 		checkGroup:     uu.String(),
 		stateTracker:   mst,
 		sf:             sf,
+		// private property, but can be overriden in tests to speed them up
+		retryDelay: time.Second,
 	}
 }
+
+var id int
 
 func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
 	if maxAttempts < 1 {
 		maxAttempts = 1
 	}
 
+	id++
 	return &JobSummary{
+		Id:          id,
 		MaxAttempts: maxAttempts,
 		Attempt:     attempt,
 		RetryGroup:  retryGroup,
@@ -137,7 +146,19 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 				s.contsRemaining = 1
 				s.checkGroup = fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt)
-				conts = []jobs.Job{s.rootJob}
+
+				// Delay retries by 1s for two reasons:
+				// 1. Since ES timestamps are millisecond resolution they can happen so fast
+				//    that it's hard to tell the sequence in which jobs executed apart in our
+				//    kibana queries
+				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
+				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
+					return func(event *beat.Event) ([]jobs.Job, error) {
+						time.Sleep(s.retryDelay)
+						return j(event)
+					}
+				})
+				conts = []jobs.Job{delayedRootJob}
 			}
 		}
 
