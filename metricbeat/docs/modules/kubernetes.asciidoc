@@ -157,7 +157,7 @@ roleRef:
 === Compatibility
 
 The Kubernetes module is tested with the following versions of Kubernetes:
-1.23.x, 1.24.x, 1.25.x, 1.26.x
+1.25.x, 1.26.x and 1.27.x.
 
 [float]
 === Dashboard

@@ -842,6 +842,12 @@ would have to list every module with the <<modules-command,`modules`>>
 command and enable every fileset within the module with a `-M` option,
 to load all of the ingest pipelines.
 
+*`--force-enable-module-filesets`*::
+Enables all filesets in the enabled modules. This is useful with
+`--pipelines` if you want to load ingest pipelines. Without this
+option you enable every fileset within the module with a `-M` option,
+to load the ingest pipelines.
+
 endif::[]
 
 *`--index-management`*::

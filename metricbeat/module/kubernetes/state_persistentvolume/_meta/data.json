@@ -8,11 +8,11 @@
     "kubernetes": {
         "persistentvolume": {
             "capacity": {
-                "bytes": 5368709120
+                "bytes": 2048
             },
-            "name": "pv0003",
-            "phase": "Available",
-            "storage_class": "slow"
+            "name": "task-pv-volume",
+            "phase": "Bound",
+            "storage_class": "generic"
         }
     },
     "metricset": {

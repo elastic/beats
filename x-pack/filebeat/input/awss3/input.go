@@ -69,6 +69,18 @@ type s3Input struct {
 
 func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
+
+	if config.AWSConfig.Endpoint != "" {
+		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
+		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+			return awssdk.Endpoint{
+				PartitionID:   "aws",
+				URL:           config.AWSConfig.Endpoint,
+				SigningRegion: awsConfig.Region,
+			}, nil
+		})
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}

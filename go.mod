@@ -28,8 +28,8 @@ require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.13.3
 	github.com/aws/aws-sdk-go-v2 v1.18.0
-	github.com/aws/aws-sdk-go-v2/config v1.15.12
-	github.com/aws/aws-sdk-go-v2/credentials v1.12.7
+	github.com/aws/aws-sdk-go-v2/config v1.17.7
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.20
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.26.0
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.15.5
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.18.4
@@ -39,9 +39,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/organizations v1.15.2
 	github.com/aws/aws-sdk-go-v2/service/rds v1.20.1
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.13.5
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.12
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.11
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.18.4
-	github.com/aws/aws-sdk-go-v2/service/sts v1.16.8
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.19
 	github.com/awslabs/goformation/v4 v4.1.0
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
@@ -69,7 +69,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.2.0
+	github.com/elastic/elastic-agent-client/v7 v7.3.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.3
 	github.com/elastic/go-licenser v0.4.1
@@ -78,7 +78,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.3.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.11.0
+	github.com/elastic/go-sysinfo v1.11.1
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -140,7 +140,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
@@ -152,14 +152,14 @@ require (
 	go.uber.org/atomic v1.10.0
 	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.24.0
-	golang.org/x/crypto v0.6.0
+	golang.org/x/crypto v0.12.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.9.0
-	golang.org/x/net v0.9.0
+	golang.org/x/net v0.10.0
 	golang.org/x/oauth2 v0.7.0
 	golang.org/x/sync v0.1.0
-	golang.org/x/sys v0.9.0
-	golang.org/x/text v0.9.0
+	golang.org/x/sys v0.11.0
+	golang.org/x/text v0.12.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.6.0
 	google.golang.org/api v0.103.0
@@ -191,18 +191,18 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.14
 	github.com/apache/arrow/go/v12 v12.0.1-0.20230605094802-c153c6d36ccf
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.7
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.17
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.17
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.33
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
 	github.com/aws/smithy-go v1.13.5
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.2
-	github.com/elastic/elastic-agent-libs v0.3.11
+	github.com/elastic/elastic-agent-libs v0.3.13
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
@@ -213,11 +213,14 @@ require (
 	github.com/googleapis/gax-go/v2 v2.7.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
-	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/lestrrat-go/jwx/v2 v2.0.11
+	github.com/otiai10/copy v1.12.0
+	github.com/pierrec/lz4/v4 v4.1.16
+	github.com/pkg/xattr v0.4.9
 	github.com/shirou/gopsutil/v3 v3.22.10
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
-	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
-	go.elastic.co/apm/v2 v2.0.0
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
+	go.elastic.co/apm/module/apmhttp/v2 v2.4.4
+	go.elastic.co/apm/v2 v2.4.4
 	go.mongodb.org/mongo-driver v1.5.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
@@ -244,20 +247,22 @@ require (
 	github.com/apache/thrift v0.18.1 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.60 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.3 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.33 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.27 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.14 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.11.10 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.24 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.14 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.18 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.17 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.17 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.23 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
@@ -268,13 +273,13 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
+	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/here v0.6.7 // indirect
-	github.com/goccy/go-json v0.9.11 // indirect
+	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
@@ -293,7 +298,6 @@ require (
 	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jcchavezs/porto v0.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.0.0 // indirect
@@ -308,6 +312,11 @@ require (
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
+	github.com/lestrrat-go/httpcc v1.0.1 // indirect
+	github.com/lestrrat-go/httprc v1.0.4 // indirect
+	github.com/lestrrat-go/iter v1.0.2 // indirect
+	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/markbates/pkger v0.17.1 // indirect
@@ -330,7 +339,7 @@ require (
 	github.com/prometheus/client_golang v1.11.1 // indirect
 	github.com/rootless-containers/rootlesskit v1.1.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
-	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
+	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
@@ -349,7 +358,7 @@ require (
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20220921023135-46d9e7742f1e // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/term v0.11.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -376,6 +385,7 @@ require (
 replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.0.1-0.20230529151645-4546c1b1f847
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
+	github.com/Microsoft/hcsshim => github.com/Microsoft/hcsshim v0.9.8
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
@@ -389,7 +399,9 @@ replace (
 	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
+	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
+	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
 )
 
 // Exclude this version because the version has an invalid checksum.

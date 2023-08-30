@@ -10,11 +10,11 @@
             "completions": {
                 "desired": 1
             },
-            "name": "hello-cronjob-27900586",
+            "name": "hello-28192809",
             "owner": {
                 "is_controller": "true",
                 "kind": "CronJob",
-                "name": "hello-cronjob"
+                "name": "hello"
             },
             "parallelism": {
                 "desired": 1
@@ -28,11 +28,11 @@
                 "complete": "true"
             },
             "time": {
-                "completed": "2023-01-18T09:46:04.000Z",
-                "created": "2023-01-18T09:46:00.000Z"
+                "completed": "2023-08-09T08:09:04.000Z",
+                "created": "2023-08-09T08:09:00.000Z"
             }
         },
-        "namespace": "kube-system"
+        "namespace": "default"
     },
     "metricset": {
         "name": "state_job",

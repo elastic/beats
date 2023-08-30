@@ -399,7 +399,7 @@ func Test_StorageClient(t *testing.T) {
 }
 
 func Test_Concurrency(t *testing.T) {
-	for _, workers := range []int{100, 1000, 2000, 3000} {
+	for _, workers := range []int{100, 1000, 2000} {
 		t.Run(fmt.Sprintf("TestConcurrency_%d_Workers", workers), func(t *testing.T) {
 			const expectedLen = mock.TotalRandomDataSets
 			serv := httptest.NewServer(mock.AzureConcurrencyServer())

@@ -17,12 +17,14 @@ import (
 )
 
 var (
-	usersBucket = []byte("users")
-	stateBucket = []byte("state")
+	usersBucket   = []byte("users")
+	devicesBucket = []byte("devices")
+	stateBucket   = []byte("state")
 
-	lastSyncKey   = []byte("last_sync")
-	lastUpdateKey = []byte("last_update")
-	usersLinkKey  = []byte("users_link")
+	lastSyncKey    = []byte("last_sync")
+	lastUpdateKey  = []byte("last_update")
+	usersLinkKey   = []byte("users_link")
+	devicesLinkKey = []byte("devices_link")
 )
 
 //go:generate stringer -type State
@@ -40,19 +42,28 @@ type User struct {
 	State     State `json:"state"`
 }
 
+type Device struct {
+	okta.Device `json:"properties"`
+	State       State `json:"state"`
+}
+
 // stateStore wraps a kvstore.Transaction and provides convenience methods for
 // accessing and store relevant data within the kvstore database.
 type stateStore struct {
 	tx *kvstore.Transaction
 
-	// next is a url.Values stored as a string to make
-	// use of the direct serialisation/deserialisation
+	// nextUsers and nextDevices are url.Values stored as a string
+	// to make use of the direct serialisation/deserialisation
 	// rather than encoding/json.
-	next string
+	nextUsers   string
+	nextDevices string
 
+	// lastSync and lastUpdate are the times of the first update
+	// or sync operation of users/devices.
 	lastSync   time.Time
 	lastUpdate time.Time
 	users      map[string]*User
+	devices    map[string]*Device
 }
 
 // newStateStore creates a new instance of stateStore. It will open a new write
@@ -67,8 +78,9 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	}
 
 	s := stateStore{
-		users: make(map[string]*User),
-		tx:    tx,
+		users:   make(map[string]*User),
+		devices: make(map[string]*Device),
+		tx:      tx,
 	}
 
 	err = s.tx.Get(stateBucket, lastSyncKey, &s.lastSync)
@@ -79,9 +91,13 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	if err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get last update time from state: %w", err)
 	}
-	err = s.tx.Get(stateBucket, usersLinkKey, &s.next)
+	err = s.tx.Get(stateBucket, usersLinkKey, &s.nextUsers)
 	if err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get users link from state: %w", err)
+	}
+	err = s.tx.Get(stateBucket, devicesLinkKey, &s.nextDevices)
+	if err != nil && !errIsItemNotFound(err) {
+		return nil, fmt.Errorf("unable to get devices link from state: %w", err)
 	}
 
 	err = s.tx.ForEach(usersBucket, func(key, value []byte) error {
@@ -96,6 +112,20 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	})
 	if err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get users from state: %w", err)
+	}
+
+	err = s.tx.ForEach(devicesBucket, func(key, value []byte) error {
+		var d Device
+		err = json.Unmarshal(value, &d)
+		if err != nil {
+			return fmt.Errorf("unable to unmarshal device from state: %w", err)
+		}
+		s.devices[d.ID] = &d
+
+		return nil
+	})
+	if err != nil && !errIsItemNotFound(err) {
+		return nil, fmt.Errorf("unable to get devices from state: %w", err)
 	}
 
 	return &s, nil
@@ -118,6 +148,25 @@ func (s *stateStore) storeUser(u okta.User) *User {
 		s.users[u.ID] = &su
 	}
 	return &su
+}
+
+// storeDevice stores a device. If the device does not exist in the store, then the
+// device will be marked as discovered. Otherwise, the user will be marked
+// as modified.
+func (s *stateStore) storeDevice(d okta.Device) *Device {
+	du := Device{Device: d}
+	if d.Status == "DEPROVISIONED" {
+		du.State = Deleted
+		return &du
+	}
+	if existing, ok := s.devices[d.ID]; ok {
+		du.State = Modified
+		*existing = du
+	} else {
+		du.State = Discovered
+		s.devices[d.ID] = &du
+	}
+	return &du
 }
 
 // close will close out the stateStore. If commit is true, the staged values on the
@@ -156,10 +205,16 @@ func (s *stateStore) close(commit bool) (err error) {
 			return fmt.Errorf("unable to save last update time to state: %w", err)
 		}
 	}
-	if s.next != "" {
-		err = s.tx.Set(stateBucket, usersLinkKey, &s.next)
+	if s.nextUsers != "" {
+		err = s.tx.Set(stateBucket, usersLinkKey, &s.nextUsers)
 		if err != nil {
 			return fmt.Errorf("unable to save users link to state: %w", err)
+		}
+	}
+	if s.nextDevices != "" {
+		err = s.tx.Set(stateBucket, devicesLinkKey, &s.nextDevices)
+		if err != nil {
+			return fmt.Errorf("unable to save devices link to state: %w", err)
 		}
 	}
 
@@ -167,6 +222,12 @@ func (s *stateStore) close(commit bool) (err error) {
 		err = s.tx.Set(usersBucket, []byte(key), value)
 		if err != nil {
 			return fmt.Errorf("unable to save user %q to state: %w", key, err)
+		}
+	}
+	for key, value := range s.devices {
+		err = s.tx.Set(devicesBucket, []byte(key), value)
+		if err != nil {
+			return fmt.Errorf("unable to save device %q to state: %w", key, err)
 		}
 	}
 

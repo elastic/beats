@@ -41,7 +41,10 @@ func TestMetrics(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       time.Millisecond,
-				"request.method": http.MethodGet,
+				"request.method": http.MethodPost,
+				"request.body": map[string]interface{}{
+					"field": "value",
+				},
 				"response.split": map[string]interface{}{
 					"target": "body.items",
 					"transforms": []interface{}{
@@ -70,21 +73,20 @@ func TestMetrics(t *testing.T) {
 			},
 			assertMetrics: func(reg *monitoring.Registry) error {
 				checkHasValue := func(v interface{}) bool {
-					var c int64
 					switch t := v.(type) {
 					case int64:
-						c = t
+						return t > 0
 					case map[string]interface{}:
 						h := t["histogram"].(map[string]interface{})
-						c = h["count"].(int64)
+						return h["count"].(int64) > 0 && h["max"].(int64) > 0
 					}
-					return c > 0
+					return false
 				}
 
 				snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, true)
 
 				for _, m := range []string{
-					"http_request_body_bytes", "http_request_get_total",
+					"http_request_body_bytes", "http_request_post_total",
 					"http_request_total", "http_response_2xx_total",
 					"http_response_body_bytes", "http_response_total",
 					"http_round_trip_time", "httpjson_interval_execution_time",
