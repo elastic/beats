@@ -54,6 +54,7 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        echo '!!!test!!!'
         deleteDir()
         githubEnv()
         githubPrCheckApproved()
