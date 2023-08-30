@@ -73,16 +73,12 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 	}
 }
 
-var id int
-
 func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
 	if maxAttempts < 1 {
 		maxAttempts = 1
 	}
 
-	id++
 	return &JobSummary{
-		Id:          id,
 		MaxAttempts: maxAttempts,
 		Attempt:     attempt,
 		RetryGroup:  retryGroup,
