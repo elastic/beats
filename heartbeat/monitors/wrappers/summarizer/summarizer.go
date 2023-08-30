@@ -68,7 +68,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 		checkGroup:     uu.String(),
 		stateTracker:   mst,
 		sf:             sf,
-		// private property, but can be overriden in tests to speed them up
+		// private property, but can be overridden in tests to speed them up
 		retryDelay: time.Second,
 	}
 }
