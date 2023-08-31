@@ -18,12 +18,6 @@ import (
 
 const responseNamespace = "response"
 
-func registerResponseTransforms() {
-	registerTransform(responseNamespace, appendName, newAppendResponse)
-	registerTransform(responseNamespace, deleteName, newDeleteResponse)
-	registerTransform(responseNamespace, setName, newSetResponse)
-}
-
 type response struct {
 	page       int64
 	url        url.URL
@@ -53,6 +47,51 @@ func (resp *response) clone() *response {
 	return clone
 }
 
+func (resp *response) asTransformables(log *logp.Logger) []transformable {
+	var ts []transformable
+
+	convertAndAppend := func(m map[string]interface{}) {
+		tr := transformable{}
+		tr.setHeader(resp.header.Clone())
+		tr.setURL(resp.url)
+		tr.setBody(mapstr.M(m).Clone())
+		ts = append(ts, tr)
+	}
+
+	switch tresp := resp.body.(type) {
+	case []interface{}:
+		for _, v := range tresp {
+			m, ok := v.(map[string]interface{})
+			if !ok {
+				log.Debugf("events must be JSON objects, but got %T: skipping", v)
+				continue
+			}
+			convertAndAppend(m)
+		}
+	case map[string]interface{}:
+		convertAndAppend(tresp)
+	default:
+		log.Debugf("response is not a valid JSON")
+	}
+
+	return ts
+}
+
+func (resp *response) templateValues() mapstr.M {
+	if resp == nil {
+		return mapstr.M{}
+	}
+	return mapstr.M{
+		"header": resp.header.Clone(),
+		"page":   resp.page,
+		"url": mapstr.M{
+			"value":  resp.url.String(),
+			"params": resp.url.Query(),
+		},
+		"body": resp.body,
+	}
+}
+
 type responseProcessor struct {
 	metrics    *inputMetrics
 	log        *logp.Logger
@@ -75,7 +114,7 @@ func newResponseProcessor(config config, pagination *pagination, xmlDetails map[
 		rps = append(rps, rp)
 		return rps
 	}
-	ts, _ := newBasicTransformsFromConfig(config.Response.Transforms, responseNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Transforms, responseNamespace, log)
 	rp.transforms = ts
 
 	split, _ := newSplitResponse(config.Response.Split, log)
@@ -119,7 +158,7 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 			return rp
 		}
 
-		ts, _ := newBasicTransformsFromConfig(config.Step.Response.Transforms, responseNamespace, log)
+		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Step.Response.Transforms, responseNamespace, log)
 		rp.transforms = ts
 
 		split, _ := newSplitResponse(config.Step.Response.Split, log)
@@ -130,7 +169,7 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 			return rp
 		}
 
-		ts, _ := newBasicTransformsFromConfig(config.While.Response.Transforms, responseNamespace, log)
+		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.While.Response.Transforms, responseNamespace, log)
 		rp.transforms = ts
 
 		split, _ := newSplitResponse(config.While.Response.Split, log)
@@ -220,49 +259,4 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 	}()
 
 	return ch
-}
-
-func (resp *response) asTransformables(log *logp.Logger) []transformable {
-	var ts []transformable
-
-	convertAndAppend := func(m map[string]interface{}) {
-		tr := transformable{}
-		tr.setHeader(resp.header.Clone())
-		tr.setURL(resp.url)
-		tr.setBody(mapstr.M(m).Clone())
-		ts = append(ts, tr)
-	}
-
-	switch tresp := resp.body.(type) {
-	case []interface{}:
-		for _, v := range tresp {
-			m, ok := v.(map[string]interface{})
-			if !ok {
-				log.Debugf("events must be JSON objects, but got %T: skipping", v)
-				continue
-			}
-			convertAndAppend(m)
-		}
-	case map[string]interface{}:
-		convertAndAppend(tresp)
-	default:
-		log.Debugf("response is not a valid JSON")
-	}
-
-	return ts
-}
-
-func (resp *response) templateValues() mapstr.M {
-	if resp == nil {
-		return mapstr.M{}
-	}
-	return mapstr.M{
-		"header": resp.header.Clone(),
-		"page":   resp.page,
-		"url": mapstr.M{
-			"value":  resp.url.String(),
-			"params": resp.url.Query(),
-		},
-		"body": resp.body,
-	}
 }

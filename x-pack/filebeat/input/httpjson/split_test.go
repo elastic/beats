@@ -15,8 +15,6 @@ import (
 )
 
 func TestSplit(t *testing.T) {
-	registerResponseTransforms()
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
 	cases := []struct {
 		name             string
 		config           *splitConfig

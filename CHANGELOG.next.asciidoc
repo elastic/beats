@@ -125,6 +125,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
+- Fix GCP compute metadata. {pull}36338[36338]
 - Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
@@ -228,6 +229,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
 - Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
 - Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
+- Add Azure resource tags support to Azure Billing module {pull}36428[36428]
 
 
 *Osquerybeat*

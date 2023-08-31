@@ -1,6 +1,6 @@
 [role="xpack"]
 
-:modulename: sonicwall
+:modulename: sonicwall_firewall
 :has-dashboards: false
 
 == Sonicwall module
