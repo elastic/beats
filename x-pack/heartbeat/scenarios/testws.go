@@ -25,25 +25,7 @@ func startTestWebserver(t *testing.T) *httptest.Server {
 	testWsOnce.Do(func() {
 		testWs = httptest.NewServer(hbtest.HelloWorldHandler(200))
 
-		// wait for ws to become available
-		var err error
-		for i := 0; i < 20; i++ {
-			var resp *http.Response
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, testWs.URL, nil)
-			resp, err = http.DefaultClient.Do(req)
-			if err == nil {
-				resp.Body.Close()
-				if resp.StatusCode == 200 {
-					break
-				}
-			}
-
-			time.Sleep(time.Millisecond * 250)
-		}
-
-		if err != nil {
-			require.NoError(t, err, "could not retrieve successful response from test webserver")
-		}
+		waitForWs(t, testWs.URL)
 	})
 
 	return testWs
@@ -67,24 +49,20 @@ func StartStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
 	}))
 
 	// wait for ws to become available
-	var err error
-	for i := 0; i < 20; i++ {
-		var resp *http.Response
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, testWs.URL, nil)
-		resp, err = http.DefaultClient.Do(req)
-		if err == nil {
-			resp.Body.Close()
-			if resp.StatusCode == 200 {
-				break
-			}
-		}
-
-		time.Sleep(time.Millisecond * 250)
-	}
-
-	if err != nil {
-		require.NoError(t, err, "could not retrieve successful response from test webserver")
-	}
+	waitForWs(t, testWs.URL)
 
 	return testWs
+}
+
+func waitForWs(t *testing.T, url string) {
+	require.Eventuallyf(
+		t,
+		func() bool {
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+			resp, _ := http.DefaultClient.Do(req)
+			resp.Body.Close()
+			return resp.StatusCode == 200
+		},
+		10*time.Second, 250*time.Millisecond, "could not start webserver",
+	)
 }

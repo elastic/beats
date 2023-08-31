@@ -16,13 +16,13 @@ import (
 // without actually using ES
 type loaderDB struct {
 	keysToState map[string]*monitorstate.State
-	mtx         *sync.Mutex
+	mtx         sync.Mutex
 }
 
 func newLoaderDB() *loaderDB {
 	return &loaderDB{
 		keysToState: map[string]*monitorstate.State{},
-		mtx:         &sync.Mutex{},
+		mtx:         sync.Mutex{},
 	}
 }
 
