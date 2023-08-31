@@ -84,6 +84,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Skip HTTPJSON flakey test. {issue}34929[34929] {pull}35138[35138]
 - Fix ingest pipeline for panw module to parse url scheme correctly {pull}35757[35757]
 - Renamed an httpjson input metric to follow naming conventions. `httpjson_interval_pages_total` was renamed to `httpjson_interval_pages` because the `_total` suffix is reserved for counters. {issue}35933[35933] {pull}36169[36169]
+- Fixed some race conditions in tests {pull}36185[36185]
 
 ==== Added
 
