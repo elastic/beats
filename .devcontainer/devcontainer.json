@@ -21,7 +21,7 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// Mage is installed this way, and not via the feature plugin because that plugin was
 	// broken for me, and mage install is simple enough
-	"postCreateCommand": "cd /opt/; sudo mkdir mage; sudo chown $USER:$(id -g) mage; git clone --depth=1 https://github.com/magefile/mage && cd mage && go run bootstrap.go"
+	"postCreateCommand": "cd /opt/; sudo mkdir mage; sudo chown $USER:$(id -g) mage; git clone --depth=1 https://github.com/magefile/mage && cd mage && go run bootstrap.go; npm i -g @elastic/synthetics; sudo env \"PATH=$PATH\" npx -yes playwright install-deps"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

@@ -123,7 +123,8 @@ func listenTilClosed(t *testing.T, sockPath string) []string {
 
 	conn, err := listener.Accept()
 	require.NoError(t, err)
-	var received []string
+	// no need to pre-allocate, but it seems to make the linter happy
+	received := make([]string, 0, 10)
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		received = append(received, scanner.Text())
