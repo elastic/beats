@@ -91,7 +91,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		conts, jobErr := j(event)
 
-		_, _ = event.PutValue("monitor.check_group", s.checkGroup)
+		_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt))
 
 		s.mtx.Lock()
 		defer s.mtx.Unlock()
@@ -140,7 +140,6 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				// We preserve `s` across attempts
 				s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 				s.contsRemaining = 1
-				s.checkGroup = fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt)
 
 				// Delay retries by 1s for two reasons:
 				// 1. Since ES timestamps are millisecond resolution they can happen so fast
