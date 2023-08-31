@@ -1,5 +1,5 @@
 This module collects metrics from
-https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html[Airflow metrics] running a
+https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html[Airflow metrics]. It runs a
 statsd server where airflow will send metrics to. The default metricset is `statsd`.
 
 [float]
