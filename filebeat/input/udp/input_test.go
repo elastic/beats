@@ -22,13 +22,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/filebeat/input/internal/procnet"
 )
 
 func TestProcNetUDP(t *testing.T) {
 	t.Run("IPv4", func(t *testing.T) {
 		path := "testdata/proc_net_udp.txt"
 		t.Run("with_match", func(t *testing.T) {
-			addr := []string{ipv4KernelAddr(net.IP{0x0a, 0x64, 0x08, 0x25}, 0x1bbe)}
+			addr := []string{procnet.IPv4(net.IP{0x0a, 0x64, 0x08, 0x25}, 0x1bbe)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
@@ -40,7 +42,7 @@ func TestProcNetUDP(t *testing.T) {
 		})
 
 		t.Run("leading_zero", func(t *testing.T) {
-			addr := []string{ipv4KernelAddr(net.IP{0x00, 0x7f, 0x01, 0x00}, 0x1eef)}
+			addr := []string{procnet.IPv4(net.IP{0x00, 0x7f, 0x01, 0x00}, 0x1eef)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
@@ -52,7 +54,7 @@ func TestProcNetUDP(t *testing.T) {
 		})
 
 		t.Run("unspecified", func(t *testing.T) {
-			addr := []string{ipv4KernelAddr(net.ParseIP("0.0.0.0"), 0x1bbe)}
+			addr := []string{procnet.IPv4(net.ParseIP("0.0.0.0"), 0x1bbe)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
@@ -65,8 +67,8 @@ func TestProcNetUDP(t *testing.T) {
 
 		t.Run("without_match", func(t *testing.T) {
 			addr := []string{
-				ipv4KernelAddr(net.IP{0xde, 0xad, 0xbe, 0xef}, 0xf00d),
-				ipv4KernelAddr(net.IP{0xba, 0x1d, 0xfa, 0xce}, 0x1135),
+				procnet.IPv4(net.IP{0xde, 0xad, 0xbe, 0xef}, 0xf00d),
+				procnet.IPv4(net.IP{0xba, 0x1d, 0xfa, 0xce}, 0x1135),
 			}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
@@ -90,7 +92,7 @@ func TestProcNetUDP(t *testing.T) {
 	t.Run("IPv6", func(t *testing.T) {
 		path := "testdata/proc_net_udp6.txt"
 		t.Run("with_match", func(t *testing.T) {
-			addr := []string{ipv6KernelAddr(net.IP{0: 0x7f, 3: 0x01, 15: 0}, 0x1bbd)}
+			addr := []string{procnet.IPv6(net.IP{0: 0x7f, 3: 0x01, 15: 0}, 0x1bbd)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
@@ -102,7 +104,7 @@ func TestProcNetUDP(t *testing.T) {
 		})
 
 		t.Run("leading_zero", func(t *testing.T) {
-			addr := []string{ipv6KernelAddr(net.IP{1: 0x7f, 2: 0x81, 15: 0}, 0x1eef)}
+			addr := []string{procnet.IPv6(net.IP{1: 0x7f, 2: 0x81, 15: 0}, 0x1eef)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
@@ -114,7 +116,7 @@ func TestProcNetUDP(t *testing.T) {
 		})
 
 		t.Run("unspecified", func(t *testing.T) {
-			addr := []string{ipv6KernelAddr(net.ParseIP("[::]"), 0x1bbd)}
+			addr := []string{procnet.IPv6(net.ParseIP("[::]"), 0x1bbd)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
@@ -127,8 +129,8 @@ func TestProcNetUDP(t *testing.T) {
 
 		t.Run("without_match", func(t *testing.T) {
 			addr := []string{
-				ipv6KernelAddr(net.IP{0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef}, 0xf00d),
-				ipv6KernelAddr(net.IP{0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce}, 0x1135),
+				procnet.IPv6(net.IP{0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef}, 0xf00d),
+				procnet.IPv6(net.IP{0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce}, 0x1135),
 			}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)

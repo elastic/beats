@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -346,6 +347,77 @@ scanner:
 		e = fw.Event()
 		// means no event
 		require.Equal(t, loginp.OpDone, e.Op)
+	})
+
+	t.Run("does not log warnings on duplicate globs and filters out duplicates", func(t *testing.T) {
+		dir := t.TempDir()
+		firstBasename := "file-123.ndjson"
+		secondBasename := "file-watcher-123.ndjson"
+		firstFilename := filepath.Join(dir, firstBasename)
+		secondFilename := filepath.Join(dir, secondBasename)
+		err := os.WriteFile(firstFilename, []byte("line\n"), 0777)
+		require.NoError(t, err)
+		err = os.WriteFile(secondFilename, []byte("line\n"), 0777)
+		require.NoError(t, err)
+
+		paths := []string{
+			// to emulate the case we have in the agent monitoring
+			filepath.Join(dir, "file-*.ndjson"),
+			filepath.Join(dir, "file-watcher-*.ndjson"),
+		}
+		cfgStr := `
+scanner:
+  check_interval: 100ms
+`
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		err = logp.DevelopmentSetup(logp.ToObserverOutput())
+		require.NoError(t, err)
+
+		fw := createWatcherWithConfig(t, paths, cfgStr)
+
+		go fw.Run(ctx)
+
+		expectedEvents := []loginp.FSEvent{
+			{
+				NewPath: firstFilename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: firstFilename,
+					Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
+				},
+			},
+			{
+				NewPath: secondFilename,
+				Op:      loginp.OpCreate,
+				Descriptor: loginp.FileDescriptor{
+					Filename: secondFilename,
+					Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
+				},
+			},
+		}
+		var actualEvents []loginp.FSEvent
+		actualEvents = append(actualEvents, fw.Event())
+		actualEvents = append(actualEvents, fw.Event())
+
+		// since this is coming from a map, the order is not deterministic
+		// we need to sort events based on paths first
+		// we expect only creation events for two different files, so it's alright.
+		sort.Slice(actualEvents, func(i, j int) bool {
+			return actualEvents[i].NewPath < actualEvents[j].NewPath
+		})
+		sort.Slice(expectedEvents, func(i, j int) bool {
+			return expectedEvents[i].NewPath < expectedEvents[j].NewPath
+		})
+
+		for i, actualEvent := range actualEvents {
+			requireEqualEvents(t, expectedEvents[i], actualEvent)
+		}
+
+		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)
 	})
 }
 

@@ -41,7 +41,7 @@ output.console:
 		expected string
 	}{
 		"bash completion": {shell: "bash", expected: "bash completion for mockbeat"},
-		"zsh completion":  {shell: "zsh", expected: "#compdef _mockbeat mockbeat"},
+		"zsh completion":  {shell: "zsh", expected: "zsh completion for mockbeat"},
 		"awesomeshell":    {shell: "awesomeshell", expected: "Unknown shell awesomeshell"},
 	}
 	for name, tc := range tests {

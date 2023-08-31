@@ -18,6 +18,7 @@
 package elasticsearch
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -90,17 +91,27 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		return nil, err
 	}
 
-	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
-
 	config := struct {
-		Scope        Scope `config:"scope"`
-		XPackEnabled bool  `config:"xpack.enabled"`
+		Scope        Scope  `config:"scope"`
+		XPackEnabled bool   `config:"xpack.enabled"`
+		ApiKey       string `config:"api_key"`
 	}{
 		Scope:        ScopeNode,
 		XPackEnabled: false,
+		ApiKey:       "",
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
+	if config.ApiKey != "" {
+		hostData := base.HostData()
+		if hostData.User != "" || hostData.Password != "" {
+			return nil, fmt.Errorf("cannot set both api_key and username/password")
+		}
+		http.SetHeader("Authorization", "ApiKey "+base64.StdEncoding.EncodeToString([]byte(config.ApiKey)))
 	}
 
 	ms := &MetricSet{

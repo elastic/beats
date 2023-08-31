@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"sync"
 
+	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -42,7 +44,7 @@ func (l *limiter) release() {
 
 type scheduler struct {
 	publisher  cursor.Publisher
-	client     *azblob.ContainerClient
+	client     *azcontainer.Client
 	credential *serviceCredentials
 	src        *Source
 	cfg        *config
@@ -53,7 +55,7 @@ type scheduler struct {
 }
 
 // newScheduler, returns a new scheduler instance
-func newScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
+func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 	credential *serviceCredentials, src *Source, cfg *config,
 	state *state, serviceURL string, log *logp.Logger,
 ) *scheduler {
@@ -92,11 +94,30 @@ func (s *scheduler) schedule(ctx context.Context) error {
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
-	for pager.NextPage(ctx) {
-		jobs, err := s.createJobs(pager)
+	for pager.More() {
+		resp, err := pager.NextPage(ctx)
 		if err != nil {
-			s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
 			return err
+		}
+
+		var jobs []*job
+		for _, v := range resp.Segment.BlobItems {
+
+			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
+			blobCreds := &blobCredentials{
+				serviceCreds:  s.credential,
+				blobName:      *v.Name,
+				containerName: s.src.ContainerName,
+			}
+
+			blobClient, err := fetchBlobClient(blobURL, blobCreds, s.log)
+			if err != nil {
+				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
+				return err
+			}
+
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
+			jobs = append(jobs, job)
 		}
 
 		// If previous checkpoint was saved then look up starting point for new jobs
@@ -116,7 +137,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		}
 	}
 
-	return pager.Err()
+	return nil
 }
 
 // fetchJobID returns a job id which is a combination of worker id, container name and blob name
@@ -124,29 +145,6 @@ func fetchJobID(workerId int, containerName string, blobName string) string {
 	jobID := fmt.Sprintf("%s-%s-worker-%d", containerName, blobName, workerId)
 
 	return jobID
-}
-
-func (s *scheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]*job, error) {
-	var jobs []*job
-
-	for _, v := range pager.PageResponse().Segment.BlobItems {
-		blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
-		blobCreds := &blobCredentials{
-			serviceCreds:  s.credential,
-			blobName:      *v.Name,
-			containerName: s.src.ContainerName,
-		}
-
-		blobClient, err := fetchBlobClient(blobURL, blobCreds, s.log)
-		if err != nil {
-			return nil, err
-		}
-
-		job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
-		jobs = append(jobs, job)
-	}
-
-	return jobs, nil
 }
 
 // fetchBlobPager fetches the current blob page object given a batch size & a page marker.
@@ -157,11 +155,11 @@ func (s *scheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]*job
 // hence disabling it for now, until more feedback is given. Disabling this how ever makes the sheduler loop
 // through all the blobs on every poll action to arrive at the latest checkpoint.
 // [NOTE] : There are no api's / sdk functions that list blobs via timestamp/latest entry, it's always lexicographical order
-func (s *scheduler) fetchBlobPager(batchSize int32) *azblob.ContainerListBlobFlatPager {
-	pager := s.client.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
-		Include: []azblob.ListBlobsIncludeItem{
-			azblob.ListBlobsIncludeItemMetadata,
-			azblob.ListBlobsIncludeItemTags,
+func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.ListBlobsFlatResponse] {
+	pager := s.client.NewListBlobsFlatPager(&azcontainer.ListBlobsFlatOptions{
+		Include: azcontainer.ListBlobsInclude{
+			Metadata: true,
+			Tags:     true,
 		},
 		MaxResults: &batchSize,
 	})
