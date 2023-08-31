@@ -78,7 +78,7 @@ func TestDecodeJSON(t *testing.T) {
 		},
 		{
 			body: "[{\"a\":\"b\"},\nunfortunate text\n{\"c\":\"d\"}]",
-			err:  `invalid character 'u' looking for beginning of value: text context "...\"},\nunfortunate text\n{\"..."`,
+			err:  `invalid character 'u' looking for beginning of value: text context "...a\":\"b\"},\nunfortunate ..."`,
 		},
 	}
 	for _, test := range tests {
@@ -136,7 +136,7 @@ func TestDecodeNdjson(t *testing.T) {
 		},
 		{
 			body: "{\"a\":\"b\"}unfortunate text\r\n{\"c\":\"d\"}\r\n",
-			err:  `invalid character 'u' looking for beginning of value: text context "...\"b\"}unfortunate text..."`,
+			err:  `invalid character 'u' looking for beginning of value: text context "{\"a\":\"b\"}unfortunate ..."`,
 		},
 	}
 	for _, test := range tests {
@@ -179,7 +179,7 @@ func TestDecodeCSV(t *testing.T) {
 		{
 			body: "EVENT_TYPE,TIMESTAMP,REQUEST_ID,ORGANIZATION_ID,USER_ID\n" +
 				"Login,20211018071505.579,id4,user2\n",
-			err: "record on line 2: wrong number of fields: text context \"Login,20211...\"",
+			err: "record on line 2: wrong number of fields: text context \"Login,202110...\"",
 		},
 	}
 	for _, test := range tests {
@@ -235,7 +235,7 @@ func TestDecodeXML(t *testing.T) {
         </i>
 </o>
 `,
-			err: `XML syntax error on line 7: element <n> closed by </name>: text context "...     <n>Egil's Saga</name>"`,
+			err: `XML syntax error on line 7: element <n> closed by </name>: text context "...          <n>Egil's S..."`,
 		},
 	}
 	for _, test := range tests {
@@ -286,5 +286,25 @@ func TestEncodeAsForm(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, test.body, string(res))
 		assert.Equal(t, "application/x-www-form-urlencoded", trReq.header().Get("Content-Type"))
+	}
+}
+
+func TestTextContext(t *testing.T) {
+	tests := []struct {
+		text string
+		pos  int64
+		want string
+	}{
+		{},
+		{text: "0987654321*1234567890", pos: 10, want: "0987654321*1234567890"},
+		{text: "54321*1234567890xxxxx", pos: 5, want: "54321*1234567890..."},
+		{text: "xxxxx0987654321*12345", pos: 15, want: "...0987654321*12345"},
+		{text: "x0987654321*1234567890x", pos: 11, want: "...0987654321*1234567890..."},
+	}
+	for _, test := range tests {
+		got := string(textContext([]byte(test.text), test.pos))
+		if got != test.want {
+			t.Errorf("unexpected result for textContext(%q, %d): got:%q want:%q", test.text, test.pos, got, test.want)
+		}
 	}
 }

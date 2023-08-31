@@ -77,7 +77,7 @@ func encodeAsJSON(trReq transformable) ([]byte, error) {
 func decodeAsJSON(p []byte, dst *response) error {
 	err := json.Unmarshal(p, &dst.body)
 	if err != nil {
-		return jsonError{error: err, body: p}
+		return textContextError{error: err, body: p}
 	}
 	return nil
 }
@@ -102,34 +102,12 @@ func decodeAsNdjson(p []byte, dst *response) error {
 	for dec.More() {
 		var o interface{}
 		if err := dec.Decode(&o); err != nil {
-			return jsonError{error: err, body: p}
+			return textContextError{error: err, body: p}
 		}
 		results = append(results, o)
 	}
 	dst.body = results
 	return nil
-}
-
-type jsonError struct {
-	error
-	body []byte
-}
-
-func (e jsonError) Error() string {
-	switch err := e.error.(type) {
-	case nil:
-		return "<nil>"
-	case *json.SyntaxError:
-		return fmt.Sprintf("%v: text context %q", err, textContext(e.body, err.Offset))
-	case *json.UnmarshalTypeError:
-		return fmt.Sprintf("%v: text context %q", err, textContext(e.body, err.Offset))
-	default:
-		return err.Error()
-	}
-}
-
-func (e jsonError) Unwrap() error {
-	return e.error
 }
 
 // decodeAsCSV decodes p as a headed CSV document into dst.
@@ -164,38 +142,13 @@ func decodeAsCSV(p []byte, dst *response) error {
 
 	if err != nil {
 		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
-			return csvError{error: err, body: p}
+			return textContextError{error: err, body: p}
 		}
 	}
 
 	dst.body = results
 
 	return nil
-}
-
-type csvError struct {
-	error
-	body []byte
-}
-
-func (e csvError) Error() string {
-	switch err := e.error.(type) {
-	case nil:
-		return "<nil>"
-	case *csv.ParseError:
-		lines := bytes.Split(e.body, []byte{'\n'})
-		l := err.Line - 1 // Lines are 1-based.
-		if uint(l) >= uint(len(lines)) {
-			return err.Error()
-		}
-		return fmt.Sprintf("%v: text context %q", err, textContext(lines[l], int64(err.Column)))
-	default:
-		return err.Error()
-	}
-}
-
-func (e csvError) Unwrap() error {
-	return e.error
 }
 
 // decodeAsZip decodes p as a ZIP archive into dst.
@@ -219,7 +172,7 @@ func decodeAsZip(p []byte, dst *response) error {
 			var o interface{}
 			if err := dec.Decode(&o); err != nil {
 				rc.Close()
-				return jsonError{error: err, body: p}
+				return textContextError{error: err, body: p}
 			}
 			results = append(results, o)
 		}
@@ -239,22 +192,36 @@ func decodeAsZip(p []byte, dst *response) error {
 func decodeAsXML(p []byte, dst *response) error {
 	cdata, body, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
 	if err != nil {
-		return xmlError{error: err, body: p}
+		return textContextError{error: err, body: p}
 	}
 	dst.body = body
 	dst.header["XML-CDATA"] = []string{cdata}
 	return nil
 }
 
-type xmlError struct {
+// textContextError is an error that can provide the text context for
+// a decoding error from the csv, json and xml packages.
+type textContextError struct {
 	error
 	body []byte
 }
 
-func (e xmlError) Error() string {
+func (e textContextError) Error() string {
+	var ctx []byte
 	switch err := e.error.(type) {
 	case nil:
 		return "<nil>"
+	case *json.SyntaxError:
+		ctx = textContext(e.body, err.Offset)
+	case *json.UnmarshalTypeError:
+		ctx = textContext(e.body, err.Offset)
+	case *csv.ParseError:
+		lines := bytes.Split(e.body, []byte{'\n'})
+		l := err.Line - 1 // Lines are 1-based.
+		if uint(l) >= uint(len(lines)) {
+			return err.Error()
+		}
+		ctx = textContext(lines[l], int64(err.Column))
 	case *stdxml.SyntaxError:
 		lines := bytes.Split(e.body, []byte{'\n'})
 		l := err.Line - 1 // Lines are 1-based.
@@ -271,37 +238,46 @@ func (e xmlError) Error() string {
 		if pos < 0 {
 			pos = 0
 		}
-		return fmt.Sprintf("%v: text context %q", err, textContext(lines[l], int64(pos)))
+		ctx = textContext(lines[l], int64(pos))
 	default:
 		return err.Error()
 	}
+	return fmt.Sprintf("%v: text context %q", e.error, ctx)
 }
 
-func (e xmlError) Unwrap() error {
+func (e textContextError) Unwrap() error {
 	return e.error
 }
 
 // textContext returns the context of text around the provided position starting
-// five bytes before pos and extending ten bytes, dependent on the length of the
+// ten bytes before pos and ten bytes after, dependent on the length of the
 // text and the value of pos relative to bounds. If a text truncation is made,
-// an ellipsis is added to indicate this. The returned []byte should not be mutated
-// as it may be shared with the caller.
+// an ellipsis is added to indicate this.
 func textContext(text []byte, pos int64) []byte {
-	left := maxInt64(0, pos-5)
-	text = text[left:]
-	var pad int64
+	if len(text) == 0 {
+		return text
+	}
+	const (
+		dots = "..."
+		span = 10
+	)
+	left := maxInt64(0, pos-span)
+	right := minInt(pos+span+1, int64(len(text)))
+	ctx := make([]byte, right-left+2*int64(len(dots)))
+	copy(ctx[3:], text[left:right])
 	if left != 0 {
-		pad = 3
-		text = append([]byte("..."), text...)
-	}
-	right := minInt(pos+10+pad, int64(len(text)))
-	if right != int64(len(text)) {
-		// Ensure we don't clobber the body's bytes.
-		text = append(text[:right:right], []byte("...")...)
+		copy(ctx, dots)
+		left = 0
 	} else {
-		text = text[:right]
+		left = int64(len(dots))
 	}
-	return text
+	if right != int64(len(text)) {
+		copy(ctx[len(ctx)-len(dots):], dots)
+		right = int64(len(ctx))
+	} else {
+		right = int64(len(ctx) - len(dots))
+	}
+	return ctx[left:right]
 }
 
 func minInt(a, b int64) int64 {
