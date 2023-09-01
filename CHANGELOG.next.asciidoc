@@ -65,12 +65,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
 - Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
 - Update mito CEL extension library to v1.5.0. {pull}36146[36146]
-- Filter out duplicate paths resolved from matching globs. {issue}36253[36253] {pull}36256[36256]
-- Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
-- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
-- Remove erroneous error log in GCPPubSub input. {pull}36296[36296]
-- Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
-- Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
 - Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
 
 *Heartbeat*
