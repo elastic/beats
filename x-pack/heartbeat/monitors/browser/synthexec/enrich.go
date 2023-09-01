@@ -1,7 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
+//go:build linux || darwin || synthetics
 
 package synthexec
 
@@ -24,10 +24,9 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je           *journeyEnricher
-	journeyCount int
-	sFields      stdfields.StdMonitorFields
-	checkGroup   string
+	je         *journeyEnricher
+	sFields    stdfields.StdMonitorFields
+	checkGroup string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
@@ -39,15 +38,6 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		senr.je = newJourneyEnricher(senr)
 	}
 
-	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
-	if se != nil && se.Type == JourneyStart {
-		senr.journeyCount++
-		if senr.journeyCount > 1 {
-			senr.checkGroup = makeUuid()
-		}
-	}
-
-	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
 	return senr.je.enrich(event, se)
 }
 

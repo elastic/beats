@@ -28,43 +28,43 @@ import (
 
 func TestTrackerRecord(t *testing.T) {
 	mst := NewTracker(NilStateLoader, true)
-	ms := mst.RecordStatus(TestSf, StatusUp)
+	ms := mst.RecordStatus(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
 	for i := 0; i < FlappingThreshold; i++ {
-		_ = mst.RecordStatus(TestSf, StatusDown)
-		ms = mst.RecordStatus(TestSf, StatusUp)
+		_ = mst.RecordStatus(TestSf, StatusDown, true)
+		ms = mst.RecordStatus(TestSf, StatusUp, true)
 	}
 	require.Equal(t, StatusFlapping, ms.Status)
 	requireMSCounts(t, ms, FlappingThreshold+1, FlappingThreshold)
 
 	// Restore stable state
 	for i := 0; i < FlappingThreshold; i++ {
-		_ = mst.RecordStatus(TestSf, StatusDown)
+		_ = mst.RecordStatus(TestSf, StatusDown, true)
 	}
 
-	ms = mst.RecordStatus(TestSf, StatusDown)
+	ms = mst.RecordStatus(TestSf, StatusDown, true)
 	require.Equal(t, StatusDown, ms.Status)
 	requireMSStatusCount(t, ms, StatusDown, FlappingThreshold-1)
 }
 
 func TestTrackerRecordFlappingDisabled(t *testing.T) {
 	mst := NewTracker(NilStateLoader, false)
-	ms := mst.RecordStatus(TestSf, StatusUp)
+	ms := mst.RecordStatus(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
 
 	for i := 0; i < FlappingThreshold; i++ {
-		_ = mst.RecordStatus(TestSf, StatusDown)
-		ms = mst.RecordStatus(TestSf, StatusUp)
+		_ = mst.RecordStatus(TestSf, StatusDown, true)
+		ms = mst.RecordStatus(TestSf, StatusUp, true)
 	}
 
 	// with flapping disabled it only shows as up
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, 1, 0)
 
-	ms = mst.RecordStatus(TestSf, StatusDown)
+	ms = mst.RecordStatus(TestSf, StatusDown, true)
 	require.Equal(t, StatusDown, ms.Status)
 	requireMSStatusCount(t, ms, StatusDown, 1)
 }
