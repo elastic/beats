@@ -65,6 +65,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - The `queue.Batch` API now provides access to individual events instead of an array. {pull}31699[31699]
 - Rename `queue.Batch.ACK()` to `queue.Batch.Done()`. {pull}31903[31903]
 - `queue.ACKListener` has been removed. Queue configurations now accept an explicit callback function for ACK handling. {pull}35078[35078]
+- Split split httpmon out of x-pack/filebeat/input/internal/httplog. {pull}36385[36385]
 
 ==== Bugfixes
 
@@ -84,6 +85,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Skip HTTPJSON flakey test. {issue}34929[34929] {pull}35138[35138]
 - Fix ingest pipeline for panw module to parse url scheme correctly {pull}35757[35757]
 - Renamed an httpjson input metric to follow naming conventions. `httpjson_interval_pages_total` was renamed to `httpjson_interval_pages` because the `_total` suffix is reserved for counters. {issue}35933[35933] {pull}36169[36169]
+- Fixed some race conditions in tests {pull}36185[36185]
 
 ==== Added
 

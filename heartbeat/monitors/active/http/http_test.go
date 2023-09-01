@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -262,7 +263,7 @@ func TestUpStatuses(t *testing.T) {
 					lookslike.Compose(
 						hbtest.BaseChecks("127.0.0.1", "up", "http"),
 						hbtest.RespondingTCPChecks(),
-						hbtest.SummaryChecks(1, 0),
+						hbtest.SummaryStateChecks(1, 0),
 						respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
 					),
 					event.Fields,
@@ -279,7 +280,7 @@ func TestHeadersDisabled(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 		)),
 		event.Fields,
@@ -297,7 +298,7 @@ func TestDownStatuses(t *testing.T) {
 				lookslike.Strict(lookslike.Compose(
 					hbtest.BaseChecks("127.0.0.1", "down", "http"),
 					hbtest.RespondingTCPChecks(),
-					hbtest.SummaryChecks(0, 1),
+					hbtest.SummaryStateChecks(0, 1),
 					respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
 					hbtest.ECSErrChecks(ecserr.NewBadHTTPStatusErr(status)),
 					respondingHTTPBodyChecks("hello, world!"),
@@ -336,7 +337,7 @@ func TestLargeResponse(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 		)),
 		event.Fields,
@@ -453,7 +454,7 @@ func TestJsonBody(t *testing.T) {
 					lookslike.Strict(lookslike.Compose(
 						hbtest.BaseChecks("127.0.0.1", "up", "http"),
 						hbtest.RespondingTCPChecks(),
-						hbtest.SummaryChecks(1, 0),
+						hbtest.SummaryStateChecks(1, 0),
 						respondingHTTPChecks(server.URL, tc.expectedContentType, 200),
 					)),
 					event.Fields,
@@ -464,7 +465,7 @@ func TestJsonBody(t *testing.T) {
 					lookslike.Strict(lookslike.Compose(
 						hbtest.BaseChecks("127.0.0.1", "down", "http"),
 						hbtest.RespondingTCPChecks(),
-						hbtest.SummaryChecks(0, 1),
+						hbtest.SummaryStateChecks(0, 1),
 						hbtest.ErrorChecks(tc.expectedErrMsg, "validate"),
 						respondingHTTPChecks(server.URL, tc.expectedContentType, 200),
 					)),
@@ -530,7 +531,7 @@ func runHTTPSServerCheck(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", http.StatusOK),
 		)),
 		event.Fields,
@@ -559,7 +560,7 @@ func TestExpiredHTTPSServer(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "down", "http"),
 			hbtest.RespondingTCPChecks(),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.ExpiredCertChecks(cert),
 			hbtest.URLChecks(t, &url.URL{Scheme: "https", Host: net.JoinHostPort(host, port)}),
 			// No HTTP fields expected because we fail at the TCP level
@@ -617,7 +618,7 @@ func TestConnRefusedJob(t *testing.T) {
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
 			urlChecks(url),
 		)),
@@ -639,7 +640,7 @@ func TestUnreachableJob(t *testing.T) {
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, fmt.Sprintf("%s:%d", ip, port)),
 			urlChecks(url),
 		)),
@@ -673,33 +674,30 @@ func TestRedirect(t *testing.T) {
 	sched, _ := schedule.Parse("@every 1s")
 	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil)[0]
 
-	// Run this test multiple times since in the past we had an issue where the redirects
-	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
-	for i := 0; i < 10; i++ {
-		event := &beat.Event{}
-		_, err = job(event)
-		require.NoError(t, err)
+	events, err := jobs.ExecJobAndConts(t, job)
+	require.NoError(t, err)
+	require.Len(t, events, 1)
+	event := events[0]
 
-		testslike.Test(
-			t,
-			lookslike.Compose(
-				hbtest.BaseChecks("", "up", "http"),
-				hbtest.SummaryChecks(1, 0),
-				minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", 200),
-				respondingHTTPHeaderChecks(),
-				lookslike.MustCompile(map[string]interface{}{
-					// For redirects that are followed we shouldn't record this header because there's no sensible
-					// value
-					"http.response.headers.Location": isdef.KeyMissing,
-					"http.response.redirects": []string{
-						server.URL + redirectingPaths["/redirect_one"],
-						server.URL + redirectingPaths["/redirect_two"],
-					},
-				}),
-			),
-			event.Fields,
-		)
-	}
+	testslike.Test(
+		t,
+		lookslike.Compose(
+			hbtest.BaseChecks("", "up", "http"),
+			minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", 200),
+			respondingHTTPHeaderChecks(),
+			hbtest.SummaryStateChecks(1, 0),
+			lookslike.MustCompile(map[string]interface{}{
+				// For redirects that are followed we shouldn't record this header because there's no sensible
+				// value
+				"http.response.headers.Location": isdef.KeyMissing,
+				"http.response.redirects": []string{
+					server.URL + redirectingPaths["/redirect_one"],
+					server.URL + redirectingPaths["/redirect_two"],
+				},
+			}),
+		),
+		event.Fields,
+	)
 }
 
 func TestNoHeaders(t *testing.T) {
@@ -728,7 +726,7 @@ func TestNoHeaders(t *testing.T) {
 		t,
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.RespondingTCPChecks(),
 			respondingHTTPStatusAndTimingChecks(200),
 			minimalRespondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
