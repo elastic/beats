@@ -42,7 +42,7 @@ processors:
       ignore_empty_values: true
 ------------------------------------------------------------------------------
 
-Copies the values of `concrete.field`, `array.one` response field and the static values from to `target-field`:
+Copies the values of `concrete.field`, `array.one` response fields and the static values to `target-field`:
 
 [source,json]
 -------------------------------------------------------------------------------
