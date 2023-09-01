@@ -1102,3 +1102,219 @@ func TestV2CID(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
 }
+
+func TestAddProcessMetadataWithV2(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors(processorName))
+	startTime := time.Now()
+	testProcs := testProvider{
+		1: {
+			name:  "systemd",
+			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+			exe:   "/usr/lib/systemd/systemd",
+			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			env: map[string]string{
+				"HOME":       "/",
+				"TERM":       "linux",
+				"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+				"LANG":       "en_US.UTF-8",
+			},
+			pid:       1,
+			ppid:      0,
+			startTime: startTime,
+			username:  "root",
+			userid:    "0",
+		},
+	}
+
+	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
+		testMap := map[int]cgroup.PathList{
+			1: {
+				V2: map[string]cgroup.ControllerPath{
+					"K8s-Docker": {IsV2: true, ControllerPath: "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/docker-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope"},
+				},
+			},
+			2: {
+				V2: map[string]cgroup.ControllerPath{
+					"K8s-containerd": {IsV2: true, ControllerPath: "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod2d5133c0_65f3_40b2_b375_c04866d418e1.slice/cri-containerd-e01a26336924e2fb8089bcf4cf943954fd9ea616cc5678f38f65928307979459.scope"},
+				},
+			},
+			3: {
+				V2: map[string]cgroup.ControllerPath{
+					"K8s-CRI-O": {IsV2: true, ControllerPath: "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/crio-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope"},
+				},
+			},
+			4: {
+				V2: map[string]cgroup.ControllerPath{
+					"Podman": {IsV2: true, ControllerPath: "/user.slice/user-1000.slice/user@1000.service/user.slice/libpod-conmon-ee059a097566fdc5ac9141bfcdfbed0c972163da891de076e0849d7b53597aac.scope"},
+				},
+			},
+			5: {
+				V2: map[string]cgroup.ControllerPath{
+					"Docker": {IsV2: true, ControllerPath: "/docker/485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9"},
+				},
+			},
+		}
+		return testMap[pid], nil
+	}
+
+	for _, test := range []struct {
+		description             string
+		config, event, expected mapstr.M
+		err, initErr            error
+	}{
+		{
+			description: "container.id only",
+			config: mapstr.M{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "1",
+					},
+				},
+				"container": mapstr.M{
+					"id": "80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460",
+				},
+			},
+		},
+		{
+			description: "container.id only",
+			config: mapstr.M{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "2",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "2",
+					},
+				},
+				"container": mapstr.M{
+					"id": "e01a26336924e2fb8089bcf4cf943954fd9ea616cc5678f38f65928307979459",
+				},
+			},
+		},
+		{
+			description: "container.id only",
+			config: mapstr.M{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "3",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "3",
+					},
+				},
+				"container": mapstr.M{
+					"id": "80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460",
+				},
+			},
+		},
+		{
+			description: "container.id only",
+			config: mapstr.M{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "4",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "4",
+					},
+				},
+				"container": mapstr.M{
+					"id": "ee059a097566fdc5ac9141bfcdfbed0c972163da891de076e0849d7b53597aac",
+				},
+			},
+		},
+		{
+			description: "container.id only",
+			config: mapstr.M{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "5",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "5",
+					},
+				},
+				"container": mapstr.M{
+					"id": "485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+				},
+			},
+		},
+	} {
+		t.Run(test.description, func(t *testing.T) {
+			config, err := conf.NewConfigFrom(test.config)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
+			if test.initErr == nil {
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				assert.EqualError(t, err, test.initErr.Error())
+				return
+			}
+			t.Log(proc.String())
+			ev := beat.Event{
+				Fields: test.event,
+			}
+			result, err := proc.Run(&ev)
+			if test.err == nil {
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				assert.EqualError(t, err, test.err.Error())
+			}
+			if test.expected != nil {
+				assert.Equal(t, test.expected, result.Fields)
+			} else {
+				assert.Nil(t, result)
+			}
+		})
+	}
+}
