@@ -129,7 +129,6 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		maxRead:     c.BatchReadSize,
 		renderer:    renderer,
 		log:         log,
-		metrics:     newInputMetrics(c.Name, id),
 	}
 
 	return l, nil
@@ -164,6 +163,17 @@ func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
 			return l.open(l.lastRead)
 		}),
 		win.WithBatchSize(l.maxRead))
+	if err == nil && l.metrics == nil {
+		// We can only set up an input metrics collector when we know that
+		// there will be a valid paired Close call, which means the Open
+		// must have been successful.
+		// The filebeat winlog input and winlogbeat behave differently in
+		// their approaches to handling recoverable errors; winlog closes
+		// the eventlog connector while winlogbeat does not, so only start
+		// a new metrics collector when the field is nil. Close nils the
+		// field.
+		l.metrics = newInputMetrics(l.config.Name, l.id)
+	}
 	return err
 }
 
@@ -351,6 +361,7 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 func (l *winEventLogExp) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
+	l.metrics = nil
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}

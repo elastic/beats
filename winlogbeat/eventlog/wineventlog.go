@@ -270,7 +270,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
 		winMetaCache: newWinMetaCache(metaTTL),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
-		metrics:      newInputMetrics(c.Name, id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
@@ -328,9 +327,22 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	defer win.Close(bookmark)
 
 	if l.file {
-		return l.openFile(state, bookmark)
+		err = l.openFile(state, bookmark)
+	} else {
+		err = l.openChannel(bookmark)
 	}
-	return l.openChannel(bookmark)
+	if err == nil && l.metrics == nil {
+		// We can only set up an input metrics collector when we know that
+		// there will be a valid paired Close call, which means the Open
+		// must have been successful.
+		// The filebeat winlog input and winlogbeat behave differently in
+		// their approaches to handling recoverable errors; winlog closes
+		// the eventlog connector while winlogbeat does not, so only start
+		// a new metrics collector when the field is nil. Close nils the
+		// field.
+		l.metrics = newInputMetrics(l.config.Name, l.id)
+	}
+	return err
 }
 
 func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
@@ -583,6 +595,7 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
 	l.metrics.close()
+	l.metrics = nil
 	return win.Close(l.subscription)
 }
 
