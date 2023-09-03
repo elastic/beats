@@ -71,18 +71,17 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 		exists, _ := getWildcardDimensions(defaultMetric.Dimensions)
 
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
-			var event mb.Event
-			var metricList mapstr.M
-			var vm VmResource
+			//var event mb.Event
+			//var metricList mapstr.M
+			//var vm VmResource
 			// group events by dimension values
 			//exists, validDimensions := getWildcardDimensions(defaultMetric.Dimensions)
 			//exists, _ := getWildcardDimensions(defaultMetric.Dimensions)
-
 			if !exists {
 				//
 				// There are no dimensions with wildcards, so we can group all the values in one event.
 				//
-				manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupTimeValues)
+				manageAndReportEvent(client, report, timestamp, defaultMetric, resource, groupTimeValues)
 				continue
 			}
 
@@ -101,7 +100,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 
 			// Create an event for each group of dimension values.
 			for _, groupDimValues := range groupByDimensions {
-				manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupDimValues)
+				manageAndReportEvent(client, report, timestamp, defaultMetric, resource, groupDimValues)
 			}
 		}
 	}
@@ -118,10 +117,10 @@ func buildDimensionKey(dimensions []Dimension) string {
 }
 
 // manageAndReportEvent function will handle event creation and report
-func manageAndReportEvent(client *Client, report mb.ReporterV2, event mb.Event, metricList mapstr.M, vm VmResource, timestamp time.Time, defaultMetric Metric, resource Resource, groupedValues []MetricValue) {
-	event, metricList = createEvent(timestamp, defaultMetric, resource, groupedValues)
+func manageAndReportEvent(client *Client, report mb.ReporterV2, timestamp time.Time, defaultMetric Metric, resource Resource, groupedValues []MetricValue) {
+	event, metricList := createEvent(timestamp, defaultMetric, resource, groupedValues)
 	if client.Config.AddCloudMetadata {
-		vm = client.GetVMForMetaData(&resource, groupedValues)
+		vm := client.GetVMForMetaData(&resource, groupedValues)
 		addCloudVMMetadata(&event, vm, resource.Subscription)
 	}
 	if client.Config.DefaultResourceType == "" {
@@ -224,7 +223,7 @@ func createEvent(timestamp time.Time, metric Metric, resource Resource, metricVa
 
 	metricList := mapstr.M{}
 	for _, value := range metricValues {
-		metricNameString := fmt.Sprintf("%s", managePropertyName(value.name))
+		metricNameString := managePropertyName(value.name)
 		if value.min != nil {
 			metricList.Put(fmt.Sprintf("%s.%s", metricNameString, "min"), *value.min)
 		}
@@ -249,7 +248,7 @@ func createEvent(timestamp time.Time, metric Metric, resource Resource, metricVa
 // getDimensionValue will return dimension value for the key provided
 func getDimensionValue(dimension string, dimensions []Dimension) string {
 	for _, dim := range dimensions {
-		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
+		if strings.EqualFold(dim.Name, dimension) {
 			return dim.Value
 		}
 	}
