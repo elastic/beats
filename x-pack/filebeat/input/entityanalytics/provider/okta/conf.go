@@ -6,6 +6,7 @@ package okta
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -61,6 +62,11 @@ type conf struct {
 	// Request is the configuration for establishing
 	// HTTP requests to the API.
 	Request *requestConfig `config:"request"`
+
+	// Dataset specifies the datasets to collect from
+	// the API. It can be ""/"all", "users", or
+	// "devices".
+	Dataset string `config:"dataset"`
 }
 
 type requestConfig struct {
@@ -159,7 +165,11 @@ func (c *conf) Validate() error {
 		return errInvalidUpdateInterval
 	case c.SyncInterval <= c.UpdateInterval:
 		return errSyncBeforeUpdate
-	default:
+	}
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users", "devices":
 		return nil
+	default:
+		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 }
