@@ -46,8 +46,10 @@ func NewClient(config Config) (*Client, error) {
 	return client, nil
 }
 
-// InitResources function will retrieve and validate the resources configured by the users and then map the information configured to client metrics.
-// the mapMetric function sent in this case will handle the mapping part as different metric and aggregation options work for different metricsets
+// InitResources function retrieves and validates the resources configured by the users and then map the information
+// configured to client metrics.
+// The mapResourceMetrics function sent in this case will handle the mapping part as different metric and aggregation options
+// work for different metricsets.
 func (client *Client) InitResources(fn mapResourceMetrics) error {
 	if len(client.Config.Resources) == 0 {
 		return fmt.Errorf("no resource options defined")
@@ -72,7 +74,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			client.Log.Error(err)
 			continue
 		}
-		//map resources to the client
+		// map resources to the client; copies the Azure resource information to the client.
 		for _, resource := range resourceList {
 			if !containsResource(*resource.ID, client.Resources) {
 				client.Resources = append(client.Resources, Resource{

@@ -24,7 +24,7 @@ func TestReturnAllDimensions(t *testing.T) {
 			Name:  "SlotID",
 		},
 	}
-	result, dims := returnAllDimensions(dimensionList)
+	result, dims := getWildcardDimensions(dimensionList)
 	assert.True(t, result)
 	assert.Equal(t, len(dims), 1)
 	assert.Equal(t, dims[0].Name, "SlotID")

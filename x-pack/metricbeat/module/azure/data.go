@@ -55,39 +55,66 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 		}
 	}
 
-	// grouping metric values by timestamp and creating events (for each metric the REST api can retrieve multiple metric values for same aggregation  but different timeframes)
+	// grouping metric values by timestamp and creating events (for each metric the REST api can retrieve multiple
+	// metric values for same aggregation  but different timeframes)
 	for _, grouped := range groupByDimensions {
 		defaultMetric := grouped[0]
 		resource := client.GetResourceForMetaData(defaultMetric)
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
+
 		for _, metric := range grouped {
 			for _, m := range metric.Values {
 				groupByTimeMetrics[m.timestamp] = append(groupByTimeMetrics[m.timestamp], m)
 			}
 		}
+
+		exists, _ := getWildcardDimensions(defaultMetric.Dimensions)
+
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
 			var event mb.Event
 			var metricList mapstr.M
 			var vm VmResource
 			// group events by dimension values
-			exists, validDimensions := returnAllDimensions(defaultMetric.Dimensions)
-			if exists {
-				for _, selectedDimension := range validDimensions {
-					groupByDimensions := make(map[string][]MetricValue)
-					for _, dimGroupValue := range groupTimeValues {
-						dimKey := fmt.Sprintf("%s,%s", selectedDimension.Name, getDimensionValue(selectedDimension.Name, dimGroupValue.dimensions))
-						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
-					}
-					for _, groupDimValues := range groupByDimensions {
-						manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupDimValues)
-					}
-				}
-			} else {
+			//exists, validDimensions := getWildcardDimensions(defaultMetric.Dimensions)
+			//exists, _ := getWildcardDimensions(defaultMetric.Dimensions)
+
+			if !exists {
+				//
+				// There are no dimensions with wildcards, so we can group all the values in one event.
+				//
 				manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupTimeValues)
+				continue
+			}
+
+			//
+			// There are dimensions with wildcards, so we need to group the values by the dimension values.
+			//
+			groupByDimensions := make(map[string][]MetricValue)
+			for _, dimGroupValue := range groupTimeValues {
+				//dimKey := fmt.Sprintf("%s,%s", selectedDimension.Name, getDimensionValue(selectedDimension.Name, dimGroupValue.dimensions))
+				//
+				// We need to group the values by the dimension values.
+				//
+				dimKey := buildDimensionKey(dimGroupValue.dimensions)
+				groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
+			}
+
+			// Create an event for each group of dimension values.
+			for _, groupDimValues := range groupByDimensions {
+				manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupDimValues)
 			}
 		}
 	}
+
 	return nil
+}
+
+func buildDimensionKey(dimensions []Dimension) string {
+	var dimKey string
+	for _, dim := range dimensions {
+		dimKey += fmt.Sprintf("%s,%s;", dim.Name, dim.Value)
+	}
+	return dimKey
 }
 
 // manageAndReportEvent function will handle event creation and report
@@ -229,8 +256,8 @@ func getDimensionValue(dimension string, dimensions []Dimension) string {
 	return ""
 }
 
-// returnAllDimensions will check if users has entered a filter for all dimension values (*)
-func returnAllDimensions(dimensions []Dimension) (bool, []Dimension) {
+// getWildcardDimensions returns all user-defined dimension names with values = * (wildcard)
+func getWildcardDimensions(dimensions []Dimension) (bool, []Dimension) {
 	if len(dimensions) == 0 {
 		return false, nil
 	}
