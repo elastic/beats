@@ -177,7 +177,7 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricD
 		metricGroups[string(*met.PrimaryAggregationType)] = append(metricGroups[string(*met.PrimaryAggregationType)], met)
 	}
 
-	clientMetrics := make([]Metric, len(metricGroups))
+	clientMetrics := make([]Metric, 0, len(metricGroups))
 	for key, metricGroup := range metricGroups {
 		var metricNames []string
 		for _, metricName := range metricGroup {
