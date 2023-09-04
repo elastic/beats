@@ -83,7 +83,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
 				p := newPublisher(trCtx, publisher, true, r.log)
-				r.responseProcessors[i].startProcessingSeq(stdCtx, trCtx, finalResps, true, p)
+				r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true, p)
 				n = p.eventCount()
 				continue
 			}
@@ -120,7 +120,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
 			p := newPublisher(trCtx, publisher, false, r.log)
-			r.responseProcessors[i].startProcessingSeq(stdCtx, trCtx, finalResps, false, p)
+			r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false, p)
 			n = p.eventCount()
 		} else {
 			if len(ids) == 0 {
@@ -191,9 +191,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
 			if rf.isChain {
-				rf.chainResponseProcessor.startProcessingSeq(stdCtx, chainTrCtx, resps, true, p)
+				rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, p)
 			} else {
-				r.responseProcessors[i].startProcessingSeq(stdCtx, trCtx, resps, true, p)
+				r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true, p)
 			}
 			n += p.eventCount()
 		}
@@ -544,7 +544,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
 	p := newChainProcessor(r, trCtx, publisher, chainIndex)
-	r.responseProcessors[0].startProcessingSeq(stdCtx, trCtx, initialResp, true, p)
+	r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true, p)
 	return p.eventCount()
 }
 
@@ -702,7 +702,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			resps = intermediateResps
 		}
 		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
-		rf.chainResponseProcessor.startProcessingSeq(stdCtx, chainTrCtx, resps, true, p)
+		rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
 
