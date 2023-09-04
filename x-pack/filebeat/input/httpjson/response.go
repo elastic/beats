@@ -183,35 +183,12 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 type sendStream interface {
 	event(context.Context, mapstr.M)
 	fail(error)
-	close()
-}
-
-type stream struct {
-	ch chan maybeMsg
-}
-
-func newStream() stream {
-	return stream{make(chan maybeMsg)}
-}
-
-func (s stream) event(_ context.Context, e mapstr.M) {
-	s.ch <- maybeMsg{msg: e}
-}
-
-func (s stream) fail(err error) {
-	s.ch <- maybeMsg{err: err}
-}
-
-func (s stream) close() {
-	close(s.ch)
 }
 
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, ch sendStream) {
 	trCtx.clearIntervalData()
 
-	defer ch.close()
 	var npages int64
-
 	for i, httpResp := range resps {
 		iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp, rp.xmlDetails)
 		for {

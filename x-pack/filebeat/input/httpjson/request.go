@@ -610,8 +610,6 @@ func (p *chainProcessor) eventCount() int {
 	return p.n
 }
 
-func (*chainProcessor) close() {}
-
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
 //
 //nolint:bodyclose // response body is closed through drainBody method
@@ -742,22 +740,6 @@ func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bo
 	}
 }
 
-// processAndPublishEvents process and publish events based on event type
-func (p *publisher) processAndPublishEvents(events stream) {
-	for maybeMsg := range events.ch {
-		p.processAndPublishEvent(maybeMsg)
-	}
-}
-
-// processAndPublishEvent processes and publishes one events based on event type
-func (p *publisher) processAndPublishEvent(evt maybeMsg) {
-	if evt.failed() {
-		p.fail(evt.err)
-		return
-	}
-	p.event(nil, evt.msg)
-}
-
 func (p *publisher) event(_ context.Context, msg mapstr.M) {
 	if p.pub != nil {
 		event, err := makeEvent(msg)
@@ -787,8 +769,6 @@ func (p *publisher) fail(err error) {
 func (p *publisher) eventCount() int {
 	return p.n
 }
-
-func (p *publisher) close() {}
 
 const (
 	// This is generally updated with chain responses, if present, as they continue to occur
