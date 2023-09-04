@@ -180,10 +180,19 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool) <-chan maybeMsg {
+type stream chan maybeMsg
+
+func (s stream) event(e mapstr.M) {
+	s <- maybeMsg{msg: e}
+}
+
+func (s stream) fail(err error) {
+	s <- maybeMsg{err: err}
+}
+
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, ch stream) {
 	trCtx.clearIntervalData()
 
-	ch := make(chan maybeMsg)
 	go func() {
 		defer close(ch)
 		var npages int64
@@ -194,7 +203,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				pageStartTime := time.Now()
 				page, hasNext, err := iter.next()
 				if err != nil {
-					ch <- maybeMsg{err: err}
+					ch.fail(err)
 					return
 				}
 
@@ -221,13 +230,13 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 					for _, t := range rp.transforms {
 						tr, err = t.run(trCtx, tr)
 						if err != nil {
-							ch <- maybeMsg{err: err}
+							ch.fail(err)
 							return
 						}
 					}
 
 					if rp.split == nil {
-						ch <- maybeMsg{msg: tr.body()}
+						ch.event(tr.body())
 						rp.log.Debug("no split found: continuing")
 						continue
 					}
@@ -242,7 +251,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 							rp.log.Debug(err)
 						default:
 							rp.log.Debug("split operation failed")
-							ch <- maybeMsg{err: err}
+							ch.fail(err)
 							return
 						}
 					}
@@ -257,6 +266,4 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 		}
 		rp.metrics.updatePagesPerInterval(npages)
 	}()
-
-	return ch
 }
