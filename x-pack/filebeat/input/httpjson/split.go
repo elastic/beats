@@ -95,13 +95,13 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 // run runs the split operation on the contents of resp, sending successive
 // split results on ch. ctx is passed to transforms that are called during
 // the split.
-func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMsg) error {
+func (s *split) run(ctx *transformContext, resp transformable, events stream) error {
 	root := resp.body()
-	return s.split(ctx, root, ch)
+	return s.split(ctx, root, events)
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) error {
+func (s *split) split(ctx *transformContext, root mapstr.M, events stream) error {
 	v, err := root.GetValue(s.targetInfo.Name)
 	if err != nil && err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by GetValue.
 		return err
@@ -110,21 +110,21 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 	if v == nil {
 		if s.ignoreEmptyValue {
 			if s.child != nil {
-				return s.child.split(ctx, root, ch)
+				return s.child.split(ctx, root, events)
 			}
 			if s.keepParent {
-				ch <- maybeMsg{msg: root}
+				events.event(root)
 			}
 			return nil
 		}
 		if s.isRoot {
 			if s.keepParent {
-				ch <- maybeMsg{msg: root}
+				events.event(root)
 				return errEmptyField
 			}
 			return errEmptyRootField
 		}
-		ch <- maybeMsg{msg: root}
+		events.event(root)
 		return errEmptyField
 	}
 
@@ -138,23 +138,23 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		if len(varr) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, ch)
+					return s.child.split(ctx, root, events)
 				}
 				if s.keepParent {
-					ch <- maybeMsg{msg: root}
+					events.event(root)
 				}
 				return nil
 			}
 			if s.isRoot {
-				ch <- maybeMsg{msg: root}
+				events.event(root)
 				return errEmptyRootField
 			}
-			ch <- maybeMsg{msg: root}
+			events.event(root)
 			return errEmptyField
 		}
 
 		for _, e := range varr {
-			err := s.sendMessage(ctx, root, s.targetInfo.Name, e, ch)
+			err := s.sendMessage(ctx, root, s.targetInfo.Name, e, events)
 			if err != nil {
 				s.log.Debug(err)
 			}
@@ -170,22 +170,22 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		if len(vmap) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, ch)
+					return s.child.split(ctx, root, events)
 				}
 				if s.keepParent {
-					ch <- maybeMsg{msg: root}
+					events.event(root)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			ch <- maybeMsg{msg: root}
+			events.event(root)
 			return errEmptyField
 		}
 
 		for k, e := range vmap {
-			if err := s.sendMessage(ctx, root, k, e, ch); err != nil {
+			if err := s.sendMessage(ctx, root, k, e, events); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -200,18 +200,18 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		if len(vstr) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, ch)
+					return s.child.split(ctx, root, events)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			ch <- maybeMsg{msg: root}
+			events.event(root)
 			return errEmptyField
 		}
 		for _, substr := range strings.Split(vstr, s.delimiter) {
-			if err := s.sendMessageSplitString(ctx, root, substr, ch); err != nil {
+			if err := s.sendMessageSplitString(ctx, root, substr, events); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -224,7 +224,7 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 
 // sendMessage sends an array or map split result value, v, on ch after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, ch chan<- maybeMsg) error {
+func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, events stream) error {
 	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
@@ -252,10 +252,10 @@ func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v 
 	}
 
 	if s.child != nil {
-		return s.child.split(ctx, clone, ch)
+		return s.child.split(ctx, clone, events)
 	}
 
-	ch <- maybeMsg{msg: clone}
+	events.event(clone)
 
 	return nil
 }
@@ -277,7 +277,7 @@ func toMapStr(v interface{}, key string) (mapstr.M, bool) {
 
 // sendMessage sends a string split result value, v, on ch after performing any
 // necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, ch chan<- maybeMsg) error {
+func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, events stream) error {
 	clone := root.Clone()
 	_, _ = clone.Put(s.targetInfo.Name, v)
 
@@ -293,10 +293,10 @@ func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v s
 	}
 
 	if s.child != nil {
-		return s.child.split(ctx, clone, ch)
+		return s.child.split(ctx, clone, events)
 	}
 
-	ch <- maybeMsg{msg: clone}
+	events.event(clone)
 
 	return nil
 }

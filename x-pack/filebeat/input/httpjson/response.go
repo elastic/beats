@@ -180,21 +180,31 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 	return rp
 }
 
-type stream chan maybeMsg
+type stream struct {
+	ch chan maybeMsg
+}
+
+func newStream() stream {
+	return stream{make(chan maybeMsg)}
+}
 
 func (s stream) event(e mapstr.M) {
-	s <- maybeMsg{msg: e}
+	s.ch <- maybeMsg{msg: e}
 }
 
 func (s stream) fail(err error) {
-	s <- maybeMsg{err: err}
+	s.ch <- maybeMsg{err: err}
+}
+
+func (s stream) close() {
+	close(s.ch)
 }
 
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, ch stream) {
 	trCtx.clearIntervalData()
 
 	go func() {
-		defer close(ch)
+		defer ch.close()
 		var npages int64
 
 		for i, httpResp := range resps {

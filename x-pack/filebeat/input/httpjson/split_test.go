@@ -704,19 +704,19 @@ func TestSplit(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			ch := make(chan maybeMsg, len(tc.expectedMessages))
+			events := stream{make(chan maybeMsg, len(tc.expectedMessages))}
 			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
 			assert.NoError(t, err)
-			err = split.run(tc.ctx, tc.resp, ch)
+			err = split.run(tc.ctx, tc.resp, events)
 			if tc.expectedErr == nil {
 				assert.NoError(t, err)
 			} else {
 				assert.EqualError(t, err, tc.expectedErr.Error())
 			}
-			close(ch)
-			assert.Equal(t, len(tc.expectedMessages), len(ch))
+			events.close()
+			assert.Equal(t, len(tc.expectedMessages), len(events.ch))
 			for _, msg := range tc.expectedMessages {
-				e := <-ch
+				e := <-events.ch
 				assert.NoError(t, e.err)
 				assert.Equal(t, msg.Flatten(), e.msg.Flatten())
 			}
