@@ -83,9 +83,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
 				p := newPublisher(trCtx, publisher, true, r.log)
-				events := newStream()
-				r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true, events)
-				p.processAndPublishEvents(events)
+				r.responseProcessors[i].startProcessingSeq(stdCtx, trCtx, finalResps, true, p)
 				n = p.eventCount()
 				continue
 			}
