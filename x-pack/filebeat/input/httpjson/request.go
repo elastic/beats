@@ -190,13 +190,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 
 			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
-			events := newStream()
 			if rf.isChain {
-				rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, events)
+				rf.chainResponseProcessor.startProcessingSeq(stdCtx, chainTrCtx, resps, true, p)
 			} else {
-				r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true, events)
+				r.responseProcessors[i].startProcessingSeq(stdCtx, trCtx, resps, true, p)
 			}
-			p.processAndPublishEvents(events)
 			n += p.eventCount()
 		}
 	}
