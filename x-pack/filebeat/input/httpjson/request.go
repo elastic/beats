@@ -550,9 +550,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
 	p := newChainProcessor(r, trCtx, publisher, chainIndex)
-	events := newStream()
-	r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true, events)
-	p.processRemainingChainEvents(stdCtx, events)
+	r.responseProcessors[0].startProcessingSeq(stdCtx, trCtx, initialResp, true, p)
 	return p.eventCount()
 }
 
@@ -571,17 +569,6 @@ func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.
 		ctx: trCtx,
 		pub: pub,
 		idx: idx,
-	}
-}
-
-func (p *chainProcessor) processRemainingChainEvents(ctx context.Context, events stream) {
-	for maybeMsg := range events.ch {
-		if maybeMsg.failed() {
-			p.fail(maybeMsg.err)
-			continue
-		}
-
-		p.event(ctx, maybeMsg.msg)
 	}
 }
 
