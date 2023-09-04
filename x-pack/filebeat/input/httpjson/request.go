@@ -82,9 +82,10 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
+				p := newPublisher(trCtx, publisher, true, r.log)
 				events := make(stream)
 				r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true, events)
-				n = processAndPublishEvents(trCtx, events, publisher, true, r.log)
+				n = p.processAndPublishEvents(events)
 				continue
 			}
 
@@ -119,9 +120,10 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return err
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
+			p := newPublisher(trCtx, publisher, false, r.log)
 			events := make(stream)
 			r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false, events)
-			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
+			n = p.processAndPublishEvents(events)
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -189,13 +191,14 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				resps = intermediateResps
 			}
 
+			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
 			events := make(stream)
 			if rf.isChain {
 				rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, events)
 			} else {
 				r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true, events)
 			}
-			n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
+			n += p.processAndPublishEvents(events)
 		}
 	}
 
@@ -678,9 +681,10 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 			resps = intermediateResps
 		}
+		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
 		events := make(stream)
 		rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, events)
-		n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
+		n += p.processAndPublishEvents(events)
 	}
 
 	defer func() {
@@ -701,36 +705,58 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
+type publisher struct {
+	ctx *transformContext
+	pub inputcursor.Publisher
+	log *logp.Logger
+}
+
+func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, log *logp.Logger) publisher {
+	if !publish {
+		pub = nil
+	}
+	return publisher{
+		ctx: trCtx,
+		pub: pub,
+		log: log,
+	}
+}
+
 // processAndPublishEvents process and publish events based on event type
-func processAndPublishEvents(trCtx *transformContext, events stream, publisher inputcursor.Publisher, publish bool, log *logp.Logger) int {
+func (p publisher) processAndPublishEvents(events stream) int {
 	var n int
 	for maybeMsg := range events {
-		if maybeMsg.failed() {
-			log.Errorf("error processing response: %v", maybeMsg)
-			continue
-		}
-
-		if publish {
-			event, err := makeEvent(maybeMsg.msg)
-			if err != nil {
-				log.Errorf("error creating event: %v", maybeMsg)
-				continue
-			}
-
-			if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
-				log.Errorf("error publishing event: %v", err)
-				continue
-			}
-		}
-		if len(*trCtx.firstEventClone()) == 0 {
-			trCtx.updateFirstEvent(maybeMsg.msg)
-		}
-		trCtx.updateLastEvent(maybeMsg.msg)
-		trCtx.updateCursor()
-
-		n++
+		n += p.processAndPublishEvent(maybeMsg)
 	}
 	return n
+}
+
+// processAndPublishEvent processes and publishes one events based on event type
+func (p publisher) processAndPublishEvent(evt maybeMsg) int {
+	if evt.failed() {
+		p.log.Errorf("error processing response: %v", evt)
+		return 0
+	}
+
+	if p.pub != nil {
+		event, err := makeEvent(evt.msg)
+		if err != nil {
+			p.log.Errorf("error creating event: %v", evt)
+			return 0
+		}
+
+		if err := p.pub.Publish(event, p.ctx.cursorMap()); err != nil {
+			p.log.Errorf("error publishing event: %v", err)
+			return 0
+		}
+	}
+	if len(*p.ctx.firstEventClone()) == 0 {
+		p.ctx.updateFirstEvent(evt.msg)
+	}
+	p.ctx.updateLastEvent(evt.msg)
+	p.ctx.updateCursor()
+
+	return 1
 }
 
 const (
