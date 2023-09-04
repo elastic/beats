@@ -27,16 +27,17 @@ import (
 	"strings"
 	"time"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -739,14 +740,16 @@ func extractHostHeader(header string) (host string, port int) {
 		return header, port
 	}
 	// Split :port trailer
-	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
+	if pos := strings.LastIndexByte(header, ':'); pos != -1 && pos < len(header)-1 {
 		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
 			header, port = header[:pos], num
 		}
 	}
 	// Remove square bracket boxing of IPv6 address.
-	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
-		header = header[1:last]
+	if len(header) > 1 {
+		if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
+			header = header[1:last]
+		}
 	}
 	return header, port
 }

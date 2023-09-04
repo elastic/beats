@@ -30,14 +30,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type testParser struct {
@@ -1898,6 +1899,28 @@ func TestHttpParser_Extension(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestHttpParser_extractHostHeader(t *testing.T) {
+	var testCases = []struct {
+		host       string
+		wantedHost string
+		wantedPort int
+	}{
+		{"www.elastic.co", "www.elastic.co", 0},
+		{"www.elastic.co:443", "www.elastic.co", 443},
+		{"www.elastic.co:8080", "www.elastic.co", 8080},
+		{"wrong-host:1234", "wrong-host", 1234},
+		{":1234", "", 1234},
+		{"", "", 0},
+		{"[1::]:80", "1::", 80},
+		{"[1::]", "1::", 0},
+	}
+	for _, tc := range testCases {
+		host, port := extractHostHeader(tc.host)
+		assert.Equal(t, tc.wantedHost, host)
+		assert.Equal(t, tc.wantedPort, port)
 	}
 }
 
