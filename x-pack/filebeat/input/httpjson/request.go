@@ -549,51 +549,87 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
+	p := newChainProcessor(r, trCtx, publisher, chainIndex)
 	events := newStream()
 	r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true, events)
+	p.processRemainingChainEvents(stdCtx, events)
+	return p.eventCount()
+}
 
-	var n int
-	var eventCount int
+type chainProcessor struct {
+	req  *requester
+	ctx  *transformContext
+	pub  inputcursor.Publisher
+	idx  int
+	tail bool
+	n    int
+}
+
+func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.Publisher, idx int) *chainProcessor {
+	return &chainProcessor{
+		req: req,
+		ctx: trCtx,
+		pub: pub,
+		idx: idx,
+	}
+}
+
+func (p *chainProcessor) processRemainingChainEvents(ctx context.Context, events stream) {
 	for maybeMsg := range events.ch {
 		if maybeMsg.failed() {
-			r.log.Errorf("error processing response: %v", maybeMsg)
+			p.fail(maybeMsg.err)
 			continue
 		}
 
-		if n >= 1 { // skip 1st event as it has already ben processed before
-			var response http.Response
-			response.StatusCode = 200
-			body := new(bytes.Buffer)
-			// we construct a new response here from each of the pagination events
-			err := json.NewEncoder(body).Encode(maybeMsg.msg)
-			if err != nil {
-				r.log.Errorf("error processing chain event: %w", err)
-				continue
-			}
-			response.Body = io.NopCloser(body)
-
-			// updates the cursor for pagination last_event & last_response when chaining is present
-			trCtx.updateLastEvent(maybeMsg.msg)
-			trCtx.updateCursor()
-
-			// for each pagination response, we repeat all the chain steps / blocks
-			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
-			if err != nil {
-				r.log.Errorf("error processing chain event: %w", err)
-				continue
-			}
-			eventCount += count
-
-			err = response.Body.Close()
-			if err != nil {
-				r.log.Errorf("error closing http response body: %w", err)
-			}
-		}
-
-		n++
+		p.event(ctx, maybeMsg.msg)
 	}
-	return eventCount
 }
+
+func (p *chainProcessor) event(ctx context.Context, msg mapstr.M) {
+	if !p.tail {
+		// Skip first event as it has already been processed.
+		p.tail = true
+		return
+	}
+
+	var response http.Response
+	response.StatusCode = 200
+	body := new(bytes.Buffer)
+	// we construct a new response here from each of the pagination events
+	err := json.NewEncoder(body).Encode(msg)
+	if err != nil {
+		p.req.log.Errorf("error processing chain event: %w", err)
+		return
+	}
+	response.Body = io.NopCloser(body)
+
+	// updates the cursor for pagination last_event & last_response when chaining is present
+	p.ctx.updateLastEvent(msg)
+	p.ctx.updateCursor()
+
+	// for each pagination response, we repeat all the chain steps / blocks
+	n, err := p.req.processChainPaginationEvents(ctx, p.ctx, p.pub, &response, p.idx, p.req.log)
+	if err != nil {
+		p.req.log.Errorf("error processing chain event: %w", err)
+		return
+	}
+	p.n += n
+
+	err = response.Body.Close()
+	if err != nil {
+		p.req.log.Errorf("error closing http response body: %w", err)
+	}
+}
+
+func (p *chainProcessor) fail(err error) {
+	p.req.log.Errorf("error processing response: %v", err)
+}
+
+func (p *chainProcessor) eventCount() int {
+	return p.n
+}
+
+func (*chainProcessor) close() {}
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
 //
@@ -740,10 +776,10 @@ func (p *publisher) processAndPublishEvent(evt maybeMsg) {
 		p.fail(evt.err)
 		return
 	}
-	p.event(evt.msg)
+	p.event(nil, evt.msg)
 }
 
-func (p *publisher) event(msg mapstr.M) {
+func (p *publisher) event(_ context.Context, msg mapstr.M) {
 	if p.pub != nil {
 		event, err := makeEvent(msg)
 		if err != nil {

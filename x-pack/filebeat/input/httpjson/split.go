@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -102,6 +103,8 @@ func (s *split) run(ctx *transformContext, resp transformable, events sendStream
 
 // split recursively executes the split processor chain.
 func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) error {
+	todo := context.TODO()
+
 	v, err := root.GetValue(s.targetInfo.Name)
 	if err != nil && err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by GetValue.
 		return err
@@ -113,18 +116,18 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 				return s.child.split(ctx, root, events)
 			}
 			if s.keepParent {
-				events.event(root)
+				events.event(todo, root)
 			}
 			return nil
 		}
 		if s.isRoot {
 			if s.keepParent {
-				events.event(root)
+				events.event(todo, root)
 				return errEmptyField
 			}
 			return errEmptyRootField
 		}
-		events.event(root)
+		events.event(todo, root)
 		return errEmptyField
 	}
 
@@ -141,15 +144,15 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 					return s.child.split(ctx, root, events)
 				}
 				if s.keepParent {
-					events.event(root)
+					events.event(todo, root)
 				}
 				return nil
 			}
 			if s.isRoot {
-				events.event(root)
+				events.event(todo, root)
 				return errEmptyRootField
 			}
-			events.event(root)
+			events.event(todo, root)
 			return errEmptyField
 		}
 
@@ -173,14 +176,14 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 					return s.child.split(ctx, root, events)
 				}
 				if s.keepParent {
-					events.event(root)
+					events.event(todo, root)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			events.event(root)
+			events.event(todo, root)
 			return errEmptyField
 		}
 
@@ -207,7 +210,7 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			events.event(root)
+			events.event(todo, root)
 			return errEmptyField
 		}
 		for _, substr := range strings.Split(vstr, s.delimiter) {
@@ -255,7 +258,7 @@ func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v 
 		return s.child.split(ctx, clone, events)
 	}
 
-	events.event(clone)
+	events.event(context.TODO(), clone)
 
 	return nil
 }
@@ -296,7 +299,7 @@ func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v s
 		return s.child.split(ctx, clone, events)
 	}
 
-	events.event(clone)
+	events.event(context.TODO(), clone)
 
 	return nil
 }

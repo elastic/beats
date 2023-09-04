@@ -181,7 +181,7 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 }
 
 type sendStream interface {
-	event(mapstr.M)
+	event(context.Context, mapstr.M)
 	fail(error)
 	close()
 }
@@ -194,7 +194,7 @@ func newStream() stream {
 	return stream{make(chan maybeMsg)}
 }
 
-func (s stream) event(e mapstr.M) {
+func (s stream) event(_ context.Context, e mapstr.M) {
 	s.ch <- maybeMsg{msg: e}
 }
 
@@ -252,7 +252,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 					}
 
 					if rp.split == nil {
-						ch.event(tr.body())
+						ch.event(stdCtx, tr.body())
 						rp.log.Debug("no split found: continuing")
 						continue
 					}
