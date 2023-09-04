@@ -85,7 +85,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				p := newPublisher(trCtx, publisher, true, r.log)
 				events := newStream()
 				r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true, events)
-				n = p.processAndPublishEvents(events)
+				p.processAndPublishEvents(events)
+				n = p.eventCount()
 				continue
 			}
 
@@ -123,7 +124,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			p := newPublisher(trCtx, publisher, false, r.log)
 			events := newStream()
 			r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false, events)
-			n = p.processAndPublishEvents(events)
+			p.processAndPublishEvents(events)
+			n = p.eventCount()
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -198,7 +200,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			} else {
 				r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true, events)
 			}
-			n += p.processAndPublishEvents(events)
+			p.processAndPublishEvents(events)
+			n += p.eventCount()
 		}
 	}
 
@@ -684,7 +687,8 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
 		events := newStream()
 		rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, events)
-		n += p.processAndPublishEvents(events)
+		p.processAndPublishEvents(events)
+		n += p.eventCount()
 	}
 
 	defer func() {
@@ -708,14 +712,15 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 type publisher struct {
 	ctx *transformContext
 	pub inputcursor.Publisher
+	n   int
 	log *logp.Logger
 }
 
-func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, log *logp.Logger) publisher {
+func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, log *logp.Logger) *publisher {
 	if !publish {
 		pub = nil
 	}
-	return publisher{
+	return &publisher{
 		ctx: trCtx,
 		pub: pub,
 		log: log,
@@ -723,41 +728,52 @@ func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bo
 }
 
 // processAndPublishEvents process and publish events based on event type
-func (p publisher) processAndPublishEvents(events stream) int {
-	var n int
+func (p *publisher) processAndPublishEvents(events stream) {
 	for maybeMsg := range events.ch {
-		n += p.processAndPublishEvent(maybeMsg)
+		p.processAndPublishEvent(maybeMsg)
 	}
-	return n
 }
 
 // processAndPublishEvent processes and publishes one events based on event type
-func (p publisher) processAndPublishEvent(evt maybeMsg) int {
+func (p *publisher) processAndPublishEvent(evt maybeMsg) {
 	if evt.failed() {
-		p.log.Errorf("error processing response: %v", evt)
-		return 0
+		p.fail(evt.err)
+		return
 	}
+	p.event(evt.msg)
+}
 
+func (p *publisher) event(msg mapstr.M) {
 	if p.pub != nil {
-		event, err := makeEvent(evt.msg)
+		event, err := makeEvent(msg)
 		if err != nil {
-			p.log.Errorf("error creating event: %v", evt)
-			return 0
+			p.log.Errorf("error creating event: %v: %v", msg, err)
+			return
 		}
 
 		if err := p.pub.Publish(event, p.ctx.cursorMap()); err != nil {
 			p.log.Errorf("error publishing event: %v", err)
-			return 0
+			return
 		}
 	}
 	if len(*p.ctx.firstEventClone()) == 0 {
-		p.ctx.updateFirstEvent(evt.msg)
+		p.ctx.updateFirstEvent(msg)
 	}
-	p.ctx.updateLastEvent(evt.msg)
+	p.ctx.updateLastEvent(msg)
 	p.ctx.updateCursor()
 
-	return 1
+	p.n++
 }
+
+func (p *publisher) fail(err error) {
+	p.log.Errorf("error processing response: %v", err)
+}
+
+func (p *publisher) eventCount() int {
+	return p.n
+}
+
+func (p *publisher) close() {}
 
 const (
 	// This is generally updated with chain responses, if present, as they continue to occur
