@@ -702,9 +702,7 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			resps = intermediateResps
 		}
 		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
-		events := newStream()
-		rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, events)
-		p.processAndPublishEvents(events)
+		rf.chainResponseProcessor.startProcessingSeq(stdCtx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
 
