@@ -244,23 +244,13 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	p.logger.Debugf("Starting fetch...")
-	switch strings.ToLower(p.cfg.Dataset) {
-	case "", "all", "users":
-		_, err = p.doFetchUsers(ctx, state, true)
-		if err != nil {
-			return err
-		}
-	default:
-		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
+	_, err = p.doFetchUsers(ctx, state, true)
+	if err != nil {
+		return err
 	}
-	switch strings.ToLower(p.cfg.Dataset) {
-	case "", "all", "devices":
-		_, err = p.doFetchDevices(ctx, state, true)
-		if err != nil {
-			return err
-		}
-	default:
-		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
+	_, err = p.doFetchDevices(ctx, state, true)
+	if err != nil {
+		return err
 	}
 
 	if len(state.users) != 0 || len(state.devices) != 0 {
@@ -312,25 +302,13 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	var updatedUsers []*User
-	switch strings.ToLower(p.cfg.Dataset) {
-	case "", "all", "users":
-		updatedUsers, err = p.doFetchUsers(ctx, state, false)
-		if err != nil {
-			return err
-		}
-	default:
-		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
+	updatedUsers, err := p.doFetchUsers(ctx, state, false)
+	if err != nil {
+		return err
 	}
-	var updatedDevices []*Device
-	switch strings.ToLower(p.cfg.Dataset) {
-	case "", "all", "devices":
-		updatedDevices, err = p.doFetchDevices(ctx, state, false)
-		if err != nil {
-			return err
-		}
-	default:
-		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
+	updatedDevices, err := p.doFetchDevices(ctx, state, false)
+	if err != nil {
+		return err
 	}
 
 	var tracker *kvstore.TxTracker
@@ -361,6 +339,13 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 // any existing deltaLink will be ignored, forcing a full synchronization from Okta.
 // Returns a set of modified users by ID.
 func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	switch strings.ToLower(p.cfg.Dataset) {
+	case "", "all", "users":
+	default:
+		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
+		return nil, nil
+	}
+
 	var (
 		query url.Values
 		err   error
@@ -441,7 +426,10 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 // synchronization from Okta.
 // Returns a set of modified devices by ID.
 func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*Device, error) {
-	if !p.cfg.WantDevices {
+	switch strings.ToLower(p.cfg.Dataset) {
+	case "", "all", "devices":
+	default:
+		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
 		return nil, nil
 	}
 

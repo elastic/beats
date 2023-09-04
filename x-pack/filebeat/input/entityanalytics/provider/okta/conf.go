@@ -42,10 +42,10 @@ type conf struct {
 	OktaDomain string `config:"okta_domain" validate:"required"`
 	OktaToken  string `config:"okta_token" validate:"required"`
 
-	// WantDevices indicates that device details
-	// should be collected. This is optional as
-	// the devices API is not necessarily activated.
-	WantDevices bool `config:"collect_device_details"`
+	// Dataset specifies the datasets to collect from
+	// the API. It can be ""/"all", "users", or
+	// "devices".
+	Dataset string `config:"dataset"`
 
 	// SyncInterval is the time between full
 	// synchronisation operations.
@@ -62,11 +62,6 @@ type conf struct {
 	// Request is the configuration for establishing
 	// HTTP requests to the API.
 	Request *requestConfig `config:"request"`
-
-	// Dataset specifies the datasets to collect from
-	// the API. It can be ""/"all", "users", or
-	// "devices".
-	Dataset string `config:"dataset"`
 }
 
 type requestConfig struct {
