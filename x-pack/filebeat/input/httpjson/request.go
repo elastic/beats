@@ -120,9 +120,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
 			p := newPublisher(trCtx, publisher, false, r.log)
-			events := newStream()
-			r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false, events)
-			p.processAndPublishEvents(events)
+			r.responseProcessors[i].startProcessingSeq(stdCtx, trCtx, finalResps, false, p)
 			n = p.eventCount()
 		} else {
 			if len(ids) == 0 {
