@@ -95,13 +95,13 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 // run runs the split operation on the contents of resp, sending successive
 // split results on ch. ctx is passed to transforms that are called during
 // the split.
-func (s *split) run(ctx *transformContext, resp transformable, events stream) error {
+func (s *split) run(ctx *transformContext, resp transformable, events sendStream) error {
 	root := resp.body()
 	return s.split(ctx, root, events)
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(ctx *transformContext, root mapstr.M, events stream) error {
+func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) error {
 	v, err := root.GetValue(s.targetInfo.Name)
 	if err != nil && err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by GetValue.
 		return err
@@ -224,7 +224,7 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events stream) error
 
 // sendMessage sends an array or map split result value, v, on ch after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, events stream) error {
+func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, events sendStream) error {
 	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
@@ -277,7 +277,7 @@ func toMapStr(v interface{}, key string) (mapstr.M, bool) {
 
 // sendMessage sends a string split result value, v, on ch after performing any
 // necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, events stream) error {
+func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, events sendStream) error {
 	clone := root.Clone()
 	_, _ = clone.Put(s.targetInfo.Name, v)
 

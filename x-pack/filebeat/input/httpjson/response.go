@@ -180,6 +180,12 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 	return rp
 }
 
+type sendStream interface {
+	event(mapstr.M)
+	fail(error)
+	close()
+}
+
 type stream struct {
 	ch chan maybeMsg
 }
@@ -200,7 +206,7 @@ func (s stream) close() {
 	close(s.ch)
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, ch stream) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, ch sendStream) {
 	trCtx.clearIntervalData()
 
 	go func() {
