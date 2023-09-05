@@ -75,7 +75,7 @@ func defaultProcessors() []mapstr.M {
 
 	// Setting environmental variable NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor.
 	// This will result to events not being enhanced with host.ip and host.mac
-	//Related to https://github.com/elastic/integrations/issues/6674
+	// Related to https://github.com/elastic/integrations/issues/6674
 	valueNETINFO, status := os.LookupEnv("NETINFO")
 
 	if valueNETINFO == "false" && status == true {
