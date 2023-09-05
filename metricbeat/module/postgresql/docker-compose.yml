@@ -2,17 +2,18 @@ version: '2.3'
 
 services:
   postgresql:
-    image: docker.elastic.co/integrations-ci/beats-postgresql:${POSTGRESQL_VERSION:-13.2}-2
+    image: docker.elastic.co/integrations-ci/beats-postgresql:${POSTGRESQL_VERSION:-13.11}-2
     build:
       context: ./_meta
       args:
-        POSTGRESQL_VERSION: ${POSTGRESQL_VERSION:-13.2}
+        POSTGRESQL_VERSION: ${POSTGRESQL_VERSION:-13.11}
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -p 5432"]
-      interval: 5s
-      timeout: 5s
+      test: ['CMD-SHELL', 'psql -h localhost -p 5432 -U postgres -c select 1 -d postgres']
+      interval: 15s
+      timeout: 30s
       retries: 5
+      start_period: 15s

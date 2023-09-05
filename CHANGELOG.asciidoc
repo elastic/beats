@@ -3,6 +3,207 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.9.2]]
+=== Beats version 8.9.2
+https://github.com/elastic/beats/compare/v8.9.1\...v8.9.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
+- Update mito CEL extension library to v1.5.0. {pull}36146[36146]
+
+==== Added
+
+*Metricbeat*
+
+- Add Azure resource tags support to Azure Billing module {pull}36428[36428]
+
+
+[[release-notes-8.9.1]]
+=== Beats version 8.9.1
+https://github.com/elastic/beats/compare/v8.9.0\...v8.9.1[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- auditd: Expanded the bitmask applied to ECS file.mode so that the SUID, SGID, and sticky bits can be represented. {pull}36294[36294]
+
+*Filebeat*
+
+- Fix panic when SQS input metrics getter is invoked. {pull}36101[36101] {issue}36077[36077]
+- Make CEL input's `now` global variable static for evaluation lifetime. {pull}36107[36107]
+- Fix handling of TCP/UDP address resolution during metric initialization. {issue}35064[35064] {pull}36287[36287]
+- Fix handling of Juniper SRX structured data when there is no leading Junos element. {issue}36270[36270] {pull}36308[36308]
+- Remove erroneous error log in GCPPubSub input. {pull}36296[36296]
+- Fix Filebeat Cisco module with missing escape character. {issue}36325[36325] {pull}36326[36326]
+
+*Heartbeat*
+
+- Enable heartbeat-wide publish timeout setting with run_once. {pull}35721[35721]
+- Added default timezone UTC to heartbeat docker images to fix synthetics journeys navigation errors. {pull}36193[36193]
+
+*Packetbeat*
+
+- Fix handling of Npcap installation options from Fleet. {pull}35541[35541] {pull}35935[35935]
+
+*Winlogbeat*
+
+- Fix powershell details regexp to prevent excessive backtracking when processing command invocations. {pull}36178[36178]
+
+==== Added
+
+*Affecting all Beats*
+
+- Upgrade Go to 1.19.12 {pull}36246[36246]
+- Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
+
+*Filebeat*
+
+- Add support for endpoint resolver in AWS config {pull}36208[36208]
+
+
+[[release-notes-8.9.0]]
+=== Beats version 8.9.0
+https://github.com/elastic/beats/compare/v8.8.2\...v8.9.0[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Do not print context cancelled error message when running under agent {pull}36006[36006]
+- Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
+
+*Filebeat*
+
+- Add support in s3 input for JSON with array of objects. {pull}35475[35475]
+- RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
+- Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
+- Fix CEL input JSON marshalling of nested objects. {issue}35763[35763] {pull}35774[35774]
+- Fix metric collection in GCPPubSub input. {pull}35773[35773]
+- Fix end point deregistration in http_endpoint input. {issue}35899[35899] {pull}35903[35903]
+- Fix duplicate ID panic in filestream metrics. {issue}35964[35964] {pull}35972[35972]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35996[35996]
+- Fix handling of NUL-terminated log lines in Fortinet Firewall module. {issue}36026[36026] {pull}36027[36027]
+- Make redact field configuration recommended in CEL input and log warning if missing. {pull}36008[36008]
+- Fix handling of region name configuration in awss3 input {pull}36034[36034]
+
+*Heartbeat*
+
+- Update gval version. {pull}35636[35636]
+- Filter dev flags for ui monitors inside synthetics_args. {pull}35788[35788]
+- Fix temp dir running out of space with project monitors. {issue}35843[35843]
+
+*Metricbeat*
+
+- Fix no error logs displayed in CloudWatch EC2, RDS and SQS metadata {issue}34985[34985] {pull}35035[35035]
+- Remove Beta warning from IIS application_pool metricset {pull}35480[35480]
+- Improve documentation for ActiveMQ module {issue}35113[35113] {pull}35558[35558]
+- Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
+
+*Packetbeat*
+
+- Fix double channel close panic when reloading. {pull}35324[35324]
+
+*Winlogbeat*
+
+- Prevent panic on closing iterators on empty channels in experimental API. {issue}33966[33966] {pull}35423[35423]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add Hetzner Cloud as a provider for `add_cloud_metadata`. {pull}35456[35456]
+- Upgrade version of elastic-agent-autodiscover to v0.6.1 for improved memory consumption on k8s. {pull}35483[35483]
+- Added `orchestrator.cluster.id` and `orchestrator.cluster.name` fields to the add_cloud_metadata processor, AWS cloud provider. {pull}35182[35182]
+- Lowercase reported hostnames per Elastic Common Schema (ECS) guidelines for the host.name field. Upgraded github.com/elastic/go-sysinfo to 1.11.0. {pull}35652[35652]
+
+*Filebeat*
+
+- Added support for decoding apache parquet files in awss3 input. {issue}34662[34662] {pull}35578[35578]
+- Add support for CRC validation in Filebeat's HTTP endpoint input. {pull}35204[35204]
+- Add support for CRC validation in Zoom module. {pull}35604[35604]
+- Add execution budget to CEL input. {pull}35409[35409]
+- Add XML decoding support to HTTPJSON. {issue}34438[34438] {pull}35235[35235]
+- Add delegated account support when using Google ADC in `httpjson` input. {pull}35507[35507]
+- Add metrics for filestream input. {pull}35529[35529]
+- Add support for collecting `httpjson` metrics. {pull}35392[35392]
+- Add XML decoding support to CEL. {issue}34438[34438] {pull}35372[35372]
+- Mark CEL input as GA. {pull}35559[35559]
+- Add metrics for gcp-pubsub input. {pull}35614[35614]
+- Allow non-AWS endpoints for awss3 input. {issue}35496[35496] {pull}35520[35520]
+- Add Okta input package for entity analytics. {pull}35611[35611]
+- Expose harvester metrics from filestream input {pull}35835[35835] {issue}33771[33771]
+- Add device support for Azure AD entity analytics. {pull}35807[35807]
+
+*Libbeat*
+- Added support for Apache Parquet file reader. {issue}34662[34662] {pull}35183[35183]
+
+*Metricbeat*
+
+- Add GCP Redis metadata {pull}33701[33701]
+- Migrate Azure Billing, Monitor, and Storage metricsets to the newer SDK. {pull}33585[33585]
+- Add support for float64 values parsing for statsd metrics of counter type. {pull}35099[35099]
+
+*Packetbeat*
+
+- Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+
+*Winlogbeat*
+
+- Set `host.os.type` and `host.os.family` to "windows" if not already set. {pull}35435[35435]
+- Handle empty DNS answer data in QueryResults for the Sysmon Pipeline {pull}35207[35207]
+
+[[release-notes-8.8.2]]
+=== Beats version 8.8.2
+https://github.com/elastic/beats/compare/v8.8.1\...v8.8.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Make sure k8s watchers are closed when closing k8s meta processor. {pull}35630[35630]
+- Upgraded Apache Arrow library used in `x-pack/libbeat/reader/parquet` from v11 to v12.0.1 in order to fix cross-compilation issues. {pull}35640[35640]
+- Fix panic when the disk queue's MaxRetryInterval configuration is specified, but RetryInterval is not. {pull}35820[35820]
+
+*Filebeat*
+
+- Fix syslog message parsing for fortinet.firewall to take into account quoted values. {pull}35522[35522]
+- [Filebeat GCS input] Fixed an issue where `bucket_timeout` was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
+- Fix handling of IPv6 unspecified addresses in TCP input. {issue}35064[35064] {pull}35637[35637]
+- Improve error reporting and fix IPv6 handling of TCP and UDP metric collection. {pull}35772[35772]
+- Fix input reload on autodiscover. {issue}34388[34388] {pull}35645[35645]
+
+*Heartbeat*
+
+- Fix serialization of processors when running diagnostics. {pull}35698[35698]
+
+*Metricbeat*
+
+- Fix calculation of the `host.cpu.usage` metric for EC2. {pull}35717[35717]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.19.10. {pull}35751[35751]
+
+*Filebeat*
+
+- [GCS] Added scheduler debug logs and improved the context passing mechanism by removing them from struct params and passing them as function arguments. {pull}35674[35674]
+
+*Packetbeat*
+
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
+
+==== Deprecated
+
+*Heartbeat*
+
+- Removed support for `zip_url` and `local` browser sources. {pull}35429[35429]
+
 [[release-notes-8.8.1]]
 === Beats version 8.8.1
 https://github.com/elastic/beats/compare/v8.8.0\...v8.8.1[View commits]

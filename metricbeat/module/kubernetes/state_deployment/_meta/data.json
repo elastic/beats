@@ -14,6 +14,10 @@
                 "desired": 1,
                 "unavailable": 0,
                 "updated": 1
+            },
+            "status": {
+                "available": "true",
+                "progressing": "true"
             }
         },
         "namespace": "kube-system"

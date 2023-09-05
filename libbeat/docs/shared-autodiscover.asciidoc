@@ -371,9 +371,9 @@ endif::autodiscoverJolokia[]
 
 ifdef::autodiscoverAWSELB[]
 [float]
-===== Amazon ELBs
+===== Amazon ELBs (Deprecated)
 
-*Note: This provider is experimental*
+*Note: This provider is now deprecated and will be removed in a future release.*
 
 The Amazon ELB autodiscover provider discovers https://aws.amazon.com/elasticloadbalancing/[ELBs] and their listeners. This is useful when you don't want to connect
 directly to a service, but rather to the ELB fronting a pool of services.

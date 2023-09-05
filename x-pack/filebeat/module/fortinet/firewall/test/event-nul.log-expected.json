@@ -1,0 +1,167 @@
+[
+    {
+        "@timestamp": "2020-04-23T12:32:48.000-05:00",
+        "event.action": "FSSO-logon",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "0102043014",
+        "event.dataset": "fortinet.firewall",
+        "event.kind": "event",
+        "event.module": "fortinet",
+        "event.outcome": "success",
+        "event.start": "2020-04-18T12:32:48.439-05:00",
+        "event.timezone": "-0500",
+        "event.type": [
+            "start",
+            "user"
+        ],
+        "fileset.name": "firewall",
+        "fortinet.firewall.action": "FSSO-logon",
+        "fortinet.firewall.server": "elasticserver",
+        "fortinet.firewall.subtype": "user",
+        "fortinet.firewall.type": "event",
+        "fortinet.firewall.vd": "root",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 0,
+        "message": "log contains NUL terminators",
+        "network.type": "ipv4",
+        "observer.name": "testswitch3",
+        "observer.product": "Fortigate",
+        "observer.serial_number": "someotherrouteridagain",
+        "observer.type": "firewall",
+        "observer.vendor": "Fortinet",
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "elasticouser"
+        ],
+        "rule.description": "FSSO logon authentication status",
+        "service.type": "fortinet",
+        "source.ip": "10.10.10.10",
+        "source.user.name": "elasticouser",
+        "tags": [
+            "fortinet-firewall",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-23T12:32:47.000-05:00",
+        "destination.ip": "8.8.4.4",
+        "destination.port": 500,
+        "event.action": "negotiate",
+        "event.category": [
+            "network"
+        ],
+        "event.code": "0101037124",
+        "event.dataset": "fortinet.firewall",
+        "event.kind": "event",
+        "event.module": "fortinet",
+        "event.outcome": "failure",
+        "event.reason": "peer SA proposal not match local policy",
+        "event.start": "2020-04-18T12:32:48.339-05:00",
+        "event.timezone": "-0500",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "firewall",
+        "fortinet.firewall.action": "negotiate",
+        "fortinet.firewall.cookies": "345hkjhdrs87/0000000000000000",
+        "fortinet.firewall.outintf": "wan2",
+        "fortinet.firewall.peer_notif": "NOT-APPLICABLE",
+        "fortinet.firewall.status": "negotiate_error",
+        "fortinet.firewall.subtype": "vpn",
+        "fortinet.firewall.type": "event",
+        "fortinet.firewall.vd": "root",
+        "input.type": "log",
+        "log.level": "error",
+        "log.offset": 361,
+        "message": "IPsec phase 1 error",
+        "network.type": "ipv4",
+        "observer.name": "testswitch3",
+        "observer.product": "Fortigate",
+        "observer.serial_number": "someotherrouteridagain",
+        "observer.type": "firewall",
+        "observer.vendor": "Fortinet",
+        "related.ip": [
+            "175.16.199.1",
+            "8.8.4.4"
+        ],
+        "rule.description": "IPsec phase 1 error",
+        "service.type": "fortinet",
+        "source.geo.city_name": "Changchun",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "CN",
+        "source.geo.country_name": "China",
+        "source.geo.location.lat": 43.88,
+        "source.geo.location.lon": 125.3228,
+        "source.geo.region_iso_code": "CN-22",
+        "source.geo.region_name": "Jilin Sheng",
+        "source.ip": "175.16.199.1",
+        "source.port": 500,
+        "tags": [
+            "fortinet-firewall",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-04-23T12:32:31.000-05:00",
+        "destination.ip": "8.4.5.4",
+        "destination.port": 500,
+        "event.action": "negotiate",
+        "event.category": [
+            "network"
+        ],
+        "event.code": "0101037127",
+        "event.dataset": "fortinet.firewall",
+        "event.kind": "event",
+        "event.module": "fortinet",
+        "event.outcome": "success",
+        "event.start": "2020-04-18T12:32:31.628-05:00",
+        "event.timezone": "-0500",
+        "event.type": [
+            "connection"
+        ],
+        "fileset.name": "firewall",
+        "fortinet.firewall.action": "negotiate",
+        "fortinet.firewall.cookies": "df868dsg876d/0000000000000000",
+        "fortinet.firewall.init": "local",
+        "fortinet.firewall.mode": "main",
+        "fortinet.firewall.outintf": "wan1",
+        "fortinet.firewall.result": "OK",
+        "fortinet.firewall.role": "initiator",
+        "fortinet.firewall.stage": "1",
+        "fortinet.firewall.status": "success",
+        "fortinet.firewall.subtype": "vpn",
+        "fortinet.firewall.type": "event",
+        "fortinet.firewall.vd": "root",
+        "fortinet.firewall.vpntunnel": "elasticvpn",
+        "input.type": "log",
+        "log.level": "notice",
+        "log.offset": 935,
+        "message": "progress IPsec phase 1",
+        "network.direction": "outbound",
+        "network.type": "ipv4",
+        "observer.name": "testswitch3",
+        "observer.product": "Fortigate",
+        "observer.serial_number": "someotherrouteridagain",
+        "observer.type": "firewall",
+        "observer.vendor": "Fortinet",
+        "related.ip": [
+            "1.128.3.4",
+            "8.4.5.4"
+        ],
+        "rule.description": "Progress IPsec phase 1",
+        "service.type": "fortinet",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
+        "source.port": 500,
+        "tags": [
+            "fortinet-firewall",
+            "forwarded"
+        ]
+    }
+]

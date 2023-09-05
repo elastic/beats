@@ -7,6 +7,70 @@
         },
         "kubernetes": {
             "scheduler": {
+                "name": "DynamicServingCertificateController",
+                "workqueue": {
+                    "adds": {
+                        "count": 21
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "count": 29
+                    }
+                },
+                "code": "403",
+                "host": "172.18.0.2:6443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
                 "name": "RequestHeaderAuthRequestController",
                 "workqueue": {
                     "adds": {
@@ -25,6 +89,131 @@
                         "sec": 0
                     }
                 }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "name": "DynamicConfigMapCABundle-client-ca",
+                "workqueue": {
+                    "adds": {
+                        "count": 21
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 21,
+                                    "100000": 21,
+                                    "1000000": 21,
+                                    "15000000": 21,
+                                    "2000000": 21,
+                                    "25000": 21,
+                                    "250000": 21,
+                                    "30000000": 21,
+                                    "4000000": 21,
+                                    "5000": 6,
+                                    "500000": 21,
+                                    "60000000": 21,
+                                    "8000000": 21
+                                },
+                                "count": 21,
+                                "sum": 128073.85899999995
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 21,
+                                    "1024": 19,
+                                    "1048576": 21,
+                                    "16384": 21,
+                                    "16777216": 21,
+                                    "256": 7,
+                                    "262144": 21,
+                                    "4096": 21,
+                                    "4194304": 21,
+                                    "512": 17,
+                                    "64": 0,
+                                    "65536": 21
+                                },
+                                "count": 21,
+                                "sum": 8318
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 21,
+                                    "1024": 17,
+                                    "1048576": 21,
+                                    "16384": 21,
+                                    "16777216": 21,
+                                    "256": 6,
+                                    "262144": 21,
+                                    "4096": 21,
+                                    "4194304": 21,
+                                    "512": 7,
+                                    "64": 6,
+                                    "65536": 21
+                                },
+                                "count": 21,
+                                "sum": 12863
+                            }
+                        }
+                    }
+                },
+                "host": "172.18.0.2:6443",
+                "verb": "POST"
             }
         },
         "metricset": {
@@ -87,7 +276,7 @@
                                     "8000000": 3
                                 },
                                 "count": 3,
-                                "sum": 40375.45
+                                "sum": 36600.51900000001
                             }
                         },
                         "size": {
@@ -107,7 +296,7 @@
                                     "65536": 3
                                 },
                                 "count": 3,
-                                "sum": 1026
+                                "sum": 1029
                             }
                         }
                     },
@@ -129,101 +318,13 @@
                                     "65536": 3
                                 },
                                 "count": 3,
-                                "sum": 10897
+                                "sum": 10950
                             }
                         }
                     }
                 },
                 "host": "172.18.0.2:6443",
                 "verb": "PATCH"
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "client": {
-                    "request": {
-                        "duration": {
-                            "us": {
-                                "bucket": {
-                                    "+Inf": 1350,
-                                    "100000": 1350,
-                                    "1000000": 1350,
-                                    "15000000": 1350,
-                                    "2000000": 1350,
-                                    "25000": 1350,
-                                    "250000": 1350,
-                                    "30000000": 1350,
-                                    "4000000": 1350,
-                                    "5000": 1289,
-                                    "500000": 1350,
-                                    "60000000": 1350,
-                                    "8000000": 1350
-                                },
-                                "count": 1350,
-                                "sum": 4774056.504999995
-                            }
-                        },
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 1350,
-                                    "1024": 1350,
-                                    "1048576": 1350,
-                                    "16384": 1350,
-                                    "16777216": 1350,
-                                    "256": 0,
-                                    "262144": 1350,
-                                    "4096": 1350,
-                                    "4194304": 1350,
-                                    "512": 1350,
-                                    "64": 0,
-                                    "65536": 1350
-                                },
-                                "count": 1350,
-                                "sum": 574521
-                            }
-                        }
-                    },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 1350,
-                                    "1024": 1350,
-                                    "1048576": 1350,
-                                    "16384": 1350,
-                                    "16777216": 1350,
-                                    "256": 0,
-                                    "262144": 1350,
-                                    "4096": 1350,
-                                    "4194304": 1350,
-                                    "512": 1350,
-                                    "64": 0,
-                                    "65536": 1350
-                                },
-                                "count": 1350,
-                                "sum": 574522
-                            }
-                        }
-                    }
-                },
-                "host": "172.18.0.2:6443",
-                "verb": "PUT"
             }
         },
         "metricset": {
@@ -271,35 +372,62 @@
         "kubernetes": {
             "scheduler": {
                 "profile": "default-scheduler",
-                "result": "unschedulable",
+                "result": "scheduled",
                 "scheduling": {
                     "attempts": {
                         "duration": {
                             "us": {
                                 "bucket": {
-                                    "+Inf": 3,
-                                    "1000": 3,
-                                    "1024000": 3,
-                                    "128000": 3,
-                                    "16000": 3,
-                                    "16384000": 3,
-                                    "2000": 3,
-                                    "2048000": 3,
-                                    "256000": 3,
-                                    "32000": 3,
-                                    "4000": 3,
-                                    "4096000": 3,
-                                    "512000": 3,
-                                    "64000": 3,
-                                    "8000": 3,
-                                    "8192000": 3
+                                    "+Inf": 6,
+                                    "1000": 0,
+                                    "1024000": 6,
+                                    "128000": 6,
+                                    "16000": 6,
+                                    "16384000": 6,
+                                    "2000": 0,
+                                    "2048000": 6,
+                                    "256000": 6,
+                                    "32000": 6,
+                                    "4000": 0,
+                                    "4096000": 6,
+                                    "512000": 6,
+                                    "64000": 6,
+                                    "8000": 2,
+                                    "8192000": 6
                                 },
-                                "count": 3,
-                                "sum": 403.655
+                                "count": 6,
+                                "sum": 52896.684
                             }
                         }
                     }
                 }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "count": 21
+                    }
+                },
+                "code": "201",
+                "host": "172.18.0.2:6443",
+                "method": "POST"
             }
         },
         "metricset": {
@@ -348,73 +476,12 @@
             "scheduler": {
                 "client": {
                     "request": {
-                        "duration": {
-                            "us": {
-                                "bucket": {
-                                    "+Inf": 1393,
-                                    "100000": 1392,
-                                    "1000000": 1392,
-                                    "15000000": 1393,
-                                    "2000000": 1392,
-                                    "25000": 1392,
-                                    "250000": 1392,
-                                    "30000000": 1393,
-                                    "4000000": 1392,
-                                    "5000": 1368,
-                                    "500000": 1392,
-                                    "60000000": 1393,
-                                    "8000000": 1393
-                                },
-                                "count": 1393,
-                                "sum": 9186328.12299999
-                            }
-                        },
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 1393,
-                                    "1024": 1393,
-                                    "1048576": 1393,
-                                    "16384": 1393,
-                                    "16777216": 1393,
-                                    "256": 1393,
-                                    "262144": 1393,
-                                    "4096": 1393,
-                                    "4194304": 1393,
-                                    "512": 1393,
-                                    "64": 1393,
-                                    "65536": 1393
-                                },
-                                "count": 1393,
-                                "sum": 0
-                            }
-                        }
-                    },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 1393,
-                                    "1024": 1389,
-                                    "1048576": 1393,
-                                    "16384": 1392,
-                                    "16777216": 1393,
-                                    "256": 31,
-                                    "262144": 1393,
-                                    "4096": 1392,
-                                    "4194304": 1393,
-                                    "512": 1388,
-                                    "64": 10,
-                                    "65536": 1393
-                                },
-                                "count": 1393,
-                                "sum": 609699
-                            }
-                        }
+                        "count": 589
                     }
                 },
+                "code": "200",
                 "host": "172.18.0.2:6443",
-                "verb": "GET"
+                "method": "PUT"
             }
         },
         "metricset": {
@@ -461,36 +528,139 @@
         },
         "kubernetes": {
             "scheduler": {
-                "profile": "default-scheduler",
-                "result": "scheduled",
+                "process": {
+                    "cpu": {
+                        "sec": 8
+                    },
+                    "fds": {
+                        "max": {
+                            "count": 1048576
+                        },
+                        "open": {
+                            "count": 11
+                        }
+                    },
+                    "memory": {
+                        "resident": {
+                            "bytes": 58523648
+                        },
+                        "virtual": {
+                            "bytes": 785260544
+                        }
+                    },
+                    "started": {
+                        "sec": 1691572169.15
+                    }
+                },
                 "scheduling": {
-                    "attempts": {
-                        "duration": {
-                            "us": {
-                                "bucket": {
-                                    "+Inf": 6,
-                                    "1000": 0,
-                                    "1024000": 6,
-                                    "128000": 6,
-                                    "16000": 6,
-                                    "16384000": 6,
-                                    "2000": 0,
-                                    "2048000": 6,
-                                    "256000": 6,
-                                    "32000": 6,
-                                    "4000": 0,
-                                    "4096000": 6,
-                                    "512000": 6,
-                                    "64000": 6,
-                                    "8000": 5,
-                                    "8192000": 6
-                                },
-                                "count": 6,
-                                "sum": 36963.698000000004
-                            }
+                    "preemption": {
+                        "attempts": {
+                            "count": 3
+                        },
+                        "victims": {
+                            "bucket": {
+                                "+Inf": 0,
+                                "1": 0,
+                                "16": 0,
+                                "2": 0,
+                                "32": 0,
+                                "4": 0,
+                                "64": 0,
+                                "8": 0
+                            },
+                            "count": 0,
+                            "sum": 0
                         }
                     }
                 }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 589,
+                                    "100000": 589,
+                                    "1000000": 589,
+                                    "15000000": 589,
+                                    "2000000": 589,
+                                    "25000": 588,
+                                    "250000": 589,
+                                    "30000000": 589,
+                                    "4000000": 589,
+                                    "5000": 50,
+                                    "500000": 589,
+                                    "60000000": 589,
+                                    "8000000": 589
+                                },
+                                "count": 589,
+                                "sum": 5999108.381000003
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 589,
+                                    "1024": 589,
+                                    "1048576": 589,
+                                    "16384": 589,
+                                    "16777216": 589,
+                                    "256": 0,
+                                    "262144": 589,
+                                    "4096": 589,
+                                    "4194304": 589,
+                                    "512": 589,
+                                    "64": 0,
+                                    "65536": 589
+                                },
+                                "count": 589,
+                                "sum": 250590
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 589,
+                                    "1024": 589,
+                                    "1048576": 589,
+                                    "16384": 589,
+                                    "16777216": 589,
+                                    "256": 0,
+                                    "262144": 589,
+                                    "4096": 589,
+                                    "4194304": 589,
+                                    "512": 589,
+                                    "64": 0,
+                                    "65536": 589
+                                },
+                                "count": 589,
+                                "sum": 250591
+                            }
+                        }
+                    }
+                },
+                "host": "172.18.0.2:6443",
+                "verb": "PUT"
             }
         },
         "metricset": {
@@ -537,294 +707,33 @@
         },
         "kubernetes": {
             "scheduler": {
-                "client": {
-                    "request": {
-                        "count": 27
-                    }
-                },
-                "code": "403",
-                "host": "172.18.0.2:6443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "client": {
-                    "request": {
+                "profile": "default-scheduler",
+                "result": "unschedulable",
+                "scheduling": {
+                    "attempts": {
                         "duration": {
                             "us": {
                                 "bucket": {
-                                    "+Inf": 255,
-                                    "100000": 255,
-                                    "1000000": 255,
-                                    "15000000": 255,
-                                    "2000000": 255,
-                                    "25000": 255,
-                                    "250000": 255,
-                                    "30000000": 255,
-                                    "4000000": 255,
-                                    "5000": 242,
-                                    "500000": 255,
-                                    "60000000": 255,
-                                    "8000000": 255
+                                    "+Inf": 3,
+                                    "1000": 3,
+                                    "1024000": 3,
+                                    "128000": 3,
+                                    "16000": 3,
+                                    "16384000": 3,
+                                    "2000": 3,
+                                    "2048000": 3,
+                                    "256000": 3,
+                                    "32000": 3,
+                                    "4000": 3,
+                                    "4096000": 3,
+                                    "512000": 3,
+                                    "64000": 3,
+                                    "8000": 3,
+                                    "8192000": 3
                                 },
-                                "count": 255,
-                                "sum": 653478.0260000001
+                                "count": 3,
+                                "sum": 695.5989999999999
                             }
-                        },
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 255,
-                                    "1024": 136,
-                                    "1048576": 255,
-                                    "16384": 255,
-                                    "16777216": 255,
-                                    "256": 7,
-                                    "262144": 255,
-                                    "4096": 255,
-                                    "4194304": 255,
-                                    "512": 17,
-                                    "64": 0,
-                                    "65536": 255
-                                },
-                                "count": 255,
-                                "sum": 208805
-                            }
-                        }
-                    },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 255,
-                                    "1024": 17,
-                                    "1048576": 255,
-                                    "16384": 255,
-                                    "16777216": 255,
-                                    "256": 6,
-                                    "262144": 255,
-                                    "4096": 255,
-                                    "4194304": 255,
-                                    "512": 7,
-                                    "64": 6,
-                                    "65536": 255
-                                },
-                                "count": 255,
-                                "sum": 348458
-                            }
-                        }
-                    }
-                },
-                "host": "172.18.0.2:6443",
-                "verb": "POST"
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "name": "DynamicServingCertificateController",
-                "workqueue": {
-                    "adds": {
-                        "count": 47
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "client": {
-                    "request": {
-                        "count": 255
-                    }
-                },
-                "code": "201",
-                "host": "172.18.0.2:6443",
-                "method": "POST"
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "client": {
-                    "request": {
-                        "count": 1464
-                    }
-                },
-                "code": "200",
-                "host": "172.18.0.2:6443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "name": "DynamicConfigMapCABundle-client-ca",
-                "workqueue": {
-                    "adds": {
-                        "count": 47
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "scheduler",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.scheduler",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "scheduler": {
-                "process": {
-                    "cpu": {
-                        "sec": 17
-                    },
-                    "fds": {
-                        "max": {
-                            "count": 1048576
-                        },
-                        "open": {
-                            "count": 13
-                        }
-                    },
-                    "memory": {
-                        "resident": {
-                            "bytes": 62873600
-                        },
-                        "virtual": {
-                            "bytes": 779169792
-                        }
-                    },
-                    "started": {
-                        "sec": 1671725505.95
-                    }
-                },
-                "scheduling": {
-                    "preemption": {
-                        "attempts": {
-                            "count": 3
-                        },
-                        "victims": {
-                            "bucket": {
-                                "+Inf": 0,
-                                "10": 0,
-                                "15": 0,
-                                "20": 0,
-                                "25": 0,
-                                "30": 0,
-                                "35": 0,
-                                "40": 0,
-                                "45": 0,
-                                "5": 0,
-                                "50": 0
-                            },
-                            "count": 0,
-                            "sum": 0
                         }
                     }
                 }
@@ -874,14 +783,129 @@
         },
         "kubernetes": {
             "scheduler": {
+                "queue": "gated",
+                "scheduling": {
+                    "pending": {
+                        "pods": {
+                            "count": 0
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
                 "client": {
                     "request": {
-                        "count": 1350
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 634,
+                                    "100000": 633,
+                                    "1000000": 633,
+                                    "15000000": 634,
+                                    "2000000": 633,
+                                    "25000": 633,
+                                    "250000": 633,
+                                    "30000000": 634,
+                                    "4000000": 634,
+                                    "5000": 620,
+                                    "500000": 633,
+                                    "60000000": 634,
+                                    "8000000": 634
+                                },
+                                "count": 634,
+                                "sum": 4443225.512000004
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 634,
+                                    "1024": 634,
+                                    "1048576": 634,
+                                    "16384": 634,
+                                    "16777216": 634,
+                                    "256": 634,
+                                    "262144": 634,
+                                    "4096": 634,
+                                    "4194304": 634,
+                                    "512": 634,
+                                    "64": 634,
+                                    "65536": 634
+                                },
+                                "count": 634,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 634,
+                                    "1024": 629,
+                                    "1048576": 634,
+                                    "16384": 634,
+                                    "16777216": 634,
+                                    "256": 33,
+                                    "262144": 634,
+                                    "4096": 634,
+                                    "4194304": 634,
+                                    "512": 628,
+                                    "64": 9,
+                                    "65536": 634
+                                },
+                                "count": 634,
+                                "sum": 271449
+                            }
+                        }
+                    }
+                },
+                "host": "172.18.0.2:6443",
+                "verb": "GET"
+            }
+        },
+        "metricset": {
+            "name": "scheduler",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.scheduler",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "scheduler": {
+                "client": {
+                    "request": {
+                        "count": 650
                     }
                 },
                 "code": "200",
                 "host": "172.18.0.2:6443",
-                "method": "PUT"
+                "method": "GET"
             }
         },
         "metricset": {

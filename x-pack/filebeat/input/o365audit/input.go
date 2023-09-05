@@ -7,11 +7,11 @@ package o365audit
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -70,7 +70,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, nil, errors.Wrap(err, "reading config")
+		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
 
 	var sources []cursor.Source
@@ -100,7 +100,7 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	}
 
 	if _, err := auth.Token(); err != nil {
-		return errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", tenantID)
+		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", tenantID, err)
 	}
 
 	return nil
@@ -150,7 +150,7 @@ func (inp *o365input) runOnce(
 	}
 
 	if _, err := tokenProvider.Token(); err != nil {
-		return errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", stream.tenantID)
+		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", stream.tenantID, err)
 	}
 
 	config := &inp.config
@@ -171,7 +171,7 @@ func (inp *o365input) runOnce(
 		),
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to create API poller")
+		return fmt.Errorf("failed to create API poller: %w", err)
 	}
 
 	start := initCheckpoint(log, cursor, config.API.MaxRetention)
@@ -243,7 +243,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
 		ts = time.Now()
-		errs = append(errs, errors.Wrap(err, "failed parsing CreationTime"))
+		errs = append(errs, fmt.Errorf("failed parsing CreationTime: %w", err))
 	}
 	b := beat.Event{
 		Timestamp: ts,

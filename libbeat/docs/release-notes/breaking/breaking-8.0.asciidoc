@@ -9,11 +9,6 @@ See the <<release-notes,release notes>> for a complete list of breaking changes,
 bug fixes, and enhancements, including changes to beta or experimental
 functionality.
 
-//NOTE: The notable-breaking-changes tagged regions are re-used in the
-//Installation and Upgrade Guide
-
-//tag::notable-breaking-changes[]
-
 [discrete]
 ==== {beats} logs are now ECS-compliant
 
@@ -92,7 +87,3 @@ However this caused problems for some users.
 
 Starting in version 8.0.0, filesets are disabled by default. You must explicitly
 enable the filesets you want {filebeat} to use.
-
-// end::notable-breaking-changes[]
-
-

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"path"
 	"strings"
 	"testing"
 	"time"
@@ -21,101 +22,186 @@ import (
 )
 
 func TestOktaDoFetch(t *testing.T) {
-	dbFilename := "TestOktaDoFetch.db"
-	store := testSetupStore(t, dbFilename)
-	t.Cleanup(func() {
-		testCleanupStore(store, dbFilename)
-	})
-
-	const (
-		window = time.Minute
-		key    = "token"
-		msg    = `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`
-	)
-
-	var wantUsers []User
-	err := json.Unmarshal([]byte(msg), &wantUsers)
-	if err != nil {
-		t.Fatalf("failed to unmarshal user data: %v", err)
+	tests := []struct {
+		dataset     string
+		wantUsers   bool
+		wantDevices bool
+	}{
+		{dataset: "", wantUsers: true, wantDevices: true},
+		{dataset: "all", wantUsers: true, wantDevices: true},
+		{dataset: "users", wantUsers: true, wantDevices: false},
+		{dataset: "devices", wantUsers: false, wantDevices: true},
 	}
 
-	wantUserStates := make(map[string]State)
+	for _, test := range tests {
+		t.Run(test.dataset, func(t *testing.T) {
+			suffix := test.dataset
+			if suffix != "" {
+				suffix = "_" + suffix
+			}
+			dbFilename := fmt.Sprintf("TestOktaDoFetch%s.db", suffix)
+			store := testSetupStore(t, dbFilename)
+			t.Cleanup(func() {
+				testCleanupStore(store, dbFilename)
+			})
 
-	// Set the number of repeats.
-	const repeats = 3
-	var n int
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Leave 49 remaining, reset in one minute.
-		w.Header().Add("x-rate-limit-limit", "50")
-		w.Header().Add("x-rate-limit-remaining", "49")
-		w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
+			const (
+				window  = time.Minute
+				key     = "token"
+				users   = `[{"id":"USERID","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/USERID"}}}]`
+				devices = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
+			)
 
-		// Set next link if we can still repeat.
-		n++
-		if n < repeats {
-			w.Header().Add("link", `<https://localhost/api/v1/users?limit=200&after=opaquevalue>; rel="next"`)
-		}
+			data := map[string]string{
+				"users":   users,
+				"devices": devices,
+			}
 
-		userid := fmt.Sprintf("userid%d", n)
+			var wantUsers []User
+			if test.wantUsers {
+				err := json.Unmarshal([]byte(users), &wantUsers)
+				if err != nil {
+					t.Fatalf("failed to unmarshal user data: %v", err)
+				}
+			}
+			var wantDevices []Device
+			if test.wantDevices {
+				err := json.Unmarshal([]byte(users), &wantDevices)
+				if err != nil {
+					t.Fatalf("failed to unmarshal device data: %v", err)
+				}
+			}
 
-		// Store expected states. The State values are all Discovered
-		// unless the user is deleted since they are all first appearance.
-		states := []string{
-			"ACTIVE",
-			"RECOVERY",
-			"DEPROVISIONED",
-		}
-		status := states[n%len(states)]
-		state := Discovered
-		if status == "DEPROVISIONED" {
-			state = Deleted
-		}
-		wantUserStates[userid] = state
+			wantStates := make(map[string]State)
 
-		replacer := strings.NewReplacer(
-			"userid", userid,
-			"STATUS", status,
-		)
-		fmt.Fprintln(w, replacer.Replace(msg))
-	}))
-	defer ts.Close()
+			// Set the number of repeats.
+			const repeats = 3
+			var n int
+			ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Leave 49 remaining, reset in one minute.
+				w.Header().Add("x-rate-limit-limit", "50")
+				w.Header().Add("x-rate-limit-remaining", "49")
+				w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
 
-	u, err := url.Parse(ts.URL)
-	if err != nil {
-		t.Errorf("failed to parse server URL: %v", err)
+				if strings.HasPrefix(r.URL.Path, "/api/v1/device") && strings.HasSuffix(r.URL.Path, "users") {
+					// Give one user if this is a get device users request.
+					fmt.Fprintln(w, data["users"])
+					return
+				}
+
+				base := path.Base(r.URL.Path)
+
+				// Set next link if we can still repeat.
+				n++
+				if n < repeats {
+					w.Header().Add("link", fmt.Sprintf(`<https://localhost/api/v1/%s?limit=200&after=opaquevalue>; rel="next"`, base))
+				}
+
+				prefix := strings.TrimRight(base, "s") // endpoints are plural.
+				id := fmt.Sprintf("%sid%d", prefix, n)
+
+				// Store expected states. The State values are all Discovered
+				// unless the user is deleted since they are all first appearance.
+				states := []string{
+					"ACTIVE",
+					"RECOVERY",
+					"DEPROVISIONED",
+				}
+				status := states[n%len(states)]
+				state := Discovered
+				if status == "DEPROVISIONED" {
+					state = Deleted
+				}
+				wantStates[id] = state
+
+				replacer := strings.NewReplacer(
+					strings.ToUpper(prefix+"id"), id,
+					"STATUS", status,
+				)
+				fmt.Fprintln(w, replacer.Replace(data[base]))
+			}))
+			defer ts.Close()
+
+			u, err := url.Parse(ts.URL)
+			if err != nil {
+				t.Errorf("failed to parse server URL: %v", err)
+			}
+			a := oktaInput{
+				cfg: conf{
+					OktaDomain: u.Host,
+					OktaToken:  key,
+					Dataset:    test.dataset,
+				},
+				client: ts.Client(),
+				lim:    rate.NewLimiter(1, 1),
+				logger: logp.L(),
+			}
+
+			ss, err := newStateStore(store)
+			if err != nil {
+				t.Fatalf("unexpected error making state store: %v", err)
+			}
+			defer ss.close(false)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			defer cancel()
+
+			t.Run("users", func(t *testing.T) {
+				n = 0
+
+				got, err := a.doFetchUsers(ctx, ss, false)
+				if err != nil {
+					t.Fatalf("unexpected error from doFetch: %v", err)
+				}
+
+				if len(got) != wantCount(repeats, test.wantUsers) {
+					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantUsers))
+				}
+				for i, g := range got {
+					if wantID := fmt.Sprintf("userid%d", i+1); g.ID != wantID {
+						t.Errorf("unexpected user ID for user %d: got:%s want:%s", i, g.ID, wantID)
+					}
+					if g.State != wantStates[g.ID] {
+						t.Errorf("unexpected user state for user %s: got:%s want:%s", g.ID, g.State, wantStates[g.ID])
+					}
+				}
+			})
+
+			t.Run("devices", func(t *testing.T) {
+				n = 0
+
+				got, err := a.doFetchDevices(ctx, ss, false)
+				if err != nil {
+					t.Fatalf("unexpected error from doFetch: %v", err)
+				}
+
+				if len(got) != wantCount(repeats, test.wantDevices) {
+					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantDevices))
+				}
+				for i, g := range got {
+					if wantID := fmt.Sprintf("deviceid%d", i+1); g.ID != wantID {
+						t.Errorf("unexpected device ID for device %d: got:%s want:%s", i, g.ID, wantID)
+					}
+					if g.State != wantStates[g.ID] {
+						t.Errorf("unexpected device state for device %s: got:%s want:%s", g.ID, g.State, wantStates[g.ID])
+					}
+					if g.Users == nil {
+						t.Errorf("expected users for device %s", g.ID)
+					}
+				}
+
+				if t.Failed() {
+					b, _ := json.MarshalIndent(got, "", "\t")
+					t.Logf("document:\n%s", b)
+				}
+			})
+		})
 	}
-	a := oktaInput{
-		cfg: conf{
-			OktaDomain: u.Host,
-			OktaToken:  key,
-		},
-		client: ts.Client(),
-		lim:    rate.NewLimiter(1, 1),
-		logger: logp.L(),
-	}
+}
 
-	ss, err := newStateStore(store)
-	if err != nil {
-		t.Fatalf("unexpected error making state store: %v", err)
+func wantCount(n int, want bool) int {
+	if !want {
+		return 0
 	}
-	defer ss.close(false)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	got, err := a.doFetch(ctx, ss, false)
-	if err != nil {
-		t.Fatalf("unexpected error from doFetch: %v", err)
-	}
-
-	if len(got) != repeats {
-		t.Errorf("unexpected number of results: got:%d want:%d", len(got), repeats)
-	}
-	for i, g := range got {
-		if wantID := fmt.Sprintf("userid%d", i+1); g.ID != wantID {
-			t.Errorf("unexpected user ID for user %d: got:%s want:%s", i, g.ID, wantID)
-		}
-		if g.State != wantUserStates[g.ID] {
-			t.Errorf("unexpected user ID for user %s: got:%s want:%s", g.ID, g.State, wantUserStates[g.ID])
-		}
-	}
+	return n
 }

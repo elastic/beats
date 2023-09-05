@@ -15,6 +15,7 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -44,7 +45,7 @@ type config struct {
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
 	// Redact is the debug log state redaction configuration.
-	Redact redact `config:"redact"`
+	Redact *redact `config:"redact"`
 
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
@@ -65,6 +66,10 @@ type redact struct {
 }
 
 func (c config) Validate() error {
+	if c.Redact == nil {
+		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
+	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}

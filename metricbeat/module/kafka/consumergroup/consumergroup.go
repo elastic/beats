@@ -20,8 +20,6 @@ package consumergroup
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -81,7 +79,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		return errors.Wrap(err, "error in connect")
+		return fmt.Errorf("error in connect: %w", err)
 	}
 	defer broker.Close()
 
@@ -114,7 +112,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred())
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	return nil

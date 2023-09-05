@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -256,12 +257,49 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 	}
 
 	if reg != nil {
-		netHTTPClient.Transport = httplog.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
+		netHTTPClient.Transport = httpmon.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
 	}
 
 	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)
 
 	return netHTTPClient, nil
+}
+
+func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
+	// Make retryable HTTP client
+	netHTTPClient, err := newNetHTTPClient(ctx, requestCfg, log, reg)
+	if err != nil {
+		return nil, err
+	}
+
+	var retryPolicyFunc retryablehttp.CheckRetry
+	if len(p) != 0 {
+		retryPolicyFunc = p[0].CustomRetryPolicy
+	} else {
+		retryPolicyFunc = retryablehttp.DefaultRetryPolicy
+	}
+
+	client := &retryablehttp.Client{
+		HTTPClient:   netHTTPClient,
+		Logger:       newRetryLogger(log),
+		RetryWaitMin: requestCfg.Retry.getWaitMin(),
+		RetryWaitMax: requestCfg.Retry.getWaitMax(),
+		RetryMax:     requestCfg.Retry.getMaxAttempts(),
+		CheckRetry:   retryPolicyFunc,
+		Backoff:      retryablehttp.DefaultBackoff,
+	}
+
+	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, log)
+
+	if authCfg != nil && authCfg.OAuth2.isEnabled() {
+		authClient, err := authCfg.OAuth2.client(ctx, client.StandardClient())
+		if err != nil {
+			return nil, err
+		}
+		return &httpClient{client: authClient, limiter: limiter}, nil
+	}
+
+	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
 }
 
 // clientOption returns constructed client configuration options, including

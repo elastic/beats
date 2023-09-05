@@ -30,6 +30,7 @@ import (
 
 type managedInput struct {
 	userID           string
+	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
@@ -61,7 +62,7 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(ctx.ID)
+	metrics := NewMetrics(inp.metricsID)
 	defer metrics.Close()
 
 	hg := &defaultHarvesterGroup{

@@ -310,7 +310,7 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					Tags: []types.TagDescription{},
 				}, nil
 			},
-			processorOverwrite: false,
+			processorOverwrite: true,
 			previousEvent: mapstr.M{
 				"cloud.provider": "aws",
 			},
@@ -349,6 +349,7 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 
 			config, err := conf.NewConfigFrom(map[string]interface{}{
 				"overwrite": tc.processorOverwrite,
+				"providers": []string{"aws"},
 			})
 			if err != nil {
 				t.Fatalf("error creating config from map: %s", err.Error())

@@ -201,7 +201,6 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
-
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
@@ -502,7 +501,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	var stopBeat = func() {
+	stopBeat := func() {
 		b.Instrumentation.Tracer().Close()
 		beater.Stop()
 	}
@@ -615,8 +614,9 @@ type SetupSettings struct {
 	// Deprecated: use IndexManagementKey instead
 	Template bool
 	// Deprecated: use IndexManagementKey instead
-	ILMPolicy         bool
-	EnableAllFilesets bool
+	ILMPolicy                 bool
+	EnableAllFilesets         bool
+	ForceEnableModuleFilesets bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -628,16 +628,19 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		if err != nil {
 			return err
 		}
-
 		// Tell the beat that we're in the setup command
 		b.InSetupCmd = true
 
+		if setup.ForceEnableModuleFilesets {
+			if err := b.Beat.BeatConfig.SetBool("config.modules.force_enable_module_filesets", -1, true); err != nil {
+				return fmt.Errorf("error setting force_enable_module_filesets config option %w", err)
+			}
+		}
 		// Create beater to give it the opportunity to set loading callbacks
 		_, err = b.createBeater(bt)
 		if err != nil {
 			return err
 		}
-
 		if setup.IndexManagement || setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
 			if !isElasticsearchOutput(outCfg.Name()) {
@@ -648,7 +651,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return err
 			}
 
-			var loadTemplate, loadILM = idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
+			loadTemplate, loadILM := idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 			if setup.IndexManagement || setup.Template {
 				loadTemplate = idxmgmt.LoadModeOverwrite
 			}
@@ -687,6 +690,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 					return fmt.Errorf("error setting enable_all_filesets config option %w", err)
 				}
 			}
+
 			esConfig := b.Config.Output.Config()
 			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
@@ -900,7 +904,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 
 	// write temporary file first
 	tempFile := metaPath + ".new"
-	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
 		return fmt.Errorf("failed to create Beat meta file: %w", err)
 	}

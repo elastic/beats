@@ -32,9 +32,9 @@ func TestForecastPeriodFrom(t *testing.T) {
 		referenceTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-09 09:41:00")
 		assert.NoError(t, err)
 
-		expectedStartTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-01 00:00:00")
+		expectedStartTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-07 00:00:00")
 		assert.NoError(t, err)
-		expectedEndTime, err := time.Parse("2006-01-02 15:04:05", "2007-01-31 23:59:59")
+		expectedEndTime, err := time.Parse("2006-01-02 15:04:05", "2007-02-05 23:59:59")
 		assert.NoError(t, err)
 
 		actualStartTime, actualEndTime := forecastIntervalFrom(referenceTime)

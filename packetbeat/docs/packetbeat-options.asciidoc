@@ -61,7 +61,7 @@ On Windows {beatname} requires an Npcap DLL installation. This is provided by {b
 for users of the Elastic Licenced version. In some cases users may wish to use
 their own installed version. In order to do this the `packetbeat.npcap.never_install`
 option can be used. Setting this option to `true` will not attempt to install the
-bundled Npcap library on start-up.
+bundled Npcap library on start-up unless no Npcap is already installed.
 
 [source,yaml]
 ------------------------------------------------------------------------------

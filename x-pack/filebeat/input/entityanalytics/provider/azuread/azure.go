@@ -491,6 +491,36 @@ func (p *azure) publishDevice(d *fetcher.Device, state *stateStore, inputID stri
 		_, _ = deviceDoc.Put("device.group", groups)
 	}
 
+	owners := make([]mapstr.M, 0, d.RegisteredOwners.Len())
+	d.RegisteredOwners.ForEach(func(userID uuid.UUID) {
+		u, ok := state.users[userID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup registered owner %q for device %q", userID, d.ID)
+			return
+		}
+		m := u.Fields.Clone()
+		_, _ = m.Put("user.id", u.ID.String())
+		owners = append(owners, m)
+	})
+	if len(owners) != 0 {
+		_, _ = deviceDoc.Put("device.registered_owners", owners)
+	}
+
+	users := make([]mapstr.M, 0, d.RegisteredUsers.Len())
+	d.RegisteredUsers.ForEach(func(userID uuid.UUID) {
+		u, ok := state.users[userID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup registered user %q for device %q", userID, d.ID)
+			return
+		}
+		m := u.Fields.Clone()
+		_, _ = m.Put("user.id", u.ID.String())
+		users = append(users, m)
+	})
+	if len(users) != 0 {
+		_, _ = deviceDoc.Put("device.registered_users", users)
+	}
+
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields:    deviceDoc,

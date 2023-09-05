@@ -56,25 +56,33 @@ type Tracker struct {
 // other than ES if necessary
 type StateLoader func(stdfields.StdMonitorFields) (*State, error)
 
-func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateStatus) (ms *State) {
+func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateStatus, isFinalAttempt bool) (ms *State) {
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	state := t.getCurrentState(sf)
+	state := t.GetCurrentState(sf)
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
 		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
 		t.states[sf.ID] = state
 	} else {
-		state.recordCheck(sf, newStatus)
+		state.recordCheck(sf, newStatus, isFinalAttempt)
 	}
 	// return a copy since the state itself is a pointer that is frequently mutated
 	return state.copy()
 }
 
-func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) {
+func (t *Tracker) GetCurrentStatus(sf stdfields.StdMonitorFields) StateStatus {
+	s := t.GetCurrentState(sf)
+	if s == nil {
+		return StatusEmpty
+	}
+	return s.Status
+}
+
+func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) {
 	if state, ok := t.states[sf.ID]; ok {
 		return state
 	}

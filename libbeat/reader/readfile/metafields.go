@@ -18,6 +18,9 @@
 package readfile
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -25,15 +28,17 @@ import (
 // Reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
 type FileMetaReader struct {
-	reader reader.Reader
-	path   string
-	offset int64
+	reader      reader.Reader
+	path        string
+	fi          os.FileInfo
+	fingerprint string
+	offset      int64
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string, offset int64) reader.Reader {
-	return &FileMetaReader{r, path, offset}
+func NewFilemeta(r reader.Reader, path string, fi os.FileInfo, fingerprint string, offset int64) reader.Reader {
+	return &FileMetaReader{r, path, fi, fingerprint, offset}
 }
 
 // Next reads the next line from it's initial io.Reader
@@ -56,6 +61,17 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		},
 	})
 
+	err = setFileSystemMetadata(r.fi, message.Fields)
+	if err != nil {
+		return message, fmt.Errorf("failed to set file system metadata: %w", err)
+	}
+
+	if r.fingerprint != "" {
+		_, err = message.Fields.Put("log.file.fingerprint", r.fingerprint)
+		if err != nil {
+			return message, fmt.Errorf("failed to set fingerprint: %w", err)
+		}
+	}
 	r.offset += int64(message.Bytes)
 
 	return message, err

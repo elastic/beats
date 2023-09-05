@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
@@ -145,7 +143,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 		XPackEnabled bool `config:"xpack.enabled"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+		return nil, fmt.Errorf("could not unpack configuration for module %v: %w", moduleName, err)
 	}
 
 	// No special configuration is needed if xpack.enabled != true
@@ -155,7 +153,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 
 	var raw mapstr.M
 	if err := base.UnpackConfig(&raw); err != nil {
-		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+		return nil, fmt.Errorf("could not unpack configuration for module %v: %w", moduleName, err)
 	}
 
 	// Ensure all required metricsets are enabled when xpack.enabled == true, and add any additional which are optional
@@ -190,12 +188,12 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 
 	newConfig, err := conf.NewConfigFrom(raw)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
+		return nil, fmt.Errorf("could not create new configuration for module %v: %w", moduleName, err)
 	}
 
 	newModule, err := base.WithConfig(*newConfig)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
+		return nil, fmt.Errorf("could not reconfigure module %v: %w", moduleName, err)
 	}
 
 	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)

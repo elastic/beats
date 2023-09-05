@@ -28,10 +28,9 @@ import (
 )
 
 var files = []string{
-	"../_meta/test/ksm.v2.4.2.plain",
-	"../_meta/test/ksm.v2.5.0.plain",
-	"../_meta/test/ksm.v2.6.0.plain",
 	"../_meta/test/ksm.v2.7.0.plain",
+	"../_meta/test/ksm.v2.8.2.plain",
+	"../_meta/test/ksm.v2.9.2.plain",
 }
 
 const name = "state_container"
@@ -45,5 +44,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestStateMetricsFamily(t, files, mapping)
+	k.TestMetricsFamily(t, files, mapping)
 }

@@ -28,8 +28,7 @@ import (
 type gosysinfoProvider struct{}
 
 func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata, err error) {
-	var proc types.Process
-	proc, err = sysinfo.Process(pid)
+	proc, err := sysinfo.Process(pid)
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +37,11 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 	info, err = proc.Info()
 	if err != nil {
 		return nil, err
+	}
+
+	var env map[string]string
+	if e, ok := proc.(types.Environment); ok {
+		env, _ = e.Environment()
 	}
 
 	username, userid := "", ""
@@ -51,6 +55,7 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 	r := processMetadata{
 		name:      info.Name,
 		args:      info.Args,
+		env:       env,
 		title:     strings.Join(info.Args, " "),
 		exe:       info.Exe,
 		pid:       info.PID,

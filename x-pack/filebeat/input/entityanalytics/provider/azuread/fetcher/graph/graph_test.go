@@ -10,12 +10,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"path"
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -113,6 +117,24 @@ var devicesResponse2 = apiDeviceResponse{
 	},
 }
 
+var deviceOwnerResponses = map[string]apiUserResponse{
+	"6a59ea83-02bd-468f-a40b-f2c3d1821983": {
+		Users: []userAPI{{"id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"}},
+	},
+	"adbbe40a-0627-4328-89f1-88cac84dbc7f": {
+		Users: []userAPI{{"id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"}},
+	},
+}
+
+var deviceUserResponses = map[string]apiUserResponse{
+	"6a59ea83-02bd-468f-a40b-f2c3d1821983": {
+		Users: []userAPI{{"id": "d897d560-3d17-4dae-81b3-c898fe82bf84"}, {"id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"}},
+	},
+	"adbbe40a-0627-4328-89f1-88cac84dbc7f": {
+		Users: []userAPI{{"id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"}},
+	},
+}
+
 var groupsResponse1 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
@@ -195,6 +217,26 @@ func (s *testServer) setup(t *testing.T) {
 			data, err = json.Marshal(&devicesResponse2)
 		default:
 			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
+		}
+		require.NoError(t, err)
+
+		_, err = w.Write(data)
+		require.NoError(t, err)
+	})
+
+	mux.HandleFunc("/devices/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		var data []byte
+		var err error
+
+		switch path.Base(r.URL.Path) {
+		case "registeredOwners":
+			data, err = json.Marshal(deviceOwnerResponses[path.Base(path.Dir(r.URL.Path))])
+		case "registeredUsers":
+			data, err = json.Marshal(deviceUserResponses[path.Base(path.Dir(r.URL.Path))])
+		default:
+			err = fmt.Errorf("unknown endpoint: %s", r.URL)
 		}
 		require.NoError(t, err)
 
@@ -375,6 +417,13 @@ func TestGraph_Devices(t *testing.T) {
 					},
 				},
 			},
+			RegisteredOwners: collections.NewUUIDSet(
+				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+			),
+			RegisteredUsers: collections.NewUUIDSet(
+				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+			),
 		},
 		{
 			ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
@@ -399,6 +448,12 @@ func TestGraph_Devices(t *testing.T) {
 					},
 				},
 			},
+			RegisteredOwners: collections.NewUUIDSet(
+				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+			),
+			RegisteredUsers: collections.NewUUIDSet(
+				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+			),
 		},
 	}
 
@@ -417,6 +472,13 @@ func TestGraph_Devices(t *testing.T) {
 	gotDevices, gotDeltaLink, gotErr := f.Devices(ctx, "")
 
 	require.NoError(t, gotErr)
-	require.EqualValues(t, wantDevices, gotDevices)
+	// Using go-cmp because testify is too weak for this comparison.
+	// reflect.DeepEqual works, but won't show a reasonable diff.
+	exporter := cmp.Exporter(func(t reflect.Type) bool {
+		return t == reflect.TypeOf(collections.UUIDSet{})
+	})
+	if !cmp.Equal(wantDevices, gotDevices, exporter) {
+		t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
+	}
 	require.Equal(t, wantDeltaLink, gotDeltaLink)
 }

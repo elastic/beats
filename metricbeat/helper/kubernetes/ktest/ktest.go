@@ -47,14 +47,14 @@ func GetTestCases(files []string) ptest.TestCases {
 	return cases
 }
 
-// TestStateMetricsFamily
+// TestMetricsFamily
 // This function reads the metric files and checks if the resource fetched metrics exist in it.
 // It only checks the family metric, because if the metric doesn't have any data, we don't have a way
 // to know the labels from the file.
 // The test fails if the metric does not exist in any of the files.
 // A warning is printed if the metric is not present in all of them.
 // Nothing happens, otherwise.
-func TestStateMetricsFamily(t *testing.T, files []string, mapping *p.MetricsMapping) {
+func TestMetricsFamily(t *testing.T, files []string, mapping *p.MetricsMapping) {
 	metricsFiles := map[string][]string{}
 	for i := 0; i < len(files); i++ {
 		content, err := ioutil.ReadFile(files[i])

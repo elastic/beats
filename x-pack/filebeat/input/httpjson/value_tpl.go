@@ -66,6 +66,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmacBase64":          hmacStringBase64,
 			"join":                join,
 			"toJSON":              toJSON,
+			"max":                 max,
+			"min":                 min,
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
@@ -293,6 +295,32 @@ func mul(a, b int64) int64 {
 
 func div(a, b int64) int64 {
 	return a / b
+}
+
+func min(arg1, arg2 reflect.Value) (interface{}, error) {
+	lessThan, err := lt(arg1, arg2)
+	if err != nil {
+		return nil, err
+	}
+
+	// arg1 is < arg2.
+	if lessThan {
+		return arg1.Interface(), nil
+	}
+	return arg2.Interface(), nil
+}
+
+func max(arg1, arg2 reflect.Value) (interface{}, error) {
+	lessThan, err := lt(arg1, arg2)
+	if err != nil {
+		return nil, err
+	}
+
+	// arg1 is < arg2.
+	if lessThan {
+		return arg2.Interface(), nil
+	}
+	return arg1.Interface(), nil
 }
 
 func base64Encode(values ...string) string {

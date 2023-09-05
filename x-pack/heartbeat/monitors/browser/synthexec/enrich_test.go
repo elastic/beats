@@ -1,7 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux
+//go:build linux || synthetics
 
 package synthexec
 
@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -103,7 +102,6 @@ func TestJourneyEnricher(t *testing.T) {
 				"synthetics.type":     "heartbeat/summary",
 				"url":                 wrappers.URLFields(u),
 				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
-				"monitor.check_group": isdef.IsString,
 			}))
 		}
 		return lookslike.Compose(v...)
@@ -125,29 +123,9 @@ func TestJourneyEnricher(t *testing.T) {
 		})
 	}
 
-	tests := []struct {
-		name                  string
-		IsLegacyBrowserSource bool
-	}{
-		{
-			name:                  "legacy project monitor",
-			IsLegacyBrowserSource: true,
-		},
-		{
-			name:                  "modern monitor",
-			IsLegacyBrowserSource: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
-
-			je := makeTestJourneyEnricher(sFields)
-			for _, se := range synthEvents {
-				check(t, se, je)
-			}
-		})
+	je := makeTestJourneyEnricher(sFields)
+	for _, se := range synthEvents {
+		check(t, se, je)
 	}
 }
 

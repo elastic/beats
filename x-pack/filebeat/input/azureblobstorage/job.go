@@ -17,6 +17,8 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
+	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -27,8 +29,8 @@ import (
 const jobErrString = "job with jobId %s encountered an error: %w"
 
 type job struct {
-	client       *azblob.BlobClient
-	blob         *azblob.BlobItemInternal
+	client       *blob.Client
+	blob         *azcontainer.BlobItem
 	blobURL      string
 	hash         string
 	offset       int64
@@ -40,7 +42,7 @@ type job struct {
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
-func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL string,
+func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger,
 ) *job {
 	return &job{
@@ -56,7 +58,7 @@ func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL st
 }
 
 // azureObjectHash returns a short sha256 hash of the container name + blob name.
-func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
+func azureObjectHash(src *Source, blob *azcontainer.BlobItem) string {
 	h := sha256.New()
 	h.Write([]byte(src.ContainerName))
 	h.Write([]byte((*blob.Name)))
@@ -86,10 +88,13 @@ func (j *job) do(ctx context.Context, id string) {
 			Fields:    fields,
 		}
 		event.SetID(objectID(j.hash, 0))
-		j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
-		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+		// locks while data is being saved to avoid concurrent map read/writes
+		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorf(jobErrString, id, err)
 		}
+		// unlocks after data is saved
+		done()
 	}
 }
 
@@ -103,17 +108,17 @@ func (j *job) timestamp() *time.Time {
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	var err error
-	downloadOptions := &azblob.BlobDownloadOptions{}
+	downloadOptions := &blob.DownloadStreamOptions{}
 	if !j.isCompressed {
-		downloadOptions.Offset = &j.offset
+		downloadOptions.Range.Offset = j.offset
 	}
 
-	get, err := j.client.Download(ctx, downloadOptions)
+	get, err := j.client.DownloadStream(ctx, downloadOptions)
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
 
-	reader := get.Body(&azblob.RetryReaderOptions{})
+	reader := get.NewRetryReader(context.Background(), &azblob.RetryReaderOptions{})
 	defer func() {
 		err = reader.Close()
 		if err != nil {
@@ -186,16 +191,21 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		// updates the offset after reading the file
 		// this avoids duplicates for the last read when resuming operation
 		offset = dec.InputOffset()
+		var (
+			cp   *Checkpoint
+			done func()
+		)
 		if !dec.More() {
 			// if this is the last object, then peform a complete state save
-			j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
+			cp, done = j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
 		} else {
 			// partially saves read state using offset
-			j.state.savePartial(*j.blob.Name, offset+relativeOffset, j.blob.Properties.LastModified)
+			cp, done = j.state.savePartialForTx(*j.blob.Name, offset+relativeOffset)
 		}
-		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
+		if err := j.publisher.Publish(evt, cp); err != nil {
 			j.log.Errorf(jobErrString, id, err)
 		}
+		done()
 	}
 	return nil
 }

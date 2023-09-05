@@ -4,4 +4,5 @@
   hosts: ["http://localhost:9200"]
   #username: "user"
   #password: "secret"
+  #api_key: "foo:bar"
 

@@ -1867,5 +1867,62 @@
             "forwarded",
             "juniper.srx"
         ]
+    },
+    {
+        "@timestamp": "2023-08-08T17:28:00.778-02:00",
+        "client.ip": "192.168.1.1",
+        "client.port": 39017,
+        "destination.ip": "8.8.4.4",
+        "destination.port": 53,
+        "event.action": "flow_deny",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "juniper.srx",
+        "event.kind": "event",
+        "event.module": "juniper",
+        "event.original": "source-address=\"192.168.1.1\" source-port=\"39017\" destination-address=\"8.8.4.4\" destination-port=\"53\" connection-tag=\"0\" service-name=\"junos-dns-udp\" protocol-id=\"17\" icmp-type=\"0\" policy-name=\"dns_deny_outbound\" source-zone-name=\"trust\" destination-zone-name=\"untrust\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth0.0\" encrypted=\"No\" reason=\"Denied by policy\" session-id=\"85905209174\" application-category=\"N/A\" application-sub-category=\"N/A\" application-risk=\"-1\" application-characteristics=\"N/A\" src-vrf-grp=\"N/A\" dst-vrf-grp=\"N/A\"",
+        "event.outcome": "success",
+        "event.risk_score": -1.0,
+        "event.severity": 14,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
+        "fileset.name": "srx",
+        "input.type": "log",
+        "juniper.srx.connection_tag": "0",
+        "juniper.srx.encrypted": "No",
+        "juniper.srx.icmp_type": "0",
+        "juniper.srx.process": "RT_FLOW",
+        "juniper.srx.reason": "Denied by policy",
+        "juniper.srx.service_name": "junos-dns-udp",
+        "juniper.srx.session_id": "85905209174",
+        "juniper.srx.tag": "RT_FLOW_SESSION_DENY",
+        "log.level": "informational",
+        "log.offset": 19862,
+        "network.iana_number": "17",
+        "observer.egress.zone": "untrust",
+        "observer.ingress.interface.name": "reth0.0",
+        "observer.ingress.zone": "trust",
+        "observer.name": "Route1-",
+        "observer.product": "SRX",
+        "observer.type": "firewall",
+        "observer.vendor": "Juniper",
+        "related.ip": [
+            "192.168.1.1",
+            "8.8.4.4"
+        ],
+        "rule.name": "dns_deny_outbound",
+        "server.ip": "8.8.4.4",
+        "server.port": 53,
+        "service.type": "juniper",
+        "source.ip": "192.168.1.1",
+        "source.port": 39017,
+        "tags": [
+            "forwarded",
+            "juniper.srx"
+        ]
     }
 ]

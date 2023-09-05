@@ -12,7 +12,7 @@ scms:
       repository: beats
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
-      branch: 7.17
+      branch: "7.17"
 
 actions:
   beats:
@@ -84,6 +84,15 @@ conditions:
       command: 'grep -v -q {{ source "latestGoVersion" }} .go-version #'
 
 targets:
+  update-gomod:
+    name: "Update go.mod"
+    sourceid: gomod
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: 'go {{ source "gomod" }}'
+      file: go.mod
+      matchpattern: 'go \d+.\d+'
   update-go-version:
     name: "Update .go-version"
     sourceid: latestGoVersion
@@ -111,34 +120,154 @@ targets:
       content: ':go-version: {{ source "latestGoVersion" }}'
       file: libbeat/docs/version.asciidoc
       matchpattern: ':go-version: \d+.\d+.\d+'
-  update-dockerfiles:
-    name: "Update from dockerfiles"
+  update-auditbeat-dockerfile:
+    name: "Update Auditbeat Dockerfile"
     sourceid: latestGoVersion
     scmid: githubConfig
-    kind: file
+    kind: dockerfile
     spec:
-      content: 'FROM golang:{{ source "latestGoVersion" }}'
-      # This list differs from the main branch, this is the main reason we have a separate job
-      files:
-        - ./metricbeat/Dockerfile
-        - ./metricbeat/module/vsphere/_meta/Dockerfile
-        - ./metricbeat/module/nats/_meta/Dockerfile
-        - ./metricbeat/module/http/_meta/Dockerfile
-        - ./filebeat/Dockerfile
-        - ./auditbeat/Dockerfile
-        - ./heartbeat/Dockerfile
-        - ./packetbeat/Dockerfile
-        - ./libbeat/Dockerfile
-        - ./x-pack/metricbeat/module/stan/_meta/Dockerfile
-        - ./x-pack/functionbeat/Dockerfile
-        - ./x-pack/libbeat/Dockerfile
-      matchpattern: 'FROM golang:\d+.\d+.\d+'
-  update-gomod:
-    name: "Update go.mod"
-    sourceid: gomod
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./auditbeat/Dockerfile
+  update-heartbeat-dockerfile:
+    name: "Update Heartbeat Dockerfile"
+    sourceid: latestGoVersion
     scmid: githubConfig
-    kind: file
+    kind: dockerfile
     spec:
-      content: 'go {{ source "gomod" }}'
-      file: go.mod
-      matchpattern: 'go \d+.\d+'
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./heartbeat/Dockerfile
+  update-metricbeat-dockerfile:
+    name: "Update Metricbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/Dockerfile
+  update-packetbeat-dockerfile:
+    name: "Update Packetbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./packetbeat/Dockerfile
+  update-functionbeat-dockerfile:
+    name: "Update Functionbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/functionbeat/Dockerfile
+  update-nats-module-dockerfile:
+    name: "Update NATS module Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/nats/_meta/Dockerfile
+  update-http-module-dockerfile:
+    name: "Update HTTP module Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/http/_meta/Dockerfile
+  update-vsphere-module-dockerfile:
+    name: "Update from vsphere Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/vsphere/_meta/Dockerfile
+  update-metricbeat-debug-dockerfile:
+    name: "Update Metricbeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
+  update-dockerfiles-filebeat-debug:
+    name: "Update Filebeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/filebeat/Dockerfile.debug
+  update-heartbeat-debug-dockerfile:
+    name: "Update Heartbeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
+  update-stan-module-dockerfile:
+    name: "Update stan Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/metricbeat/module/stan/_meta/Dockerfile
+  # The following Dockerfiles aren't present on the main branch, this is the main reason we have a separate job
+  update-filebeat-dockerfile:
+    name: "Update Filebeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./filebeat/Dockerfile
+  update-libbeat-dockerfile:
+    name: "Update libbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./libbeat/Dockerfile
+  update-x-pack-libbeat-dockerfile:
+    name: "Update x-pack/libbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/libbeat/Dockerfile

@@ -80,6 +80,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		r.log.Debugf("Received %v SQS messages.", len(msgs))
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
 		workerWg.Add(len(msgs))
+
 		for _, msg := range msgs {
 			go func(msg types.Message, start time.Time) {
 				id := r.metrics.beginSQSWorker()

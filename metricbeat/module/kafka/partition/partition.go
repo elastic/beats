@@ -18,11 +18,10 @@
 package partition
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Shopify/sarama"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -78,13 +77,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		return errors.Wrap(err, "error in connect")
+		return fmt.Errorf("error in connect: %w", err)
 	}
 	defer broker.Close()
 
 	topics, err := broker.GetTopicsMetadata(m.topics...)
 	if err != nil {
-		return errors.Wrap(err, "error getting topic metadata")
+		return fmt.Errorf("error getting topic metadata: %w", err)
 	}
 	if len(topics) == 0 {
 		debugf("no topic could be read, check ACLs")
@@ -190,12 +189,12 @@ func queryOffsetRange(
 ) (int64, int64, bool, error) {
 	oldest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetOldest)
 	if err != nil {
-		return -1, -1, false, errors.Wrap(err, "failed to get oldest offset")
+		return -1, -1, false, fmt.Errorf("failed to get oldest offset: %w", err)
 	}
 
 	newest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetNewest)
 	if err != nil {
-		return -1, -1, false, errors.Wrap(err, "failed to get newest offset")
+		return -1, -1, false, fmt.Errorf("failed to get newest offset: %w", err)
 	}
 
 	okOld := oldest != -1

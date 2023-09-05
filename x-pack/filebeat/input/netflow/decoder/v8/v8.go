@@ -13,8 +13,6 @@ import (
 	"net"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -323,7 +321,7 @@ func (p *NetflowV8Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	header, err := ReadPacketHeader(buf)
 	if err != nil {
 		p.logger.Printf("Failed parsing packet: %v", err)
-		return nil, errors.Wrap(err, "error reading V8 header")
+		return nil, fmt.Errorf("error reading V8 header: %w", err)
 	}
 	template, found := templates[header.Aggregation]
 	if !found {
@@ -333,7 +331,7 @@ func (p *NetflowV8Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	metadata := header.GetMetadata(source)
 	flows, err = template.Apply(buf, int(header.Count))
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to decode V8 flows of type %d", header.Aggregation)
+		return nil, fmt.Errorf("unable to decode V8 flows of type %d: %w", header.Aggregation, err)
 	}
 	for i := range flows {
 		flows[i].Exporter = metadata

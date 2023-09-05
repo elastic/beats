@@ -18,6 +18,7 @@
 package inputmon
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/google/uuid"
@@ -77,4 +78,10 @@ func sanitizeID(id string) string {
 
 func globalRegistry() *monitoring.Registry {
 	return monitoring.GetNamespace("dataset").GetRegistry()
+}
+
+// MetricSnapshotJSON returns a snapshot of the input metric values from the
+// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
+func MetricSnapshotJSON() ([]byte, error) {
+	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
 }
