@@ -102,7 +102,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
 - Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
-- Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
 
 *Heartbeat*
