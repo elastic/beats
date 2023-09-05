@@ -42,6 +42,13 @@ type Summarizer struct {
 	stateTracker   *monitorstate.Tracker
 	sf             stdfields.StdMonitorFields
 	retryDelay     time.Duration
+	startedAt      time.Time
+	// Used to track whether the start time has been overridden in the case of browser
+	// monitors where the `journey/start` event sets it.
+	// In the case of a bug with double journey/start events we would prefer the first time
+	// to prevent recording an inaccurate lower runtime
+	deferredStart bool
+	endedAt       time.Time
 }
 
 type JobSummary struct {
@@ -69,6 +76,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 		sf:             sf,
 		// private property, but can be overridden in tests to speed them up
 		retryDelay: time.Second,
+		startedAt:  time.Now(),
 	}
 }
 
@@ -102,57 +110,13 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 		// these many still need to be processed
 		s.contsRemaining += uint16(len(conts))
 
-		monitorStatus, err := event.GetValue("monitor.status")
-		if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
-			mss := monitorstate.StateStatus(monitorStatus.(string))
-
-			if mss == monitorstate.StatusUp {
-				js.Up++
-			} else {
-				js.Down++
-			}
-		}
+		s.RecordUpDownStatus(event, js)
 
 		if s.contsRemaining == 0 {
-			if js.Down > 0 {
-				js.Status = monitorstate.StatusDown
-			} else {
-				js.Status = monitorstate.StatusUp
-			}
+			s.AddSummaryAndState(event, js)
 
-			// Get the last status of this monitor, we use this later to
-			// determine if a retry is needed
-			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
-
-			// FinalAttempt is true if no retries will occur
-			js.FinalAttempt = js.Status != monitorstate.StatusDown || js.Attempt >= js.MaxAttempts
-
-			ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
-
-			eventext.MergeEventFields(event, mapstr.M{
-				"summary": js,
-				"state":   ms,
-			})
-
-			logp.L().Debugf("attempt info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
 			if !js.FinalAttempt {
-				// Reset the job summary for the next attempt
-				// We preserve `s` across attempts
-				s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
-				s.contsRemaining = 1
-
-				// Delay retries by 1s for two reasons:
-				// 1. Since ES timestamps are millisecond resolution they can happen so fast
-				//    that it's hard to tell the sequence in which jobs executed apart in our
-				//    kibana queries
-				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
-				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
-					return func(event *beat.Event) ([]jobs.Job, error) {
-						time.Sleep(s.retryDelay)
-						return j(event)
-					}
-				})
-				conts = []jobs.Job{delayedRootJob}
+				conts = []jobs.Job{s.retryJob(js)}
 			}
 		}
 
@@ -164,4 +128,61 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 		return conts, jobErr
 	}
+}
+
+func (s *Summarizer) RecordUpDownStatus(event *beat.Event, js *JobSummary) {
+	monitorStatus, err := event.GetValue("monitor.status")
+	if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
+		mss := monitorstate.StateStatus(monitorStatus.(string))
+
+		if mss == monitorstate.StatusUp {
+			js.Up++
+		} else {
+			js.Down++
+		}
+	}
+}
+
+func (s *Summarizer) AddSummaryAndState(event *beat.Event, js *JobSummary) {
+	if js.Down > 0 {
+		js.Status = monitorstate.StatusDown
+	} else {
+		js.Status = monitorstate.StatusUp
+	}
+
+	// Get the last status of this monitor, we use this later to
+	// determine if a retry is needed
+	lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
+
+	// FinalAttempt is true if no retries will occur
+	js.FinalAttempt = js.Status != monitorstate.StatusDown || js.Attempt >= js.MaxAttempts
+
+	ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
+
+	eventext.MergeEventFields(event, mapstr.M{
+		"summary": js,
+		"state":   ms,
+	})
+
+	logp.L().Debugf("attempt info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
+}
+
+func (s *Summarizer) retryJob(js *JobSummary) jobs.Job {
+	// Reset the job summary for the next attempt
+	// We preserve `s` across attempts
+	s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+	s.contsRemaining = 1
+
+	// Delay retries by 1s for two reasons:
+	// 1. Since ES timestamps are millisecond resolution they can happen so fast
+	//    that it's hard to tell the sequence in which jobs executed apart in our
+	//    kibana queries
+	// 2. If the site error is very short 1s gives it a tiny bit of time to recover
+	delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			time.Sleep(s.retryDelay)
+			return j(event)
+		}
+	})
+	return delayedRootJob
 }
