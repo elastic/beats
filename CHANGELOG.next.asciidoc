@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix panic in HTTP protocol parsing when host header has empty host part. {issue}36497[36497] {issue}36518[36518]
 
 *Winlogbeat*
 
