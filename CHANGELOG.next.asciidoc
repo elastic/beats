@@ -210,6 +210,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for a simplified input configuraton when running under Elastic-Agent {pull}36390[36390]
 - Make HTTPJSON response body decoding errors more informative. {pull}36481[36481]
 - Allow fine-grained control of entity analytics API requests for Okta provider. {issue}36440[36440] {pull}36492[36492]
+- Add support for expanding `journald.process.capabilities` into the human-readable effective capabilities in the ECS `process.thread.capabilities.effective` field. {issue}36454[36454] {pull}36470[36470]
 
 *Auditbeat*
 
