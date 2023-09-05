@@ -7,151 +7,18 @@
 === Beats version 8.9.2
 https://github.com/elastic/beats/compare/v8.9.1\...v8.9.2[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
 - Update mito CEL extension library to v1.5.0. {pull}36146[36146]
 
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-*Libbeat*
-
-*Heartbeat*
-
 
 *Metricbeat*
 
 - Add Azure resource tags support to Azure Billing module {pull}36428[36428]
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
 
 
 [[release-notes-8.9.1]]
