@@ -72,6 +72,8 @@ func defaultProcessors() []mapstr.M {
 	//   - add_cloud_metadata: ~
 	//   - add_docker_metadata: ~
 	//   - add_kubernetes_metadata: ~
+
+	// We check for the existance of environmental variable NETINFO. Related to https://github.com/elastic/integrations/issues/6674
 	valueNETINFO, status := os.LookupEnv("NETINFO")
 
 	if valueNETINFO == "false" && status == true {
