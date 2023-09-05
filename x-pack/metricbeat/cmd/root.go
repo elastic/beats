@@ -50,8 +50,7 @@ func init() {
 	management.ConfigTransform.SetTransform(metricbeatCfg)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	checkKubernetesInstallation := verifyKubernetesInstallation()
-	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors(checkKubernetesInstallation))
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
 	}
@@ -67,7 +66,7 @@ func init() {
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
 }
 
-func defaultProcessors(check bool) []mapstr.M {
+func defaultProcessors() []mapstr.M {
 	// processors:
 	//   - add_host_metadata: ~
 	//   - add_cloud_metadata: ~
@@ -75,7 +74,7 @@ func defaultProcessors(check bool) []mapstr.M {
 	//   - add_kubernetes_metadata: ~
 	valueNETINFO, status := os.LookupEnv("NETINFO")
 
-	if check == true || (valueNETINFO == "false" && status == true) {
+	if valueNETINFO == "false" && status == true {
 		return []mapstr.M{
 			{"add_host_metadata": mapstr.M{
 				"netinfo.enabled": "false",
@@ -92,16 +91,4 @@ func defaultProcessors(check bool) []mapstr.M {
 			{"add_kubernetes_metadata": nil},
 		}
 	}
-}
-
-func verifyKubernetesInstallation() bool {
-	isKubernetes := false
-	if _, err := os.Stat("/var/run/secrets/kubernetes.io"); err == nil {
-		fmt.Printf("PASOLE")
-		isKubernetes = true
-	} else if _, present := os.LookupEnv("KUBERNETES_SERVICE_HOST"); present == true {
-		isKubernetes = true
-	}
-
-	return isKubernetes
 }
