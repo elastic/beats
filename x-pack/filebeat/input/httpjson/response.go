@@ -144,8 +144,8 @@ func newResponseProcessor(config config, pagination *pagination, xmlDetails map[
 	return rps
 }
 
-func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) *responseProcessor {
-	pagination := &pagination{httpClient: httpClient, log: log}
+func newChainResponseProcessor(config chainConfig, client *httpClient, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) *responseProcessor {
+	pagination := &pagination{client: client, log: log}
 
 	rp := &responseProcessor{
 		pagination: pagination,

@@ -219,8 +219,8 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 		return nil, fmt.Errorf("failed to create http request: %w", err)
 	}
 
-	if rf.isChain && rf.chainHTTPClient != nil {
-		httpResp, err = rf.chainHTTPClient.do(ctx, req)
+	if rf.isChain && rf.chainClient != nil {
+		httpResp, err = rf.chainClient.do(ctx, req)
 		if err != nil {
 			return nil, fmt.Errorf("failed to execute chain http client.Do: %w", err)
 		}
@@ -258,7 +258,7 @@ func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response,
 }
 
 type requestFactory struct {
-	chainHTTPClient        *httpClient
+	chainClient            *httpClient
 	url                    url.URL
 	method                 string
 	body                   *mapstr.M
@@ -309,7 +309,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 		if ch.Step != nil {
 			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.Step.Request.Transforms, requestNamespace, log)
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
-			httpClient, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log, reg)
+			client, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log, reg)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
 			}
@@ -318,7 +318,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				rf.password = ch.Step.Auth.Basic.Password
 			}
 
-			responseProcessor := newChainResponseProcessor(ch, httpClient, xmlDetails, metrics, log)
+			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
 
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
@@ -330,14 +330,14 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				replace:                ch.Step.Replace,
 				replaceWith:            ch.Step.ReplaceWith,
 				isChain:                true,
-				chainHTTPClient:        httpClient,
+				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
 			}
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
-			httpClient, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
+			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
 			}
@@ -346,7 +346,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				rf.password = ch.While.Auth.Basic.Password
 			}
 
-			responseProcessor := newChainResponseProcessor(ch, httpClient, xmlDetails, metrics, log)
+			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
 			rf = &requestFactory{
 				url:                    *ch.While.Request.URL.URL,
 				method:                 ch.While.Request.Method,
@@ -358,7 +358,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				replaceWith:            ch.While.ReplaceWith,
 				until:                  ch.While.Until,
 				isChain:                true,
-				chainHTTPClient:        httpClient,
+				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
 			}
 		}

@@ -126,7 +126,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 	metrics := newInputMetrics(reg)
 
-	httpClient, err := newHTTPClient(stdCtx, cfg, log, reg)
+	client, err := newHTTPClient(stdCtx, cfg, log, reg)
 	if err != nil {
 		return err
 	}
@@ -144,9 +144,9 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 	}
-	pagination := newPagination(cfg, httpClient, log)
+	pagination := newPagination(cfg, client, log)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
+	requester := newRequester(client, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(cfg.Cursor, log)
