@@ -548,6 +548,7 @@ func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *t
 	return p.eventCount()
 }
 
+// chainProcessor is a chained processing handler.
 type chainProcessor struct {
 	req   *requester
 	trCtx *transformContext
@@ -566,6 +567,7 @@ func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.
 	}
 }
 
+// handleEvents processes msg as a request body in an execution chain.
 func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	if !p.tail {
 		// Skip first event as it has already been processed.
@@ -606,6 +608,7 @@ func (p *chainProcessor) handleError(err error) {
 	p.req.log.Errorf("error processing response: %v", err)
 }
 
+// eventCount returns the number of events that have been processed.
 func (p *chainProcessor) eventCount() int {
 	return p.n
 }
@@ -722,6 +725,7 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
+// publisher is an event publication handler.
 type publisher struct {
 	trCtx *transformContext
 	pub   inputcursor.Publisher
@@ -740,6 +744,7 @@ func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bo
 	}
 }
 
+// handleEvent publishes msg to the publishers backing inputcursor.Publisher.
 func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 	if p.pub != nil {
 		event, err := makeEvent(msg)
@@ -762,10 +767,12 @@ func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 	p.n++
 }
 
+// handleError logs err.
 func (p *publisher) handleError(err error) {
 	p.log.Errorf("error processing response: %v", err)
 }
 
+// eventCount returns the number of successfully published events.
 func (p *publisher) eventCount() int {
 	return p.n
 }
