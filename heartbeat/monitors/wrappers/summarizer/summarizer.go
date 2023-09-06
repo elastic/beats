@@ -33,22 +33,20 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+type SumPlugin interface {
+	EachEvent(event *beat.Event)
+	// If at least one plugin returns true a retry will be performed
+	OnSummary(event *beat.Event) (doRetry bool)
+}
+
 type Summarizer struct {
 	rootJob        jobs.Job
 	contsRemaining uint16
 	mtx            *sync.Mutex
-	jobSummary     *JobSummary
-	checkGroup     string
-	stateTracker   *monitorstate.Tracker
 	sf             stdfields.StdMonitorFields
 	retryDelay     time.Duration
+	plugins        []SumPlugin
 	startedAt      time.Time
-	// Used to track whether the start time has been overridden in the case of browser
-	// monitors where the `journey/start` event sets it.
-	// In the case of a bug with double journey/start events we would prefer the first time
-	// to prevent recording an inaccurate lower runtime
-	deferredStart bool
-	endedAt       time.Time
 }
 
 type JobSummary struct {
@@ -62,21 +60,22 @@ type JobSummary struct {
 }
 
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
-	uu, err := uuid.NewV1()
-	if err != nil {
-		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
+	plugins := make([]SumPlugin, 0, 2)
+	if sf.Type == "browser" {
+		plugins = append(plugins, &BrowserDurationSumPlugin{})
+	} else {
+		plugins = append(plugins, &LightweightDurationSumPlugin{})
 	}
+	plugins = append(plugins, NewStateStatusPlugin(mst, sf))
+
 	return &Summarizer{
 		rootJob:        rootJob,
 		contsRemaining: 1,
 		mtx:            &sync.Mutex{},
-		jobSummary:     NewJobSummary(1, sf.MaxAttempts, uu.String()),
-		checkGroup:     uu.String(),
-		stateTracker:   mst,
 		sf:             sf,
-		// private property, but can be overridden in tests to speed them up
-		retryDelay: time.Second,
-		startedAt:  time.Now(),
+		retryDelay:     time.Second,
+		startedAt:      time.Now(),
+		plugins:        plugins,
 	}
 }
 
@@ -92,6 +91,10 @@ func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSu
 	}
 }
 
+func (js *JobSummary) BumpAttempt() {
+	*js = *NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+}
+
 // Wrap wraps the given job in such a way that the last event summarizes all previous events
 // and additionally adds some common fields like monitor.check_group to all events.
 // This adds the state and summary top level fields.
@@ -99,24 +102,43 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		conts, jobErr := j(event)
 
-		_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt))
-
 		s.mtx.Lock()
 		defer s.mtx.Unlock()
-
-		js := s.jobSummary
 
 		s.contsRemaining-- // we just ran one cont, discount it
 		// these many still need to be processed
 		s.contsRemaining += uint16(len(conts))
 
-		s.RecordUpDownStatus(event, js)
+		for _, plugin := range s.plugins {
+			plugin.EachEvent(event)
+		}
 
 		if s.contsRemaining == 0 {
-			s.AddSummaryAndState(event, js)
+			var retry bool
+			for _, plugin := range s.plugins {
+				doRetry := plugin.OnSummary(event)
+				if doRetry {
+					retry = true
+				}
+			}
 
-			if !js.FinalAttempt {
-				conts = []jobs.Job{s.retryJob(js)}
+			if retry {
+				// Bump the job summary for the next attempt
+				s.contsRemaining = 1
+
+				// Delay retries by 1s for two reasons:
+				// 1. Since ES timestamps are millisecond resolution they can happen so fast
+				//    that it's hard to tell the sequence in which jobs executed apart in our
+				//    kibana queries
+				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
+				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
+					return func(event *beat.Event) ([]jobs.Job, error) {
+						time.Sleep(s.retryDelay)
+						return j(event)
+					}
+				})
+
+				conts = []jobs.Job{delayedRootJob}
 			}
 		}
 
@@ -130,59 +152,72 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	}
 }
 
-func (s *Summarizer) RecordUpDownStatus(event *beat.Event, js *JobSummary) {
+type StateStatusPlugin struct {
+	js           *JobSummary
+	stateTracker *monitorstate.Tracker
+	sf           stdfields.StdMonitorFields
+	checkGroup   string
+}
+
+func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *StateStatusPlugin {
+	uu, err := uuid.NewV1()
+	if err != nil {
+		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
+	}
+	js := NewJobSummary(1, sf.MaxAttempts, uu.String())
+	return &StateStatusPlugin{
+		js:           js,
+		stateTracker: stateTracker,
+		sf:           sf,
+		checkGroup:   uu.String(),
+	}
+}
+
+func (ssp *StateStatusPlugin) EachEvent(event *beat.Event) {
 	monitorStatus, err := event.GetValue("monitor.status")
 	if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
 		mss := monitorstate.StateStatus(monitorStatus.(string))
 
 		if mss == monitorstate.StatusUp {
-			js.Up++
+			ssp.js.Up++
 		} else {
-			js.Down++
+			ssp.js.Down++
 		}
 	}
 }
 
-func (s *Summarizer) AddSummaryAndState(event *beat.Event, js *JobSummary) {
-	if js.Down > 0 {
-		js.Status = monitorstate.StatusDown
+func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
+	if ssp.js.Down > 0 {
+		ssp.js.Status = monitorstate.StatusDown
 	} else {
-		js.Status = monitorstate.StatusUp
+		ssp.js.Status = monitorstate.StatusUp
 	}
 
 	// Get the last status of this monitor, we use this later to
 	// determine if a retry is needed
-	lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
+	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
 	// FinalAttempt is true if no retries will occur
-	js.FinalAttempt = js.Status != monitorstate.StatusDown || js.Attempt >= js.MaxAttempts
+	retry = ssp.js.Status == monitorstate.StatusDown && ssp.js.Attempt < ssp.js.MaxAttempts
+	ssp.js.FinalAttempt = !retry
 
-	ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
+	ms := ssp.stateTracker.RecordStatus(ssp.sf, ssp.js.Status, ssp.js.FinalAttempt)
 
+	// dereference the pointer since the pointer is pointed at the next step
+	// after this
+	jsCopy := *ssp.js
 	eventext.MergeEventFields(event, mapstr.M{
-		"summary": js,
-		"state":   ms,
+		"monitor.check_group": fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt),
+		"summary":             &jsCopy,
+		"state":               ms,
 	})
 
-	logp.L().Debugf("attempt info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
-}
+	if retry {
+		// mutate the js into the state for the next attempt
+		ssp.js.BumpAttempt()
+	}
 
-func (s *Summarizer) retryJob(js *JobSummary) jobs.Job {
-	// Reset the job summary for the next attempt
-	// We preserve `s` across attempts
-	s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
-	s.contsRemaining = 1
+	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
-	// Delay retries by 1s for two reasons:
-	// 1. Since ES timestamps are millisecond resolution they can happen so fast
-	//    that it's hard to tell the sequence in which jobs executed apart in our
-	//    kibana queries
-	// 2. If the site error is very short 1s gives it a tiny bit of time to recover
-	delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			time.Sleep(s.retryDelay)
-			return j(event)
-		}
-	})
-	return delayedRootJob
+	return !ssp.js.FinalAttempt
 }
