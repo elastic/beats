@@ -7,7 +7,6 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"os"
 
 	"github.com/spf13/pflag"
 
@@ -72,27 +71,11 @@ func defaultProcessors() []mapstr.M {
 	//   - add_cloud_metadata: ~
 	//   - add_docker_metadata: ~
 	//   - add_kubernetes_metadata: ~
-
-	// Setting environmental variable NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor.
-	// This will result to events not being enhanced with host.ip and host.mac
-	// Related to https://github.com/elastic/integrations/issues/6674
-	valueNETINFO, _ := os.LookupEnv("NETINFO")
-
-	if valueNETINFO == "false" {
-		return []mapstr.M{
-			{"add_host_metadata": mapstr.M{
-				"netinfo.enabled": "false",
-			}},
-			{"add_cloud_metadata": nil},
-			{"add_docker_metadata": nil},
-			{"add_kubernetes_metadata": nil},
-		}
-	} else {
-		return []mapstr.M{
-			{"add_host_metadata": nil},
-			{"add_cloud_metadata": nil},
-			{"add_docker_metadata": nil},
-			{"add_kubernetes_metadata": nil},
-		}
+	return []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
 	}
+
 }

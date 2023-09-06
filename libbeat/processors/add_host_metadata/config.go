@@ -18,6 +18,7 @@
 package add_host_metadata
 
 import (
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -34,10 +35,21 @@ type Config struct {
 }
 
 func defaultConfig() Config {
-	return Config{
-		NetInfoEnabled:      true,
-		CacheTTL:            5 * time.Minute,
-		ExpireUpdateTimeout: time.Second * 10,
-		ReplaceFields:       true,
+	valueNETINFO, _ := os.LookupEnv("NETINFO")
+
+	if valueNETINFO == "false" {
+		return Config{
+			NetInfoEnabled:      false,
+			CacheTTL:            5 * time.Minute,
+			ExpireUpdateTimeout: time.Second * 10,
+			ReplaceFields:       true,
+		}
+	} else {
+		return Config{
+			NetInfoEnabled:      true,
+			CacheTTL:            5 * time.Minute,
+			ExpireUpdateTimeout: time.Second * 10,
+			ReplaceFields:       true,
+		}
 	}
 }
