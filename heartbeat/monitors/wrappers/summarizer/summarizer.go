@@ -60,6 +60,10 @@ type JobSummary struct {
 	RetryGroup   string                   `json:"retry_group"`
 }
 
+func (js *JobSummary) String() string {
+	return fmt.Sprintf("<JobSummary status=%s attempt=%d/%d, final=%t, up=%d/%d retryGroup=%s>", js.Status, js.Attempt, js.MaxAttempts, js.FinalAttempt, js.Up, js.Down, js.RetryGroup)
+}
+
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
 	plugins := make([]SumPlugin, 0, 2)
 	if sf.Type == "browser" {
@@ -209,10 +213,16 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
 	// dereference the pointer since the pointer is pointed at the next step
 	// after this
 	jsCopy := *ssp.js
-	eventext.MergeEventFields(event, mapstr.M{
+
+	fields := mapstr.M{
+		"event":   mapstr.M{"type": "heartbeat/summary"},
 		"summary": &jsCopy,
 		"state":   ms,
-	})
+	}
+	if ssp.sf.Type == "browser" {
+		fields["synthetics"] = mapstr.M{"type": "heartbeat/summary"}
+	}
+	eventext.MergeEventFields(event, fields)
 
 	if retry {
 		// mutate the js into the state for the next attempt

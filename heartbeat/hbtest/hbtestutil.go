@@ -172,6 +172,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	}
 
 	return lookslike.Compose(
+		HasEventType,
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
@@ -186,6 +187,12 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 		hbtestllext.MonitorTimespanValidator,
 	)
 }
+
+var HasEventType = lookslike.MustCompile(map[string]interface{}{
+	"event": map[string]interface{}{
+		"type": isdef.Optional(isdef.IsNonEmptyString),
+	},
+})
 
 // SummaryStateChecks validates the "summary" + "state" fields
 func SummaryStateChecks(up uint16, down uint16) validator.Validator {

@@ -51,7 +51,8 @@ func TestSummarizer(t *testing.T) {
 		// The expected states on each event
 		expectedStates string
 		// the attempt number of the given event
-		expectedAttempts string
+		expectedAttempts  string
+		expectedSummaries int
 	}{
 		{
 			"start down, transition to up",
@@ -59,6 +60,7 @@ func TestSummarizer(t *testing.T) {
 			"du",
 			"du",
 			"12",
+			2,
 		},
 		{
 			"start up, stay up",
@@ -66,6 +68,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuuuuuu",
 			"uuuuuuuu",
 			"11111111",
+			8,
 		},
 		{
 			"start down, stay down",
@@ -73,6 +76,7 @@ func TestSummarizer(t *testing.T) {
 			"dddddddd",
 			"dddddddd",
 			"12121212",
+			8,
 		},
 		{
 			"start up - go down with one retry - thenrecover",
@@ -80,6 +84,7 @@ func TestSummarizer(t *testing.T) {
 			"udddduuu",
 			"uuddduuu",
 			"11212111",
+			8,
 		},
 		{
 			"start up, transient down, recover",
@@ -87,6 +92,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuduuuu",
 			"uuuuuuuu",
 			"11112111",
+			8,
 		},
 		{
 			"start up, multiple transient down, recover",
@@ -94,6 +100,7 @@ func TestSummarizer(t *testing.T) {
 			"uuudududu",
 			"uuuuuuuuu",
 			"111121212",
+			9,
 		},
 		{
 			"no retries, single down",
@@ -101,6 +108,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuduuuu",
 			"uuuduuuu",
 			"11111111",
+			8,
 		},
 	}
 
@@ -135,6 +143,8 @@ func TestSummarizer(t *testing.T) {
 			rcvdStatuses := ""
 			rcvdStates := ""
 			rcvdAttempts := ""
+			rcvdEvents := []*beat.Event{}
+			rcvdSummaries := []*JobSummary{}
 			i := 0
 			var lastSummary *JobSummary
 			for {
@@ -144,6 +154,7 @@ func TestSummarizer(t *testing.T) {
 				wrapped := s.Wrap(job)
 				events, _ := jobs.ExecJobAndConts(t, wrapped)
 				for _, event := range events {
+					rcvdEvents = append(rcvdEvents, event)
 					eventStatus, _ := event.GetValue("monitor.status")
 					eventStatusStr := eventStatus.(string)
 					rcvdStatuses += eventStatusStr[:1]
@@ -155,8 +166,18 @@ func TestSummarizer(t *testing.T) {
 					}
 					summaryIface, _ := event.GetValue("summary")
 					summary := summaryIface.(*JobSummary)
+					duration, _ := event.GetValue("monitor.duration.us")
+
+					// Ensure that only summaries have a duration
+					if summary != nil {
+						rcvdSummaries = append(rcvdSummaries, summary)
+						require.GreaterOrEqual(t, duration, int64(0))
+					} else {
+						require.Nil(t, duration)
+					}
 
 					if summary == nil {
+						// note missing summaries
 						rcvdAttempts += "!"
 					} else if lastSummary != nil {
 						if summary.Attempt > 1 {
@@ -165,6 +186,7 @@ func TestSummarizer(t *testing.T) {
 							require.NotEqual(t, lastSummary.RetryGroup, summary.RetryGroup)
 						}
 					}
+
 					rcvdAttempts += fmt.Sprintf("%d", summary.Attempt)
 					lastSummary = summary
 				}
@@ -176,6 +198,8 @@ func TestSummarizer(t *testing.T) {
 			require.Equal(t, tt.statusSequence, rcvdStatuses)
 			require.Equal(t, tt.expectedStates, rcvdStates)
 			require.Equal(t, tt.expectedAttempts, rcvdAttempts)
+			require.Len(t, rcvdEvents, len(tt.statusSequence))
+			require.Len(t, rcvdSummaries, tt.expectedSummaries)
 		})
 	}
 }
