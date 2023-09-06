@@ -186,12 +186,12 @@ type handler interface {
 	handleError(error)
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler) {
+func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler) {
 	trCtx.clearIntervalData()
 
 	var npages int64
 	for i, httpResp := range resps {
-		iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp, rp.xmlDetails)
+		iter := rp.pagination.newPageIterator(ctx, trCtx, httpResp, rp.xmlDetails)
 		for {
 			pageStartTime := time.Now()
 			page, hasNext, err := iter.next()
@@ -229,12 +229,12 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				}
 
 				if rp.split == nil {
-					h.handleEvent(stdCtx, tr.body())
+					h.handleEvent(ctx, tr.body())
 					rp.log.Debug("no split found: continuing")
 					continue
 				}
 
-				if err := rp.split.run(trCtx, tr, h); err != nil {
+				if err := rp.split.run(ctx, trCtx, tr, h); err != nil {
 					switch err { //nolint:errorlint // run never returns a wrapped error.
 					case errEmptyField:
 						// nothing else to send for this page

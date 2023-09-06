@@ -707,7 +707,7 @@ func TestSplit(t *testing.T) {
 			events := &stream{t: t}
 			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
 			assert.NoError(t, err)
-			err = split.run(tc.ctx, tc.resp, events)
+			err = split.run(context.Background(), tc.ctx, tc.resp, events)
 			if tc.expectedErr == nil {
 				assert.NoError(t, err)
 			} else {
