@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
@@ -69,8 +68,6 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 		addMonitorMeta(stdMonFields, len(js) > 1),
 		addMonitorStatus(nil),
 		addMonitorErr,
-		addMonitorDuration,
-		logMonitorRun(nil),
 	)
 }
 
@@ -85,7 +82,6 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(byEventType("heartbeat/summary")),
 		addMonitorErr,
-		logMonitorRun(byEventType("heartbeat/summary")),
 	)
 }
 
@@ -214,41 +210,6 @@ func addMonitorErr(origJob jobs.Job) jobs.Job {
 		}
 
 		return cont, nil
-	}
-}
-
-// addMonitorDuration adds duration correctly for all non-browser jobs
-func addMonitorDuration(job jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		start := time.Now()
-		cont, err := job(event)
-		duration := time.Since(start)
-
-		if event != nil {
-			eventext.MergeEventFields(event, mapstr.M{
-				"monitor": mapstr.M{
-					"duration": look.RTT(duration),
-				},
-			})
-			event.Timestamp = start
-		}
-
-		return cont, err
-	}
-}
-
-// logMonitorRun emits a metric for the service when summary events are complete.
-func logMonitorRun(match EventMatcher) jobs.JobWrapper {
-	return func(job jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := job(event)
-
-			if match == nil || match(event) {
-				logger.LogRun(event)
-			}
-
-			return cont, err
-		}
 	}
 }
 

@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -184,6 +185,8 @@ func (ssp *StateStatusPlugin) EachEvent(event *beat.Event) {
 			ssp.js.Down++
 		}
 	}
+
+	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
 }
 
 func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
@@ -207,9 +210,8 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
 	// after this
 	jsCopy := *ssp.js
 	eventext.MergeEventFields(event, mapstr.M{
-		"monitor.check_group": fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt),
-		"summary":             &jsCopy,
-		"state":               ms,
+		"summary": &jsCopy,
+		"state":   ms,
 	})
 
 	if retry {
@@ -219,5 +221,6 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
 
 	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
+	logger.LogRun(event)
 	return !ssp.js.FinalAttempt
 }

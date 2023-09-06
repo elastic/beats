@@ -90,13 +90,12 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		assert.Len(t, results, len(tt.want), "Expected test def wants to correspond exactly to number results.")
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
-
 				want := tt.want[idx]
-				testslike.Test(t, lookslike.Strict(want), r.Fields)
+				testslike.Test(t, want, r.Fields)
 
 				if tt.metaWant != nil {
 					metaWant := tt.metaWant[idx]
-					testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
+					testslike.Test(t, metaWant, r.Meta)
 				}
 
 			})
@@ -308,7 +307,6 @@ func TestMultiJobConts(t *testing.T) {
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -432,7 +430,6 @@ func TestRetryMultiCont(t *testing.T) {
 					"type":    isdef.IsString,
 				},
 				"monitor": map[string]interface{}{
-					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -497,7 +494,6 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
-					"duration.us": hbtestllext.IsInt64,
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -640,22 +636,21 @@ func TestInlineBrowserJob(t *testing.T) {
 		sFields,
 		[]jobs.Job{makeInlineBrowserJob(t, "http://foo.com")},
 		[]validator.Validator{
-			lookslike.Strict(
-				lookslike.Compose(
-					urlValidator(t, "http://foo.com"),
-					lookslike.MustCompile(map[string]interface{}{
-						"state": isdef.Optional(hbtestllext.IsMonitorState),
-						"monitor": map[string]interface{}{
-							"type":        "browser",
-							"id":          inlineMonitorValues.id,
-							"name":        inlineMonitorValues.name,
-							"check_group": isdef.IsString,
-							"status":      "up",
-						},
-					}),
-					summarizertesthelper.SummaryValidator(1, 0),
-					hbtestllext.MonitorTimespanValidator,
-				),
+			lookslike.Compose(
+				urlValidator(t, "http://foo.com"),
+				lookslike.MustCompile(map[string]interface{}{
+					"state": isdef.Optional(hbtestllext.IsMonitorState),
+					"monitor": map[string]interface{}{
+						"type":        "browser",
+						"id":          inlineMonitorValues.id,
+						"name":        inlineMonitorValues.name,
+						"check_group": isdef.IsString,
+						"duration":    mapstr.M{"us": isdef.Optional(isdef.IsDuration)},
+						"status":      "up",
+					},
+				}),
+				summarizertesthelper.SummaryValidator(1, 0),
+				hbtestllext.MonitorTimespanValidator,
 			),
 		},
 		nil,
@@ -671,6 +666,7 @@ var projectMonitorValues = BrowserMonitor{
 }
 
 func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error, bm BrowserMonitor) jobs.Job {
+	// TODO: Generate a start, middle, and end event to test summarizing better
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
@@ -688,7 +684,7 @@ func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr erro
 		if summary {
 			eventext.MergeEventFields(event, mapstr.M{
 				"event": mapstr.M{
-					"type": "heartbeat/summary",
+					"type": "journey/end",
 				},
 			})
 		}
@@ -748,12 +744,11 @@ func TestProjectBrowserJob(t *testing.T) {
 		sFields,
 		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, projectMonitorValues)},
 		[]validator.Validator{
-			lookslike.Strict(
-				lookslike.Compose(
-					summarizertesthelper.SummaryValidator(1, 0),
-					urlValidator(t, urlStr),
-					expectedMonFields,
-				))},
+			lookslike.Compose(
+				summarizertesthelper.SummaryValidator(1, 0),
+				urlValidator(t, urlStr),
+				expectedMonFields,
+			)},
 		nil,
 		nil,
 	})

@@ -24,6 +24,7 @@ package summarizertesthelper
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -36,7 +37,8 @@ import (
 // It could be refactored out, but it just isn't worth it.
 func SummaryValidator(up uint16, down uint16) validator.Validator {
 	return lookslike.MustCompile(map[string]interface{}{
-		"summary": summaryIsdef(up, down),
+		"summary":             summaryIsdef(up, down),
+		"monitor.duration.us": hbtestllext.IsInt64,
 	})
 }
 

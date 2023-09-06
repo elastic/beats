@@ -3,10 +3,8 @@ package summarizer
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type LightweightDurationSumPlugin struct {
@@ -22,7 +20,7 @@ func (lwdsp *LightweightDurationSumPlugin) EachEvent(event *beat.Event) {
 }
 
 func (lwdsp *LightweightDurationSumPlugin) OnSummary(event *beat.Event) bool {
-	eventext.MergeEventFields(event, mapstr.M{"monitor.duration": look.RTT(time.Since(*lwdsp.startedAt))})
+	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(time.Since(*lwdsp.startedAt)))
 	return false
 }
 
@@ -50,7 +48,7 @@ func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) bool {
 		now := time.Now()
 		bwdsp.endedAt = &now
 	}
-	eventext.MergeEventFields(event, mapstr.M{"monitor.duration": look.RTT(bwdsp.endedAt.Sub(*bwdsp.startedAt))})
+	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(bwdsp.endedAt.Sub(*bwdsp.startedAt)))
 
 	return false
 }

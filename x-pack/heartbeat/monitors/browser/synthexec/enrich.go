@@ -16,7 +16,6 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -127,11 +126,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 			if se.Error != nil {
 				je.error = se.Error.toECSErr()
 			}
-			return je.createSummary(event)
 		}
 	case JourneyEnd:
 		je.journeyComplete = true
-		return je.createSummary(event)
 	case StepEnd:
 		je.stepCount++
 	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
@@ -157,40 +154,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		}
 	}
 	return jobErr
-}
-
-func (je *journeyEnricher) createSummary(event *beat.Event) error {
-	// In case of syntax errors or incorrect runner options, the Synthetics
-	// runner would exit immediately with exitCode 1 and we do not set the duration
-	// to inform the journey never ran
-	if !je.start.IsZero() {
-		duration := je.end.Sub(je.start)
-		eventext.MergeEventFields(event, mapstr.M{
-			"monitor": mapstr.M{
-				"duration": mapstr.M{
-					"us": duration.Microseconds(),
-				},
-			},
-		})
-	}
-	eventext.MergeEventFields(event, mapstr.M{
-		"url": je.urlFields,
-		"event": mapstr.M{
-			"type": "heartbeat/summary",
-		},
-		"synthetics": mapstr.M{
-			"type":    "heartbeat/summary",
-			"journey": je.journey,
-		},
-	})
-
-	// Add step count meta for log wrapper
-	eventext.SetMeta(event, logger.META_STEP_COUNT, je.stepCount)
-
-	if je.journeyComplete {
-		return je.error
-	}
-	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
 
 func stepError(e *SynthError) error {
