@@ -20,7 +20,6 @@ package http
 import (
 	"bytes"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"net"
 	"net/url"
@@ -760,11 +759,24 @@ func extractHostHeader(header string) (host string, port int) {
 }
 
 func trimSquareBracket(s string) string {
-	s, ok := strings.CutPrefix(s, "[")
+	s, ok := stringsCutPrefix(s, "[")
 	if !ok {
 		return s
 	}
 	return strings.TrimSuffix(s, "]")
+}
+
+// stringsCutPrefix is copied from the standard library strings package as 7.17 is not built
+// with go1.20 when strings.CutPrefix was added.
+//
+// Copyright 2009 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+func stringsCutPrefix(s, prefix string) (after string, found bool) {
+	if !strings.HasPrefix(s, prefix) {
+		return s, false
+	}
+	return s[len(prefix):], true
 }
 
 func (http *httpPlugin) hideHeaders(m *message) {
