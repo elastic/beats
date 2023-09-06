@@ -93,16 +93,16 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	}, nil
 }
 
-// run runs the split operation on the contents of resp, sending successive
-// split results on ch. ctx is passed to transforms that are called during
+// run runs the split operation on the contents of resp, processing successive
+// split results on via h. ctx is passed to transforms that are called during
 // the split.
-func (s *split) run(ctx *transformContext, resp transformable, events sendStream) error {
+func (s *split) run(ctx *transformContext, resp transformable, h handler) error {
 	root := resp.body()
-	return s.split(ctx, root, events)
+	return s.split(ctx, root, h)
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) error {
+func (s *split) split(ctx *transformContext, root mapstr.M, h handler) error {
 	todo := context.TODO()
 
 	v, err := root.GetValue(s.targetInfo.Name)
@@ -113,21 +113,21 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 	if v == nil {
 		if s.ignoreEmptyValue {
 			if s.child != nil {
-				return s.child.split(ctx, root, events)
+				return s.child.split(ctx, root, h)
 			}
 			if s.keepParent {
-				events.event(todo, root)
+				h.handleEvent(todo, root)
 			}
 			return nil
 		}
 		if s.isRoot {
 			if s.keepParent {
-				events.event(todo, root)
+				h.handleEvent(todo, root)
 				return errEmptyField
 			}
 			return errEmptyRootField
 		}
-		events.event(todo, root)
+		h.handleEvent(todo, root)
 		return errEmptyField
 	}
 
@@ -141,23 +141,23 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 		if len(varr) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, events)
+					return s.child.split(ctx, root, h)
 				}
 				if s.keepParent {
-					events.event(todo, root)
+					h.handleEvent(todo, root)
 				}
 				return nil
 			}
 			if s.isRoot {
-				events.event(todo, root)
+				h.handleEvent(todo, root)
 				return errEmptyRootField
 			}
-			events.event(todo, root)
+			h.handleEvent(todo, root)
 			return errEmptyField
 		}
 
 		for _, e := range varr {
-			err := s.sendMessage(ctx, root, s.targetInfo.Name, e, events)
+			err := s.processMessage(ctx, root, s.targetInfo.Name, e, h)
 			if err != nil {
 				s.log.Debug(err)
 			}
@@ -173,22 +173,22 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 		if len(vmap) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, events)
+					return s.child.split(ctx, root, h)
 				}
 				if s.keepParent {
-					events.event(todo, root)
+					h.handleEvent(todo, root)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			events.event(todo, root)
+			h.handleEvent(todo, root)
 			return errEmptyField
 		}
 
 		for k, e := range vmap {
-			if err := s.sendMessage(ctx, root, k, e, events); err != nil {
+			if err := s.processMessage(ctx, root, k, e, h); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -203,18 +203,18 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 		if len(vstr) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, events)
+					return s.child.split(ctx, root, h)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			events.event(todo, root)
+			h.handleEvent(todo, root)
 			return errEmptyField
 		}
 		for _, substr := range strings.Split(vstr, s.delimiter) {
-			if err := s.sendMessageSplitString(ctx, root, substr, events); err != nil {
+			if err := s.processMessageSplitString(ctx, root, substr, h); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -225,9 +225,9 @@ func (s *split) split(ctx *transformContext, root mapstr.M, events sendStream) e
 	return errUnknownSplitType
 }
 
-// sendMessage sends an array or map split result value, v, on ch after performing
+// processMessage processes an array or map split result value, v, via h after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, events sendStream) error {
+func (s *split) processMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, h handler) error {
 	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
@@ -255,10 +255,10 @@ func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v 
 	}
 
 	if s.child != nil {
-		return s.child.split(ctx, clone, events)
+		return s.child.split(ctx, clone, h)
 	}
 
-	events.event(context.TODO(), clone)
+	h.handleEvent(context.TODO(), clone)
 
 	return nil
 }
@@ -278,9 +278,9 @@ func toMapStr(v interface{}, key string) (mapstr.M, bool) {
 	return mapstr.M{}, false
 }
 
-// sendMessage sends a string split result value, v, on ch after performing any
+// sendMessage processes a string split result value, v, via h after performing any
 // necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, events sendStream) error {
+func (s *split) processMessageSplitString(ctx *transformContext, root mapstr.M, v string, h handler) error {
 	clone := root.Clone()
 	_, _ = clone.Put(s.targetInfo.Name, v)
 
@@ -296,10 +296,10 @@ func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v s
 	}
 
 	if s.child != nil {
-		return s.child.split(ctx, clone, events)
+		return s.child.split(ctx, clone, h)
 	}
 
-	events.event(context.TODO(), clone)
+	h.handleEvent(context.TODO(), clone)
 
 	return nil
 }

@@ -566,7 +566,7 @@ func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.
 	}
 }
 
-func (p *chainProcessor) event(ctx context.Context, msg mapstr.M) {
+func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	if !p.tail {
 		// Skip first event as it has already been processed.
 		p.tail = true
@@ -602,7 +602,7 @@ func (p *chainProcessor) event(ctx context.Context, msg mapstr.M) {
 	}
 }
 
-func (p *chainProcessor) fail(err error) {
+func (p *chainProcessor) handleError(err error) {
 	p.req.log.Errorf("error processing response: %v", err)
 }
 
@@ -740,7 +740,7 @@ func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bo
 	}
 }
 
-func (p *publisher) event(_ context.Context, msg mapstr.M) {
+func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 	if p.pub != nil {
 		event, err := makeEvent(msg)
 		if err != nil {
@@ -762,7 +762,7 @@ func (p *publisher) event(_ context.Context, msg mapstr.M) {
 	p.n++
 }
 
-func (p *publisher) fail(err error) {
+func (p *publisher) handleError(err error) {
 	p.log.Errorf("error processing response: %v", err)
 }
 

@@ -180,12 +180,13 @@ func newChainResponseProcessor(config chainConfig, httpClient *httpClient, xmlDe
 	return rp
 }
 
-type sendStream interface {
-	event(context.Context, mapstr.M)
-	fail(error)
+// handler is an event stream processor.
+type handler interface {
+	handleEvent(ctx context.Context, event mapstr.M)
+	handleError(error)
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, ch sendStream) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler) {
 	trCtx.clearIntervalData()
 
 	var npages int64
@@ -195,7 +196,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 			pageStartTime := time.Now()
 			page, hasNext, err := iter.next()
 			if err != nil {
-				ch.fail(err)
+				h.handleError(err)
 				return
 			}
 
@@ -222,18 +223,18 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				for _, t := range rp.transforms {
 					tr, err = t.run(trCtx, tr)
 					if err != nil {
-						ch.fail(err)
+						h.handleError(err)
 						return
 					}
 				}
 
 				if rp.split == nil {
-					ch.event(stdCtx, tr.body())
+					h.handleEvent(stdCtx, tr.body())
 					rp.log.Debug("no split found: continuing")
 					continue
 				}
 
-				if err := rp.split.run(trCtx, tr, ch); err != nil {
+				if err := rp.split.run(trCtx, tr, h); err != nil {
 					switch err { //nolint:errorlint // run never returns a wrapped error.
 					case errEmptyField:
 						// nothing else to send for this page
@@ -243,7 +244,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 						rp.log.Debug(err)
 					default:
 						rp.log.Debug("split operation failed")
-						ch.fail(err)
+						h.handleError(err)
 						return
 					}
 				}

@@ -726,10 +726,10 @@ type stream struct {
 	t         *testing.T
 }
 
-func (s *stream) event(_ context.Context, msg mapstr.M) {
+func (s *stream) handleEvent(_ context.Context, msg mapstr.M) {
 	s.collected = append(s.collected, msg)
 }
 
-func (s *stream) fail(err error) {
+func (s *stream) handleError(err error) {
 	s.t.Errorf("fail: %v", err)
 }
