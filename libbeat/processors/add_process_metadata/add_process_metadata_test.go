@@ -21,6 +21,8 @@ import (
 	"errors"
 	"math"
 	"os"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 	"unsafe"
@@ -821,9 +823,10 @@ func TestUsingCache(t *testing.T) {
 	}
 
 	config, err := conf.NewConfigFrom(mapstr.M{
-		"match_pids":     []string{"system.process.ppid"},
-		"include_fields": []string{"container.id"},
-		"target":         "meta",
+		"match_pids":        []string{"system.process.ppid"},
+		"include_fields":    []string{"container.id", "process.env"},
+		"target":            "meta",
+		"restricted_fields": true,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -854,6 +857,24 @@ func TestUsingCache(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
+
+	// check environment for GOOSes that support it.
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		env, err := result.Fields.GetValue("meta.process.env")
+		if err != nil {
+			t.Fatal(err)
+		}
+		// The event is for this process, so we can just grab our env to compare.
+		want := make(map[string]string)
+		for _, kv := range os.Environ() {
+			k, v, ok := strings.Cut(kv, "=")
+			if ok {
+				want[k] = v
+			}
+		}
+		assert.Equal(t, want, env)
+	}
 
 	ev = beat.Event{
 		Fields: mapstr.M{

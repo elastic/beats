@@ -12,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -338,6 +339,13 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 // any existing deltaLink will be ignored, forcing a full synchronization from Okta.
 // Returns a set of modified users by ID.
 func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	switch strings.ToLower(p.cfg.Dataset) {
+	case "", "all", "users":
+	default:
+		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
+		return nil, nil
+	}
+
 	var (
 		query url.Values
 		err   error
@@ -418,7 +426,10 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 // synchronization from Okta.
 // Returns a set of modified devices by ID.
 func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*Device, error) {
-	if !p.cfg.WantDevices {
+	switch strings.ToLower(p.cfg.Dataset) {
+	case "", "all", "devices":
+	default:
+		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
 		return nil, nil
 	}
 
@@ -482,7 +493,9 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				// Users are not stored in the state as they are in doFetchUsers. We expect
 				// them to already have been discovered/stored from that call and are stored
-				// associated with the device undecorated with discovery state.
+				// associated with the device undecorated with discovery state. Or, if the
+				// the dataset is set to "devices", then we have been asked not to care about
+				// this detail.
 				batch[i].Users = append(batch[i].Users, users...)
 
 				next, err := okta.Next(h)

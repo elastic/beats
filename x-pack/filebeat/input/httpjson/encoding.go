@@ -9,9 +9,12 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	stdxml "encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"unicode"
 
 	"github.com/elastic/mito/lib/xml"
 )
@@ -72,7 +75,11 @@ func encodeAsJSON(trReq transformable) ([]byte, error) {
 
 // decodeAsJSON decodes the JSON message in p into dst.
 func decodeAsJSON(p []byte, dst *response) error {
-	return json.Unmarshal(p, &dst.body)
+	err := json.Unmarshal(p, &dst.body)
+	if err != nil {
+		return textContextError{error: err, body: p}
+	}
+	return nil
 }
 
 // encodeAsForm encodes trReq as a URL encoded form.
@@ -95,7 +102,7 @@ func decodeAsNdjson(p []byte, dst *response) error {
 	for dec.More() {
 		var o interface{}
 		if err := dec.Decode(&o); err != nil {
-			return err
+			return textContextError{error: err, body: p}
 		}
 		results = append(results, o)
 	}
@@ -135,7 +142,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 
 	if err != nil {
 		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
-			return err
+			return textContextError{error: err, body: p}
 		}
 	}
 
@@ -165,7 +172,7 @@ func decodeAsZip(p []byte, dst *response) error {
 			var o interface{}
 			if err := dec.Decode(&o); err != nil {
 				rc.Close()
-				return err
+				return textContextError{error: err, body: p}
 			}
 			results = append(results, o)
 		}
@@ -185,9 +192,104 @@ func decodeAsZip(p []byte, dst *response) error {
 func decodeAsXML(p []byte, dst *response) error {
 	cdata, body, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
 	if err != nil {
-		return err
+		return textContextError{error: err, body: p}
 	}
 	dst.body = body
 	dst.header["XML-CDATA"] = []string{cdata}
 	return nil
+}
+
+// textContextError is an error that can provide the text context for
+// a decoding error from the csv, json and xml packages.
+type textContextError struct {
+	error
+	body []byte
+}
+
+func (e textContextError) Error() string {
+	var ctx []byte
+	switch err := e.error.(type) {
+	case nil:
+		return "<nil>"
+	case *json.SyntaxError:
+		ctx = textContext(e.body, err.Offset)
+	case *json.UnmarshalTypeError:
+		ctx = textContext(e.body, err.Offset)
+	case *csv.ParseError:
+		lines := bytes.Split(e.body, []byte{'\n'})
+		l := err.Line - 1 // Lines are 1-based.
+		if uint(l) >= uint(len(lines)) {
+			return err.Error()
+		}
+		ctx = textContext(lines[l], int64(err.Column))
+	case *stdxml.SyntaxError:
+		lines := bytes.Split(e.body, []byte{'\n'})
+		l := err.Line - 1 // Lines are 1-based.
+		if uint(l) >= uint(len(lines)) {
+			return err.Error()
+		}
+		// The xml package does not provide column-level context,
+		// so just point to first non-whitespace character of the
+		// line. This doesn't make a great deal of difference
+		// except in deeply indented XML documents.
+		pos := bytes.IndexFunc(lines[l], func(r rune) bool {
+			return !unicode.IsSpace(r)
+		})
+		if pos < 0 {
+			pos = 0
+		}
+		ctx = textContext(lines[l], int64(pos))
+	default:
+		return err.Error()
+	}
+	return fmt.Sprintf("%v: text context %q", e.error, ctx)
+}
+
+func (e textContextError) Unwrap() error {
+	return e.error
+}
+
+// textContext returns the context of text around the provided position starting
+// ten bytes before pos and ten bytes after, dependent on the length of the
+// text and the value of pos relative to bounds. If a text truncation is made,
+// an ellipsis is added to indicate this.
+func textContext(text []byte, pos int64) []byte {
+	if len(text) == 0 {
+		return text
+	}
+	const (
+		dots = "..."
+		span = 10
+	)
+	left := maxInt64(0, pos-span)
+	right := minInt(pos+span+1, int64(len(text)))
+	ctx := make([]byte, right-left+2*int64(len(dots)))
+	copy(ctx[3:], text[left:right])
+	if left != 0 {
+		copy(ctx, dots)
+		left = 0
+	} else {
+		left = int64(len(dots))
+	}
+	if right != int64(len(text)) {
+		copy(ctx[len(ctx)-len(dots):], dots)
+		right = int64(len(ctx))
+	} else {
+		right = int64(len(ctx) - len(dots))
+	}
+	return ctx[left:right]
+}
+
+func minInt(a, b int64) int64 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func maxInt64(a, b int64) int64 {
+	if a > b {
+		return a
+	}
+	return b
 }
