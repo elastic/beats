@@ -77,5 +77,4 @@ func defaultProcessors() []mapstr.M {
 		{"add_docker_metadata": nil},
 		{"add_kubernetes_metadata": nil},
 	}
-
 }
