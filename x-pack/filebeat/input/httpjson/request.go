@@ -847,16 +847,13 @@ func responseToMap(r *response) (mapstr.M, error) {
 	}
 	respMap := map[string]interface{}{
 		"header": make(mapstr.M),
-		"body":   make(mapstr.M),
+		"body":   r.body,
 	}
-
 	for key, value := range r.header {
 		respMap["header"] = mapstr.M{
 			key: value,
 		}
 	}
-	respMap["body"] = r.body
-
 	return respMap, nil
 }
 
