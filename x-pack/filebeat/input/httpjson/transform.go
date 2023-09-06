@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -25,7 +24,6 @@ type transformsConfig []*conf.C
 type transforms []transform
 
 type transformContext struct {
-	lock          sync.RWMutex
 	cursor        *cursor
 	parentTrCtx   *transformContext
 	firstEvent    *mapstr.M
@@ -45,41 +43,28 @@ func emptyTransformContext() *transformContext {
 }
 
 func (ctx *transformContext) cursorMap() mapstr.M {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
 	return ctx.cursor.clone()
 }
 
 func (ctx *transformContext) lastEventClone() *mapstr.M {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
 	clone := ctx.lastEvent.Clone()
 	return &clone
 }
 
 func (ctx *transformContext) firstEventClone() *mapstr.M {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
 	clone := ctx.firstEvent.Clone()
 	return &clone
 }
 
 func (ctx *transformContext) firstResponseClone() *response {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
 	return ctx.firstResponse.clone()
 }
 
 func (ctx *transformContext) lastResponseClone() *response {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
 	return ctx.lastResponse.clone()
 }
 
 func (ctx *transformContext) updateCursor() {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
-
 	// we do not want to pass the cursor data to itself
 	newCtx := emptyTransformContext()
 	newCtx.lastEvent = ctx.lastEvent
@@ -91,8 +76,6 @@ func (ctx *transformContext) updateCursor() {
 }
 
 func (ctx *transformContext) clone() *transformContext {
-	ctx.lock.Lock()
-
 	newCtx := emptyTransformContext()
 	newCtx.lastEvent = ctx.lastEvent
 	newCtx.firstEvent = ctx.firstEvent
@@ -100,41 +83,29 @@ func (ctx *transformContext) clone() *transformContext {
 	newCtx.firstResponse = ctx.firstResponse
 	newCtx.cursor = ctx.cursor
 	newCtx.parentTrCtx = ctx
-
-	ctx.lock.Unlock()
 	return newCtx
 }
 
 func (ctx *transformContext) updateLastEvent(e mapstr.M) {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 	*ctx.lastEvent = e
 }
 
 func (ctx *transformContext) updateFirstEvent(e mapstr.M) {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 	*ctx.firstEvent = e
 }
 
 func (ctx *transformContext) updateLastResponse(r response) {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 	*ctx.lastResponse = r
 }
 
 func (ctx *transformContext) updateFirstResponse(r response) {
-	ctx.lock.Lock()
 	*ctx.firstResponse = r
-	ctx.lock.Unlock()
 }
 
 func (ctx *transformContext) clearIntervalData() {
-	ctx.lock.Lock()
 	ctx.lastEvent = &mapstr.M{}
 	ctx.firstEvent = &mapstr.M{}
 	ctx.lastResponse = &response{}
-	ctx.lock.Unlock()
 }
 
 type transformable mapstr.M

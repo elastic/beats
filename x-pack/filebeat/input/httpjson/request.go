@@ -82,8 +82,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-				events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true)
-				n = processAndPublishEvents(trCtx, events, publisher, true, r.log)
+				p := newPublisher(trCtx, publisher, true, r.log)
+				r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, true, p)
+				n = p.eventCount()
 				continue
 			}
 
@@ -118,8 +119,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return err
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
-			events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false)
-			n = processAndPublishEvents(trCtx, events, publisher, false, r.log)
+			p := newPublisher(trCtx, publisher, false, r.log)
+			r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps, false, p)
+			n = p.eventCount()
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -187,13 +189,13 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				resps = intermediateResps
 			}
 
-			var events <-chan maybeMsg
+			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
 			if rf.isChain {
-				events = rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true)
+				rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, p)
 			} else {
-				events = r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true)
+				r.responseProcessors[i].startProcessing(stdCtx, trCtx, resps, true, p)
 			}
-			n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
+			n += p.eventCount()
 		}
 	}
 
@@ -541,49 +543,71 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
-	events := r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true)
+	p := newChainProcessor(r, trCtx, publisher, chainIndex)
+	r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true, p)
+	return p.eventCount()
+}
 
-	var n int
-	var eventCount int
-	for maybeMsg := range events {
-		if maybeMsg.failed() {
-			r.log.Errorf("error processing response: %v", maybeMsg)
-			continue
-		}
+type chainProcessor struct {
+	req  *requester
+	ctx  *transformContext
+	pub  inputcursor.Publisher
+	idx  int
+	tail bool
+	n    int
+}
 
-		if n >= 1 { // skip 1st event as it has already ben processed before
-			var response http.Response
-			response.StatusCode = 200
-			body := new(bytes.Buffer)
-			// we construct a new response here from each of the pagination events
-			err := json.NewEncoder(body).Encode(maybeMsg.msg)
-			if err != nil {
-				r.log.Errorf("error processing chain event: %w", err)
-				continue
-			}
-			response.Body = io.NopCloser(body)
-
-			// updates the cursor for pagination last_event & last_response when chaining is present
-			trCtx.updateLastEvent(maybeMsg.msg)
-			trCtx.updateCursor()
-
-			// for each pagination response, we repeat all the chain steps / blocks
-			count, err := r.processChainPaginationEvents(stdCtx, trCtx, publisher, &response, chainIndex, r.log)
-			if err != nil {
-				r.log.Errorf("error processing chain event: %w", err)
-				continue
-			}
-			eventCount += count
-
-			err = response.Body.Close()
-			if err != nil {
-				r.log.Errorf("error closing http response body: %w", err)
-			}
-		}
-
-		n++
+func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.Publisher, idx int) *chainProcessor {
+	return &chainProcessor{
+		req: req,
+		ctx: trCtx,
+		pub: pub,
+		idx: idx,
 	}
-	return eventCount
+}
+
+func (p *chainProcessor) event(ctx context.Context, msg mapstr.M) {
+	if !p.tail {
+		// Skip first event as it has already been processed.
+		p.tail = true
+		return
+	}
+
+	var response http.Response
+	response.StatusCode = 200
+	body := new(bytes.Buffer)
+	// we construct a new response here from each of the pagination events
+	err := json.NewEncoder(body).Encode(msg)
+	if err != nil {
+		p.req.log.Errorf("error processing chain event: %w", err)
+		return
+	}
+	response.Body = io.NopCloser(body)
+
+	// updates the cursor for pagination last_event & last_response when chaining is present
+	p.ctx.updateLastEvent(msg)
+	p.ctx.updateCursor()
+
+	// for each pagination response, we repeat all the chain steps / blocks
+	n, err := p.req.processChainPaginationEvents(ctx, p.ctx, p.pub, &response, p.idx, p.req.log)
+	if err != nil {
+		p.req.log.Errorf("error processing chain event: %w", err)
+		return
+	}
+	p.n += n
+
+	err = response.Body.Close()
+	if err != nil {
+		p.req.log.Errorf("error closing http response body: %w", err)
+	}
+}
+
+func (p *chainProcessor) fail(err error) {
+	p.req.log.Errorf("error processing response: %v", err)
+}
+
+func (p *chainProcessor) eventCount() int {
+	return p.n
 }
 
 // processChainPaginationEvents takes a pagination response as input and runs all the chain blocks for the input
@@ -675,8 +699,9 @@ func (r *requester) processChainPaginationEvents(stdCtx context.Context, trCtx *
 			}
 			resps = intermediateResps
 		}
-		events := rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true)
-		n += processAndPublishEvents(chainTrCtx, events, publisher, i < len(r.requestFactories), r.log)
+		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
+		rf.chainResponseProcessor.startProcessing(stdCtx, chainTrCtx, resps, true, p)
+		n += p.eventCount()
 	}
 
 	defer func() {
@@ -697,36 +722,52 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 	return *newUrl, nil
 }
 
-// processAndPublishEvents process and publish events based on event type
-func processAndPublishEvents(trCtx *transformContext, events <-chan maybeMsg, publisher inputcursor.Publisher, publish bool, log *logp.Logger) int {
-	var n int
-	for maybeMsg := range events {
-		if maybeMsg.failed() {
-			log.Errorf("error processing response: %v", maybeMsg)
-			continue
-		}
+type publisher struct {
+	ctx *transformContext
+	pub inputcursor.Publisher
+	n   int
+	log *logp.Logger
+}
 
-		if publish {
-			event, err := makeEvent(maybeMsg.msg)
-			if err != nil {
-				log.Errorf("error creating event: %v", maybeMsg)
-				continue
-			}
-
-			if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
-				log.Errorf("error publishing event: %v", err)
-				continue
-			}
-		}
-		if len(*trCtx.firstEventClone()) == 0 {
-			trCtx.updateFirstEvent(maybeMsg.msg)
-		}
-		trCtx.updateLastEvent(maybeMsg.msg)
-		trCtx.updateCursor()
-
-		n++
+func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, log *logp.Logger) *publisher {
+	if !publish {
+		pub = nil
 	}
-	return n
+	return &publisher{
+		ctx: trCtx,
+		pub: pub,
+		log: log,
+	}
+}
+
+func (p *publisher) event(_ context.Context, msg mapstr.M) {
+	if p.pub != nil {
+		event, err := makeEvent(msg)
+		if err != nil {
+			p.log.Errorf("error creating event: %v: %v", msg, err)
+			return
+		}
+
+		if err := p.pub.Publish(event, p.ctx.cursorMap()); err != nil {
+			p.log.Errorf("error publishing event: %v", err)
+			return
+		}
+	}
+	if len(*p.ctx.firstEventClone()) == 0 {
+		p.ctx.updateFirstEvent(msg)
+	}
+	p.ctx.updateLastEvent(msg)
+	p.ctx.updateCursor()
+
+	p.n++
+}
+
+func (p *publisher) fail(err error) {
+	p.log.Errorf("error processing response: %v", err)
+}
+
+func (p *publisher) eventCount() int {
+	return p.n
 }
 
 const (
