@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
+- Upgrade Go to 1.21.1 {pull}36528[36528]
 
 
 *Auditbeat*
