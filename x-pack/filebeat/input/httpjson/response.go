@@ -94,11 +94,11 @@ func (resp *response) templateValues() mapstr.M {
 
 type responseProcessor struct {
 	metrics    *inputMetrics
-	log        *logp.Logger
 	transforms []basicTransform
 	split      *split
 	pagination *pagination
 	xmlDetails map[string]xml.Detail
+	log        *logp.Logger
 }
 
 func newResponseProcessor(config config, pagination *pagination, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) []*responseProcessor {

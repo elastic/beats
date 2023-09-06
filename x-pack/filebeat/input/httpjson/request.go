@@ -258,21 +258,21 @@ func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response,
 }
 
 type requestFactory struct {
+	chainHTTPClient        *httpClient
 	url                    url.URL
 	method                 string
 	body                   *mapstr.M
 	transforms             []basicTransform
 	user                   string
 	password               string
-	log                    *logp.Logger
 	encoder                encoderFunc
 	replace                string
 	replaceWith            string
 	isChain                bool
 	until                  *valueTpl
-	chainHTTPClient        *httpClient
 	chainResponseProcessor *responseProcessor
 	saveFirstResponse      bool
+	log                    *logp.Logger
 }
 
 func newRequestFactory(ctx context.Context, config config, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
@@ -471,23 +471,18 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 }
 
 type requester struct {
-	log                *logp.Logger
 	client             *httpClient
 	requestFactories   []*requestFactory
 	responseProcessors []*responseProcessor
+	log                *logp.Logger
 }
 
-func newRequester(
-	client *httpClient,
-	requestFactory []*requestFactory,
-	responseProcessor []*responseProcessor,
-	log *logp.Logger,
-) *requester {
+func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, log *logp.Logger) *requester {
 	return &requester{
-		log:                log,
 		client:             client,
-		requestFactories:   requestFactory,
-		responseProcessors: responseProcessor,
+		requestFactories:   reqs,
+		responseProcessors: resps,
+		log:                log,
 	}
 }
 

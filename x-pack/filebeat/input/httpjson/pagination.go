@@ -20,10 +20,10 @@ import (
 const paginationNamespace = "pagination"
 
 type pagination struct {
-	log            *logp.Logger
 	httpClient     *httpClient
 	requestFactory *requestFactory
 	decoder        decoderFunc
+	log            *logp.Logger
 }
 
 func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {

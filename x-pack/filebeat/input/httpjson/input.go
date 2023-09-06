@@ -108,60 +108,49 @@ func test(url *url.URL) error {
 	return nil
 }
 
-func runWithMetrics(
-	ctx v2.Context,
-	config config,
-	publisher inputcursor.Publisher,
-	cursor *inputcursor.Cursor,
-) error {
+func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
 	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
 	defer unreg()
-	return run(ctx, config, publisher, cursor, reg)
+	return run(ctx, cfg, pub, crsr, reg)
 }
 
-func run(
-	ctx v2.Context,
-	config config,
-	publisher inputcursor.Publisher,
-	cursor *inputcursor.Cursor,
-	reg *monitoring.Registry,
-) error {
-	log := ctx.Logger.With("input_url", config.Request.URL)
+func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
+	log := ctx.Logger.With("input_url", cfg.Request.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	if config.Request.Tracer != nil {
+	if cfg.Request.Tracer != nil {
 		id := sanitizeFileName(ctx.ID)
-		config.Request.Tracer.Filename = strings.ReplaceAll(config.Request.Tracer.Filename, "*", id)
+		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
 	}
 
 	metrics := newInputMetrics(reg)
 
-	httpClient, err := newHTTPClient(stdCtx, config, log, reg)
+	httpClient, err := newHTTPClient(stdCtx, cfg, log, reg)
 	if err != nil {
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, config, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, log, metrics, reg)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		return err
 	}
 	var xmlDetails map[string]xml.Detail
-	if config.Response.XSD != "" {
-		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
+	if cfg.Response.XSD != "" {
+		xmlDetails, err = xml.Details([]byte(cfg.Response.XSD))
 		if err != nil {
 			log.Errorf("error while collecting xml decoder type hints: %v", err)
 			return err
 		}
 	}
-	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config, pagination, xmlDetails, metrics, log)
+	pagination := newPagination(cfg, httpClient, log)
+	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
-	trCtx.cursor = newCursor(config.Cursor, log)
-	trCtx.cursor.load(cursor)
+	trCtx.cursor = newCursor(cfg.Cursor, log)
+	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
 		log.Info("Process another repeated request.")
@@ -169,7 +158,7 @@ func run(
 		startTime := time.Now()
 
 		var err error
-		if err = requester.doRequest(stdCtx, trCtx, publisher); err != nil {
+		if err = requester.doRequest(stdCtx, trCtx, pub); err != nil {
 			log.Errorf("Error while processing http request: %v", err)
 		}
 
@@ -185,7 +174,7 @@ func run(
 	// we trigger the first call immediately,
 	// then we schedule it on the given interval using timed.Periodic
 	if err = doFunc(); err == nil {
-		err = timed.Periodic(stdCtx, config.Interval, doFunc)
+		err = timed.Periodic(stdCtx, cfg.Interval, doFunc)
 	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)

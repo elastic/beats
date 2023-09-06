@@ -27,7 +27,6 @@ var (
 // by applying elements of the chain's linked list to an input until completed
 // or an error state is encountered.
 type split struct {
-	log              *logp.Logger
 	targetInfo       targetInfo
 	kind             string
 	transforms       []basicTransform
@@ -37,6 +36,7 @@ type split struct {
 	keyField         string
 	isRoot           bool
 	delimiter        string
+	log              *logp.Logger
 }
 
 // newSplitResponse returns a new split based on the provided config and
@@ -81,7 +81,6 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	}
 
 	return &split{
-		log:              log,
 		targetInfo:       ti,
 		kind:             c.Type,
 		keepParent:       c.KeepParent,
@@ -90,6 +89,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		delimiter:        c.DelimiterString,
 		transforms:       ts,
 		child:            s,
+		log:              log,
 	}, nil
 }
 
