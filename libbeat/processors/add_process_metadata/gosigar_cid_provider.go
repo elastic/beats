@@ -38,7 +38,7 @@ type gosigarCidProvider struct {
 	log                *logp.Logger
 	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
-	cgroupRegex        string
+	cgroupRegex        *string
 	cidRegex           *regexp.Regexp
 	processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error)
 	pidCidCache        *common.Cache
@@ -72,13 +72,13 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex *string, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		cgroupRegex:        cgroupRegex,
-		cidRegex:           regexp.MustCompile(`[\w]{64}`),
+		cidRegex:           regexp.MustCompile(`([0-9a-f]{64})`),
 		processCgroupPaths: processCgroupPaths,
 		pidCidCache:        pidCidCache,
 	}
@@ -112,12 +112,12 @@ func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) 
 // V2 Example:
 // /kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod1f306eaea646903787fd7cc4eb6be515.slice/crio-eac98011dea91157038ca797f2141754106e074b7242721c7170a642a2204a54.scope
 func (p gosigarCidProvider) getCid(cgroups cgroup.PathList) string {
-	// if regex defined use it to find cid
-	if len(p.cgroupRegex) != 0 {
-		re := regexp.MustCompile(p.cgroupRegex)
+	// if regex is configured
+	if p.cgroupRegex != nil {
+		re := regexp.MustCompile(*p.cgroupRegex)
 		for _, path := range cgroups.Flatten() {
 			rs := re.FindStringSubmatch(path.ControllerPath)
-			if rs != nil {
+			if len(rs) > 1 {
 				return rs[1]
 			}
 		}

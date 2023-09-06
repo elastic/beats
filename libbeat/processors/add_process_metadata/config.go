@@ -51,7 +51,7 @@ type config struct {
 	CgroupPrefixes []string `config:"cgroup_prefixes"`
 
 	// CgroupRegex is the regular expression that captures the container id from cgroup path
-	CgroupRegex string `config:"cgroup_regex"`
+	CgroupRegex *string `config:"cgroup_regex"`
 
 	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
 	// set to 0 to disable the cgroup cache
@@ -101,7 +101,6 @@ func defaultConfig() config {
 		HostPath:              "/",
 		CgroupPrefixes:        []string{"/kubepods", "/docker"},
 		CgroupCacheExpireTime: cacheExpiration,
-		CgroupRegex:           "([0-9a-f]{64})(\\.scope)?$",
 	}
 }
 

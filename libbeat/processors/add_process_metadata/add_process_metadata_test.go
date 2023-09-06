@@ -1101,7 +1101,7 @@ func TestV2CID(t *testing.T) {
 		}
 		return testMap, nil
 	}
-	provider := newCidProvider(resolve.NewTestResolver(""), []string{}, "", processCgroupPaths, nil)
+	provider := newCidProvider(resolve.NewTestResolver(""), []string{}, nil, processCgroupPaths, nil)
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
@@ -1154,7 +1154,7 @@ func TestAddProcessMetadataWithV2(t *testing.T) {
 				},
 			},
 			5: {
-				V2: map[string]cgroup.ControllerPath{
+				V1: map[string]cgroup.ControllerPath{
 					"Docker": {IsV2: true, ControllerPath: "/docker/485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9"},
 				},
 			},
@@ -1284,6 +1284,53 @@ func TestAddProcessMetadataWithV2(t *testing.T) {
 				},
 				"container": mapstr.M{
 					"id": "485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+				},
+			},
+		},
+		{
+			description: "v1 , cgroup_prefixes configured",
+			config: mapstr.M{
+				"match_pids":      []string{"system.process.ppid"},
+				"include_fields":  []string{"container.id"},
+				"cgroup_prefixes": []string{"/kubepods", "/docker", "/user"},
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "5",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "5",
+					},
+				},
+				"container": mapstr.M{
+					"id": "485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+				},
+			},
+		},
+		{
+			description: "Invalid regex configured , ContainerId not retrieved",
+			config: mapstr.M{
+				"match_pids":     []string{"system.process.ppid"},
+				"include_fields": []string{"container.id"},
+				"cgroup_regex":   "",
+			},
+			event: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "1",
+					},
+				},
+			},
+			expected: mapstr.M{
+				"system": mapstr.M{
+					"process": mapstr.M{
+						"ppid": "1",
+					},
 				},
 			},
 		},

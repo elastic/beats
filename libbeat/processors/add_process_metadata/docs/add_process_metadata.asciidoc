@@ -22,7 +22,7 @@ The fields added to the event look as follows:
 "process": {
   "name":  "systemd",
   "title": "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-  "exe":   "/usr/lib/systemd/systemd",
+  "executable":   "/usr/lib/systemd/systemd",
   "args":  ["/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"],
   "pid":   1,
   "parent": {
@@ -86,12 +86,10 @@ to `/kubepods` and `/docker`. This is the prefix where the container ID is
 inside cgroup. For different runtime configurations of Kubernetes or Docker,
 the `cgroup_prefixes` can be set to overwrite the defaults.
 
-`cgroup_regex`:: (Optional) A regular expression that matches most of the 
-cgroup paths is added by default. This looks like:
-`([0-9a-f]{64})(\\.scope)?$` which matches container id for majority of cgroups.
-This can be overwritten by specifying regular expression with capture group 
-for capturing container id from cgroup path. Examples:
-
+`cgroup_regex`:: (Optional) By default, the container id is extracted from
+cgroup file based on `cgroup_prefixes`. This can be overwritten by specifying
+regular expression with capture group for capturing container id from cgroup
+path. Examples:
 . `^\/.+\/.+\/.+\/([0-9a-f]{64}).*` will match the container id of a cgroup
 like `/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1`
 . `^\/.+\/.+\/.+\/docker-([0-9a-f]{64}).scope` will match the container id of a cgroup
