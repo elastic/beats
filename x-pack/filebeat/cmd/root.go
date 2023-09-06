@@ -52,15 +52,28 @@ func defaultProcessors() []mapstr.M {
 	if shipperEnv == "True" {
 		return []mapstr.M{}
 	}
-	return []mapstr.M{
-		{
-			"add_host_metadata": mapstr.M{
-				"when.not.contains.tags": "forwarded",
-			},
-		},
-		{"add_cloud_metadata": nil},
-		{"add_docker_metadata": nil},
-		{"add_kubernetes_metadata": nil},
-	}
 
+	// Setting environmental variable NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor.
+	// This will result to events not being enhanced with host.ip and host.mac
+	// Related to https://github.com/elastic/integrations/issues/6674
+	valueNETINFO, _ := os.LookupEnv("NETINFO")
+
+	if valueNETINFO == "false" {
+		return []mapstr.M{
+			{"add_host_metadata": mapstr.M{
+				"when.not.contains.tags": "forwarded",
+				"netinfo.enabled":        "false",
+			}},
+			{"add_cloud_metadata": nil},
+			{"add_docker_metadata": nil},
+			{"add_kubernetes_metadata": nil},
+		}
+	} else {
+		return []mapstr.M{
+			{"add_host_metadata": nil},
+			{"add_cloud_metadata": nil},
+			{"add_docker_metadata": nil},
+			{"add_kubernetes_metadata": nil},
+		}
+	}
 }
