@@ -6,6 +6,7 @@ package azuread
 
 import (
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type conf struct {
 	TenantID       string        `config:"tenant_id" validate:"required"`
 	SyncInterval   time.Duration `config:"sync_interval"`
 	UpdateInterval time.Duration `config:"update_interval"`
+	Dataset        string        `config:"dataset"`
 }
 
 // Validate runs validation against the config.
@@ -33,6 +35,11 @@ func (c *conf) Validate() error {
 	}
 	if c.UpdateInterval == 0 {
 		return errors.New("update_interval must not be zero")
+	}
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users", "devices":
+	default:
+		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 
 	return nil

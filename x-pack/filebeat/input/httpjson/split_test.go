@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -702,24 +703,33 @@ func TestSplit(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			ch := make(chan maybeMsg, len(tc.expectedMessages))
+			events := &stream{t: t}
 			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
 			assert.NoError(t, err)
-			err = split.run(tc.ctx, tc.resp, ch)
+			err = split.run(tc.ctx, tc.resp, events)
 			if tc.expectedErr == nil {
 				assert.NoError(t, err)
 			} else {
 				assert.EqualError(t, err, tc.expectedErr.Error())
 			}
-			close(ch)
-			assert.Equal(t, len(tc.expectedMessages), len(ch))
-			for _, msg := range tc.expectedMessages {
-				e := <-ch
-				assert.NoError(t, e.err)
-				assert.Equal(t, msg.Flatten(), e.msg.Flatten())
+			assert.Equal(t, len(tc.expectedMessages), len(events.collected))
+			for i, msg := range tc.expectedMessages {
+				assert.Equal(t, msg.Flatten(), events.collected[i].Flatten())
 			}
 		})
 	}
+}
+
+type stream struct {
+	collected []mapstr.M
+	t         *testing.T
+}
+
+func (s *stream) event(_ context.Context, msg mapstr.M) {
+	s.collected = append(s.collected, msg)
+}
+
+func (s *stream) fail(err error) {
+	s.t.Errorf("fail: %v", err)
 }

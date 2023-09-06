@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
 - Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
 
 *Heartbeat*
 
@@ -139,6 +140,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Ensure event loggers retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
 
 *Elastic Logging Plugin*
 
@@ -153,6 +155,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Mark `translate_sid` processor is GA. {issue}36279[36279] {pull}36280[36280]
 - dns processor: Add support for forward lookups (`A`, `AAAA`, and `TXT`). {issue}11416[11416] {pull}36394[36394]
 - Mark `syslog` processor as GA, improve docs about how processor handles syslog messages. {issue}36416[36416] {pull}36417[36417]
+- Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 
 *Auditbeat*
 
@@ -212,6 +215,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make HTTPJSON response body decoding errors more informative. {pull}36481[36481]
 - Allow fine-grained control of entity analytics API requests for Okta provider. {issue}36440[36440] {pull}36492[36492]
 - Add support for expanding `journald.process.capabilities` into the human-readable effective capabilities in the ECS `process.thread.capabilities.effective` field. {issue}36454[36454] {pull}36470[36470]
+- Allow fine-grained control of entity analytics API requests for AzureAD provider. {issue}36440[36440] {pull}36441[36441]
 
 *Auditbeat*
 
