@@ -62,6 +62,13 @@ type config struct {
 	CgroupCacheExpireTime time.Duration `config:"cgroup_cache_expire_time"`
 }
 
+func (c *config) Validate() error {
+	if c.CgroupRegex != nil && c.CgroupRegex.NumSubexp() != 1 {
+		return fmt.Errorf("cgroup_regexp must contain exactly one capturing group for the container ID")
+	}
+	return nil
+}
+
 // available fields by default
 var defaultFields = mapstr.M{
 	"process": mapstr.M{
