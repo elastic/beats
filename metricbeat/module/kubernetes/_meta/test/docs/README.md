@@ -7,7 +7,7 @@ Follow instructions at https://kind.sigs.k8s.io/docs/user/quick-start/#installat
 
 Create a kind kubernetes cluster.
 ```
-kind create cluster  --image 'kindest/node:v1.21.0'
+kind create cluster  --image 'kindest/node:v1.21.1'
 ```
 
 ## Deploy Kube-state-metrics
