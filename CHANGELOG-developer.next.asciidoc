@@ -86,6 +86,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix ingest pipeline for panw module to parse url scheme correctly {pull}35757[35757]
 - Renamed an httpjson input metric to follow naming conventions. `httpjson_interval_pages_total` was renamed to `httpjson_interval_pages` because the `_total` suffix is reserved for counters. {issue}35933[35933] {pull}36169[36169]
 - Fixed some race conditions in tests {pull}36185[36185]
+- Re-enable HTTPJSON fixed flakey test. {issue}34929[34929] {pull}36525[36525]
 
 ==== Added
 
@@ -168,6 +169,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Pin PyYAML version to 5.3.1 to avoid CI errors temporarily {pull}36091[36091]
 - Skip dependabot updates for github.com/elastic/mito. {pull}36158[36158]
 - Add device handling to Okta API package for entity analytics. {pull}35980[35980]
+- Make Filebeat HTTPJSON input process responses sequentially. {pull}36493[36493]
 
 ==== Deprecated
 
