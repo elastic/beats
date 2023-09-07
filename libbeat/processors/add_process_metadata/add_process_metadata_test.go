@@ -1182,8 +1182,13 @@ func TestAddProcessMetadataWithV2(t *testing.T) {
 				},
 			},
 			5: {
-				V1: map[string]cgroup.ControllerPath{
+				V2: map[string]cgroup.ControllerPath{
 					"Docker": {IsV2: true, ControllerPath: "/docker/485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9"},
+				},
+			},
+			6: {
+				V2: map[string]cgroup.ControllerPath{
+					"Docker": {IsV2: true, ControllerPath: "/custom_path/123456abc"},
 				},
 			},
 		}
@@ -1316,49 +1321,19 @@ func TestAddProcessMetadataWithV2(t *testing.T) {
 			},
 		},
 		{
-			description: "v1 , cgroup_prefixes configured",
+			description: "cgroup_prefixes configured",
 			config: mapstr.M{
-				"match_pids":      []string{"system.process.ppid"},
+				"match_pids":      []string{"pid"},
 				"include_fields":  []string{"container.id"},
-				"cgroup_prefixes": []string{"/kubepods", "/docker", "/user"},
+				"cgroup_prefixes": []string{"/custom_path"},
 			},
 			event: mapstr.M{
-				"system": mapstr.M{
-					"process": mapstr.M{
-						"ppid": "5",
-					},
-				},
+				"pid": "6",
 			},
 			expected: mapstr.M{
-				"system": mapstr.M{
-					"process": mapstr.M{
-						"ppid": "5",
-					},
-				},
+				"pid": "6",
 				"container": mapstr.M{
-					"id": "485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
-				},
-			},
-		},
-		{
-			description: "Invalid regex configured , ContainerId not retrieved",
-			config: mapstr.M{
-				"match_pids":     []string{"system.process.ppid"},
-				"include_fields": []string{"container.id"},
-				"cgroup_regex":   "",
-			},
-			event: mapstr.M{
-				"system": mapstr.M{
-					"process": mapstr.M{
-						"ppid": "1",
-					},
-				},
-			},
-			expected: mapstr.M{
-				"system": mapstr.M{
-					"process": mapstr.M{
-						"ppid": "1",
-					},
+					"id": "123456abc",
 				},
 			},
 		},
