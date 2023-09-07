@@ -114,17 +114,17 @@ func defaultConfig() config {
 	}
 }
 
-func (pf *config) getMappings() (mappings mapstr.M, err error) {
+func (c *config) getMappings() (mappings mapstr.M, err error) {
 	mappings = mapstr.M{}
 	validFields := defaultFields
-	if pf.RestrictedFields {
+	if c.RestrictedFields {
 		validFields = restrictedFields
 	}
-	fieldPrefix := pf.Target
+	fieldPrefix := c.Target
 	if len(fieldPrefix) > 0 {
 		fieldPrefix += "."
 	}
-	wantedFields := pf.Fields
+	wantedFields := c.Fields
 	if len(wantedFields) == 0 {
 		wantedFields = []string{"process", "container"}
 	}
