@@ -39,8 +39,8 @@ import (
 )
 
 func TestAddProcessMetadata(t *testing.T) {
-	setupErr := logp.TestingSetup(logp.WithSelectors(processorName))
-	require.NoError(t, setupErr)
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	startTime := time.Now()
 	testProcs := testProvider{
 		1: {
@@ -797,8 +797,8 @@ func TestAddProcessMetadata(t *testing.T) {
 }
 
 func TestUsingCache(t *testing.T) {
-	setupErr := logp.TestingSetup(logp.WithSelectors(processorName))
-	require.NoError(t, setupErr)
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	selfPID := os.Getpid()
 
 	// mock of the cgroup processCgroupPaths
@@ -907,8 +907,8 @@ func TestUsingCache(t *testing.T) {
 }
 
 func TestSelf(t *testing.T) {
-	setupErr := logp.TestingSetup(logp.WithSelectors(processorName))
-	require.NoError(t, setupErr)
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -941,8 +941,8 @@ func TestSelf(t *testing.T) {
 }
 
 func TestBadProcess(t *testing.T) {
-	setupErr := logp.TestingSetup(logp.WithSelectors(processorName))
-	require.NoError(t, setupErr)
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -1136,8 +1136,8 @@ func TestV2CID(t *testing.T) {
 }
 
 func TestAddProcessMetadataWithV2(t *testing.T) {
-	setupErr := logp.TestingSetup(logp.WithSelectors(processorName))
-	require.NoError(t, setupErr)
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	startTime := time.Now()
 	testProcs := testProvider{
 		1: {
