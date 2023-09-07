@@ -11,11 +11,11 @@ import (
 )
 
 type cursor struct {
-	log *logp.Logger
-
 	cfg cursorConfig
 
 	state mapstr.M
+
+	log *logp.Logger
 }
 
 func newCursor(cfg cursorConfig, log *logp.Logger) *cursor {
