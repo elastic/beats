@@ -22,34 +22,35 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
-
-	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type SumPlugin interface {
-	EachEvent(event *beat.Event)
-	// If at least one plugin returns true a retry will be performed
-	OnSummary(event *beat.Event) (doRetry bool)
-}
-
+// Summarizer produces summary events (with summary.* and other asssociated fields).
+// It accumulates state as it processes the whole event field in order to produce
+// this summary.
 type Summarizer struct {
 	rootJob        jobs.Job
 	contsRemaining uint16
 	mtx            *sync.Mutex
 	sf             stdfields.StdMonitorFields
 	retryDelay     time.Duration
-	plugins        []SumPlugin
+	plugins        []SummarizerPlugin
 	startedAt      time.Time
 }
 
+// SummarizerPlugin encapsulates functionality for the Summarizer that's easily expressed
+// in one location. Prior to this code was strewn about a bit more and following it was
+// a bit trickier.
+type SummarizerPlugin interface {
+	EachEvent(event *beat.Event)
+	// If at least one plugin returns true a retry will be performed
+	OnSummary(event *beat.Event) (doRetry bool)
+}
+
+// JobSummary is the struct that is serialized in the `summary` field in the emitted event.
 type JobSummary struct {
 	Attempt      uint16                   `json:"attempt"`
 	MaxAttempts  uint16                   `json:"max_attempts"`
@@ -65,7 +66,7 @@ func (js *JobSummary) String() string {
 }
 
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
-	plugins := make([]SumPlugin, 0, 2)
+	plugins := make([]SummarizerPlugin, 0, 2)
 	if sf.Type == "browser" {
 		plugins = append(plugins, &BrowserDurationSumPlugin{})
 	} else {
@@ -96,6 +97,8 @@ func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSu
 	}
 }
 
+// BumpAttempt swaps the JobSummary object's pointer for a new job summary
+// that is a clone of the current one but with the Attempt field incremented.
 func (js *JobSummary) BumpAttempt() {
 	*js = *NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 }
@@ -155,82 +158,4 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 		return conts, jobErr
 	}
-}
-
-type StateStatusPlugin struct {
-	js           *JobSummary
-	stateTracker *monitorstate.Tracker
-	sf           stdfields.StdMonitorFields
-	checkGroup   string
-}
-
-func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *StateStatusPlugin {
-	uu, err := uuid.NewV1()
-	if err != nil {
-		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
-	}
-	js := NewJobSummary(1, sf.MaxAttempts, uu.String())
-	return &StateStatusPlugin{
-		js:           js,
-		stateTracker: stateTracker,
-		sf:           sf,
-		checkGroup:   uu.String(),
-	}
-}
-
-func (ssp *StateStatusPlugin) EachEvent(event *beat.Event) {
-	monitorStatus, err := event.GetValue("monitor.status")
-	if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
-		mss := monitorstate.StateStatus(monitorStatus.(string))
-
-		if mss == monitorstate.StatusUp {
-			ssp.js.Up++
-		} else {
-			ssp.js.Down++
-		}
-	}
-
-	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
-}
-
-func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
-	if ssp.js.Down > 0 {
-		ssp.js.Status = monitorstate.StatusDown
-	} else {
-		ssp.js.Status = monitorstate.StatusUp
-	}
-
-	// Get the last status of this monitor, we use this later to
-	// determine if a retry is needed
-	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
-
-	// FinalAttempt is true if no retries will occur
-	retry = ssp.js.Status == monitorstate.StatusDown && ssp.js.Attempt < ssp.js.MaxAttempts
-	ssp.js.FinalAttempt = !retry
-
-	ms := ssp.stateTracker.RecordStatus(ssp.sf, ssp.js.Status, ssp.js.FinalAttempt)
-
-	// dereference the pointer since the pointer is pointed at the next step
-	// after this
-	jsCopy := *ssp.js
-
-	fields := mapstr.M{
-		"event":   mapstr.M{"type": "heartbeat/summary"},
-		"summary": &jsCopy,
-		"state":   ms,
-	}
-	if ssp.sf.Type == "browser" {
-		fields["synthetics"] = mapstr.M{"type": "heartbeat/summary"}
-	}
-	eventext.MergeEventFields(event, fields)
-
-	if retry {
-		// mutate the js into the state for the next attempt
-		ssp.js.BumpAttempt()
-	}
-
-	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
-
-	logger.LogRun(event)
-	return !ssp.js.FinalAttempt
 }

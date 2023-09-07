@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
+// LightweightDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
+// for lightweight monitors.
 type LightweightDurationSumPlugin struct {
 	startedAt *time.Time
 }
@@ -41,6 +43,8 @@ func (lwdsp *LightweightDurationSumPlugin) OnSummary(event *beat.Event) bool {
 	return false
 }
 
+// BrowserDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
+// for browser monitors.
 type BrowserDurationSumPlugin struct {
 	startedAt *time.Time
 	endedAt   *time.Time

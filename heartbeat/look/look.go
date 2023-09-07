@@ -39,6 +39,8 @@ func RTT(rtt time.Duration) mapstr.M {
 	}
 }
 
+// RTTMS returns the given time.Duration as an int64 in microseconds, with a value of 0
+// if input is negative.
 func RTTMS(rtt time.Duration) int64 {
 	if rtt < 0 {
 		return 0

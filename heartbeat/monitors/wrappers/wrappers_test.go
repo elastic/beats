@@ -67,12 +67,6 @@ var testMonFields = stdfields.StdMonitorFields{
 	MaxAttempts: 1,
 }
 
-var testBrowserMonFields = stdfields.StdMonitorFields{
-	Type:     "browser",
-	Schedule: schedule.MustParse("@every 1s"),
-	Timeout:  1,
-}
-
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Helper()
 	t.Run(tt.name, func(t *testing.T) {
