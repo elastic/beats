@@ -19,11 +19,15 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// defaultCgroupRegex captures 64-character lowercase hexadecimal container IDs found in cgroup paths.
+var defaultCgroupRegex = regexp.MustCompile(`[-/]([0-9a-f]{64})(\.scope)?$`)
 
 type config struct {
 	// IgnoreMissing: Ignore errors if event has no PID field.
@@ -99,7 +103,6 @@ func defaultConfig() config {
 		RestrictedFields:      false,
 		MatchPIDs:             []string{"process.pid", "process.parent.pid"},
 		HostPath:              "/",
-		CgroupPrefixes:        []string{"/kubepods", "/docker"},
 		CgroupCacheExpireTime: cacheExpiration,
 	}
 }
