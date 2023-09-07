@@ -38,7 +38,7 @@ type gosigarCidProvider struct {
 	log                *logp.Logger
 	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
-	cgroupRegex        *string
+	cgroupRegex        *regexp.Regexp
 	cidRegex           *regexp.Regexp
 	processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error)
 	pidCidCache        *common.Cache
@@ -72,7 +72,7 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex *string, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex *regexp.Regexp, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
@@ -114,9 +114,8 @@ func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) 
 func (p gosigarCidProvider) getCid(cgroups cgroup.PathList) string {
 	// if regex is configured
 	if p.cgroupRegex != nil {
-		re := regexp.MustCompile(*p.cgroupRegex)
 		for _, path := range cgroups.Flatten() {
-			rs := re.FindStringSubmatch(path.ControllerPath)
+			rs := p.cgroupRegex.FindStringSubmatch(path.ControllerPath)
 			if len(rs) > 1 {
 				return rs[1]
 			}
