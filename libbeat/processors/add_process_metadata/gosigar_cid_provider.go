@@ -39,7 +39,6 @@ type gosigarCidProvider struct {
 	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
 	cgroupRegex        *regexp.Regexp
-	cidRegex           *regexp.Regexp
 	processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error)
 	pidCidCache        *common.Cache
 }
@@ -78,7 +77,6 @@ func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRe
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		cgroupRegex:        cgroupRegex,
-		cidRegex:           regexp.MustCompile(`([0-9a-f]{64})`),
 		processCgroupPaths: processCgroupPaths,
 		pidCidCache:        pidCidCache,
 	}

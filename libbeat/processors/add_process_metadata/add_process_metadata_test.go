@@ -1122,7 +1122,7 @@ func TestV2CID(t *testing.T) {
 		}
 		return testMap, nil
 	}
-	provider := newCidProvider(resolve.NewTestResolver(""), []string{}, nil, processCgroupPaths, nil)
+	provider := newCidProvider(resolve.NewTestResolver(""), nil, defaultCgroupRegex, processCgroupPaths, nil)
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
