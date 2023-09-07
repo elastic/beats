@@ -45,7 +45,6 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 type journeyEnricher struct {
 	journeyComplete bool
 	journey         *Journey
-	errorCount      int
 	error           error
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
