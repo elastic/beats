@@ -45,12 +45,7 @@ func (in *cursorInput) Test(src inputcursor.Source, _ v2.TestContext) error {
 
 // Run starts the input and blocks until it ends the execution.
 // It will return on context cancellation, any other error will be retried.
-func (in *cursorInput) Run(
-	ctx v2.Context,
-	src inputcursor.Source,
-	cursor inputcursor.Cursor,
-	publisher inputcursor.Publisher,
-) error {
+func (in *cursorInput) Run(ctx v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	s := src.(*source)
-	return runWithMetrics(ctx, s.config, publisher, &cursor)
+	return runWithMetrics(ctx, s.config, pub, &crsr)
 }

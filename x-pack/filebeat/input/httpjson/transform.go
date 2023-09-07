@@ -17,8 +17,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const logName = "httpjson.transforms"
-
 type transformsConfig []*conf.C
 
 type transforms []transform
@@ -189,18 +187,9 @@ type basicTransform interface {
 	run(*transformContext, transformable) (transformable, error)
 }
 
-type maybeMsg struct {
-	err error
-	msg mapstr.M
-}
-
-func (e maybeMsg) failed() bool { return e.err != nil }
-
-func (e maybeMsg) Error() string { return e.err.Error() }
-
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
 func newTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
-	var trans transforms
+	trans := make(transforms, 0, len(config))
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
 			return nil, fmt.Errorf(
@@ -238,7 +227,7 @@ func newBasicTransformsFromConfig(registeredTransforms registry, config transfor
 		return nil, err
 	}
 
-	var rts []basicTransform
+	rts := make([]basicTransform, 0, len(ts))
 	for _, t := range ts {
 		rt, ok := t.(basicTransform)
 		if !ok {

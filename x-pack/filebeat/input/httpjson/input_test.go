@@ -374,8 +374,6 @@ var testCases = []struct {
 		},
 	},
 	{
-		skipReason: "flakey test - see https://github.com/elastic/beats/issues/34929",
-
 		name: "first_event",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)

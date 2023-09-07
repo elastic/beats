@@ -707,7 +707,7 @@ func TestSplit(t *testing.T) {
 			events := &stream{t: t}
 			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
 			assert.NoError(t, err)
-			err = split.run(tc.ctx, tc.resp, events)
+			err = split.run(context.Background(), tc.ctx, tc.resp, events)
 			if tc.expectedErr == nil {
 				assert.NoError(t, err)
 			} else {
@@ -726,10 +726,10 @@ type stream struct {
 	t         *testing.T
 }
 
-func (s *stream) event(_ context.Context, msg mapstr.M) {
+func (s *stream) handleEvent(_ context.Context, msg mapstr.M) {
 	s.collected = append(s.collected, msg)
 }
 
-func (s *stream) fail(err error) {
+func (s *stream) handleError(err error) {
 	s.t.Errorf("fail: %v", err)
 }
