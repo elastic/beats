@@ -101,12 +101,15 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	if !ok {
 		return errors.New("collection 'totals' are not a map")
 	}
-
+	collectedCollectionDataNum := 0
 	for group, info := range totals {
 		if group == "note" {
 			continue
 		}
-
+		// 如果已采集的collection的数量大于定义的，那么不再采集数据
+		if collectedCollectionDataNum >= m.Config.MaxCollectionNum {
+			break
+		}
 		infoMap, ok := info.(map[string]interface{})
 		if !ok {
 			reporter.Error(errors.New("unexpected data returned by mongodb"))
@@ -122,6 +125,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		reporter.Event(mb.Event{
 			MetricSetFields: event,
 		})
+		collectedCollectionDataNum += 1
 	}
 
 	databaseNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
@@ -138,6 +142,9 @@ OutLoop:
 			continue
 		}
 		for _, collectionName := range collectionNames {
+			if collectedCollectionNum >= m.Config.MaxCollectionNum {
+				break OutLoop
+			}
 			res = db.RunCommand(context.Background(), bson.D{bson.E{Key: "collStats", Value: collectionName}})
 			if err = res.Err(); err != nil {
 				m.Logger().Errorf("'collStats %s' command returned an error: %w", collectionName, err)
@@ -159,9 +166,7 @@ OutLoop:
 				MetricSetFields: event,
 			})
 			collectedCollectionNum += 1
-			if collectedCollectionNum >= m.Config.MaxCollectionNum {
-				break OutLoop
-			}
+
 		}
 	}
 
