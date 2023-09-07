@@ -84,7 +84,6 @@ func TestAddProcessMetadata(t *testing.T) {
 		testMap := map[int]cgroup.PathList{
 			1: {
 				V1: map[string]cgroup.ControllerPath{
-
 					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -102,7 +101,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 			2: {
 				V1: map[string]cgroup.ControllerPath{
-
 					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -805,7 +803,6 @@ func TestUsingCache(t *testing.T) {
 	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
 		testStruct := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
-
 				"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -1377,7 +1374,7 @@ func TestAddProcessMetadataWithV2(t *testing.T) {
 // TestDefaultCgroupRegex verifies that defaultCgroupRegex matches the most common
 // container runtime and container orchestrator cgroup paths.
 func TestDefaultCgroupRegex(t *testing.T) {
-	var testCases = []struct {
+	testCases := []struct {
 		TestName    string
 		CgroupPath  string
 		ContainerID string

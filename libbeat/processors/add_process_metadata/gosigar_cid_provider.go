@@ -44,7 +44,6 @@ type gosigarCidProvider struct {
 }
 
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
-
 	var cid string
 	var ok bool
 
@@ -57,7 +56,6 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	}
 
 	cgroups, err := p.getProcessCgroups(pid)
-
 	if err != nil {
 		p.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 	}
@@ -85,7 +83,6 @@ func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRe
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
 func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) {
-
 	var cgroup cgroup.PathList
 
 	cgroup, err := p.processCgroupPaths(p.hostPath, pid)
