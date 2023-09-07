@@ -716,6 +716,13 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "invalid cgroup_regex configured",
+			config: mapstr.M{
+				"cgroup_regex": "",
+			},
+			initErr: errors.New("fail to unpack the add_process_metadata configuration: cgroup_regexp must contain exactly one capturing group for the container ID accessing config"),
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := conf.NewConfigFrom(test.config)
