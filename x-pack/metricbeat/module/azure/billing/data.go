@@ -60,6 +60,10 @@ func EventsMapping(
 						"group": legacy.Properties.ResourceGroup,
 					},
 				}
+				if len(legacy.Tags) > 0 {
+					_, _ = event.ModuleFields.Put("resource.tags", legacy.Tags)
+				}
+
 				event.MetricSetFields = mapstr.M{
 					// original fields
 					"billing_period_id": legacy.ID,
@@ -96,6 +100,10 @@ func EventsMapping(
 						"group": strings.ToLower(*modern.Properties.ResourceGroup),
 					},
 				}
+				if len(modern.Tags) > 0 {
+					_, _ = event.ModuleFields.Put("resource.tags", modern.Tags)
+				}
+
 				event.MetricSetFields = mapstr.M{
 					// original fields
 					"billing_period_id": modern.ID,
