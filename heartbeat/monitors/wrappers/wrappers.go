@@ -18,7 +18,6 @@
 package wrappers
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -27,7 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -67,7 +65,6 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, len(js) > 1),
 		addMonitorStatus(nil),
-		addMonitorErr,
 	)
 }
 
@@ -81,7 +78,6 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
 		addMonitorStatus(byEventType("heartbeat/summary")),
-		addMonitorErr,
 	)
 }
 
@@ -189,27 +185,6 @@ func addMonitorStatus(match EventMatcher) jobs.JobWrapper {
 
 			return cont, err
 		}
-	}
-}
-
-func addMonitorErr(origJob jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		cont, err := origJob(event)
-
-		if err != nil {
-			var errVal interface{}
-			var asECS *ecserr.ECSErr
-			if errors.As(err, &asECS) {
-				// Override the message of the error in the event it was wrapped
-				asECS.Message = err.Error()
-				errVal = asECS
-			} else {
-				errVal = look.Reason(err)
-			}
-			eventext.MergeEventFields(event, mapstr.M{"error": errVal})
-		}
-
-		return cont, nil
 	}
 }
 

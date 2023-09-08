@@ -30,17 +30,18 @@ type LightweightDurationSumPlugin struct {
 	startedAt *time.Time
 }
 
-func (lwdsp *LightweightDurationSumPlugin) EachEvent(event *beat.Event) {
+func (lwdsp *LightweightDurationSumPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
 	// Effectively only runs once, on the first event
 	if lwdsp.startedAt == nil {
 		now := time.Now()
 		lwdsp.startedAt = &now
 	}
+	return 0
 }
 
-func (lwdsp *LightweightDurationSumPlugin) OnSummary(event *beat.Event) bool {
+func (lwdsp *LightweightDurationSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(time.Since(*lwdsp.startedAt)))
-	return false
+	return 0
 }
 
 // BrowserDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
@@ -50,7 +51,7 @@ type BrowserDurationSumPlugin struct {
 	endedAt   *time.Time
 }
 
-func (bwdsp *BrowserDurationSumPlugin) EachEvent(event *beat.Event) {
+func (bwdsp *BrowserDurationSumPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
 	// Effectively only runs once, on the first event
 	et, _ := event.GetValue("synthetics.type")
 	if et == "journey/start" {
@@ -58,9 +59,11 @@ func (bwdsp *BrowserDurationSumPlugin) EachEvent(event *beat.Event) {
 	} else if et == "journey/end" {
 		bwdsp.endedAt = &event.Timestamp
 	}
+
+	return 0
 }
 
-func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) bool {
+func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if bwdsp.startedAt == nil {
 		now := time.Now()
 		bwdsp.startedAt = &now
@@ -71,5 +74,5 @@ func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) bool {
 	}
 	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(bwdsp.endedAt.Sub(*bwdsp.startedAt)))
 
-	return false
+	return 0
 }

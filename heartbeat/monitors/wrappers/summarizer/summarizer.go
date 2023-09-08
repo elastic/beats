@@ -41,13 +41,27 @@ type Summarizer struct {
 	startedAt      time.Time
 }
 
+// EachEventActions is a set of options to inform execution after the EachEvent callback
+type EachEventActions uint8
+
+// DropErrEvent if will remove the error from the job return.
+// Octal val like chmod
+const DropErrEvent = 1
+
+// OnSummaryActions is a set of options to inform execution after the OnSummary callback
+// Octal val like chmod
+type OnSummaryActions uint8
+
+// RetryOnSummary will retry the job once complete.
+const RetryOnSummary = 1
+
 // SummarizerPlugin encapsulates functionality for the Summarizer that's easily expressed
 // in one location. Prior to this code was strewn about a bit more and following it was
 // a bit trickier.
 type SummarizerPlugin interface {
-	EachEvent(event *beat.Event)
+	EachEvent(event *beat.Event, err error) EachEventActions
 	// If at least one plugin returns true a retry will be performed
-	OnSummary(event *beat.Event) (doRetry bool)
+	OnSummary(event *beat.Event) OnSummaryActions
 }
 
 // JobSummary is the struct that is serialized in the `summary` field in the emitted event.
@@ -66,13 +80,14 @@ func (js *JobSummary) String() string {
 }
 
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
-	plugins := make([]SummarizerPlugin, 0, 2)
+	var durPlugin SummarizerPlugin
 	if sf.Type == "browser" {
-		plugins = append(plugins, &BrowserDurationSumPlugin{})
+		durPlugin = &BrowserDurationSumPlugin{}
 	} else {
-		plugins = append(plugins, &LightweightDurationSumPlugin{})
+		durPlugin = &LightweightDurationSumPlugin{}
 	}
-	plugins = append(plugins, NewStateStatusPlugin(mst, sf))
+
+	plugins := []SummarizerPlugin{durPlugin, &ErrSumPlugin{}, NewStateStatusPlugin(mst, sf)}
 
 	return &Summarizer{
 		rootJob:        rootJob,
@@ -108,7 +123,7 @@ func (js *JobSummary) BumpAttempt() {
 // This adds the state and summary top level fields.
 func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		conts, jobErr := j(event)
+		conts, eventErr := j(event)
 
 		s.mtx.Lock()
 		defer s.mtx.Unlock()
@@ -118,14 +133,17 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 		s.contsRemaining += uint16(len(conts))
 
 		for _, plugin := range s.plugins {
-			plugin.EachEvent(event)
+			actions := plugin.EachEvent(event, eventErr)
+			if actions&DropErrEvent != 0 {
+				eventErr = nil
+			}
 		}
 
 		if s.contsRemaining == 0 {
 			var retry bool
 			for _, plugin := range s.plugins {
-				doRetry := plugin.OnSummary(event)
-				if doRetry {
+				actions := plugin.OnSummary(event)
+				if actions&RetryOnSummary != 0 {
 					retry = true
 				}
 			}
@@ -156,6 +174,6 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			conts[i] = s.Wrap(cont)
 		}
 
-		return conts, jobErr
+		return conts, eventErr
 	}
 }

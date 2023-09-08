@@ -54,7 +54,7 @@ func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMo
 	}
 }
 
-func (ssp *StateStatusPlugin) EachEvent(event *beat.Event) {
+func (ssp *StateStatusPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
 	monitorStatus, err := event.GetValue("monitor.status")
 	if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
 		mss := monitorstate.StateStatus(monitorStatus.(string))
@@ -67,9 +67,11 @@ func (ssp *StateStatusPlugin) EachEvent(event *beat.Event) {
 	}
 
 	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
+
+	return 0
 }
 
-func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
+func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if ssp.js.Down > 0 {
 		ssp.js.Status = monitorstate.StatusDown
 	} else {
@@ -81,7 +83,7 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
 	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
 	// FinalAttempt is true if no retries will occur
-	retry = ssp.js.Status == monitorstate.StatusDown && ssp.js.Attempt < ssp.js.MaxAttempts
+	retry := ssp.js.Status == monitorstate.StatusDown && ssp.js.Attempt < ssp.js.MaxAttempts
 	ssp.js.FinalAttempt = !retry
 
 	ms := ssp.stateTracker.RecordStatus(ssp.sf, ssp.js.Status, ssp.js.FinalAttempt)
@@ -108,5 +110,9 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) (retry bool) {
 	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	logger.LogRun(event)
-	return !ssp.js.FinalAttempt
+
+	if retry {
+		return RetryOnSummary
+	}
+	return 0
 }
