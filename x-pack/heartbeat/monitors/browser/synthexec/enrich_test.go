@@ -13,6 +13,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
@@ -204,81 +206,65 @@ func TestEnrichSynthEvent(t *testing.T) {
 				testslike.Test(t, v, e.Fields)
 			},
 		},
-		/*
-			{
-				// If a journey did not emit `journey/end` but exited without
-				// errors, we consider the journey to be up.
-				"cmd/status - without error",
-				&SynthEvent{
-					Type:  CmdStatus,
-					Error: nil,
-				},
-				true,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					v := lookslike.MustCompile(mapstr.M{
-						"event": map[string]string{
-							"type": "heartbeat/summary",
-						},
-					})
-					testslike.Test(t, v, e.Fields)
-				},
+		{
+			// If a journey did not emit `journey/end` but exited without
+			// errors, we consider the journey to be up.
+			"cmd/status - without error",
+			&SynthEvent{
+				Type:  CmdStatus,
+				Error: nil,
 			},
-			{
-				"journey/end",
-				&SynthEvent{Type: JourneyEnd},
-				false,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					v := lookslike.MustCompile(mapstr.M{
-						"event": map[string]string{
-							"type": "heartbeat/summary",
-						},
-					})
-					testslike.Test(t, v, e.Fields)
-				},
+			false,
+			nil,
+		},
+		{
+			"journey/end",
+			&SynthEvent{Type: JourneyEnd},
+			false,
+			nil,
+		},
+		{
+			"step/end",
+			&SynthEvent{Type: "step/end"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, 1, je.stepCount)
 			},
-			{
-				"step/end",
-				&SynthEvent{Type: "step/end"},
-				false,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					require.Equal(t, 1, je.stepCount)
-				},
+		},
+		{
+			"step/screenshot",
+			&SynthEvent{Type: "step/screenshot"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
-			{
-				"step/screenshot",
-				&SynthEvent{Type: "step/screenshot"},
-				false,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
-				},
+		},
+		{
+			"step/screenshot_ref",
+			&SynthEvent{Type: "step/screenshot_ref"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
-			{
-				"step/screenshot_ref",
-				&SynthEvent{Type: "step/screenshot_ref"},
-				false,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
-				},
+		},
+		{
+			"step/screenshot_block",
+			&SynthEvent{Type: "screenshot/block", Id: "my_id"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "my_id", e.Meta["_id"])
+				require.Equal(t, events.OpTypeCreate, e.Meta[events.FieldMetaOpType])
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
-			{
-				"step/screenshot_block",
-				&SynthEvent{Type: "screenshot/block", Id: "my_id"},
-				false,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					require.Equal(t, "my_id", e.Meta["_id"])
-					require.Equal(t, events.OpTypeCreate, e.Meta[events.FieldMetaOpType])
-					require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
-				},
+		},
+		{
+			"journey/network_info",
+			&SynthEvent{Type: "journey/network_info"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "browser.network", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
-			{
-				"journey/network_info",
-				&SynthEvent{Type: "journey/network_info"},
-				false,
-				func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-					require.Equal(t, "browser.network", e.Meta[add_data_stream.FieldMetaCustomDataset])
-				},
-			},
-		*/
+		},
 	}
 
 	for _, tt := range tests {
@@ -288,7 +274,9 @@ func TestEnrichSynthEvent(t *testing.T) {
 			if err := je.enrichSynthEvent(e, tt.se); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
 				t.Errorf("journeyEnricher.enrichSynthEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			tt.check(t, e, je)
+			if tt.check != nil {
+				tt.check(t, e, je)
+			}
 		})
 	}
 }
