@@ -11,6 +11,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 - Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 - Upgrade Go to 1.20.7 {pull}36241[36241]
+- [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
+  Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 
 *Auditbeat*
 
