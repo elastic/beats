@@ -225,6 +225,7 @@ processors:
 				},
 			},
 		}).Do(context.Background())
+	require.NoError(t, err, "error doing search request: %s", err)
 	require.Equal(t, int64(2), res.Hits.Total.Value)
 	diff, err := diffDocs(res.Hits.Hits[0].Source_,
 		res.Hits.Hits[1].Source_)
@@ -256,9 +257,6 @@ func diffDocs(doc1 json.RawMessage, doc2 json.RawMessage) (string, error) {
 
 	for _, key := range fieldsToDrop {
 		_ = f1.Delete(key)
-	}
-
-	for _, key := range fieldsToDrop {
 		_ = f2.Delete(key)
 	}
 
