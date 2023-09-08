@@ -594,9 +594,10 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		case textparse.MetricTypeSummary:
 			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), &t, summariesByName)
 			metric.Label = labelPairs
-			if isSum(metricName) {
-				metricName = lookupMetricName
+			if !isSum(metricName) {
+				continue
 			}
+			metricName = lookupMetricName
 		case textparse.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
@@ -606,9 +607,10 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 				continue
 			}
 			metric.Label = labelPairs
-			if isSum(metricName) {
-				metricName = lookupMetricName
+			if !isSum(metricName) {
+				continue
 			}
+			metricName = lookupMetricName
 		case textparse.MetricTypeGaugeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
@@ -619,9 +621,10 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			}
 			metric.Label = labelPairs
 			metric.Histogram.IsGaugeHistogram = true
-			if isGSum(metricName) {
-				metricName = lookupMetricName
+			if !isGSum(metricName) {
+				continue
 			}
+			metricName = lookupMetricName
 		case textparse.MetricTypeStateset:
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
