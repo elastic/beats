@@ -62,6 +62,7 @@ func (m *Info) GetValue() int64 {
 	}
 	return 0
 }
+
 func (m *Info) HasValidValue() bool {
 	return m != nil && *m.Value == 1
 }
@@ -395,6 +396,10 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 	return name, metric
 }
 
+/*
+histogramMetricName returns the metric name without the suffix and its histogram.
+OpenMetric suffixes: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes.
+*/
 func histogramMetricName(name string, s float64, qv string, lbls string, t *int64, isGaugeHistogram bool, e *exemplar.Exemplar, histogramsByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
 	var histogram = &Histogram{}
 	var bucket = []*Bucket{}
@@ -404,21 +409,18 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	case isCount(name):
 		u := uint64(s)
 		histogram.SampleCount = &u
-		name = name[:len(name)-6]
+		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		histogram.SampleSum = &s
-		name = name[:len(name)-4]
+		name = strings.TrimSuffix(name, suffixSum)
 	case isGaugeHistogram && isGCount(name):
 		u := uint64(s)
 		histogram.SampleCount = &u
-		name = name[:len(name)-7]
+		name = strings.TrimSuffix(name, suffixGCount)
 	case isGaugeHistogram && isGSum(name):
 		histogram.SampleSum = &s
-		name = name[:len(name)-5]
-	default:
-		if isBucket(name) {
-			name = name[:len(name)-7]
-		}
+		name = strings.TrimSuffix(name, suffixGSum)
+	case isBucket(name):
 		f, err := strconv.ParseFloat(qv, 64)
 		if err != nil {
 			f = math.MaxUint64
@@ -433,6 +435,9 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 			}
 			bkt.Exemplar = e
 		}
+		name = strings.TrimSuffix(name, suffixBucket)
+	default:
+		return "", nil
 	}
 
 	_, k := histogramsByName[name]
@@ -537,15 +542,19 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		var lbls strings.Builder
 		lbls.Grow(len(mets))
 		var labelPairs = []*labels.Label{}
+		var qv string // value of le or quantile label
 		for _, l := range lset.Copy() {
 			if l.Name == labels.MetricName {
 				continue
 			}
 
-			if l.Name != model.QuantileLabel && l.Name != labels.BucketLabel { // quantile and le are special labels handled below
-
+			if l.Name != model.QuantileLabel && l.Name != labels.BucketLabel {
 				lbls.WriteString(l.Name)
 				lbls.WriteString(l.Value)
+			} else if l.Name == model.QuantileLabel {
+				qv = lset.Get(model.QuantileLabel)
+			} else {
+				qv = lset.Get(labels.BucketLabel)
 			}
 			n := l.Name
 			v := l.Value
@@ -568,8 +577,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
-				lookupMetricName = metricName[:len(metricName)-6]
+			if isTotal(metricName) && contentType == OpenMetricsType {
+				lookupMetricName = strings.TrimSuffix(metricName, suffixTotal)
 			} else {
 				lookupMetricName = metricName
 			}
@@ -583,33 +592,36 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
 			lookupMetricName = metricName
 		case textparse.MetricTypeSummary:
-			lookupMetricName, metric = summaryMetricName(metricName, v, lset.Get(model.QuantileLabel), lbls.String(), &t, summariesByName)
+			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), &t, summariesByName)
 			metric.Label = labelPairs
-			if !isSum(metricName) {
-				continue
+			if isSum(metricName) {
+				metricName = lookupMetricName
 			}
-			metricName = lookupMetricName
 		case textparse.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
-			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get(labels.BucketLabel), lbls.String(), &t, false, exm, histogramsByName)
-			metric.Label = labelPairs
-			if !isSum(metricName) {
+			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, false, exm, histogramsByName)
+			if metric == nil { // metric name does not have a suffix supported for the type histogram
 				continue
 			}
-			metricName = lookupMetricName
+			metric.Label = labelPairs
+			if isSum(metricName) {
+				metricName = lookupMetricName
+			}
 		case textparse.MetricTypeGaugeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
-			lookupMetricName, metric = histogramMetricName(metricName, v, lset.Get(labels.BucketLabel), lbls.String(), &t, true, exm, histogramsByName)
-			metric.Label = labelPairs
-			metric.Histogram.IsGaugeHistogram = true
-			if !isGSum(metricName) {
+			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, true, exm, histogramsByName)
+			if metric == nil { // metric name does not have a suffix supported for the type gauge histogram
 				continue
 			}
-			metricName = lookupMetricName
+			metric.Label = labelPairs
+			metric.Histogram.IsGaugeHistogram = true
+			if isGSum(metricName) {
+				metricName = lookupMetricName
+			}
 		case textparse.MetricTypeStateset:
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
