@@ -49,6 +49,10 @@ func (esp *ErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventA
 	}
 	mergeErrVal(event, errVal)
 
+	if esp.firstErrVal == nil {
+		esp.firstErrVal = errVal
+	}
+
 	return DropErrEvent
 }
 

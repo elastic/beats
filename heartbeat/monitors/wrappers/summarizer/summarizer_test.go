@@ -172,6 +172,10 @@ func TestSummarizer(t *testing.T) {
 					if summary != nil {
 						rcvdSummaries = append(rcvdSummaries, summary)
 						require.GreaterOrEqual(t, duration, int64(0))
+						// down summaries should always have errors
+						if eventStatusStr == "down" {
+							require.NotNil(t, event.Fields["error"])
+						}
 					} else {
 						require.Nil(t, duration)
 					}
