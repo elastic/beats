@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -144,9 +145,13 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				if actions&RetryOnSummary != 0 {
 					retry = true
 				}
+
 			}
 
-			if retry {
+			if !retry {
+				// on final run emits a metric for the service when summary events are complete
+				logger.LogRun(event)
+			} else {
 				// Bump the job summary for the next attempt
 				s.contsRemaining = 1
 

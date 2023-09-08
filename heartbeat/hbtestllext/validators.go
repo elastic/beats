@@ -36,6 +36,7 @@ var HasEventType = lookslike.MustCompile(map[string]interface{}{
 	"event": map[string]interface{}{
 		"type": isdef.Optional(isdef.IsNonEmptyString),
 	},
+	"synthetics.type": isdef.Optional(isdef.IsNonEmptyString),
 })
 
 var OptionalDuration = lookslike.MustCompile(map[string]interface{}{

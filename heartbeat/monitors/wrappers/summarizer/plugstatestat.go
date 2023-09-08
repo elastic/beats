@@ -23,7 +23,6 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -108,8 +107,6 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	}
 
 	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
-
-	logger.LogRun(event)
 
 	if retry {
 		return RetryOnSummary
