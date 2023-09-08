@@ -44,6 +44,8 @@ func (lwdsp *LightweightDurationSumPlugin) OnSummary(event *beat.Event) OnSummar
 	return 0
 }
 
+func (lwdsp *LightweightDurationSumPlugin) OnRetry() {}
+
 // BrowserDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
 // for browser monitors.
 type BrowserDurationSumPlugin struct {
@@ -76,3 +78,5 @@ func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) OnSummaryAct
 
 	return 0
 }
+
+func (bwdsp *BrowserDurationSumPlugin) OnRetry() {}

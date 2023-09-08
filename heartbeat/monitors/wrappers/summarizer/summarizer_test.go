@@ -175,6 +175,8 @@ func TestSummarizer(t *testing.T) {
 						// down summaries should always have errors
 						if eventStatusStr == "down" {
 							require.NotNil(t, event.Fields["error"])
+						} else {
+							require.Nil(t, event.Fields["error"])
 						}
 					} else {
 						require.Nil(t, duration)

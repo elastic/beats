@@ -63,6 +63,10 @@ func (esp *ErrSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	return 0
 }
 
+func (esp *ErrSumPlugin) OnRetry() {
+	esp.firstErrVal = nil
+}
+
 func mergeErrVal(event *beat.Event, errVal interface{}) {
 	eventext.MergeEventFields(event, mapstr.M{"error": errVal})
 }

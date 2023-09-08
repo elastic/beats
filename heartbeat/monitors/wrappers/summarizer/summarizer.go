@@ -59,9 +59,13 @@ const RetryOnSummary = 1
 // in one location. Prior to this code was strewn about a bit more and following it was
 // a bit trickier.
 type SummarizerPlugin interface {
+	// EachEvent is called on each event, and allows for the mutation of events
 	EachEvent(event *beat.Event, err error) EachEventActions
 	// If at least one plugin returns true a retry will be performed
 	OnSummary(event *beat.Event) OnSummaryActions
+	// OnRetry is called before the first EachEvent in the event of a retry
+	// can be used for resetting state between retries
+	OnRetry()
 }
 
 // JobSummary is the struct that is serialized in the `summary` field in the emitted event.
@@ -167,12 +171,14 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
 				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
 					return func(event *beat.Event) ([]jobs.Job, error) {
+						for _, p := range s.plugins {
+							p.OnRetry()
+						}
 						time.Sleep(s.retryDelay)
 						return j(event)
 					}
 				})
 
-				s.setupPlugins()
 				conts = []jobs.Job{delayedRootJob}
 			}
 		}

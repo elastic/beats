@@ -113,3 +113,5 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	}
 	return 0
 }
+
+func (ssp *StateStatusPlugin) OnRetry() {}
