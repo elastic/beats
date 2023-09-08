@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -67,6 +68,12 @@ var testMonFields = stdfields.StdMonitorFields{
 	MaxAttempts: 1,
 }
 
+var testBrowserMonFields = stdfields.StdMonitorFields{
+	Type:     "browser",
+	Schedule: schedule.MustParse("@every 1s"),
+	Timeout:  1,
+}
+
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Helper()
 	t.Run(tt.name, func(t *testing.T) {
@@ -83,12 +90,16 @@ func testCommonWrap(t *testing.T, tt testDef) {
 		assert.Len(t, results, len(tt.want), "Expected test def wants to correspond exactly to number results.")
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
+
 				want := tt.want[idx]
-				testslike.Test(t, want, r.Fields)
+				z := testslike.Test(t, lookslike.Strict(want), r.Fields)
+				if !z.Valid {
+					fmt.Println("INValid")
+				}
 
 				if tt.metaWant != nil {
 					metaWant := tt.metaWant[idx]
-					testslike.Test(t, metaWant, r.Meta)
+					testslike.Test(t, lookslike.Strict(metaWant), r.Meta)
 				}
 
 			})
@@ -119,6 +130,7 @@ func TestSimpleJob(t *testing.T) {
 					},
 				}),
 				hbtestllext.MonitorTimespanValidator,
+				hbtestllext.HasEventType,
 				stateValidator(),
 				summarizertesthelper.SummaryValidator(1, 0),
 			)},
@@ -196,6 +208,7 @@ func TestAdditionalStdFields(t *testing.T) {
 								"check_group": isdef.IsString,
 							},
 						}),
+						hbtestllext.HasEventType,
 						stateValidator(),
 						hbtestllext.MonitorTimespanValidator,
 						summarizertesthelper.SummaryValidator(1, 0),
@@ -215,6 +228,7 @@ func TestErrorJob(t *testing.T) {
 
 	errorJobValidator := lookslike.Compose(
 		stateValidator(),
+		hbtestllext.HasEventType,
 		lookslike.MustCompile(map[string]interface{}{"error": map[string]interface{}{"message": "myerror", "type": "io"}}),
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
@@ -260,6 +274,7 @@ func TestMultiJobNoConts(t *testing.T) {
 				},
 			}),
 			stateValidator(),
+			hbtestllext.HasEventType,
 			hbtestllext.MonitorTimespanValidator,
 			summarizertesthelper.SummaryValidator(1, 0),
 		)
@@ -298,8 +313,10 @@ func TestMultiJobConts(t *testing.T) {
 		return lookslike.Compose(
 			urlValidator(t, u),
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
+			hbtestllext.HasEventType,
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
+					"duration.us": isdef.Optional(hbtestllext.IsInt64),
 					"id":          uniqScope.IsUniqueTo(u),
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
@@ -416,6 +433,7 @@ func TestRetryMultiCont(t *testing.T) {
 	contJobValidator := func(u string, msg string) validator.Validator {
 		return lookslike.Compose(
 			urlValidator(t, u),
+			hbtestllext.HasEventType,
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"error": map[string]interface{}{
@@ -448,11 +466,13 @@ func TestRetryMultiCont(t *testing.T) {
 				lookslike.Compose(
 					contJobValidator("http://foo.com", "2nd"),
 					summarizertesthelper.SummaryValidator(expected.js.Up, expected.js.Down),
+					hbtestllext.OptionalDuration,
 				),
 				contJobValidator("http://foo.com", "1st"),
 				lookslike.Compose(
 					contJobValidator("http://foo.com", "2nd"),
 					summarizertesthelper.SummaryValidator(expected.js.Up, expected.js.Down),
+					hbtestllext.OptionalDuration,
 				),
 			},
 			nil,
@@ -484,6 +504,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 	contJobValidator := func(u string, msg string) validator.Validator {
 		return lookslike.Compose(
 			urlValidator(t, u),
+			hbtestllext.HasEventType,
 			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
 			lookslike.MustCompile(map[string]interface{}{
 				"monitor": map[string]interface{}{
@@ -511,6 +532,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			lookslike.Compose(
 				contJobValidator("http://foo.com", "2nd"),
 				summarizertesthelper.SummaryValidator(1, 0),
+				hbtestllext.OptionalDuration,
 			),
 			lookslike.Compose(
 				contJobValidator("http://bar.com", "1st"),
@@ -518,6 +540,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 			lookslike.Compose(
 				contJobValidator("http://bar.com", "2nd"),
 				summarizertesthelper.SummaryValidator(1, 0),
+				hbtestllext.OptionalDuration,
 			),
 		},
 		[]validator.Validator{
@@ -588,6 +611,232 @@ func TestTimespan(t *testing.T) {
 			if got := timespan(tt.args.started, tt.args.sched, tt.args.timeout); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("timespan() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+type BrowserMonitor struct {
+	id         string
+	name       string
+	checkGroup string
+	durationMs int64
+}
+
+var inlineMonitorValues = BrowserMonitor{
+	id:         "inline",
+	name:       "inline",
+	checkGroup: "inline-check-group",
+}
+
+func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
+	parsed, err := url.Parse(u)
+	require.NoError(t, err)
+	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.MergeEventFields(event, mapstr.M{
+			"url": URLFields(parsed),
+			"monitor": mapstr.M{
+				"type":   "browser",
+				"status": "up",
+			},
+		})
+		return nil, nil
+	}
+}
+
+func TestInlineBrowserJob(t *testing.T) {
+	sFields := testBrowserMonFields
+	sFields.ID = inlineMonitorValues.id
+	sFields.Name = inlineMonitorValues.name
+	testCommonWrap(t, testDef{
+		"simple",
+		sFields,
+		[]jobs.Job{makeInlineBrowserJob(t, "http://foo.com")},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, "http://foo.com"),
+					lookslike.MustCompile(map[string]interface{}{
+						"state": isdef.Optional(hbtestllext.IsMonitorState),
+						"monitor": map[string]interface{}{
+							"type":        "browser",
+							"id":          inlineMonitorValues.id,
+							"name":        inlineMonitorValues.name,
+							"check_group": isdef.IsString,
+							"status":      "up",
+						},
+					}),
+					summarizertesthelper.SummaryValidator(1, 0),
+					hbtestllext.MonitorTimespanValidator,
+				),
+			),
+		},
+		nil,
+		nil,
+	})
+}
+
+var projectMonitorValues = BrowserMonitor{
+	id:         "project-journey_1",
+	name:       "project-Journey 1",
+	checkGroup: "journey-1-check-group",
+	durationMs: time.Second.Microseconds(),
+}
+
+func makeProjectBrowserJob(t *testing.T, u string, summary bool, projectErr error, bm BrowserMonitor) jobs.Job {
+	parsed, err := url.Parse(u)
+	require.NoError(t, err)
+	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.SetMeta(event, logger.META_STEP_COUNT, 2)
+		eventext.MergeEventFields(event, mapstr.M{
+			"url": URLFields(parsed),
+			"monitor": mapstr.M{
+				"type":     "browser",
+				"id":       bm.id,
+				"name":     bm.name,
+				"status":   "up",
+				"duration": mapstr.M{"us": bm.durationMs},
+			},
+		})
+		if summary {
+			eventext.MergeEventFields(event, mapstr.M{
+				"event": mapstr.M{
+					"type": "heartbeat/summary",
+				},
+			})
+		}
+		return nil, projectErr
+	}
+}
+
+var browserLogValidator = func(monId string, expectedDurationUs int64, stepCount int, status string) func(t *testing.T, events []*beat.Event, observed []observer.LoggedEntry) {
+	return func(t *testing.T, events []*beat.Event, observed []observer.LoggedEntry) {
+		require.Len(t, observed, 1)
+		require.Equal(t, "Monitor finished", observed[0].Message)
+
+		expectedMonitor := logger.MonitorRunInfo{
+			MonitorID: monId,
+			Type:      "browser",
+			Duration:  expectedDurationUs,
+			Status:    status,
+			Steps:     &stepCount,
+		}
+		require.ElementsMatch(t, []zap.Field{
+			logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
+			logp.Any("monitor", &expectedMonitor),
+		}, observed[0].Context)
+	}
+}
+
+func TestProjectBrowserJob(t *testing.T) {
+	sFields := testBrowserMonFields
+	sFields.ID = projectMonitorValues.id
+	sFields.Name = projectMonitorValues.name
+	sFields.Origin = "my-origin"
+	urlStr := "http://foo.com"
+	urlU, _ := url.Parse(urlStr)
+
+	expectedMonFields := lookslike.Compose(
+		lookslike.MustCompile(map[string]interface{}{
+			"state": isdef.Optional(hbtestllext.IsMonitorState),
+			"monitor": map[string]interface{}{
+				"type":        "browser",
+				"id":          projectMonitorValues.id,
+				"name":        projectMonitorValues.name,
+				"duration":    mapstr.M{"us": time.Second.Microseconds()},
+				"origin":      "my-origin",
+				"check_group": isdef.IsString,
+				"timespan": mapstr.M{
+					"gte": hbtestllext.IsTime,
+					"lt":  hbtestllext.IsTime,
+				},
+				"status": isdef.IsString,
+			},
+			"url": URLFields(urlU),
+		}),
+	)
+
+	testCommonWrap(t, testDef{
+		"simple", // has no summary fields!
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, false, nil, projectMonitorValues)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					summarizertesthelper.SummaryValidator(1, 0),
+					urlValidator(t, urlStr),
+					expectedMonFields,
+				))},
+		nil,
+		nil,
+	})
+	testCommonWrap(t, testDef{
+		"with up summary",
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, nil, projectMonitorValues)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
+					summarizertesthelper.SummaryValidator(1, 0),
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{"status": "up"},
+						"event": map[string]interface{}{
+							"type": "heartbeat/summary",
+						},
+					}),
+				))},
+		nil,
+		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2, "up"),
+	})
+	testCommonWrap(t, testDef{
+		"with down summary",
+		sFields,
+		[]jobs.Job{makeProjectBrowserJob(t, urlStr, true, fmt.Errorf("testerr"), projectMonitorValues)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
+					summarizertesthelper.SummaryValidator(0, 1),
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{"status": "down"},
+						"error": map[string]interface{}{
+							"type":    isdef.IsString,
+							"message": "testerr",
+						},
+						"event": map[string]interface{}{
+							"type": "heartbeat/summary",
+						},
+					}),
+				))},
+		nil,
+		browserLogValidator(projectMonitorValues.id, time.Second.Microseconds(), 2, "down"),
+	})
+}
+
+func TestECSErrors(t *testing.T) {
+	// key is test name, value is whether to test a summary event or not
+	testCases := map[string]bool{
+		"on summary event":     true,
+		"on non-summary event": false,
+	}
+
+	ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
+	wrappedECSErr := fmt.Errorf("wrapped: %w", ecse)
+	expectedECSErr := ecserr.NewECSErr(
+		ecse.Type,
+		ecse.Code,
+		wrappedECSErr.Error(),
+	)
+
+	for name, makeSummaryEvent := range testCases {
+		t.Run(name, func(t *testing.T) {
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil)
+			event := &beat.Event{}
+			_, err := j[0](event)
+			require.NoError(t, err)
+			require.Equal(t, expectedECSErr, event.Fields["error"])
 		})
 	}
 }
