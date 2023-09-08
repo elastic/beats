@@ -37,6 +37,7 @@ type Summarizer struct {
 	contsRemaining uint16
 	mtx            *sync.Mutex
 	sf             stdfields.StdMonitorFields
+	mst            *monitorstate.Tracker
 	retryDelay     time.Duration
 	plugins        []SummarizerPlugin
 	startedAt      time.Time
@@ -79,24 +80,28 @@ func (js *JobSummary) String() string {
 }
 
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
+	s := &Summarizer{
+		rootJob:        rootJob,
+		contsRemaining: 1,
+		mtx:            &sync.Mutex{},
+		mst:            mst,
+		sf:             sf,
+		retryDelay:     time.Second,
+		startedAt:      time.Now(),
+	}
+	s.setupPlugins()
+	return s
+}
+
+func (s *Summarizer) setupPlugins() {
 	var durPlugin SummarizerPlugin
-	if sf.Type == "browser" {
+	if s.sf.Type == "browser" {
 		durPlugin = &BrowserDurationSumPlugin{}
 	} else {
 		durPlugin = &LightweightDurationSumPlugin{}
 	}
 
-	plugins := []SummarizerPlugin{durPlugin, &ErrSumPlugin{}, NewStateStatusPlugin(mst, sf)}
-
-	return &Summarizer{
-		rootJob:        rootJob,
-		contsRemaining: 1,
-		mtx:            &sync.Mutex{},
-		sf:             sf,
-		retryDelay:     time.Second,
-		startedAt:      time.Now(),
-		plugins:        plugins,
-	}
+	s.plugins = []SummarizerPlugin{durPlugin, &ErrSumPlugin{}, NewStateStatusPlugin(s.mst, s.sf)}
 }
 
 func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
@@ -167,6 +172,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 					}
 				})
 
+				s.setupPlugins()
 				conts = []jobs.Job{delayedRootJob}
 			}
 		}
