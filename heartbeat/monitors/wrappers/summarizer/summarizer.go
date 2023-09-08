@@ -41,15 +41,13 @@ type Summarizer struct {
 	startedAt      time.Time
 }
 
-// EachEventActions is a set of options to inform execution after the EachEvent callback
+// EachEventActions is a set of options using bitmasks to inform execution after the EachEvent callback
 type EachEventActions uint8
 
 // DropErrEvent if will remove the error from the job return.
-// Octal val like chmod
 const DropErrEvent = 1
 
-// OnSummaryActions is a set of options to inform execution after the OnSummary callback
-// Octal val like chmod
+// OnSummaryActions is a set of options using bitmasks to inform execution after the OnSummary callback
 type OnSummaryActions uint8
 
 // RetryOnSummary will retry the job once complete.
