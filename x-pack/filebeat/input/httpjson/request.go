@@ -152,14 +152,14 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				// reformat urls of requestFactory using ids
 				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
-					return fmt.Errorf("failed to generate new URL: %w", err)
+					return fmt.Errorf("failed to generate new url: %w", err)
 				}
 
 				// reformat url accordingly if replaceWith clause exists
 				if doReplaceWith {
 					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 					if err != nil {
-						return fmt.Errorf("failed to generate new URL: %w", err)
+						return fmt.Errorf("failed to generate new url with replacement: %w", err)
 					}
 				}
 				// collect data from new urls
@@ -663,14 +663,14 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			// reformat urls of requestFactory using ids
 			rf.url, err = generateNewUrl(rf.replace, urlString, id)
 			if err != nil {
-				return -1, fmt.Errorf("failed to generate new url: %w", err)
+				return -1, fmt.Errorf("failed to generate new url for chain: %w", err)
 			}
 
 			// reformat url accordingly if replaceWith clause exists
 			if doReplaceWith {
 				rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 				if err != nil {
-					return n, fmt.Errorf("failed to generate new url: %w", err)
+					return n, fmt.Errorf("failed to generate new url for chain replacement: %w", err)
 				}
 			}
 
