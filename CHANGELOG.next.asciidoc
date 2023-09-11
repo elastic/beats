@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
+- Support fattened `data_stream` object when running under Elastic-Agent {pr}36516[36516]
 
 
 *Auditbeat*
