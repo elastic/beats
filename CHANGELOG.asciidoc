@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
+- Fix status reporting to {agent} when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 - Upgrade Go to 1.20.7 {pull}36241[36241]
 
 *Winlogbeat*
@@ -23,14 +23,14 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 - Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
 - Eliminate cloning of event in deepUpdate {pull}35945[35945]
 - Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
-- Support build of projects outside of beats directory {pull}36126[36126]
-- Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
+- Support build of projects outside of Beats directory {pull}36126[36126]
+- Add default cgroup regex for `add_process_metadata` processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
 
 *Filebeat*
 
 - Fix error message formatting from filestream input. {pull}35658[35658]
-- Fixed concurrency and flakey tests issue in azure blob storage input. {issue}35983[35983] {pull}36124[36124]
+- Fixed concurrency and flakey tests issue in Azure Blob Storage input. {issue}35983[35983] {pull}36124[36124]
 - Filter out duplicate paths resolved from matching globs. {issue}36253[36253] {pull}36256[36256]
 - Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
 - Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
@@ -38,9 +38,9 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 *Metricbeat*
 
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
-- Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
+- Add option in SQL module to execute queries for all databases. {pull}35688[35688]
 - Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
-- Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
+- Add remaining dimensions for Azure storage account to make them available for TSDB enablement. {pull}36331[36331]
 
 *Packetbeat*
 
