@@ -23,6 +23,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
+const elasticAPIVersionHeaderKey = "Elastic-Api-Version"
+const elasticAPIDefaultVersion = "2023-10-31"
+
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
 	Protocol     string `config:"protocol" yaml:"protocol,omitempty"`
@@ -54,6 +57,7 @@ func DefaultClientConfig() ClientConfig {
 		APIKey:       "",
 		ServiceToken: "",
 		Transport:    httpcommon.DefaultHTTPTransportSettings(),
+		Headers:      map[string]string{elasticAPIVersionHeaderKey: elasticAPIDefaultVersion},
 	}
 }
 
