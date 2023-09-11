@@ -13,33 +13,9 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 - Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 - Upgrade Go to 1.20.7 {pull}36241[36241]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Fix the ability to use filtering features (e.g. `ignore_older`, `event_id`, `provider`, `level`) while reading `.evtx` files. {issue}16826[16826] {pull}36173[36173]
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Bugfixes
 
@@ -51,10 +27,6 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
 
-
-*Auditbeat*
-
-
 *Filebeat*
 
 - Fix error message formatting from filestream input. {pull}35658[35658]
@@ -63,18 +35,12 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 - Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
 - Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
 
-*Heartbeat*
-
-
 *Metricbeat*
 
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
-
-*Osquerybeat*
-
 
 *Packetbeat*
 
@@ -83,9 +49,6 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 *Winlogbeat*
 
 - Ensure event loggers retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -104,9 +67,8 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 - Allow specifying since when to read journald entries. {pull}35408[35408]
 - Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 - Improve CEL input performance. {pull}35915[35915]
-- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
 - Added support for min/max template functions in httpjson input. {issue}36094[36094] {pull}36036[36036]
-- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[35806]
 - Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
 - Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
 - Add support for localstack based input integration testing {pull}35727[35727]
@@ -115,91 +77,28 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 - Add device handling to Okta input package for entity analytics. {pull}36049[36049]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}36286[36286]
 - [Azure] Add input metrics to the azure-eventhub input. {pull}35739[35739]
-
-*Auditbeat*
-
-*Libbeat*
-
-*Heartbeat*
-
 
 *Metricbeat*
 
 - Add support for multiple regions in GCP {pull}32964[32964]
 - Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
 
-
-*Osquerybeat*
-
-
 *Packetbeat*
 
 - Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 - Add support for multiple regions in GCP {pull}32964[32964]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 *Winlogbeat*
 
 - Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
 
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
 ==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
 
 *Heartbeat*
 
 - Deprecate aws_elb autodiscover provider. {pull}36191[36191]
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.9.2]]
