@@ -240,6 +240,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Added `packetbeat.interfaces.fanout_group` to allow a Packetbeat sniffer to join an AF_PACKET fanout group. {issue}35451[35451] {pull}35453[35453]
+- Add AF_PACKET metrics. {issue}35428[35428] {pull}35489[35489]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
+- Add support for multiple regions in GCP {pull}32964[32964]
+- Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
 
 *Packetbeat*
 
