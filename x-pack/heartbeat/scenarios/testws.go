@@ -19,16 +19,27 @@ import (
 )
 
 var testWsOnce = &sync.Once{}
+var failingTestWsOnce = &sync.Once{}
 
 // Starting this thing up is expensive, let's just do it once
 func startTestWebserver(t *testing.T) *httptest.Server {
 	testWsOnce.Do(func() {
 		testWs = httptest.NewServer(hbtest.HelloWorldHandler(200))
 
-		waitForWs(t, testWs.URL)
+		waitForWs(t, testWs.URL, 200)
 	})
 
 	return testWs
+}
+
+func startFailingTestWebserver(t *testing.T) *httptest.Server {
+	failingTestWsOnce.Do(func() {
+		failingTestWs = httptest.NewServer(hbtest.HelloWorldHandler(400))
+
+		waitForWs(t, failingTestWs.URL, 400)
+	})
+
+	return failingTestWs
 }
 
 func StartStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
@@ -49,19 +60,19 @@ func StartStatefulTestWS(t *testing.T, statuses []int) *httptest.Server {
 	}))
 
 	// wait for ws to become available
-	waitForWs(t, testWs.URL)
+	waitForWs(t, testWs.URL, 200)
 
 	return testWs
 }
 
-func waitForWs(t *testing.T, url string) {
+func waitForWs(t *testing.T, url string, statusCode int) {
 	require.Eventuallyf(
 		t,
 		func() bool {
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
 			resp, _ := http.DefaultClient.Do(req)
 			resp.Body.Close()
-			return resp.StatusCode == 200
+			return resp.StatusCode == statusCode
 		},
 		10*time.Second, 250*time.Millisecond, "could not start webserver",
 	)

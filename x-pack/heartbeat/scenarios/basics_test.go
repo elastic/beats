@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
@@ -102,7 +103,7 @@ func TestLightweightSummaries(t *testing.T) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
 		testslike.Test(t,
-			summarizertesthelper.SummaryValidator(1, 0),
+			SummaryValidatorForStatus(mtr.Meta.Status),
 			lastEvent.Fields)
 
 		for _, e := range firstEvents {
@@ -118,13 +119,9 @@ func TestBrowserSummaries(t *testing.T) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
 
-		var expectedUp, expectedDown uint16 = 1, 0
-		if mtr.Meta.Status == monitorstate.StatusDown {
-			expectedUp, expectedDown = 0, 1
-		}
 		testslike.Test(t,
 			lookslike.Compose(
-				summarizertesthelper.SummaryValidator(expectedUp, expectedDown),
+				SummaryValidatorForStatus(mtr.Meta.Status),
 				hbtest.URLChecks(t, mtr.Meta.URL),
 			),
 			lastEvent.Fields)
@@ -158,4 +155,12 @@ func TestRunFromOverride(t *testing.T) {
 			testslike.Test(t, validator, e.Fields)
 		}
 	})
+}
+
+func SummaryValidatorForStatus(ss monitorstate.StateStatus) validator.Validator {
+	var expectedUp, expectedDown uint16 = 1, 0
+	if ss == monitorstate.StatusDown {
+		expectedUp, expectedDown = 0, 1
+	}
+	return summarizertesthelper.SummaryValidator(expectedUp, expectedDown)
 }

@@ -36,14 +36,6 @@ type ScenarioRunMeta struct {
 	Status monitorstate.StateStatus
 }
 
-func (scr *ScenarioRunMeta) setURL(us string) {
-	u, err := url.Parse(us)
-	scr.URL = u
-	// Panic because we're not in a test helper, and this shouldn't
-	// really happen
-	panic(fmt.Sprintf("could not parse scenario URL: %s", err))
-}
-
 type Scenario struct {
 	Name         string
 	Type         string
