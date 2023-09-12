@@ -78,7 +78,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.3.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.11.0
+	github.com/elastic/go-sysinfo v1.11.1
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -202,7 +202,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.2
-	github.com/elastic/elastic-agent-libs v0.3.11
+	github.com/elastic/elastic-agent-libs v0.3.13
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
@@ -216,6 +216,7 @@ require (
 	github.com/lestrrat-go/jwx/v2 v2.0.11
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.15
+	github.com/pkg/xattr v0.4.9
 	github.com/shirou/gopsutil/v3 v3.22.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0

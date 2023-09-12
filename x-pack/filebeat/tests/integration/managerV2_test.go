@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -265,7 +266,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 		"../../filebeat.test",
 	)
 
-	finalStateReached := false
+	finalStateReached := atomic.Bool{}
 	var units = []*proto.UnitExpected{
 		{
 			Id:             "output-unit-borken",
@@ -319,7 +320,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 		// So we wait until the state matches the desired state
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			if management.DoesStateMatch(observed, units, 0) {
-				finalStateReached = true
+				finalStateReached.Store(true)
 			}
 
 			return &proto.CheckinExpected{
@@ -337,7 +338,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	)
 
 	require.Eventually(t, func() bool {
-		return finalStateReached
+		return finalStateReached.Load()
 	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
 
 	t.Cleanup(server.Stop)

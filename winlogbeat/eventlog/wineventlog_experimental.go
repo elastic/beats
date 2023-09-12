@@ -348,9 +348,18 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 	return bookmark.XML()
 }
 
+func (l *winEventLogExp) Reset() error {
+	l.log.Debug("Closing event log reader handles for reset.")
+	return l.close()
+}
+
 func (l *winEventLogExp) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
+	return l.close()
+}
+
+func (l *winEventLogExp) close() error {
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}
