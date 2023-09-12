@@ -379,7 +379,6 @@ scanner:
 
 		go fw.Run(ctx)
 
-		e := fw.Event()
 		expEvent := loginp.FSEvent{
 			NewPath: firstFilename,
 			Op:      loginp.OpCreate,
@@ -388,10 +387,7 @@ scanner:
 				Info:     testFileInfo{name: firstBasename, size: 5}, // "line\n"
 			},
 		}
-		requireEqualEvents(t, expEvent, e)
-
-		e = fw.Event()
-		expEvent = loginp.FSEvent{
+		expEvent2 := loginp.FSEvent{
 			NewPath: secondFilename,
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
@@ -399,7 +395,27 @@ scanner:
 				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
 			},
 		}
-		requireEqualEvents(t, expEvent, e)
+		nextEvt := loginp.FSEvent{}
+
+		// Events can be out of order, at least on Windows, so we
+		// need to check the fileneame, then compare the events.
+		// We need to have two events, one for each file we created,
+		// if there are more events or events for other files, we fail.
+		// So we keep track of the next expected event.
+		e := fw.Event()
+		switch e.Descriptor.Filename {
+		case firstFilename:
+			requireEqualEvents(t, expEvent, e)
+			nextEvt = expEvent2
+		case secondFilename:
+			requireEqualEvents(t, expEvent2, e)
+			nextEvt = expEvent
+		default:
+			t.Fatalf("got a FS event for an unexpected file: %q", e.Descriptor.Filename)
+		}
+
+		e = fw.Event()
+		requireEqualEvents(t, nextEvt, e)
 
 		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
 		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)
