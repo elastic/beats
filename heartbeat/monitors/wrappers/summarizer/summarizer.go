@@ -98,14 +98,21 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 }
 
 func (s *Summarizer) setupPlugins() {
-	var durPlugin SummarizerPlugin
 	if s.sf.Type == "browser" {
-		durPlugin = &BrowserDurationSumPlugin{}
+		s.plugins = append(
+			s.plugins,
+			&BrowserDurationSumPlugin{},
+			&BrowserURLSumPlugin{},
+		)
 	} else {
-		durPlugin = &LightweightDurationSumPlugin{}
+		s.plugins = append(s.plugins, &LightweightDurationSumPlugin{})
 	}
 
-	s.plugins = []SummarizerPlugin{durPlugin, &ErrSumPlugin{}, NewStateStatusPlugin(s.mst, s.sf)}
+	s.plugins = append(
+		s.plugins,
+		&ErrSumPlugin{},
+		NewStateStatusPlugin(s.mst, s.sf),
+	)
 }
 
 func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {

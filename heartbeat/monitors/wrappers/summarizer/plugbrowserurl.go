@@ -19,6 +19,7 @@ package summarizer
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +41,10 @@ func (busp *BrowserURLSumPlugin) EachEvent(event *beat.Event, eventErr error) Ea
 
 func (busp *BrowserURLSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if busp.urlFields != nil {
-		event.PutValue("url", busp.urlFields)
+		_, err := event.PutValue("url", busp.urlFields)
+		if err != nil {
+			logp.L().Errorf("could not set URL value for browser job: %s", err)
+		}
 	}
 	return 0
 }

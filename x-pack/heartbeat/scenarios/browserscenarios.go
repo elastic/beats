@@ -8,6 +8,7 @@ package scenarios
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"testing"
 
@@ -22,25 +23,27 @@ func init() {
 			Name: "simple-browser",
 			Type: "browser",
 			Tags: []string{"browser", "browser-inline"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
 				if err != nil {
-					return nil, nil, err
+					return nil, meta, nil, err
 				}
 				server := startTestWebserver(t)
+
+				// Add / to normalize with test output
+				meta.URL, _ = url.Parse(server.URL + "/")
 				config = mapstr.M{
 					"id":       "browser-test-id",
 					"name":     "browser-test-name",
 					"type":     "browser",
 					"schedule": "@every 1m",
-					"hosts":    []string{"127.0.0.1"},
 					"source": mapstr.M{
 						"inline": mapstr.M{
 							"script": fmt.Sprintf("step('load server', async () => {await page.goto('%s')})", server.URL),
 						},
 					},
 				}
-				return config, nil, nil
+				return config, meta, nil, nil
 			},
 		},
 	)

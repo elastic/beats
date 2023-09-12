@@ -6,6 +6,7 @@ package framework
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"sync"
 	"testing"
@@ -29,7 +30,18 @@ import (
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
-type ScenarioRun func(t *testing.T) (config mapstr.M, close func(), err error)
+type ScenarioRun func(t *testing.T) (config mapstr.M, meta ScenarioRunMeta, close func(), err error)
+type ScenarioRunMeta struct {
+	URL *url.URL
+}
+
+func (scr *ScenarioRunMeta) setURL(us string) {
+	u, err := url.Parse(us)
+	scr.URL = u
+	// Panic because we're not in a test helper, and this shouldn't
+	// really happen
+	panic(fmt.Sprintf("could not parse scenario URL: %s", err))
+}
 
 type Scenario struct {
 	Name         string
@@ -38,6 +50,7 @@ type Scenario struct {
 	Tags         []string
 	RunFrom      *hbconfig.LocationWithID
 	NumberOfRuns int
+	URL          string
 }
 
 type Twist struct {
@@ -83,7 +96,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 		runS = twist.Fn(s.clone())
 	}
 
-	cfgMap, rClose, err := runS.Runner(t)
+	cfgMap, meta, rClose, err := runS.Runner(t)
 	if rClose != nil {
 		defer rClose()
 	}
@@ -109,7 +122,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 		var conf mapstr.M
 		for i := 0; i < numberRuns; i++ {
 			var mtr *MonitorTestRun
-			mtr, err = runMonitorOnce(t, cfgMap, runS.RunFrom, loaderDB.StateLoader())
+			mtr, err = runMonitorOnce(t, cfgMap, meta, runS.RunFrom, loaderDB.StateLoader())
 
 			mtr.wait()
 			events = append(events, mtr.Events()...)
@@ -127,6 +140,7 @@ func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mt
 		sumMtr := MonitorTestRun{
 			StdFields: sf,
 			Config:    conf,
+			Meta:      meta,
 			Events: func() []*beat.Event {
 				return events
 			},
@@ -209,6 +223,7 @@ func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist *Twi
 
 type MonitorTestRun struct {
 	StdFields stdfields.StdMonitorFields
+	Meta      ScenarioRunMeta
 	Config    mapstr.M
 	Events    func() []*beat.Event
 	monitor   *monitors.Monitor
@@ -216,9 +231,10 @@ type MonitorTestRun struct {
 	close     func()
 }
 
-func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
+func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
 	mtr = &MonitorTestRun{
 		Config: monitorConfig,
+		Meta:   meta,
 		StdFields: stdfields.StdMonitorFields{
 			RunFrom: location,
 		},

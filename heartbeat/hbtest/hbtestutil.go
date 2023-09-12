@@ -224,6 +224,8 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 
 // URLChecks returns a validator for the given URL's fields
 func URLChecks(t *testing.T, u *url.URL) validator.Validator {
+	t.Helper()
+	require.NotNil(t, u)
 	return lookslike.MustCompile(map[string]interface{}{
 		"url": wraputil.URLFields(u),
 	})

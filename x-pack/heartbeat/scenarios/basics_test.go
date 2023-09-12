@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
@@ -116,7 +117,10 @@ func TestBrowserSummaries(t *testing.T) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
 		testslike.Test(t,
-			summarizertesthelper.SummaryValidator(1, 0),
+			lookslike.Compose(
+				summarizertesthelper.SummaryValidator(1, 0),
+				hbtest.URLChecks(t, mtr.Meta.URL),
+			),
 			lastEvent.Fields)
 
 		for _, e := range firstEvents {

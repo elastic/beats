@@ -26,7 +26,7 @@ func init() {
 			Name: "http-simple",
 			Type: "http",
 			Tags: []string{"lightweight", "http"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				server := startTestWebserver(t)
 				config = mapstr.M{
 					"id":       "http-test-id",
@@ -35,14 +35,14 @@ func init() {
 					"schedule": "@every 1m",
 					"urls":     []string{server.URL},
 				}
-				return config, nil, nil
+				return config, meta, nil, nil
 			},
 		},
 		framework.Scenario{
 			Name: "tcp-simple",
 			Type: "tcp",
 			Tags: []string{"lightweight", "tcp"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				server := startTestWebserver(t)
 				parsedUrl, err := url.Parse(server.URL)
 				if err != nil {
@@ -55,21 +55,21 @@ func init() {
 					"schedule": "@every 1m",
 					"hosts":    []string{parsedUrl.Host}, // Host includes host:port
 				}
-				return config, nil, nil
+				return config, meta, nil, nil
 			},
 		},
 		framework.Scenario{
 			Name: "simple-icmp",
 			Type: "icmp",
 			Tags: []string{"icmp"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				return mapstr.M{
 					"id":       "icmp-test-id",
 					"name":     "icmp-test-name",
 					"type":     "icmp",
 					"schedule": "@every 1m",
 					"hosts":    []string{"127.0.0.1"},
-				}, func() {}, nil
+				}, meta, nil, nil
 			},
 		},
 	)
