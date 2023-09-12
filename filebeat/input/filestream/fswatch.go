@@ -442,7 +442,7 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {
 			s.log.Debugf("finding path to original file has failed %s: %+v", it.filename, err)
-			return it, nil
+			it.originalFilename = it.filename
 		}
 
 		if s.isFileExcluded(it.originalFilename) {
