@@ -45,7 +45,6 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 type journeyEnricher struct {
 	journeyComplete bool
 	journey         *Journey
-	error           error
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
@@ -79,7 +78,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
-			je.error = nil
 			je.journey = se.Journey
 			je.start = event.Timestamp
 		case JourneyEnd, CmdStatus:
@@ -100,9 +98,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
-		if je.error == nil {
-			je.error = jobErr
-		}
 	}
 
 	// Needed for the edge case where a console log is emitted after one journey ends
@@ -118,14 +113,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	switch se.Type {
 	case CmdStatus:
-		// If a command failed _after_ the journey was complete, as it happens
-		// when an `afterAll` hook fails, for example, we don't wan't to include
-		// a summary in the cmd/status event.
-		if !je.journeyComplete {
-			if se.Error != nil {
-				je.error = se.Error.toECSErr()
-			}
-		}
+		// noop
 	case JourneyEnd:
 		je.journeyComplete = true
 	case StepEnd:

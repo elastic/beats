@@ -27,18 +27,69 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// LightweightDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
-// for lightweight monitors.
-type ErrSumPlugin struct {
-	firstErrVal interface{}
+// BrowserErrSumPlugins handles the logic for writing the `error` field
+// for browser monitors, preferentially using the journey/end event's
+// error field for errors.
+type BrowserErrSumPlugin struct {
+	summaryErrVal interface{}
 }
 
-func (esp *ErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+func (esp *BrowserErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
 	if eventErr == nil {
 		return 0
 	}
 
-	var errVal interface{}
+	errVal := errToFieldVal(eventErr)
+	mergeErrVal(event, errVal)
+
+	isJourneyEnd := false
+	if synthType(event) == "journey/end" {
+		isJourneyEnd = true
+	}
+	if esp.summaryErrVal == nil || isJourneyEnd {
+		esp.summaryErrVal = errVal
+	}
+
+	return DropErrEvent
+}
+
+func (esp *BrowserErrSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+	if esp.summaryErrVal != nil {
+		mergeErrVal(event, esp.summaryErrVal)
+	}
+	return 0
+}
+
+func (esp *BrowserErrSumPlugin) OnRetry() {
+	esp.summaryErrVal = nil
+}
+
+// LightweightErrSumPlugin simply takes error return values
+// and maps them into the "error" field in the event, return nil
+// for all events thereafter
+type LightweightErrSumPlugin struct{}
+
+func (esp *LightweightErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+	if eventErr == nil {
+		return 0
+	}
+
+	errVal := errToFieldVal(eventErr)
+	mergeErrVal(event, errVal)
+
+	return DropErrEvent
+}
+
+func (esp *LightweightErrSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+	return 0
+}
+
+func (esp *LightweightErrSumPlugin) OnRetry() {
+	// noop
+}
+
+// errToFieldVal reflects on the error and returns either an *ecserr.ECSErr if possible, and a look.Reason otherwise
+func errToFieldVal(eventErr error) (errVal interface{}) {
 	var asECS *ecserr.ECSErr
 	if errors.As(eventErr, &asECS) {
 		// Override the message of the error in the event it was wrapped
@@ -47,26 +98,22 @@ func (esp *ErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventA
 	} else {
 		errVal = look.Reason(eventErr)
 	}
-	mergeErrVal(event, errVal)
-
-	if esp.firstErrVal == nil {
-		esp.firstErrVal = errVal
-	}
-
-	return DropErrEvent
-}
-
-func (esp *ErrSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
-	if esp.firstErrVal != nil {
-		mergeErrVal(event, esp.firstErrVal)
-	}
-	return 0
-}
-
-func (esp *ErrSumPlugin) OnRetry() {
-	esp.firstErrVal = nil
+	return errVal
 }
 
 func mergeErrVal(event *beat.Event, errVal interface{}) {
 	eventext.MergeEventFields(event, mapstr.M{"error": errVal})
+}
+
+func synthType(event *beat.Event) string {
+	synthType, err := event.GetValue("synthetics.type")
+	if err != nil {
+		return ""
+	}
+
+	str, ok := synthType.(string)
+	if !ok {
+		return ""
+	}
+	return str
 }

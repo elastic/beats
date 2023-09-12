@@ -98,21 +98,25 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 }
 
 func (s *Summarizer) setupPlugins() {
+	// ssp must appear before Err plugin since
+	// it intercepts errors
+	ssp := NewStateStatusPlugin(s.mst, s.sf)
 	if s.sf.Type == "browser" {
 		s.plugins = append(
 			s.plugins,
 			&BrowserDurationSumPlugin{},
 			&BrowserURLSumPlugin{},
+			ssp,
+			&BrowserErrSumPlugin{},
 		)
 	} else {
-		s.plugins = append(s.plugins, &LightweightDurationSumPlugin{})
+		s.plugins = append(
+			s.plugins,
+			&LightweightDurationSumPlugin{},
+			ssp,
+			&LightweightErrSumPlugin{},
+		)
 	}
-
-	s.plugins = append(
-		s.plugins,
-		&ErrSumPlugin{},
-		NewStateStatusPlugin(s.mst, s.sf),
-	)
 }
 
 func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {

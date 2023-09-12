@@ -32,7 +32,8 @@ import (
 
 type ScenarioRun func(t *testing.T) (config mapstr.M, meta ScenarioRunMeta, close func(), err error)
 type ScenarioRunMeta struct {
-	URL *url.URL
+	URL    *url.URL
+	Status monitorstate.StateStatus
 }
 
 func (scr *ScenarioRunMeta) setURL(us string) {

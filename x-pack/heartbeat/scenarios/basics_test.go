@@ -18,6 +18,7 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
@@ -116,9 +117,14 @@ func TestBrowserSummaries(t *testing.T) {
 	scenarioDB.RunTag(t, "browser", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
+
+		var expectedUp, expectedDown uint16 = 1, 0
+		if mtr.Meta.Status == monitorstate.StatusDown {
+			expectedUp, expectedDown = 0, 1
+		}
 		testslike.Test(t,
 			lookslike.Compose(
-				summarizertesthelper.SummaryValidator(1, 0),
+				summarizertesthelper.SummaryValidator(expectedUp, expectedDown),
 				hbtest.URLChecks(t, mtr.Meta.URL),
 			),
 			lastEvent.Fields)
