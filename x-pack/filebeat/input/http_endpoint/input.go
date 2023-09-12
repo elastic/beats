@@ -121,7 +121,6 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 	log := ctx.Logger.With("address", e.addr)
 	pattern := e.config.URL
 
-	metrics.bindAddr.Set(e.addr)
 	u, err := url.Parse(pattern)
 	if err != nil {
 		return err
@@ -171,10 +170,10 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 		log.Infof("Starting HTTPS server on %s with %s end point", srv.Addr, pattern)
 		// The certificate is already loaded so we do not need
 		// to pass the cert file and key file parameters.
-		err = s.srv.ListenAndServeTLS("", "")
+		err = listenAndServeTLS(s.srv, "", "", metrics)
 	} else {
 		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
-		err = s.srv.ListenAndServe()
+		err = listenAndServe(s.srv, metrics)
 	}
 	p.mu.Lock()
 	delete(p.servers, e.addr)
@@ -182,6 +181,36 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 	s.setErr(err)
 	s.cancel()
 	return err
+}
+
+func listenAndServeTLS(srv *http.Server, certFile, keyFile string, metrics *inputMetrics) error {
+	addr := srv.Addr
+	if addr == "" {
+		addr = ":https"
+	}
+
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	metrics.bindAddr.Set(ln.Addr().String())
+
+	defer ln.Close()
+
+	return srv.ServeTLS(ln, certFile, keyFile)
+}
+
+func listenAndServe(srv *http.Server, metrics *inputMetrics) error {
+	addr := srv.Addr
+	if addr == "" {
+		addr = ":http"
+	}
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	metrics.bindAddr.Set(ln.Addr().String())
+	return srv.Serve(ln)
 }
 
 func checkTLSConsistency(addr string, old, new *tlscommon.ServerConfig) error {
