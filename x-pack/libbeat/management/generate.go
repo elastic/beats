@@ -5,7 +5,10 @@
 package management
 
 import (
+	"errors"
 	"fmt"
+
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -82,10 +85,78 @@ func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
 	return m, nil
 }
 
+// dataStreamAndSource is a generic way to represent proto mesages
+// that contain a source field and a datastream field.
+type dataStreamAndSource interface {
+	GetDataStream() *proto.DataStream
+	GetSource() *structpb.Struct
+}
+
+// deDotDataStream reads any datastream value from the dotted notation
+// (data_stream.*) and returns it as a *proto.DataStream. If raw already
+// contains a DataStream but no fields are duplicated, then the values are merged.
+func deDotDataStream(raw dataStreamAndSource) (*proto.DataStream, error) {
+	ds := raw.GetDataStream()
+	if ds == nil {
+		ds = &proto.DataStream{}
+	}
+
+	tmp := struct {
+		DataStream struct {
+			Dataset   string `config:"dataset" yaml:"dataset"`
+			Type      string `config:"type" yaml:"type"`
+			Namespace string `config:"namespace" yaml:"namespace"`
+		} `config:"data_stream" yaml:"data_stream"`
+	}{}
+
+	cfg, err := conf.NewConfigFrom(raw.GetSource().AsMap())
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate config from source field: %w", err)
+	}
+
+	if err := cfg.Unpack(&tmp); err != nil {
+		return nil, fmt.Errorf("cannot unpack source field into struct: %w", err)
+	}
+
+	if ds.Dataset != "" && tmp.DataStream.Dataset != "" {
+		return nil, errors.New("duplicated key 'datastream.dataset'")
+	}
+
+	if ds.Type != "" && tmp.DataStream.Type != "" {
+		return nil, errors.New("duplicated key 'datastream.type'")
+	}
+
+	if ds.Namespace != "" && tmp.DataStream.Namespace != "" {
+		return nil, errors.New("duplicated key 'datastream.namespace'")
+	}
+
+	ret := &proto.DataStream{
+		Dataset:   merge(tmp.DataStream.Dataset, ds.Dataset),
+		Type:      merge(tmp.DataStream.Type, ds.Type),
+		Namespace: merge(tmp.DataStream.Namespace, ds.Namespace),
+	}
+
+	return ret, nil
+}
+
+// merge returns b if a is an empty string
+func merge(a, b string) string {
+	if a == "" {
+		return b
+	}
+	return a
+}
+
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
 func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
+	ds, err := deDotDataStream(raw)
+	if err != nil {
+		return nil, fmt.Errorf("could not read 'data_stream': %w", err)
+	}
+	raw.DataStream = ds
+
 	// If there are no streams, we fall into the 'simple input config' case,
 	// this means the key configuration values are on the root level instead of
 	// an element in the `streams` array.
@@ -106,8 +177,14 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
 
 	for iter, stream := range raw.GetStreams() {
+		ds, err := deDotDataStream(stream)
+		if err != nil {
+			return nil, fmt.Errorf("could not read 'data_stream' from stream ID '%s': %w",
+				stream.GetId(), err)
+		}
+		stream.DataStream = ds
 		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
-		streamSource, err := createStreamRules(raw, streamSource, stream, defaultDataStreamType, agentInfo, defaultProcessors...)
+		streamSource, err = createStreamRules(raw, streamSource, stream, defaultDataStreamType, agentInfo, defaultProcessors...)
 		if err != nil {
 			return nil, fmt.Errorf("error creating stream rules: %w", err)
 		}

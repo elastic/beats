@@ -57,7 +57,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 			// perform and store regular call responses
 			httpResp, err = rf.collectResponse(ctx, trCtx, r)
 			if err != nil {
-				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
+				return fmt.Errorf("failed to collect first response: %w", err)
 			}
 
 			if rf.saveFirstResponse {
@@ -70,7 +70,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				httpResp.Body = io.NopCloser(bytes.NewReader(body))
 				err = json.Unmarshal(body, &bodyMap)
 				if err != nil {
-					r.log.Errorf("unable to unmarshal first_response.body: %v", err)
+					r.log.Errorf("unable to unmarshal first_response.body: %v", textContextError{error: err, body: body})
 				}
 				firstResponse := response{
 					url:    *httpResp.Request.URL,
@@ -152,20 +152,20 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				// reformat urls of requestFactory using ids
 				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
-					return fmt.Errorf("failed to generate new URL: %w", err)
+					return fmt.Errorf("failed to generate new url: %w", err)
 				}
 
 				// reformat url accordingly if replaceWith clause exists
 				if doReplaceWith {
 					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 					if err != nil {
-						return fmt.Errorf("failed to generate new URL: %w", err)
+						return fmt.Errorf("failed to generate new url with replacement: %w", err)
 					}
 				}
 				// collect data from new urls
 				httpResp, err = rf.collectResponse(ctx, chainTrCtx, r)
 				if err != nil {
-					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
+					return fmt.Errorf("failed to collect tail response %d: %w", i, err)
 				}
 				// store data according to response type
 				if i == len(r.requestFactories)-1 && len(ids) != 0 {
@@ -222,12 +222,12 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 	if rf.isChain && rf.chainClient != nil {
 		httpResp, err = rf.chainClient.do(ctx, req)
 		if err != nil {
-			return nil, fmt.Errorf("failed to execute chain http client.Do: %w", err)
+			return nil, fmt.Errorf("failed to execute chain http %s: %w", req.Method, err)
 		}
 	} else {
 		httpResp, err = r.client.do(ctx, req)
 		if err != nil {
-			return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
+			return nil, fmt.Errorf("failed to execute http %s: %w", req.Method, err)
 		}
 	}
 
@@ -239,7 +239,7 @@ func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response,
 		return c.client.Do(req)
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -250,9 +250,12 @@ func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response,
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	if resp.StatusCode > 399 {
+	if resp.StatusCode >= http.StatusBadRequest {
 		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
+		if len(body) == 0 {
+			return nil, fmt.Errorf("server responded with status code %d", resp.StatusCode)
+		}
+		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, body)
 	}
 	return resp, nil
 }
@@ -311,7 +314,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
 			client, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log, reg)
 			if err != nil {
-				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
+				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
 			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
 				rf.user = ch.Step.Auth.Basic.User
@@ -339,7 +342,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
 			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
 			if err != nil {
-				return nil, fmt.Errorf("failed in creating chain http client with error : %w", err)
+				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
 			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
 				rf.user = ch.While.Auth.Basic.User
@@ -372,7 +375,7 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 
 	err := json.Unmarshal(data, &dataMap)
 	if err != nil {
-		return false, fmt.Errorf("error while unmarshalling data : %w", err)
+		return false, fmt.Errorf("error while unmarshalling data: %w", textContextError{error: err, body: data})
 	}
 	tr := transformable{}
 	paramCtx := &transformContext{
@@ -384,11 +387,11 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 
 	val, err := expression.Execute(paramCtx, tr, "", nil, log)
 	if err != nil {
-		return false, fmt.Errorf("error while evaluating expression : %w", err)
+		return false, fmt.Errorf("error while evaluating expression: %w", err)
 	}
 	result, err := strconv.ParseBool(val)
 	if err != nil {
-		return false, fmt.Errorf("error while parsing boolean value of string : %w", err)
+		return false, fmt.Errorf("error while parsing boolean value of string: %w", err)
 	}
 
 	return result, nil
@@ -508,7 +511,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		// get replace values from collected json
 		var v interface{}
 		if err := json.Unmarshal(b, &v); err != nil {
-			return nil, fmt.Errorf("cannot unmarshal data: %w", err)
+			return nil, fmt.Errorf("cannot unmarshal data: %w", textContextError{error: err, body: b})
 		}
 		values, err := jsonpath.Get(replace, v)
 		if err != nil {
@@ -529,7 +532,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		case float64, string:
 			ids = append(ids, fmt.Sprintf("%v", tresp))
 		default:
-			r.log.Errorf("cannot collect IDs from type '%T' : '%v'", values, values)
+			r.log.Errorf("cannot collect IDs from type %T: %v", values, values)
 		}
 	}
 	return ids, nil
@@ -660,21 +663,21 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			// reformat urls of requestFactory using ids
 			rf.url, err = generateNewUrl(rf.replace, urlString, id)
 			if err != nil {
-				return -1, fmt.Errorf("failed to generate new URL: %w", err)
+				return -1, fmt.Errorf("failed to generate new url for chain: %w", err)
 			}
 
 			// reformat url accordingly if replaceWith clause exists
 			if doReplaceWith {
 				rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 				if err != nil {
-					return n, fmt.Errorf("failed to generate new URL: %w", err)
+					return n, fmt.Errorf("failed to generate new url for chain replacement: %w", err)
 				}
 			}
 
 			// collect data from new urls
 			httpResp, err = rf.collectResponse(ctx, chainTrCtx, r)
 			if err != nil {
-				return -1, fmt.Errorf("failed to execute rf.collectResponse: %w", err)
+				return -1, fmt.Errorf("failed to collect response: %w", err)
 			}
 			// store data according to response type
 			if i == len(r.requestFactories)-1 && len(ids) != 0 {

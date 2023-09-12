@@ -11,6 +11,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 - Fix status reporting to Elastic-Agent when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
 - Upgrade Go to 1.20.7 {pull}36241[36241]
+- [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
+  Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 
 *Auditbeat*
 
@@ -62,7 +64,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Eliminate cloning of event in deepUpdate {pull}35945[35945]
 - Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
 - Support build of projects outside of beats directory {pull}36126[36126]
+- Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
+- Support fattened `data_stream` object when running under Elastic-Agent {pr}36516[36516]
 
 
 *Auditbeat*
@@ -127,6 +131,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
 - Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
+- Fix Azure Monitor empty metricnamespace. {pull}36295[36295]
 - Fix GCP compute metadata. {pull}36338[36338]
 - Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
@@ -219,6 +224,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow fine-grained control of entity analytics API requests for AzureAD provider. {issue}36440[36440] {pull}36441[36441]
 - For request tracer logging in CEL and httpjson the request and response body are no longer included in `event.original`. The body is still present in `http.{request,response}.body.content`. {pull}36531[36531]
 - Added support for Okta OAuth2 provider in the CEL input. {issue}36336[36336] {pull}36521[36521]
+- Improve error logging in HTTPJSON input. {pull}36529[36529]
 
 *Auditbeat*
 
