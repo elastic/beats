@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 )
 
 // These constants define all known synthetics event types
@@ -97,7 +97,7 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		if e != nil {
 			logp.L().Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
-			_, _ = m.Put("url", wrappers.URLFields(u))
+			_, _ = m.Put("url", wraputil.URLFields(u))
 		}
 	}
 

@@ -15,30 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package hbtestllext
+package summarizer
 
 import (
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
-var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
-	"monitor": map[string]interface{}{
-		"timespan": map[string]interface{}{
-			"gte": IsTime,
-			"lt":  IsTime,
-		},
-	},
-})
+// BrowserURLSumPlugin handles the logic for writing the error.* fields
+type BrowserURLSumPlugin struct {
+	urlFields mapstr.M
+}
 
-var MaybeHasEventType = lookslike.MustCompile(map[string]interface{}{
-	"event": map[string]interface{}{
-		"type": isdef.Optional(isdef.IsNonEmptyString),
-	},
-	"synthetics.type": isdef.Optional(isdef.IsNonEmptyString),
-})
+func (busp *BrowserURLSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+	if len(busp.urlFields) == 0 {
+		if urlFields, err := event.GetValue("url"); err == nil {
+			if ufMap, ok := urlFields.(mapstr.M); ok {
+				busp.urlFields = ufMap
+			}
+		}
+	}
+	return 0
+}
 
-var MaybeHasDuration = lookslike.MustCompile(map[string]interface{}{
-	"monitor.duration.us": IsInt64,
-})
+func (busp *BrowserURLSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+	if busp.urlFields != nil {
+		event.PutValue("url", busp.urlFields)
+	}
+	return 0
+}
+
+func (busp *BrowserURLSumPlugin) OnRetry() {
+	busp.urlFields = nil
+}

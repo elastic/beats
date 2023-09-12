@@ -110,6 +110,22 @@ func TestLightweightSummaries(t *testing.T) {
 	})
 }
 
+func TestBrowserSummaries(t *testing.T) {
+	t.Parallel()
+	scenarioDB.RunTag(t, "browser", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+		all := mtr.Events()
+		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
+		testslike.Test(t,
+			summarizertesthelper.SummaryValidator(1, 0),
+			lastEvent.Fields)
+
+		for _, e := range firstEvents {
+			summary, _ := e.GetValue("summary")
+			require.Nil(t, summary)
+		}
+	})
+}
+
 func TestRunFromOverride(t *testing.T) {
 	t.Parallel()
 	scenarioDB.RunAllWithATwist(t, TwistAddRunFrom, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {

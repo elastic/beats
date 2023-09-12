@@ -53,15 +53,22 @@ func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMo
 	}
 }
 
-func (ssp *StateStatusPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
-	monitorStatus, err := event.GetValue("monitor.status")
-	if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
-		mss := monitorstate.StateStatus(monitorStatus.(string))
+func (ssp *StateStatusPlugin) EachEvent(event *beat.Event, jobErr error) EachEventActions {
+	if ssp.sf.Type == "browser" {
+		if jobErr != nil {
+			// Browser jobs only return either a single up or down
+			ssp.js.Down = 1
+		}
+	} else {
+		monitorStatus, _ := event.GetValue("monitor.status")
+		if !eventext.IsEventCancelled(event) { // if this event contains a status...
+			mss := monitorstate.StateStatus(monitorStatus.(string))
 
-		if mss == monitorstate.StatusUp {
-			ssp.js.Up++
-		} else {
-			ssp.js.Down++
+			if mss == monitorstate.StatusUp {
+				ssp.js.Up++
+			} else {
+				ssp.js.Down++
+			}
 		}
 	}
 
@@ -74,6 +81,11 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if ssp.js.Down > 0 {
 		ssp.js.Status = monitorstate.StatusDown
 	} else {
+		if ssp.sf.Type == "browser" {
+			// Browsers don't have a prior increment of this, so set it to some
+			// non-zero value
+			ssp.js.Up = 1
+		}
 		ssp.js.Status = monitorstate.StatusUp
 	}
 

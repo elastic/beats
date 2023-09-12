@@ -41,6 +41,7 @@ func TestSummarizer(t *testing.T) {
 		}
 	}
 
+	testURL := "https://example.net"
 	// these tests use strings to describe sequences of events
 	tests := []struct {
 		name        string
@@ -53,6 +54,7 @@ func TestSummarizer(t *testing.T) {
 		// the attempt number of the given event
 		expectedAttempts  string
 		expectedSummaries int
+		url               string
 	}{
 		{
 			"start down, transition to up",
@@ -61,6 +63,7 @@ func TestSummarizer(t *testing.T) {
 			"du",
 			"12",
 			2,
+			testURL,
 		},
 		{
 			"start up, stay up",
@@ -69,6 +72,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuuuuuu",
 			"11111111",
 			8,
+			testURL,
 		},
 		{
 			"start down, stay down",
@@ -77,6 +81,7 @@ func TestSummarizer(t *testing.T) {
 			"dddddddd",
 			"12121212",
 			8,
+			testURL,
 		},
 		{
 			"start up - go down with one retry - thenrecover",
@@ -85,6 +90,7 @@ func TestSummarizer(t *testing.T) {
 			"uuddduuu",
 			"11212111",
 			8,
+			testURL,
 		},
 		{
 			"start up, transient down, recover",
@@ -93,6 +99,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuuuuuu",
 			"11112111",
 			8,
+			testURL,
 		},
 		{
 			"start up, multiple transient down, recover",
@@ -101,6 +108,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuuuuuuu",
 			"111121212",
 			9,
+			testURL,
 		},
 		{
 			"no retries, single down",
@@ -109,6 +117,7 @@ func TestSummarizer(t *testing.T) {
 			"uuuduuuu",
 			"11111111",
 			8,
+			testURL,
 		},
 	}
 
@@ -138,7 +147,7 @@ func TestSummarizer(t *testing.T) {
 			}
 
 			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
-			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", MaxAttempts: uint16(tt.maxAttempts)}
+			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
 			rcvdStatuses := ""
 			rcvdStates := ""

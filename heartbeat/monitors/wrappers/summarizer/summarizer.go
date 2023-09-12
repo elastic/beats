@@ -61,7 +61,7 @@ const RetryOnSummary = 1
 type SummarizerPlugin interface {
 	// EachEvent is called on each event, and allows for the mutation of events
 	EachEvent(event *beat.Event, err error) EachEventActions
-	// If at least one plugin returns true a retry will be performed
+	// OnSummary is run on the final (summary) event for each monitor.
 	OnSummary(event *beat.Event) OnSummaryActions
 	// OnRetry is called before the first EachEvent in the event of a retry
 	// can be used for resetting state between retries

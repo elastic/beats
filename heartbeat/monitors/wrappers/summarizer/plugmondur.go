@@ -54,7 +54,6 @@ type BrowserDurationSumPlugin struct {
 }
 
 func (bwdsp *BrowserDurationSumPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
-	// Effectively only runs once, on the first event
 	et, _ := event.GetValue("synthetics.type")
 	if et == "journey/start" {
 		bwdsp.startedAt = &event.Timestamp
