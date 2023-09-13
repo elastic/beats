@@ -66,7 +66,7 @@ func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Confi
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatname)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 
 	loader := KibanaLoader{

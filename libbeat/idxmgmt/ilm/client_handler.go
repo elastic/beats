@@ -135,7 +135,7 @@ func checkILMEnabled(enabled bool, c VersionCheckerClient) (bool, error) {
 func (h *FileClientHandler) CreateILMPolicy(policy Policy) error {
 	str := fmt.Sprintf("%s\n", policy.Body.StringToPrint())
 	if err := h.client.Write("policy", policy.Name, str); err != nil {
-		return fmt.Errorf("error printing policy : %v", err)
+		return fmt.Errorf("error printing policy : %w", err)
 	}
 	return nil
 }
