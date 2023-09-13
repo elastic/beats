@@ -104,17 +104,17 @@ func (s *Summarizer) setupPlugins() {
 	if s.sf.Type == "browser" {
 		s.plugins = append(
 			s.plugins,
-			&BrowserDurationSumPlugin{},
-			&BrowserURLSumPlugin{},
+			&BrowserDurationPlugin{},
+			&BrowserURLPlugin{},
 			ssp,
-			&BrowserErrSumPlugin{},
+			&BrowserErrPlugin{},
 		)
 	} else {
 		s.plugins = append(
 			s.plugins,
-			&LightweightDurationSumPlugin{},
+			&LightweightDurationPlugin{},
 			ssp,
-			&LightweightErrSumPlugin{},
+			&LightweightErrPlugin{},
 		)
 	}
 }

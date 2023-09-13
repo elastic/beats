@@ -23,12 +23,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// BrowserURLSumPlugin handles the logic for writing the error.* fields
-type BrowserURLSumPlugin struct {
+// BrowserURLPlugin handles the logic for writing the error.* fields
+type BrowserURLPlugin struct {
 	urlFields mapstr.M
 }
 
-func (busp *BrowserURLSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+func (busp *BrowserURLPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
 	if len(busp.urlFields) == 0 {
 		if urlFields, err := event.GetValue("url"); err == nil {
 			if ufMap, ok := urlFields.(mapstr.M); ok {
@@ -39,7 +39,7 @@ func (busp *BrowserURLSumPlugin) EachEvent(event *beat.Event, eventErr error) Ea
 	return 0
 }
 
-func (busp *BrowserURLSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (busp *BrowserURLPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if busp.urlFields != nil {
 		_, err := event.PutValue("url", busp.urlFields)
 		if err != nil {
@@ -49,6 +49,6 @@ func (busp *BrowserURLSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	return 0
 }
 
-func (busp *BrowserURLSumPlugin) OnRetry() {
+func (busp *BrowserURLPlugin) OnRetry() {
 	busp.urlFields = nil
 }

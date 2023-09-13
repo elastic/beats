@@ -27,14 +27,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// BrowserErrSumPlugins handles the logic for writing the `error` field
+// BrowserErrPlugins handles the logic for writing the `error` field
 // for browser monitors, preferentially using the journey/end event's
 // error field for errors.
-type BrowserErrSumPlugin struct {
+type BrowserErrPlugin struct {
 	summaryErrVal interface{}
 }
 
-func (esp *BrowserErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
 	if eventErr == nil {
 		return 0
 	}
@@ -53,23 +53,23 @@ func (esp *BrowserErrSumPlugin) EachEvent(event *beat.Event, eventErr error) Eac
 	return DropErrEvent
 }
 
-func (esp *BrowserErrSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (esp *BrowserErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if esp.summaryErrVal != nil {
 		mergeErrVal(event, esp.summaryErrVal)
 	}
 	return 0
 }
 
-func (esp *BrowserErrSumPlugin) OnRetry() {
+func (esp *BrowserErrPlugin) OnRetry() {
 	esp.summaryErrVal = nil
 }
 
-// LightweightErrSumPlugin simply takes error return values
+// LightweightErrPlugin simply takes error return values
 // and maps them into the "error" field in the event, return nil
 // for all events thereafter
-type LightweightErrSumPlugin struct{}
+type LightweightErrPlugin struct{}
 
-func (esp *LightweightErrSumPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+func (esp *LightweightErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
 	if eventErr == nil {
 		return 0
 	}
@@ -80,11 +80,11 @@ func (esp *LightweightErrSumPlugin) EachEvent(event *beat.Event, eventErr error)
 	return DropErrEvent
 }
 
-func (esp *LightweightErrSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (esp *LightweightErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	return 0
 }
 
-func (esp *LightweightErrSumPlugin) OnRetry() {
+func (esp *LightweightErrPlugin) OnRetry() {
 	// noop
 }
 

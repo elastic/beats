@@ -24,13 +24,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-// LightweightDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
+// LightweightDurationPlugin handles the logic for writing the `monitor.duration.us` field
 // for lightweight monitors.
-type LightweightDurationSumPlugin struct {
+type LightweightDurationPlugin struct {
 	startedAt *time.Time
 }
 
-func (lwdsp *LightweightDurationSumPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
+func (lwdsp *LightweightDurationPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
 	// Effectively only runs once, on the first event
 	if lwdsp.startedAt == nil {
 		now := time.Now()
@@ -39,21 +39,21 @@ func (lwdsp *LightweightDurationSumPlugin) EachEvent(event *beat.Event, _ error)
 	return 0
 }
 
-func (lwdsp *LightweightDurationSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (lwdsp *LightweightDurationPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(time.Since(*lwdsp.startedAt)))
 	return 0
 }
 
-func (lwdsp *LightweightDurationSumPlugin) OnRetry() {}
+func (lwdsp *LightweightDurationPlugin) OnRetry() {}
 
-// BrowserDurationSumPlugin handles the logic for writing the `monitor.duration.us` field
+// BrowserDurationPlugin handles the logic for writing the `monitor.duration.us` field
 // for browser monitors.
-type BrowserDurationSumPlugin struct {
+type BrowserDurationPlugin struct {
 	startedAt *time.Time
 	endedAt   *time.Time
 }
 
-func (bwdsp *BrowserDurationSumPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
+func (bwdsp *BrowserDurationPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
 	et, _ := event.GetValue("synthetics.type")
 	if et == "journey/start" {
 		bwdsp.startedAt = &event.Timestamp
@@ -64,7 +64,7 @@ func (bwdsp *BrowserDurationSumPlugin) EachEvent(event *beat.Event, _ error) Eac
 	return 0
 }
 
-func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (bwdsp *BrowserDurationPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	if bwdsp.startedAt == nil {
 		now := time.Now()
 		bwdsp.startedAt = &now
@@ -78,4 +78,4 @@ func (bwdsp *BrowserDurationSumPlugin) OnSummary(event *beat.Event) OnSummaryAct
 	return 0
 }
 
-func (bwdsp *BrowserDurationSumPlugin) OnRetry() {}
+func (bwdsp *BrowserDurationPlugin) OnRetry() {}
