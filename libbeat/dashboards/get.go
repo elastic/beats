@@ -20,6 +20,7 @@ package dashboards
 import (
 	"bytes"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/kibana"
@@ -38,8 +39,14 @@ func Get(client *kibana.Client, id string) ([]byte, error) {
 		return nil, fmt.Errorf("Kibana version must be at least " + MinimumRequiredVersionSavedObjects.String())
 	}
 
+	// add a special header for serverless, where saved_objects is "hidden"
+	headers := http.Header{}
+	if serverless, _ := client.KibanaIsServerless(); serverless {
+		headers.Add("x-elastic-internal-origin", "libbeat")
+	}
+
 	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true, "excludeExportDetails": true}`, id)
-	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
+	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, headers, strings.NewReader(body))
 	if err != nil || statusCode >= 300 {
 		return nil, fmt.Errorf("error exporting dashboard: %+v, code: %d", err, statusCode)
 	}

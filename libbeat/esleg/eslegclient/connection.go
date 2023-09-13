@@ -60,6 +60,8 @@ type Connection struct {
 	version          libversion.V
 	log              *logp.Logger
 	responseBuffer   *bytes.Buffer
+
+	isServerless bool
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -84,6 +86,16 @@ type ConnectionSettings struct {
 	IdleConnTimeout time.Duration
 
 	Transport httpcommon.HTTPTransportSettings
+}
+
+type ESPingData struct {
+	Version ESVersionData `json:"version"`
+	Name    string        `json:"name"`
+}
+
+type ESVersionData struct {
+	Number      string `json:"number"`
+	BuildFlavor string `json:"build_flavor"`
 }
 
 // NewConnection returns a new Elasticsearch client
@@ -268,33 +280,29 @@ func (conn *Connection) Connect() error {
 }
 
 // Ping sends a GET request to the Elasticsearch.
-func (conn *Connection) Ping() (string, error) {
+func (conn *Connection) Ping() (ESPingData, error) {
 	conn.log.Debugf("ES Ping(url=%v)", conn.URL)
 
 	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
 		conn.log.Debugf("Ping request failed with: %v", err)
-		return "", err
+		return ESPingData{}, err
 	}
 
 	if status >= 300 {
-		return "", fmt.Errorf("non 2xx response code: %d", status)
+		return ESPingData{}, fmt.Errorf("non 2xx response code: %d", status)
 	}
 
-	var response struct {
-		Version struct {
-			Number string
-		}
-	}
+	response := ESPingData{}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse JSON response: %w", err)
+		return ESPingData{}, fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
 	conn.log.Debugf("Ping status code: %v", status)
-	conn.log.Infof("Attempting to connect to Elasticsearch version %s", response.Version.Number)
-	return response.Version.Number, nil
+	conn.log.Infof("Attempting to connect to Elasticsearch version %s (%s)", response.Version.Number, response.Version.BuildFlavor)
+	return response, nil
 }
 
 // Close closes a connection.
@@ -394,17 +402,32 @@ func (conn *Connection) GetVersion() libversion.V {
 	return conn.version
 }
 
+// IsServerless returns true if we're connected to a serverless ES instance
+func (conn *Connection) IsServerless() bool {
+	// make sure we've initialized the version state first
+	_ = conn.GetVersion()
+	return conn.isServerless
+}
+
 func (conn *Connection) getVersion() error {
-	versionString, err := conn.Ping()
+	versionData, err := conn.Ping()
 	if err != nil {
 		return err
 	}
 
-	if v, err := libversion.New(versionString); err != nil {
-		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
+	if v, err := libversion.New(versionData.Version.Number); err != nil {
+		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionData.Version.Number)
 		conn.version = libversion.V{}
 	} else {
 		conn.version = *v
+	}
+
+	if versionData.Version.BuildFlavor == "serverless" {
+		conn.isServerless = true
+	} else if versionData.Version.BuildFlavor == "default" {
+		conn.isServerless = false
+	} else {
+		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 
 	return nil

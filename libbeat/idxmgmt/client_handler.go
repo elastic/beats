@@ -39,6 +39,7 @@ type clientHandler struct {
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() version.V
+	IsServerless() bool
 }
 
 // FileClient defines the minimal interface required for the Loader to

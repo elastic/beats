@@ -41,6 +41,8 @@ var (
 	// developers migrate their dashboards we are more lenient.
 	minimumRequiredVersionSavedObjects = version.MustNew("7.14.0")
 
+	// the base path of the saved objects API
+	// On serverless, you must add an x-elastic-internal-header to reach this API
 	importAPI = "/api/saved_objects/_import"
 )
 
@@ -58,9 +60,8 @@ type KibanaLoader struct {
 
 // NewKibanaLoader creates a new loader to load Kibana files
 func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
-
 	if cfg == nil || !cfg.Enabled() {
-		return nil, fmt.Errorf("Kibana is not configured or enabled")
+		return nil, fmt.Errorf("kibana is not configured or enabled")
 	}
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatname)
@@ -138,7 +139,8 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 		errs = append(errs, fmt.Errorf("error setting index '%s' in index pattern: %w", loader.config.Index, err))
 	}
 
-	if err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
+	err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String())
+	if err != nil {
 		errs = append(errs, fmt.Errorf("error loading index pattern: %w", err))
 	}
 	return errs.Err()
