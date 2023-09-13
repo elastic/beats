@@ -80,28 +80,28 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	errors := []error{}
 	monitorID, err := event.GetValue("monitor.id")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.id: %w", err))
 	}
 
 	durationUs, err := event.GetValue("monitor.duration.us")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.duration.us: %w", err))
 	}
 
 	monType, err := event.GetValue("monitor.type")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.type: %w", err))
 	}
 
 	status, err := event.GetValue("monitor.status")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.status: %w", err))
 	}
 
 	jsIface, err := event.GetValue("summary")
 	var attempt int
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract summary to add attempt info: %w", err))
 	} else {
 		js, ok := jsIface.(*jobsummary.JobSummary)
 		if ok && js != nil {
