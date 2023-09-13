@@ -49,6 +49,6 @@ func (busp *BrowserURLPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	return 0
 }
 
-func (busp *BrowserURLPlugin) OnRetry() {
+func (busp *BrowserURLPlugin) BeforeRetry() {
 	busp.urlFields = nil
 }

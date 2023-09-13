@@ -62,9 +62,9 @@ type SummarizerPlugin interface {
 	EachEvent(event *beat.Event, err error) EachEventActions
 	// OnSummary is run on the final (summary) event for each monitor.
 	OnSummary(event *beat.Event) OnSummaryActions
-	// OnRetry is called before the first EachEvent in the event of a retry
+	// BeforeRetry is called before the first EachEvent in the event of a retry
 	// can be used for resetting state between retries
-	OnRetry()
+	BeforeRetry()
 }
 
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
@@ -147,7 +147,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
 					return func(event *beat.Event) ([]jobs.Job, error) {
 						for _, p := range s.plugins {
-							p.OnRetry()
+							p.BeforeRetry()
 						}
 						time.Sleep(s.retryDelay)
 						return j(event)

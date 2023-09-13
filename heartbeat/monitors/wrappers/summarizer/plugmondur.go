@@ -44,7 +44,7 @@ func (lwdsp *LightweightDurationPlugin) OnSummary(event *beat.Event) OnSummaryAc
 	return 0
 }
 
-func (lwdsp *LightweightDurationPlugin) OnRetry() {}
+func (lwdsp *LightweightDurationPlugin) BeforeRetry() {}
 
 // BrowserDurationPlugin handles the logic for writing the `monitor.duration.us` field
 // for browser monitors.
@@ -78,4 +78,4 @@ func (bwdsp *BrowserDurationPlugin) OnSummary(event *beat.Event) OnSummaryAction
 	return 0
 }
 
-func (bwdsp *BrowserDurationPlugin) OnRetry() {}
+func (bwdsp *BrowserDurationPlugin) BeforeRetry() {}

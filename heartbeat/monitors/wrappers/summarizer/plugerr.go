@@ -89,7 +89,7 @@ func (esp *BrowserErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	return 0
 }
 
-func (esp *BrowserErrPlugin) OnRetry() {
+func (esp *BrowserErrPlugin) BeforeRetry() {
 	attempt := esp.attempt + 1
 	*esp = *NewBrowserErrPlugin()
 	esp.attempt = attempt
@@ -119,7 +119,7 @@ func (esp *LightweightErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	return 0
 }
 
-func (esp *LightweightErrPlugin) OnRetry() {
+func (esp *LightweightErrPlugin) BeforeRetry() {
 	// noop
 }
 
