@@ -96,7 +96,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1, beatname)
 			}
 		}
-		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 	return client, nil
 }
@@ -112,13 +112,13 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 	// read json file
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
+		return fmt.Errorf("fail to read index-pattern from file %s: %w", file, err)
 	}
 
 	var indexContent mapstr.M
 	err = json.Unmarshal(reader, &indexContent)
 	if err != nil {
-		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
+		return fmt.Errorf("fail to unmarshal the index content from file %s: %w", file, err)
 	}
 
 	return loader.ImportIndex(indexContent)
@@ -160,18 +160,18 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	// read json file
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
+		return fmt.Errorf("fail to read dashboard from file %s: %w", file, err)
 	}
 
 	content = loader.formatDashboardAssets(content)
 
 	dashboardWithReferences, err := loader.addReferences(file, content)
 	if err != nil {
-		return fmt.Errorf("error getting references of dashboard: %+v", err)
+		return fmt.Errorf("error getting references of dashboard: %w", err)
 	}
 
 	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), dashboardWithReferences); err != nil {
-		return fmt.Errorf("error dashboard asset: %+v", err)
+		return fmt.Errorf("error dashboard asset: %w", err)
 	}
 
 	loader.loadedAssets[file] = true
@@ -190,7 +190,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 	var d dashboardObj
 	err := json.Unmarshal(dashboard, &d)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse dashboard references: %+v", err)
+		return "", fmt.Errorf("failed to parse dashboard references: %w", err)
 	}
 
 	base := filepath.Dir(path)
@@ -205,12 +205,12 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 		}
 		refContents, err := ioutil.ReadFile(referencePath)
 		if err != nil {
-			return "", fmt.Errorf("fail to read referenced asset from file %s: %v", referencePath, err)
+			return "", fmt.Errorf("fail to read referenced asset from file %s: %w", referencePath, err)
 		}
 		refContents = loader.formatDashboardAssets(refContents)
 		refContentsWithReferences, err := loader.addReferences(referencePath, refContents)
 		if err != nil {
-			return "", fmt.Errorf("failed to get references of %s: %+v", referencePath, err)
+			return "", fmt.Errorf("failed to get references of %s: %w", referencePath, err)
 		}
 
 		result += refContentsWithReferences
@@ -220,7 +220,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 	var res mapstr.M
 	err = json.Unmarshal(dashboard, &res)
 	if err != nil {
-		return "", fmt.Errorf("failed to convert asset: %+v", err)
+		return "", fmt.Errorf("failed to convert asset: %w", err)
 	}
 	result += res.String() + "\n"
 

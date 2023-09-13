@@ -186,7 +186,10 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 		indexName = s.defaultIndex
 	}
 
-	selCfg.SetString("index", -1, indexName)
+	err = selCfg.SetString("index", -1, indexName)
+	if err != nil {
+		return nil, fmt.Errorf("error setting 'index' in selector cfg: %w", err)
+	}
 	buildSettings := outil.Settings{
 		Key:              "index",
 		MultiKey:         "indices",
