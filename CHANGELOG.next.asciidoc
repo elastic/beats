@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
+- Add log error when statsd server fails to start {pull}36477[36477]
 
 *Osquerybeat*
 
