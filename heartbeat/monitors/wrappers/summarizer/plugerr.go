@@ -36,6 +36,13 @@ type BrowserErrPlugin struct {
 	summaryErr     error
 	stepCount      int
 	journeyEndRcvd bool
+	attempt        int
+}
+
+func NewBrowserErrPlugin() *BrowserErrPlugin {
+	return &BrowserErrPlugin{
+		attempt: 1,
+	}
 }
 
 func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
@@ -71,7 +78,7 @@ func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEv
 func (esp *BrowserErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	// If no journey end was received, make that the summary error
 	if !esp.journeyEndRcvd {
-		esp.summaryErr = fmt.Errorf("journey did not finish executing, %d steps ran: %w", esp.stepCount, esp.summaryErr)
+		esp.summaryErr = fmt.Errorf("journey did not finish executing, %d steps ran (attempt: %d), wrapped: %w", esp.stepCount, esp.attempt, esp.summaryErr)
 		esp.summaryErrVal = errToFieldVal(esp.summaryErr)
 	}
 
@@ -83,13 +90,19 @@ func (esp *BrowserErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 }
 
 func (esp *BrowserErrPlugin) OnRetry() {
-	esp.summaryErrVal = nil
+	attempt := esp.attempt + 1
+	*esp = *NewBrowserErrPlugin()
+	esp.attempt = attempt
 }
 
 // LightweightErrPlugin simply takes error return values
 // and maps them into the "error" field in the event, return nil
 // for all events thereafter
 type LightweightErrPlugin struct{}
+
+func NewLightweightErrPlugin() *LightweightErrPlugin {
+	return &LightweightErrPlugin{}
+}
 
 func (esp *LightweightErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
 	if eventErr == nil {

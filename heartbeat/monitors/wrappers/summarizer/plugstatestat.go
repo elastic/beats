@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -33,7 +34,7 @@ import (
 // StateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
 type StateStatusPlugin struct {
-	js           *JobSummary
+	js           *jobsummary.JobSummary
 	stateTracker *monitorstate.Tracker
 	sf           stdfields.StdMonitorFields
 	checkGroup   string
@@ -44,7 +45,7 @@ func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMo
 	if err != nil {
 		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
 	}
-	js := NewJobSummary(1, sf.MaxAttempts, uu.String())
+	js := jobsummary.NewJobSummary(1, sf.MaxAttempts, uu.String())
 	return &StateStatusPlugin{
 		js:           js,
 		stateTracker: stateTracker,

@@ -18,7 +18,6 @@
 package summarizer
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -68,21 +67,6 @@ type SummarizerPlugin interface {
 	OnRetry()
 }
 
-// JobSummary is the struct that is serialized in the `summary` field in the emitted event.
-type JobSummary struct {
-	Attempt      uint16                   `json:"attempt"`
-	MaxAttempts  uint16                   `json:"max_attempts"`
-	FinalAttempt bool                     `json:"final_attempt"`
-	Up           uint16                   `json:"up"`
-	Down         uint16                   `json:"down"`
-	Status       monitorstate.StateStatus `json:"status"`
-	RetryGroup   string                   `json:"retry_group"`
-}
-
-func (js *JobSummary) String() string {
-	return fmt.Sprintf("<JobSummary status=%s attempt=%d/%d, final=%t, up=%d/%d retryGroup=%s>", js.Status, js.Attempt, js.MaxAttempts, js.FinalAttempt, js.Up, js.Down, js.RetryGroup)
-}
-
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
 	s := &Summarizer{
 		rootJob:        rootJob,
@@ -102,39 +86,19 @@ func (s *Summarizer) setupPlugins() {
 	// it intercepts errors
 	ssp := NewStateStatusPlugin(s.mst, s.sf)
 	if s.sf.Type == "browser" {
-		s.plugins = append(
-			s.plugins,
+		s.plugins = []SummarizerPlugin{
 			&BrowserDurationPlugin{},
 			&BrowserURLPlugin{},
 			ssp,
-			&BrowserErrPlugin{},
-		)
+			NewBrowserErrPlugin(),
+		}
 	} else {
-		s.plugins = append(
-			s.plugins,
+		s.plugins = []SummarizerPlugin{
 			&LightweightDurationPlugin{},
 			ssp,
-			&LightweightErrPlugin{},
-		)
+			NewLightweightErrPlugin(),
+		}
 	}
-}
-
-func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
-	if maxAttempts < 1 {
-		maxAttempts = 1
-	}
-
-	return &JobSummary{
-		MaxAttempts: maxAttempts,
-		Attempt:     attempt,
-		RetryGroup:  retryGroup,
-	}
-}
-
-// BumpAttempt swaps the JobSummary object's pointer for a new job summary
-// that is a clone of the current one but with the Attempt field incremented.
-func (js *JobSummary) BumpAttempt() {
-	*js = *NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
 }
 
 // Wrap wraps the given job in such a way that the last event summarizes all previous events

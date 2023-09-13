@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -153,9 +154,9 @@ func TestSummarizer(t *testing.T) {
 			rcvdStates := ""
 			rcvdAttempts := ""
 			rcvdEvents := []*beat.Event{}
-			rcvdSummaries := []*JobSummary{}
+			rcvdSummaries := []*jobsummary.JobSummary{}
 			i := 0
-			var lastSummary *JobSummary
+			var lastSummary *jobsummary.JobSummary
 			for {
 				s := NewSummarizer(job, sf, tracker)
 				// Shorten retry delay to make tests run faster
@@ -174,7 +175,7 @@ func TestSummarizer(t *testing.T) {
 						rcvdStates += "_"
 					}
 					summaryIface, _ := event.GetValue("summary")
-					summary := summaryIface.(*JobSummary)
+					summary := summaryIface.(*jobsummary.JobSummary)
 					duration, _ := event.GetValue("monitor.duration.us")
 
 					// Ensure that only summaries have a duration

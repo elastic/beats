@@ -44,7 +44,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -144,6 +144,7 @@ func TestSimpleJob(t *testing.T) {
 				Type:      testMonFields.Type,
 				Duration:  durationUs.(int64),
 				Status:    "up",
+				Attempt:   1,
 			}
 			require.ElementsMatch(t, []zap.Field{
 				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
@@ -355,12 +356,12 @@ func TestRetryMultiCont(t *testing.T) {
 
 	expected := []struct {
 		monStatus string
-		js        summarizer.JobSummary
+		js        jobsummary.JobSummary
 		state     monitorstate.State
 	}{
 		{
 			"down",
-			summarizer.JobSummary{
+			jobsummary.JobSummary{
 				Status:       "down",
 				FinalAttempt: true,
 				// we expect two up since this is a lightweight
@@ -380,7 +381,7 @@ func TestRetryMultiCont(t *testing.T) {
 		},
 		{
 			"down",
-			summarizer.JobSummary{
+			jobsummary.JobSummary{
 				Status:       "down",
 				FinalAttempt: true,
 				Up:           0,
@@ -717,6 +718,7 @@ var browserLogValidator = func(monId string, expectedDurationUs int64, stepCount
 			Duration:  expectedDurationUs,
 			Status:    status,
 			Steps:     &stepCount,
+			Attempt:   1,
 		}
 		actionE := logp.Any("event", map[string]string{"action": logger.ActionMonitorRun})
 		monE := logp.Any("monitor", &expectedMonitor)
@@ -825,17 +827,17 @@ func TestECSErrors(t *testing.T) {
 		"on non-summary event": false,
 	}
 
-	ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
-	wrappedECSErr := fmt.Errorf("wrapped: %w", ecse)
-	expectedECSErr := ecserr.NewECSErr(
-		ecse.Type,
-		ecse.Code,
-		wrappedECSErr.Error(),
-	)
-
 	for name, makeSummaryEvent := range testCases {
 		t.Run(name, func(t *testing.T) {
-			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, wrappedECSErr, projectMonitorValues)}, testBrowserMonFields, nil)
+			ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
+			wrappedECSErr := fmt.Errorf("journey did not finish executing, 0 steps ran (attempt: 1), wrapped: %w", ecse)
+			expectedECSErr := ecserr.NewECSErr(
+				ecse.Type,
+				ecse.Code,
+				wrappedECSErr.Error(),
+			)
+
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, ecse, projectMonitorValues)}, testBrowserMonFields, nil)
 			event := &beat.Event{}
 			_, err := j[0](event)
 			require.NoError(t, err)

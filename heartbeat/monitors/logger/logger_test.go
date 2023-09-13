@@ -28,6 +28,7 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -47,6 +48,7 @@ func TestLogRun(t *testing.T) {
 		"monitor.duration.us": durationUs,
 		"monitor.type":        "browser",
 		"monitor.status":      "down",
+		"summary":             jobsummary.NewJobSummary(1, 1, "abc"),
 	}
 
 	event := beat.Event{Fields: fields}
@@ -64,6 +66,7 @@ func TestLogRun(t *testing.T) {
 		Duration:  durationUs,
 		Status:    "down",
 		Steps:     &steps,
+		Attempt:   1,
 	}
 
 	assert.ElementsMatch(t, []zap.Field{

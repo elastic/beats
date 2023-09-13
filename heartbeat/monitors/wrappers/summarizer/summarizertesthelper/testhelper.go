@@ -25,7 +25,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/llpath"
@@ -44,9 +44,9 @@ func SummaryValidator(up uint16, down uint16) validator.Validator {
 
 func summaryIsdef(up uint16, down uint16) isdef.IsDef {
 	return isdef.Is("summary", func(path llpath.Path, v interface{}) *llresult.Results {
-		js, ok := v.(summarizer.JobSummary)
+		js, ok := v.(jobsummary.JobSummary)
 		if !ok {
-			return llresult.SimpleResult(path, false, fmt.Sprintf("expected a *JobSummary, got %v", v))
+			return llresult.SimpleResult(path, false, fmt.Sprintf("expected a *jobsummary.JobSummary, got %v", v))
 		}
 
 		if js.Up != up || js.Down != down {

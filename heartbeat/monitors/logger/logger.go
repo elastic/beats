@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -44,7 +45,7 @@ type MonitorRunInfo struct {
 	Duration  int64  `json:"-"`
 	Steps     *int   `json:"steps,omitempty"`
 	Status    string `json:"status"`
-	Attempts  uint16 `json:"attempts`
+	Attempt   int    `json:"attempt"`
 }
 
 func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
@@ -97,9 +98,15 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		errors = append(errors, err)
 	}
 
-	attempts, err := event.GetValue("summary.attempt")
+	jsIface, err := event.GetValue("summary")
+	var attempt int
 	if err != nil {
 		errors = append(errors, err)
+	} else {
+		js, ok := jsIface.(*jobsummary.JobSummary)
+		if ok && js != nil {
+			attempt = int(js.Attempt)
+		}
 	}
 
 	if len(errors) > 0 {
@@ -111,7 +118,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		Type:      monType.(string),
 		Duration:  durationUs.(int64),
 		Status:    status.(string),
-		Attempts:  attempts.(uint16),
+		Attempt:   attempt,
 	}
 
 	sc, _ := event.Meta.GetValue(META_STEP_COUNT)
