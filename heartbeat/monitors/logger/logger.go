@@ -44,6 +44,7 @@ type MonitorRunInfo struct {
 	Duration  int64  `json:"-"`
 	Steps     *int   `json:"steps,omitempty"`
 	Status    string `json:"status"`
+	Attempts  uint16 `json:"attempts`
 }
 
 func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
@@ -96,6 +97,11 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		errors = append(errors, err)
 	}
 
+	attempts, err := event.GetValue("summary.attempt")
+	if err != nil {
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return nil, fmt.Errorf("logErrors: %+v", errors)
 	}
@@ -105,6 +111,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		Type:      monType.(string),
 		Duration:  durationUs.(int64),
 		Status:    status.(string),
+		Attempts:  attempts.(uint16),
 	}
 
 	sc, _ := event.Meta.GetValue(META_STEP_COUNT)

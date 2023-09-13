@@ -19,6 +19,7 @@ package summarizer
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -31,22 +32,36 @@ import (
 // for browser monitors, preferentially using the journey/end event's
 // error field for errors.
 type BrowserErrPlugin struct {
-	summaryErrVal interface{}
+	summaryErrVal  interface{}
+	summaryErr     error
+	stepCount      int
+	journeyEndRcvd bool
 }
 
 func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
+	// track these to determine if the journey
+	// needs an error injected due to incompleteness
+	st := synthType(event)
+	switch st {
+	case "step/end":
+		esp.stepCount++
+	case "journey/end":
+		esp.journeyEndRcvd = true
+	}
+
+	// Nothing else to do if there's no error
 	if eventErr == nil {
 		return 0
 	}
 
+	// Merge the error value into the event's "error" field
 	errVal := errToFieldVal(eventErr)
 	mergeErrVal(event, errVal)
 
-	isJourneyEnd := false
-	if synthType(event) == "journey/end" {
-		isJourneyEnd = true
-	}
-	if esp.summaryErrVal == nil || isJourneyEnd {
+	// If there is no error value OR this is the journey end event
+	// record this as the definitive error
+	if esp.summaryErrVal == nil || st == "journey/end" {
+		esp.summaryErr = eventErr
 		esp.summaryErrVal = errVal
 	}
 
@@ -54,9 +69,16 @@ func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEv
 }
 
 func (esp *BrowserErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+	// If no journey end was received, make that the summary error
+	if !esp.journeyEndRcvd {
+		esp.summaryErr = fmt.Errorf("journey did not finish executing, %d steps ran: %w", esp.stepCount, esp.summaryErr)
+		esp.summaryErrVal = errToFieldVal(esp.summaryErr)
+	}
+
 	if esp.summaryErrVal != nil {
 		mergeErrVal(event, esp.summaryErrVal)
 	}
+
 	return 0
 }
 
@@ -103,17 +125,4 @@ func errToFieldVal(eventErr error) (errVal interface{}) {
 
 func mergeErrVal(event *beat.Event, errVal interface{}) {
 	eventext.MergeEventFields(event, mapstr.M{"error": errVal})
-}
-
-func synthType(event *beat.Event) string {
-	synthType, err := event.GetValue("synthetics.type")
-	if err != nil {
-		return ""
-	}
-
-	str, ok := synthType.(string)
-	if !ok {
-		return ""
-	}
-	return str
 }
