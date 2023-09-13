@@ -70,6 +70,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic when redact option is not provided to CEL input. {issue}36387[36387] {pull}36388[36388]
 - Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
+- Revert error introduced in {pull}35734[35734] when symlinks can't be resolved in filestream. {pull}36557[36557]
 
 *Heartbeat*
 
