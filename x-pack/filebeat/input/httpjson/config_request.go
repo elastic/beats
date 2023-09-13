@@ -151,7 +151,7 @@ func (c *requestConfig) Validate() error {
 		return fmt.Errorf("unsupported method %q", c.Method)
 	}
 
-	if _, err := newBasicTransformsFromConfig(c.Transforms, requestNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, requestNamespace, nil); err != nil {
 		return err
 	}
 

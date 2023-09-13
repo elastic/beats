@@ -30,7 +30,7 @@ func TestAddrs(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if len(addr4) == 0 {
-			t.Errorf("expected addr in addr4 for IPv4 address: %v", addr6)
+			t.Errorf("expected addr in addr4 for IPv4 address: addr6 is %v", addr6)
 		}
 		if len(addr6) != 0 {
 			t.Errorf("unexpected addrs in addr6 for IPv4 address: %v", addr6)
@@ -43,10 +43,10 @@ func TestAddrs(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if len(addr4) != 0 {
-			t.Errorf("expected addr in addr4 for IPv4 address: %v", addr6)
+			t.Errorf("unexpected addr in addr4 for IPv6 address: %v", addr4)
 		}
 		if len(addr6) == 0 {
-			t.Errorf("unexpected addrs in addr6 for IPv4 address: %v", addr6)
+			t.Errorf("expected addrs in addr6 for IPv6 address: addr4 is %v", addr4)
 		}
 	})
 }

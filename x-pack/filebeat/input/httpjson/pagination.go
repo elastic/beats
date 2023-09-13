@@ -19,21 +19,15 @@ import (
 
 const paginationNamespace = "pagination"
 
-func registerPaginationTransforms() {
-	registerTransform(paginationNamespace, appendName, newAppendPagination)
-	registerTransform(paginationNamespace, deleteName, newDeletePagination)
-	registerTransform(paginationNamespace, setName, newSetRequestPagination)
-}
-
 type pagination struct {
-	log            *logp.Logger
-	httpClient     *httpClient
+	client         *httpClient
 	requestFactory *requestFactory
 	decoder        decoderFunc
+	log            *logp.Logger
 }
 
-func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {
-	pagination := &pagination{httpClient: httpClient, log: log}
+func newPagination(config config, client *httpClient, log *logp.Logger) *pagination {
+	pagination := &pagination{client: client, log: log}
 	if config.Response == nil {
 		return pagination
 	}
@@ -44,8 +38,8 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 		return pagination
 	}
 
-	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
-	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
+	rts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, log)
+	pts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Pagination, paginationNamespace, log)
 
 	body := func() *mapstr.M {
 		if config.Response.RequestBodyOnPagination {
@@ -144,7 +138,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 	}
 
 	//nolint:bodyclose // response body is closed through drainBody method
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq)
+	resp, err := iter.pagination.client.do(iter.stdCtx, httpReq)
 	if err != nil {
 		return nil, false, err
 	}

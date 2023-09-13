@@ -32,9 +32,6 @@ func TestMetrics(t *testing.T) {
 		{
 			name: "Test pagination metrics",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				registerPaginationTransforms()
-				registerResponseTransforms()
-				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)

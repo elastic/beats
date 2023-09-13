@@ -138,6 +138,9 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 
 		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
 		files, err := filepath.Glob(glob)
+		if err != nil {
+			t.Logf("glob error with: %s: %s", glob, err)
+		}
 		for _, f := range files {
 			contents, err := readLastNBytes(f, maxlen)
 			if err != nil {
@@ -210,10 +213,10 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
-	b.stdout.Seek(0, 0)
-	b.stdout.Truncate(0)
-	b.stderr.Seek(0, 0)
-	b.stderr.Truncate(0)
+	_, _ = b.stdout.Seek(0, 0)
+	_ = b.stdout.Truncate(0)
+	_, _ = b.stderr.Seek(0, 0)
+	_ = b.stderr.Truncate(0)
 	var procAttr os.ProcAttr
 	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
 	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
@@ -254,7 +257,7 @@ func (b *BeatProc) Stop() {
 func (b *BeatProc) LogMatch(match string) bool {
 	re := regexp.MustCompile(match)
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, os.SEEK_SET)
+	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
 	if err != nil {
 		b.t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -294,7 +297,7 @@ func (b *BeatProc) LogMatch(match string) bool {
 func (b *BeatProc) LogContains(s string) bool {
 	t := b.t
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, os.SEEK_SET)
+	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
 	if err != nil {
 		t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -402,14 +405,17 @@ func (b *BeatProc) openLogFile() *os.File {
 // If the tests are run with -v, the temporary directory will
 // be logged.
 func createTempDir(t *testing.T) string {
-	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
-		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
+	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
 	}
-
-	if err := os.MkdirAll(tempDir, 0o766); err != nil {
-		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
+	err = os.MkdirAll(rootDir, 0o750)
+	if err != nil {
+		t.Fatalf("error making test dir: %s: %s", rootDir, err)
+	}
+	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))
+	if err != nil {
+		t.Fatalf("failed to make temp directory: %s", err)
 	}
 
 	cleanup := func() {
@@ -450,6 +456,7 @@ func EnsureESIsRunning(t *testing.T) {
 		// containers required for integration tests
 		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage compose:Up)", err)
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
 	}
@@ -570,7 +577,10 @@ func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
 func HttpDo(t *testing.T, method string, targetURL url.URL) (statusCode int, body []byte, err error) {
 	t.Helper()
 	client := &http.Client{}
-	req, err := http.NewRequest(method, targetURL.String(), nil)
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, method, targetURL.String(), nil)
 	if err != nil {
 		return 0, nil, fmt.Errorf("error making request, method: %s, url: %s, error: %w", method, targetURL.String(), err)
 	}
