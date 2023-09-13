@@ -346,6 +346,19 @@ func (client *Client) readVersion() error {
 // IgnoreVersion was set when creating the client.
 func (client *Client) GetVersion() version.V { return client.Version }
 
+// KibanaIsServerless returns true if we're talking to a serverless instance.
+// Right now we don't have an API to tell us if we're running against serverless or not, so this actual implementation is something of a hack.
+// see https://github.com/elastic/kibana/pull/164850
+func (client *Client) KibanaIsServerless() (bool, error) {
+	ret, _, err := client.Connection.Request("GET", "/api/saved_objects/_find", nil, nil, nil)
+	if ret > 300 && strings.Contains(err.Error(), "not available with the current configuration") {
+		return true, nil
+	} else if err != nil {
+		return false, fmt.Errorf("error checking serverless status: %w", err)
+	}
+	return false, nil
+}
+
 func (client *Client) ImportMultiPartFormFile(url string, params url.Values, filename string, contents string) error {
 	buf := &bytes.Buffer{}
 	w := multipart.NewWriter(buf)
@@ -364,9 +377,13 @@ func (client *Client) ImportMultiPartFormFile(url string, params url.Values, fil
 	}
 	w.Close()
 
-	headers := http.Header{}
-	headers.Add("Content-Type", w.FormDataContentType())
-	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
+	// On serverless, special header is required to talk to this endpoint
+	sendHeaders := http.Header{}
+	sendHeaders.Add("Content-Type", w.FormDataContentType())
+	if serverless, _ := client.KibanaIsServerless(); serverless {
+		sendHeaders.Add("x-elastic-internal-origin", "elastic-agent-libs")
+	}
+	statusCode, response, err := client.Connection.Request("POST", url, params, sendHeaders, buf)
 	if err != nil {
 		return fmt.Errorf("returned %d to import file: %w. Response: %s", statusCode, err, response)
 	}
