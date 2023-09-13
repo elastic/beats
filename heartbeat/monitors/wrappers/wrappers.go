@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
@@ -64,7 +63,6 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, len(js) > 1),
-		addMonitorStatus(),
 	)
 }
 
@@ -162,25 +160,5 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 	return mapstr.M{
 		"gte": started,
 		"lt":  maxEnd,
-	}
-}
-
-// addMonitorStatus wraps the given Job's execution such that any error returned
-// by the original Job will be set as a field. The original error will not be
-// passed through as a return value. Errors may still be present but only if there
-// is an actual error wrapping the error.
-func addMonitorStatus() jobs.JobWrapper {
-	return func(origJob jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := origJob(event)
-
-			eventext.MergeEventFields(event, mapstr.M{
-				"monitor": mapstr.M{
-					"status": look.Status(err),
-				},
-			})
-
-			return cont, err
-		}
 	}
 }

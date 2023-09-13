@@ -23,6 +23,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
@@ -49,7 +50,6 @@ func (ssp *BrowserStateStatusPlugin) EachEvent(event *beat.Event, jobErr error) 
 		// any err will mark it as a down job
 		ssp.cssp.js.Down = 1
 	}
-
 	ssp.cssp.BeforeEach(event, jobErr)
 
 	return 0
@@ -64,8 +64,6 @@ func (ssp *BrowserStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSumm
 
 	res := ssp.cssp.BeforeSummary(event)
 
-	// lightweights already have this from the wrapper
-	// synchronize monitor.status with summary.status
 	_, _ = event.PutValue("monitor.status", string(ssp.cssp.js.Status))
 	return res
 }
@@ -87,15 +85,17 @@ func NewLightweightStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdf
 }
 
 func (ssp *LightweightStateStatusPlugin) EachEvent(event *beat.Event, jobErr error) EachEventActions {
-	monitorStatus, _ := event.GetValue("monitor.status")
+	status := look.Status(jobErr)
+	_, _ = event.PutValue("monitor.status", status)
 	if !eventext.IsEventCancelled(event) { // if this event contains a status...
-		mss := monitorstate.StateStatus(monitorStatus.(string))
+		mss := monitorstate.StateStatus(status)
 
 		if mss == monitorstate.StatusUp {
 			ssp.cssp.js.Up++
 		} else {
 			ssp.cssp.js.Down++
 		}
+
 	}
 
 	ssp.cssp.BeforeEach(event, jobErr)
