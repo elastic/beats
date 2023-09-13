@@ -149,9 +149,9 @@ require (
 	go.elastic.co/ecszap v1.0.1
 	go.elastic.co/go-licence-detector v0.6.0
 	go.etcd.io/bbolt v1.3.6
-	go.uber.org/atomic v1.10.0
-	go.uber.org/multierr v1.10.0
-	go.uber.org/zap v1.24.0
+	go.uber.org/atomic v1.11.0
+	go.uber.org/multierr v1.11.0
+	go.uber.org/zap v1.25.0
 	golang.org/x/crypto v0.12.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.9.0
@@ -202,7 +202,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.2
-	github.com/elastic/elastic-agent-libs v0.3.11
+	github.com/elastic/elastic-agent-libs v0.3.15-0.20230913212237-dbdaf18c898b
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
@@ -402,6 +402,7 @@ replace (
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
+
 )
 
 // Exclude this version because the version has an invalid checksum.

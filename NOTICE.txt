@@ -12712,11 +12712,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.3.11
+Version: v0.3.15-0.20230913212237-dbdaf18c898b
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.3.11/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.3.15-0.20230913212237-dbdaf18c898b/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -24590,11 +24590,11 @@ Contents of probable licence file $GOMODCACHE/go.mongodb.org/mongo-driver@v1.5.1
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/atomic
-Version: v1.10.0
+Version: v1.11.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/atomic@v1.10.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/atomic@v1.11.0/LICENSE.txt:
 
 Copyright (c) 2016 Uber Technologies, Inc.
 
@@ -24619,11 +24619,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/multierr
-Version: v1.10.0
+Version: v1.11.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.10.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.11.0/LICENSE.txt:
 
 Copyright (c) 2017-2021 Uber Technologies, Inc.
 
@@ -24648,11 +24648,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/zap
-Version: v1.24.0
+Version: v1.25.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/zap@v1.24.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/zap@v1.25.0/LICENSE.txt:
 
 Copyright (c) 2016-2017 Uber Technologies, Inc.
 
@@ -34042,11 +34042,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 --------------------------------------------------------------------------------
 Dependency : github.com/benbjohnson/clock
-Version: v1.1.0
+Version: v1.3.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/benbjohnson/clock@v1.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/benbjohnson/clock@v1.3.0/LICENSE:
 
 The MIT License (MIT)
 
@@ -49952,11 +49952,11 @@ Contents of probable licence file $GOMODCACHE/go.opencensus.io@v0.24.0/LICENSE:
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/goleak
-Version: v1.1.12
+Version: v1.2.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/goleak@v1.1.12/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.uber.org/goleak@v1.2.0/LICENSE:
 
 The MIT License (MIT)
 
