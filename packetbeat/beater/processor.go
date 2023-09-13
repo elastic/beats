@@ -220,14 +220,31 @@ func setupSniffer(id string, cfg config.Config, protocols *protos.ProtocolsStruc
 		return nil, err
 	}
 
-	for i, iface := range cfg.Interfaces {
+	// Ensure interfaces are uniquely represented so we don't listen on the
+	// same interface with multiple sniffers.
+	interfaces := make([]config.InterfaceConfig, 0, len(cfg.Interfaces))
+	seen := make(map[uint64]bool)
+	for _, iface := range cfg.Interfaces {
+		// Currently we hash on all fields in the config. We can revise this in future.
+		h, err := hashstructure.Hash(iface, nil)
+		if err != nil {
+			return nil, fmt.Errorf("could not deduplicate interface configurations: %w", err)
+		}
+		if seen[h] {
+			continue
+		}
+		seen[h] = true
+		interfaces = append(interfaces, iface)
+	}
+
+	for i, iface := range interfaces {
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
 		}
-		cfg.Interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
+		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, cfg.Interfaces)
+	return sniffer.New(id, false, "", decoders, interfaces)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
