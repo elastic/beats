@@ -20,14 +20,14 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
 type CheckHistItem struct {
 	cg      string
-	summary *summarizer.JobSummary
+	summary *jobsummary.JobSummary
 }
 
 func TestSimpleScenariosBasicFields(t *testing.T) {
@@ -50,10 +50,10 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 			require.NoError(t, err)
 			cg := cgIface.(string)
 
-			var summary *summarizer.JobSummary
+			var summary *jobsummary.JobSummary
 			summaryIface, err := e.GetValue("summary")
 			if err == nil {
-				summary = summaryIface.(*summarizer.JobSummary)
+				summary = summaryIface.(*jobsummary.JobSummary)
 			}
 
 			var lastCheck *CheckHistItem
