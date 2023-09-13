@@ -180,8 +180,7 @@ func getNodeName(http *helper.HTTP, uri string) (string, error) {
 }
 
 func getMasterName(http *helper.HTTP, uri string) (string, error) {
-	// TODO: evaluate on why when run with ?local=true request does not contain master_node field
-	content, err := fetchPath(http, uri, "_cluster/state/master_node", "")
+	content, err := fetchPath(http, uri, "_cluster/state/master_node", "local=true")
 	if err != nil {
 		return "", err
 	}
@@ -287,7 +286,7 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (maps
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	content, err := fetchPath(http, resetURI, clusterStateURI, "")
+	content, err := fetchPath(http, resetURI, clusterStateURI, "local=true")
 	if err != nil {
 		return nil, err
 	}
