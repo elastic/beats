@@ -33,20 +33,98 @@ import (
 
 // StateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
-type StateStatusPlugin struct {
+type BrowserStateStatusPlugin struct {
+	cssp *commonSSP
+}
+
+func NewBrowserStateStatusplugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *BrowserStateStatusPlugin {
+	return &BrowserStateStatusPlugin{
+		cssp: newCommonSSP(stateTracker, sf),
+	}
+}
+
+func (ssp *BrowserStateStatusPlugin) EachEvent(event *beat.Event, jobErr error) EachEventActions {
+	if jobErr != nil {
+		// Browser jobs only return either a single up or down
+		// any err will mark it as a down job
+		ssp.cssp.js.Down = 1
+	}
+
+	ssp.cssp.BeforeEach(event, jobErr)
+
+	return 0
+}
+
+func (ssp *BrowserStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
+	if ssp.cssp.js.Down == 0 {
+		// Browsers don't have a prior increment of this, so set it to some
+		// non-zero value
+		ssp.cssp.js.Up = 1
+	}
+
+	res := ssp.cssp.BeforeSummary(event)
+
+	// lightweights already have this from the wrapper
+	// synchronize monitor.status with summary.status
+	_, _ = event.PutValue("monitor.status", string(ssp.cssp.js.Status))
+	return res
+}
+
+func (ssp *BrowserStateStatusPlugin) BeforeRetry() {
+	// noop
+}
+
+// LightweightStateStatusPlugin encapsulates the writing of the primary fields used by the summary,
+// those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
+type LightweightStateStatusPlugin struct {
+	cssp *commonSSP
+}
+
+func NewLightweightStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *LightweightStateStatusPlugin {
+	return &LightweightStateStatusPlugin{
+		cssp: newCommonSSP(stateTracker, sf),
+	}
+}
+
+func (ssp *LightweightStateStatusPlugin) EachEvent(event *beat.Event, jobErr error) EachEventActions {
+	monitorStatus, _ := event.GetValue("monitor.status")
+	if !eventext.IsEventCancelled(event) { // if this event contains a status...
+		mss := monitorstate.StateStatus(monitorStatus.(string))
+
+		if mss == monitorstate.StatusUp {
+			ssp.cssp.js.Up++
+		} else {
+			ssp.cssp.js.Down++
+		}
+	}
+
+	ssp.cssp.BeforeEach(event, jobErr)
+
+	return 0
+}
+
+func (ssp *LightweightStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
+	return ssp.cssp.BeforeSummary(event)
+}
+
+func (ssp *LightweightStateStatusPlugin) BeforeRetry() {
+	// noop
+}
+
+type commonSSP struct {
 	js           *jobsummary.JobSummary
 	stateTracker *monitorstate.Tracker
 	sf           stdfields.StdMonitorFields
 	checkGroup   string
 }
 
-func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *StateStatusPlugin {
+func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *commonSSP {
 	uu, err := uuid.NewV1()
 	if err != nil {
 		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
 	}
 	js := jobsummary.NewJobSummary(1, sf.MaxAttempts, uu.String())
-	return &StateStatusPlugin{
+	return &commonSSP{
 		js:           js,
 		stateTracker: stateTracker,
 		sf:           sf,
@@ -54,44 +132,15 @@ func NewStateStatusPlugin(stateTracker *monitorstate.Tracker, sf stdfields.StdMo
 	}
 }
 
-func (ssp *StateStatusPlugin) EachEvent(event *beat.Event, jobErr error) EachEventActions {
-	if ssp.sf.Type == "browser" {
-		if jobErr != nil {
-			// Browser jobs only return either a single up or down
-			ssp.js.Down = 1
-		}
-	} else {
-		monitorStatus, _ := event.GetValue("monitor.status")
-		if !eventext.IsEventCancelled(event) { // if this event contains a status...
-			mss := monitorstate.StateStatus(monitorStatus.(string))
-
-			if mss == monitorstate.StatusUp {
-				ssp.js.Up++
-			} else {
-				ssp.js.Down++
-			}
-		}
-	}
-
+func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
 	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
-
-	return 0
 }
 
-func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
-	isBrowser := ssp.sf.Type == "browser"
+func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	if ssp.js.Down > 0 {
 		ssp.js.Status = monitorstate.StatusDown
 	} else {
-		if isBrowser {
-			// Browsers don't have a prior increment of this, so set it to some
-			// non-zero value
-			ssp.js.Up = 1
-		}
 		ssp.js.Status = monitorstate.StatusUp
-	}
-	if isBrowser {
-		event.PutValue("monitor.status", string(ssp.js.Status))
 	}
 
 	// Get the last status of this monitor, we use this later to
@@ -126,9 +175,8 @@ func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
 	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
-		return RetryOnSummary
+		return RetryBeforeSummary
 	}
+
 	return 0
 }
-
-func (ssp *StateStatusPlugin) BeforeRetry() {}

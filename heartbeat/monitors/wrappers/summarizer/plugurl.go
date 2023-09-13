@@ -39,7 +39,7 @@ func (busp *BrowserURLPlugin) EachEvent(event *beat.Event, eventErr error) EachE
 	return 0
 }
 
-func (busp *BrowserURLPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (busp *BrowserURLPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	if busp.urlFields != nil {
 		_, err := event.PutValue("url", busp.urlFields)
 		if err != nil {

@@ -64,7 +64,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, len(js) > 1),
-		addMonitorStatus(nil),
+		addMonitorStatus(),
 	)
 }
 
@@ -169,33 +169,18 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-func addMonitorStatus(match EventMatcher) jobs.JobWrapper {
+func addMonitorStatus() jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
 
-			if match == nil || match(event) {
-				eventext.MergeEventFields(event, mapstr.M{
-					"monitor": mapstr.M{
-						"status": look.Status(err),
-					},
-				})
-			}
+			eventext.MergeEventFields(event, mapstr.M{
+				"monitor": mapstr.M{
+					"status": look.Status(err),
+				},
+			})
 
 			return cont, err
 		}
 	}
 }
-
-func byEventType(t string) func(event *beat.Event) bool {
-	return func(event *beat.Event) bool {
-		eventType, err := event.Fields.GetValue("event.type")
-		if err != nil {
-			return false
-		}
-
-		return eventType == t
-	}
-}
-
-type EventMatcher func(event *beat.Event) bool

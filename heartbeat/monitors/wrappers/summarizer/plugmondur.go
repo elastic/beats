@@ -39,7 +39,7 @@ func (lwdsp *LightweightDurationPlugin) EachEvent(event *beat.Event, _ error) Ea
 	return 0
 }
 
-func (lwdsp *LightweightDurationPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (lwdsp *LightweightDurationPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(time.Since(*lwdsp.startedAt)))
 	return 0
 }
@@ -64,7 +64,7 @@ func (bwdsp *BrowserDurationPlugin) EachEvent(event *beat.Event, _ error) EachEv
 	return 0
 }
 
-func (bwdsp *BrowserDurationPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (bwdsp *BrowserDurationPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	if bwdsp.startedAt == nil {
 		now := time.Now()
 		bwdsp.startedAt = &now

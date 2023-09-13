@@ -48,11 +48,11 @@ type EachEventActions uint8
 // DropErrEvent if will remove the error from the job return.
 const DropErrEvent = 1
 
-// OnSummaryActions is a set of options using bitmasks to inform execution after the OnSummary callback
-type OnSummaryActions uint8
+// BeforeSummaryActions is a set of options using bitmasks to inform execution after the BeforeSummary callback
+type BeforeSummaryActions uint8
 
-// RetryOnSummary will retry the job once complete.
-const RetryOnSummary = 1
+// RetryBeforeSummary will retry the job once complete.
+const RetryBeforeSummary = 1
 
 // SummarizerPlugin encapsulates functionality for the Summarizer that's easily expressed
 // in one location. Prior to this code was strewn about a bit more and following it was
@@ -60,8 +60,8 @@ const RetryOnSummary = 1
 type SummarizerPlugin interface {
 	// EachEvent is called on each event, and allows for the mutation of events
 	EachEvent(event *beat.Event, err error) EachEventActions
-	// OnSummary is run on the final (summary) event for each monitor.
-	OnSummary(event *beat.Event) OnSummaryActions
+	// BeforeSummary is run on the final (summary) event for each monitor.
+	BeforeSummary(event *beat.Event) BeforeSummaryActions
 	// BeforeRetry is called before the first EachEvent in the event of a retry
 	// can be used for resetting state between retries
 	BeforeRetry()
@@ -84,18 +84,17 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 func (s *Summarizer) setupPlugins() {
 	// ssp must appear before Err plugin since
 	// it intercepts errors
-	ssp := NewStateStatusPlugin(s.mst, s.sf)
 	if s.sf.Type == "browser" {
 		s.plugins = []SummarizerPlugin{
 			&BrowserDurationPlugin{},
 			&BrowserURLPlugin{},
-			ssp,
+			NewBrowserStateStatusplugin(s.mst, s.sf),
 			NewBrowserErrPlugin(),
 		}
 	} else {
 		s.plugins = []SummarizerPlugin{
 			&LightweightDurationPlugin{},
-			ssp,
+			NewLightweightStateStatusPlugin(s.mst, s.sf),
 			NewLightweightErrPlugin(),
 		}
 	}
@@ -125,8 +124,8 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 		if s.contsRemaining == 0 {
 			var retry bool
 			for _, plugin := range s.plugins {
-				actions := plugin.OnSummary(event)
-				if actions&RetryOnSummary != 0 {
+				actions := plugin.BeforeSummary(event)
+				if actions&RetryBeforeSummary != 0 {
 					retry = true
 				}
 

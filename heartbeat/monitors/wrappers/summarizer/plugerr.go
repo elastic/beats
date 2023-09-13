@@ -75,7 +75,7 @@ func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEv
 	return DropErrEvent
 }
 
-func (esp *BrowserErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (esp *BrowserErrPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	// If no journey end was received, make that the summary error
 	if !esp.journeyEndRcvd {
 		esp.summaryErr = fmt.Errorf("journey did not finish executing, %d steps ran (attempt: %d), wrapped: %w", esp.stepCount, esp.attempt, esp.summaryErr)
@@ -115,7 +115,7 @@ func (esp *LightweightErrPlugin) EachEvent(event *beat.Event, eventErr error) Ea
 	return DropErrEvent
 }
 
-func (esp *LightweightErrPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+func (esp *LightweightErrPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	return 0
 }
 
