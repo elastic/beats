@@ -127,7 +127,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs multierror.Errors

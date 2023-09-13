@@ -164,16 +164,19 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 	if cfg.HasField("indices") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error getting child value 'indices' in config: %w", err)
 		}
-		selCfg.SetChild("indices", -1, sub)
+		err = selCfg.SetChild("indices", -1, sub)
+		if err != nil {
+			return nil, fmt.Errorf("error setting child 'indicies': %w", err)
+		}
 	}
 
 	var indexName string
 	if cfg.HasField("index") {
 		indexName, err = cfg.String("index", -1)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error getting config string 'index': %w", err)
 		}
 	}
 
@@ -250,7 +253,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		// install ilm policy
 		policyCreated, err := m.ilm.EnsurePolicy(ilmComponent.overwrite)
 		if err != nil {
-			return err
+			return fmt.Errorf("EnsurePolicy failed during ILM setup: %w", err)
 		}
 
 		// The template should be updated if a new policy is created.
@@ -266,7 +269,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		if ilmComponent.enabled {
 			tmplCfg, err = applyILMSettings(log, tmplCfg, m.support.ilm.Policy())
 			if err != nil {
-				return err
+				return fmt.Errorf("error applying ILM settings: %w", err)
 			}
 		}
 		fields := m.assets.Fields(m.support.info.Beat)
