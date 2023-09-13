@@ -77,7 +77,6 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
-		addMonitorStatus(byEventType("heartbeat/summary")),
 	)
 }
 

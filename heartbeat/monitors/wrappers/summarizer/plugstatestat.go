@@ -79,15 +79,19 @@ func (ssp *StateStatusPlugin) EachEvent(event *beat.Event, jobErr error) EachEve
 }
 
 func (ssp *StateStatusPlugin) OnSummary(event *beat.Event) OnSummaryActions {
+	isBrowser := ssp.sf.Type == "browser"
 	if ssp.js.Down > 0 {
 		ssp.js.Status = monitorstate.StatusDown
 	} else {
-		if ssp.sf.Type == "browser" {
+		if isBrowser {
 			// Browsers don't have a prior increment of this, so set it to some
 			// non-zero value
 			ssp.js.Up = 1
 		}
 		ssp.js.Status = monitorstate.StatusUp
+	}
+	if isBrowser {
+		event.PutValue("monitor.status", string(ssp.js.Status))
 	}
 
 	// Get the last status of this monitor, we use this later to
