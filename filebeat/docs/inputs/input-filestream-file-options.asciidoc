@@ -373,7 +373,7 @@ results in files that are not completely read because they are removed from
 disk too early, disable this option.
 
 This option is enabled by default. If you disable this option, you must also
-disable `clean.on_state_change.removed`.
+disable `clean_removed`.
 
 WINDOWS: If your Windows log rotation system shows errors because it can't
 rotate files, make sure this option is enabled.
@@ -480,7 +480,7 @@ will be read again from the beginning because the states were removed from the
 registry file. In such cases, we recommend that you disable the `clean_removed`
 option.
 
-You must disable this option if you also disable `close_removed`.
+You must disable this option if you also disable `close.on_state_change.removed`.
 
 [float]
 ===== `backoff.*`
