@@ -426,6 +426,7 @@ func (conn *Connection) getVersion() error {
 		conn.isServerless = true
 	} else if versionData.Version.BuildFlavor == "default" {
 		conn.isServerless = false
+		// not sure if this is even possible, just being defensive
 	} else {
 		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}

@@ -168,7 +168,7 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 		}
 		err = selCfg.SetChild("indices", -1, sub)
 		if err != nil {
-			return nil, fmt.Errorf("error setting child 'indicies': %w", err)
+			return nil, fmt.Errorf("error setting child 'indices': %w", err)
 		}
 	}
 
@@ -270,7 +270,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
 		if ilmComponent.enabled {
-			tmplCfg, err = applyILMSettings(log, tmplCfg, m.support.ilm.Policy())
+			tmplCfg, err = applyILMSettingsToTemplate(log, tmplCfg, m.support.ilm.Policy())
 			if err != nil {
 				return fmt.Errorf("error applying ILM settings: %w", err)
 			}
@@ -341,7 +341,8 @@ func unpackTemplateConfig(info beat.Info, cfg *config.C) (config template.Templa
 	return config, err
 }
 
-func applyILMSettings(
+// applies the specified ILM policy to the provided template, returns a struct of the template config
+func applyILMSettingsToTemplate(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
 	policy ilm.Policy,
