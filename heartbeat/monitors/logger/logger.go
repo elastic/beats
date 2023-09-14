@@ -85,7 +85,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 
 	durationUs, err := event.GetValue("monitor.duration.us")
 	if err != nil {
-		errors = append(errors, fmt.Errorf("could not extract monitor.duration.us: %w", err))
+		durationUs = int64(0)
 	}
 
 	monType, err := event.GetValue("monitor.type")

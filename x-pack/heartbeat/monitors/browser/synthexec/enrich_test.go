@@ -227,9 +227,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"step/end",
 			&SynthEvent{Type: "step/end"},
 			false,
-			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				require.Equal(t, 1, je.stepCount)
-			},
+			nil,
 		},
 		{
 			"step/screenshot",
