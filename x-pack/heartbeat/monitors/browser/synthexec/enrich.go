@@ -43,14 +43,7 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 // journeyEnricher holds state across received SynthEvents retaining fields
 // where relevant to properly enrich *beat.Event instances.
 type journeyEnricher struct {
-	journeyComplete bool
-	journey         *Journey
-	stepCount       int
-	// The first URL we visit is the URL for this journey, which is set on the summary event.
-	// We store the URL fields here for use on the summary event.
-	urlFields      mapstr.M
-	start          time.Time
-	end            time.Time
+	journey        *Journey
 	streamEnricher *streamEnricher
 }
 
@@ -79,9 +72,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		switch se.Type {
 		case JourneyStart:
 			je.journey = se.Journey
-			je.start = event.Timestamp
 		case JourneyEnd, CmdStatus:
-			je.end = event.Timestamp
 		}
 	} else {
 		event.Timestamp = time.Now()
@@ -114,10 +105,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	switch se.Type {
 	case CmdStatus:
 		// noop
-	case JourneyEnd:
-		je.journeyComplete = true
-	case StepEnd:
-		je.stepCount++
 	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
 		add_data_stream.SetEventDataset(event, "browser.screenshot")
 	case JourneyNetworkInfo:
@@ -133,13 +120,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	eventext.MergeEventFields(event, se.ToMap())
 
-	if len(je.urlFields) == 0 {
-		if urlFields, err := event.GetValue("url"); err == nil {
-			if ufMap, ok := urlFields.(mapstr.M); ok {
-				je.urlFields = ufMap
-			}
-		}
-	}
 	return jobErr
 }
 

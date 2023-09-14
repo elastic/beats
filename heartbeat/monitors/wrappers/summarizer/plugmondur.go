@@ -65,14 +65,12 @@ func (bwdsp *BrowserDurationPlugin) EachEvent(event *beat.Event, _ error) EachEv
 }
 
 func (bwdsp *BrowserDurationPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
-	if bwdsp.startedAt == nil {
-		now := time.Now()
-		bwdsp.startedAt = &now
+	// do not set the duration if we're missing data
+	// usually because the runner failed in a weird way
+	if bwdsp.startedAt == nil || bwdsp.endedAt == nil {
+		return 0
 	}
-	if bwdsp.endedAt == nil {
-		now := time.Now()
-		bwdsp.endedAt = &now
-	}
+
 	_, _ = event.PutValue("monitor.duration.us", look.RTTMS(bwdsp.endedAt.Sub(*bwdsp.startedAt)))
 
 	return 0

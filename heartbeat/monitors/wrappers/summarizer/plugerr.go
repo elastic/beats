@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -52,6 +53,9 @@ func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEv
 	switch st {
 	case "step/end":
 		esp.stepCount++
+		// track step count for error logging
+		// this is a bit of an awkward spot and combination of concerns, but it makes sense
+		eventext.SetMeta(event, logger.META_STEP_COUNT, esp.stepCount)
 	case "journey/end":
 		esp.journeyEndRcvd = true
 	}
