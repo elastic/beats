@@ -54,10 +54,10 @@ type BrowserDurationPlugin struct {
 }
 
 func (bwdsp *BrowserDurationPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
-	et, _ := event.GetValue("synthetics.type")
-	if et == "journey/start" {
+	switch synthType(event) {
+	case "journey/start":
 		bwdsp.startedAt = &event.Timestamp
-	} else if et == "journey/end" {
+	case "journey/end":
 		bwdsp.endedAt = &event.Timestamp
 	}
 
@@ -65,13 +65,11 @@ func (bwdsp *BrowserDurationPlugin) EachEvent(event *beat.Event, _ error) EachEv
 }
 
 func (bwdsp *BrowserDurationPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
-	var durUS int64
 	if bwdsp.startedAt == nil || bwdsp.endedAt == nil {
-		durUS = 0
-	} else {
-		durUS = look.RTTMS(bwdsp.endedAt.Sub(*bwdsp.startedAt))
+		return 0
 	}
 
+	durUS := look.RTTMS(bwdsp.endedAt.Sub(*bwdsp.startedAt))
 	_, _ = event.PutValue("monitor.duration.us", durUS)
 
 	return 0

@@ -86,6 +86,7 @@ func (s *Summarizer) setupPlugins() {
 	// it intercepts errors
 	if s.sf.Type == "browser" {
 		s.plugins = []SummarizerPlugin{
+			DropBrowserExtraEvents{},
 			&BrowserDurationPlugin{},
 			&BrowserURLPlugin{},
 			NewBrowserStateStatusplugin(s.mst, s.sf),
