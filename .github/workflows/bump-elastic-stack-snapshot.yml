@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
 jobs:
   filter:
     runs-on: ubuntu-latest
@@ -35,5 +38,6 @@ jobs:
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-elastic-stack-snapshot.yml
           notifySlackChannel: ""
+          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @TBC please look what's going on <${{ env.JOB_URL }}|here>"
         env:
           BRANCH: ${{ matrix.branch }}
