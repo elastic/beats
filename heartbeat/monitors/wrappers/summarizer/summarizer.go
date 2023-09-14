@@ -148,11 +148,11 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 						for _, p := range s.plugins {
 							p.BeforeRetry()
 						}
-						time.Sleep(s.retryDelay)
 						return j(event)
 					}
 				})
 
+				time.Sleep(s.retryDelay)
 				conts = []jobs.Job{delayedRootJob}
 			}
 		}
