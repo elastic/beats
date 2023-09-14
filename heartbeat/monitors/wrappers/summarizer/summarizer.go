@@ -143,16 +143,14 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				//    that it's hard to tell the sequence in which jobs executed apart in our
 				//    kibana queries
 				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
-				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
-					return func(event *beat.Event) ([]jobs.Job, error) {
-						for _, p := range s.plugins {
-							p.BeforeRetry()
-						}
-						return j(event)
+				delayedRootJob := func(event *beat.Event) ([]jobs.Job, error) {
+					for _, p := range s.plugins {
+						p.BeforeRetry()
 					}
-				})
+					time.Sleep(s.retryDelay)
+					return s.rootJob(event)
+				}
 
-				time.Sleep(s.retryDelay)
 				conts = []jobs.Job{delayedRootJob}
 			}
 		}
