@@ -24,6 +24,7 @@ jobs:
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-golang.yml
+          notifySlackChannel: ""
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:
@@ -31,3 +32,4 @@ jobs:
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-golang-7.17.yml
+          notifySlackChannel: ""

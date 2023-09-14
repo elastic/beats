@@ -34,5 +34,6 @@ jobs:
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-elastic-stack-snapshot.yml
+          notifySlackChannel: ""
         env:
           BRANCH: ${{ matrix.branch }}
