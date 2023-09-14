@@ -353,7 +353,7 @@ def withTools(Map args = [:], Closure body) {
       body()
     }
   } else if (args.get('nodejs', false)) {
-    withNodeJSEnv() {
+    withNodeJSEnv(version: '18.17.1') {
       withEnv(["ELASTIC_SYNTHETICS_CAPABLE=true"]) {
         cmd(label: "Install @elastic/synthetics", script: "npm i -g @elastic/synthetics")
         body()

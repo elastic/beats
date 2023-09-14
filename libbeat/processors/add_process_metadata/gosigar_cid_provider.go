@@ -18,8 +18,9 @@
 package add_process_metadata
 
 import (
+	"errors"
 	"fmt"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -38,14 +39,12 @@ type gosigarCidProvider struct {
 	log                *logp.Logger
 	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
-	cgroupRegex        string
-	cidRegex           *regexp.Regexp
+	cgroupRegex        *regexp.Regexp
 	processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error)
 	pidCidCache        *common.Cache
 }
 
 func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
-
 	var cid string
 	var ok bool
 
@@ -58,12 +57,11 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	}
 
 	cgroups, err := p.getProcessCgroups(pid)
-
 	if err != nil {
 		p.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 	}
 
-	cid = p.getCid(cgroups)
+	cid = p.getContainerID(cgroups)
 
 	// add pid and cid to cache
 	if p.pidCidCache != nil {
@@ -72,13 +70,12 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex *regexp.Regexp, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		cgroupRegex:        cgroupRegex,
-		cidRegex:           regexp.MustCompile(`[\w]{64}`),
 		processCgroupPaths: processCgroupPaths,
 		pidCidCache:        pidCidCache,
 	}
@@ -87,57 +84,40 @@ func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRe
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
 func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) {
-
-	var cgroup cgroup.PathList
-
-	cgroup, err := p.processCgroupPaths(p.hostPath, pid)
-	switch err.(type) {
-	case nil, *os.PathError:
-		// do no thing when err is nil or when os.PathError happens because the process don't exist,
-		// or not running in linux system
-	default:
+	pathList, err := p.processCgroupPaths(p.hostPath, pid)
+	if err != nil {
+		var pathError *fs.PathError
+		if errors.As(err, &pathError) {
+			// do no thing when err is nil or when os.PathError happens because the process don't exist,
+			// or not running in linux system
+			return cgroup.PathList{}, nil
+		}
 		// should never happen
-		return cgroup, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
+		return cgroup.PathList{}, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
 
-	return cgroup, nil
+	return pathList, nil
 }
 
-// getCid checks all of the processes' paths to see if any
-// of them are associated with Kubernetes. Kubernetes uses /kubepods/<quality>/<podId>/<cid> when
-// naming cgroups and we use this to determine the container ID. If no container
-// ID is found then an empty string is returned.
-// Example:
-// /kubepods/besteffort/pod9b9e44c2-00fd-11ea-95e9-080027421ddf/2bb9fd4de339e5d4f094e78bb87636004acfe53f5668104addc761fe4a93588e
-// V2 Example:
-// /kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod1f306eaea646903787fd7cc4eb6be515.slice/crio-eac98011dea91157038ca797f2141754106e074b7242721c7170a642a2204a54.scope
-func (p gosigarCidProvider) getCid(cgroups cgroup.PathList) string {
-	// if regex defined use it to find cid
-	if len(p.cgroupRegex) != 0 {
-		re := regexp.MustCompile(p.cgroupRegex)
+// getContainerID checks all the processes' cgroup paths to see if any match the
+// configured cgroup_regex or cgroup_prefixes. If there is a match, then the
+// container ID is returned. Otherwise, an empty string is returned.
+func (p gosigarCidProvider) getContainerID(cgroups cgroup.PathList) string {
+	if p.cgroupRegex != nil {
 		for _, path := range cgroups.Flatten() {
-			rs := re.FindStringSubmatch(path.ControllerPath)
-			if rs != nil {
+			rs := p.cgroupRegex.FindStringSubmatch(path.ControllerPath)
+			if len(rs) > 1 {
 				return rs[1]
 			}
 		}
-	} else {
-		// else, fall back to a hardcoded regex
-		// In an attempt to not break the user-facing config interface for this processor,
-		// fall back to the config'ed prefixes if we have cgv1, otherwise use regex
-		// This should work with k8s on cgroupsV2, as we're still trying to extract the same container ID
-		for _, path := range cgroups.Flatten() {
-			if path.IsV2 {
-				rs := p.cidRegex.FindStringSubmatch(path.ControllerPath)
-				if len(rs) > 0 {
-					return rs[0]
-				}
-			} else {
-				for _, prefix := range p.cgroupPrefixes {
-					if strings.HasPrefix(path.ControllerPath, prefix) {
-						return filepath.Base(path.ControllerPath)
-					}
-				}
+		return ""
+	}
+
+	// Try cgroup_prefixes.
+	for _, path := range cgroups.Flatten() {
+		for _, prefix := range p.cgroupPrefixes {
+			if strings.HasPrefix(path.ControllerPath, prefix) {
+				return filepath.Base(path.ControllerPath)
 			}
 		}
 	}

@@ -44,16 +44,16 @@ func TestRecordingAndFlapping(t *testing.T) {
 	require.Nil(t, ms.Ends, "expected nil ends after a stable series")
 
 	// Since we're now in a stable state a single up check should create a new state from a stable one
-	ms.recordCheck(TestSf, StatusUp)
+	ms.recordCheck(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSCounts(t, ms, 1, 0)
 }
 
 func TestDuration(t *testing.T) {
 	ms := newMonitorState(TestSf, StatusUp, 0, true)
-	ms.recordCheck(TestSf, StatusUp)
+	ms.recordCheck(TestSf, StatusUp, true)
 	time.Sleep(time.Millisecond * 10)
-	ms.recordCheck(TestSf, StatusUp)
+	ms.recordCheck(TestSf, StatusUp, true)
 	// Pretty forgiving upper bound to account for flaky CI
 	require.True(t, ms.DurationMs > 9 && ms.DurationMs < 900, "Expected duration to be ~10ms, got %d", ms.DurationMs)
 }
@@ -62,9 +62,9 @@ func TestDuration(t *testing.T) {
 func recordFlappingSeries(TestSf stdfields.StdMonitorFields, ms *State) {
 	for i := 0; i < FlappingThreshold; i++ {
 		if i%2 == 0 {
-			ms.recordCheck(TestSf, StatusUp)
+			ms.recordCheck(TestSf, StatusUp, true)
 		} else {
-			ms.recordCheck(TestSf, StatusDown)
+			ms.recordCheck(TestSf, StatusDown, true)
 		}
 	}
 }
@@ -72,7 +72,7 @@ func recordFlappingSeries(TestSf stdfields.StdMonitorFields, ms *State) {
 // recordStableSeries is a test helper for repeatedly recording one status
 func recordStableSeries(TestSf stdfields.StdMonitorFields, ms *State, count int, s StateStatus) {
 	for i := 0; i < count; i++ {
-		ms.recordCheck(TestSf, s)
+		ms.recordCheck(TestSf, s, true)
 	}
 }
 

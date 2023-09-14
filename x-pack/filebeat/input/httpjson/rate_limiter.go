@@ -16,12 +16,12 @@ import (
 )
 
 type rateLimiter struct {
-	log *logp.Logger
-
 	limit      *valueTpl
 	reset      *valueTpl
 	remaining  *valueTpl
 	earlyLimit *float64
+
+	log *logp.Logger
 }
 
 func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLimiter {

@@ -216,7 +216,7 @@ func Test_evaluateResponse(t *testing.T) {
 				log:        log,
 			},
 			want:          false,
-			expectedError: "error while parsing boolean value of string : strconv.ParseBool: parsing \"eq .last_response.body.status \\\"completed\\\" ]]\": invalid syntax",
+			expectedError: "error while parsing boolean value of string: strconv.ParseBool: parsing \"eq .last_response.body.status \\\"completed\\\" ]]\": invalid syntax",
 		},
 		{
 			name: "newEvaluateResponse_emptyExpressionError",
@@ -226,7 +226,7 @@ func Test_evaluateResponse(t *testing.T) {
 				log:        log,
 			},
 			want:          false,
-			expectedError: "error while evaluating expression : the template result is empty",
+			expectedError: "error while evaluating expression: the template result is empty",
 		},
 		{
 			name: "newEvaluateResponse_incompleteExpressionError",
@@ -236,7 +236,7 @@ func Test_evaluateResponse(t *testing.T) {
 				log:        log,
 			},
 			want:          false,
-			expectedError: "error while parsing boolean value of string : strconv.ParseBool: parsing \"initiated\": invalid syntax",
+			expectedError: "error while parsing boolean value of string: strconv.ParseBool: parsing \"initiated\": invalid syntax",
 		},
 	}
 	for _, tt := range tests {

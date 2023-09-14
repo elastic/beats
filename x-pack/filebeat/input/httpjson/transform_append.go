@@ -23,7 +23,6 @@ type appendConfig struct {
 }
 
 type appendt struct {
-	log                 *logp.Logger
 	targetInfo          targetInfo
 	value               *valueTpl
 	defaultValue        *valueTpl
@@ -31,6 +30,8 @@ type appendt struct {
 	valueType           valueType
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+
+	log *logp.Logger
 }
 
 func (appendt) transformName() string { return appendName }
