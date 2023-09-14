@@ -133,7 +133,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 func LogRun(event *beat.Event) {
 	monitor, err := extractRunInfo(event)
 	if err != nil {
-		getLogger().Errorw("error gathering information to log event: ", err)
+		getLogger().Error(fmt.Errorf("error gathering information to log event: %w", err))
 		return
 	}
 
