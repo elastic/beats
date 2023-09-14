@@ -830,7 +830,7 @@ func TestECSErrors(t *testing.T) {
 	for name, makeSummaryEvent := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ecse := ecserr.NewBadCmdStatusErr(123, "mycommand")
-			wrappedECSErr := fmt.Errorf("journey did not finish executing, 0 steps ran (attempt: 1), wrapped: %w", ecse)
+			wrappedECSErr := fmt.Errorf("journey did not finish executing, 0 steps ran (attempt: 1): %w", ecse)
 			expectedECSErr := ecserr.NewECSErr(
 				ecse.Type,
 				ecse.Code,

@@ -78,7 +78,7 @@ func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEv
 func (esp *BrowserErrPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	// If no journey end was received, make that the summary error
 	if !esp.journeyEndRcvd {
-		esp.summaryErr = fmt.Errorf("journey did not finish executing, %d steps ran (attempt: %d), wrapped: %w", esp.stepCount, esp.attempt, esp.summaryErr)
+		esp.summaryErr = fmt.Errorf("journey did not finish executing, %d steps ran (attempt: %d): %w", esp.stepCount, esp.attempt, esp.summaryErr)
 		esp.summaryErrVal = errToFieldVal(esp.summaryErr)
 	}
 
