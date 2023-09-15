@@ -24,8 +24,8 @@ jobs:
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-golang.yml
-          notifySlackChannel: ""
-          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @TBC please look what's going on <${{ env.JOB_URL }}|here>"
+          notifySlackChannel: "#ingest-notifications"
+          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:
@@ -33,5 +33,5 @@ jobs:
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-golang-7.17.yml
-          notifySlackChannel: ""
-          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @TBC please look what's going on <${{ env.JOB_URL }}|here>"
+          notifySlackChannel: "#ingest-notifications"
+          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
