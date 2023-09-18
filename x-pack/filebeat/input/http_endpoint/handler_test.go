@@ -320,7 +320,9 @@ func Test_apiResponse(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
 			pub := new(publisher)
-			apiHandler := newHandler(tc.conf, pub, logp.NewLogger("http_endpoint.test"))
+			metrics := newInputMetrics("")
+			defer metrics.Close()
+			apiHandler := newHandler(tc.conf, pub, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()

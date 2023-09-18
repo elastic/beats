@@ -20,13 +20,9 @@ Obtaining {beatname_uc} for Docker is as simple as issuing a +docker pull+ comma
 against the Elastic Docker registry.
 
 ifeval::["{release-state}"=="unreleased"]
-
-However, version {version} of {beatname_uc} has not yet been
-released, so no Docker image is currently available for this version.
-
+WARNING: Version {version} of {beatname_uc} has not yet been released.
+No Docker image is currently available for {beatname_uc} {version}.
 endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
@@ -37,8 +33,6 @@ Alternatively, you can download other Docker images that contain only features
 available under the Apache 2.0 license. To download the images, go to
 https://www.docker.elastic.co[www.docker.elastic.co].
 
-endif::[]
-
 ifndef::apm-server[]
 
 ==== Optional: Verify the image
@@ -46,23 +40,26 @@ ifndef::apm-server[]
 You can use the https://docs.sigstore.dev/cosign/installation/[Cosign application] to verify the {beatname_uc} Docker image signature.
 
 ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been
-released, so no Docker image is currently available for this version.
-
+WARNING: Version {version} of {beatname_uc} has not yet been released.
+No Docker image is currently available for {beatname_uc} {version}.
 endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
 
 ["source", "sh", subs="attributes"]
-------------------------------------------------
+----
 wget https://artifacts.elastic.co/cosign.pub
 cosign verify --key cosign.pub {dockerimage}
-------------------------------------------------
+----
 
-For details about this step, refer to {ref}/docker.html#docker-verify-signature[Verify the {es} Docker image signature] in the {es} documentation.
+The `cosign` command prints the check results and the signature payload in JSON format:
 
-endif::[]
+[source,sh,subs="attributes"]
+----
+Verification for {dockerimage} --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+----
 
 ==== Run the {beatname_uc} setup
 

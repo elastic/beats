@@ -3,6 +3,108 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.10.1]]
+=== Beats version 8.10.1
+https://github.com/elastic/beats/compare/v8.10.0\...v8.10.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Revert error introduced in {pull}35734[35734] when symlinks can't be resolved in filestream. {pull}36557[36557]
+- Fix ignoring external input configuration in `take_over: true` mode {issue}36378[36378] {pull}36395[36395]
+
+
+[[release-notes-8.10.0]]
+=== Beats version 8.10.0
+https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
+- Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
+- Add default cgroup regex for `add_process_metadata` processor {pull}36484[36484] {issue}32961[32961]
+- Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
+- Fix status reporting to {agent} when output configuration is invalid running under Elastic-Agent {pull}35719[35719]
+
+*Filebeat*
+
+- Fix error message formatting from filestream input. {pull}35658[35658]
+- Fixed concurrency and flaky tests issue in Azure Blob Storage input. {issue}35983[35983] {pull}36124[36124]
+- Filter out duplicate paths resolved from matching globs. {issue}36253[36253] {pull}36256[36256]
+- Remove 'onFilteredOut' and 'onDroppedOnPublish' callback logs {issue}36299[36299] {pull}36399[36399]
+- Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
+
+*Metricbeat*
+
+- Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
+- Add option in SQL module to execute queries for all databases. {pull}35688[35688]
+- Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
+- Add remaining dimensions for Azure storage account to make them available for TSDB enablement. {pull}36331[36331]
+
+*Packetbeat*
+
+- Fix panic in HTTP protocol parsing when host header has empty host part. {issue}36497[36497] {issue}36518[36518]
+
+*Winlogbeat*
+
+- Ensure event loggers retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
+- Fix the ability to use filtering features (e.g. `ignore_older`, `event_id`, `provider`, `level`) while reading `.evtx` files. {issue}16826[16826] {pull}36173[36173]
+
+==== Added
+
+*Affecting all Beats*
+
+- When running under Elastic-Agent the status is now reported per Unit instead of the whole Beat {issue}35874[35874] {pull}36183[36183]
+- Mark `translate_sid` processor is GA. {issue}36279[36279] {pull}36280[36280]
+- Upgrade Go to 1.20.7 {pull}36241[36241]
+
+*Auditbeat*
+
+- Add support for `security.selinux` and `system.posix_acl_access` extended attributes to FIM. {issue}36265[36265] {pull}36310[36310]
+
+*Filebeat*
+
+- Adding filename details from zip to response for httpjson {issue}33952[33952] {pull}34044[34044]
+- Allow specifying since when to read journald entries. {pull}35408[35408]
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
+- Improve CEL input performance. {pull}35915[35915]
+- Added support for min/max template functions in httpjson input. {issue}36094[36094] {pull}36036[36036]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[35806]
+- Add fingerprint mode for the filestream scanner and new file identity based on it {issue}34419[34419] {pull}35734[35734]
+- Add file system metadata to events ingested via filestream {issue}35801[35801] {pull}36065[36065]
+- Add support for localstack based input integration testing {pull}35727[35727]
+- Allow parsing bytes in and bytes out as long integer in CEF processor. {issue}36100[36100] {pull}36108[36108]
+- Add support for registered owners and users to AzureAD entity analytics provider. {pull}36092[36092]
+- Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
+- Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
+- Add device handling to Okta input package for entity analytics. {pull}36049[36049]
+- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}36286[36286]
+- [Azure] Add input metrics to the azure-eventhub input. {pull}35739[35739]
+
+*Metricbeat*
+
+- Add support for multiple regions in GCP {pull}32964[32964]
+- Add kubernetes.deployment.status.* fields for Kubernetes module {pull}35999[35999]
+
+*Packetbeat*
+
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
+- Add support for multiple regions in GCP {pull}32964[32964]
+
+*Winlogbeat*
+
+- Under elastic-agent the input metrics will now be included in agent diagnostics dumps. {pull}35798[35798]
+
+==== Deprecated
+
+*Heartbeat*
+
+- Deprecate aws_elb autodiscover provider. {pull}36191[36191]
+
+
 [[release-notes-8.9.2]]
 === Beats version 8.9.2
 https://github.com/elastic/beats/compare/v8.9.1\...v8.9.2[View commits]
