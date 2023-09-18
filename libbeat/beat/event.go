@@ -98,45 +98,62 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 	if len(d) == 0 {
 		return
 	}
-	fieldsUpdate := d.Clone() // so we can delete redundant keys
 
-	var metaUpdate common.MapStr
-
-	for fieldKey, value := range d {
-		switch fieldKey {
-
-		// one of the updates is the timestamp which is not a part of the event fields
-		case timestampFieldKey:
-			if overwrite {
-				_ = e.setTimestamp(value)
-			}
-			delete(fieldsUpdate, fieldKey)
-
-		// some updates are addressed for the metadata not the fields
-		case metadataFieldKey:
-			switch meta := value.(type) {
-			case common.MapStr:
-				metaUpdate = meta
-			case map[string]interface{}:
-				metaUpdate = common.MapStr(meta)
-			}
-
-			delete(fieldsUpdate, fieldKey)
-		}
-	}
-
-	if metaUpdate != nil {
-		if e.Meta == nil {
-			e.Meta = common.MapStr{}
-		}
+	// It's supported to update the timestamp using this function.
+	// However, we must handle it separately since it's a separate field of the event.
+	timestampValue, timestampExists := d[timestampFieldKey]
+	if timestampExists {
 		if overwrite {
-			e.Meta.DeepUpdate(metaUpdate)
-		} else {
-			e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+			_ = e.setTimestamp(timestampValue)
 		}
+
+		// Temporary delete it from the update map,
+		// so we can do `e.Fields.DeepUpdate(d)` or
+		// `e.Fields.DeepUpdateNoOverwrite(d)` later
+		delete(d, timestampFieldKey)
 	}
 
-	if len(fieldsUpdate) == 0 {
+	// It's supported to update the metadata using this function.
+	// However, we must handle it separately since it's a separate field of the event.
+	metaValue, metaExists := d[metadataFieldKey]
+	if metaExists {
+		var metaUpdate common.MapStr
+
+		switch meta := metaValue.(type) {
+		case common.MapStr:
+			metaUpdate = meta
+		case map[string]interface{}:
+			metaUpdate = common.MapStr(meta)
+		}
+
+		if metaUpdate != nil {
+			if e.Meta == nil {
+				e.Meta = common.MapStr{}
+			}
+			if overwrite {
+				e.Meta.DeepUpdate(metaUpdate)
+			} else {
+				e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+			}
+		}
+
+		// Temporary delete it from the update map,
+		// so we can do `e.Fields.DeepUpdate(d)` or
+		// `e.Fields.DeepUpdateNoOverwrite(d)` later
+		delete(d, metadataFieldKey)
+	}
+
+	// At the end we revert all changes we made to the update map
+	defer func() {
+		if timestampExists {
+			d[timestampFieldKey] = timestampValue
+		}
+		if metaExists {
+			d[metadataFieldKey] = metaValue
+		}
+	}()
+
+	if len(d) == 0 {
 		return
 	}
 
@@ -145,9 +162,9 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 	}
 
 	if overwrite {
-		e.Fields.DeepUpdate(fieldsUpdate)
+		e.Fields.DeepUpdate(d)
 	} else {
-		e.Fields.DeepUpdateNoOverwrite(fieldsUpdate)
+		e.Fields.DeepUpdateNoOverwrite(d)
 	}
 }
 

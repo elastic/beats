@@ -30,7 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-*Filebeat*
+- Eliminate cloning of event in deepUpdate {pull}35945[35945]
 
 *Auditbeat*
 
@@ -141,9 +141,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-
-
-
-
-
-
