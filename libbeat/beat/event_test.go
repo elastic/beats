@@ -351,7 +351,7 @@ func BenchmarkTestEventMetadata(b *testing.B) {
 	b.Run("put non-metadata", func(b *testing.B) {
 		evt := newEmptyEvent()
 
-		evt.PutValue("@metadataSpecial", id)
+		_, _ = evt.PutValue("@metadataSpecial", id)
 
 		assert.Equal(b, common.MapStr{"@metadataSpecial": id}, evt.Fields)
 	})
