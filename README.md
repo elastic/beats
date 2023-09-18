@@ -36,3 +36,16 @@ Then the tag should be available at https://github.com/elastic/elastic-agent-aut
 
 
 After the tag is available a Release can be created using this tag and the proper content from the changelog.
+
+
+## Development
+
+When one wants to edit and test the library as part of the Beats or Elastic Agent projects, the local version of the dependency can be referenced with the following:
+
+`go.mod`:
+```golang
+replace github.com/elastic/elastic-agent-autodiscover => /home/user/go/src/github.com/elastic/elastic-agent-autodiscover
+```
+
+This will use the local code rather than the upstream dependency. 
+Note: Do not forget to exclude this change from the final commits.
