@@ -118,15 +118,15 @@ func deDotDataStream(raw dataStreamAndSource) (*proto.DataStream, error) {
 		return nil, fmt.Errorf("cannot unpack source field into struct: %w", err)
 	}
 
-	if ds.Dataset != "" && tmp.DataStream.Dataset != "" {
+	if ds.Dataset != "" && tmp.DataStream.Dataset != "" && (ds.Dataset != tmp.DataStream.Dataset) {
 		return nil, errors.New("duplicated key 'datastream.dataset'")
 	}
 
-	if ds.Type != "" && tmp.DataStream.Type != "" {
+	if ds.Type != "" && tmp.DataStream.Type != "" && (ds.Type != tmp.DataStream.Type) {
 		return nil, errors.New("duplicated key 'datastream.type'")
 	}
 
-	if ds.Namespace != "" && tmp.DataStream.Namespace != "" {
+	if ds.Namespace != "" && tmp.DataStream.Namespace != "" && (ds.Namespace != tmp.DataStream.Namespace) {
 		return nil, errors.New("duplicated key 'datastream.namespace'")
 	}
 
