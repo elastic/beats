@@ -22,8 +22,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 const (
@@ -82,7 +83,7 @@ func BenchmarkTestEventPutGetTimestamp(b *testing.B) {
 	evt := newEmptyEvent()
 	ts := time.Now()
 
-	evt.PutValue("@timestamp", ts)
+	_, _ = evt.PutValue("@timestamp", ts)
 
 	v, err := evt.GetValue("@timestamp")
 	if err != nil {
@@ -284,7 +285,7 @@ func BenchmarkTestEventMetadata(b *testing.B) {
 		evt := newEmptyEvent()
 		meta := newMeta()
 
-		evt.PutValue("@metadata", meta)
+		_, _ = evt.PutValue("@metadata", meta)
 
 		assert.Equal(b, meta, evt.Meta)
 		assert.Empty(b, evt.Fields)
@@ -303,7 +304,7 @@ func BenchmarkTestEventMetadata(b *testing.B) {
 	b.Run("put sub-key", func(b *testing.B) {
 		evt := newEmptyEvent()
 
-		evt.PutValue("@metadata._id", id)
+		_, _ = evt.PutValue("@metadata._id", id)
 
 		assert.Equal(b, newMeta(), evt.Meta)
 		assert.Empty(b, evt.Fields)
