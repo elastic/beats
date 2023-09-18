@@ -65,8 +65,15 @@ func (bwdsp *BrowserDurationPlugin) EachEvent(event *beat.Event, _ error) EachEv
 }
 
 func (bwdsp *BrowserDurationPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
-	if bwdsp.startedAt == nil || bwdsp.endedAt == nil {
+	// If we never even ran a journey, it's a zero duration
+	if bwdsp.startedAt == nil {
 		return 0
+	}
+
+	// if we never received an end event, just use the current time
+	if bwdsp.endedAt == nil {
+		now := time.Now()
+		bwdsp.endedAt = &now
 	}
 
 	durUS := look.RTTMS(bwdsp.endedAt.Sub(*bwdsp.startedAt))
