@@ -531,7 +531,7 @@ func TestFlattenedDataStreams(t *testing.T) {
 
 	inputs := &mockReloadable{
 		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
-			// The datea_stream fields are used to generate the `index` key in
+			// The data_stream fields are used to generate the `index` key in
 			// the config, so we check for it.
 			for _, input := range configs {
 				tmp := struct {
