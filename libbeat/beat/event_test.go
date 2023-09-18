@@ -22,9 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -43,17 +42,17 @@ func newEmptyEvent() *Event {
 	return &Event{Fields: common.MapStr{}}
 }
 
-func newEvent(e mapstr.M) *Event {
-	n := &mapstr.M{
-		"Fields": mapstr.M{
+func newEvent(e common.MapStr) *Event {
+	n := &common.MapStr{
+		"Fields": common.MapStr{
 			"large_prop": largeProp,
 		},
 	}
 	n.DeepUpdate(e)
 	var ts time.Time
-	var meta mapstr.M
-	var fields mapstr.M
-	var private mapstr.M
+	var meta common.MapStr
+	var fields common.MapStr
+	var private common.MapStr
 
 	v, ex := (*n)["Timestamp"]
 	if ex {
@@ -61,15 +60,15 @@ func newEvent(e mapstr.M) *Event {
 	}
 	v, ex = (*n)["Meta"]
 	if ex {
-		meta = v.(mapstr.M)
+		meta = v.(common.MapStr)
 	}
 	v, ex = (*n)["Fields"]
 	if ex {
-		fields = v.(mapstr.M)
+		fields = v.(common.MapStr)
 	}
 	v, ex = (*n)["Private"]
 	if ex {
-		private = v.(mapstr.M)
+		private = v.(common.MapStr)
 	}
 	return &Event{
 		Timestamp: ts,
@@ -109,69 +108,45 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 	}{
 		{
 			name:     "does nothing if no update",
-<<<<<<< HEAD
-			event:    &Event{},
+			event:    newEvent(common.MapStr{}),
 			update:   common.MapStr{},
-			expected: &Event{},
+			expected: newEvent(common.MapStr{}),
 		},
 		{
 			name:  "updates timestamp",
-			event: &Event{},
+			event: newEvent(common.MapStr{}),
 			update: common.MapStr{
-=======
-			event:    newEvent(mapstr.M{}),
-			update:   mapstr.M{},
-			expected: newEvent(mapstr.M{}),
-		},
-		{
-			name:  "updates timestamp",
-			event: newEvent(mapstr.M{}),
-			update: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 				timestampFieldKey: ts,
 			},
 			overwrite: true,
 			expected: &Event{
 				Timestamp: ts,
-				Fields: mapstr.M{
+				Fields: common.MapStr{
 					"large_prop": largeProp,
 				},
 			},
 		},
 		{
 			name: "does not overwrite timestamp",
-<<<<<<< HEAD
-			event: &Event{
-				Timestamp: ts,
-			},
-			update: common.MapStr{
-=======
-			event: newEvent(mapstr.M{
+			event: newEvent(common.MapStr{
 				"Timestamp": ts,
 			}),
-			update: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
+			update: common.MapStr{
 				timestampFieldKey: time.Now().Add(time.Hour),
 			},
 			overwrite: false,
 			expected: &Event{
 				Timestamp: ts,
-				Fields: mapstr.M{
+				Fields: common.MapStr{
 					"large_prop": largeProp,
 				},
 			},
 		},
 		{
 			name:  "initializes metadata if nil",
-<<<<<<< HEAD
-			event: &Event{},
+			event: newEvent(common.MapStr{}),
 			update: common.MapStr{
 				metadataFieldKey: common.MapStr{
-=======
-			event: newEvent(mapstr.M{}),
-			update: mapstr.M{
-				metadataFieldKey: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 					"first":  "new",
 					"second": 42,
 				},
@@ -181,30 +156,20 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 					"first":  "new",
 					"second": 42,
 				},
-				Fields: mapstr.M{
+				Fields: common.MapStr{
 					"large_prop": largeProp,
 				},
 			},
 		},
 		{
 			name: "updates metadata but does not overwrite",
-<<<<<<< HEAD
-			event: &Event{
-				Meta: common.MapStr{
-					"first": "initial",
-				},
-			},
-			update: common.MapStr{
-				metadataFieldKey: common.MapStr{
-=======
-			event: newEvent(mapstr.M{
-				"Meta": mapstr.M{
+			event: newEvent(common.MapStr{
+				"Meta": common.MapStr{
 					"first": "initial",
 				},
 			}),
-			update: mapstr.M{
-				metadataFieldKey: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
+			update: common.MapStr{
+				metadataFieldKey: common.MapStr{
 					"first":  "new",
 					"second": 42,
 				},
@@ -215,30 +180,20 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 					"first":  "initial",
 					"second": 42,
 				},
-				Fields: mapstr.M{
+				Fields: common.MapStr{
 					"large_prop": largeProp,
 				},
 			},
 		},
 		{
 			name: "updates metadata and overwrites",
-<<<<<<< HEAD
-			event: &Event{
-				Meta: common.MapStr{
-					"first": "initial",
-				},
-			},
-			update: common.MapStr{
-				metadataFieldKey: common.MapStr{
-=======
-			event: newEvent(mapstr.M{
-				"Meta": mapstr.M{
+			event: newEvent(common.MapStr{
+				"Meta": common.MapStr{
 					"first": "initial",
 				},
 			}),
-			update: mapstr.M{
-				metadataFieldKey: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
+			update: common.MapStr{
+				metadataFieldKey: common.MapStr{
 					"first":  "new",
 					"second": 42,
 				},
@@ -249,104 +204,63 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 					"first":  "new",
 					"second": 42,
 				},
-				Fields: mapstr.M{
+				Fields: common.MapStr{
 					"large_prop": largeProp,
 				},
 			},
 		},
 		{
 			name: "updates fields but does not overwrite",
-<<<<<<< HEAD
-			event: &Event{
-				Fields: common.MapStr{
-					"first": "initial",
-				},
-			},
-			update: common.MapStr{
-=======
-			event: newEvent(mapstr.M{
-				"Fields": mapstr.M{
+			event: newEvent(common.MapStr{
+				"Fields": common.MapStr{
 					"first": "initial",
 				},
 			}),
-			update: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
+			update: common.MapStr{
 				"first":  "new",
 				"second": 42,
 			},
 			overwrite: false,
 			expected: &Event{
-<<<<<<< HEAD
 				Fields: common.MapStr{
-					"first":  "initial",
-					"second": 42,
-=======
-				Fields: mapstr.M{
 					"first":      "initial",
 					"second":     42,
 					"large_prop": largeProp,
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 				},
 			},
 		},
 		{
 			name: "updates metadata and overwrites",
-<<<<<<< HEAD
-			event: &Event{
-				Fields: common.MapStr{
-					"first": "initial",
-				},
-			},
-			update: common.MapStr{
-=======
-			event: newEvent(mapstr.M{
-				"Fields": mapstr.M{
+			event: newEvent(common.MapStr{
+				"Fields": common.MapStr{
 					"first": "initial",
 				},
 			}),
-			update: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
+			update: common.MapStr{
 				"first":  "new",
 				"second": 42,
 			},
 			overwrite: true,
 			expected: &Event{
-<<<<<<< HEAD
 				Fields: common.MapStr{
-					"first":  "new",
-					"second": 42,
-=======
-				Fields: mapstr.M{
 					"first":      "new",
 					"second":     42,
 					"large_prop": largeProp,
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 				},
 			},
 		},
 		{
 			name:  "initializes fields if nil",
-<<<<<<< HEAD
-			event: &Event{},
+			event: newEvent(common.MapStr{}),
 			update: common.MapStr{
-=======
-			event: newEvent(mapstr.M{}),
-			update: mapstr.M{
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 				"first":  "new",
 				"second": 42,
 			},
 			expected: &Event{
-<<<<<<< HEAD
 				Fields: common.MapStr{
-					"first":  "new",
-					"second": 42,
-=======
-				Fields: mapstr.M{
 					"first":      "new",
 					"second":     42,
 					"large_prop": largeProp,
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 				},
 			},
 		},
@@ -438,11 +352,7 @@ func BenchmarkTestEventMetadata(b *testing.B) {
 
 		evt.PutValue("@metadataSpecial", id)
 
-<<<<<<< HEAD
-		assert.Equal(t, common.MapStr{"@metadataSpecial": id}, evt.Fields)
-=======
-		assert.Equal(b, mapstr.M{"@metadataSpecial": id}, evt.Fields)
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
+		assert.Equal(b, common.MapStr{"@metadataSpecial": id}, evt.Fields)
 	})
 
 	b.Run("delete non-metadata", func(b *testing.B) {

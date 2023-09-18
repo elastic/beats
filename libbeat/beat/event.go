@@ -99,42 +99,10 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 		return
 	}
 
-<<<<<<< HEAD
-	var metaUpdate common.MapStr
-
-	for fieldKey, value := range d {
-		switch fieldKey {
-
-		// one of the updates is the timestamp which is not a part of the event fields
-		case timestampFieldKey:
-			if overwrite {
-				_ = e.setTimestamp(value)
-			}
-			delete(fieldsUpdate, fieldKey)
-
-		// some updates are addressed for the metadata not the fields
-		case metadataFieldKey:
-			switch meta := value.(type) {
-			case common.MapStr:
-				metaUpdate = meta
-			case map[string]interface{}:
-				metaUpdate = common.MapStr(meta)
-			}
-
-			delete(fieldsUpdate, fieldKey)
-		}
-	}
-
-	if metaUpdate != nil {
-		if e.Meta == nil {
-			e.Meta = common.MapStr{}
-		}
-=======
 	// It's supported to update the timestamp using this function.
 	// However, we must handle it separately since it's a separate field of the event.
 	timestampValue, timestampExists := d[timestampFieldKey]
 	if timestampExists {
->>>>>>> faf88b7d69 (Decrease Clones (#35945))
 		if overwrite {
 			_ = e.setTimestamp(timestampValue)
 		}
@@ -149,18 +117,18 @@ func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
 	// However, we must handle it separately since it's a separate field of the event.
 	metaValue, metaExists := d[metadataFieldKey]
 	if metaExists {
-		var metaUpdate mapstr.M
+		var metaUpdate common.MapStr
 
 		switch meta := metaValue.(type) {
-		case mapstr.M:
+		case common.MapStr:
 			metaUpdate = meta
 		case map[string]interface{}:
-			metaUpdate = mapstr.M(meta)
+			metaUpdate = common.MapStr(meta)
 		}
 
 		if metaUpdate != nil {
 			if e.Meta == nil {
-				e.Meta = mapstr.M{}
+				e.Meta = common.MapStr{}
 			}
 			if overwrite {
 				e.Meta.DeepUpdate(metaUpdate)
