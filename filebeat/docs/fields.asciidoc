@@ -24,7 +24,6 @@ grouped in the following categories:
 * <<exported-fields-barracuda>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-bluecoat>>
-* <<exported-fields-cache>>
 * <<exported-fields-cef>>
 * <<exported-fields-cef-module>>
 * <<exported-fields-checkpoint>>
@@ -14523,12 +14522,6 @@ This key captures values or decorators used within a registry entry
 type: keyword
 
 --
-
-[[exported-fields-cache]]
-== Cache fields
-
-Cache processor
-
 
 [[exported-fields-cef]]
 == Decode CEF processor fields fields

@@ -16,7 +16,6 @@ grouped in the following categories:
 
 * <<exported-fields-amqp>>
 * <<exported-fields-beat-common>>
-* <<exported-fields-cache>>
 * <<exported-fields-cassandra>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
@@ -510,12 +509,6 @@ Time series instance id
 type: keyword
 
 --
-
-[[exported-fields-cache]]
-== Cache fields
-
-Cache processor
-
 
 [[exported-fields-cassandra]]
 == Cassandra fields

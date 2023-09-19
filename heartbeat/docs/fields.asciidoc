@@ -16,7 +16,6 @@ grouped in the following categories:
 
 * <<exported-fields-beat-common>>
 * <<exported-fields-browser>>
-* <<exported-fields-cache>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -241,12 +240,6 @@ weighted score of the layout shift event
 type: integer
 
 --
-
-[[exported-fields-cache]]
-== Cache fields
-
-Cache processor
-
 
 [[exported-fields-cloud]]
 == Cloud provider metadata fields

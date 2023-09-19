@@ -23,7 +23,6 @@ grouped in the following categories:
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
-* <<exported-fields-cache>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-cloudfoundry>>
@@ -9148,12 +9147,6 @@ Number of write errors
 type: long
 
 --
-
-[[exported-fields-cache]]
-== Cache fields
-
-Cache processor
-
 
 [[exported-fields-ceph]]
 == Ceph fields

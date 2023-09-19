@@ -16,7 +16,6 @@ grouped in the following categories:
 
 * <<exported-fields-auditd>>
 * <<exported-fields-beat-common>>
-* <<exported-fields-cache>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -2479,12 +2478,6 @@ Time series instance id
 type: keyword
 
 --
-
-[[exported-fields-cache]]
-== Cache fields
-
-Cache processor
-
 
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
