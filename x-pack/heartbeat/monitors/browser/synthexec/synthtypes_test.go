@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 
 	"github.com/stretchr/testify/require"
 )
@@ -55,7 +55,7 @@ func TestToMap(t *testing.T) {
 					"package_version": "1.2.3",
 					"nested":          "v1",
 				},
-				"url":           wrappers.URLFields(testUrl),
+				"url":           wraputil.URLFields(testUrl),
 				"truly_at_root": "v2",
 			},
 		},

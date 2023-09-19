@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -44,6 +45,7 @@ type MonitorRunInfo struct {
 	Duration  int64  `json:"-"`
 	Steps     *int   `json:"steps,omitempty"`
 	Status    string `json:"status"`
+	Attempt   int    `json:"attempt"`
 }
 
 func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
@@ -78,22 +80,33 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	errors := []error{}
 	monitorID, err := event.GetValue("monitor.id")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.id: %w", err))
 	}
 
 	durationUs, err := event.GetValue("monitor.duration.us")
 	if err != nil {
-		errors = append(errors, err)
+		durationUs = int64(0)
 	}
 
 	monType, err := event.GetValue("monitor.type")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.type: %w", err))
 	}
 
 	status, err := event.GetValue("monitor.status")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.status: %w", err))
+	}
+
+	jsIface, err := event.GetValue("summary")
+	var attempt int
+	if err != nil {
+		errors = append(errors, fmt.Errorf("could not extract summary to add attempt info: %w", err))
+	} else {
+		js, ok := jsIface.(*jobsummary.JobSummary)
+		if ok && js != nil {
+			attempt = int(js.Attempt)
+		}
 	}
 
 	if len(errors) > 0 {
@@ -105,6 +118,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		Type:      monType.(string),
 		Duration:  durationUs.(int64),
 		Status:    status.(string),
+		Attempt:   attempt,
 	}
 
 	sc, _ := event.Meta.GetValue(META_STEP_COUNT)
@@ -119,7 +133,7 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 func LogRun(event *beat.Event) {
 	monitor, err := extractRunInfo(event)
 	if err != nil {
-		getLogger().Errorw("error gathering information to log event: ", err)
+		getLogger().Error(fmt.Errorf("error gathering information to log event: %w", err))
 		return
 	}
 

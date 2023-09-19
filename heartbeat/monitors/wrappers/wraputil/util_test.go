@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package wrappers
+package wraputil
 
 import (
 	"net/url"
