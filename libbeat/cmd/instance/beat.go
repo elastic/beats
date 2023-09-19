@@ -783,6 +783,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	if err := mergeOutputQueueSettings(&b.Config); err != nil {
+		return fmt.Errorf("could not merge output queue settings: %w", err)
+	}
+
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
@@ -1479,4 +1483,18 @@ func sanitizeIPs(ips []string) []string {
 		validIPs = append(validIPs, ip)
 	}
 	return validIPs
+}
+
+func mergeOutputQueueSettings(bc *beatConfig) error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		pc := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&pc)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if pc.Queue.IsSet() {
+			bc.Pipeline.Queue = pc.Queue
+		}
+	}
+	return nil
 }
