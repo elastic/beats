@@ -40,10 +40,10 @@ func TwistMaxAttempts(maxAttempts int) *framework.Twist {
 	return framework.MakeTwist(fmt.Sprintf("run with %d max_attempts", maxAttempts), func(s framework.Scenario) framework.Scenario {
 		s.Tags = append(s.Tags, "retry")
 		origRunner := s.Runner
-		s.Runner = func(t *testing.T) (config mapstr.M, close func(), err error) {
-			config, close, err = origRunner(t)
+		s.Runner = func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
+			config, meta, close, err = origRunner(t)
 			config["max_attempts"] = maxAttempts
-			return config, close, err
+			return config, meta, close, err
 		}
 		return s
 	})
