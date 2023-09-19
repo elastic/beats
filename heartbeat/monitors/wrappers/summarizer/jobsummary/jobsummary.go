@@ -49,7 +49,11 @@ func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSu
 // BumpAttempt swaps the JobSummary object's pointer for a new job summary
 // that is a clone of the current one but with the Attempt field incremented.
 func (js *JobSummary) BumpAttempt() {
-	*js = *NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+	newJs := *NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+	newJs.Up = js.Up
+	newJs.Down = js.Down
+	newJs.Status = js.Status
+	*js = newJs
 }
 
 func (js *JobSummary) String() string {

@@ -65,6 +65,7 @@ func (ssp *BrowserStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSumm
 	res := ssp.cssp.BeforeSummary(event)
 
 	_, _ = event.PutValue("monitor.status", string(ssp.cssp.js.Status))
+	_, _ = event.PutValue("synthetics", mapstr.M{"type": "heartbeat/summary"})
 	return res
 }
 
@@ -162,19 +163,14 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 		"summary": &jsCopy,
 		"state":   ms,
 	}
-	if ssp.sf.Type == "browser" {
-		fields["synthetics"] = mapstr.M{"type": "heartbeat/summary"}
-	}
+
 	eventext.MergeEventFields(event, fields)
+
+	logp.L().Debugf("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		// mutate the js into the state for the next attempt
 		ssp.js.BumpAttempt()
-	}
-
-	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
-
-	if retry {
 		return RetryBeforeSummary
 	}
 
