@@ -19,7 +19,6 @@ package cache
 
 import (
 	"errors"
-	"io"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -297,6 +296,263 @@ var cacheTests = []struct {
 			},
 		},
 	},
+	{
+		name: "put_and_get_value_with_get_error_no_overwrite",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["put"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"put": mapstr.M{
+						"key_field":   "crowdstrike.aid",
+						"value_field": "crowdstrike.metadata",
+						"ttl":         "168h",
+					},
+				},
+			},
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new",
+					},
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"put": true,
+					"crowdstrike": mapstr.M{
+						"aid":      "one",
+						"metadata": "metadata_value",
+					},
+				},
+				want: mapstr.M{
+					"put": true,
+					"crowdstrike": mapstr.M{
+						"aid":      "one",
+						"metadata": "metadata_value",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{
+					"one": {key: "one", value: "metadata_value"},
+				},
+				wantErr: nil,
+			},
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+						"metadata_new": mapstr.M{
+							"someone_is_already_here": mapstr.M{
+								"another_key": "value",
+							},
+						},
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+						"metadata_new": mapstr.M{
+							"someone_is_already_here": mapstr.M{
+								"another_key": "value",
+							},
+						},
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{
+					"one": {key: "one", value: "metadata_value"},
+				},
+				wantErr: errors.New("error applying cache get processor: target field 'crowdstrike.metadata_new' already exists and overwrite_keys is false"),
+			},
+		},
+	},
+	{
+		name: "put_and_get_value_allow_overwrite",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["put"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"put": mapstr.M{
+						"key_field":   "crowdstrike.aid",
+						"value_field": "crowdstrike.metadata",
+						"ttl":         "168h",
+					},
+				},
+			},
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"overwrite_keys": true,
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new",
+					},
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"put": true,
+					"crowdstrike": mapstr.M{
+						"aid":      "one",
+						"metadata": "metadata_value",
+					},
+				},
+				want: mapstr.M{
+					"put": true,
+					"crowdstrike": mapstr.M{
+						"aid":      "one",
+						"metadata": "metadata_value",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{
+					"one": {key: "one", value: "metadata_value"},
+				},
+				wantErr: nil,
+			},
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid": "one",
+						"metadata_new": mapstr.M{
+							"someone_is_already_here": mapstr.M{
+								"another_key": "value",
+							},
+						},
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid":          "one",
+						"metadata_new": "metadata_value",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{
+					"one": {key: "one", value: "metadata_value"},
+				},
+				wantErr: nil,
+			},
+		},
+	},
+	{
+		name: "put_and_get_value_allow_overwrite_but_get_error",
+		configs: []testConfig{
+			{
+				when: func(e mapstr.M) bool {
+					return e["put"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"put": mapstr.M{
+						"key_field":   "crowdstrike.aid",
+						"value_field": "crowdstrike.metadata",
+						"ttl":         "168h",
+					},
+				},
+			},
+			{
+				when: func(e mapstr.M) bool {
+					return e["get"] == true
+				},
+				cfg: mapstr.M{
+					"backend": mapstr.M{
+						"memory": mapstr.M{
+							"id": "aidmaster",
+						},
+					},
+					"overwrite_keys": true,
+					"get": mapstr.M{
+						"key_field":    "crowdstrike.aid",
+						"target_field": "crowdstrike.metadata_new.child",
+					},
+				},
+			},
+		},
+		wantInitErr: nil,
+		steps: []cacheTestStep{
+			{
+				event: mapstr.M{
+					"put": true,
+					"crowdstrike": mapstr.M{
+						"aid":      "one",
+						"metadata": "metadata_value",
+					},
+				},
+				want: mapstr.M{
+					"put": true,
+					"crowdstrike": mapstr.M{
+						"aid":      "one",
+						"metadata": "metadata_value",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{
+					"one": {key: "one", value: "metadata_value"},
+				},
+				wantErr: nil,
+			},
+			{
+				event: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid":          "one",
+						"metadata_new": "someone_is_already_here",
+					},
+				},
+				want: mapstr.M{
+					"get": true,
+					"crowdstrike": mapstr.M{
+						"aid":          "one",
+						"metadata_new": "someone_is_already_here",
+					},
+				},
+				wantCacheVal: map[string]*CacheEntry{
+					"one": {key: "one", value: "metadata_value"},
+				},
+				wantErr: errors.New("error applying cache get processor: expected map but type is string"),
+			},
+		},
+	},
 }
 
 type testConfig struct {
@@ -309,7 +565,7 @@ func TestCache(t *testing.T) {
 	for _, test := range cacheTests {
 		t.Run(test.name, func(t *testing.T) {
 			var processors []beat.Processor
-			for _, cfg := range test.configs {
+			for i, cfg := range test.configs {
 				config, err := conf.NewConfigFrom(cfg.cfg)
 				if err != nil {
 					t.Fatal(err)
@@ -322,7 +578,20 @@ func TestCache(t *testing.T) {
 				if err != nil {
 					return
 				}
+
 				t.Log(p)
+				c, ok := p.(*cache)
+				if !ok {
+					t.Fatalf("processor %d is not an *cache", i)
+				}
+
+				defer func() {
+					err := c.Close()
+					if err != nil {
+						t.Errorf("unexpected error from c.Close(): %v", err)
+					}
+				}()
+
 				processors = append(processors, p)
 			}
 
@@ -349,18 +618,6 @@ func TestCache(t *testing.T) {
 							t.Errorf("unexpected cache state result %d:\n--- want\n+++ got\n%s", i, cmp.Diff(step.wantCacheVal, got.cache, allow, ignore))
 						}
 					}
-				}
-			}
-
-			for i, p := range processors {
-				p, ok := p.(io.Closer)
-				if !ok {
-					t.Errorf("processor %d is not an io.Closer", i)
-					continue
-				}
-				err := p.Close()
-				if err != nil {
-					t.Errorf("unexpected error from p.Close(): %v", err)
 				}
 			}
 		})

@@ -50,7 +50,9 @@ var memStoreTests = []struct {
 			},
 		},
 		want: &memStore{
+			id:     "test",
 			cache:  map[string]*CacheEntry{},
+			refs:   1,
 			ttl:    time.Second,
 			cap:    1000,
 			effort: 10,
@@ -67,7 +69,9 @@ var memStoreTests = []struct {
 			Get: &getConfig{},
 		},
 		want: &memStore{
+			id:    "test",
 			cache: map[string]*CacheEntry{},
+			refs:  1,
 			// TTL, capacity and effort are set only by put.
 			ttl:    -1,
 			cap:    -1,
@@ -85,7 +89,9 @@ var memStoreTests = []struct {
 			Delete: &delConfig{},
 		},
 		want: &memStore{
+			id:    "test",
 			cache: map[string]*CacheEntry{},
+			refs:  1,
 			// TTL, capacity and effort are set only by put.
 			ttl:    -1,
 			cap:    -1,
@@ -103,8 +109,10 @@ var memStoreTests = []struct {
 			Get: &getConfig{},
 		},
 		want: &memStore{
+			id:    "test",
 			cache: map[string]*CacheEntry{},
 			// TTL, capacity and effort are set only by put.
+			refs:   1,
 			ttl:    -1,
 			cap:    -1,
 			effort: -1,
@@ -126,7 +134,9 @@ var memStoreTests = []struct {
 					return nil
 				},
 				want: &memStore{
+					id:     "test",
 					cache:  map[string]*CacheEntry{},
+					refs:   2,
 					ttl:    time.Second,
 					cap:    1000,
 					effort: 10,
@@ -145,7 +155,9 @@ var memStoreTests = []struct {
 			Get: &getConfig{},
 		},
 		want: &memStore{
+			id:    "test",
 			cache: map[string]*CacheEntry{},
+			refs:  1,
 			// TTL, capacity and effort are set only by put.
 			ttl:    -1,
 			cap:    -1,
@@ -168,7 +180,9 @@ var memStoreTests = []struct {
 					return nil
 				},
 				want: &memStore{
+					id:     "test",
 					cache:  map[string]*CacheEntry{},
+					refs:   2,
 					ttl:    time.Second,
 					cap:    1000,
 					effort: 10,
@@ -182,6 +196,7 @@ var memStoreTests = []struct {
 					return nil
 				},
 				want: &memStore{
+					id: "test",
 					cache: map[string]*CacheEntry{
 						"one":   {key: "one", value: int(1), index: 0},
 						"two":   {key: "two", value: int(2), index: 1},
@@ -192,6 +207,7 @@ var memStoreTests = []struct {
 						{key: "two", value: int(2), index: 1},
 						{key: "three", value: int(3), index: 2},
 					},
+					refs:   2,
 					ttl:    time.Second,
 					cap:    1000,
 					effort: 10,
@@ -206,6 +222,7 @@ var memStoreTests = []struct {
 					return err
 				},
 				want: &memStore{
+					id: "test",
 					cache: map[string]*CacheEntry{
 						"one":   {key: "one", value: int(1), index: 0},
 						"two":   {key: "two", value: int(2), index: 1},
@@ -216,6 +233,7 @@ var memStoreTests = []struct {
 						{key: "two", value: int(2), index: 1},
 						{key: "three", value: int(3), index: 2},
 					},
+					refs:   2,
 					ttl:    time.Second,
 					cap:    1000,
 					effort: 10,
@@ -226,6 +244,7 @@ var memStoreTests = []struct {
 					return s.Delete("two")
 				},
 				want: &memStore{
+					id: "test",
 					cache: map[string]*CacheEntry{
 						"one":   {key: "one", value: int(1), index: 0},
 						"three": {key: "three", value: int(3), index: 1},
@@ -234,6 +253,7 @@ var memStoreTests = []struct {
 						{key: "one", value: int(1), index: 0},
 						{key: "three", value: int(3), index: 1},
 					},
+					refs:   2,
 					ttl:    time.Second,
 					cap:    1000,
 					effort: 10,
@@ -248,6 +268,7 @@ var memStoreTests = []struct {
 					return nil
 				},
 				want: &memStore{
+					id: "test",
 					cache: map[string]*CacheEntry{
 						"one":   {key: "one", value: int(1), index: 0},
 						"three": {key: "three", value: int(3), index: 1},
@@ -256,9 +277,56 @@ var memStoreTests = []struct {
 						{key: "one", value: int(1), index: 0},
 						{key: "three", value: int(3), index: 1},
 					},
+					refs:   2,
 					ttl:    time.Second,
 					cap:    1000,
 					effort: 10,
+				},
+			},
+			5: {
+				doTo: func(s *memStore) error {
+					storeMu.Lock()
+					s.close(memStores)
+					defer storeMu.Unlock()
+					if _, ok := memStores[s.id]; !ok {
+						return fmt.Errorf("%q memStore not found after single close", s.id)
+					}
+					return nil
+				},
+				want: &memStore{
+					id: "test",
+					cache: map[string]*CacheEntry{
+						"one":   {key: "one", value: int(1), index: 0},
+						"three": {key: "three", value: int(3), index: 1},
+					},
+					expiries: expiryHeap{
+						{key: "one", value: int(1), index: 0},
+						{key: "three", value: int(3), index: 1},
+					},
+					refs:   1,
+					ttl:    time.Second,
+					cap:    1000,
+					effort: 10,
+				},
+			},
+			6: {
+				doTo: func(s *memStore) error {
+					storeMu.Lock()
+					s.close(memStores)
+					defer storeMu.Unlock()
+					if _, ok := memStores[s.id]; ok {
+						return fmt.Errorf("%q memStore still found after double close", s.id)
+					}
+					return nil
+				},
+				want: &memStore{
+					id:       "test",
+					cache:    nil, // assistively nil-ed.
+					expiries: nil, // assistively nil-ed.
+					refs:     0,
+					ttl:      time.Second,
+					cap:      1000,
+					effort:   10,
 				},
 			},
 		},
@@ -272,7 +340,14 @@ func TestMemStore(t *testing.T) {
 
 	for _, test := range memStoreTests {
 		t.Run(test.name, func(t *testing.T) {
-			store := newMemStore(test.cfg)
+			// Construct the store and put in into the stores map as
+			// we would if we were calling Run.
+			store := newMemStore(test.cfg, test.cfg.Store.Memory.ID)
+			store.setPutOptions(test.cfg)
+			storeMu.Lock()
+			memStores[store.id] = store
+			storeMu.Unlock()
+
 			if !cmp.Equal(test.want, store, allow, ignoreInMemStore) {
 				t.Errorf("unexpected new memStore result:\n--- want\n+++ got\n%s",
 					cmp.Diff(test.want, store, allow, ignoreInMemStore))

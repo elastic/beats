@@ -29,6 +29,10 @@ type memStore struct {
 	cache    map[string]*CacheEntry
 	expiries expiryHeap
 	ttl      time.Duration // ttl is the time entries are valid for in the cache.
+	refs     int           // refs is the number of processors referring to this store.
+
+	// id is the index into global cache store for the cache.
+	id string
 
 	// cap is the maximum number of elements the cache
 	// will hold. If not positive, no limit.
@@ -39,43 +43,55 @@ type memStore struct {
 }
 
 // newMemStore returns a new memStore configured to apply the give TTL duration.
-// The memStore is guaranteed not to grow larger than cap elements.
-func newMemStore(cfg config) *memStore {
-	// Mark the ttl as invalid until we have had a put operation
-	// configured.
-	ttl := time.Duration(-1)
-	cap := -1
-	effort := -1
-	if cfg.Put != nil {
-		// putConfig.TTL is a required field, so we don't
-		// need to check for nil-ness.
-		ttl = *cfg.Put.TTL
-		cap = cfg.Store.Capacity
-		effort = cfg.Store.Effort
-	}
+// The memStore is guaranteed not to grow larger than cap elements. id is the
+// look-up into the global cache store the memStore is held in.
+func newMemStore(cfg config, id string) *memStore {
 	return &memStore{
-		cache:  make(map[string]*CacheEntry),
-		ttl:    ttl,
-		cap:    cap,
-		effort: effort,
+		id:    id,
+		cache: make(map[string]*CacheEntry),
+
+		// Mark the ttl as invalid until we have had a put operation
+		// configured.
+		ttl:    -1,
+		cap:    -1,
+		effort: -1,
 	}
 }
 
 // setPutOptions allows concurrency-safe updating of the put options. While the shared
 // backing data store is incomplete, and has no put operation defined, the TTL
 // will be invalid, but will never be accessed since all time operations outside
-// put refer to absolute times.
+// put refer to absolute times. setPutOptions also increases the reference count
+// for the memStore for all operation types.
 func (c *memStore) setPutOptions(cfg config) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.refs++
 	if cfg.Put == nil {
 		return
 	}
-	c.mu.Lock()
 	if c.ttl == -1 {
 		// putConfig.TTL is a required field, so we don't
 		// need to check for nil-ness.
 		c.ttl = *cfg.Put.TTL
 		c.cap = cfg.Store.Capacity
 		c.effort = cfg.Store.Effort
+	}
+}
+
+// close decreases the reference count for the memStore and removes it from the
+// stores map if the count is zero.
+func (c *memStore) close(stores map[string]*memStore) {
+	c.mu.Lock()
+	c.refs--
+	if c.refs < 0 {
+		panic("invalid reference count")
+	}
+	if c.refs == 0 {
+		delete(stores, c.id)
+		// GC assists.
+		c.cache = nil
+		c.expiries = nil
 	}
 	c.mu.Unlock()
 }

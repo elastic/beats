@@ -127,35 +127,29 @@ func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
 	}
 }
 
+// noop is a no-op context.CancelFunc.
+func noop() {}
+
 func getMemStore(stores map[string]*memStore, id string, cfg config) (*memStore, context.CancelFunc) {
 	s, ok := stores[id]
-	if ok {
-		// We may have already constructed the store with
-		// a get or a delete config, so set the TTL, cap
-		// and effort if we have a put config. If another
-		// put config has already been included, we ignore
-		// the put options now.
-		s.setPutOptions(cfg)
-		return s, noop
+	if !ok {
+		s = newMemStore(cfg, id)
+		stores[s.id] = s
 	}
-	s = newMemStore(cfg)
-	stores[id] = s
+
+	// We may have already constructed the store with
+	// a get or a delete config, so set the TTL, cap
+	// and effort if we have a put config. If another
+	// put config has already been included, we ignore
+	// the put options now.
+	s.setPutOptions(cfg)
+
 	return s, func() {
-		// TODO: Consider making this reference counted.
-		// Currently, what we have is essentially an
-		// ownership model, where the put operation is
-		// owner. This could conceivably be problematic
-		// if a processor were shared between different
-		// inputs and the put is closed due to a config
-		// change.
 		storeMu.Lock()
-		delete(stores, id)
+		s.close(stores)
 		storeMu.Unlock()
 	}
 }
-
-// noop is a no-op context.CancelFunc.
-func noop() {}
 
 // Run enriches the given event with the host metadata.
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
@@ -260,12 +254,16 @@ func (p *cache) getFor(event *beat.Event) (result *beat.Event, err error) {
 	if m, ok := meta.(map[string]interface{}); ok {
 		meta = mapstr.M(m)
 	}
-	// ... and write it into the cloned event.
-	result = event.Clone()
-	if _, err = result.PutValue(dst, meta); err != nil {
+	// ... and write it into the event.
+	// The implementation of PutValue currently leaves event
+	// essentially unchanged in the case of an error (in the
+	// case of an @metadata field there may be a mutation,
+	// but at most this will be the addition of a Meta field
+	// value to event). None of this is documented.
+	if _, err = event.PutValue(dst, meta); err != nil {
 		return nil, err
 	}
-	return result, nil
+	return event, nil
 }
 
 // deleteFor deletes the configured value from the cache based on the value of
