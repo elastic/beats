@@ -6,8 +6,17 @@
 <titleabbrev>decode_cef</titleabbrev>
 ++++
 
-The `decode_cef` processor decodes Common Event Format (CEF) messages. This
-processor is available in Filebeat.
+The `decode_cef` processor decodes Common Event Format (CEF) messages. It
+follows the specification defined in
+https://archive.org/download/commoneventformatv25/CommonEventFormatV25.pdf[
+_Micro Focus Security ArcSight Common Event Format, Version 25_]. This processor
+is available in Filebeat. This is an example CEF message.
+
+`CEF:0|SomeVendor|TheProduct|1.0|100|connection to malware C2 successfully
+stopped|10|src=192.0.2.10 dst=203.0.113.2 spt=31224`
+
+Any content that precedes `CEF:` is ignored. This allows the processor to
+directly parse CEF content from messages that contain syslog headers.
 
 Below is an example configuration that decodes the `message` field as CEF after
 renaming it to `event.original`. It is best to rename `message` to

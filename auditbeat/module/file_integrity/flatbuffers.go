@@ -125,11 +125,16 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 		return 0
 	}
 
-	var sidOffset flatbuffers.UOffsetT
+	var sidOffset, selinuxOffset, aclAccessOffset flatbuffers.UOffsetT
 	if m.SID != "" {
 		sidOffset = b.CreateString(m.SID)
 	}
-
+	if m.SELinux != "" {
+		selinuxOffset = b.CreateString(m.SELinux)
+	}
+	if len(m.POSIXACLAccess) != 0 {
+		aclAccessOffset = b.CreateByteVector(m.POSIXACLAccess)
+	}
 	schema.MetadataStart(b)
 	schema.MetadataAddInode(b, m.Inode)
 	schema.MetadataAddUid(b, m.UID)
@@ -159,6 +164,12 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 		schema.MetadataAddType(b, schema.TypeDir)
 	case SymlinkType:
 		schema.MetadataAddType(b, schema.TypeSymlink)
+	}
+	if selinuxOffset > 0 {
+		schema.MetadataAddSelinux(b, selinuxOffset)
+	}
+	if aclAccessOffset > 0 {
+		schema.MetadataAddPosixAclAccess(b, aclAccessOffset)
 	}
 	return schema.MetadataEnd(b)
 }
@@ -245,17 +256,26 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 		return nil
 	}
 	mode := os.FileMode(info.Mode())
+	var posixACLAccess []byte
+	if n := info.PosixAclAccessLength(); n != 0 {
+		posixACLAccess = make([]byte, n)
+		for i := range posixACLAccess {
+			posixACLAccess[i] = byte(info.PosixAclAccess(i))
+		}
+	}
 	rtn := &Metadata{
-		Inode:  info.Inode(),
-		UID:    info.Uid(),
-		GID:    info.Gid(),
-		SID:    string(info.Sid()),
-		Mode:   mode & ^(os.ModeSetuid | os.ModeSetgid),
-		Size:   info.Size(),
-		MTime:  time.Unix(0, info.MtimeNs()).UTC(),
-		CTime:  time.Unix(0, info.CtimeNs()).UTC(),
-		SetUID: mode&os.ModeSetuid != 0,
-		SetGID: mode&os.ModeSetgid != 0,
+		Inode:          info.Inode(),
+		UID:            info.Uid(),
+		GID:            info.Gid(),
+		SID:            string(info.Sid()),
+		Mode:           mode & ^(os.ModeSetuid | os.ModeSetgid),
+		Size:           info.Size(),
+		MTime:          time.Unix(0, info.MtimeNs()).UTC(),
+		CTime:          time.Unix(0, info.CtimeNs()).UTC(),
+		SetUID:         mode&os.ModeSetuid != 0,
+		SetGID:         mode&os.ModeSetgid != 0,
+		SELinux:        string(info.Selinux()),
+		POSIXACLAccess: posixACLAccess,
 	}
 
 	switch info.Type() {

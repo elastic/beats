@@ -1,6 +1,6 @@
 [
     {
-        "crowdstrike.event.CommandLine": "C:\\Windows\\Explorer.EXE",
+        "crowdstrike.event.CommandLine": "C:\\Windows\\Explorer.EXE  --test",
         "crowdstrike.event.ComputerName": "alice-laptop",
         "crowdstrike.event.DetectDescription": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
         "crowdstrike.event.DetectId": "ldt:ec86abd353824e96765ecbe18eb4f0b4:38655257584",
@@ -67,9 +67,10 @@
         "log.offset": 0,
         "message": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
         "process.args": [
-            "C:\\Windows\\Explorer.EXE"
+            "C:\\Windows\\Explorer.EXE",
+            "--test"
         ],
-        "process.command_line": "C:\\Windows\\Explorer.EXE",
+        "process.command_line": "C:\\Windows\\Explorer.EXE  --test",
         "process.executable": "C:\\Windows\\Explorer.EXE",
         "process.name": "explorer.exe",
         "process.pid": 38684386611,
@@ -126,7 +127,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 2063,
+        "log.offset": 2071,
         "message": "Incident score 1.2",
         "service.type": "crowdstrike",
         "tags": [
@@ -169,7 +170,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 2579,
+        "log.offset": 2587,
         "message": "quarantined_file_update",
         "related.user": [
             "Crowdstrike"

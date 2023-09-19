@@ -84,6 +84,15 @@ conditions:
       command: 'grep -v -q {{ source "latestGoVersion" }} .go-version #'
 
 targets:
+  update-gomod:
+    name: "Update go.mod"
+    sourceid: gomod
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: 'go {{ source "gomod" }}'
+      file: go.mod
+      matchpattern: 'go \d+.\d+'
   update-go-version:
     name: "Update .go-version"
     sourceid: latestGoVersion
@@ -111,33 +120,132 @@ targets:
       content: ':go-version: {{ source "latestGoVersion" }}'
       file: libbeat/docs/version.asciidoc
       matchpattern: ':go-version: \d+.\d+.\d+'
-  update-dockerfiles:
-    name: "Update from dockerfiles"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: file
-    spec:
-      content: 'FROM golang:{{ source "latestGoVersion" }}'
-      files:
-        - ./auditbeat/Dockerfile
-        - ./heartbeat/Dockerfile
-        - ./metricbeat/Dockerfile
-        - ./packetbeat/Dockerfile
-        - ./x-pack/functionbeat/Dockerfile
-        - ./metricbeat/module/nats/_meta/Dockerfile
-        - ./metricbeat/module/http/_meta/Dockerfile
-        - ./metricbeat/module/vsphere/_meta/Dockerfile
-        - ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
-        - ./dev-tools/kubernetes/filebeat/Dockerfile.debug
-        - ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
-        - ./x-pack/metricbeat/module/stan/_meta/Dockerfile
-      matchpattern: 'FROM golang:\d+.\d+.\d+'
-  update-gomod:
-    name: "Update go.mod"
+  update-devcontainer:
+    name: "Update .devcontainer/devcontainer.json"
     sourceid: gomod
     scmid: githubConfig
     kind: file
     spec:
-      content: 'go {{ source "gomod" }}'
-      file: go.mod
-      matchpattern: 'go \d+.\d+'
+      content: 'go:1-{{ source "gomod" }}'
+      file: ./.devcontainer/devcontainer.json
+      matchpattern: 'go:1-\d+.\d+'
+  update-auditbeat-dockerfile:
+    name: "Update Auditbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./auditbeat/Dockerfile
+  update-heartbeat-dockerfile:
+    name: "Update Heartbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./heartbeat/Dockerfile
+  update-metricbeat-dockerfile:
+    name: "Update Metricbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/Dockerfile
+  update-packetbeat-dockerfile:
+    name: "Update Packetbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./packetbeat/Dockerfile
+  update-functionbeat-dockerfile:
+    name: "Update Functionbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/functionbeat/Dockerfile
+  update-nats-module-dockerfile:
+    name: "Update NATS module Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/nats/_meta/Dockerfile
+  update-http-module-dockerfile:
+    name: "Update HTTP module Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/http/_meta/Dockerfile
+  update-vsphere-module-dockerfile:
+    name: "Update from vsphere Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/vsphere/_meta/Dockerfile
+  update-metricbeat-debug-dockerfile:
+    name: "Update Metricbeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
+  update-dockerfiles-filebeat-debug:
+    name: "Update Filebeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/filebeat/Dockerfile.debug
+  update-heartbeat-debug-dockerfile:
+    name: "Update Heartbeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
+  update-stan-module-dockerfile:
+    name: "Update stan Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/metricbeat/module/stan/_meta/Dockerfile

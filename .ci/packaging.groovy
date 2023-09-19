@@ -4,11 +4,6 @@
 
 import groovy.transform.Field
 
-/**
- This is required to store the test suites we will use to trigger the E2E tests.
-*/
-@Field def e2eTestSuites = []
-
 pipeline {
   agent none
   environment {
@@ -20,7 +15,6 @@ pipeline {
     JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
-    GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     PIPELINE_LOG_LEVEL = "INFO"
     SLACK_CHANNEL = '#ingest-notifications'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
@@ -39,9 +33,6 @@ pipeline {
     issueCommentTrigger('(?i)^\\/packag[ing|e]$')
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
-  }
-  parameters {
-    booleanParam(name: 'run_e2e', defaultValue: true, description: 'Allow to disable the e2e tets. This workaround will generate broken/buggy binaries.')
   }
   stages {
     stage('Filter build') {
@@ -101,15 +92,6 @@ pipeline {
           options { skipDefaultCheckout() }
           steps {
             generateSteps()
-          }
-        }
-        stage('Run E2E Tests for Packages'){
-          options { skipDefaultCheckout() }
-          when {
-            expression { return params.run_e2e }
-          }
-          steps {
-            runE2ETests()
           }
         }
         stage('DRA Snapshot') {
@@ -303,7 +285,6 @@ def generateLinuxStep(beat) {
             pushCIDockerImages(arch: 'amd64')
           }
         }
-        prepareE2ETestForPackage("${beat}")
 
         // Staging is only needed from branches (main or release branches)
         if (isBranch()) {
@@ -389,19 +370,6 @@ def tagAndPush(Map args = [:]) {
   )
 }
 
-def prepareE2ETestForPackage(String beat){
-  if ("${beat}" == "filebeat" || "${beat}" == "x-pack/filebeat") {
-    e2eTestSuites.push('fleet')
-    e2eTestSuites.push('helm')
-  } else if ("${beat}" == "metricbeat" || "${beat}" == "x-pack/metricbeat") {
-    e2eTestSuites.push('ALL')
-    echo("${beat} adds all test suites to the E2E tests job.")
-  } else {
-    echo("${beat} does not add any test suite to the E2E tests job.")
-    return
-  }
-}
-
 def release(type){
   withBeatsEnv(type){
     // As agreed DEV=false for staging otherwise DEV=true
@@ -437,32 +405,6 @@ def release(type){
     }
   }
 }
-
-def runE2ETests(){
-  if (e2eTestSuites.size() == 0) {
-    echo("Not triggering E2E tests for PR-${env.CHANGE_ID} because the changes does not affect the E2E.")
-    return
-  }
-
-  def suites = '' // empty value represents all suites in the E2E tests
-
-  def suitesSet = e2eTestSuites.toSet()
-
-  if (!suitesSet.contains('ALL')) {
-    suitesSet.each { suite ->
-      suites += "${suite},"
-    };
-  }
-  echo 'runE2E has asynchronously triggered the end to end test job.'
-  runE2E(runTestsSuites: suites,
-        testMatrixFile: '.ci/.e2e-tests-beats.yaml',
-        beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-        gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
-        gitHubCheckRepo: env.REPO,
-        gitHubCheckSha1: env.GIT_BASE_COMMIT,
-        propagate: false, // Ignore the result of the downstream E2E job.
-        wait: false) // Do not synchronously wait for the downstream E2E job to complete.
-  }
 
 /**
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/

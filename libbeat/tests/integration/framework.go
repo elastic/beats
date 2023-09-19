@@ -31,6 +31,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
@@ -118,6 +119,36 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		stdout:     stdoutFile,
 		stderr:     stderrFile,
 	}
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
+		}
+		var maxlen int64 = 2048
+		stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
+		if err != nil {
+			t.Logf("error reading stderr: %s", err)
+		}
+		t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+
+		stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
+		if err != nil {
+			t.Logf("error reading stdout: %s", err)
+		}
+		t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+
+		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
+		files, err := filepath.Glob(glob)
+		if err != nil {
+			t.Logf("glob error with: %s: %s", glob, err)
+		}
+		for _, f := range files {
+			contents, err := readLastNBytes(f, maxlen)
+			if err != nil {
+				t.Logf("error reading %s: %s", f, err)
+			}
+			t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
+		}
+	})
 	return &p
 }
 
@@ -182,10 +213,10 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
-	b.stdout.Seek(0, 0)
-	b.stdout.Truncate(0)
-	b.stderr.Seek(0, 0)
-	b.stderr.Truncate(0)
+	_, _ = b.stdout.Seek(0, 0)
+	_ = b.stdout.Truncate(0)
+	_, _ = b.stderr.Seek(0, 0)
+	_ = b.stderr.Truncate(0)
 	var procAttr os.ProcAttr
 	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
 	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
@@ -219,13 +250,54 @@ func (b *BeatProc) Stop() {
 	}
 }
 
+// LogMatch tests each line of the logfile to see if contains any
+// match of the provided regular expression.  It will open the log
+// file on every call, read until EOF, then close it.  LogContains
+// will be faster so use that if possible.
+func (b *BeatProc) LogMatch(match string) bool {
+	re := regexp.MustCompile(match)
+	logFile := b.openLogFile()
+	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
+	if err != nil {
+		b.t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
+	}
+
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			b.t.Errorf("could not close log file: %s", err)
+		}
+	}()
+
+	r := bufio.NewReader(logFile)
+	for {
+		data, err := r.ReadBytes('\n')
+		line := string(data)
+		b.logFileOffset += int64(len(data))
+
+		if err != nil {
+			if err != io.EOF {
+				b.t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
+
+		if re.MatchString(line) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // LogContains looks for `s` as a substring of every log line,
 // it will open the log file on every call, read it until EOF,
 // then close it.
 func (b *BeatProc) LogContains(s string) bool {
 	t := b.t
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, os.SEEK_SET)
+	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
 	if err != nil {
 		t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -242,7 +314,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		b.logFileOffset += int64(len(line))
+		b.logFileOffset += int64(len(data))
 
 		if err != nil {
 			if err != io.EOF {
@@ -333,14 +405,17 @@ func (b *BeatProc) openLogFile() *os.File {
 // If the tests are run with -v, the temporary directory will
 // be logged.
 func createTempDir(t *testing.T) string {
-	tempDir, err := filepath.Abs(filepath.Join("../../build/integration-tests/",
-		fmt.Sprintf("%s-%d", t.Name(), time.Now().Unix())))
+	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
 	}
-
-	if err := os.MkdirAll(tempDir, 0o766); err != nil {
-		t.Fatalf("cannot create tmp dir: %s, msg: %s", err, err.Error())
+	err = os.MkdirAll(rootDir, 0o750)
+	if err != nil {
+		t.Fatalf("error making test dir: %s: %s", rootDir, err)
+	}
+	tempDir, err := os.MkdirTemp(rootDir, strings.ReplaceAll(t.Name(), "/", "-"))
+	if err != nil {
+		t.Fatalf("failed to make temp directory: %s", err)
 	}
 
 	cleanup := func() {
@@ -381,6 +456,7 @@ func EnsureESIsRunning(t *testing.T) {
 		// containers required for integration tests
 		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage compose:Up)", err)
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
 	}
@@ -501,7 +577,10 @@ func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
 func HttpDo(t *testing.T, method string, targetURL url.URL) (statusCode int, body []byte, err error) {
 	t.Helper()
 	client := &http.Client{}
-	req, err := http.NewRequest(method, targetURL.String(), nil)
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, method, targetURL.String(), nil)
 	if err != nil {
 		return 0, nil, fmt.Errorf("error making request, method: %s, url: %s, error: %w", method, targetURL.String(), err)
 	}
@@ -563,4 +642,26 @@ func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) 
 	}
 	srcURL.Path = path
 	return srcURL, nil
+}
+
+func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("error opening %s: %w", filename, err)
+	}
+	fInfo, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("error stating %s: %w", filename, err)
+	}
+	var startPosition int64
+	if fInfo.Size() >= numBytes {
+		startPosition = fInfo.Size() - numBytes
+	} else {
+		startPosition = 0
+	}
+	_, err = f.Seek(startPosition, io.SeekStart)
+	if err != nil {
+		return nil, fmt.Errorf("error seeking to %d in %s: %w", startPosition, filename, err)
+	}
+	return io.ReadAll(f)
 }

@@ -44,11 +44,6 @@ type User struct {
 	Embedded              HAL            `json:"_embedded,omitempty"`
 }
 
-// HAL is a JSON Hypertext Application Language object.
-//
-// See https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06 for details.
-type HAL map[string]any
-
 // Profile is an Okta user's profile.
 //
 // See https://developer.okta.com/docs/reference/api/users/#profile-object for details.
@@ -102,6 +97,61 @@ type Provider struct {
 	Type string  `json:"type"`
 	Name *string `json:"name,omitempty"`
 }
+
+// Device is an Okta device's details.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
+type Device struct {
+	Created             time.Time         `json:"created"`
+	ID                  string            `json:"id"`
+	LastUpdated         time.Time         `json:"lastUpdated"`
+	Profile             DeviceProfile     `json:"profile"`
+	ResourceAlternateID string            `json:"resourceAlternateID"`
+	ResourceDisplayName DeviceDisplayName `json:"resourceDisplayName"`
+	ResourceID          string            `json:"resourceID"`
+	ResourceType        string            `json:"resourceType"`
+	Status              string            `json:"status"`
+	Links               HAL               `json:"_links,omitempty"` // See https://developer.okta.com/docs/reference/api/users/#links-object for details.
+
+	// Users is the set of users associated with the device.
+	// It is not part of the list devices API return, but can
+	// be populated by a call to GetDeviceUsers.
+	Users []User `json:"users,omitempty"`
+}
+
+// DeviceProfile is an Okta device's hardware and security profile.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
+type DeviceProfile struct {
+	DiskEncryptionType    *string `json:"diskEncryptionType,omitempty"`
+	DisplayName           string  `json:"displayName"`
+	IMEI                  *string `json:"imei,omitempty"`
+	IntegrityJailBreak    *bool   `json:"integrityJailBreak,omitempty"`
+	Manufacturer          *string `json:"manufacturer,omitempty"`
+	MEID                  *string `json:"meid,omitempty"`
+	Model                 *string `json:"model,omitempty"`
+	OSVersion             *string `json:"osVersion,omitempty"`
+	Platform              string  `json:"platform"`
+	Registered            bool    `json:"registered"`
+	SecureHardwarePresent *bool   `json:"secureHardwarePresent,omitempty"`
+	SerialNumber          *string `json:"serialNumber,omitempty"`
+	SID                   *string `json:"sid,omitempty"`
+	TPMPublicKeyHash      *string `json:"tpmPublicKeyHash,omitempty"`
+	UDID                  *string `json:"udid,omitempty"`
+}
+
+// DeviceDisplayName is an Okta device's annotated display name.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
+type DeviceDisplayName struct {
+	Sensitive bool   `json:"sensitive"`
+	Value     string `json:"value"`
+}
+
+// HAL is a JSON Hypertext Application Language object.
+//
+// See https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-06 for details.
+type HAL map[string]any
 
 // Response is a set of omit options specifying a part of the response to omit.
 //
@@ -164,12 +214,81 @@ func (o Response) String() string {
 func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration) ([]User, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
-	u := url.URL{
+	u := &url.URL{
 		Scheme:   "https",
 		Host:     host,
 		Path:     path.Join(endpoint, user),
 		RawQuery: query.Encode(),
 	}
+	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window)
+}
+
+// GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. If device is not empty,
+// details for the specific device are returned, otherwise a list of all devices is returned.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details.
+func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration) ([]Device, http.Header, error) {
+	const endpoint = "/api/v1/devices"
+
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     host,
+		Path:     path.Join(endpoint, device),
+		RawQuery: query.Encode(),
+	}
+	return getDetails[Device](ctx, cli, u, key, device == "", OmitNone, lim, window)
+}
+
+// GetDeviceUsers returns Okta user details for users asscoiated with the provided device identifier
+// using the list device users API. host is the Okta user domain and key is the API token to use for
+// the query. If device is empty, a nil User slice and header is returned, without error.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDeviceUsers for details.
+func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration) ([]User, http.Header, error) {
+	if device == "" {
+		// No user associated with a null device. Not an error.
+		return nil, nil, nil
+	}
+
+	const endpoint = "/api/v1/devices"
+
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     host,
+		Path:     path.Join(endpoint, device, "users"),
+		RawQuery: query.Encode(),
+	}
+	du, h, err := getDetails[devUser](ctx, cli, u, key, true, omit, lim, window)
+	if err != nil {
+		return nil, h, err
+	}
+	users := make([]User, len(du))
+	for i, du := range du {
+		users[i] = du.User
+	}
+	return users, h, nil
+}
+
+// entity is an Okta entity analytics entity.
+type entity interface {
+	User | Device | devUser
+}
+
+type devUser struct {
+	User `json:"user"`
+}
+
+// getDetails returns Okta details using the API endpoint in u. host is the Okta
+// user domain and key is the API token to use for the query. If all is false, details
+// for the specific user are returned, otherwise a list of all users is returned.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key string, all bool, omit Response, lim *rate.Limiter, window time.Duration) ([]E, http.Header, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, nil, err
@@ -203,22 +322,22 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 		return nil, nil, err
 	}
 
-	if user == "" {
-		// List all users.
-		var users []User
-		err = json.Unmarshal(body.Bytes(), &users)
+	if all {
+		// List all entities.
+		var e []E
+		err = json.Unmarshal(body.Bytes(), &e)
 		if err != nil {
 			err = recoverError(body.Bytes())
 		}
-		return users, resp.Header, err
+		return e, resp.Header, err
 	}
-	// Get single user's details.
-	var users [1]User
-	err = json.Unmarshal(body.Bytes(), &users[0])
+	// Get single entity's details.
+	var e [1]E
+	err = json.Unmarshal(body.Bytes(), &e[0])
 	if err != nil {
 		err = recoverError(body.Bytes())
 	}
-	return users[:], resp.Header, err
+	return e[:], resp.Header, err
 }
 
 // recoverError returns an error based on the returned Okta API error. Error

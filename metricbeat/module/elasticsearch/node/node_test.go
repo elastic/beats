@@ -20,6 +20,7 @@
 package node
 
 import (
+	"encoding/base64"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -78,4 +79,48 @@ func TestFetch(t *testing.T) {
 			t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 		})
 	}
+
+	t.Run("with api key", func(t *testing.T) {
+		apiKey := "foo:bar"
+		expectedHeader := "ApiKey " + base64.StdEncoding.EncodeToString([]byte(apiKey))
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.RequestURI {
+			case "/_nodes/_local":
+				apiKey := r.Header.Get("Authorization")
+				if apiKey != expectedHeader {
+					t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+				}
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json;")
+				w.Write([]byte([]byte("{}")))
+
+			case "/":
+				apiKey := r.Header.Get("Authorization")
+				if apiKey != expectedHeader {
+					t.Errorf("expected api key to be %s but got %s", expectedHeader, apiKey)
+				}
+
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte("{}"))
+
+			default:
+				t.FailNow()
+			}
+
+		}))
+		defer server.Close()
+
+		config := map[string]interface{}{
+			"module":     "elasticsearch",
+			"metricsets": []string{"node"},
+			"hosts":      []string{server.URL},
+			"api_key":    "foo:bar",
+		}
+		reporter := &mbtest.CapturingReporterV2{}
+
+		metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
+		metricSet.Fetch(reporter)
+	})
 }

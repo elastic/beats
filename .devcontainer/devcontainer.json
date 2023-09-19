@@ -1,0 +1,31 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/go
+// If you're wondering how to get SSH working for git pushes, make sure to ssh-add ~/.ssh/<YOURPRIVATEKEY> on your host system
+// to make sure the ssh agent has your key
+{
+	"name": "Beats Development Container",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/go:1-1.20-bullseye",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/python:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// Mage is installed this way, and not via the feature plugin because that plugin was
+	// broken for me, and mage install is simple enough
+	"postCreateCommand": "cd /opt/; sudo mkdir mage; sudo chown $USER:$(id -g) mage; git clone --depth=1 https://github.com/magefile/mage && cd mage && go run bootstrap.go; npm i -g @elastic/synthetics; sudo env \"PATH=$PATH\" npx -yes playwright install-deps"
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

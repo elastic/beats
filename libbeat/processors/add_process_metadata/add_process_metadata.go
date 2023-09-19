@@ -113,6 +113,16 @@ func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetada
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
+	// If neither option is configured, then add a default. A default cgroup_regex
+	// cannot be added to the struct returned by defaultConfig() because if
+	// config_regex is set, it would take precedence over any user-configured
+	// cgroup_prefixes.
+	hasCgroupPrefixes, _ := cfg.Has("cgroup_prefixes", -1)
+	hasCgroupRegex, _ := cfg.Has("cgroup_regex", -1)
+	if !hasCgroupPrefixes && !hasCgroupRegex {
+		config.CgroupRegex = defaultCgroupRegex
+	}
+
 	mappings, err := config.getMappings()
 	if err != nil {
 		return nil, fmt.Errorf("error unpacking %v.target_fields: %w", processorName, err)

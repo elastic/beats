@@ -25,6 +25,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -800,4 +801,128 @@ func TestClientWithAPIKey(t *testing.T) {
 	//nolint:errcheck // connection doesn't need to succeed
 	client.Connect()
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
+}
+
+func TestPublishEventsWithBulkFiltering(t *testing.T) {
+	makePublishTestClient := func(t *testing.T, url string, configParams map[string]string) *Client {
+		client, err := NewClient(
+			ClientSettings{
+				Observer: outputs.NewNilObserver(),
+				ConnectionSettings: eslegclient.ConnectionSettings{
+					URL:        url,
+					Parameters: configParams,
+				},
+				Index: testIndexSelector{},
+			},
+			nil,
+		)
+		require.NoError(t, err)
+		return client
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	event1 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
+
+	t.Run("Single event with response filtering", func(t *testing.T) {
+		var expectedFilteringParams = map[string]string{
+			"filter_path": "errors,items.*.error,items.*.status",
+		}
+		var recParams url.Values
+
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			if strings.ContainsAny("_bulk", r.URL.Path) {
+				recParams = r.URL.Query()
+				response := []byte(`{"took":85,"errors":false,"items":[{"index":{"status":200}}]}`)
+				_, _ = w.Write(response)
+			}
+			if strings.Contains("/", r.URL.Path) {
+				response := []byte(`{}`)
+				_, _ = w.Write(response)
+			}
+		}))
+		defer esMock.Close()
+		client := makePublishTestClient(t, esMock.URL, nil)
+
+		// Try publishing a batch that can be split
+		events := []publisher.Event{event1}
+		evt, err := client.publishEvents(ctx, events)
+		require.NoError(t, err)
+		require.Equal(t, len(recParams), len(expectedFilteringParams))
+		require.Nil(t, evt)
+	})
+	t.Run("Single event with response filtering and preconfigured client params", func(t *testing.T) {
+		var configParams = map[string]string{
+			"hardcoded": "yes",
+		}
+		var expectedFilteringParams = map[string]string{
+			"filter_path": "errors,items.*.error,items.*.status",
+		}
+		var recParams url.Values
+
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			if strings.ContainsAny("_bulk", r.URL.Path) {
+				recParams = r.URL.Query()
+				response := []byte(`{"took":85,"errors":false,"items":[{"index":{"status":200}}]}`)
+				_, _ = w.Write(response)
+			}
+			if strings.Contains("/", r.URL.Path) {
+				response := []byte(`{}`)
+				_, _ = w.Write(response)
+			}
+		}))
+		defer esMock.Close()
+		client := makePublishTestClient(t, esMock.URL, configParams)
+
+		// Try publishing a batch that can be split
+		events := []publisher.Event{event1}
+		evt, err := client.publishEvents(ctx, events)
+		require.NoError(t, err)
+		require.Equal(t, len(recParams), len(expectedFilteringParams)+len(configParams))
+		require.Nil(t, evt)
+	})
+	t.Run("Single event without response filtering", func(t *testing.T) {
+		var recParams url.Values
+
+		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.ContainsAny("_bulk", r.URL.Path) {
+				recParams = r.URL.Query()
+				response := []byte(`{
+					"took":85,
+					"errors":false,
+					"items":[
+						{
+							"index":{
+								"_index":"test",
+								"_id":"1",
+								"_version":1,
+								"result":"created",
+								"_shards":{"total":2,"successful":1,"failed":0},
+								"_seq_no":0,
+								"_primary_term":1,
+								"status":201
+							}
+						}
+					]}`)
+				_, _ = w.Write(response)
+			}
+			if strings.Contains("/", r.URL.Path) {
+				response := []byte(`{}`)
+				_, _ = w.Write(response)
+			}
+			w.WriteHeader(http.StatusOK)
+
+		}))
+		defer esMock.Close()
+		client := makePublishTestClient(t, esMock.URL, nil)
+
+		// Try publishing a batch that can be split
+		events := []publisher.Event{event1}
+		_, err := client.publishEvents(ctx, events)
+		require.NoError(t, err)
+		require.Equal(t, len(recParams), 1)
+	})
 }

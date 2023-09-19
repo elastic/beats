@@ -444,6 +444,43 @@ var oAuth2ValidationTests = []struct {
 			},
 		},
 	},
+	{
+		name:    "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
+		wantErr: errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'"),
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":  "okta",
+				"client.id": "a_client_id",
+				"token_url": "localhost",
+				"scopes":    []string{"foo"},
+			},
+		},
+	},
+	{
+		name:    "okta oauth2 validation fails if jwk_json is not a valid JSON",
+		wantErr: errors.New("the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'"),
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":      "okta",
+				"client.id":     "a_client_id",
+				"token_url":     "localhost",
+				"scopes":        []string{"foo"},
+				"okta.jwk_json": `"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
+			},
+		},
+	},
+	{
+		name: "okta successful oauth2 validation",
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":      "okta",
+				"client.id":     "a_client_id",
+				"token_url":     "localhost",
+				"scopes":        []string{"foo"},
+				"okta.jwk_json": `{"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
+			},
+		},
+	},
 }
 
 func TestConfigOauth2Validation(t *testing.T) {
