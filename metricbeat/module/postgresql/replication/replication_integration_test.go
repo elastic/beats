@@ -90,7 +90,7 @@ func TestData(t *testing.T) {
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "postgresql",
-		"metricsets": []string{"database"},
+		"metricsets": []string{"replication"},
 		"hosts":      []string{postgresql.GetDSN(host)},
 		"username":   postgresql.GetEnvUsername(),
 		"password":   postgresql.GetEnvPassword(),
