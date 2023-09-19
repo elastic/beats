@@ -40,7 +40,7 @@ func TestFetch(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d: %v", len(errs), errs)
 	}
-	assert.NotEmpty(t, events)
+	require.NotEmpty(t, events)
 	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
