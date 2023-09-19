@@ -27,7 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -268,4 +270,75 @@ func (r *outputReloaderMock) Reload(
 ) error {
 	r.cfg = cfg
 	return nil
+}
+
+func TestMergeOutputQueueSettings(t *testing.T) {
+	tests := map[string]struct {
+		input     []byte
+		memEvents int
+	}{
+		"blank": {input: []byte(""),
+			memEvents: 4096},
+		"defaults": {input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 4096},
+		"topLevelQueue": {input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 8096
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 8096},
+		"outputLevelQueue": {input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			memEvents: 8096},
+		"topAndOutputLevelQueue": {input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 2048
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			memEvents: 8096},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			require.NoError(t, err)
+
+			err = mergeOutputQueueSettings(&config)
+			require.NoError(t, err)
+
+			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			require.NoError(t, err)
+			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
+		})
+	}
 }
