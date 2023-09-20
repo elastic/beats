@@ -12,19 +12,22 @@ import (
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 
+	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
 type CheckHistItem struct {
 	cg      string
-	summary *summarizer.JobSummary
+	summary *jobsummary.JobSummary
 }
 
 func TestSimpleScenariosBasicFields(t *testing.T) {
@@ -47,10 +50,10 @@ func TestSimpleScenariosBasicFields(t *testing.T) {
 			require.NoError(t, err)
 			cg := cgIface.(string)
 
-			var summary *summarizer.JobSummary
+			var summary *jobsummary.JobSummary
 			summaryIface, err := e.GetValue("summary")
 			if err == nil {
-				summary = summaryIface.(*summarizer.JobSummary)
+				summary = summaryIface.(*jobsummary.JobSummary)
 			}
 
 			var lastCheck *CheckHistItem
@@ -100,7 +103,27 @@ func TestLightweightSummaries(t *testing.T) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
 		testslike.Test(t,
-			summarizertesthelper.SummaryValidator(1, 0),
+			SummaryValidatorForStatus(mtr.Meta.Status),
+			lastEvent.Fields)
+
+		for _, e := range firstEvents {
+			summary, _ := e.GetValue("summary")
+			require.Nil(t, summary)
+		}
+	})
+}
+
+func TestBrowserSummaries(t *testing.T) {
+	t.Parallel()
+	scenarioDB.RunTag(t, "browser", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+		all := mtr.Events()
+		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
+
+		testslike.Test(t,
+			lookslike.Compose(
+				SummaryValidatorForStatus(mtr.Meta.Status),
+				hbtest.URLChecks(t, mtr.Meta.URL),
+			),
 			lastEvent.Fields)
 
 		for _, e := range firstEvents {
@@ -132,4 +155,12 @@ func TestRunFromOverride(t *testing.T) {
 			testslike.Test(t, validator, e.Fields)
 		}
 	})
+}
+
+func SummaryValidatorForStatus(ss monitorstate.StateStatus) validator.Validator {
+	var expectedUp, expectedDown uint16 = 1, 0
+	if ss == monitorstate.StatusDown {
+		expectedUp, expectedDown = 0, 1
+	}
+	return summarizertesthelper.SummaryValidator(expectedUp, expectedDown)
 }

@@ -7,10 +7,8 @@ package management
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -231,86 +229,4 @@ func buildConfigMap(t *testing.T, unitRaw *proto.UnitExpectedConfig, agentInfo *
 	err = reloadCfg[0].Config.Unpack(&cfgMap)
 	require.NoError(t, err, "error in unpack for config %#v", reloadCfg[0].Config)
 	return cfgMap
-}
-
-func TestDeDotDataStream(t *testing.T) {
-	testCases := map[string]struct {
-		source             map[string]any
-		dataStream         *proto.DataStream
-		wantError          bool
-		expectedDataStream *proto.DataStream
-	}{
-		"all data is flattened": {
-			source: map[string]any{
-				"data_stream.dataset":   "my dataset",
-				"data_stream.namespace": "my namespace",
-				"data_stream.type":      "my type",
-			},
-			expectedDataStream: &proto.DataStream{
-				Dataset:   "my dataset",
-				Namespace: "my namespace",
-				Type:      "my type",
-			},
-		},
-		"no data is flattened": {
-			dataStream: &proto.DataStream{
-				Dataset:   "my dataset",
-				Namespace: "my namespace",
-				Type:      "my type",
-			},
-			expectedDataStream: &proto.DataStream{
-				Dataset:   "my dataset",
-				Namespace: "my namespace",
-				Type:      "my type",
-			},
-		},
-		"mix of flattened and data_stream": {
-			dataStream: &proto.DataStream{
-				Dataset: "my dataset",
-				Type:    "my type",
-			},
-			source: map[string]any{
-				"data_stream.namespace": "my namespace",
-			},
-			expectedDataStream: &proto.DataStream{
-				Dataset:   "my dataset",
-				Namespace: "my namespace",
-				Type:      "my type",
-			},
-		},
-		"duplicated keys generate error": {
-			dataStream: &proto.DataStream{
-				Dataset: "my dataset",
-			},
-			source: map[string]any{
-				"data_stream.dataset": "another dataset",
-			},
-			wantError: true,
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			raw := &proto.UnitExpectedConfig{
-				Source:     requireNewStruct(t, tc.source),
-				DataStream: tc.dataStream,
-			}
-
-			final, err := deDotDataStream(raw)
-			if tc.wantError {
-				if err == nil {
-					t.Error("expecting an error")
-				}
-				return
-			}
-			if err != nil {
-				t.Fatalf("deDotDataStream returned an error: %s", err)
-			}
-
-			if !cmp.Equal(final, tc.expectedDataStream, protocmp.Transform()) {
-				t.Errorf("expecting a different value: --got/++want\n'%s'",
-					cmp.Diff(final, tc.expectedDataStream, protocmp.Transform()))
-			}
-		})
-	}
 }

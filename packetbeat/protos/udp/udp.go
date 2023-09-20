@@ -48,7 +48,7 @@ type UDP struct {
 }
 
 // NewUDP creates and returns a new UDP.
-func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
+func NewUDP(p protos.Protocols, id, device string, idx int) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func NewUDP(p protos.Protocols, id, device string) (*UDP, error) {
 	udp := &UDP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(id, device, portMap),
+		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap),
 	}
 	logp.Debug("udp", "Port map: %v", portMap)
 
