@@ -74,13 +74,14 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	id := int(instanceID.Inc())
 	log := logp.NewLogger(name).With("instance_id", id)
 
-	p := cache{
+	p := &cache{
 		config: config,
 		store:  src,
 		cancel: cancel,
 		log:    log,
 	}
-	return &p, nil
+	p.log.Infow("initialized cache processor", "details", p)
+	return p, nil
 }
 
 // Store is the interface implemented by metadata providers.
@@ -88,6 +89,11 @@ type Store interface {
 	Put(key string, val any) error
 	Get(key string) (any, error)
 	Delete(key string) error
+
+	// The string returned from the String method should
+	// be the backing store ID. Either "file:<id>" or
+	// "memory:<id>".
+	fmt.Stringer
 }
 
 type CacheEntry struct {
@@ -112,13 +118,13 @@ func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
 	defer storeMu.Unlock()
 	switch {
 	case cfg.Store.Memory != nil:
-		s, cancel := getMemStore(memStores, cfg.Store.Memory.ID, cfg)
+		s, cancel := getMemStore(memStores, cfg.Store.Memory.ID, cfg, "memory")
 		return s, cancel, nil
 
 	case cfg.Store.File != nil:
 		logp.L().Warn("using memory store when file is configured")
 		// TODO: Replace place-holder code with a file-store.
-		s, cancel := getMemStore(fileStores, cfg.Store.File.ID, cfg)
+		s, cancel := getMemStore(fileStores, cfg.Store.File.ID, cfg, "file")
 		return s, cancel, nil
 
 	default:
@@ -130,10 +136,12 @@ func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
 // noop is a no-op context.CancelFunc.
 func noop() {}
 
-func getMemStore(stores map[string]*memStore, id string, cfg config) (*memStore, context.CancelFunc) {
+// TODO: Remove the typ parameter when a file-backed store is available
+// and each type knows who they are.
+func getMemStore(stores map[string]*memStore, id string, cfg config, typ string) (*memStore, context.CancelFunc) {
 	s, ok := stores[id]
 	if !ok {
-		s = newMemStore(cfg, id)
+		s = newMemStore(cfg, id, typ)
 		stores[s.id] = s
 	}
 
@@ -155,6 +163,7 @@ func getMemStore(stores map[string]*memStore, id string, cfg config) (*memStore,
 func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 	switch {
 	case p.config.Put != nil:
+		p.log.Debugw("put", "backend_id", p.store, "config", p.config.Put)
 		err := p.putFrom(event)
 		if err != nil {
 			switch {
@@ -169,6 +178,7 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 
 	case p.config.Get != nil:
+		p.log.Debugw("get", "backend_id", p.store, "config", p.config.Get)
 		result, err := p.getFor(event)
 		if err != nil {
 			switch {
@@ -187,6 +197,7 @@ func (p *cache) Run(event *beat.Event) (*beat.Event, error) {
 		return event, ErrNoMatch
 
 	case p.config.Delete != nil:
+		p.log.Debugw("delete", "backend_id", p.store, "config", p.config.Delete)
 		err := p.deleteFor(event)
 		if err != nil {
 			return event, fmt.Errorf("error applying %s delete processor: %w", name, err)
@@ -210,10 +221,13 @@ func (p *cache) putFrom(event *beat.Event) error {
 	if !ok {
 		return fmt.Errorf("key field '%s' not a string: %T", p.config.Put.Key, k)
 	}
+	p.log.Debugw("put", "backend_id", p.store, "key", key)
+
 	val, err := event.GetValue(p.config.Put.Value)
 	if err != nil {
 		return err
 	}
+
 	err = p.store.Put(key, val)
 	if err != nil {
 		return fmt.Errorf("failed to put '%s' into '%s': %w", key, p.config.Put.Value, err)
@@ -242,6 +256,7 @@ func (p *cache) getFor(event *beat.Event) (result *beat.Event, err error) {
 	if !ok {
 		return nil, fmt.Errorf("key field '%s' not a string: %T", key, v)
 	}
+	p.log.Debugw("get", "backend_id", p.store, "key", k)
 
 	// Get metadata...
 	meta, err := p.store.Get(k)
@@ -289,13 +304,13 @@ func (p *cache) Close() error {
 func (p *cache) String() string {
 	switch {
 	case p.config.Put != nil:
-		return fmt.Sprintf("%s=[operation=put, key_field=%s, value_field=%s, ttl=%v, ignore_missing=%t, overwrite_fields=%t]",
-			name, p.config.Put.Key, p.config.Put.Value, p.config.Put.TTL, p.config.IgnoreMissing, p.config.OverwriteKeys)
+		return fmt.Sprintf("%s=[operation=put, store_id=%s, key_field=%s, value_field=%s, ttl=%v, ignore_missing=%t, overwrite_fields=%t]",
+			name, p.store, p.config.Put.Key, p.config.Put.Value, p.config.Put.TTL, p.config.IgnoreMissing, p.config.OverwriteKeys)
 	case p.config.Get != nil:
-		return fmt.Sprintf("%s=[operation=get, key_field=%s, target_field=%s, ignore_missing=%t, overwrite_fields=%t]",
-			name, p.config.Get.Key, p.config.Get.Target, p.config.IgnoreMissing, p.config.OverwriteKeys)
+		return fmt.Sprintf("%s=[operation=get, store_id=%s, key_field=%s, target_field=%s, ignore_missing=%t, overwrite_fields=%t]",
+			name, p.store, p.config.Get.Key, p.config.Get.Target, p.config.IgnoreMissing, p.config.OverwriteKeys)
 	case p.config.Delete != nil:
-		return fmt.Sprintf("%s=[operation=delete, key_field=%s]", name, p.config.Delete.Key)
+		return fmt.Sprintf("%s=[operation=delete, store_id=%s, key_field=%s]", name, p.store, p.config.Delete.Key)
 	default:
 		return fmt.Sprintf("%s=[operation=invalid]", name)
 	}

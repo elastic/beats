@@ -335,14 +335,14 @@ var memStoreTests = []struct {
 
 func TestMemStore(t *testing.T) {
 	allow := cmp.AllowUnexported(memStore{}, CacheEntry{})
-	ignoreInMemStore := cmpopts.IgnoreFields(memStore{}, "mu")
+	ignoreInMemStore := cmpopts.IgnoreFields(memStore{}, "mu", "typ")
 	ignoreInCacheEntry := cmpopts.IgnoreFields(CacheEntry{}, "expires")
 
 	for _, test := range memStoreTests {
 		t.Run(test.name, func(t *testing.T) {
 			// Construct the store and put in into the stores map as
 			// we would if we were calling Run.
-			store := newMemStore(test.cfg, test.cfg.Store.Memory.ID)
+			store := newMemStore(test.cfg, test.cfg.Store.Memory.ID, "memory")
 			store.setPutOptions(test.cfg)
 			storeMu.Lock()
 			memStores[store.id] = store

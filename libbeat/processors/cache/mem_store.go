@@ -33,6 +33,10 @@ type memStore struct {
 
 	// id is the index into global cache store for the cache.
 	id string
+	// typ is a temporary tag to differentiate memory stores
+	// from the mocked file store.
+	// TODO: Remove when a file-backed store exists.
+	typ string
 
 	// cap is the maximum number of elements the cache
 	// will hold. If not positive, no limit.
@@ -45,9 +49,10 @@ type memStore struct {
 // newMemStore returns a new memStore configured to apply the give TTL duration.
 // The memStore is guaranteed not to grow larger than cap elements. id is the
 // look-up into the global cache store the memStore is held in.
-func newMemStore(cfg config, id string) *memStore {
+func newMemStore(cfg config, id, typ string) *memStore {
 	return &memStore{
 		id:    id,
+		typ:   typ,
 		cache: make(map[string]*CacheEntry),
 
 		// Mark the ttl as invalid until we have had a put operation
@@ -57,6 +62,8 @@ func newMemStore(cfg config, id string) *memStore {
 		effort: -1,
 	}
 }
+
+func (c *memStore) String() string { return c.typ + ":" + c.id }
 
 // setPutOptions allows concurrency-safe updating of the put options. While the shared
 // backing data store is incomplete, and has no put operation defined, the TTL
