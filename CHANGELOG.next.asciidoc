@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Prevent panic when more than one interface is configured in fleet. {issue}36574[36574] {pull}36575[36575]
 
 *Winlogbeat*
 
