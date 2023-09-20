@@ -128,6 +128,22 @@ put:
 `,
 		want: errors.New("must specify one of backend.memory.id or backend.file.id accessing 'backend'"),
 	},
+	{
+
+		name: "too_many_backends",
+		cfg: `
+backend:
+  file:
+    id: aidmaster_f
+  memory:
+    id: aidmaster_m
+put:
+  ttl: 168h
+  key_field: crowdstrike.aid
+  value_field: crowdstrike.metadata
+`,
+		want: errors.New("must specify only one of backend.memory.id or backend.file.id accessing 'backend'"),
+	},
 }
 
 func TestValidate(t *testing.T) {

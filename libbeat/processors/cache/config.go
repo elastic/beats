@@ -103,6 +103,8 @@ type id struct {
 
 func (cfg *storeConfig) Validate() error {
 	switch {
+	case cfg.Memory != nil && cfg.File != nil:
+		return errors.New("must specify only one of backend.memory.id or backend.file.id")
 	case cfg.Memory != nil, cfg.File != nil:
 	default:
 		return errors.New("must specify one of backend.memory.id or backend.file.id")
