@@ -141,12 +141,9 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 	groupedAddProp := make(map[string][]MetricValue)
 	mValues := mapMetricValues(metricValues)
 
-	var segValues []MetricValue
 	for _, mv := range mValues {
 		if len(mv.Segments) == 0 {
 			groupedAddProp[mv.Interval] = append(groupedAddProp[mv.Interval], mv)
-		} else {
-			segValues = append(segValues, mv)
 		}
 	}
 
@@ -249,24 +246,6 @@ func getSortedKeys(m map[string]string) string {
 	return strings.Join(keys, "")
 }
 
-func createSegEvent(parentMetricValue MetricValue, metricValue MetricValue, applicationId string, namespace string) mb.Event {
-	metricList := mapstr.M{}
-	for key, metric := range metricValue.Value {
-		metricList.Put(key, metric)
-	}
-	if len(metricList) == 0 {
-		return mb.Event{}
-	}
-	event := createEvent(parentMetricValue.Start, parentMetricValue.End, applicationId, namespace, metricList)
-	if len(parentMetricValue.SegmentName) > 0 {
-		event.ModuleFields.Put("dimensions", parentMetricValue.SegmentName)
-	}
-	if len(metricValue.SegmentName) > 0 {
-		event.ModuleFields.Put("dimensions", metricValue.SegmentName)
-	}
-	return event
-}
-
 func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, applicationId string, namespace string) mb.Event {
 	metricList := mapstr.M{}
 
@@ -361,9 +340,9 @@ func createNoSegEvent(values []MetricValue, applicationId string, namespace stri
 func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interface{} {
 	metricNames := make(map[string]interface{})
 	for key, val := range addProp {
-		switch val.(type) {
+		switch v := val.(type) {
 		case map[string]interface{}:
-			for subKey, subVal := range val.(map[string]interface{}) {
+			for subKey, subVal := range v {
 				if subVal != nil {
 					metricNames[cleanMetricNames(fmt.Sprintf("%s.%s", key, subKey))] = subVal
 				}
