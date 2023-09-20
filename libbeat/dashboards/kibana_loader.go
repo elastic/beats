@@ -61,7 +61,7 @@ type KibanaLoader struct {
 // NewKibanaLoader creates a new loader to load Kibana files
 func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
 	if cfg == nil || !cfg.Enabled() {
-		return nil, fmt.Errorf("kibana is not configured or enabled")
+		return nil, fmt.Errorf("Kibana is not configured or enabled")
 	}
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatname)
