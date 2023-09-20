@@ -665,7 +665,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return fmt.Errorf("error unpacking ILM config: %w", err)
 			}
 			if ilmCfg.Ilm.Enabled() && esClient.IsServerless() {
-				fmt.Println("WARNING: ILM is not supported under serverless")
+				fmt.Println("WARNING: ILM is not supported in Serverless projects")
 			}
 
 			loadTemplate, loadILM := idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset

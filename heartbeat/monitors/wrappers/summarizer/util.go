@@ -15,30 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package hbtestllext
+package summarizer
 
-import (
-	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
-)
+import "github.com/elastic/beats/v7/libbeat/beat"
 
-// MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
-var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
-	"monitor": map[string]interface{}{
-		"timespan": map[string]interface{}{
-			"gte": IsTime,
-			"lt":  IsTime,
-		},
-	},
-})
+func synthType(event *beat.Event) string {
+	synthType, err := event.GetValue("synthetics.type")
+	if err != nil {
+		return ""
+	}
 
-var MaybeHasEventType = lookslike.MustCompile(map[string]interface{}{
-	"event": map[string]interface{}{
-		"type": isdef.Optional(isdef.IsNonEmptyString),
-	},
-	"synthetics.type": isdef.Optional(isdef.IsNonEmptyString),
-})
-
-var MaybeHasDuration = lookslike.MustCompile(map[string]interface{}{
-	"monitor.duration.us": IsInt64,
-})
+	str, ok := synthType.(string)
+	if !ok {
+		return ""
+	}
+	return str
+}
