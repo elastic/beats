@@ -15,9 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -26,11 +27,8 @@ import (
 type stdSupport struct {
 	log *logp.Logger
 
-	enabled     bool
-	overwrite   bool
-	checkExists bool
-
-	policy Policy
+	// cfg
+	cfg LifecycleConfig
 }
 
 type stdManager struct {
@@ -51,22 +49,15 @@ var defaultCacheDuration = 5 * time.Minute
 // NewStdSupport creates an instance of default ILM support implementation.
 func NewStdSupport(
 	log *logp.Logger,
-	enabled bool,
-	policy Policy,
-	overwrite, checkExists bool,
+	cfg LifecycleConfig,
 ) Supporter {
 	return &stdSupport{
-		log:         log,
-		enabled:     enabled,
-		overwrite:   overwrite,
-		checkExists: checkExists,
-		policy:      policy,
+		log: log,
+		cfg: cfg,
 	}
 }
 
-func (s *stdSupport) Enabled() bool   { return s.enabled }
-func (s *stdSupport) Policy() Policy  { return s.policy }
-func (s *stdSupport) Overwrite() bool { return s.overwrite }
+func (s *stdSupport) Enabled() bool { return s.cfg.ILM.Enabled || s.cfg.DSL.Enabled }
 
 func (s *stdSupport) Manager(h ClientHandler) Manager {
 	return &stdManager{
@@ -75,18 +66,18 @@ func (s *stdSupport) Manager(h ClientHandler) Manager {
 	}
 }
 
+func (m *stdManager) PolicyName() string {
+	return m.client.PolicyName()
+}
+
 func (m *stdManager) CheckEnabled() (bool, error) {
-	if !m.enabled {
-		return false, nil
+	ilmEnabled, err := m.client.CheckEnabled()
+	if err != nil {
+		return ilmEnabled, err
 	}
 
 	if m.cache.Valid() {
 		return m.cache.Enabled, nil
-	}
-
-	ilmEnabled, err := m.client.CheckILMEnabled(m.enabled)
-	if err != nil {
-		return ilmEnabled, err
 	}
 
 	m.cache.Enabled = ilmEnabled
@@ -94,22 +85,23 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 	return ilmEnabled, nil
 }
 
+// EnsurePolicy creates the upstream lifecycle policy, depending on if it exists, and if overwrite is set.
+// returns true if the policy has been created
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
-	if !m.checkExists {
+	if !m.client.CheckExists() {
 		log.Infof("ILM policy is not checked as setup.ilm.check_exists is disabled")
 		return false, nil
 	}
-
-	overwrite = overwrite || m.Overwrite()
-	name := m.policy.Name
+	overwrite = overwrite || m.client.Overwrite()
+	name := m.client.PolicyName()
 
 	var exists bool
 	if !overwrite {
 		var err error
-		exists, err = m.client.HasILMPolicy(name)
+		exists, err = m.client.HasPolicy()
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("error checking if policy %s exists: %w", name, err)
 		}
 	}
 
@@ -119,7 +111,7 @@ func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 		return false, nil
 
 	case !exists || overwrite:
-		err := m.client.CreateILMPolicy(m.policy)
+		err := m.client.CreatePolicyFromConfig()
 		if err != nil {
 			log.Errorf("ILM policy %v creation failed: %v", name, err)
 			return false, err

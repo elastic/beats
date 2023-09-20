@@ -18,7 +18,10 @@
 package idxmgmt
 
 import (
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	ilm "github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -56,12 +59,20 @@ func NewClientHandler(ilm ilm.ClientHandler, template template.Loader) ClientHan
 
 // NewESClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewESClientHandler(c ESClient) ClientHandler {
-	return NewClientHandler(ilm.NewESClientHandler(c), template.NewESLoader(c))
+func NewESClientHandler(c ESClient, info beat.Info, cfg ilm.LifecycleConfig) (ClientHandler, error) {
+	esHandler, err := ilm.NewESClientHandler(c, info, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error creating ES handler: %w", err)
+	}
+	return NewClientHandler(esHandler, template.NewESLoader(c)), nil
 }
 
 // NewFileClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewFileClientHandler(c FileClient) ClientHandler {
-	return NewClientHandler(ilm.NewFileClientHandler(c), template.NewFileLoader(c))
+func NewFileClientHandler(c FileClient, info beat.Info, cfg ilm.LifecycleConfig) (ClientHandler, error) {
+	mgmt, err := ilm.NewFileClientHandler(c, info, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error creating client handler: %w", err)
+	}
+	return NewClientHandler(mgmt, template.NewFileLoader(c)), nil
 }

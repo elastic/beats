@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -28,6 +28,8 @@ type Config struct {
 	Enabled    bool                     `config:"enabled"`
 	PolicyName fmtstr.EventFormatString `config:"policy_name"`
 	PolicyFile string                   `config:"policy_file"`
+	// used only for testing
+	policyRaw *Policy
 
 	// CheckExists can disable the check for an existing policy. Check required
 	// read_ilm privileges.  If check is disabled the policy will only be
@@ -38,11 +40,17 @@ type Config struct {
 	Overwrite bool `config:"overwrite"`
 }
 
-// DefaultPolicy defines the default policy to be used if no custom policy is
+// LifecycleConfig maps all possible ILM/DSL config values present in a config
+type LifecycleConfig struct {
+	ILM Config `config:"setup.ilm"`
+	DSL Config `config:"setup.dsl"`
+}
+
+// DefaultILMPolicy defines the default policy to be used if no custom policy is
 // configured.
 // By default the policy contains not warm, cold, or delete phase.
 // The index is configured to rollover every 50GB or after 30d.
-var DefaultPolicy = mapstr.M{
+var DefaultILMPolicy = mapstr.M{
 	"policy": mapstr.M{
 		"phases": mapstr.M{
 			"hot": mapstr.M{
@@ -57,18 +65,48 @@ var DefaultPolicy = mapstr.M{
 	},
 }
 
+// DefaultDSLPolicy defines the default policy to be used for DSL if
+// no custom policy is configured
+var DefaultDSLPolicy = mapstr.M{
+	"data_retention": "7d",
+}
+
 // Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
 	return nil
 }
 
-func defaultConfig(info beat.Info) Config {
+func DefaultILMConfig(info beat.Info) LifecycleConfig {
 	policyFmt := fmtstr.MustCompileEvent(info.Beat)
+	return LifecycleConfig{
+		ILM: Config{
+			Enabled:     true,
+			PolicyName:  *policyFmt,
+			PolicyFile:  "",
+			CheckExists: true,
+		},
+		DSL: Config{
+			Enabled:     false,
+			PolicyName:  *policyFmt,
+			CheckExists: true,
+		},
+	}
+}
 
-	return Config{
-		Enabled:     true,
-		PolicyName:  *policyFmt,
-		PolicyFile:  "",
-		CheckExists: true,
+func DefaultDSLConfig(info beat.Info) LifecycleConfig {
+	policyFmt := fmtstr.MustCompileEvent(info.Beat)
+	return LifecycleConfig{
+		ILM: Config{
+			Enabled:     false,
+			PolicyName:  *policyFmt,
+			PolicyFile:  "",
+			CheckExists: true,
+		},
+		DSL: Config{
+			Enabled:     true,
+			PolicyName:  *policyFmt,
+			PolicyFile:  "",
+			CheckExists: true,
+		},
 	}
 }

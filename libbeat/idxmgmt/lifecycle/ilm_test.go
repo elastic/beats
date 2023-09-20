@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
 	"errors"
@@ -25,127 +25,99 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
+
+// TODO: most of these tests are less useful, as we need the *manager* to tell us the policy,
+// so these tests will need to be changed to provide a mock clientHandler, then we test the policy
 
 func TestDefaultSupport_Init(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 
 	t.Run("with custom config", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
-			map[string]interface{}{
-				"enabled":      true,
-				"name":         "test-%{[agent.version]}",
-				"check_exists": false,
-				"overwrite":    true,
+		tmp, err := DefaultSupport(nil, info, LifecycleConfig{
+			ILM: Config{
+				Enabled:     true,
+				PolicyName:  *fmtstr.MustCompileEvent("test-%{[agent.version]}"),
+				CheckExists: false,
+				Overwrite:   true,
 			},
-		))
+		})
 		require.NoError(t, err)
 
 		s := tmp.(*stdSupport)
 		assert := assert.New(t)
-		assert.Equal(true, s.overwrite)
-		assert.Equal(false, s.checkExists)
+		assert.Equal(true, s.cfg.ILM.Overwrite)
+		assert.Equal(false, s.cfg.ILM.CheckExists)
 		assert.Equal(true, s.Enabled())
-		assert.Equal(DefaultPolicy, mapstr.M(s.Policy().Body))
 	})
 
 	t.Run("with custom alias config with fieldref", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
-			map[string]interface{}{
-				"enabled":      true,
-				"check_exists": false,
-				"overwrite":    true,
+		tmp, err := DefaultSupport(nil, info, LifecycleConfig{
+			ILM: Config{
+				Enabled:     true,
+				CheckExists: false,
+				Overwrite:   true,
 			},
-		))
+		})
 		require.NoError(t, err)
 
 		s := tmp.(*stdSupport)
 		assert := assert.New(t)
-		assert.Equal(true, s.overwrite)
-		assert.Equal(false, s.checkExists)
+		assert.Equal(true, s.cfg.ILM.Overwrite)
+		assert.Equal(false, s.cfg.ILM.CheckExists)
 		assert.Equal(true, s.Enabled())
-		assert.Equal(DefaultPolicy, mapstr.M(s.Policy().Body))
 	})
 
-	t.Run("with default alias", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
-			map[string]interface{}{
-				"enabled":      true,
-				"pattern":      "01",
-				"check_exists": false,
-				"overwrite":    true,
-			},
-		))
-		require.NoError(t, err)
-
-		s := tmp.(*stdSupport)
-		assert := assert.New(t)
-		assert.Equal(true, s.overwrite)
-		assert.Equal(false, s.checkExists)
-		assert.Equal(true, s.Enabled())
-		assert.Equal(DefaultPolicy, mapstr.M(s.Policy().Body))
-	})
-
-	t.Run("load external policy", func(t *testing.T) {
-		s, err := DefaultSupport(nil, info, config.MustNewConfigFrom(
-			mapstr.M{"policy_file": "testfiles/custom.json"},
-		))
-		require.NoError(t, err)
-		assert.Equal(t, mapstr.M{"hello": "world"}, s.Policy().Body)
-	})
 }
 
 func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 	cases := map[string]struct {
 		calls   []onCall
-		cfg     map[string]interface{}
+		cfg     LifecycleConfig
 		enabled bool
 		fail    error
 		err     bool
 	}{
 		"disabled via config": {
-			cfg: map[string]interface{}{"enabled": false},
+			cfg: LifecycleConfig{ILM: Config{Enabled: false}, DSL: Config{Enabled: false}},
 		},
 		"disabled via handler": {
 			calls: []onCall{
-				onCheckILMEnabled(true).Return(false, ErrESILMDisabled),
+				onCheckEnabled().Return(false, ErrESILMDisabled),
 			},
+			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
 			err: true,
 		},
 		"enabled via handler": {
 			calls: []onCall{
-				onCheckILMEnabled(true).Return(true, nil),
+				onCheckEnabled().Return(true, nil),
 			},
 			enabled: true,
+			cfg:     DefaultILMConfig(beat.Info{Name: "test"}),
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
-				onCheckILMEnabled(true).Return(true, nil),
+				onCheckEnabled().Return(true, nil),
 			},
-			cfg:     map[string]interface{}{"enabled": true},
+			cfg:     LifecycleConfig{ILM: Config{Enabled: true}},
 			enabled: true,
 		},
 		"io error": {
 			calls: []onCall{
-				onCheckILMEnabled(true).Return(false, errors.New("ups")),
+				onCheckEnabled().Return(false, errors.New("ups")),
 			},
-			cfg: map[string]interface{}{},
+			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
 			err: true,
 		},
 	}
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			cfg := test.cfg
-			if cfg == nil {
-				cfg = map[string]interface{}{}
-			}
 
-			h := newMockHandler(test.calls...)
-			m := createManager(t, h, test.cfg)
-			enabled, err := m.CheckEnabled()
+			testHandler := newMockHandler(test.cfg, Policy{}, test.calls...)
+			testManager := createManager(t, testHandler, test.cfg)
+			enabled, err := testManager.CheckEnabled()
 
 			if test.fail == nil && !test.err {
 				require.NoError(t, err)
@@ -158,7 +130,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 			}
 
 			assert.Equal(t, test.enabled, enabled)
-			h.AssertExpectations(t)
+			testHandler.AssertExpectations(t)
 		})
 	}
 }
@@ -166,49 +138,57 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	testPolicy := Policy{
 		Name: "test",
-		Body: DefaultPolicy,
+		Body: DefaultILMPolicy,
 	}
 
 	cases := map[string]struct {
 		calls     []onCall
 		overwrite bool
-		cfg       map[string]interface{}
+		cfg       LifecycleConfig
 		create    bool
 		fail      error
 	}{
 		"create new policy": {
 			create: true,
 			calls: []onCall{
-				onHasILMPolicy(testPolicy.Name).Return(false, nil),
-				onCreateILMPolicy(testPolicy).Return(nil),
+				onCheckExists().Return(true),
+				onHasPolicy().Return(false, nil),
+				onCreatePolicyFromConfig().Return(nil),
 			},
+			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
 		},
 		"policy already exists": {
 			create: false,
 			calls: []onCall{
-				onHasILMPolicy(testPolicy.Name).Return(true, nil),
+				onCheckExists().Return(true),
+				onHasPolicy().Return(true, nil),
 			},
+			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
 		},
 		"overwrite": {
 			overwrite: true,
 			create:    true,
+			cfg:       DefaultILMConfig(beat.Info{Name: "test"}),
 			calls: []onCall{
-				onCreateILMPolicy(testPolicy).Return(nil),
+				onCheckExists().Return(true),
+				onCreatePolicyFromConfig().Return(nil),
 			},
 		},
 		"fail": {
 			calls: []onCall{
-				onHasILMPolicy(testPolicy.Name).Return(false, nil),
-				onCreateILMPolicy(testPolicy).Return(errOf(ErrRequestFailed)),
+				onCheckExists().Return(true),
+				onHasPolicy().Return(false, nil),
+				onCreatePolicyFromConfig().Return(errOf(ErrRequestFailed)),
 			},
 			fail: ErrRequestFailed,
+			cfg:  DefaultILMConfig(beat.Info{Name: "test"}),
 		},
 	}
 
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			h := newMockHandler(test.calls...)
+			h := newMockHandler(test.cfg, testPolicy, test.calls...)
 			m := createManager(t, h, test.cfg)
 			created, err := m.EnsurePolicy(test.overwrite)
 
@@ -225,9 +205,9 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	}
 }
 
-func createManager(t *testing.T, h ClientHandler, cfg map[string]interface{}) Manager {
+func createManager(t *testing.T, h ClientHandler, cfg LifecycleConfig) Manager {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
-	s, err := DefaultSupport(nil, info, config.MustNewConfigFrom(cfg))
+	s, err := DefaultSupport(nil, info, cfg)
 	require.NoError(t, err)
 	return s.Manager(h)
 }

@@ -15,33 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // SupportFactory is used to define a policy type to be used.
-type SupportFactory func(*logp.Logger, beat.Info, *config.C) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, LifecycleConfig) (Supporter, error)
 
 // Supporter implements ILM support. For loading the policies
 // a manager instance must be generated.
 type Supporter interface {
 	// Query settings
 	Enabled() bool
-	Policy() Policy
-	Overwrite() bool
-
 	// Manager creates a new Manager instance for checking and installing
 	// resources.
 	Manager(h ClientHandler) Manager
@@ -56,6 +48,7 @@ type Manager interface {
 	// The created flag is set to true only if a new policy is created. `created`
 	// is false if an existing policy gets overwritten.
 	EnsurePolicy(overwrite bool) (created bool, err error)
+	PolicyName() string
 }
 
 // Policy describes a policy to be loaded into Elasticsearch.
@@ -66,69 +59,33 @@ type Policy struct {
 }
 
 // DefaultSupport configures a new default ILM support implementation.
-func DefaultSupport(log *logp.Logger, info beat.Info, c *config.C) (Supporter, error) {
-	cfg := defaultConfig(info)
-	if c != nil {
-		if err := c.Unpack(&cfg); err != nil {
-			return nil, err
-		}
+func DefaultSupport(log *logp.Logger, info beat.Info, cfg LifecycleConfig) (Supporter, error) {
+	if !cfg.DSL.Enabled && !cfg.ILM.Enabled {
+		return NewNoopSupport(info, cfg)
 	}
 
-	if !cfg.Enabled {
-		return NewNoopSupport(info, c)
-	}
-
-	return StdSupport(log, info, c)
+	return StdSupport(log, info, cfg)
 }
 
 // StdSupport configures a new std ILM support implementation.
-func StdSupport(log *logp.Logger, info beat.Info, c *config.C) (Supporter, error) {
+func StdSupport(log *logp.Logger, info beat.Info, cfg LifecycleConfig) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
 	} else {
 		log = log.Named("ilm")
 	}
 
-	cfg := defaultConfig(info)
-	if c != nil {
-		if err := c.Unpack(&cfg); err != nil {
-			return nil, err
-		}
-	}
-
-	name, err := applyStaticFmtstr(info, &cfg.PolicyName)
-	if err != nil {
-		return nil, errors.New("failed to read ilm policy name")
-	}
-
-	policy := Policy{
-		Name: name,
-		Body: DefaultPolicy,
-	}
-	if path := cfg.PolicyFile; path != "" {
-		contents, err := ioutil.ReadFile(path)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read policy file '%v': %w", path, err)
-		}
-
-		var body map[string]interface{}
-		if err := json.Unmarshal(contents, &body); err != nil {
-			return nil, fmt.Errorf("failed to decode policy file '%v': %w", path, err)
-		}
-
-		policy.Body = body
-	}
-
-	return NewStdSupport(log, cfg.Enabled, policy, cfg.Overwrite, cfg.CheckExists), nil
+	return NewStdSupport(log, cfg), nil
 }
 
 // NoopSupport configures a new noop ILM support implementation,
 // should be used when ILM is disabled
-func NoopSupport(_ *logp.Logger, info beat.Info, c *config.C) (Supporter, error) {
+func NoopSupport(_ *logp.Logger, info beat.Info, c LifecycleConfig) (Supporter, error) {
 	return NewNoopSupport(info, c)
 }
 
-func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {
+// ApplyStaticFmtstr applies the beat info to the given format string
+func ApplyStaticFmtstr(info beat.Info, fmt fmtstr.EventFormatString) (string, error) {
 	return fmt.Run(
 		&beat.Event{
 			Fields:    fmtstr.FieldsForBeat(info.Beat, info.Version),

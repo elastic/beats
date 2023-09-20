@@ -22,7 +22,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -99,20 +100,44 @@ func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *config.C) (Sup
 
 // MakeDefaultSupport creates some default index management support, with a
 // custom ILM support implementation.
-func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
+func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 	if ilmSupport == nil {
-		ilmSupport = ilm.DefaultSupport
+		ilmSupport = lifecycle.DefaultSupport
 	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
 
-		cfg := struct {
-			ILM       *config.C        `config:"setup.ilm"`
-			Template  *config.C        `config:"setup.template"`
-			Output    config.Namespace `config:"output"`
-			Migration *config.C        `config:"migration.6_to_7"`
+		// first fetch the ES output, check if we're running against serverless, use that to set a default config
+		outCfg := struct {
+			Output config.Namespace `config:"output"`
 		}{}
+		if configRoot != nil {
+			err := configRoot.Unpack(&outCfg)
+			if err != nil {
+				return nil, fmt.Errorf("error unpacking output config while making index support: %w", err)
+			}
+		}
+
+		defaultLifecycle := lifecycle.DefaultILMConfig(info)
+		if outCfg.Output.IsSet() && outCfg.Output.Name() == "elasticsearch" {
+			esClient, err := eslegclient.NewConnectedClient(outCfg.Output.Config(), info.Beat)
+			if err != nil {
+				return nil, fmt.Errorf("error creating ES client while setting up index support: %w", err)
+			}
+			if esClient.IsServerless() {
+				defaultLifecycle = lifecycle.DefaultDSLConfig(info)
+			}
+		}
+
+		cfg := struct {
+			ILM       lifecycle.LifecycleConfig `config:",inline"`
+			Template  *config.C                 `config:"setup.template"`
+			Output    config.Namespace          `config:"output"`
+			Migration *config.C                 `config:"migration.6_to_7"`
+		}{
+			ILM: defaultLifecycle,
+		}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
 				return nil, err

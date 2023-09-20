@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/template"
@@ -35,7 +35,7 @@ import (
 
 type indexSupport struct {
 	log          *logp.Logger
-	ilm          ilm.Supporter
+	ilm          lifecycle.Supporter
 	info         beat.Info
 	migration    bool
 	templateCfg  template.TemplateConfig
@@ -50,7 +50,7 @@ type indexState struct {
 
 type indexManager struct {
 	support *indexSupport
-	ilm     ilm.Manager
+	ilm     lifecycle.Manager
 
 	clientHandler ClientHandler
 	assets        Asseter
@@ -95,23 +95,23 @@ func newFeature(c componentType, enabled, overwrite bool, mode LoadMode) feature
 func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
-	ilmFactory ilm.SupportFactory,
+	ilmFactory lifecycle.SupportFactory,
 	tmplConfig *config.C,
-	ilmConfig *config.C,
+	ilmConfig lifecycle.LifecycleConfig,
 	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
-		ilmFactory = ilm.DefaultSupport
+		ilmFactory = lifecycle.DefaultSupport
 	}
 
 	ilmSupporter, err := ilmFactory(log, info, ilmConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating lifecycle supporter: %w", err)
 	}
 
 	tmplCfg, err := unpackTemplateConfig(info, tmplConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error unpacking template config: %w", err)
 	}
 
 	return &indexSupport{
@@ -208,7 +208,7 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 
 // VerifySetup verifies the given feature setup, will return an error string if it detects something suspect
 func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
-	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.support.ilm.Overwrite(), loadILM)
+	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.clientHandler.Overwrite(), loadILM)
 
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
@@ -248,7 +248,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	}
 
 	// create feature objects for ILM and template setup
-	ilmComponent := newFeature(componentILM, withILM, m.support.ilm.Overwrite(), loadILM)
+	ilmComponent := newFeature(componentILM, withILM, m.clientHandler.Overwrite(), loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
 
@@ -270,7 +270,8 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
 		if ilmComponent.enabled {
-			tmplCfg, err = applyILMSettingsToTemplate(log, tmplCfg, m.support.ilm.Policy())
+			name := m.clientHandler.PolicyName()
+			tmplCfg, err = applyILMSettingsToTemplate(log, tmplCfg, name)
 			if err != nil {
 				return fmt.Errorf("error applying ILM settings: %w", err)
 			}
@@ -345,13 +346,13 @@ func unpackTemplateConfig(info beat.Info, cfg *config.C) (config template.Templa
 func applyILMSettingsToTemplate(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
-	policy ilm.Policy,
+	policyName string,
 ) (template.TemplateConfig, error) {
 	if !tmpl.Enabled {
 		return tmpl, nil
 	}
 
-	if policy.Name == "" {
+	if policyName == "" {
 		return tmpl, errors.New("no ilm policy name configured")
 	}
 
@@ -383,8 +384,8 @@ func applyILMSettingsToTemplate(
 	idxSettings["lifecycle"] = lifecycle
 
 	if _, exists := lifecycle["name"]; !exists {
-		log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policy)
-		lifecycle["name"] = policy.Name
+		log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policyName)
+		lifecycle["name"] = policyName
 	}
 
 	return tmpl, nil

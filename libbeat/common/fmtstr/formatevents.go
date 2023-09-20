@@ -170,6 +170,11 @@ func (fs *EventFormatString) Unpack(v interface{}) error {
 	return nil
 }
 
+// IsInitialized returns true if the underlying event formatted is prepared to format an event
+func (fs *EventFormatString) IsInitialized() bool {
+	return fs.formatter != nil
+}
+
 // NumFields returns number of unique event fields used by the format string.
 func (fs *EventFormatString) NumFields() int {
 	return len(fs.fields)
@@ -190,6 +195,9 @@ func (fs *EventFormatString) Fields() []string {
 // Run executes the format string returning a new expanded string or an error
 // if execution or event field expansion fails.
 func (fs *EventFormatString) Run(event *beat.Event) (string, error) {
+	if !fs.IsInitialized() {
+		return "", fmt.Errorf("event formatter is nil")
+	}
 	ctx := newEventCtx(len(fs.fields))
 	defer releaseCtx(ctx)
 

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
 	"errors"
@@ -36,7 +36,7 @@ var (
 	ErrInvalidResponse       = errors.New("invalid response received")
 	ErrESILMDisabled         = errors.New("ILM is disabled in Elasticsearch")
 	ErrRequestFailed         = errors.New("request failed")
-	ErrOpNotAvailable        = errors.New("operation not available")
+	ErrOpNotAvailable        = errors.New("operation not available, no lifecycle manager is enabled")
 )
 
 func errOf(reason error) error {
@@ -45,10 +45,6 @@ func errOf(reason error) error {
 
 func errf(reason error, msg string, vs ...interface{}) error {
 	return wrapErrf(nil, reason, msg, vs...)
-}
-
-func wrapErr(cause, reason error) error {
-	return wrapErrf(cause, reason, "")
 }
 
 func wrapErrf(cause, reason error, msg string, vs ...interface{}) error {
