@@ -64,8 +64,9 @@ type sniffer struct {
 	// filter is the bpf filter program used by the sniffer.
 	filter string
 
-	// id identifies the sniffer for metric collection.
-	id string
+	// id and idx identify the sniffer for metric collection.
+	id  string
+	idx int
 
 	decoders Decoders
 
@@ -100,6 +101,7 @@ func New(id string, testMode bool, _ string, decoders Decoders, interfaces []con
 			state:         atomic.MakeInt32(snifferInactive),
 			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
 			id:            id,
+			idx:           i,
 			decoders:      decoders,
 			log:           s.log,
 		}
@@ -287,7 +289,7 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 	}
 	defer handle.Close()
 
-	dec, cleanup, err := s.decoders(handle.LinkType(), device)
+	dec, cleanup, err := s.decoders(handle.LinkType(), device, s.idx)
 	if err != nil {
 		return err
 	}
@@ -330,7 +332,7 @@ func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layer
 	if dec == nil || linkType != last {
 		s.log.Infof("changing link type: %d -> %d", last, linkType)
 		var cleanup func()
-		dec, cleanup, err = s.decoders(linkType, device)
+		dec, cleanup, err = s.decoders(linkType, device, s.idx)
 		if err != nil {
 			return linkType, dec, err
 		}
@@ -464,7 +466,7 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 	case "pcap":
 		return openPcap(device, s.filter, &s.config)
 	case "af_packet":
-		return openAFPacket(s.id, device, s.filter, &s.config)
+		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
 	}

@@ -17,6 +17,7 @@ external identity providers.
 The following identity providers are supported:
 
 - <<provider-azure-ad>>
+- <<provider-okta>>
 
 ==== Configuration options
 
