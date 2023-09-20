@@ -19,9 +19,45 @@ package cache
 
 import (
 	"container/heap"
+	"context"
 	"sync"
 	"time"
 )
+
+// memStoreSet is a collection of shared memStore caches.
+type memStoreSet struct {
+	mu     sync.Mutex
+	stores map[string]*memStore
+	typ    string // TODO: Remove when a file-backed store exists.
+}
+
+// get returns a memStore cache with the provided ID based on the config.
+// If a memStore with the ID already exist, its configuration is adjusted
+// and its reference count is increased. The returned context.CancelFunc
+// reduces the reference count and deletes the memStore from set if the
+// count reaches zero.
+func (s *memStoreSet) get(id string, cfg config) (*memStore, context.CancelFunc) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	store, ok := s.stores[id]
+	if !ok {
+		store = newMemStore(cfg, id, s.typ)
+		s.stores[store.id] = store
+	}
+	store.add(cfg)
+
+	return store, func() {
+		store.dropFrom(s)
+	}
+}
+
+// free removes the memStore with the given ID from the set. free is safe
+// for concurrent use.
+func (s *memStoreSet) free(id string) {
+	s.mu.Lock()
+	delete(s.stores, id)
+	s.mu.Unlock()
+}
 
 // memStore is a memory-backed cache store.
 type memStore struct {
@@ -55,8 +91,12 @@ func newMemStore(cfg config, id, typ string) *memStore {
 		typ:   typ,
 		cache: make(map[string]*CacheEntry),
 
-		// Mark the ttl as invalid until we have had a put operation
-		// configured.
+		// Mark the ttl as invalid until we have had a put
+		// operation configured. While the shared backing
+		// data store is incomplete, and has no put operation
+		// defined, the TTL will be invalid, but will never
+		// be accessed since all time operations outside put
+		// refer to absolute times, held by the CacheEntry.
 		ttl:    -1,
 		cap:    -1,
 		effort: -1,
@@ -65,15 +105,20 @@ func newMemStore(cfg config, id, typ string) *memStore {
 
 func (c *memStore) String() string { return c.typ + ":" + c.id }
 
-// setPutOptions allows concurrency-safe updating of the put options. While the shared
-// backing data store is incomplete, and has no put operation defined, the TTL
-// will be invalid, but will never be accessed since all time operations outside
-// put refer to absolute times. setPutOptions also increases the reference count
-// for the memStore for all operation types.
-func (c *memStore) setPutOptions(cfg config) {
+// add updates a the receiver for a new operation. It increases the reference
+// count for the receiver, and if the config is a put operation and has no
+// previous put operation defined, the TTL, cap and effort will be set from
+// cfg. add is safe for concurrent use.
+func (c *memStore) add(cfg config) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.refs++
+
+	// We may have already constructed the store with
+	// a get or a delete config, so set the TTL, cap
+	// and effort if we have a put config. If another
+	// put config has already been included, we ignore
+	// the put options now.
 	if cfg.Put == nil {
 		return
 	}
@@ -86,16 +131,16 @@ func (c *memStore) setPutOptions(cfg config) {
 	}
 }
 
-// close decreases the reference count for the memStore and removes it from the
-// stores map if the count is zero.
-func (c *memStore) close(stores map[string]*memStore) {
+// dropFrom decreases the reference count for the memStore and removes it from
+// the stores map if the count is zero. dropFrom is safe for concurrent use.
+func (c *memStore) dropFrom(stores *memStoreSet) {
 	c.mu.Lock()
 	c.refs--
 	if c.refs < 0 {
 		panic("invalid reference count")
 	}
 	if c.refs == 0 {
-		delete(stores, c.id)
+		stores.free(c.id)
 		// GC assists.
 		c.cache = nil
 		c.expiries = nil
@@ -104,7 +149,8 @@ func (c *memStore) close(stores map[string]*memStore) {
 }
 
 // Get return the cached value associated with the provided key. If there is
-// no value for the key, or the value has expired Get returns ErrNoData.
+// no value for the key, or the value has expired Get returns ErrNoData. Get
+// is safe for concurrent use.
 func (c *memStore) Get(key string) (any, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -121,6 +167,7 @@ func (c *memStore) Get(key string) (any, error) {
 
 // Put stores the provided value in the cache associated with the given key.
 // The value is given an expiry time based on the configured TTL of the cache.
+// Put is safe for concurrent use.
 func (c *memStore) Put(key string, val any) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -159,6 +206,7 @@ func (c *memStore) evictExpired(now time.Time) {
 }
 
 // Delete removes the value associated with the provided key from the cache.
+// Delete is safe for concurrent use.
 func (c *memStore) Delete(key string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()

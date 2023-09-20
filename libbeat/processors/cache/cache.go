@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -84,6 +83,36 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	return p, nil
 }
 
+// getStoreFor returns a backing store for the provided configuration,
+// and a context cancellation that releases the cache resource when it
+// is no longer required. The cancellation should be called when the
+// processor is closed.
+func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
+	switch {
+	case cfg.Store.Memory != nil:
+		s, cancel := memStores.get(cfg.Store.Memory.ID, cfg)
+		return s, cancel, nil
+
+	case cfg.Store.File != nil:
+		logp.L().Warn("using memory store when file is configured")
+		// TODO: Replace place-holder code with a file-store.
+		s, cancel := fileStores.get(cfg.Store.File.ID, cfg)
+		return s, cancel, nil
+
+	default:
+		// This should have been caught by config validation.
+		return nil, noop, errors.New("no configured store")
+	}
+}
+
+var (
+	memStores  = memStoreSet{stores: map[string]*memStore{}, typ: "memory"}
+	fileStores = memStoreSet{stores: map[string]*memStore{}, typ: "file"} // This is a temporary mock.
+)
+
+// noop is a no-op context.CancelFunc.
+func noop() {}
+
 // Store is the interface implemented by metadata providers.
 type Store interface {
 	Put(key string, val any) error
@@ -101,62 +130,6 @@ type CacheEntry struct {
 	value   any
 	expires time.Time
 	index   int
-}
-
-var (
-	storeMu    sync.Mutex
-	memStores  = map[string]*memStore{}
-	fileStores = map[string]*memStore{}
-)
-
-// getStoreFor returns a backing store for the provided configuration,
-// and a context cancellation that releases the cache resource when it
-// is no longer required. The cancellation should be called when the
-// processor is closed.
-func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
-	storeMu.Lock()
-	defer storeMu.Unlock()
-	switch {
-	case cfg.Store.Memory != nil:
-		s, cancel := getMemStore(memStores, cfg.Store.Memory.ID, cfg, "memory")
-		return s, cancel, nil
-
-	case cfg.Store.File != nil:
-		logp.L().Warn("using memory store when file is configured")
-		// TODO: Replace place-holder code with a file-store.
-		s, cancel := getMemStore(fileStores, cfg.Store.File.ID, cfg, "file")
-		return s, cancel, nil
-
-	default:
-		// This should have been caught by config validation.
-		return nil, noop, errors.New("no configured store")
-	}
-}
-
-// noop is a no-op context.CancelFunc.
-func noop() {}
-
-// TODO: Remove the typ parameter when a file-backed store is available
-// and each type knows who they are.
-func getMemStore(stores map[string]*memStore, id string, cfg config, typ string) (*memStore, context.CancelFunc) {
-	s, ok := stores[id]
-	if !ok {
-		s = newMemStore(cfg, id, typ)
-		stores[s.id] = s
-	}
-
-	// We may have already constructed the store with
-	// a get or a delete config, so set the TTL, cap
-	// and effort if we have a put config. If another
-	// put config has already been included, we ignore
-	// the put options now.
-	s.setPutOptions(cfg)
-
-	return s, func() {
-		storeMu.Lock()
-		s.close(stores)
-		storeMu.Unlock()
-	}
 }
 
 // Run enriches the given event with the host metadata.

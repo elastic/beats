@@ -130,7 +130,7 @@ var memStoreTests = []struct {
 							TTL: ptrTo(time.Second),
 						},
 					}
-					s.setPutOptions(putCfg)
+					s.add(putCfg)
 					return nil
 				},
 				want: &memStore{
@@ -176,7 +176,7 @@ var memStoreTests = []struct {
 							TTL: ptrTo(time.Second),
 						},
 					}
-					s.setPutOptions(putCfg)
+					s.add(putCfg)
 					return nil
 				},
 				want: &memStore{
@@ -285,10 +285,8 @@ var memStoreTests = []struct {
 			},
 			5: {
 				doTo: func(s *memStore) error {
-					storeMu.Lock()
-					s.close(memStores)
-					defer storeMu.Unlock()
-					if _, ok := memStores[s.id]; !ok {
+					s.dropFrom(&memStores)
+					if !memStores.has(s.id) {
 						return fmt.Errorf("%q memStore not found after single close", s.id)
 					}
 					return nil
@@ -311,10 +309,8 @@ var memStoreTests = []struct {
 			},
 			6: {
 				doTo: func(s *memStore) error {
-					storeMu.Lock()
-					s.close(memStores)
-					defer storeMu.Unlock()
-					if _, ok := memStores[s.id]; ok {
+					s.dropFrom(&memStores)
+					if memStores.has(s.id) {
 						return fmt.Errorf("%q memStore still found after double close", s.id)
 					}
 					return nil
@@ -343,10 +339,8 @@ func TestMemStore(t *testing.T) {
 			// Construct the store and put in into the stores map as
 			// we would if we were calling Run.
 			store := newMemStore(test.cfg, test.cfg.Store.Memory.ID, "memory")
-			store.setPutOptions(test.cfg)
-			storeMu.Lock()
-			memStores[store.id] = store
-			storeMu.Unlock()
+			store.add(test.cfg)
+			memStores.add(store)
 
 			if !cmp.Equal(test.want, store, allow, ignoreInMemStore) {
 				t.Errorf("unexpected new memStore result:\n--- want\n+++ got\n%s",
@@ -364,6 +358,21 @@ func TestMemStore(t *testing.T) {
 			}
 		})
 	}
+}
+
+// add adds the store to the set, it is used only for testing.
+func (s *memStoreSet) add(store *memStore) {
+	s.mu.Lock()
+	s.stores[store.id] = store
+	s.mu.Unlock()
+}
+
+// has returns whether the store exists in the set, it is used only for testing.
+func (s *memStoreSet) has(id string) bool {
+	s.mu.Lock()
+	_, ok := s.stores[id]
+	s.mu.Unlock()
+	return ok
 }
 
 func ptrTo[T any](v T) *T { return &v }
