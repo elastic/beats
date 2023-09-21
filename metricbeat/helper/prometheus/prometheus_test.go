@@ -20,12 +20,13 @@ package prometheus
 import (
 	"bytes"
 	"compress/gzip"
-	"github.com/prometheus/prometheus/pkg/labels"
 	"io"
 	"net/http"
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/prometheus/prometheus/pkg/labels"
 
 	"github.com/stretchr/testify/assert"
 
