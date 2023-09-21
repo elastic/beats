@@ -246,6 +246,9 @@ func (t *Template) generateComponent(properties, analyzers mapstr.M, dynamicTemp
 			},
 		},
 	}
+	if len(t.config.Settings.Lifecycle) > 0 {
+		m.Put("template.lifecycle", t.config.Settings.Lifecycle)
+	}
 	if len(analyzers) != 0 {
 		m.Put("template.settings.analysis.analyzer", analyzers)
 	}

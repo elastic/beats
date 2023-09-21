@@ -25,6 +25,7 @@ type mockHandler struct {
 	mock.Mock
 	cfg        LifecycleConfig
 	testPolicy Policy
+	mode       Mode
 }
 
 type onCall struct {
@@ -71,6 +72,14 @@ func (h *mockHandler) Overwrite() bool {
 
 func (h *mockHandler) PolicyName() string {
 	return h.testPolicy.Name
+}
+
+func (h *mockHandler) Policy() Policy {
+	return h.testPolicy
+}
+
+func (h *mockHandler) Mode() Mode {
+	return h.mode
 }
 
 func onCheckExists() onCall { return makeOnCall("CheckExists") }

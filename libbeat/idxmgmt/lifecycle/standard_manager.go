@@ -24,21 +24,20 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// stdSupport is a config wrapper that carries lifecycle info.
 type stdSupport struct {
 	log *logp.Logger
-
-	// cfg
 	cfg LifecycleConfig
 }
 
+// stdManager creates, checks, and updates lifecycle policies.
 type stdManager struct {
 	*stdSupport
 	client ClientHandler
-
-	// cached info
-	cache infoCache
+	cache  infoCache
 }
 
+// infoCache stores config relating to caching lifecycle config
 type infoCache struct {
 	LastUpdate time.Time
 	Enabled    bool
@@ -47,6 +46,8 @@ type infoCache struct {
 var defaultCacheDuration = 5 * time.Minute
 
 // NewStdSupport creates an instance of default ILM support implementation.
+// This contains only the config, and a manager must be created to write and check
+// lifecycle policies. I suspect that with enough time/work, you could merge the stdSupport and stdManager objects
 func NewStdSupport(
 	log *logp.Logger,
 	cfg LifecycleConfig,
@@ -57,8 +58,11 @@ func NewStdSupport(
 	}
 }
 
+// Enabled returns true if either ILM or DSL are enabled
 func (s *stdSupport) Enabled() bool { return s.cfg.ILM.Enabled || s.cfg.DSL.Enabled }
 
+// Manager returns a standard support manager. unlike the stdSupport object,
+// the manager is capable of writing and checking lifecycle policies.
 func (s *stdSupport) Manager(h ClientHandler) Manager {
 	return &stdManager{
 		client:     h,
@@ -66,10 +70,7 @@ func (s *stdSupport) Manager(h ClientHandler) Manager {
 	}
 }
 
-func (m *stdManager) PolicyName() string {
-	return m.client.PolicyName()
-}
-
+// CheckEnabled checks to see if lifecycle management is enabled.
 func (m *stdManager) CheckEnabled() (bool, error) {
 	ilmEnabled, err := m.client.CheckEnabled()
 	if err != nil {
@@ -90,7 +91,7 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
 	if !m.client.CheckExists() {
-		log.Infof("ILM policy is not checked as setup.ilm.check_exists is disabled")
+		log.Infof("lifecycle policy is not checked as check_exists is disabled")
 		return false, nil
 	}
 	overwrite = overwrite || m.client.Overwrite()
@@ -107,25 +108,26 @@ func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 
 	switch {
 	case exists && !overwrite:
-		log.Infof("ILM policy %v exists already.", name)
+		log.Infof("lifecycle policy %v exists already.", name)
 		return false, nil
 
 	case !exists || overwrite:
 		err := m.client.CreatePolicyFromConfig()
 		if err != nil {
-			log.Errorf("ILM policy %v creation failed: %v", name, err)
+			log.Errorf("lifecycle policy %v creation failed: %v", name, err)
 			return false, err
 		}
 
-		log.Infof("ILM policy %v successfully created.", name)
+		log.Infof("lifecycle policy %v successfully created.", name)
 		return true, err
 
 	default:
-		log.Infof("ILM policy not created: exists=%v, overwrite=%v.", exists, overwrite)
+		log.Infof("lifecycle policy not created: exists=%v, overwrite=%v.", exists, overwrite)
 		return false, nil
 	}
 }
 
+// Valid returns true if the cache is valid
 func (c *infoCache) Valid() bool {
 	return !c.LastUpdate.IsZero() && time.Since(c.LastUpdate) < defaultCacheDuration
 }

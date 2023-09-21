@@ -39,6 +39,13 @@ type Supporter interface {
 	Manager(h ClientHandler) Manager
 }
 
+type Mode int
+
+const (
+	ILM Mode = iota
+	DSL
+)
+
 // Manager uses a ClientHandler to install a policy.
 type Manager interface {
 	CheckEnabled() (bool, error)
@@ -48,7 +55,6 @@ type Manager interface {
 	// The created flag is set to true only if a new policy is created. `created`
 	// is false if an existing policy gets overwritten.
 	EnsurePolicy(overwrite bool) (created bool, err error)
-	PolicyName() string
 }
 
 // Policy describes a policy to be loaded into Elasticsearch.

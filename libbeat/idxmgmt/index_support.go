@@ -214,7 +214,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 		m.support.templateCfg.Overwrite, loadTemplate)
 
 	if ilmComponent.load && !templateComponent.load {
-		return false, "Loading ILM policy without loading template is not recommended. Check your configuration."
+		return false, "Loading lifecycle policy without loading template is not recommended. Check your configuration."
 	}
 
 	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
@@ -244,7 +244,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		return err
 	}
 	if withILM {
-		log.Info("Auto ILM enable success.")
+		log.Info("Auto lifecycle enable success.")
 	}
 
 	// create feature objects for ILM and template setup
@@ -252,7 +252,12 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
 
-	if ilmComponent.load {
+	if m.clientHandler.Mode() == lifecycle.DSL {
+		log.Info("setting up DSL")
+	}
+
+	// on DSL, the template load will create the lifecycle policy
+	if ilmComponent.load && m.clientHandler.Mode() == lifecycle.ILM {
 		// install ilm policy
 		policyCreated, err := m.ilm.EnsurePolicy(ilmComponent.overwrite)
 		if err != nil {
@@ -270,8 +275,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
 		if ilmComponent.enabled {
-			name := m.clientHandler.PolicyName()
-			tmplCfg, err = applyILMSettingsToTemplate(log, tmplCfg, name)
+			tmplCfg, err = applyLifecycleSettingsToTemplate(log, tmplCfg, m.clientHandler)
 			if err != nil {
 				return fmt.Errorf("error applying ILM settings: %w", err)
 			}
@@ -343,17 +347,17 @@ func unpackTemplateConfig(info beat.Info, cfg *config.C) (config template.Templa
 }
 
 // applies the specified ILM policy to the provided template, returns a struct of the template config
-func applyILMSettingsToTemplate(
+func applyLifecycleSettingsToTemplate(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
-	policyName string,
+	policymgr lifecycle.ClientHandler,
 ) (template.TemplateConfig, error) {
 	if !tmpl.Enabled {
 		return tmpl, nil
 	}
 
-	if policyName == "" {
-		return tmpl, errors.New("no ilm policy name configured")
+	if policymgr.PolicyName() == "" {
+		return tmpl, errors.New("no policy name configured")
 	}
 
 	// init/copy index settings
@@ -369,23 +373,28 @@ func applyILMSettingsToTemplate(
 	}
 	tmpl.Settings.Index = idxSettings
 
-	// init/copy index.lifecycle settings
-	var lifecycle map[string]interface{}
-	if ifcLifecycle := idxSettings["lifecycle"]; ifcLifecycle == nil {
-		lifecycle = map[string]interface{}{}
-	} else if tmp, ok := ifcLifecycle.(map[string]interface{}); ok {
-		lifecycle = make(map[string]interface{}, len(tmp))
-		for k, v := range tmp {
-			lifecycle[k] = v
+	if policymgr.Mode() == lifecycle.ILM {
+		// init/copy index.lifecycle settings
+		var lifecycle map[string]interface{}
+		if ifcLifecycle := idxSettings["lifecycle"]; ifcLifecycle == nil {
+			lifecycle = map[string]interface{}{}
+		} else if tmp, ok := ifcLifecycle.(map[string]interface{}); ok {
+			lifecycle = make(map[string]interface{}, len(tmp))
+			for k, v := range tmp {
+				lifecycle[k] = v
+			}
+		} else {
+			return tmpl, errors.New("settings.index.lifecycle must be an object")
+		}
+		idxSettings["lifecycle"] = lifecycle
+
+		if _, exists := lifecycle["name"]; !exists {
+			log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policymgr.PolicyName())
+			lifecycle["name"] = policymgr.PolicyName()
 		}
 	} else {
-		return tmpl, errors.New("settings.index.lifecycle must be an object")
-	}
-	idxSettings["lifecycle"] = lifecycle
-
-	if _, exists := lifecycle["name"]; !exists {
-		log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policyName)
-		lifecycle["name"] = policyName
+		// when we're in DSL mode, this is what actually creates the policy
+		tmpl.Settings.Lifecycle = policymgr.Policy().Body
 	}
 
 	return tmpl, nil

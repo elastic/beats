@@ -36,6 +36,8 @@ type ClientHandler interface {
 	PolicyName() string
 	Overwrite() bool
 	CheckExists() bool
+	Policy() Policy
+	Mode() Mode
 }
 
 type VersionCheckerClient interface {

@@ -15,11 +15,12 @@ type FileClientHandler struct {
 	cfg           Config
 	defaultPolicy mapstr.M
 	name          string
+	mode          Mode
+	policy        Policy
 }
 
 // NewFileClientHandler initializes and returns a new FileClientHandler instance.
 func NewFileClientHandler(c FileClient, info beat.Info, cfg LifecycleConfig) (*FileClientHandler, error) {
-	// TODO: should return an error if both are enabled
 	// default to ILM for file handler
 	if cfg.DSL.Enabled && cfg.ILM.Enabled {
 		return nil, errors.New("both ILM and DLM are enabled")
@@ -35,23 +36,38 @@ func NewFileClientHandler(c FileClient, info beat.Info, cfg LifecycleConfig) (*F
 		return nil, fmt.Errorf("error creating policy name: %w", err)
 	}
 
+	// set defaults
+	defaultPolicy := DefaultILMPolicy
+	mode := ILM
+	configType := cfg.ILM
+
 	if cfg.DSL.Enabled {
-		return &FileClientHandler{client: c, info: info, cfg: cfg.DSL, defaultPolicy: DefaultDSLPolicy, name: name}, nil
+		defaultPolicy = DefaultDSLPolicy
+		mode = DSL
+		configType = cfg.DSL
 	}
-	return &FileClientHandler{client: c, info: info, cfg: cfg.ILM, defaultPolicy: DefaultILMPolicy, name: name}, nil
+
+	policy, err := createPolicy(configType, info, defaultPolicy)
+	if err != nil {
+		return nil, fmt.Errorf("error creating policy: %w", err)
+	}
+
+	return &FileClientHandler{client: c, info: info, cfg: configType,
+		defaultPolicy: defaultPolicy, name: name, policy: policy, mode: mode}, nil
 
 }
 
+// CheckExists returns the state of the check_exists config flag
 func (h *FileClientHandler) CheckExists() bool {
 	return h.cfg.CheckExists
 }
 
+// Overwrite returns the state of the overwrite config flag
 func (h *FileClientHandler) Overwrite() bool {
 	return h.cfg.Enabled
 }
 
-// CheckEnabled indicates whether or not ILM is supported for the configured mode and client version.
-// If the connected ES instance is serverless, this will return false
+// CheckEnabled indicates whether or not lifecycle management is supported for the configured mode and client version.
 func (h *FileClientHandler) CheckEnabled() (bool, error) {
 	return checkILMEnabled(h.cfg.Enabled, h.client)
 }
@@ -65,25 +81,31 @@ func (h *FileClientHandler) CreatePolicy(policy Policy) error {
 	return nil
 }
 
+// Policy returns the complete policy
+func (h *FileClientHandler) Policy() Policy {
+	return h.policy
+}
+
+// Mode returns the configured instance mode
+func (h *FileClientHandler) Mode() Mode {
+	return h.mode
+}
+
+// CreatePolicyFromConfig creates a lifecycle policy from its config and posts it to elasticsearch
 func (h *FileClientHandler) CreatePolicyFromConfig() error {
 	// only applicable to testing
 	if h.cfg.policyRaw != nil {
 		return h.CreatePolicy(*h.cfg.policyRaw)
 	}
 
-	// default to ILM
-	policy, err := createPolicy(h.cfg, h.info, DefaultILMPolicy)
-	if err != nil {
-		return fmt.Errorf("error creating ILM policy: %w", err)
-	}
-
-	err = h.CreatePolicy(policy)
+	err := h.CreatePolicy(h.policy)
 	if err != nil {
 		return fmt.Errorf("error writing policy: %w", err)
 	}
 	return nil
 }
 
+// PolicyName returns the generated policy name.
 func (h *FileClientHandler) PolicyName() string {
 	return h.name
 }

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// //go:build integration
+//go:build integration
 
 package lifecycle
 
@@ -244,7 +244,8 @@ func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
 	assert.Equal(t, testPolicy.Name, testClient.name)
 	assert.Equal(t, "policy", testClient.component)
 	var out mapstr.M
-	json.Unmarshal([]byte(testClient.body), &out)
+	err = json.Unmarshal([]byte(testClient.body), &out)
+	require.NoError(t, err)
 	assert.Equal(t, testPolicy.Body, out)
 }
 

@@ -55,19 +55,6 @@ func wrapErrf(cause, reason error, msg string, vs ...interface{}) error {
 	}
 }
 
-// ErrReason calls Reason() if the error implements this method. Otherwise return nil.
-func ErrReason(err error) error {
-	if err == nil {
-		return nil
-	}
-
-	ifc, ok := err.(interface{ Reason() error })
-	if !ok {
-		return nil
-	}
-	return ifc.Reason()
-}
-
 // Cause returns the errors cause, if present.
 func (e *Error) Cause() error { return e.cause }
 

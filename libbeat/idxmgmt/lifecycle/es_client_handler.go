@@ -17,15 +17,12 @@ type ESClientHandler struct {
 	defaultPolicy mapstr.M
 	putPath       string
 	name          string
+	policy        Policy
+	mode          Mode
 }
 
 // NewESClientHandler initializes and returns an ESClientHandler
 func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESClientHandler, error) {
-	policyName := cfg.ILM.PolicyName
-	if c.IsServerless() {
-		policyName = cfg.DSL.PolicyName
-	}
-
 	// trying to protect against config confusion;
 	// it's possible that the "wrong" lifecycle got enabled somehow,
 	// this is a last-ditch effort to fix things
@@ -41,22 +38,42 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESCli
 		}
 	}
 
+	// by using IsServerless here, we're essentially letting the remote setting override the user config
+	policyName := cfg.ILM.PolicyName
+	if c.IsServerless() {
+		policyName = cfg.DSL.PolicyName
+	}
+
+	// create name and policy
 	name, err := ApplyStaticFmtstr(info, policyName)
 	if err != nil {
 		return nil, fmt.Errorf("error applying format string to policy name: %w", err)
 	}
-
 	if name == "" {
 		return nil, errors.New("could not generate usable policy name from config. Check setup.*.policy_name fields")
 	}
 
+	// set defaults
+	defaultPolicy := DefaultILMPolicy
+	mode := ILM
+	path := fmt.Sprintf("%s/%s", esILMPath, name)
+	configType := cfg.ILM
+
 	if c.IsServerless() {
-		path := fmt.Sprintf("/_data_stream/%s/_lifecycle", name)
-		return &ESClientHandler{client: c, info: info, cfg: cfg.DSL, defaultPolicy: DefaultDSLPolicy, name: name, putPath: path}, nil
+		defaultPolicy = DefaultDSLPolicy
+		mode = DSL
+		path = fmt.Sprintf("/_data_stream/%s/_lifecycle", name)
+		configType = cfg.DSL
 	}
 
-	path := fmt.Sprintf("%s/%s", esILMPath, name)
-	return &ESClientHandler{client: c, info: info, cfg: cfg.ILM, defaultPolicy: DefaultILMPolicy, name: name, putPath: path}, nil
+	policy, err := createPolicy(configType, info, defaultPolicy)
+	if err != nil {
+		return nil, fmt.Errorf("error creating DSL policy: %w", err)
+	}
+
+	return &ESClientHandler{client: c,
+		info: info, cfg: configType,
+		defaultPolicy: defaultPolicy, name: name, putPath: path, policy: policy, mode: mode}, nil
 }
 
 // CheckExists returns the value of the check_exists config flag
@@ -64,7 +81,7 @@ func (h *ESClientHandler) CheckExists() bool {
 	return h.cfg.CheckExists
 }
 
-// returns the value of the overwrite config flag
+// Overwrite returns the value of the overwrite config flag
 func (h *ESClientHandler) Overwrite() bool {
 	return h.cfg.Overwrite
 }
@@ -116,13 +133,19 @@ func (h *ESClientHandler) PolicyName() string {
 	return h.name
 }
 
+// Policy returns the full policy
+func (h *ESClientHandler) Policy() Policy {
+	return h.policy
+}
+
+// Mode returns the connected instance mode
+func (h *ESClientHandler) Mode() Mode {
+	return h.mode
+}
+
 // creates a policy from config, then performs the PUT request to ES
 func (h *ESClientHandler) createAndPutPolicy(cfg Config, info beat.Info, defaultPolicy mapstr.M) error {
-	policy, err := createPolicy(cfg, info, defaultPolicy)
-	if err != nil {
-		return fmt.Errorf("error creating lifetime policy: %w", err)
-	}
-	err = h.putPolicyToES(h.putPath, policy)
+	err := h.putPolicyToES(h.putPath, h.policy)
 	if err != nil {
 		return fmt.Errorf("error submitting policy: %w", err)
 	}

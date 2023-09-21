@@ -77,34 +77,32 @@ func (cfg *Config) Validate() error {
 }
 
 func DefaultILMConfig(info beat.Info) LifecycleConfig {
-	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 	return LifecycleConfig{
 		ILM: Config{
 			Enabled:     true,
-			PolicyName:  *policyFmt,
+			PolicyName:  *fmtstr.MustCompileEvent(info.Beat),
 			PolicyFile:  "",
 			CheckExists: true,
 		},
 		DSL: Config{
 			Enabled:     false,
-			PolicyName:  *policyFmt,
+			PolicyName:  *fmtstr.MustCompileEvent("%{[beat.name]}-%{[beat.version]}"),
 			CheckExists: true,
 		},
 	}
 }
 
 func DefaultDSLConfig(info beat.Info) LifecycleConfig {
-	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 	return LifecycleConfig{
 		ILM: Config{
 			Enabled:     false,
-			PolicyName:  *policyFmt,
+			PolicyName:  *fmtstr.MustCompileEvent(info.Beat),
 			PolicyFile:  "",
 			CheckExists: true,
 		},
 		DSL: Config{
 			Enabled:     true,
-			PolicyName:  *policyFmt,
+			PolicyName:  *fmtstr.MustCompileEvent("%{[beat.name]}-%{[beat.version]}"),
 			PolicyFile:  "",
 			CheckExists: true,
 		},

@@ -62,7 +62,13 @@ func (m *mockILMSupport) Policy() lifecycle.Policy {
 	return args.Get(0).(lifecycle.Policy)
 }
 
-func onOverwrite() onCall { return makeOnCall("Overwrite") }
+// func onMode() onCall { return makeOnCall("Mode") }
+func (m *mockILMSupport) Mode() lifecycle.Mode {
+	args := m.Called()
+	return args.Get(0).(lifecycle.Mode)
+}
+
+// func onOverwrite() onCall { return makeOnCall("Overwrite") }
 func (m *mockILMSupport) Overwrite() bool {
 	return m.Called().Bool(0)
 }
@@ -71,19 +77,19 @@ func (m *mockILMSupport) Manager(_ lifecycle.ClientHandler) lifecycle.Manager {
 	return m
 }
 
-func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
+// func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
 func (m *mockILMSupport) CheckEnabled() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
 
-func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }
+// func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }
 func (m *mockILMSupport) EnsurePolicy(overwrite bool) (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
 
-func onPolicyName() onCall { return makeOnCall("PolicyName") }
+// func onPolicyName() onCall { return makeOnCall("PolicyName") }
 func (m *mockILMSupport) PolicyName() string {
 	args := m.Called()
 	return args.String(0)

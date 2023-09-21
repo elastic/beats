@@ -28,9 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
-// TODO: most of these tests are less useful, as we need the *manager* to tell us the policy,
-// so these tests will need to be changed to provide a mock clientHandler, then we test the policy
-
 func TestDefaultSupport_Init(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 
@@ -71,7 +68,17 @@ func TestDefaultSupport_Init(t *testing.T) {
 
 }
 
+func TestDefaultSupport_Manager_Enabled_Serverless(t *testing.T) {
+	cfg := DefaultDSLConfig(beat.Info{Name: "test"})
+	runEnabledTests(t, cfg)
+}
+
 func TestDefaultSupport_Manager_Enabled(t *testing.T) {
+	cfg := DefaultILMConfig(beat.Info{Name: "test"})
+	runEnabledTests(t, cfg)
+}
+
+func runEnabledTests(t *testing.T, cfg LifecycleConfig) {
 	cases := map[string]struct {
 		calls   []onCall
 		cfg     LifecycleConfig
@@ -86,7 +93,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 			calls: []onCall{
 				onCheckEnabled().Return(false, ErrESILMDisabled),
 			},
-			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg: cfg,
 			err: true,
 		},
 		"enabled via handler": {
@@ -94,20 +101,20 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 				onCheckEnabled().Return(true, nil),
 			},
 			enabled: true,
-			cfg:     DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg:     cfg,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
 				onCheckEnabled().Return(true, nil),
 			},
-			cfg:     LifecycleConfig{ILM: Config{Enabled: true}},
+			cfg:     cfg,
 			enabled: true,
 		},
 		"io error": {
 			calls: []onCall{
 				onCheckEnabled().Return(false, errors.New("ups")),
 			},
-			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg: cfg,
 			err: true,
 		},
 	}
@@ -126,7 +133,7 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 				require.Error(t, err)
 			}
 			if test.fail != nil {
-				assert.Equal(t, test.fail, ErrReason(err))
+				assert.Equal(t, test.fail, err)
 			}
 
 			assert.Equal(t, test.enabled, enabled)
@@ -135,12 +142,25 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 	}
 }
 
+func TestDefaultSupport_Manager_EnsurePolicy_Serverless(t *testing.T) {
+	testPolicy := Policy{
+		Name: "test",
+		Body: DefaultDSLPolicy,
+	}
+	cfg := DefaultDSLConfig(beat.Info{Name: "test"})
+	runEnsurePolicyTest(t, testPolicy, cfg)
+}
+
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	testPolicy := Policy{
 		Name: "test",
 		Body: DefaultILMPolicy,
 	}
+	cfg := DefaultILMConfig(beat.Info{Name: "test"})
+	runEnsurePolicyTest(t, testPolicy, cfg)
+}
 
+func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 	cases := map[string]struct {
 		calls     []onCall
 		overwrite bool
@@ -155,7 +175,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 				onHasPolicy().Return(false, nil),
 				onCreatePolicyFromConfig().Return(nil),
 			},
-			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg: cfg,
 		},
 		"policy already exists": {
 			create: false,
@@ -163,12 +183,12 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 				onCheckExists().Return(true),
 				onHasPolicy().Return(true, nil),
 			},
-			cfg: DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg: cfg,
 		},
 		"overwrite": {
 			overwrite: true,
 			create:    true,
-			cfg:       DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg:       cfg,
 			calls: []onCall{
 				onCheckExists().Return(true),
 				onCreatePolicyFromConfig().Return(nil),
@@ -181,7 +201,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 				onCreatePolicyFromConfig().Return(errOf(ErrRequestFailed)),
 			},
 			fail: ErrRequestFailed,
-			cfg:  DefaultILMConfig(beat.Info{Name: "test"}),
+			cfg:  cfg,
 		},
 	}
 
@@ -197,7 +217,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 				require.NoError(t, err)
 			} else {
 				require.Error(t, err)
-				assert.Equal(t, test.fail, ErrReason(err))
+				assert.Equal(t, test.fail, err)
 			}
 
 			h.AssertExpectations(t)

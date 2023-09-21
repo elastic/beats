@@ -30,11 +30,23 @@ func NewNoopSupport(info beat.Info, c LifecycleConfig) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 
-func (*noopSupport) Enabled() bool                   { return false }
-func (*noopSupport) Policy() Policy                  { return Policy{} }
-func (*noopSupport) Overwrite() bool                 { return false }
+// Enabled no-op
+func (*noopSupport) Enabled() bool { return false }
+
+// Policy no-op
+func (*noopSupport) Policy() Policy { return Policy{} }
+
+// Overwrite no-op
+func (*noopSupport) Overwrite() bool { return false }
+
+// Manager no-op
 func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil) }
 
-func (*noopManager) CheckEnabled() (bool, error)       { return false, nil }
+// CheckEnabled no-op
+func (*noopManager) CheckEnabled() (bool, error) { return false, nil }
+
+// EnsurePolicy no-op
 func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, errOf(ErrOpNotAvailable) }
-func (*noopManager) PolicyName() string                { return "" }
+
+// Policyname no-op
+func (*noopManager) PolicyName() string { return "" }

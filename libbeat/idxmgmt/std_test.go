@@ -215,12 +215,12 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 		"load template with ilm without loading ilm": {
 			ilmEnabled: true, tmplEnabled: true, loadILM: LoadModeDisabled,
 			warn:      "whithout loading ILM policy",
-			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true}},
+			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, PolicyName: *fmtstr.MustCompileEvent("test")}},
 		},
 		"load ilm without template": {
 			ilmEnabled: true, loadILM: LoadModeUnset,
 			warn:      "without loading template is not recommended",
-			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true}},
+			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, PolicyName: *fmtstr.MustCompileEvent("test")}},
 		},
 		"template disabled but loading enabled": {
 			loadTmpl:  LoadModeEnabled,
@@ -246,12 +246,12 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 			tmplEnabled: true,
 			ilmEnabled:  true, ilmOverwrite: false, loadILM: LoadModeEnabled,
 			warn:      "Overwriting ILM policy is disabled",
-			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, Overwrite: false}},
+			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, Overwrite: false, PolicyName: *fmtstr.MustCompileEvent("test")}},
 		},
 		"everything enabled": {
 			tmplEnabled: true,
 			ilmEnabled:  true, ilmOverwrite: true,
-			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, Overwrite: true}},
+			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, Overwrite: true, PolicyName: *fmtstr.MustCompileEvent("test")}},
 			ok:        true,
 		},
 	} {
@@ -473,6 +473,7 @@ type mockClientHandler struct {
 	lifecycle   lifecycle.LifecycleConfig
 	selectedCfg lifecycle.Config
 	operations  []mockCreateOp
+	mode        lifecycle.Mode
 }
 
 func newMockClientHandler(cfg lifecycle.LifecycleConfig, info beat.Info) (*mockClientHandler, error) {
@@ -522,6 +523,14 @@ func (h *mockClientHandler) HasPolicy() (bool, error) {
 
 func (h *mockClientHandler) PolicyName() string {
 	return h.policyName
+}
+
+func (h *mockClientHandler) Policy() lifecycle.Policy {
+	return lifecycle.Policy{}
+}
+
+func (h *mockClientHandler) Mode() lifecycle.Mode {
+	return h.mode
 }
 
 func (h *mockClientHandler) createILMPolicy(policy lifecycle.Policy) error {

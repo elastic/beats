@@ -3,11 +3,12 @@ package lifecycle
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
-	"github.com/stretchr/testify/require"
 )
 
 type mockESClient struct {
@@ -42,6 +43,8 @@ func (client *mockESClient) Request(method, path string, pipeline string, params
 
 func TestESSetup(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
+	bothEnabledConfig := DefaultDSLConfig(info)
+	bothEnabledConfig.ILM.Enabled = true
 	cases := map[string]struct {
 		serverless      bool
 		serverHasPolicy bool
@@ -56,8 +59,8 @@ func TestESSetup(t *testing.T) {
 			serverless:      true,
 			cfg:             DefaultDSLConfig(info),
 			err:             false,
-			expectedPUTPath: "/_data_stream/test/_lifecycle",
-			expectedName:    "test",
+			expectedPUTPath: "/_data_stream/test-9.9.9/_lifecycle",
+			expectedName:    "test-9.9.9",
 			expectedPolicy:  DefaultDSLPolicy,
 		},
 		"stateful-with-correct-default": {
@@ -72,9 +75,32 @@ func TestESSetup(t *testing.T) {
 			serverless:      true,
 			cfg:             DefaultILMConfig(info),
 			err:             false,
-			expectedPUTPath: "/_data_stream/test/_lifecycle",
-			expectedName:    "test",
+			expectedPUTPath: "/_data_stream/test-9.9.9/_lifecycle",
+			expectedName:    "test-9.9.9",
 			expectedPolicy:  DefaultDSLPolicy,
+		},
+		"stateful-with-wrong-defaults": {
+			serverless:      false,
+			cfg:             DefaultDSLConfig(info),
+			err:             false,
+			expectedPUTPath: "/_ilm/policy/test",
+			expectedName:    "test",
+		},
+		"serverless-with-both-enabled": {
+			serverless:      true,
+			cfg:             bothEnabledConfig,
+			err:             false,
+			expectedPUTPath: "/_data_stream/test-9.9.9/_lifecycle",
+			expectedName:    "test-9.9.9",
+			expectedPolicy:  DefaultDSLPolicy,
+		},
+		"stateful-with-both-enabled": {
+			serverless:      false,
+			cfg:             bothEnabledConfig,
+			err:             false,
+			expectedPUTPath: "/_ilm/policy/test",
+			expectedName:    "test",
+			expectedPolicy:  DefaultILMPolicy,
 		},
 		"serverless-with-bare-PolicyName": {
 			serverless: true,

@@ -108,7 +108,8 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
 
-		// first fetch the ES output, check if we're running against serverless, use that to set a default config
+		// first fetch the ES output, check if we're running against serverless, use that to set a default config.
+		// the Supporter only cares about lifecycle config for checking if ILM/DSL is enabled or disabled.
 		outCfg := struct {
 			Output config.Namespace `config:"output"`
 		}{}
@@ -130,6 +131,7 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 			}
 		}
 
+		// now that we have the "correct" default, unpack the rest of the config
 		cfg := struct {
 			ILM       lifecycle.LifecycleConfig `config:",inline"`
 			Template  *config.C                 `config:"setup.template"`
@@ -181,7 +183,7 @@ func checkTemplateESSettings(tmpl *config.C, out config.Namespace) error {
 	var tmplCfg template.TemplateConfig
 	if tmpl != nil {
 		if err := tmpl.Unpack(&tmplCfg); err != nil {
-			return fmt.Errorf("unpacking template config fails: %v", err)
+			return fmt.Errorf("unpacking template config fails: %w", err)
 		}
 	}
 
