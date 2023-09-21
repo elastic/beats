@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 
@@ -49,7 +50,6 @@ import (
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common/x509util"
 )
 
@@ -172,6 +172,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 	}
 
 	return lookslike.Compose(
+		hbtestllext.MaybeHasEventType,
 		lookslike.MustCompile(map[string]interface{}{
 			"monitor": map[string]interface{}{
 				"ip":          ipCheck,
@@ -223,8 +224,10 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) vali
 
 // URLChecks returns a validator for the given URL's fields
 func URLChecks(t *testing.T, u *url.URL) validator.Validator {
+	t.Helper()
+	require.NotNil(t, u)
 	return lookslike.MustCompile(map[string]interface{}{
-		"url": wrappers.URLFields(u),
+		"url": wraputil.URLFields(u),
 	})
 }
 

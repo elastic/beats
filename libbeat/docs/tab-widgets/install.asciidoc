@@ -79,12 +79,11 @@ endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-. Download the {beatname_uc} Windows zip file from the
-https://www.elastic.co/downloads/beats/{beatname_lc}[downloads page].
+. Download the {beatname_uc} Windows zip file: https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-windows-x86_64.zip
 
 . Extract the contents of the zip file into `C:\Program Files`.
 
-. Rename the +{beatname_lc}-<version>-windows+ directory to +{beatname_uc}+.
+. Rename the +{beatname_lc}-{version}-windows-x86_64+ directory to +{beatname_uc}+.
 
 . Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
 and select *Run As Administrator*).

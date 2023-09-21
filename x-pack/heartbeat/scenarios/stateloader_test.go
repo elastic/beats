@@ -9,7 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
@@ -35,7 +34,7 @@ func TestStateContinuity(t *testing.T) {
 
 		lastSS := framework.LastState(mtr.Events())
 
-		assert.Equal(t, monitorstate.StatusUp, lastSS.State.Status, "monitor was unexpectedly down, synthetics console output: %s, errors", sout, errors)
+		assert.Equal(t, mtr.Meta.Status, lastSS.State.Status, "monitor had unexpected state %v, synthetics console output: %s, errors", lastSS.State.Status, sout, errors)
 
 		allSS := framework.AllStates(mtr.Events())
 		assert.Len(t, allSS, numRuns)

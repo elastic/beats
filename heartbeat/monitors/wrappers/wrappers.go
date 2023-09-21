@@ -18,7 +18,6 @@
 package wrappers
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -27,11 +26,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer"
@@ -67,10 +63,6 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, len(js) > 1),
-		addMonitorStatus(nil),
-		addMonitorErr,
-		addMonitorDuration,
-		logMonitorRun(nil),
 	)
 }
 
@@ -83,9 +75,6 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *mo
 		addMonitorTimespan(stdMonFields),
 		addServiceName(stdMonFields),
 		addMonitorMeta(stdMonFields, false),
-		addMonitorStatus(byEventType("heartbeat/summary")),
-		addMonitorErr,
-		logMonitorRun(byEventType("heartbeat/summary")),
 	)
 }
 
@@ -173,94 +162,3 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 		"lt":  maxEnd,
 	}
 }
-
-// addMonitorStatus wraps the given Job's execution such that any error returned
-// by the original Job will be set as a field. The original error will not be
-// passed through as a return value. Errors may still be present but only if there
-// is an actual error wrapping the error.
-func addMonitorStatus(match EventMatcher) jobs.JobWrapper {
-	return func(origJob jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := origJob(event)
-
-			if match == nil || match(event) {
-				eventext.MergeEventFields(event, mapstr.M{
-					"monitor": mapstr.M{
-						"status": look.Status(err),
-					},
-				})
-			}
-
-			return cont, err
-		}
-	}
-}
-
-func addMonitorErr(origJob jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		cont, err := origJob(event)
-
-		if err != nil {
-			var errVal interface{}
-			var asECS *ecserr.ECSErr
-			if errors.As(err, &asECS) {
-				// Override the message of the error in the event it was wrapped
-				asECS.Message = err.Error()
-				errVal = asECS
-			} else {
-				errVal = look.Reason(err)
-			}
-			eventext.MergeEventFields(event, mapstr.M{"error": errVal})
-		}
-
-		return cont, nil
-	}
-}
-
-// addMonitorDuration adds duration correctly for all non-browser jobs
-func addMonitorDuration(job jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		start := time.Now()
-		cont, err := job(event)
-		duration := time.Since(start)
-
-		if event != nil {
-			eventext.MergeEventFields(event, mapstr.M{
-				"monitor": mapstr.M{
-					"duration": look.RTT(duration),
-				},
-			})
-			event.Timestamp = start
-		}
-
-		return cont, err
-	}
-}
-
-// logMonitorRun emits a metric for the service when summary events are complete.
-func logMonitorRun(match EventMatcher) jobs.JobWrapper {
-	return func(job jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, err := job(event)
-
-			if match == nil || match(event) {
-				logger.LogRun(event)
-			}
-
-			return cont, err
-		}
-	}
-}
-
-func byEventType(t string) func(event *beat.Event) bool {
-	return func(event *beat.Event) bool {
-		eventType, err := event.Fields.GetValue("event.type")
-		if err != nil {
-			return false
-		}
-
-		return eventType == t
-	}
-}
-
-type EventMatcher func(event *beat.Event) bool

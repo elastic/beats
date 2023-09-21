@@ -69,7 +69,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.3.0
+	github.com/elastic/elastic-agent-client/v7 v7.4.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.3
 	github.com/elastic/go-licenser v0.4.1
@@ -149,9 +149,9 @@ require (
 	go.elastic.co/ecszap v1.0.1
 	go.elastic.co/go-licence-detector v0.6.0
 	go.etcd.io/bbolt v1.3.6
-	go.uber.org/atomic v1.10.0
-	go.uber.org/multierr v1.10.0
-	go.uber.org/zap v1.24.0
+	go.uber.org/atomic v1.11.0
+	go.uber.org/multierr v1.11.0
+	go.uber.org/zap v1.25.0
 	golang.org/x/crypto v0.12.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.9.0
@@ -202,7 +202,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.2
-	github.com/elastic/elastic-agent-libs v0.3.13
+	github.com/elastic/elastic-agent-libs v0.3.15-0.20230913212237-dbdaf18c898b
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
 	github.com/elastic/go-elasticsearch/v8 v8.9.0
@@ -217,6 +217,7 @@ require (
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.16
 	github.com/pkg/xattr v0.4.9
+	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.4
@@ -340,7 +341,6 @@ require (
 	github.com/rootless-containers/rootlesskit v1.1.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
@@ -402,6 +402,7 @@ replace (
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
+
 )
 
 // Exclude this version because the version has an invalid checksum.
