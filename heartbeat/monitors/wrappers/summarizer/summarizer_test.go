@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -41,6 +42,7 @@ func TestSummarizer(t *testing.T) {
 		}
 	}
 
+	testURL := "https://example.net"
 	// these tests use strings to describe sequences of events
 	tests := []struct {
 		name        string
@@ -51,7 +53,9 @@ func TestSummarizer(t *testing.T) {
 		// The expected states on each event
 		expectedStates string
 		// the attempt number of the given event
-		expectedAttempts string
+		expectedAttempts  string
+		expectedSummaries int
+		url               string
 	}{
 		{
 			"start down, transition to up",
@@ -59,6 +63,8 @@ func TestSummarizer(t *testing.T) {
 			"du",
 			"du",
 			"12",
+			2,
+			testURL,
 		},
 		{
 			"start up, stay up",
@@ -66,6 +72,8 @@ func TestSummarizer(t *testing.T) {
 			"uuuuuuuu",
 			"uuuuuuuu",
 			"11111111",
+			8,
+			testURL,
 		},
 		{
 			"start down, stay down",
@@ -73,6 +81,8 @@ func TestSummarizer(t *testing.T) {
 			"dddddddd",
 			"dddddddd",
 			"12121212",
+			8,
+			testURL,
 		},
 		{
 			"start up - go down with one retry - thenrecover",
@@ -80,6 +90,8 @@ func TestSummarizer(t *testing.T) {
 			"udddduuu",
 			"uuddduuu",
 			"11212111",
+			8,
+			testURL,
 		},
 		{
 			"start up, transient down, recover",
@@ -87,6 +99,8 @@ func TestSummarizer(t *testing.T) {
 			"uuuduuuu",
 			"uuuuuuuu",
 			"11112111",
+			8,
+			testURL,
 		},
 		{
 			"start up, multiple transient down, recover",
@@ -94,6 +108,8 @@ func TestSummarizer(t *testing.T) {
 			"uuudududu",
 			"uuuuuuuuu",
 			"111121212",
+			9,
+			testURL,
 		},
 		{
 			"no retries, single down",
@@ -101,6 +117,8 @@ func TestSummarizer(t *testing.T) {
 			"uuuduuuu",
 			"uuuduuuu",
 			"11111111",
+			8,
+			testURL,
 		},
 	}
 
@@ -130,13 +148,15 @@ func TestSummarizer(t *testing.T) {
 			}
 
 			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
-			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", MaxAttempts: uint16(tt.maxAttempts)}
+			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
 			rcvdStatuses := ""
 			rcvdStates := ""
 			rcvdAttempts := ""
+			rcvdEvents := []*beat.Event{}
+			rcvdSummaries := []*jobsummary.JobSummary{}
 			i := 0
-			var lastSummary *JobSummary
+			var lastSummary *jobsummary.JobSummary
 			for {
 				s := NewSummarizer(job, sf, tracker)
 				// Shorten retry delay to make tests run faster
@@ -144,6 +164,7 @@ func TestSummarizer(t *testing.T) {
 				wrapped := s.Wrap(job)
 				events, _ := jobs.ExecJobAndConts(t, wrapped)
 				for _, event := range events {
+					rcvdEvents = append(rcvdEvents, event)
 					eventStatus, _ := event.GetValue("monitor.status")
 					eventStatusStr := eventStatus.(string)
 					rcvdStatuses += eventStatusStr[:1]
@@ -154,9 +175,25 @@ func TestSummarizer(t *testing.T) {
 						rcvdStates += "_"
 					}
 					summaryIface, _ := event.GetValue("summary")
-					summary := summaryIface.(*JobSummary)
+					summary := summaryIface.(*jobsummary.JobSummary)
+					duration, _ := event.GetValue("monitor.duration.us")
+
+					// Ensure that only summaries have a duration
+					if summary != nil {
+						rcvdSummaries = append(rcvdSummaries, summary)
+						require.GreaterOrEqual(t, duration, int64(0))
+						// down summaries should always have errors
+						if eventStatusStr == "down" {
+							require.NotNil(t, event.Fields["error"])
+						} else {
+							require.Nil(t, event.Fields["error"])
+						}
+					} else {
+						require.Nil(t, duration)
+					}
 
 					if summary == nil {
+						// note missing summaries
 						rcvdAttempts += "!"
 					} else if lastSummary != nil {
 						if summary.Attempt > 1 {
@@ -165,6 +202,7 @@ func TestSummarizer(t *testing.T) {
 							require.NotEqual(t, lastSummary.RetryGroup, summary.RetryGroup)
 						}
 					}
+
 					rcvdAttempts += fmt.Sprintf("%d", summary.Attempt)
 					lastSummary = summary
 				}
@@ -176,6 +214,8 @@ func TestSummarizer(t *testing.T) {
 			require.Equal(t, tt.statusSequence, rcvdStatuses)
 			require.Equal(t, tt.expectedStates, rcvdStates)
 			require.Equal(t, tt.expectedAttempts, rcvdAttempts)
+			require.Len(t, rcvdEvents, len(tt.statusSequence))
+			require.Len(t, rcvdSummaries, tt.expectedSummaries)
 		})
 	}
 }

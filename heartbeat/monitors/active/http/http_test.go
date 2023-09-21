@@ -52,6 +52,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -110,7 +111,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc, useUrls bool) (*htt
 func urlChecks(urlStr string) validator.Validator {
 	u, _ := url.Parse(urlStr)
 	return lookslike.MustCompile(map[string]interface{}{
-		"url": wrappers.URLFields(u),
+		"url": wraputil.URLFields(u),
 	})
 }
 
