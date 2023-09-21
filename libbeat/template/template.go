@@ -35,7 +35,6 @@ var (
 	// Defaults used in the template
 	defaultDateDetection           = false
 	defaultTotalFieldsLimit        = 10000
-	defaultNumberOfRoutingShards   = 30
 	defaultMaxDocvalueFieldsSearch = 200
 
 	defaultFields []string
@@ -52,7 +51,6 @@ type Template struct {
 	esVersion       version.V
 	config          TemplateConfig
 	migration       bool
-	order           int
 	priority        int
 }
 
