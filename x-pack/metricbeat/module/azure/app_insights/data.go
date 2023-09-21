@@ -123,14 +123,8 @@ type metricTimeKey struct {
 	End   time.Time
 }
 
-func newMetricTimeKey(
-	start time.Time,
-	end time.Time,
-) metricTimeKey {
-	return metricTimeKey{
-		Start: start,
-		End:   end,
-	}
+func newMetricTimeKey(start, end time.Time) metricTimeKey {
+	return metricTimeKey{Start: start, End: end}
 }
 
 func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId string, namespace string) []mb.Event {
@@ -160,7 +154,10 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 		groupedByTime := groupMetricsByTime(group)
 
 		for ts, group := range groupedByTime {
-			events = append(events, createGroupEvent(group, ts, applicationId, namespace))
+			events = append(
+				events,
+				createGroupEvent(group, ts, applicationId, namespace),
+			)
 		}
 	}
 	return events
@@ -168,12 +165,15 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 
 // groupMetricsByTime groups metrics by their start and end times truncated to the second.
 func groupMetricsByTime(metrics []MetricValue) map[metricTimeKey][]MetricValue {
-	result := make(map[metricTimeKey][]MetricValue)
+	result := make(map[metricTimeKey][]MetricValue, len(metrics)/2)
 
 	for _, metric := range metrics {
 		// The start and end times are truncated to the nearest second.
 		// This is done to ensure that metrics that fall within the same second are grouped together, even if their actual times are slightly different.
-		timeKey := newMetricTimeKey(metric.Start.Time.Truncate(time.Second), metric.End.Time.Truncate(time.Second))
+		timeKey := newMetricTimeKey(
+			metric.Start.Time.Truncate(time.Second),
+			metric.End.Time.Truncate(time.Second),
+		)
 		result[timeKey] = append(result[timeKey], metric)
 	}
 
@@ -240,18 +240,18 @@ func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 func getSortedKeys(m map[string]string) string {
 	keys := make([]string, 0, len(m))
 	for k, v := range m {
-		keys = append(keys, fmt.Sprintf("%s%s", k, v))
+		keys = append(keys, k+v)
 	}
 	sort.Strings(keys)
 	return strings.Join(keys, "")
 }
 
-func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, applicationId string, namespace string) mb.Event {
-	metricList := mapstr.M{}
-
+func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, applicationId, namespace string) mb.Event {
 	if metricTime.Start.IsZero() || metricTime.End.IsZero() {
 		return mb.Event{}
 	}
+
+	metricList := mapstr.M{}
 
 	for _, v := range metricValue {
 		for key, metric := range v.Value {
@@ -264,9 +264,7 @@ func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, appli
 	}
 
 	event := mb.Event{
-		ModuleFields: mapstr.M{
-			"application_id": applicationId,
-		},
+		ModuleFields: mapstr.M{"application_id": applicationId},
 		MetricSetFields: mapstr.M{
 			"start_date": metricTime.Start,
 			"end_date":   metricTime.End,

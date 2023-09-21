@@ -17,11 +17,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func newMetricsTest(
-	timestamp1 *date.Time,
-	timestamp2 *date.Time,
-	timestamp3 *date.Time,
-) []MetricValue {
+func newMetricsTest(timestamp1, timestamp2, timestamp3 *date.Time) []MetricValue {
 	return []MetricValue{
 		{
 			SegmentName: map[string]string{},
