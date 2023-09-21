@@ -10,56 +10,6 @@
             "period": 10000
         },
         "prometheus": {
-            "go_gc_duration_seconds": {
-                "value": 0.000098154
-            },
-            "labels": {
-                "instance": "127.0.0.1:42061",
-                "job": "prometheus",
-                "quantile": "0.75"
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "go_gc_duration_seconds": {
-                "value": 0.011689149
-            },
-            "labels": {
-                "instance": "127.0.0.1:42061",
-                "job": "prometheus",
-                "quantile": "1"
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
             "go_gc_duration_seconds_count": {
                 "counter": 13118,
                 "rate": 0
@@ -82,16 +32,41 @@
                         1.5,
                         2.5,
                         4,
-                        7
+                        5
                     ]
                 }
             },
+            "labels": {
+                "instance": "127.0.0.1:64035",
+                "job": "prometheus"
+            },
             "up": {
                 "value": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.011689149
             },
             "labels": {
-                "instance": "127.0.0.1:42061",
-                "job": "prometheus"
+                "instance": "127.0.0.1:64035",
+                "job": "prometheus",
+                "quantile": "1"
             }
         },
         "service": {
@@ -115,8 +90,33 @@
             },
             "labels": {
                 "client_id": "consumer4",
-                "instance": "127.0.0.1:42061",
+                "instance": "127.0.0.1:64035",
                 "job": "prometheus"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.000098154
+            },
+            "labels": {
+                "instance": "127.0.0.1:64035",
+                "job": "prometheus",
+                "quantile": "0.75"
             }
         },
         "service": {
@@ -140,7 +140,7 @@
                 "rate": 0
             },
             "labels": {
-                "instance": "127.0.0.1:42061",
+                "instance": "127.0.0.1:64035",
                 "job": "prometheus",
                 "method": "GET"
             }
@@ -162,7 +162,7 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:42061",
+                "instance": "127.0.0.1:64035",
                 "job": "prometheus",
                 "listener_name": "http"
             },

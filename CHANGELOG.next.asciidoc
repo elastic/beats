@@ -233,6 +233,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms
 
 
 *Osquerybeat*
