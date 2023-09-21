@@ -494,10 +494,12 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		case textparse.EntryType:
 			buf, t := parser.Type()
 			s := string(buf)
-			_, ok = metricFamiliesByName[s]
+			fam, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &MetricFamily{Name: &s, Type: t}
 				metricFamiliesByName[s] = fam
+			} else {
+				fam.Type = t
 			}
 			mt = t
 			continue
