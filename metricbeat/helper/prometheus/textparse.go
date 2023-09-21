@@ -399,6 +399,10 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 /*
 histogramMetricName returns the metric name without the suffix and its histogram.
 OpenMetric suffixes: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes.
+Prometheus naming suffixes: https://prometheus.io/docs/instrumenting/writing_exporters/#naming.
+OpenMetric includes the extra suffix _created, that falls under default in this function.
+OpenMetric also includes _g* suffixes that are not present for Prometheus metrics and are taken care of separately in
+this function.
 */
 func histogramMetricName(name string, s float64, qv string, lbls string, t *int64, isGaugeHistogram bool, e *exemplar.Exemplar, histogramsByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
 	var histogram = &Histogram{}
@@ -577,7 +581,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) && contentType == OpenMetricsType {
+			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
 				lookupMetricName = strings.TrimSuffix(metricName, suffixTotal)
 			} else {
 				lookupMetricName = metricName
