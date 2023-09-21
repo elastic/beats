@@ -56,8 +56,8 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	}
 }
 
-func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, startTime int64, endTime int64, logProcessor *logProcessor) {
-	err := p.getLogEventsFromCloudWatch(svc, logGroup, startTime, endTime, logProcessor)
+func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroupARN string, startTime int64, endTime int64, logProcessor *logProcessor) {
+	err := p.getLogEventsFromCloudWatch(svc, logGroupARN, startTime, endTime, logProcessor)
 	if err != nil {
 		var errRequestCanceled *awssdk.RequestCanceledError
 		if errors.As(err, &errRequestCanceled) {
@@ -68,9 +68,9 @@ func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, star
 }
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
-func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroup string, startTime int64, endTime int64, logProcessor *logProcessor) error {
+func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroupARN string, startTime int64, endTime int64, logProcessor *logProcessor) error {
 	// construct FilterLogEventsInput
-	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroup)
+	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroupARN)
 	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(svc, filterLogEventsInput)
 	for paginator.HasMorePages() {
 		filterLogEventsOutput, err := paginator.NextPage(context.TODO())
@@ -88,14 +88,14 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 		p.log.Debug("done sleeping")
 
 		p.log.Debugf("Processing #%v events", len(logEvents))
-		logProcessor.processLogEvents(logEvents, logGroup, p.region)
+		logProcessor.processLogEvents(logEvents, logGroupARN, p.region)
 	}
 	return nil
 }
 
-func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTime int64, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
+func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTime int64, logGroupARN string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(logGroup),
+		LogGroupIdentifier: awssdk.String(logGroupARN),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
 	}

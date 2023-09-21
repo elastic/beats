@@ -35,9 +35,9 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 	}
 }
 
-func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroup string, regionName string) {
+func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroupARN string, regionName string) {
 	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, logGroup, regionName)
+		event := createEvent(logEvent, logGroupARN, regionName)
 		p.publish(p.ack, &event)
 	}
 }
@@ -49,7 +49,11 @@ func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event
 	p.publisher.Publish(*event)
 }
 
-func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName string) beat.Event {
+func createEvent(logEvent types.FilteredLogEvent, logGroupARN string, regionName string) beat.Event {
+	logGroup, _, err := parseARN(logGroupARN)
+	if err != nil {
+		// ????
+	}
 	event := beat.Event{
 		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: mapstr.M{
