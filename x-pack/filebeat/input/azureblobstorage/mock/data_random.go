@@ -104,7 +104,7 @@ func generateRandomBlob() []byte {
 }
 
 func createRandomData() MyData {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	return MyData{
 		ID:          rand.Intn(1000) + 1,
@@ -119,6 +119,7 @@ func getRandomString(options []string) string {
 	if len(options) == 0 {
 		return ""
 	}
-	rand.Seed(time.Now().UnixNano())
+
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 	return options[rand.Intn(len(options))]
 }

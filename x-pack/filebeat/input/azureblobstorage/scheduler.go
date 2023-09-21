@@ -74,7 +74,6 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 
 // schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) schedule(ctx context.Context) error {
-	defer s.limiter.wait()
 	if !s.src.Poll {
 		return s.scheduleOnce(ctx)
 	}
@@ -93,16 +92,21 @@ func (s *scheduler) schedule(ctx context.Context) error {
 }
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
+	defer s.limiter.wait()
 	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
+	var numBlobs, numJobs int
+
 	for pager.More() {
 		resp, err := pager.NextPage(ctx)
 		if err != nil {
 			return err
 		}
 
+		numBlobs += len(resp.Segment.BlobItems)
+		s.log.Debugf("scheduler: %d blobs fetched for current batch", len(resp.Segment.BlobItems))
+
 		var jobs []*job
 		for _, v := range resp.Segment.BlobItems {
-
 			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
 			blobCreds := &blobCredentials{
 				serviceCreds:  s.credential,
@@ -125,6 +129,8 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			jobs = s.moveToLastSeenJob(jobs)
 		}
 
+		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
 			id := fetchJobID(i, s.src.ContainerName, job.name())
@@ -134,6 +140,11 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				defer s.limiter.release()
 				job.do(ctx, id)
 			}()
+		}
+
+		s.log.Debugf("scheduler: total objects read till now: %d\nscheduler: total jobs scheduled till now: %d", numBlobs, numJobs)
+		if len(jobs) != 0 {
+			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].name(), jobs[len(jobs)-1].name())
 		}
 	}
 
@@ -200,7 +211,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 		jobsToReturn = jobs
 	}
 
-	// in a senario where there are some jobs which have a later time stamp
+	// in a senario where there are some jobs which have a later timestamp
 	// but lesser alphanumeric order and some jobs have greater alphanumeric order
 	// than the current checkpoint or partially completed jobs are present
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
