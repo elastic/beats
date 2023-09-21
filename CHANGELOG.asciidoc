@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.10.1\...v8.10.2[View commits]
 
 *Packetbeat*
 
-- Prevent panic when more than one interface is configured in fleet. {issue}36574[36574] {pull}36575[36575]
+- Prevent panic when more than one interface is configured in Fleet. {issue}36574[36574] {pull}36575[36575]
 
 ==== Added
 
