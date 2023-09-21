@@ -126,9 +126,9 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		}
 	})
 
-	logGroupARNs, err := getLogGroupARNs(svc, in.config.LogGroupNamePrefix, in.config.LogGroupName)
+	logGroupNames, err := getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.LogGroupName)
 	if err != nil {
-		return fmt.Errorf("failed to get log group ARNs: %w", err)
+		return fmt.Errorf("failed to get log group names: %w", err)
 	}
 
 	log := inputContext.Logger
@@ -143,11 +143,11 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.config.LogStreams,
 		in.config.LogStreamPrefix)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
-	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupARNs)))
-	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupARNs)
+	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
+	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
 }
 
-func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupARNs []string) error {
+func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	// listing, sequentially processes every object and then does another listing
@@ -175,17 +175,17 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 		}
 
 		workerWg.Add(availableWorkers)
-		logGroupARNsLength := len(logGroupARNs)
+		logGroupNamesLength := len(logGroupNames)
 		runningGoroutines := 0
 
-		for i := lastLogGroupOffset; i < logGroupARNsLength; i++ {
+		for i := lastLogGroupOffset; i < logGroupNamesLength; i++ {
 			if runningGoroutines >= availableWorkers {
 				break
 			}
 
 			runningGoroutines++
 			lastLogGroupOffset = i + 1
-			if lastLogGroupOffset >= logGroupARNsLength {
+			if lastLogGroupOffset >= logGroupNamesLength {
 				// release unused workers
 				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
 				for j := 0; j < availableWorkers-runningGoroutines; j++ {
@@ -194,15 +194,15 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 				lastLogGroupOffset = 0
 			}
 
-			lg := logGroupARNs[i]
-			go func(logGroupARN string, startTime int64, endTime int64) {
+			lg := logGroupNames[i]
+			go func(logGroup string, startTime int64, endTime int64) {
 				defer func() {
-					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroupARN)
+					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
 					workerWg.Done()
 					cwPoller.workerSem.Release(1)
 				}()
-				cwPoller.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroupARN)
-				cwPoller.run(svc, logGroupARN, startTime, endTime, logProcessor)
+				cwPoller.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroup)
+				cwPoller.run(svc, logGroup, startTime, endTime, logProcessor)
 			}(lg, cwPoller.startTime, cwPoller.endTime)
 		}
 	}
@@ -231,8 +231,8 @@ func parseARN(logGroupARN string) (string, string, error) {
 	return "", "", fmt.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
 }
 
-// getLogGroupARNs uses DescribeLogGroups API to retrieve all log group names
-func getLogGroupARNs(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logGroupName string) ([]string, error) {
+// getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
+func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logGroupName string) ([]string, error) {
 	if logGroupNamePrefix == "" {
 		return []string{logGroupName}, nil
 	}
@@ -243,7 +243,7 @@ func getLogGroupARNs(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logG
 	}
 
 	// make API request
-	var logGroupARNs []string
+	var logGroupNames []string
 	paginator := cloudwatchlogs.NewDescribeLogGroupsPaginator(svc, describeLogGroupsInput)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.TODO())
@@ -252,10 +252,10 @@ func getLogGroupARNs(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logG
 		}
 
 		for _, lg := range page.LogGroups {
-			logGroupARNs = append(logGroupARNs, *lg.Arn)
+			logGroupNames = append(logGroupNames, *lg.LogGroupName)
 		}
 	}
-	return logGroupARNs, nil
+	return logGroupNames, nil
 }
 
 func getStartPosition(startPosition string, currentTime time.Time, endTime int64, scanFrequency time.Duration, latency time.Duration) (int64, int64) {
