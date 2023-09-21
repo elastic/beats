@@ -399,7 +399,7 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 /*
 histogramMetricName returns the metric name without the suffix and its histogram.
 OpenMetric suffixes: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes.
-Prometheus naming suffixes: https://prometheus.io/docs/instrumenting/writing_exporters/#naming.
+Prometheus histogram suffixes: https://prometheus.io/docs/concepts/metric_types/#histogram.
 OpenMetric includes the extra suffix _created, that falls under default in this function.
 OpenMetric also includes _g* suffixes that are not present for Prometheus metrics and are taken care of separately in
 this function.
@@ -554,14 +554,15 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 				continue
 			}
 
-			if l.Name != model.QuantileLabel && l.Name != labels.BucketLabel {
+			if l.Name == model.QuantileLabel {
+				qv = lset.Get(model.QuantileLabel)
+			} else if l.Name == labels.BucketLabel {
+				qv = lset.Get(labels.BucketLabel)
+			} else {
 				lbls.WriteString(l.Name)
 				lbls.WriteString(l.Value)
-			} else if l.Name == model.QuantileLabel {
-				qv = lset.Get(model.QuantileLabel)
-			} else {
-				qv = lset.Get(labels.BucketLabel)
 			}
+
 			n := l.Name
 			v := l.Value
 
