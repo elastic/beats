@@ -84,7 +84,6 @@ type eventEvalContext struct {
 }
 
 var (
-	errMissingKeys   = errors.New("missing keys")
 	errConvertString = errors.New("can not convert to string")
 )
 
@@ -304,7 +303,7 @@ func (e *eventFieldCompiler) compileEventField(
 	ops []VariableOp,
 ) (FormatEvaler, error) {
 	if len(ops) > 1 {
-		return nil, errors.New("Too many format modifiers given")
+		return nil, errors.New("too many format modifiers given")
 	}
 
 	defaultValue := ""
@@ -348,12 +347,12 @@ func (e *eventFieldCompiler) compileTimestamp(
 	ops []VariableOp,
 ) (FormatEvaler, error) {
 	if expression[0] != '+' {
-		return nil, errors.New("No timestamp expression")
+		return nil, errors.New("no timestamp expression")
 	}
 
 	formatter, err := dtfmt.NewFormatter(expression[1:])
 	if err != nil {
-		return nil, fmt.Errorf("%v in timestamp expression", err)
+		return nil, fmt.Errorf("%w in timestamp expression", err)
 	}
 
 	e.timestamp = true
@@ -361,10 +360,6 @@ func (e *eventFieldCompiler) compileTimestamp(
 }
 
 func (e *eventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
-	type stringer interface {
-		String() string
-	}
-
 	ctx := c.(*eventEvalContext)
 	s := ctx.keys[e.index]
 	_, err := out.WriteString(s)
@@ -372,10 +367,6 @@ func (e *eventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 }
 
 func (e *defaultEventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
-	type stringer interface {
-		String() string
-	}
-
 	ctx := c.(*eventEvalContext)
 	s := ctx.keys[e.index]
 	if s == "" {
@@ -393,7 +384,7 @@ func (e *eventTimestampEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 
 func parseEventPath(field string) (string, error) {
 	field = strings.Trim(field, " \n\r\t")
-	var fields []string
+	fields := []string{}
 
 	for len(field) > 0 {
 		if field[0] != '[' {
