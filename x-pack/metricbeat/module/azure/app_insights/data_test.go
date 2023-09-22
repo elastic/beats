@@ -48,7 +48,7 @@ func newMetricsTest(ts ...*date.Time) []MetricValue {
 		},
 	}
 
-	mv := make([]MetricValue, 0, 3)
+	mv := make([]MetricValue, 0, numOfMetricValue)
 	for i := range vals {
 		mv = append(mv,
 			MetricValue{

@@ -190,7 +190,6 @@ func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 		helper               func(metrics []MetricValue)
 	)
 
-	// Review comment: Can you add some more comments to this helper func?
 	helper = func(metrics []MetricValue) {
 		for _, metric := range metrics {
 			dimensionKey := getSortedKeys(metric.SegmentName)
