@@ -410,9 +410,8 @@ func FormatEventString(
 
 	// Create a buffer if one was not provided.
 	var bufferUsed uint32
-<<<<<<< HEAD
 	if buffer == nil {
-		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
+		err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag,
 			0, nil, &bufferUsed)
 		if err != nil && err != ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
 			return err
@@ -423,29 +422,12 @@ func FormatEventString(
 		bufferUsed = 0
 	}
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag,
 		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
 	bufferUsed *= 2
 	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
 		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
 	}
-=======
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
-		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
-	}
-
-	// Get a buffer from the pool and adjust its length.
-	bb := sys.NewPooledByteBuffer()
-	defer bb.Free()
-	// The documentation for EvtFormatMessage specifies that the buffer is
-	// requested "in characters", and the buffer itself is LPWSTR, meaning the
-	// characters are WCHAR so double the value.
-	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	bb.Reserve(int(bufferUsed * 2))
-
-	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferUsed, bb.PtrAt(0), &bufferUsed)
->>>>>>> 0ad4264557 (winlogbeat/sys/wineventlog: fix unsafe pointer use (#36650))
 	if err != nil {
 		return err
 	}
