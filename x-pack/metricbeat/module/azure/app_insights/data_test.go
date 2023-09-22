@@ -17,99 +17,62 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func newMetricsTest(timestamp1, timestamp2, timestamp3 *date.Time) []MetricValue {
-	return []MetricValue{
+func newMetricsTest(ts ...*date.Time) []MetricValue {
+	type values struct {
+		SegmentName map[string]string
+		Value       map[string]interface{}
+		T           *date.Time
+	}
+
+	const numOfMetricValue = 3
+
+	if numOfMetricValue != len(ts) {
+		panic("number of arguments to newMetricsTest is not correct")
+	}
+
+	vals := [numOfMetricValue]values{
 		{
-			SegmentName: map[string]string{},
-			Value:       map[string]interface{}{},
-			Segments: []MetricValue{
-				{
-					SegmentName: map[string]string{},
-					Value:       map[string]interface{}{},
-					Segments: []MetricValue{
-						{
-							SegmentName: map[string]string{
-								"request_url_host": "",
-							},
-							Value: map[string]interface{}{
-								"users_count.unique": 44,
-							},
-							Segments: nil,
-							Interval: "",
-							Start:    nil,
-							End:      nil,
-						},
-					},
-					Interval: "",
-					Start:    nil,
-					End:      nil,
-				},
-			},
-			Interval: "P5M",
-			Start:    timestamp1,
-			End:      timestamp1,
+			SegmentName: map[string]string{"request_url_host": ""},
+			Value:       map[string]interface{}{"users_count.unique": 44},
+			T:           ts[0],
 		},
 		{
-			SegmentName: map[string]string{},
-			Value:       map[string]interface{}{},
-			Segments: []MetricValue{
-				{
-					SegmentName: map[string]string{},
-					Value:       map[string]interface{}{},
-					Segments: []MetricValue{
-						{
-							SegmentName: map[string]string{
-								"request_url_host": "",
-							},
-							Value: map[string]interface{}{
-								"sessions_count.unique": 44,
-							},
-							Segments: nil,
-							Interval: "",
-							Start:    nil,
-							End:      nil,
-						},
-					},
-					Interval: "",
-					Start:    nil,
-					End:      nil,
-				},
-			},
-			Interval: "P5M",
-			Start:    timestamp2,
-			End:      timestamp2,
+			SegmentName: map[string]string{"request_url_host": ""},
+			Value:       map[string]interface{}{"sessions_count.unique": 44},
+			T:           ts[1],
 		},
 		{
-			SegmentName: map[string]string{},
-			Value:       map[string]interface{}{},
-			Segments: []MetricValue{
-				{
-					SegmentName: map[string]string{},
-					Value:       map[string]interface{}{},
-					Segments: []MetricValue{
-						{
-							SegmentName: map[string]string{
-								"request_url_host": "localhost",
-							},
-							Value: map[string]interface{}{
-								"sessions_count.unique": 44,
-							},
-							Segments: nil,
-							Interval: "",
-							Start:    nil,
-							End:      nil,
-						},
-					},
-					Interval: "",
-					Start:    nil,
-					End:      nil,
-				},
-			},
-			Interval: "P5M",
-			Start:    timestamp3,
-			End:      timestamp3,
+			SegmentName: map[string]string{"request_url_host": "localhost"},
+			Value:       map[string]interface{}{"sessions_count.unique": 44},
+			T:           ts[2],
 		},
 	}
+
+	mv := make([]MetricValue, 0, 3)
+	for i := range vals {
+		mv = append(mv,
+			MetricValue{
+				SegmentName: map[string]string{},
+				Value:       map[string]interface{}{},
+				Segments: []MetricValue{
+					{
+						SegmentName: map[string]string{},
+						Value:       map[string]interface{}{},
+						Segments: []MetricValue{
+							{
+								SegmentName: vals[i].SegmentName,
+								Value:       vals[i].Value,
+							},
+						},
+					},
+				},
+				Interval: "P5M",
+				Start:    vals[i].T, End: vals[i].T,
+			},
+		)
+	}
+
+	return mv
 }
 
 func TestGroupMetrics(t *testing.T) {
@@ -128,10 +91,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"users_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp1,
-				End:      timestamp1,
+				Start: timestamp1,
+				End:   timestamp1,
 			},
 			{
 				SegmentName: map[string]string{
@@ -140,10 +101,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"sessions_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp2,
-				End:      timestamp2,
+				Start: timestamp2,
+				End:   timestamp2,
 			},
 		}
 
@@ -155,10 +114,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"sessions_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp3,
-				End:      timestamp3,
+				Start: timestamp3,
+				End:   timestamp3,
 			},
 		}
 
@@ -205,10 +162,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"users_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp1,
-				End:      timestamp1,
+				Start: timestamp1,
+				End:   timestamp1,
 			},
 			{
 				SegmentName: map[string]string{
@@ -217,10 +172,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"sessions_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp2,
-				End:      timestamp2,
+				Start: timestamp2,
+				End:   timestamp2,
 			},
 		}
 
@@ -232,10 +185,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"sessions_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp3,
-				End:      timestamp3,
+				Start: timestamp3,
+				End:   timestamp3,
 			},
 		}
 
@@ -247,10 +198,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"users_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp1,
-				End:      timestamp1,
+				Start: timestamp1,
+				End:   timestamp1,
 			},
 		}
 
@@ -262,10 +211,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"sessions_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp2,
-				End:      timestamp2,
+				Start: timestamp2,
+				End:   timestamp2,
 			},
 		}
 
@@ -277,10 +224,8 @@ func TestGroupMetrics(t *testing.T) {
 				Value: map[string]interface{}{
 					"sessions_count.unique": 44,
 				},
-				Segments: nil,
-				Interval: "",
-				Start:    timestamp3,
-				End:      timestamp3,
+				Start: timestamp3,
+				End:   timestamp3,
 			},
 		}
 

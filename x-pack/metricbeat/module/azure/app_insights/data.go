@@ -169,7 +169,9 @@ func groupMetricsByTime(metrics []MetricValue) map[metricTimeKey][]MetricValue {
 
 	for _, metric := range metrics {
 		// The start and end times are truncated to the nearest second.
-		// This is done to ensure that metrics that fall within the same second are grouped together, even if their actual times are slightly different.
+		// This is done to ensure that metrics that fall within the same
+		// second are grouped together, even if their actual time are
+		// slightly different.
 		timeKey := newMetricTimeKey(
 			metric.Start.Time.Truncate(time.Second),
 			metric.End.Time.Truncate(time.Second),
@@ -182,10 +184,13 @@ func groupMetricsByTime(metrics []MetricValue) map[metricTimeKey][]MetricValue {
 
 // groupMetricsByDimension groups the given metrics by their dimension keys.
 func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
-	keys := make(map[string][]MetricValue)
-	var firstStart, firstEnd *date.Time
+	var (
+		keys                 = make(map[string][]MetricValue)
+		firstStart, firstEnd *date.Time
+		helper               func(metrics []MetricValue)
+	)
 
-	var helper func(metrics []MetricValue)
+	// Review comment: Can you add some more comments to this helper func?
 	helper = func(metrics []MetricValue) {
 		for _, metric := range metrics {
 			dimensionKey := getSortedKeys(metric.SegmentName)
@@ -222,9 +227,7 @@ func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 				}
 			} else if dimensionKey != "" {
 				m := metric
-				m.Start = firstStart
-				m.End = firstEnd
-
+				m.Start, m.End = firstStart, firstEnd
 				keys[dimensionKey] = append(keys[dimensionKey], m)
 			}
 		}
