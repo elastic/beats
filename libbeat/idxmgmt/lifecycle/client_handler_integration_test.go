@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
+// //go:build integration
 
 package lifecycle
 
@@ -158,7 +158,7 @@ func makeName(base string) string {
 	if err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("%v-%v", base, id.String())
+	return fmt.Sprintf("http://%v-%v", base, id.String())
 }
 
 func getURL() string {
