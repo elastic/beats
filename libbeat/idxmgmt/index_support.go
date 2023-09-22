@@ -260,7 +260,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	// this is because the DSL API directly references the datastream,
 	// so the datastream must be created first under DSL
 	// If we're writing to a file, it doesn't matter
-	if ilmComponent.load && m.clientHandler.Mode() == lifecycle.ILM || !m.clientHandler.IsElasticsearch() {
+	if ilmComponent.load && (m.clientHandler.Mode() == lifecycle.ILM || !m.clientHandler.IsElasticsearch()) {
 		// install ilm policy
 		policyCreated, err := m.ilm.EnsurePolicy(ilmComponent.overwrite)
 		if err != nil {
