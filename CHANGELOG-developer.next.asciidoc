@@ -62,18 +62,6 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 - Fix type mismatch in libbeat/metric/system/cgroup/cgv2 when building on mips platforms. {pull}34658[34658]
-- Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
-- Allow to use metricbeat for named mssql instances. {issue}24076[24076] {pull}30859[30859]
-- Setting DEV=true when running `mage build` now correctly generates binaries without optimisations and with debug symbols {pull}31955[31955]
-- The beat.cgroup.memory.mem.usage.bytes metric is now a gauge {issue}31582[31582] {pull}32652[32652]
-- Fix the integration testcase docker port mapping for sql and oracle modules {pull}34221[34221]
-- Fix the ingest pipeline for mysql slowlog to parse schema name with dash {pull}34371[34372]
-- Fix the multiple host support for mongodb module {pull}34624[34624]
-- Skip HTTPJSON flakey test. {issue}34929[34929] {pull}35138[35138]
-- Fix ingest pipeline for panw module to parse url scheme correctly {pull}35757[35757]
-- Renamed an httpjson input metric to follow naming conventions. `httpjson_interval_pages_total` was renamed to `httpjson_interval_pages` because the `_total` suffix is reserved for counters. {issue}35933[35933] {pull}36169[36169]
-- Fixed some race conditions in tests {pull}36185[36185]
-- Re-enable HTTPJSON fixed flakey test. {issue}34929[34929] {pull}36525[36525]
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 
 ==== Added
