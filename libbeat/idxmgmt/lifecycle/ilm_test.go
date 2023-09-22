@@ -198,7 +198,7 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 			calls: []onCall{
 				onCheckExists().Return(true),
 				onHasPolicy().Return(false, nil),
-				onCreatePolicyFromConfig().Return(errOf(ErrRequestFailed)),
+				onCreatePolicyFromConfig().Return(ErrRequestFailed),
 			},
 			fail: ErrRequestFailed,
 			cfg:  cfg,
