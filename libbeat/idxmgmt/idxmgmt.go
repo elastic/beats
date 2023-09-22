@@ -124,11 +124,16 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 		if outCfg.Output.IsSet() && outCfg.Output.Name() == "elasticsearch" {
 			esClient, err := eslegclient.NewConnectedClient(outCfg.Output.Config(), info.Beat)
 			if err != nil {
-				return nil, fmt.Errorf("error creating ES client while setting up index support: %w", err)
+				// this is for the benefit of tests as well as various retry mechanisms;
+				// if we can't connect to ES, print a warning and fallback to ILM, tests won't care and non-test environments can
+				// retry the connection
+				logp.L().Warnf("could not connect to ES to determine ES type during index setup. Will default to ILM.")
+			} else {
+				if esClient.IsServerless() {
+					defaultLifecycle = lifecycle.DefaultDSLConfig(info)
+				}
 			}
-			if esClient.IsServerless() {
-				defaultLifecycle = lifecycle.DefaultDSLConfig(info)
-			}
+
 		}
 
 		// now that we have the "correct" default, unpack the rest of the config

@@ -87,17 +87,15 @@ setup.template:
 
 // Test that beat stops in case elasticsearch index is modified and name not
 func TestIndexModifiedNoName(t *testing.T) {
-	cfgRaw := `
+	cfg := `
 mockbeat:
 output:
   elasticsearch:
-    hosts: %s
     index: test
 setup.template:
   pattern: test
 `
-	esUrl := GetESURL(t, "http")
-	cfg := fmt.Sprintf(cfgRaw, esUrl.String())
+
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
