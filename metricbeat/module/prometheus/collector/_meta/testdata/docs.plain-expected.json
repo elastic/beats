@@ -11,7 +11,7 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:33379",
+                "instance": "127.0.0.1:41103",
                 "job": "prometheus"
             },
             "metrics": {
@@ -35,7 +35,7 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:33379",
+                "instance": "127.0.0.1:41103",
                 "job": "prometheus",
                 "listener_name": "http"
             },
