@@ -234,6 +234,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-Try[Try]
 ** {mito_docs}/lib#hdr-Is_Error[Is Error]
 
+* {mito_docs}/lib#Debug[Debug] — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+** {mito_docs}/lib#hdr-Debug[Debug]
+
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the {beatname_lc} user-agent string.
 
 Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
