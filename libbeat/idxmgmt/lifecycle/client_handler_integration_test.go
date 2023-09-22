@@ -158,11 +158,11 @@ func makeName(base string) string {
 	if err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("http://%v-%v", base, id.String())
+	return fmt.Sprintf("%v-%v", base, id.String())
 }
 
 func getURL() string {
-	return fmt.Sprintf("%v:%v", getEsHost(), getEsPort())
+	return fmt.Sprintf("http://%v:%v", getEsHost(), getEsPort())
 }
 
 // GetEsHost returns the Elasticsearch testing host.
