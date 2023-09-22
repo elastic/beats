@@ -95,7 +95,6 @@ output:
 setup.template:
   pattern: test
 `
-
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
