@@ -499,6 +499,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 				fam = &MetricFamily{Name: &s, Type: t}
 				metricFamiliesByName[s] = fam
 			} else {
+				// In case the metric family already exists, we need to make sure the type is correctly defined
+				// instead of being `unknown` like it was initialized for the other entry types (help and unit).
 				fam.Type = t
 			}
 			mt = t
