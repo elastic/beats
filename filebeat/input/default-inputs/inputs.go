@@ -39,6 +39,7 @@ func Init(info beat.Info, log *logp.Logger, components beater.StateStore) []v2.P
 func genericInputs(log *logp.Logger, components beater.StateStore) []v2.Plugin {
 	return []v2.Plugin{
 		filestream.Plugin(log, components),
+		filestream.ContainerPlugin(log, components),
 		kafka.Plugin(),
 		tcp.Plugin(),
 		udp.Plugin(),
