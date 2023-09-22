@@ -313,6 +313,7 @@ func TestIndexManager_Setup(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 	defaultCfg := template.DefaultConfig(info)
 	defaultLifecycleConfig := lifecycle.DefaultILMConfig(info)
+	dslLifecycleConfig := lifecycle.DefaultDSLConfig(info)
 	cases := map[string]struct {
 		cfg                   mapstr.M
 		loadTemplate, loadILM LoadMode
@@ -330,6 +331,16 @@ func TestIndexManager_Setup(t *testing.T) {
 			}),
 			policy: "test",
 			ilmCfg: defaultLifecycleConfig,
+		},
+		"template-default-dsl-config": {
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
+				"overwrite":                     "true",
+				"name":                          "test-9.9.9",
+				"pattern":                       "test-9.9.9",
+				"settings.index.lifecycle.name": "test-9.9.9",
+			}),
+			policy: "test-9.9.9",
+			ilmCfg: dslLifecycleConfig,
 		},
 		"template default ilm default with policy changed": {
 			cfg: mapstr.M{

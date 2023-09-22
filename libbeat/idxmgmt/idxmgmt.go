@@ -107,6 +107,11 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 
 	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
+		if log == nil {
+			log = logp.NewLogger(logName)
+		} else {
+			log = log.Named(logName)
+		}
 
 		// first fetch the ES output, check if we're running against serverless, use that to set a default config.
 		// the Supporter only cares about lifecycle config for checking if ILM/DSL is enabled or disabled.
@@ -149,12 +154,6 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 			if err := configRoot.Unpack(&cfg); err != nil {
 				return nil, err
 			}
-		}
-
-		if log == nil {
-			log = logp.NewLogger(logName)
-		} else {
-			log = log.Named(logName)
 		}
 
 		if err := checkTemplateESSettings(cfg.Template, cfg.Output); err != nil {
