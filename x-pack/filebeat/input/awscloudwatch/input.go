@@ -69,13 +69,13 @@ func newInput(config config) (*cloudwatchInput, error) {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
+	// if ARN is provided, parse out the region to ensure correct API calls
 	if config.LogGroupARN != "" {
-		logGroupName, regionName, err := parseARN(config.LogGroupARN)
+		_, regionName, err := parseARN(config.LogGroupARN)
 		if err != nil {
 			return nil, fmt.Errorf("parse log group ARN failed: %w", err)
 		}
 
-		config.LogGroupName = logGroupName
 		config.RegionName = regionName
 	}
 
@@ -126,9 +126,20 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		}
 	})
 
-	logGroupNames, err := getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.LogGroupName)
-	if err != nil {
-		return fmt.Errorf("failed to get log group names: %w", err)
+	// this list can contain either ARNs or plain log group names;
+	// ARNs provide support for cross-account monitoring capabilities,
+	// plain names do not (support will be added for this later).
+	var logGroups []string
+
+	if in.config.LogGroupARN != "" {
+		logGroups = []string{in.config.LogGroupARN}
+	} else if in.config.LogGroupName != "" {
+		logGroups = []string{in.config.LogGroupName}
+	} else {
+		logGroups, err = getLogGroupNamesFromPrefix(svc, in.config.LogGroupNamePrefix)
+		if err != nil {
+			return fmt.Errorf("failed to get log group names: %w", err)
+		}
 	}
 
 	log := inputContext.Logger
@@ -143,11 +154,11 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.config.LogStreams,
 		in.config.LogStreamPrefix)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
-	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
-	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
+	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroups)))
+	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroups)
 }
 
-func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
+func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroups []string) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	// listing, sequentially processes every object and then does another listing
@@ -175,17 +186,17 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 		}
 
 		workerWg.Add(availableWorkers)
-		logGroupNamesLength := len(logGroupNames)
+		logGroupsLength := len(logGroups)
 		runningGoroutines := 0
 
-		for i := lastLogGroupOffset; i < logGroupNamesLength; i++ {
+		for i := lastLogGroupOffset; i < logGroupsLength; i++ {
 			if runningGoroutines >= availableWorkers {
 				break
 			}
 
 			runningGoroutines++
 			lastLogGroupOffset = i + 1
-			if lastLogGroupOffset >= logGroupNamesLength {
+			if lastLogGroupOffset >= logGroupsLength {
 				// release unused workers
 				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
 				for j := 0; j < availableWorkers-runningGoroutines; j++ {
@@ -194,7 +205,7 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 				lastLogGroupOffset = 0
 			}
 
-			lg := logGroupNames[i]
+			lg := logGroups[i]
 			go func(logGroup string, startTime int64, endTime int64) {
 				defer func() {
 					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
@@ -231,12 +242,8 @@ func parseARN(logGroupARN string) (string, string, error) {
 	return "", "", fmt.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
 }
 
-// getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
-func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logGroupName string) ([]string, error) {
-	if logGroupNamePrefix == "" {
-		return []string{logGroupName}, nil
-	}
-
+// getLogGroupNamesFromPrefix uses DescribeLogGroups API to retrieve all log group names
+func getLogGroupNamesFromPrefix(svc *cloudwatchlogs.Client, logGroupNamePrefix string) ([]string, error) {
 	// construct DescribeLogGroupsInput
 	describeLogGroupsInput := &cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix: awssdk.String(logGroupNamePrefix),

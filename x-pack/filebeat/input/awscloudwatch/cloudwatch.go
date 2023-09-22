@@ -12,6 +12,7 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -69,7 +70,19 @@ func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, star
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
 func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroup string, startTime int64, endTime int64, logProcessor *logProcessor) error {
-	// construct FilterLogEventsInput
+	var logGroupName string
+	if arn.IsARN(logGroup) {
+		var err error
+		logGroupName, _, err = parseARN(logGroup)
+		if err != nil {
+			return fmt.Errorf("invalid log group ARN (%s): %w", logGroup, err)
+		}
+	} else {
+		logGroupName = logGroup
+	}
+
+	// construct FilterLogEventsInput using logGroup instead of logGroupName in order to
+	// support cross-account log collection using ARN
 	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroup)
 	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(svc, filterLogEventsInput)
 	for paginator.HasMorePages() {
@@ -88,14 +101,14 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 		p.log.Debug("done sleeping")
 
 		p.log.Debugf("Processing #%v events", len(logEvents))
-		logProcessor.processLogEvents(logEvents, logGroup, p.region)
+		logProcessor.processLogEvents(logEvents, logGroupName, p.region)
 	}
 	return nil
 }
 
 func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTime int64, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(logGroup),
+		LogGroupIdentifier: awssdk.String(logGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
 	}
