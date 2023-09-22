@@ -108,6 +108,10 @@ func (h *ESClientHandler) CheckEnabled() (bool, error) {
 	return checkILMEnabled(h.cfg.Enabled, h.client)
 }
 
+func (h *ESClientHandler) IsElasticsearch() bool {
+	return true
+}
+
 // HasPolicy queries Elasticsearch to see if policy with given name exists.
 func (h *ESClientHandler) HasPolicy() (bool, error) {
 	status, b, err := h.client.Request("GET", h.putPath, "", nil, nil)

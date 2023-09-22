@@ -533,6 +533,10 @@ func (h *mockClientHandler) Mode() lifecycle.Mode {
 	return h.mode
 }
 
+func (h *mockClientHandler) IsElasticsearch() bool {
+	return true
+}
+
 func (h *mockClientHandler) createILMPolicy(policy lifecycle.Policy) error {
 	h.recordOp(mockCreatePolicy)
 	h.policyName = policy.Name

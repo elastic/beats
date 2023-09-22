@@ -82,6 +82,10 @@ func (h *mockHandler) Mode() Mode {
 	return h.mode
 }
 
+func (h *mockHandler) IsElasticsearch() bool {
+	return false
+}
+
 func onCheckExists() onCall { return makeOnCall("CheckExists") }
 func (h *mockHandler) CheckExists() bool {
 	args := h.Called()

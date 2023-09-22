@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
-// ClientHandler defines the interface between a remote service and the Manager.
+// ClientHandler defines the interface between a remote service and the index Manager.
 type ClientHandler interface {
 	CheckEnabled() (bool, error)
 	HasPolicy() (bool, error)
@@ -38,6 +38,7 @@ type ClientHandler interface {
 	CheckExists() bool
 	Policy() Policy
 	Mode() Mode
+	IsElasticsearch() bool
 }
 
 type VersionCheckerClient interface {

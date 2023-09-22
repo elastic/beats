@@ -108,6 +108,10 @@ func (h *FileClientHandler) Mode() Mode {
 	return h.mode
 }
 
+func (h *FileClientHandler) IsElasticsearch() bool {
+	return false
+}
+
 // CreatePolicyFromConfig creates a lifecycle policy from its config and posts it to elasticsearch
 func (h *FileClientHandler) CreatePolicyFromConfig() error {
 	// only applicable to testing
