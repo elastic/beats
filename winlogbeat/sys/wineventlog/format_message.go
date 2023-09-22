@@ -21,7 +21,6 @@ package wineventlog
 
 import (
 	"fmt"
-	"unsafe"
 
 	"golang.org/x/sys/windows"
 
@@ -70,10 +69,10 @@ func getEventXML(metadata *PublisherMetadata, eventHandle EvtHandle) (string, er
 func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID uint32, values []EvtVariant, messageFlag EvtFormatMessageFlag) (string, error) {
 	var (
 		valuesCount = uint32(len(values))
-		valuesPtr   uintptr
+		valuesPtr   *EvtVariant
 	)
-	if len(values) > 0 {
-		valuesPtr = uintptr(unsafe.Pointer(&values[0]))
+	if len(values) != 0 {
+		valuesPtr = &values[0]
 	}
 
 	// Determine the buffer size needed (given in WCHARs).
