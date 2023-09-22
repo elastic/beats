@@ -62,6 +62,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 - Fix type mismatch in libbeat/metric/system/cgroup/cgv2 when building on mips platforms. {pull}34658[34658]
+- Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 
 ==== Added
 

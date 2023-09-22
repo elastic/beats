@@ -333,19 +333,17 @@ func CreateBookmarkFromXML(bookmarkXML string) (EvtHandle, error) {
 // CreateRenderContext creates a render context. Close must be called on
 // returned EvtHandle when finished with the handle.
 func CreateRenderContext(valuePaths []string, flag EvtRenderContextFlag) (EvtHandle, error) {
-	paths := make([]uintptr, 0, len(valuePaths))
+	paths := make([]*uint16, 0, len(valuePaths))
 	for _, path := range valuePaths {
-		utf16, err := syscall.UTF16FromString(path)
+		utf16, err := syscall.UTF16PtrFromString(path)
 		if err != nil {
 			return 0, err
 		}
-
-		paths = append(paths, reflect.ValueOf(&utf16[0]).Pointer())
+		paths = append(paths, utf16)
 	}
-
-	var pathsAddr uintptr
-	if len(paths) > 0 {
-		pathsAddr = reflect.ValueOf(&paths[0]).Pointer()
+	var pathsAddr **uint16
+	if len(paths) != 0 {
+		pathsAddr = &paths[0]
 	}
 
 	context, err := _EvtCreateRenderContext(uint32(len(paths)), pathsAddr, flag)
@@ -413,7 +411,7 @@ func FormatEventString(
 	// Create a buffer if one was not provided.
 	var bufferUsed uint32
 	if buffer == nil {
-		err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
+		err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag,
 			0, nil, &bufferUsed)
 		if err != nil && err != ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
 			return err
@@ -424,7 +422,7 @@ func FormatEventString(
 		bufferUsed = 0
 	}
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, 0, messageFlag,
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag,
 		uint32(len(buffer)/2), &buffer[0], &bufferUsed)
 	bufferUsed *= 2
 	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
