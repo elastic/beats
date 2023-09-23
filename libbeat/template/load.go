@@ -157,7 +157,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
-	if sameTemplate, _ := l.isExistingTemplateTheSame(templateName, template); sameTemplate {
+	if sameTemplate, _ := l.sameAsExistingTemplate(templateName, template); sameTemplate {
 		l.log.Infof("Not loading template %s to Elasticsearch", templateName)
 		return nil
 	}
@@ -212,7 +212,7 @@ func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
 	return true, nil
 }
 
-func (l *ESLoader) isExistingTemplateTheSame(name string, newTemplate map[string]interface{}) (bool, error) {
+func (l *ESLoader) sameAsExistingTemplate(name string, newTemplate map[string]interface{}) (bool, error) {
 	path := "/_index_template/" + name
 	status, body, err := l.client.Request("GET", path, "", nil, nil)
 	if err != nil {
