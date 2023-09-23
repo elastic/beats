@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -156,6 +157,10 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
+	if sameTemplate, _ := l.isExistingTemplateTheSame(templateName, template); sameTemplate {
+		l.log.Infof("Not loading template %s to Elasticsearch", templateName)
+		return nil
+	}
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
 	path := "/_index_template/" + templateName
 	status, body, err := l.client.Request("PUT", path, "", nil, template)
@@ -205,6 +210,29 @@ func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (l *ESLoader) isExistingTemplateTheSame(name string, newTemplate map[string]interface{}) (bool, error) {
+	path := "/_index_template/" + name
+	status, body, err := l.client.Request("GET", path, "", nil, nil)
+	if err != nil {
+		return false, fmt.Errorf("get template error: %v", err)
+	}
+	if status > http.StatusMultipleChoices {
+		return false, fmt.Errorf("get template error: %s", string(body))
+	}
+	getJson := make(map[string]interface{})
+	if err := json.Unmarshal(body, &getJson); err != nil {
+		return false, fmt.Errorf("get template error: %v", err)
+	}
+	oldTemplate := getJson["index_templates"].([]interface{})
+	if len(oldTemplate) != 1 {
+		return false, fmt.Errorf("more than one template found")
+	}
+	if reflect.DeepEqual(oldTemplate[0].(map[string]interface{}), newTemplate) {
+		return true, nil
+	}
+	return false, nil
 }
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.
