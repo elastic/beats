@@ -78,7 +78,8 @@ func (r *LineReader) Next() ([]byte, int, error) {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
-			if r.inBuffer.Len() == 0 {
+			if r.inBuffer.Len() == 0 || !(err.Error() == "file was removed" || err.Error() == "file inactive") {
+				// buffer为空，或者不属于文件被删除以及文件不活跃的错误，直接返回空
 				return nil, 0, err
 			}
 
