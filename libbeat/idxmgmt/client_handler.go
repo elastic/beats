@@ -59,20 +59,24 @@ func NewClientHandler(ilm lifecycle.ClientHandler, template template.Loader) Cli
 
 // NewESClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.LifecycleConfig) (ClientHandler, error) {
+func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.RawConfig) (ClientHandler, error) {
 	esHandler, err := lifecycle.NewESClientHandler(client, info, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES handler: %w", err)
 	}
-	return NewClientHandler(esHandler, template.NewESLoader(client)), nil
+	loader, err := template.NewESLoader(client)
+	if err != nil {
+		return nil, fmt.Errorf("error creating ES loader: %w", err)
+	}
+	return NewClientHandler(esHandler, loader), nil
 }
 
 // NewFileClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewFileClientHandler(client FileClient, info beat.Info, cfg lifecycle.LifecycleConfig) (ClientHandler, error) {
+func NewFileClientHandler(client FileClient, info beat.Info, cfg lifecycle.RawConfig) (ClientHandler, error) {
 	mgmt, err := lifecycle.NewFileClientHandler(client, info, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client handler: %w", err)
 	}
-	return NewClientHandler(mgmt, template.NewFileLoader(client, cfg)), nil
+	return NewClientHandler(mgmt, template.NewFileLoader(client, mgmt.Mode() == lifecycle.DSL)), nil
 }

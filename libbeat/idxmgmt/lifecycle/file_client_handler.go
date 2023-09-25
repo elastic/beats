@@ -18,7 +18,6 @@
 package lifecycle
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -37,17 +36,28 @@ type FileClientHandler struct {
 }
 
 // NewFileClientHandler initializes and returns a new FileClientHandler instance.
-func NewFileClientHandler(c FileClient, info beat.Info, cfg LifecycleConfig) (*FileClientHandler, error) {
-	if cfg.DSL.Enabled && cfg.ILM.Enabled {
-		return nil, errors.New("both ILM and DLM are enabled")
+func NewFileClientHandler(c FileClient, info beat.Info, cfg RawConfig) (*FileClientHandler, error) {
+	// half-unpack to distinguish between a config section that's been explicitly enabled,
+	// that way we can set a proper default
+
+	if cfg.DSL.Enabled() && cfg.ILM.Enabled() {
+		return nil, fmt.Errorf("only one lifecycle management type can be used, but both ILM and DSL are enabled")
 	}
 
-	rawName := cfg.ILM.PolicyName
-	if cfg.DSL.Enabled {
-		rawName = cfg.DSL.PolicyName
+	lifecycleCfg := Config{}
+	var err error
+	if cfg.DSL.Enabled() {
+		lifecycleCfg = DefaultDSLConfig(info).DSL
+		err = cfg.DSL.Unpack(&lifecycleCfg)
+	} else {
+		lifecycleCfg = DefaultILMConfig(info).ILM
+		err = cfg.ILM.Unpack(&lifecycleCfg)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error unpacking config: %w", err)
 	}
 
-	name, err := ApplyStaticFmtstr(info, rawName)
+	name, err := ApplyStaticFmtstr(info, lifecycleCfg.PolicyName)
 	if err != nil {
 		return nil, fmt.Errorf("error creating policy name: %w", err)
 	}
@@ -55,20 +65,18 @@ func NewFileClientHandler(c FileClient, info beat.Info, cfg LifecycleConfig) (*F
 	// set defaults
 	defaultPolicy := DefaultILMPolicy
 	mode := ILM
-	configType := cfg.ILM
 
-	if cfg.DSL.Enabled {
+	if cfg.DSL.Enabled() {
 		defaultPolicy = DefaultDSLPolicy
 		mode = DSL
-		configType = cfg.DSL
 	}
 
-	policy, err := createPolicy(configType, info, defaultPolicy)
+	policy, err := createPolicy(lifecycleCfg, info, defaultPolicy)
 	if err != nil {
 		return nil, fmt.Errorf("error creating policy: %w", err)
 	}
 
-	return &FileClientHandler{client: c, info: info, cfg: configType,
+	return &FileClientHandler{client: c, info: info, cfg: lifecycleCfg,
 		defaultPolicy: defaultPolicy, name: name, policy: policy, mode: mode}, nil
 
 }

@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -60,15 +60,31 @@ func (client *mockESClient) Request(method, path string, pipeline string, params
 
 func TestESSetup(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
-	bothEnabledConfig := DefaultDSLConfig(info)
-	bothEnabledConfig.ILM.Enabled = true
 
-	bothDisabledConfig := DefaultDSLConfig(info)
-	bothDisabledConfig.DSL.Enabled = false
+	defaultILMCfg := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
+
+	defaultDSLCfg := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
+
+	bothDisabledConfig := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
+
+	bothEnabledConfig := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
+
 	cases := map[string]struct {
 		serverless      bool
 		serverHasPolicy bool
-		cfg             LifecycleConfig
+		cfg             RawConfig
 		err             bool
 		expectedPUTPath string
 		expectedName    string
@@ -77,7 +93,7 @@ func TestESSetup(t *testing.T) {
 	}{
 		"serverless-with-correct-defaults": {
 			serverless:      true,
-			cfg:             DefaultDSLConfig(info),
+			cfg:             defaultDSLCfg,
 			err:             false,
 			expectedPUTPath: "/_data_stream/test-9.9.9/_lifecycle",
 			expectedName:    "test-9.9.9",
@@ -85,78 +101,64 @@ func TestESSetup(t *testing.T) {
 		},
 		"stateful-with-correct-default": {
 			serverless:      false,
-			cfg:             DefaultILMConfig(info),
+			cfg:             defaultILMCfg,
 			err:             false,
 			expectedPUTPath: "/_ilm/policy/test",
 			expectedName:    "test",
 			expectedPolicy:  DefaultILMPolicy,
 		},
 		"serverless-with-wrong-defaults": {
-			serverless:      true,
-			cfg:             DefaultILMConfig(info),
-			err:             false,
-			expectedPUTPath: "/_data_stream/test-9.9.9/_lifecycle",
-			expectedName:    "test-9.9.9",
-			expectedPolicy:  DefaultDSLPolicy,
-		},
-		"stateful-with-wrong-defaults": {
-			serverless:      false,
-			cfg:             DefaultDSLConfig(info),
-			err:             false,
-			expectedPUTPath: "/_ilm/policy/test",
-			expectedName:    "test",
-		},
-		"serverless-with-both-enabled": {
-			serverless:      true,
-			cfg:             bothEnabledConfig,
-			err:             false,
-			expectedPUTPath: "/_data_stream/test-9.9.9/_lifecycle",
-			expectedName:    "test-9.9.9",
-			expectedPolicy:  DefaultDSLPolicy,
-		},
-		"stateful-with-both-enabled": {
-			serverless:      false,
-			cfg:             bothEnabledConfig,
-			err:             false,
-			expectedPUTPath: "/_ilm/policy/test",
-			expectedName:    "test",
-			expectedPolicy:  DefaultILMPolicy,
-		},
-		"serverless-with-bare-PolicyName": {
 			serverless: true,
-			cfg:        LifecycleConfig{DSL: Config{Enabled: true, CheckExists: true, PolicyName: *fmtstr.MustCompileEvent("")}},
+			cfg:        defaultILMCfg,
 			err:        true,
 		},
-		"everything-disabled": {
+		"stateful-with-wrong-defaults": {
+			serverless: false,
+			cfg:        defaultDSLCfg,
+			err:        true,
+		},
+		"serverless-with-both-enabled": {
 			serverless: true,
-			cfg:        LifecycleConfig{DSL: Config{Enabled: false}, ILM: Config{Enabled: false}},
+			cfg:        bothEnabledConfig,
+			err:        true,
+		},
+		"stateful-with-both-enabled": {
+			serverless: false,
+			cfg:        bothEnabledConfig,
 			err:        true,
 		},
 		"custom-policy-name": {
 			serverless: false,
-			cfg: LifecycleConfig{ILM: Config{Enabled: true, CheckExists: true,
-				PolicyName: *fmtstr.MustCompileEvent("test-%{[beat.version]}")}},
+			cfg: RawConfig{
+				ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test-%{[beat.version]}", "check_exists": true}),
+			},
 			err:          false,
 			expectedName: "test-9.9.9",
 		},
 		"custom-policy-file": {
 			serverless: false,
-			cfg: LifecycleConfig{ILM: Config{Enabled: true, CheckExists: true,
-				PolicyFile: "./testfiles/custom.json", PolicyName: *fmtstr.MustCompileEvent("test")}},
+			cfg: RawConfig{
+				ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true,
+					"policy_name":  "test",
+					"policy_file":  "./testfiles/custom.json",
+					"check_exists": true}),
+			},
 			expectedPolicy: mapstr.M{"hello": "world"},
 			err:            false,
 		},
 		"do-not-overwrite": {
 			serverless:     true,
-			cfg:            DefaultDSLConfig(info),
+			cfg:            defaultDSLCfg,
 			err:            false,
 			existingPolicy: mapstr.M{"existing": "policy"},
 			expectedPolicy: mapstr.M{"existing": "policy"},
 		},
 		"do-overwrite": {
 			serverless: true,
-			cfg: LifecycleConfig{DSL: Config{Enabled: true, Overwrite: true, CheckExists: true,
-				PolicyName: *fmtstr.MustCompileEvent("test")}},
+			cfg: RawConfig{
+				DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "overwrite": true,
+					"check_exists": true, "policy_name": "test"}),
+			},
 			err:            false,
 			existingPolicy: mapstr.M{"existing": "policy"},
 			expectedPolicy: DefaultDSLPolicy,

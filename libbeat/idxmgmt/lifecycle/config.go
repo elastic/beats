@@ -20,6 +20,7 @@ package lifecycle
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -44,6 +45,13 @@ type Config struct {
 type LifecycleConfig struct {
 	ILM Config `config:"setup.ilm"`
 	DSL Config `config:"setup.dsl"`
+}
+
+// RawConfig half-unpacks the policy config, allowing us to tell if a user has explicitly
+// enabled  a given config value
+type RawConfig struct {
+	ILM *config.C `config:"setup.ilm"`
+	DSL *config.C `config:"setup.dsl"`
 }
 
 // DefaultILMPolicy defines the default policy to be used if no custom policy is

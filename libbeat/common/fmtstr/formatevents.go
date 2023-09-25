@@ -156,12 +156,12 @@ func CompileEvent(in string) (*EventFormatString, error) {
 func (fs *EventFormatString) Unpack(v interface{}) error {
 	s, err := tryConvString(v)
 	if err != nil {
-		return err
+		return fmt.Errorf("error converting type %T to event formatter: %w", v, err)
 	}
 
 	tmp, err := CompileEvent(s)
 	if err != nil {
-		return err
+		return fmt.Errorf("error compiling event formatter: %w", err)
 	}
 
 	// init fs from tmp
@@ -169,7 +169,7 @@ func (fs *EventFormatString) Unpack(v interface{}) error {
 	return nil
 }
 
-// IsInitialized returns true if the underlying event formatted is prepared to format an event
+// IsInitialized returns true if the underlying event formatter is prepared to format an event
 func (fs *EventFormatString) IsInitialized() bool {
 	return fs.formatter != nil
 }

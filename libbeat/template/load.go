@@ -26,7 +26,6 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -76,15 +75,18 @@ type templateBuilder struct {
 }
 
 // NewESLoader creates a new template loader for ES
-func NewESLoader(client ESClient) *ESLoader {
-	return &ESLoader{client: client, builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}
+func NewESLoader(client ESClient) (*ESLoader, error) {
+	if client == nil {
+		return nil, errors.New("can not load template without active Elasticsearch client")
+	}
+	return &ESLoader{client: client, builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}, nil
 }
 
 // NewFileLoader creates a new template loader for the given file.
-func NewFileLoader(c FileClient, cfg lifecycle.LifecycleConfig) *FileLoader {
+func NewFileLoader(c FileClient, isServerless bool) *FileLoader {
 	// other components of the file loader will fail if both ILM and DSL are set,
 	// so at this point it's fairly safe to just pass cfg.DSL.Enabled
-	return &FileLoader{client: c, builder: newTemplateBuilder(cfg.DSL.Enabled), log: logp.NewLogger("file_template_loader")}
+	return &FileLoader{client: c, builder: newTemplateBuilder(isServerless), log: logp.NewLogger("file_template_loader")}
 }
 
 func newTemplateBuilder(serverlessMode bool) *templateBuilder {
@@ -95,9 +97,6 @@ func newTemplateBuilder(serverlessMode bool) *templateBuilder {
 // In case the template is not already loaded or overwriting is enabled, the
 // template is built and written to index.
 func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
-	if l.client == nil {
-		return errors.New("can not load template without active Elasticsearch client")
-	}
 
 	// build template from config
 	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)

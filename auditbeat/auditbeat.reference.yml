@@ -1337,17 +1337,17 @@ setup.template.settings:
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
 
-# ========================= Datastream Lifecycle (DSL) =========================
+# ======================== Data Stream Lifecycle (DSL) =========================
 
-# Configure Datastream Lifecycle to manage datastreams while connected to serverless elasticsearch. 
-# These settings are mutually excusive with ILM settings.
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
 
 # Enable DSL support. Valid values are true, or false.
 #setup.dsl.enabled: true
 
 # Set the lifecycle policy name. The default policy name is
 # 'beatname'.
-#setup.dsl.policy_name: "mypolicy"
+#setup.dsl.policy_name: "auditbeat"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
 # to load your own lifecycle policy.

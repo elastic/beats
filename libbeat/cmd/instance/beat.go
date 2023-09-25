@@ -135,7 +135,7 @@ type beatConfig struct {
 	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
 	// ILM settings
-	LifecycleConfig lifecycle.LifecycleConfig `config:",inline"`
+	LifecycleConfig lifecycle.RawConfig `config:",inline"`
 
 	// central management settings
 	Management *config.C `config:"management"`
@@ -778,8 +778,6 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	b.RawConfig = cfg
-	// set default before we unpack
-	b.Config.LifecycleConfig = lifecycle.DefaultILMConfig(b.Info)
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %w", err)

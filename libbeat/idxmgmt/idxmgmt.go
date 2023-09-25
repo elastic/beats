@@ -152,7 +152,7 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 		}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("error unpacking cfg settings while setting up index support: %w", err)
 			}
 		}
 

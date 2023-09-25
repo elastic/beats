@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -39,34 +38,44 @@ type ESClientHandler struct {
 }
 
 // NewESClientHandler initializes and returns an ESClientHandler
-func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESClientHandler, error) {
-	// trying to protect against config confusion;
-	// it's possible that the "wrong" lifecycle got enabled somehow,
-	// this is a last-ditch effort to fix things
-	if (!cfg.DSL.Enabled && cfg.ILM.Enabled && c.IsServerless()) || (!cfg.ILM.Enabled && cfg.DSL.Enabled && !c.IsServerless()) {
-		log := logp.L()
-		log.Warnf("lifecycle config setup does not match the type of ES we're connected to. serverless=%v, yet config ILM=%v DSL=%v. Will default to serverless=%v",
-			c.IsServerless(), cfg.ILM.Enabled, cfg.DSL.Enabled, c.IsServerless())
-		// assume we want some kind of lifecycle management
-		if c.IsServerless() {
-			cfg.DSL.Enabled = true
-		} else {
-			cfg.ILM.Enabled = true
-		}
+func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHandler, error) {
+	if !cfg.DSL.Enabled() && cfg.ILM.Enabled() && c.IsServerless() {
+		return nil, fmt.Errorf("ILM is enabled but %s is connected to a serverless instance; ILM isn't supported on Serverless Elasticsearch", info.Beat)
 	}
 
-	// by using IsServerless here, we're essentially letting the remote setting override the user config
-	policyName := cfg.ILM.PolicyName
+	if !cfg.ILM.Enabled() && cfg.DSL.Enabled() && !c.IsServerless() {
+		return nil, fmt.Errorf("DSL is enabled but %s is connected to a stateful instance; DSL is only supported on Serverless Elasticsearch", info.Beat)
+	}
+
+	if cfg.ILM.Enabled() && cfg.DSL.Enabled() {
+		return nil, fmt.Errorf("only one lifecycle management type can be used, but both ILM and DSL are enabled")
+	}
+
+	// set default based on ES connection, then unpack user config, if set
+	lifecycleCfg := Config{}
+	var err error
 	if c.IsServerless() {
-		policyName = cfg.DSL.PolicyName
+		lifecycleCfg = DefaultDSLConfig(info).DSL
+		if cfg.DSL != nil {
+			err = cfg.DSL.Unpack(&lifecycleCfg)
+		}
+
+	} else {
+		lifecycleCfg = DefaultILMConfig(info).ILM
+		if cfg.ILM != nil {
+			err = cfg.ILM.Unpack(&lifecycleCfg)
+		}
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error unpacking lifecycle config: %w", err)
 	}
 
 	// create name and policy
-	name, err := ApplyStaticFmtstr(info, policyName)
+	name, err := ApplyStaticFmtstr(info, lifecycleCfg.PolicyName)
 	if err != nil {
 		return nil, fmt.Errorf("error applying format string to policy name: %w", err)
 	}
-	if name == "" && (cfg.ILM.Enabled || cfg.DSL.Enabled) {
+	if name == "" && lifecycleCfg.Enabled {
 		return nil, errors.New("could not generate usable policy name from config. Check setup.*.policy_name fields")
 	}
 
@@ -74,27 +83,23 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESCli
 	defaultPolicy := DefaultILMPolicy
 	mode := ILM
 	path := fmt.Sprintf("%s/%s", esILMPath, name)
-	configType := cfg.ILM
 
 	if c.IsServerless() {
 		defaultPolicy = DefaultDSLPolicy
 		mode = DSL
 		path = fmt.Sprintf("/_data_stream/%s/_lifecycle", name)
-		configType = cfg.DSL
 	}
 
-	// these checks should happen elsewhere, but other components probaby aren't expecting a soft failure at this stage,
-	// so double-check to see if lifecycles are enabled before creating a policy.
 	var policy Policy
-	if cfg.ILM.Enabled || cfg.DSL.Enabled {
-		policy, err = createPolicy(configType, info, defaultPolicy)
+	if lifecycleCfg.Enabled { // these are-enabled checks should happen elsewhere, but check again here just in case
+		policy, err = createPolicy(lifecycleCfg, info, defaultPolicy)
 		if err != nil {
 			return nil, fmt.Errorf("error creating DSL policy: %w", err)
 		}
 	}
 
 	return &ESClientHandler{client: c,
-		info: info, cfg: configType,
+		info: info, cfg: lifecycleCfg,
 		defaultPolicy: defaultPolicy, name: name, putPath: path, policy: policy, mode: mode}, nil
 }
 
@@ -147,7 +152,7 @@ func (h *ESClientHandler) CreatePolicyFromConfig() error {
 		return h.putPolicyToES(h.putPath, *h.cfg.policyRaw)
 	}
 
-	err := h.createAndPutPolicy(h.cfg, h.info, h.defaultPolicy)
+	err := h.createAndPutPolicy(h.cfg, h.info)
 	if err != nil {
 		return fmt.Errorf("error creating policy from config: %w", err)
 	}
@@ -170,7 +175,7 @@ func (h *ESClientHandler) Mode() Mode {
 }
 
 // creates a policy from config, then performs the PUT request to ES
-func (h *ESClientHandler) createAndPutPolicy(cfg Config, info beat.Info, defaultPolicy mapstr.M) error {
+func (h *ESClientHandler) createAndPutPolicy(cfg Config, info beat.Info) error {
 	err := h.putPolicyToES(h.putPath, h.policy)
 	if err != nil {
 		return fmt.Errorf("error submitting policy: %w", err)

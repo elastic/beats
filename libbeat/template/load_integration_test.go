@@ -68,7 +68,9 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
+	loader, err := NewESLoader(client)
+	require.NoError(t, err)
+	s := testSetup{t: t, client: client, loader: loader, config: cfg}
 	client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
 	s.requireDataStreamDoesNotExist("")
 	client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
@@ -81,7 +83,9 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	return &testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
+	loader, err := NewESLoader(client)
+	require.NoError(t, err)
+	return &testSetup{t: t, client: client, loader: loader, config: cfg}
 }
 
 func (ts *testSetup) mustLoadTemplate(body map[string]interface{}) {
@@ -198,15 +202,6 @@ func TestESLoader_Load(t *testing.T) {
 			err := setup.loader.Load(setup.config, beatInfo, nil, false)
 			require.Error(t, err)
 			require.Contains(t, err.Error(), "version is not semver")
-		})
-
-		t.Run("no Elasticsearch client", func(t *testing.T) {
-			setup := newTestSetupWithESClient(t, nil, TemplateConfig{Enabled: true})
-
-			beatInfo := beat.Info{Version: "9.9.9"}
-			err := setup.loader.Load(setup.config, beatInfo, nil, false)
-			require.Error(t, err)
-			require.Contains(t, err.Error(), "can not load template without active Elasticsearch client")
 		})
 
 		t.Run("cannot check template", func(t *testing.T) {
