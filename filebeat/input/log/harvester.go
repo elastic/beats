@@ -204,6 +204,8 @@ func (h *Harvester) Run() error {
 			removedCheckTick = time.After(h.config.ScanFrequency)
 		}
 
+		removedTick := make(<-chan time.Time)
+
 	L:
 		for {
 			select {
@@ -215,13 +217,16 @@ func (h *Harvester) Run() error {
 			case <-removedCheckTick:
 				// 通过旁路判断文件是否被删除，避免输出堵塞时未能执行 errorChecks 导致已删文件的 fd 没有被及时释放的问题
 				if h.reader.fileReader.log.fs.Removed() {
-					logp.Info("Closing harvester because file was removed: %s", source)
-					break L
+					logp.Info("Closing harvester because file was removed: %s, wait for 60s", source)
+					// 等待 60s 才停止，避免日志没来得及采完就关掉导致漏采
+					removedTick = time.After(60 * time.Second)
 				} else {
 					logp.Debug("harvester", "File was not removed: %s, check again after %v", source, h.config.ScanFrequency)
 					// update timer
 					removedCheckTick = time.After(h.config.ScanFrequency)
 				}
+			case <-removedTick:
+				break L
 			// Required when reader loop returns and reader finished
 			case <-h.done:
 				break L
@@ -232,6 +237,8 @@ func (h *Harvester) Run() error {
 
 		// Close reader
 		h.reader.Stop()
+
+		logp.Info("Harvester stopped: %s", source)
 	}(h.state.Source)
 
 	logp.Info("Harvester started for file: %s, offset: %d", h.state.Source, h.state.Offset)

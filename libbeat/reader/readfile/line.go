@@ -78,7 +78,54 @@ func (r *LineReader) Next() ([]byte, int, error) {
 		// read next 'potential' line from input buffer/reader
 		err := r.advance()
 		if err != nil {
-			return nil, 0, err
+			if r.inBuffer.Len() == 0 || !(err.Error() == "file was removed" || err.Error() == "file inactive") {
+				// buffer为空，或者不属于文件被删除以及文件不活跃的错误，直接返回空
+				// return and reset consumed bytes count
+				sz := r.byteCount
+				r.byteCount = 0
+				return nil, sz, err
+			}
+
+			logp.Info("LineReader get an advance err: %s, send all %d bytes in buffer", err, r.inBuffer.Len())
+			// Found EOF and collectOnEOF is true
+			// -> decode input sequence into outBuffer
+			// let's take whole buffer len without len(nl) if it ends with it
+			end := r.inBuffer.Len()
+			if bytes.HasSuffix(r.inBuffer.Bytes(), r.nl) {
+				end -= len(r.nl)
+			}
+
+			sz, err := r.decode(end)
+			if err != nil {
+				logp.Err("Error decoding line: %s", err)
+				// In case of error increase size by unencoded length
+				sz = r.inBuffer.Len()
+			}
+
+			// Consume transformed bytes from input buffer
+			_ = r.inBuffer.Advance(sz)
+			r.inBuffer.Reset()
+
+			// continue scanning input buffer from last position + 1
+			r.inOffset = end - sz
+			if r.inOffset < 0 {
+				// fix inOffset if '\n' has encoding > 8bits + firl line has been decoded
+				r.inOffset = 0
+			}
+			// output buffer contains untile EOF. Extract
+			// byte slice from buffer and reset output buffer.
+			bytes, err := r.outBuffer.Collect(r.outBuffer.Len())
+			r.outBuffer.Reset()
+			if err != nil {
+				// This should never happen as otherwise we have a broken state
+				panic(err)
+			}
+
+			// return and reset consumed bytes count
+			sz = r.byteCount
+			r.byteCount = 0
+			return bytes, sz, err
+
 		}
 
 		// Check last decoded byte really being '\n' also unencoded
