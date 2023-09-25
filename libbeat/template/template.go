@@ -52,10 +52,12 @@ type Template struct {
 	config          TemplateConfig
 	migration       bool
 	priority        int
+	isServerless    bool
 }
 
 // New creates a new template instance
 func New(
+	isServerless bool,
 	beatVersion string,
 	beatName string,
 	elasticLicensed bool,
@@ -135,6 +137,7 @@ func New(
 		config:          config,
 		migration:       migration,
 		priority:        config.Priority,
+		isServerless:    isServerless,
 	}, nil
 }
 
@@ -196,6 +199,10 @@ func (t *Template) LoadMinimal() mapstr.M {
 			nil, nil,
 			mapstr.M(t.config.Settings.Source))
 	}
+	// delete default settings not available on serverless
+	if _, ok := t.config.Settings.Index["number_of_shards"]; ok && t.isServerless {
+		delete(t.config.Settings.Index, "number_of_shards")
+	}
 	templ["settings"] = mapstr.M{
 		"index": t.config.Settings.Index,
 	}
@@ -240,6 +247,7 @@ func (t *Template) generateComponent(properties, analyzers mapstr.M, dynamicTemp
 				"index": buildIdxSettings(
 					t.esVersion,
 					t.config.Settings.Index,
+					t.isServerless,
 				),
 			},
 		},
@@ -289,7 +297,7 @@ func buildDynTmpl(ver version.V) mapstr.M {
 	}
 }
 
-func buildIdxSettings(ver version.V, userSettings mapstr.M) mapstr.M {
+func buildIdxSettings(ver version.V, userSettings mapstr.M, isServerless bool) mapstr.M {
 	indexSettings := mapstr.M{
 		"refresh_interval": "5s",
 		"mapping": mapstr.M{
@@ -306,7 +314,12 @@ func buildIdxSettings(ver version.V, userSettings mapstr.M) mapstr.M {
 
 	indexSettings.Put("query.default_field", fields)
 
-	indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
+	// deal with settings that aren't available on serverless
+	if isServerless {
+		userSettings.Delete("number_of_shards")
+	} else {
+		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
+	}
 
 	indexSettings.DeepUpdate(userSettings)
 	return indexSettings

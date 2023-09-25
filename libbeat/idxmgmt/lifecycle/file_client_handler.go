@@ -38,7 +38,6 @@ type FileClientHandler struct {
 
 // NewFileClientHandler initializes and returns a new FileClientHandler instance.
 func NewFileClientHandler(c FileClient, info beat.Info, cfg LifecycleConfig) (*FileClientHandler, error) {
-	// default to ILM for file handler
 	if cfg.DSL.Enabled && cfg.ILM.Enabled {
 		return nil, errors.New("both ILM and DLM are enabled")
 	}
@@ -108,6 +107,7 @@ func (h *FileClientHandler) Mode() Mode {
 	return h.mode
 }
 
+// IsElasticsearch returns false
 func (h *FileClientHandler) IsElasticsearch() bool {
 	return false
 }

@@ -113,7 +113,7 @@ func createTestTemplate(t *testing.T, beatVersion, esVersion string, config Temp
 	beatVersion = getVersion(beatVersion)
 	esVersion = getVersion(esVersion)
 	ver := libversion.MustNew(esVersion)
-	template, err := New(beatVersion, "testbeat", false, *ver, config, false)
+	template, err := New(false, beatVersion, "testbeat", false, *ver, config, false)
 	if err != nil {
 		t.Fatalf("Failed to create the template: %+v", err)
 	}

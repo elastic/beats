@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 
@@ -37,13 +38,25 @@ func TestFileLoader_Load(t *testing.T) {
 	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
 
 	for name, test := range map[string]struct {
-		settings TemplateSettings
-		body     mapstr.M
-		fields   []byte
-		want     mapstr.M
-		wantErr  error
+		settings          TemplateSettings
+		lifecycleSettings lifecycle.LifecycleConfig
+		body              mapstr.M
+		fields            []byte
+		want              mapstr.M
+		wantErr           error
 	}{
 		"load minimal config info": {
+			lifecycleSettings: lifecycle.DefaultILMConfig(info),
+			body: mapstr.M{
+				"index_patterns": []string{"mock-7.0.0"},
+				"data_stream":    struct{}{},
+				"priority":       150,
+				"template": mapstr.M{
+					"settings": mapstr.M{"index": nil}},
+			},
+		},
+		"load minimal config info serverless": {
+			lifecycleSettings: lifecycle.DefaultDSLConfig(info),
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -53,7 +66,8 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load minimal config with index settings": {
-			settings: TemplateSettings{Index: mapstr.M{"code": "best_compression"}},
+			lifecycleSettings: lifecycle.DefaultILMConfig(info),
+			settings:          TemplateSettings{Index: mapstr.M{"code": "best_compression"}},
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -63,7 +77,8 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load minimal config with source settings": {
-			settings: TemplateSettings{Source: mapstr.M{"enabled": false}},
+			lifecycleSettings: lifecycle.DefaultILMConfig(info),
+			settings:          TemplateSettings{Source: mapstr.M{"enabled": false}},
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -80,6 +95,7 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load config and in-line analyzer fields": {
+			lifecycleSettings: lifecycle.DefaultILMConfig(info),
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
@@ -178,6 +194,7 @@ func TestFileLoader_Load(t *testing.T) {
 			},
 		},
 		"load config and in-line analyzer fields with name collision": {
+			lifecycleSettings: lifecycle.DefaultILMConfig(info),
 			body: mapstr.M{
 				"index_patterns": []string{"mock-7.0.0"},
 				"settings":       mapstr.M{"index": nil},
@@ -210,7 +227,7 @@ func TestFileLoader_Load(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			fc := newFileClient(ver)
-			fl := NewFileLoader(fc)
+			fl := NewFileLoader(fc, test.lifecycleSettings)
 
 			cfg := DefaultConfig(info)
 			cfg.Settings = test.settings

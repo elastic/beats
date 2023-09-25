@@ -45,8 +45,8 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESCli
 	// this is a last-ditch effort to fix things
 	if (!cfg.DSL.Enabled && cfg.ILM.Enabled && c.IsServerless()) || (!cfg.ILM.Enabled && cfg.DSL.Enabled && !c.IsServerless()) {
 		log := logp.L()
-		log.Warnf("lifecycle config setup does not the type of ES we're connected to. serverless=%b, yet config ILM=%b DSL=%b",
-			c.IsServerless(), cfg.ILM.Enabled, cfg.DSL.Enabled)
+		log.Warnf("lifecycle config setup does not match the type of ES we're connected to. serverless=%v, yet config ILM=%v DSL=%v. Will default to serverless=%v",
+			c.IsServerless(), cfg.ILM.Enabled, cfg.DSL.Enabled, c.IsServerless())
 		// assume we want some kind of lifecycle management
 		if c.IsServerless() {
 			cfg.DSL.Enabled = true

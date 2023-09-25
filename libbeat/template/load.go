@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -49,6 +50,7 @@ type ESLoader struct {
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() version.V
+	IsServerless() bool
 }
 
 // FileLoader implements Loader interface for loading templates to a File.
@@ -69,21 +71,24 @@ type StatusError struct {
 }
 
 type templateBuilder struct {
-	log *logp.Logger
+	log          *logp.Logger
+	isServerless bool
 }
 
 // NewESLoader creates a new template loader for ES
 func NewESLoader(client ESClient) *ESLoader {
-	return &ESLoader{client: client, builder: newTemplateBuilder(), log: logp.NewLogger("template_loader")}
+	return &ESLoader{client: client, builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}
 }
 
 // NewFileLoader creates a new template loader for the given file.
-func NewFileLoader(c FileClient) *FileLoader {
-	return &FileLoader{client: c, builder: newTemplateBuilder(), log: logp.NewLogger("file_template_loader")}
+func NewFileLoader(c FileClient, cfg lifecycle.LifecycleConfig) *FileLoader {
+	// other components of the file loader will fail if both ILM and DSL are set,
+	// so at this point it's fairly safe to just pass cfg.DSL.Enabled
+	return &FileLoader{client: c, builder: newTemplateBuilder(cfg.DSL.Enabled), log: logp.NewLogger("file_template_loader")}
 }
 
-func newTemplateBuilder() *templateBuilder {
-	return &templateBuilder{log: logp.NewLogger("template")}
+func newTemplateBuilder(serverlessMode bool) *templateBuilder {
+	return &templateBuilder{log: logp.NewLogger("template"), isServerless: serverlessMode}
 }
 
 // Load checks if the index mapping template should be loaded.
@@ -233,7 +238,7 @@ func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVers
 		b.log.Info("template config not enabled")
 		return nil, nil
 	}
-	tmpl, err := New(info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
+	tmpl, err := New(b.isServerless, info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template instance: %w", err)
 	}
