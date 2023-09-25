@@ -325,6 +325,7 @@ const (
 	suffixSum     = "_sum"
 	suffixBucket  = "_bucket"
 	suffixCreated = "_created"
+	suffixInfo    = "_info"
 )
 
 // Counters have _total suffix
@@ -604,7 +605,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
-			lookupMetricName = metricName
+			// remove the _info suffix
+			lookupMetricName = strings.TrimSuffix(metricName, suffixInfo)
 		case textparse.MetricTypeSummary:
 			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), summariesByName)
 			metric.Label = labelPairs
@@ -654,7 +656,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 
 		fam, ok = metricFamiliesByName[lookupMetricName]
 		if !ok {
-			fam = &MetricFamily{Type: mt}
+			// If the family metric does not exist, create a new one with the lookup name
+			fam = &MetricFamily{Name: &lookupMetricName, Type: mt}
 			metricFamiliesByName[lookupMetricName] = fam
 		}
 

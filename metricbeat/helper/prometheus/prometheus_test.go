@@ -1242,7 +1242,7 @@ cc_seconds_created 123.456`
 	info :=
 		`# TYPE info_metric info
 # HELP info_metric help
-info_metric{foo="bar"} 1 2`
+info_metric_info{foo="bar"} 1 2`
 	infoMetricFamily := MetricFamily{
 		Name: stringp("info_metric"),
 		Help: stringp("help"),
@@ -1256,7 +1256,7 @@ info_metric{foo="bar"} 1 2`
 						Value: "bar",
 					},
 				},
-				Name: stringp("info_metric"),
+				Name: stringp("info_metric_info"),
 				Info: &Info{
 					Value: int64p(1),
 				},
