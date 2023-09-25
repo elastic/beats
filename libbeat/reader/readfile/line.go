@@ -80,7 +80,10 @@ func (r *LineReader) Next() ([]byte, int, error) {
 		if err != nil {
 			if r.inBuffer.Len() == 0 || !(err.Error() == "file was removed" || err.Error() == "file inactive") {
 				// buffer为空，或者不属于文件被删除以及文件不活跃的错误，直接返回空
-				return nil, 0, err
+				// return and reset consumed bytes count
+				sz := r.byteCount
+				r.byteCount = 0
+				return nil, sz, err
 			}
 
 			logp.Info("LineReader get an advance err: %s, send all %d bytes in buffer", err, r.inBuffer.Len())
