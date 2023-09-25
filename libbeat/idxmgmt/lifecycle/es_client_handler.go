@@ -83,9 +83,14 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESCli
 		configType = cfg.DSL
 	}
 
-	policy, err := createPolicy(configType, info, defaultPolicy)
-	if err != nil {
-		return nil, fmt.Errorf("error creating DSL policy: %w", err)
+	// these checks should happen elsewhere, but other components probaby aren't expecting a soft failure at this stage,
+	// so double-check to see if lifecycles are enabled before creating a policy.
+	var policy Policy
+	if cfg.ILM.Enabled || cfg.DSL.Enabled {
+		policy, err = createPolicy(configType, info, defaultPolicy)
+		if err != nil {
+			return nil, fmt.Errorf("error creating DSL policy: %w", err)
+		}
 	}
 
 	return &ESClientHandler{client: c,

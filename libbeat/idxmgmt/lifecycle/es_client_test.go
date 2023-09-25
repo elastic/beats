@@ -62,6 +62,9 @@ func TestESSetup(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 	bothEnabledConfig := DefaultDSLConfig(info)
 	bothEnabledConfig.ILM.Enabled = true
+
+	bothDisabledConfig := DefaultDSLConfig(info)
+	bothDisabledConfig.DSL.Enabled = false
 	cases := map[string]struct {
 		serverless      bool
 		serverHasPolicy bool
@@ -157,6 +160,16 @@ func TestESSetup(t *testing.T) {
 			err:            false,
 			existingPolicy: mapstr.M{"existing": "policy"},
 			expectedPolicy: DefaultDSLPolicy,
+		},
+		"all-disabled-no-fail": {
+			serverless: false,
+			cfg:        bothDisabledConfig,
+			err:        false,
+		},
+		"all-disabled-no-fail-serverless": {
+			serverless: true,
+			cfg:        bothDisabledConfig,
+			err:        false,
 		},
 	}
 
