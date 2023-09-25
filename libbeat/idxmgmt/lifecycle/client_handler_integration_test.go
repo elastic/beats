@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
+// // go:build integration
 
 package lifecycle
 
@@ -47,7 +47,7 @@ const (
 
 func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
-		cfg := DefaultILMConfig(beat.Info{Name: "test"})
+		cfg := DefaultILMConfig(beat.Info{Beat: "test"})
 		cfg.ILM.Enabled = false
 		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
@@ -57,7 +57,7 @@ func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	})
 
 	t.Run("with ilm if enabled", func(t *testing.T) {
-		h, err := newESClientHandler(t, DefaultILMConfig(beat.Info{Name: "test"}))
+		h, err := newESClientHandler(t, DefaultILMConfig(beat.Info{Beat: "test"}))
 		require.NoError(t, err)
 		b, err := h.CheckEnabled()
 		assert.NoError(t, err)
@@ -66,7 +66,7 @@ func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 }
 
 func TestESClientHandler_RecoverBadConfg(t *testing.T) {
-	info := beat.Info{Name: "test"}
+	info := beat.Info{Beat: "test"}
 	client := newRawESClient(t)
 	cfg := DefaultILMConfig(info)
 	if client.IsServerless() {
@@ -92,7 +92,7 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 			Name: makeName("esch-policy-create"),
 			Body: DefaultILMPolicy,
 		}
-		cfg := DefaultILMConfig(beat.Info{Name: "test"})
+		cfg := DefaultILMConfig(beat.Info{Beat: "test"})
 		cfg.ILM.policyRaw = &policy
 		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
@@ -109,7 +109,7 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 			Name: makeName("esch-policy-overwrite"),
 			Body: DefaultILMPolicy,
 		}
-		cfg := DefaultILMConfig(beat.Info{Name: "test"})
+		cfg := DefaultILMConfig(beat.Info{Beat: "test"})
 		cfg.ILM.policyRaw = &policy
 		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
@@ -129,7 +129,7 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 
 func newESClientHandler(t *testing.T, cfg LifecycleConfig) (ClientHandler, error) {
 	client := newRawESClient(t)
-	return NewESClientHandler(client, beat.Info{Name: "testbeat"}, cfg)
+	return NewESClientHandler(client, beat.Info{Beat: "testbeat"}, cfg)
 }
 
 func newRawESClient(t *testing.T) ESClient {
@@ -189,7 +189,7 @@ func getEnv(name, def string) string {
 }
 
 func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
-	defaultCfg := DefaultILMConfig(beat.Info{Name: "test"})
+	defaultCfg := DefaultILMConfig(beat.Info{Beat: "test"})
 	defaultCfgDisabled := defaultCfg
 	defaultCfgDisabled.ILM.Enabled = false
 	for name, test := range map[string]struct {
@@ -214,7 +214,7 @@ func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			h, err := NewFileClientHandler(newMockClient(test.version), beat.Info{Name: "test"}, test.cfg)
+			h, err := NewFileClientHandler(newMockClient(test.version), beat.Info{Beat: "test"}, test.cfg)
 			require.NoError(t, err)
 			b, err := h.CheckEnabled()
 			assert.Equal(t, test.ilmEnabled, b)
@@ -228,7 +228,7 @@ func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 }
 
 func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
-	info := beat.Info{Name: "test"}
+	info := beat.Info{Beat: "test"}
 	cfg := DefaultILMConfig(info)
 	testPolicy := Policy{
 		Name: "test-policy",

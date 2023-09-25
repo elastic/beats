@@ -66,7 +66,7 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg LifecycleConfig) (*ESCli
 	if err != nil {
 		return nil, fmt.Errorf("error applying format string to policy name: %w", err)
 	}
-	if name == "" {
+	if name == "" && (cfg.ILM.Enabled || cfg.DSL.Enabled) {
 		return nil, errors.New("could not generate usable policy name from config. Check setup.*.policy_name fields")
 	}
 
