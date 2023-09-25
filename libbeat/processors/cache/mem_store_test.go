@@ -31,6 +31,7 @@ type memStoreTestSteps struct {
 	want *memStore
 }
 
+//nolint:errcheck // Paul Hogan was right.
 var memStoreTests = []struct {
 	name  string
 	cfg   config

@@ -105,7 +105,7 @@ func newMemStore(cfg config, id, typ string) *memStore {
 
 func (c *memStore) String() string { return c.typ + ":" + c.id }
 
-// add updates a the receiver for a new operation. It increases the reference
+// add updates the receiver for a new operation. It increases the reference
 // count for the receiver, and if the config is a put operation and has no
 // previous put operation defined, the TTL, cap and effort will be set from
 // cfg. add is safe for concurrent use.
@@ -148,7 +148,7 @@ func (c *memStore) dropFrom(stores *memStoreSet) {
 	c.mu.Unlock()
 }
 
-// Get return the cached value associated with the provided key. If there is
+// Get returns the cached value associated with the provided key. If there is
 // no value for the key, or the value has expired Get returns ErrNoData. Get
 // is safe for concurrent use.
 func (c *memStore) Get(key string) (any, error) {
