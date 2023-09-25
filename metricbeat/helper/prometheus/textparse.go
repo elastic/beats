@@ -318,12 +318,13 @@ func (m *MetricFamily) GetMetric() []*OpenMetric {
 }
 
 const (
-	suffixTotal  = "_total"
-	suffixGCount = "_gcount"
-	suffixGSum   = "_gsum"
-	suffixCount  = "_count"
-	suffixSum    = "_sum"
-	suffixBucket = "_bucket"
+	suffixTotal   = "_total"
+	suffixGCount  = "_gcount"
+	suffixGSum    = "_gsum"
+	suffixCount   = "_count"
+	suffixSum     = "_sum"
+	suffixBucket  = "_bucket"
+	suffixCreated = "_created"
 )
 
 // Counters have _total suffix
@@ -351,7 +352,7 @@ func isBucket(name string) bool {
 	return strings.HasSuffix(name, suffixBucket)
 }
 
-func summaryMetricName(name string, s float64, qv string, lbls string, t *int64, summariesByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
+func summaryMetricName(name string, s float64, qv string, lbls string, summariesByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
 	var summary = &Summary{}
 	var quantile = []*Quantile{}
 	var quant = &Quantile{}
@@ -392,7 +393,6 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 	} else if quant.Quantile != nil {
 		metric.Summary.Quantile = append(metric.Summary.Quantile, quant)
 	}
-
 	return name, metric
 }
 
@@ -499,8 +499,6 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 				fam = &MetricFamily{Name: &s, Type: t}
 				metricFamiliesByName[s] = fam
 			} else {
-				// In case the metric family already exists, we need to make sure the type is correctly defined
-				// instead of being `unknown` like it was initialized for the other entry types (help and unit).
 				fam.Type = t
 			}
 			mt = t
@@ -511,10 +509,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			h := string(t)
 			_, ok = metricFamiliesByName[s]
 			if !ok {
-				fam = &MetricFamily{Name: &s, Help: &h, Type: textparse.MetricTypeUnknown}
+				fam = &MetricFamily{Name: &s, Help: &h}
 				metricFamiliesByName[s] = fam
+			} else {
+				fam.Help = &h
 			}
-			fam.Help = &h
 			continue
 		case textparse.EntryUnit:
 			buf, t := parser.Unit()
@@ -522,10 +521,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			u := string(t)
 			_, ok = metricFamiliesByName[s]
 			if !ok {
-				fam = &MetricFamily{Name: &s, Unit: &u, Type: textparse.MetricTypeUnknown}
+				fam = &MetricFamily{Name: &s, Unit: &u}
 				metricFamiliesByName[string(buf)] = fam
+			} else {
+				fam.Unit = &u
 			}
-			fam.Unit = &u
 			continue
 		case textparse.EntryComment:
 			continue
@@ -586,8 +586,13 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			if isTotal(metricName) && contentType == OpenMetricsType { // Remove suffix _total, get lookup metricname
-				lookupMetricName = strings.TrimSuffix(metricName, suffixTotal)
+			if contentType == OpenMetricsType {
+				// Remove the two possible suffixes, _created and _total
+				if isTotal(metricName) {
+					lookupMetricName = strings.TrimSuffix(metricName, suffixTotal)
+				} else {
+					lookupMetricName = strings.TrimSuffix(metricName, suffixCreated)
+				}
 			} else {
 				lookupMetricName = metricName
 			}
@@ -601,7 +606,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
 			lookupMetricName = metricName
 		case textparse.MetricTypeSummary:
-			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), &t, summariesByName)
+			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), summariesByName)
 			metric.Label = labelPairs
 			if !isSum(metricName) {
 				continue
@@ -652,8 +657,6 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			fam = &MetricFamily{Type: mt}
 			metricFamiliesByName[lookupMetricName] = fam
 		}
-
-		fam.Name = &metricName
 
 		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram && metric != nil {
 			if !e.HasTs {
