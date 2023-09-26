@@ -26,7 +26,7 @@ type noopManager struct{}
 
 // NewNoopSupport creates a noop ILM implementation with ILM support being always
 // disabled.  Attempts to install a policy will fail.
-func NewNoopSupport(info beat.Info, c LifecycleConfig) (Supporter, error) {
+func NewNoopSupport(info beat.Info, c bool) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 

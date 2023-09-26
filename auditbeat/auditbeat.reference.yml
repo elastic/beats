@@ -1346,11 +1346,12 @@ setup.template.settings:
 #setup.dsl.enabled: true
 
 # Set the lifecycle policy name. The default policy name is
-# 'beatname'.
+# 'auditbeat'.
 #setup.dsl.policy_name: "auditbeat"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
 # to load your own lifecycle policy.
+# If no custom policy is specified, a default policy with a lifetime of 7 days will be created.
 #setup.dsl.policy_file:
 
 # Disable the check for an existing lifecycle policy. The default is true. If

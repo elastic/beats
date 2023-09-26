@@ -44,12 +44,13 @@ func NewFileClientHandler(c FileClient, info beat.Info, cfg RawConfig) (*FileCli
 		return nil, fmt.Errorf("only one lifecycle management type can be used, but both ILM and DSL are enabled")
 	}
 
-	lifecycleCfg := Config{}
+	// default to ILM if no configs are set
+	lifecycleCfg := DefaultILMConfig(info).ILM
 	var err error
 	if cfg.DSL.Enabled() {
 		lifecycleCfg = DefaultDSLConfig(info).DSL
 		err = cfg.DSL.Unpack(&lifecycleCfg)
-	} else {
+	} else if cfg.ILM.Enabled() {
 		lifecycleCfg = DefaultILMConfig(info).ILM
 		err = cfg.ILM.Unpack(&lifecycleCfg)
 	}

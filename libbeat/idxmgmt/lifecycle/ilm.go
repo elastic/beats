@@ -27,7 +27,7 @@ import (
 )
 
 // SupportFactory is used to define a policy type to be used.
-type SupportFactory func(*logp.Logger, beat.Info, LifecycleConfig) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, bool) (Supporter, error)
 
 // Supporter implements ILM support. For loading the policies
 // a manager instance must be generated.
@@ -65,28 +65,28 @@ type Policy struct {
 }
 
 // DefaultSupport configures a new default ILM support implementation.
-func DefaultSupport(log *logp.Logger, info beat.Info, cfg LifecycleConfig) (Supporter, error) {
-	if !cfg.DSL.Enabled && !cfg.ILM.Enabled {
-		return NewNoopSupport(info, cfg)
+func DefaultSupport(log *logp.Logger, info beat.Info, lifecycleEnabled bool) (Supporter, error) {
+	if !lifecycleEnabled {
+		return NewNoopSupport(info, lifecycleEnabled)
 	}
 
-	return StdSupport(log, info, cfg)
+	return StdSupport(log, info, lifecycleEnabled)
 }
 
 // StdSupport configures a new std ILM support implementation.
-func StdSupport(log *logp.Logger, info beat.Info, cfg LifecycleConfig) (Supporter, error) {
+func StdSupport(log *logp.Logger, info beat.Info, lifecycleEnabled bool) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
 	} else {
 		log = log.Named("ilm")
 	}
 
-	return NewStdSupport(log, cfg), nil
+	return NewStdSupport(log, lifecycleEnabled), nil
 }
 
 // NoopSupport configures a new noop ILM support implementation,
 // should be used when ILM is disabled
-func NoopSupport(_ *logp.Logger, info beat.Info, c LifecycleConfig) (Supporter, error) {
+func NoopSupport(_ *logp.Logger, info beat.Info, c bool) (Supporter, error) {
 	return NewNoopSupport(info, c)
 }
 

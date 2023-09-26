@@ -25,44 +25,26 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 )
 
 func TestDefaultSupport_Init(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 
 	t.Run("with custom config", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, LifecycleConfig{
-			ILM: Config{
-				Enabled:     true,
-				PolicyName:  *fmtstr.MustCompileEvent("test-%{[agent.version]}"),
-				CheckExists: false,
-				Overwrite:   true,
-			},
-		})
+		tmp, err := DefaultSupport(nil, info, true)
 		require.NoError(t, err)
 
 		s := tmp.(*stdSupport)
 		assert := assert.New(t)
-		assert.Equal(true, s.cfg.ILM.Overwrite)
-		assert.Equal(false, s.cfg.ILM.CheckExists)
 		assert.Equal(true, s.Enabled())
 	})
 
 	t.Run("with custom alias config with fieldref", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, LifecycleConfig{
-			ILM: Config{
-				Enabled:     true,
-				CheckExists: false,
-				Overwrite:   true,
-			},
-		})
+		tmp, err := DefaultSupport(nil, info, true)
 		require.NoError(t, err)
 
 		s := tmp.(*stdSupport)
 		assert := assert.New(t)
-		assert.Equal(true, s.cfg.ILM.Overwrite)
-		assert.Equal(false, s.cfg.ILM.CheckExists)
 		assert.Equal(true, s.Enabled())
 	})
 
@@ -80,42 +62,51 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 
 func runEnabledTests(t *testing.T, cfg LifecycleConfig) {
 	cases := map[string]struct {
-		calls   []onCall
-		cfg     LifecycleConfig
-		enabled bool
-		fail    error
-		err     bool
+		calls         []onCall
+		cfg           LifecycleConfig
+		expectEnabled bool
+		isEnabled     bool
+		fail          error
+		err           bool
 	}{
 		"disabled via config": {
-			cfg: LifecycleConfig{ILM: Config{Enabled: false}, DSL: Config{Enabled: false}},
+			cfg:           LifecycleConfig{ILM: Config{Enabled: false}, DSL: Config{Enabled: false}},
+			expectEnabled: false,
+			isEnabled:     false,
 		},
 		"disabled via handler": {
 			calls: []onCall{
 				onCheckEnabled().Return(false, ErrESILMDisabled),
 			},
-			cfg: cfg,
-			err: true,
+			expectEnabled: false,
+			isEnabled:     true,
+			cfg:           cfg,
+			err:           true,
 		},
 		"enabled via handler": {
 			calls: []onCall{
 				onCheckEnabled().Return(true, nil),
 			},
-			enabled: true,
-			cfg:     cfg,
+			expectEnabled: true,
+			isEnabled:     true,
+			cfg:           cfg,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
 				onCheckEnabled().Return(true, nil),
 			},
-			cfg:     cfg,
-			enabled: true,
+			cfg:           cfg,
+			expectEnabled: true,
+			isEnabled:     true,
 		},
 		"io error": {
 			calls: []onCall{
 				onCheckEnabled().Return(false, errors.New("ups")),
 			},
-			cfg: cfg,
-			err: true,
+			cfg:           cfg,
+			expectEnabled: false,
+			isEnabled:     true,
+			err:           true,
 		},
 	}
 
@@ -123,20 +114,20 @@ func runEnabledTests(t *testing.T, cfg LifecycleConfig) {
 		t.Run(name, func(t *testing.T) {
 
 			testHandler := newMockHandler(test.cfg, Policy{}, test.calls...)
-			testManager := createManager(t, testHandler, test.cfg)
+			testManager := createManager(t, testHandler, test.isEnabled)
 			enabled, err := testManager.CheckEnabled()
 
 			if test.fail == nil && !test.err {
-				require.NoError(t, err)
+				assert.NoError(t, err)
 			}
 			if test.err || test.fail != nil {
-				require.Error(t, err)
+				assert.Error(t, err)
 			}
 			if test.fail != nil {
 				assert.Equal(t, test.fail, err)
 			}
 
-			assert.Equal(t, test.enabled, enabled)
+			assert.Equal(t, test.expectEnabled, enabled)
 			testHandler.AssertExpectations(t)
 		})
 	}
@@ -165,6 +156,7 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 		calls     []onCall
 		overwrite bool
 		cfg       LifecycleConfig
+		enabled   bool
 		create    bool
 		fail      error
 	}{
@@ -175,7 +167,8 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 				onHasPolicy().Return(false, nil),
 				onCreatePolicyFromConfig().Return(nil),
 			},
-			cfg: cfg,
+			cfg:     cfg,
+			enabled: true,
 		},
 		"policy already exists": {
 			create: false,
@@ -183,11 +176,13 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 				onCheckExists().Return(true),
 				onHasPolicy().Return(true, nil),
 			},
-			cfg: cfg,
+			cfg:     cfg,
+			enabled: true,
 		},
 		"overwrite": {
 			overwrite: true,
 			create:    true,
+			enabled:   true,
 			cfg:       cfg,
 			calls: []onCall{
 				onCheckExists().Return(true),
@@ -200,8 +195,9 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 				onHasPolicy().Return(false, nil),
 				onCreatePolicyFromConfig().Return(ErrRequestFailed),
 			},
-			fail: ErrRequestFailed,
-			cfg:  cfg,
+			fail:    ErrRequestFailed,
+			cfg:     cfg,
+			enabled: true,
 		},
 	}
 
@@ -209,7 +205,7 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			h := newMockHandler(test.cfg, testPolicy, test.calls...)
-			m := createManager(t, h, test.cfg)
+			m := createManager(t, h, test.enabled)
 			created, err := m.EnsurePolicy(test.overwrite)
 
 			if test.fail == nil {
@@ -225,9 +221,9 @@ func runEnsurePolicyTest(t *testing.T, testPolicy Policy, cfg LifecycleConfig) {
 	}
 }
 
-func createManager(t *testing.T, h ClientHandler, cfg LifecycleConfig) Manager {
+func createManager(t *testing.T, h ClientHandler, enabled bool) Manager {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
-	s, err := DefaultSupport(nil, info, cfg)
+	s, err := DefaultSupport(nil, info, enabled)
 	require.NoError(t, err)
 	return s.Manager(h)
 }

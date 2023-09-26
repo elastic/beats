@@ -36,7 +36,7 @@ type onCall struct {
 }
 
 func makeMockILMSupport(calls ...onCall) lifecycle.SupportFactory {
-	return func(_ *logp.Logger, _ beat.Info, _ lifecycle.LifecycleConfig) (lifecycle.Supporter, error) {
+	return func(_ *logp.Logger, _ beat.Info, _ bool) (lifecycle.Supporter, error) {
 		m := &mockILMSupport{}
 		for _, c := range calls {
 			m.On(c.name, c.args...).Return(c.returns...)

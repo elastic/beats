@@ -26,8 +26,8 @@ import (
 
 // stdSupport is a config wrapper that carries lifecycle info.
 type stdSupport struct {
-	log *logp.Logger
-	cfg LifecycleConfig
+	log              *logp.Logger
+	lifecycleEnabled bool
 }
 
 // stdManager creates, checks, and updates lifecycle policies.
@@ -50,16 +50,16 @@ var defaultCacheDuration = 5 * time.Minute
 // lifecycle policies. I suspect that with enough time/work, you could merge the stdSupport and stdManager objects
 func NewStdSupport(
 	log *logp.Logger,
-	cfg LifecycleConfig,
+	lifecycleEnabled bool,
 ) Supporter {
 	return &stdSupport{
-		log: log,
-		cfg: cfg,
+		log:              log,
+		lifecycleEnabled: lifecycleEnabled,
 	}
 }
 
 // Enabled returns true if either ILM or DSL are enabled
-func (s *stdSupport) Enabled() bool { return s.cfg.ILM.Enabled || s.cfg.DSL.Enabled }
+func (s *stdSupport) Enabled() bool { return s.lifecycleEnabled }
 
 // Manager returns a standard support manager. unlike the stdSupport object,
 // the manager is capable of writing and checking lifecycle policies.

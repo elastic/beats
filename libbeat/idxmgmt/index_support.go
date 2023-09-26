@@ -97,14 +97,14 @@ func newIndexSupport(
 	info beat.Info,
 	ilmFactory lifecycle.SupportFactory,
 	tmplConfig *config.C,
-	ilmConfig lifecycle.LifecycleConfig,
+	lifecyclesEnabled bool,
 	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
 		ilmFactory = lifecycle.DefaultSupport
 	}
 
-	ilmSupporter, err := ilmFactory(log, info, ilmConfig)
+	ilmSupporter, err := ilmFactory(log, info, lifecyclesEnabled)
 	if err != nil {
 		return nil, fmt.Errorf("error creating lifecycle supporter: %w", err)
 	}

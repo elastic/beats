@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/template"
@@ -113,54 +112,34 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 			log = log.Named(logName)
 		}
 
-		// first fetch the ES output, check if we're running against serverless, use that to set a default config.
-		// the Supporter only cares about lifecycle config for checking if ILM/DSL is enabled or disabled.
-		outCfg := struct {
-			Output config.Namespace `config:"output"`
-		}{}
-		if configRoot != nil {
-			err := configRoot.Unpack(&outCfg)
-			if err != nil {
-				return nil, fmt.Errorf("error unpacking output config while making index support: %w", err)
-			}
-		}
-
-		defaultLifecycle := lifecycle.DefaultILMConfig(info)
-		if outCfg.Output.IsSet() && outCfg.Output.Name() == "elasticsearch" {
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Output.Config(), info.Beat)
-			if err != nil {
-				// this is for the benefit of tests as well as various retry mechanisms;
-				// if we can't connect to ES, print a warning and fallback to ILM, tests won't care and non-test environments can
-				// retry the connection
-				logp.L().Warnf("could not connect to ES to determine ES type during index setup. Will default to ILM.")
-			} else {
-				if esClient.IsServerless() {
-					defaultLifecycle = lifecycle.DefaultDSLConfig(info)
-				}
-			}
-
-		}
-
 		// now that we have the "correct" default, unpack the rest of the config
 		cfg := struct {
-			ILM       lifecycle.LifecycleConfig `config:",inline"`
-			Template  *config.C                 `config:"setup.template"`
-			Output    config.Namespace          `config:"output"`
-			Migration *config.C                 `config:"migration.6_to_7"`
-		}{
-			ILM: defaultLifecycle,
-		}
+			Lifecycle lifecycle.RawConfig `config:",inline"`
+			Template  *config.C           `config:"setup.template"`
+			Output    config.Namespace    `config:"output"`
+			Migration *config.C           `config:"migration.6_to_7"`
+		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
 				return nil, fmt.Errorf("error unpacking cfg settings while setting up index support: %w", err)
 			}
 		}
 
+		// consider lifecycles enabled if the user has explicitly enabled them,
+		// or if no `enabled`` setting has been set by the user, thus reverting to a default of enabled.
+		enabled := false
+		if cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() {
+			enabled = true
+		}
+		if (cfg.Lifecycle.DSL == nil || !cfg.Lifecycle.DSL.HasField("enabled")) && (cfg.Lifecycle.ILM == nil || !cfg.Lifecycle.ILM.HasField("enabled")) {
+			enabled = true
+		}
+
 		if err := checkTemplateESSettings(cfg.Template, cfg.Output); err != nil {
 			return nil, err
 		}
 
-		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM, cfg.Migration.Enabled())
+		return newIndexSupport(log, info, ilmSupport, cfg.Template, enabled, cfg.Migration.Enabled())
 	}
 }
 
