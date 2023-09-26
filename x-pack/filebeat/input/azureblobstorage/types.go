@@ -13,11 +13,13 @@ import (
 
 // Source, it is the cursor source
 type Source struct {
-	ContainerName string
-	AccountName   string
-	MaxWorkers    int
-	Poll          bool
-	PollInterval  time.Duration
+	ContainerName  string
+	AccountName    string
+	MaxWorkers     int
+	Poll           bool
+	PollInterval   time.Duration
+	PathPrefix     string
+	TimeStampEpoch *int64
 }
 
 func (s *Source) Name() string {

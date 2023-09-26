@@ -46,11 +46,13 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 	for _, c := range in.config.Containers {
 		container := tryOverrideOrDefault(in.config, c)
 		source = &Source{
-			AccountName:   in.config.AccountName,
-			ContainerName: c.Name,
-			MaxWorkers:    *container.MaxWorkers,
-			Poll:          *container.Poll,
-			PollInterval:  *container.PollInterval,
+			AccountName:    in.config.AccountName,
+			ContainerName:  c.Name,
+			MaxWorkers:     *container.MaxWorkers,
+			Poll:           *container.Poll,
+			PollInterval:   *container.PollInterval,
+			PathPrefix:     container.PathPrefix,
+			TimeStampEpoch: container.TimeStampEpoch,
 		}
 
 		st := newState()

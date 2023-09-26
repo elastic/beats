@@ -7,6 +7,7 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
@@ -107,6 +108,13 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 
 		var jobs []*job
 		for _, v := range resp.Segment.BlobItems {
+			if s.src.PathPrefix != "" && !strings.HasPrefix(*v.Name, s.src.PathPrefix) {
+				continue
+			}
+			// date filter is applied on last modified time of the blob
+			if s.src.TimeStampEpoch != nil && v.Properties.LastModified.Unix() < *s.src.TimeStampEpoch {
+				continue
+			}
 			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
 			blobCreds := &blobCredentials{
 				serviceCreds:  s.credential,

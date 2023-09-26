@@ -54,11 +54,13 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
 		sources = append(sources, &Source{
-			AccountName:   config.AccountName,
-			ContainerName: c.Name,
-			MaxWorkers:    *container.MaxWorkers,
-			Poll:          *container.Poll,
-			PollInterval:  *container.PollInterval,
+			AccountName:    config.AccountName,
+			ContainerName:  c.Name,
+			MaxWorkers:     *container.MaxWorkers,
+			Poll:           *container.Poll,
+			PollInterval:   *container.PollInterval,
+			PathPrefix:     container.PathPrefix,
+			TimeStampEpoch: container.TimeStampEpoch,
 		})
 	}
 
@@ -100,6 +102,14 @@ func tryOverrideOrDefault(cfg config, c container) container {
 			interval = *cfg.PollInterval
 		}
 		c.PollInterval = &interval
+	}
+
+	if c.PathPrefix == "" {
+		c.PathPrefix = cfg.PathPrefix
+	}
+
+	if c.TimeStampEpoch == nil {
+		c.TimeStampEpoch = cfg.TimeStampEpoch
 	}
 	return c
 }

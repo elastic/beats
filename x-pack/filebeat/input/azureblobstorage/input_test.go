@@ -35,6 +35,7 @@ const (
 	beatsJSONContainer          = "beatsjsoncontainer"
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
+	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
 )
 
 func Test_StorageClient(t *testing.T) {
@@ -314,6 +315,69 @@ func Test_StorageClient(t *testing.T) {
 			expected: map[string]bool{
 				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			name: "ReadJSONWithRootAsArray",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsJSONWithArrayContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_json_array[0]: true,
+				mock.BeatsFilesContainer_json_array[1]: true,
+				mock.BeatsFilesContainer_json_array[2]: true,
+				mock.BeatsFilesContainer_json_array[3]: true,
+			},
+		},
+		{
+			name: "PathPrefix",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"path_prefix":                         "docs/",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "TimeStampEpoch",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"timestamp_epoch":                     1663157564,
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
 		},
 	}
