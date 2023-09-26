@@ -158,7 +158,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // then use CheckTemplate prior to calling this method.
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
 	if sameTemplate, _ := l.sameAsExistingTemplate(templateName, template); sameTemplate {
-		l.log.Infof("Not loading template %s to Elasticsearch", templateName)
+		l.log.Infof("Template %s is already present in Elasticsearch, skipping...", templateName)
 		return nil
 	}
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
@@ -216,18 +216,18 @@ func (l *ESLoader) sameAsExistingTemplate(name string, newTemplate map[string]in
 	path := "/_index_template/" + name
 	status, body, err := l.client.Request("GET", path, "", nil, nil)
 	if err != nil {
-		return false, fmt.Errorf("get template error: %v", err)
+		return false, fmt.Errorf("failed to get template %s: %w", name, err)
 	}
 	if status > http.StatusMultipleChoices {
-		return false, fmt.Errorf("get template error: %s", string(body))
+		return false, fmt.Errorf("unexpected status code %d when getting template %s: %s", status, name, string(body))
 	}
 	getJson := make(map[string]interface{})
 	if err := json.Unmarshal(body, &getJson); err != nil {
-		return false, fmt.Errorf("get template error: %v", err)
+		return false, fmt.Errorf("failed to read JSON response when getting template %s: %w", name, err)
 	}
 	oldTemplate := getJson["index_templates"].([]interface{})
 	if len(oldTemplate) != 1 {
-		return false, fmt.Errorf("more than one template found")
+		return false, fmt.Errorf("more than one template with name %s found", name)
 	}
 	if reflect.DeepEqual(oldTemplate[0].(map[string]interface{}), newTemplate) {
 		return true, nil
