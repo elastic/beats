@@ -39,19 +39,31 @@ The `aws-cloudwatch` input supports the following configuration options plus the
 
 [float]
 ==== `log_group_arn`
-ARN of the log group to collect logs from.
+ARN of the log group to collect logs from. *If using
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html[cross-account observability],
+the ARN is required to collect logs from linked source accounts.*
+`log_group_name` and `log_group_name_prefix` do not currently support CloudWatch
+cross-account observability.
+
+Only one of `log_group_arn` and `log_group_name` should be configured.
+If both are set, `log_group_arn` takes precidence.
 
 [float]
 ==== `log_group_name`
 Name of the log group to collect logs from. Note: `region_name` is required when
 log_group_name is given.
 
+Only one of `log_group_arn` and `log_group_name` should be configured.
+If both are set, `log_group_arn` takes precidence.
+
 [float]
 ==== `log_group_name_prefix`
 The prefix for a group of log group names. Note: `region_name` is required when
-log_group_name_prefix is given. `log_group_name` and `log_group_name_prefix`
-cannot be given at the same time. The number of workers that will process the
+log_group_name_prefix is given. The number of workers that will process the
 log groups under this prefix is set through the `number_of_workers` config.
+
+Only one of `log_group_name` and `log_group_name_prefix` should be configured.
+If both are set, `log_group_name` takes precidence.
 
 [float]
 ==== `region_name`

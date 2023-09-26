@@ -131,6 +131,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	// plain names do not (support will be added for this later).
 	var logGroups []string
 
+	// Precidence is important here - do not re-order.
 	if in.config.LogGroupARN != "" {
 		logGroups = []string{in.config.LogGroupARN}
 	} else if in.config.LogGroupName != "" {
