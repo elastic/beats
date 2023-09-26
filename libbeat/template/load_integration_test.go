@@ -71,9 +71,11 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	loader, err := NewESLoader(client)
 	require.NoError(t, err)
 	s := testSetup{t: t, client: client, loader: loader, config: cfg}
-	client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
+	_, _, err = client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
+	require.NoError(t, err)
 	s.requireDataStreamDoesNotExist("")
-	client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
+	_, _, err = client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
+	require.NoError(t, err)
 	s.requireTemplateDoesNotExist("")
 	return &s
 }
@@ -86,13 +88,6 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 	loader, err := NewESLoader(client)
 	require.NoError(t, err)
 	return &testSetup{t: t, client: client, loader: loader, config: cfg}
-}
-
-func (ts *testSetup) mustLoadTemplate(body map[string]interface{}) {
-	ts.t.Helper()
-	err := ts.loader.loadTemplate(ts.config.Name, body)
-	require.NoError(ts.t, err)
-	ts.requireTemplateExists("")
 }
 
 func (ts *testSetup) loadFromFile(fileElems []string) error {
@@ -126,12 +121,14 @@ func (ts *testSetup) requireTemplateExists(name string) {
 }
 
 func (ts *testSetup) cleanupDataStream(name string) {
-	ts.client.Request("DELETE", "/_data_stream/"+name, "", nil, nil)
+	_, _, err := ts.client.Request("DELETE", "/_data_stream/"+name, "", nil, nil)
+	require.NoError(ts.t, err)
 	ts.requireDataStreamDoesNotExist(name)
 }
 
 func (ts *testSetup) cleanupTemplate(name string) {
-	ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
+	_, _, err := ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
+	require.NoError(ts.t, err)
 	ts.requireTemplateDoesNotExist(name)
 }
 
@@ -176,6 +173,7 @@ func (ts *testSetup) requireTestEventPresent() string {
 
 	var resp eslegclient.SearchResults
 	err = json.Unmarshal(b, &resp)
+	require.NoError(ts.t, err)
 	require.Equal(ts.t, 1, resp.Hits.Total.Value, "the test event must be returned")
 
 	idx := struct {
@@ -191,7 +189,8 @@ func TestESLoader_Load(t *testing.T) {
 		t.Run("loading disabled", func(t *testing.T) {
 			setup := newTestSetup(t, TemplateConfig{Enabled: false})
 
-			setup.load(nil)
+			err := setup.load(nil)
+			require.NoError(t, err)
 			setup.requireTemplateDoesNotExist("")
 		})
 
@@ -254,14 +253,16 @@ func TestESLoader_Load(t *testing.T) {
 		setup.config.Settings = TemplateSettings{Source: map[string]interface{}{"enabled": false}}
 
 		t.Run("disabled", func(t *testing.T) {
-			setup.load(nil)
+			err := setup.load(nil)
+			require.NoError(t, err)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, true, tmpl.SourceEnabled())
 		})
 
 		t.Run("enabled", func(t *testing.T) {
 			setup.config.Overwrite = true
-			setup.load(nil)
+			err := setup.load(nil)
+			require.NoError(t, err)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, false, tmpl.SourceEnabled())
 		})
@@ -273,6 +274,7 @@ func TestESLoader_Load(t *testing.T) {
 			setup.mustLoad(fields)
 
 			exists, err := setup.loader.checkExistsDatastream(setup.config.Name)
+			require.NoError(t, err)
 			require.True(t, exists, "data stream must exits")
 
 			// send test event before reloading the template
