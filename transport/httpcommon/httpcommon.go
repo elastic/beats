@@ -40,10 +40,11 @@ type HTTPTransportSettings struct {
 
 	Proxy HTTPClientProxySettings `config:",inline" yaml:",inline"`
 
+	IdleConnTimeout time.Duration `config:"idle_connection_timeout" yaml:"idle_connection_timeout,omitempty" json:"idle_connection_timeout,omitempty"`
+
 	// Add more settings:
 	//  - DisableKeepAlive
 	//  - MaxIdleConns
-	//  - IdleConnTimeout
 	//  - ResponseHeaderTimeout
 	//  - ConnectionTimeout (currently 'Timeout' is used for both)
 }
@@ -159,9 +160,13 @@ func DefaultHTTPTransportSettings() HTTPTransportSettings {
 // Unpack reads a config object into the settings.
 func (settings *HTTPTransportSettings) Unpack(cfg *config.C) error {
 	tmp := struct {
-		TLS     *tlscommon.Config `config:"ssl"`
-		Timeout time.Duration     `config:"timeout"`
-	}{Timeout: settings.Timeout}
+		TLS             *tlscommon.Config `config:"ssl"`
+		Timeout         time.Duration     `config:"timeout"`
+		IdleConnTimeout time.Duration     `config:"idle_connection_timeout"`
+	}{
+		Timeout:         settings.Timeout,
+		IdleConnTimeout: settings.IdleConnTimeout,
+	}
 
 	if err := cfg.Unpack(&tmp); err != nil {
 		return err
@@ -178,9 +183,10 @@ func (settings *HTTPTransportSettings) Unpack(cfg *config.C) error {
 	}
 
 	*settings = HTTPTransportSettings{
-		TLS:     tmp.TLS,
-		Timeout: tmp.Timeout,
-		Proxy:   proxy,
+		TLS:             tmp.TLS,
+		Timeout:         tmp.Timeout,
+		Proxy:           proxy,
+		IdleConnTimeout: tmp.IdleConnTimeout,
 	}
 	return nil
 }
