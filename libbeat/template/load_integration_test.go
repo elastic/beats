@@ -301,7 +301,8 @@ func TestESLoader_Load(t *testing.T) {
 			Name         string `config:"name"`
 			IsDataStream bool   `config:"data_stream"`
 		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON, IsDataStream: false}
-		setup.load(nil)
+		err := setup.load(nil)
+		require.NoError(t, err)
 		setup.requireTemplateExists(nameJSON)
 		setup.cleanupTemplate(nameJSON)
 	})
@@ -505,7 +506,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 }
 
 func (tt *testTemplate) SourceEnabled() bool {
-	key := fmt.Sprintf("template.mappings._source.enabled")
+	key := "template.mappings._source.enabled"
 
 	// _source.enabled is true if it's missing (default)
 	b, _ := tt.HasKey(key)
@@ -516,7 +517,7 @@ func (tt *testTemplate) SourceEnabled() bool {
 	val, err := tt.GetValue(key)
 	if !assert.NoError(tt.t, err) {
 		doc, _ := json.MarshalIndent(tt.M, "", "    ")
-		tt.t.Fatal(fmt.Sprintf("failed to read '%v' in %s", key, doc))
+		tt.t.Fatalf("failed to read '%v' in %s", key, doc)
 	}
 
 	return val.(bool)
@@ -577,14 +578,16 @@ func esMock(t *testing.T, method, endpoint string, code int, body []byte) *httpt
 		if r.URL.Path == "/" {
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"version":{"number":"5.0.0"}}`))
+			_, err := w.Write([]byte(`{"version":{"number":"5.0.0"}}`))
+			require.NoError(t, err)
 			return
 		}
 
 		if r.Method == method && strings.HasPrefix(r.URL.Path, endpoint) {
 			w.WriteHeader(code)
 			w.Header().Set("Content-Type", "application/json")
-			w.Write(body)
+			_, err := w.Write(body)
+			require.NoError(t, err)
 			return
 		}
 
@@ -597,7 +600,8 @@ func esMock(t *testing.T, method, endpoint string, code int, body []byte) *httpt
 		w.WriteHeader(c)
 		if body != nil {
 			w.Header().Set("Content-Type", "application/json")
-			w.Write(body)
+			_, err := w.Write(body)
+			require.NoError(t, err)
 		}
 	}))
 }
