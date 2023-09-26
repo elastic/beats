@@ -69,7 +69,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.3.0
+	github.com/elastic/elastic-agent-client/v7 v7.4.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.3
 	github.com/elastic/go-licenser v0.4.1
@@ -205,8 +205,8 @@ require (
 	github.com/elastic/elastic-agent-libs v0.3.15-0.20230913212237-dbdaf18c898b
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
-	github.com/elastic/go-elasticsearch/v8 v8.9.0
-	github.com/elastic/mito v1.5.0
+	github.com/elastic/go-elasticsearch/v8 v8.10.0
+	github.com/elastic/mito v1.6.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/google/cel-go v0.15.3

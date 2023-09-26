@@ -649,14 +649,14 @@ func EvtClearLog(session EvtHandle, channelPath string, targetFilePath string) e
 //sys   _EvtSubscribe(session EvtHandle, signalEvent uintptr, channelPath *uint16, query *uint16, bookmark EvtHandle, context uintptr, callback syscall.Handle, flags EvtSubscribeFlag) (handle EvtHandle, err error) = wevtapi.EvtSubscribe
 //sys   _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) = wevtapi.EvtCreateBookmark
 //sys   _EvtUpdateBookmark(bookmark EvtHandle, event EvtHandle) (err error) = wevtapi.EvtUpdateBookmark
-//sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
+//sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths **uint16, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
 //sys   _EvtRender(context EvtHandle, fragment EvtHandle, flags EvtRenderFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32, propertyCount *uint32) (err error) = wevtapi.EvtRender
 //sys   _EvtClose(object EvtHandle) (err error) = wevtapi.EvtClose
 //sys   _EvtSeek(resultSet EvtHandle, position int64, bookmark EvtHandle, timeout uint32, flags uint32) (success bool, err error) [!success] = wevtapi.EvtSeek
 //sys   _EvtNext(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) = wevtapi.EvtNext
 //sys   _EvtOpenChannelEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenChannelEnum
 //sys   _EvtNextChannelPath(channelEnum EvtHandle, channelPathBufferSize uint32, channelPathBuffer *uint16, channelPathBufferUsed *uint32) (err error) = wevtapi.EvtNextChannelPath
-//sys   _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values uintptr, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) = wevtapi.EvtFormatMessage
+//sys   _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values *EvtVariant, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) = wevtapi.EvtFormatMessage
 //sys   _EvtOpenPublisherMetadata(session EvtHandle, publisherIdentity *uint16, logFilePath *uint16, locale uint32, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenPublisherMetadata
 //sys   _EvtGetPublisherMetadataProperty(publisherMetadata EvtHandle, propertyID EvtPublisherMetadataPropertyID, flags uint32, bufferSize uint32, variant *EvtVariant, bufferUsed *uint32) (err error) = wevtapi.EvtGetPublisherMetadataProperty
 //sys   _EvtGetEventMetadataProperty(eventMetadata EvtHandle, propertyID EvtEventMetadataPropertyID, flags uint32, bufferSize uint32,  variant *EvtVariant, bufferUsed *uint32) (err error) = wevtapi.EvtGetEventMetadataProperty

@@ -189,7 +189,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
-	if b.Config.Output.Name() != "elasticsearch" {
+	if b.Config.Output.Name() != "elasticsearch" && !b.Manager.Enabled() {
 		logp.Warn(pipelinesWarning)
 		return nil
 	}
