@@ -188,10 +188,6 @@ func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
 		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
-	defaultCfgDisabled := RawConfig{
-		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
-		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
-	}
 	for name, test := range map[string]struct {
 		version    string
 		ilmEnabled bool
