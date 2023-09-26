@@ -219,28 +219,8 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 	tsGrouped := m.timeSeriesGrouped(ctx, gcpService, tss, e)
 
 	//Create single events for each group of data that matches some common patterns like labels and timestamp
-	events := make([]mb.Event, 0)
-	for _, groupedEvents := range tsGrouped {
-		event := mb.Event{
-			Timestamp: groupedEvents[0].Timestamp,
-			ModuleFields: mapstr.M{
-				"labels": groupedEvents[0].Labels,
-			},
-			MetricSetFields: mapstr.M{},
-		}
 
-		for _, singleEvent := range groupedEvents {
-			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
-		}
-
-		if sdc.ServiceName == "compute" {
-			event.RootFields = addHostFields(groupedEvents)
-		} else {
-			event.RootFields = groupedEvents[0].ECS
-		}
-
-		events = append(events, event)
-	}
+	events := createEventsFromGroups(sdc.ServiceName, tsGrouped)
 
 	return events, nil
 }
