@@ -20,7 +20,6 @@
 package lifecycle
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -33,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -47,8 +47,10 @@ const (
 
 func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
-		cfg := DefaultILMConfig(beat.Info{Beat: "test"})
-		cfg.ILM.Enabled = false
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
 		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
 		b, err := h.CheckEnabled()
@@ -57,32 +59,16 @@ func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	})
 
 	t.Run("with ilm if enabled", func(t *testing.T) {
-		h, err := newESClientHandler(t, DefaultILMConfig(beat.Info{Beat: "test"}))
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
 		b, err := h.CheckEnabled()
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
-}
-
-func TestESClientHandler_RecoverBadConfg(t *testing.T) {
-	info := beat.Info{Beat: "test"}
-	client := newRawESClient(t)
-	cfg := DefaultILMConfig(info)
-	if client.IsServerless() {
-		cfg.DSL.Enabled = false
-		cfg.ILM.Enabled = true
-	} else {
-		cfg.DSL.Enabled = true
-		cfg.ILM.Enabled = false
-	}
-
-	h, err := newESClientHandler(t, cfg)
-	require.NoError(t, err)
-	enabled, err := h.CheckEnabled()
-	require.NoError(t, err)
-	require.True(t, enabled)
-
 }
 
 func TestESClientHandler_ILMPolicy(t *testing.T) {
@@ -92,10 +78,15 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 			Name: makeName("esch-policy-create"),
 			Body: DefaultILMPolicy,
 		}
-		cfg := DefaultILMConfig(beat.Info{Beat: "test"})
-		cfg.ILM.policyRaw = &policy
-		h, err := newESClientHandler(t, cfg)
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		rawClient := newRawESClient(t)
+		h, err := NewESClientHandler(rawClient, beat.Info{Beat: "testbeat"}, cfg)
 		require.NoError(t, err)
+		h.cfg.policyRaw = &policy
+
 		err = h.CreatePolicyFromConfig()
 		require.NoError(t, err)
 
@@ -109,10 +100,14 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 			Name: makeName("esch-policy-overwrite"),
 			Body: DefaultILMPolicy,
 		}
-		cfg := DefaultILMConfig(beat.Info{Beat: "test"})
-		cfg.ILM.policyRaw = &policy
-		h, err := newESClientHandler(t, cfg)
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		rawClient := newRawESClient(t)
+		h, err := NewESClientHandler(rawClient, beat.Info{Beat: "testbeat"}, cfg)
 		require.NoError(t, err)
+		h.cfg.policyRaw = &policy
 
 		err = h.CreatePolicyFromConfig()
 		require.NoError(t, err)
@@ -127,7 +122,7 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 	})
 }
 
-func newESClientHandler(t *testing.T, cfg LifecycleConfig) (ClientHandler, error) {
+func newESClientHandler(t *testing.T, cfg RawConfig) (ClientHandler, error) {
 	client := newRawESClient(t)
 	return NewESClientHandler(client, beat.Info{Beat: "testbeat"}, cfg)
 }
@@ -189,14 +184,19 @@ func getEnv(name, def string) string {
 }
 
 func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
-	defaultCfg := DefaultILMConfig(beat.Info{Beat: "test"})
-	defaultCfgDisabled := defaultCfg
-	defaultCfgDisabled.ILM.Enabled = false
+	defaultCfg := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
+	defaultCfgDisabled := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
 	for name, test := range map[string]struct {
 		version    string
 		ilmEnabled bool
 		err        bool
-		cfg        LifecycleConfig
+		cfg        RawConfig
 	}{
 		"ilm enabled": {
 			cfg: defaultCfg,
@@ -225,28 +225,6 @@ func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
-	info := beat.Info{Beat: "test"}
-	cfg := DefaultILMConfig(info)
-	testPolicy := Policy{
-		Name: "test-policy",
-		Body: mapstr.M{"foo": "bar"},
-	}
-	cfg.ILM.policyRaw = &testPolicy
-	testClient := newMockClient("")
-	h, err := NewFileClientHandler(testClient, info, cfg)
-	require.NoError(t, err)
-	err = h.CreatePolicyFromConfig()
-	require.NoError(t, err)
-
-	assert.Equal(t, testPolicy.Name, testClient.name)
-	assert.Equal(t, "policy", testClient.component)
-	var out mapstr.M
-	err = json.Unmarshal([]byte(testClient.body), &out)
-	require.NoError(t, err)
-	assert.Equal(t, testPolicy.Body, out)
 }
 
 type mockClient struct {
