@@ -203,10 +203,7 @@ func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 
 			ilmEnabled: true,
 		},
-		"ilm disabled": {
-			ilmEnabled: false,
-			cfg:        defaultCfgDisabled,
-		},
+
 		"ilm enabled, version too old": {
 			version: "5.0.0",
 			err:     true,

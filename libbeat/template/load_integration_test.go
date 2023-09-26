@@ -71,11 +71,10 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	loader, err := NewESLoader(client)
 	require.NoError(t, err)
 	s := testSetup{t: t, client: client, loader: loader, config: cfg}
-	_, _, err = client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
-	require.NoError(t, err)
+	// don't care if the cleanup fails, since they might just return a 404
+	_, _, _ = client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
 	s.requireDataStreamDoesNotExist("")
-	_, _, err = client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
-	require.NoError(t, err)
+	_, _, _ = client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
 	s.requireTemplateDoesNotExist("")
 	return &s
 }
