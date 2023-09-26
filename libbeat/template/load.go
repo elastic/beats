@@ -159,7 +159,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
 	sameTemplate, sameTemplateErr := l.sameAsExistingTemplate(templateName, template)
 	if sameTemplateErr != nil {
-		l.log.Infof("Get template %s from Elasticsearch failed.", templateName)
+		l.log.Infof("Get template %s from Elasticsearch failed. Template check will be ignored.", templateName)
 	} else {
 		if sameTemplate {
 			l.log.Infof("Template %s is already present in Elasticsearch, skipping...", templateName)
