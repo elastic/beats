@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
 Dependency : Npcap (https://nmap.org/npcap/)
-Version: 1.71
+Version: 1.76
 Licence type: Commercial
 --------------------------------------------------------------------------------
 
-Npcap is Copyright (c) 2013-2021 Insecure.Com LLC. All rights reserved.
+Npcap is Copyright (c) 2013-2023 Insecure.Com LLC. All rights reserved.
 See https://npcap.org for details.
 
 Portions of Npcap are Copyright (c) 1999 - 2005 NetGroup, Politecnico di
