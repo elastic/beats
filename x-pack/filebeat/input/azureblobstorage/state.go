@@ -80,8 +80,8 @@ func (s *state) setRootArray(name string) (done func()) {
 	return func() { s.mu.Unlock() }
 }
 
-// isRootArray, returns true if the object has it's root defined as an array type, locks the state
-// and returns an unlock function done(). The caller must call done when s and result are no longer needed in a locked state.
+// isRootArray, returns true if the object has it's root defined as an array type and has been partially processed, it also locks the state
+// and returns an unlock function done(). The caller must call done when 's' and 'result' are no longer needed in a locked state.
 func (s *state) isRootArray(name string) (result bool, done func()) {
 	s.mu.Lock()
 	result = s.cp.IsRootArray[name]

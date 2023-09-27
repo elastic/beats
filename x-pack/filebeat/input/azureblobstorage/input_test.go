@@ -340,27 +340,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 		},
 		{
-			name: "PathPrefix",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"path_prefix":                         "docs/",
-				"max_workers":                         2,
-				"poll":                                false,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name": beatsContainer,
-					},
-				},
-			},
-			mockHandler: mock.AzureStorageServer,
-			expected: map[string]bool{
-				mock.Beatscontainer_blob_docs_ata_json: true,
-			},
-		},
-		{
-			name: "TimeStampEpoch",
+			name: "FilterByTimeStampEpoch",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -378,6 +358,84 @@ func Test_StorageClient(t *testing.T) {
 			expected: map[string]bool{
 				mock.Beatscontainer_blob_data3_json:    true,
 				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByFileSelectorRegexSingle",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "docs/",
+					},
+				},
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByFileSelectorRegexMulti",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "docs/",
+					},
+					{
+						"regex": "data",
+					},
+				},
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "ExpandEventListFromField",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"expand_event_list_from_field":        "Events",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "events-array",
+					},
+				},
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_events_array_json[0]: true,
+				mock.BeatsFilesContainer_events_array_json[1]: true,
 			},
 		},
 	}

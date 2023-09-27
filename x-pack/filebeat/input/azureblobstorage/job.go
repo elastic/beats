@@ -196,35 +196,102 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		if err := dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
-		// manually seek offset only if file is compressed or if root element is an array
-		if (j.isCompressed || j.isRootArray) && offset < j.offset {
+		// if expand_event_list_from_field is set, then split the event list
+		// here we assume that the field is always an array and it is the only field in the object
+		if j.src.ExpandEventListFromField != "" {
+			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
+				return err
+			}
 			continue
+		} else {
+			// manually seek offset only if file is compressed or if root element is an array
+			if (j.isCompressed || j.isRootArray) && offset < j.offset {
+				continue
+			}
+
+			data, err := item.MarshalJSON()
+			if err != nil {
+				return err
+			}
+			evt := j.createEvent(string(data), offset+relativeOffset)
+			// updates the offset after reading the file
+			// this avoids duplicates for the last read when resuming operation
+			offset = dec.InputOffset()
+			var (
+				cp   *Checkpoint
+				done func()
+			)
+			if !dec.More() {
+				// if this is the last object, then peform a complete state save
+				cp, done = j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+			} else {
+				// partially saves read state using offset
+				cp, done = j.state.savePartialForTx(*j.blob.Name, offset+relativeOffset)
+			}
+			if err := j.publisher.Publish(evt, cp); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+			done()
+		}
+	}
+	return nil
+}
+
+// splitEventList, splits the event list into individual events and publishes them
+func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
+	var jsonObject map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &jsonObject); err != nil {
+		return err
+	}
+
+	var found bool
+	raw, found = jsonObject[key]
+	if !found {
+		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+
+	tok, err := dec.Token()
+	if err != nil {
+		return err
+	}
+	delim, ok := tok.(json.Delim)
+	if !ok || delim != '[' {
+		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+	}
+
+	for dec.More() {
+		arrayOffset := dec.InputOffset()
+
+		var item json.RawMessage
+		if err := dec.Decode(&item); err != nil {
+			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
 		}
 
 		data, err := item.MarshalJSON()
 		if err != nil {
 			return err
 		}
-		evt := j.createEvent(string(data), offset+relativeOffset)
-		// updates the offset after reading the file
-		// this avoids duplicates for the last read when resuming operation
-		offset = dec.InputOffset()
-		var (
-			cp   *Checkpoint
-			done func()
-		)
+		evt := j.createEvent(string(data), offset+arrayOffset)
+
 		if !dec.More() {
-			// if this is the last object, then peform a complete state save
-			cp, done = j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+			// if this is the last object, then save checkpoint
+			// we are not supporting partial saves atm for split event list op
+			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+			if err := j.publisher.Publish(evt, cp); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+			done()
 		} else {
-			// partially saves read state using offset
-			cp, done = j.state.savePartialForTx(*j.blob.Name, offset+relativeOffset)
+			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			if err := j.publisher.Publish(evt, nil); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
 		}
-		if err := j.publisher.Publish(evt, cp); err != nil {
-			j.log.Errorf(jobErrString, id, err)
-		}
-		done()
 	}
+
 	return nil
 }
 
@@ -284,6 +351,7 @@ func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 		}
 	}
 }
+
 func (j *job) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now(),

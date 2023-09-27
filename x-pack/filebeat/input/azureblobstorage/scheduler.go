@@ -7,7 +7,6 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 
 	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
@@ -95,6 +94,7 @@ func (s *scheduler) schedule(ctx context.Context) error {
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
 	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
+	fileSelectorLen := len(s.src.FileSelectors)
 	var numBlobs, numJobs int
 
 	for pager.More() {
@@ -108,7 +108,8 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 
 		var jobs []*job
 		for _, v := range resp.Segment.BlobItems {
-			if s.src.PathPrefix != "" && !strings.HasPrefix(*v.Name, s.src.PathPrefix) {
+			// if file selectors are present, then only select the files that match the regex
+			if fileSelectorLen != 0 && !s.isFileSelected(*v.Name) {
 				continue
 			}
 			// date filter is applied on last modified time of the blob
@@ -227,4 +228,13 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	}
 
 	return jobsToReturn
+}
+
+func (s *scheduler) isFileSelected(name string) bool {
+	for _, sel := range s.src.FileSelectors {
+		if sel.Regex == nil || sel.Regex.MatchString(name) {
+			return true
+		}
+	}
+	return false
 }

@@ -215,6 +215,11 @@ var BeatsFilesContainer_log_ndjson = []string{
 	`{"@timestamp":"2021-05-25T17:25:51.391Z","log.level":"info","message":"available space is 44.3gb"}`,
 }
 
+var BeatsFilesContainer_events_array_json = []string{
+	"{\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hello\"\n        }",
+	"{\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"world\"\n        }",
+}
+
 var BeatsFilesContainer_json_array = []string{
 	"{\n        \"time\": \"2021-05-25 18:20:58 UTC\",\n        \"msg\": \"hello\"\n    }",
 	"{\n        \"time\": \"2021-05-26 22:21:40 UTC\",\n        \"msg\": \"world\"\n    }",
