@@ -10,8 +10,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
 
-// MaxWorkers, Poll, PollInterval & PathPrefix can be configured at a global level,
-// which applies to all containers. They can also be configured at individual container levels.
+// MaxWorkers, Poll, PollInterval, FileSelectors, TimeStampEpoch & ExpandEventListFromField can
+// be configured at a global level, which applies to all containers. They can also be configured at individual container levels.
 // Container level configurations will always override global level values.
 type config struct {
 	AccountName              string               `config:"account_name" validate:"required"`
@@ -37,8 +37,7 @@ type container struct {
 	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
 }
 
-// fileSelectorConfig defines reader configuration that applies to a subset
-// of azure blobs whose name matches the given regex.
+// fileSelectorConfig helps filter out azure blobs based on a regex pattern
 type fileSelectorConfig struct {
 	Regex *match.Matcher `config:"regex" validate:"required"`
 	// TODO: Add support for reader config in future
