@@ -112,7 +112,7 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "num_threads"]
 
 
 class Test(metricbeat.BaseTest):
@@ -439,7 +439,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
         """
-        Test system/process output for fields specific of unix systems.
+        Test system/process output checking it has got all expected fields specific of unix systems and no extra ones.
         """
 
         self.render_config_template(

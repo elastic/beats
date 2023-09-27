@@ -24,6 +24,10 @@
       type: alias
       path: process.pgid
       migration: true
+    - name: num_threads
+      type: integer
+      description: >
+        Number of threads in the process
     - name: cmdline
       type: keyword
       description: >
@@ -345,7 +349,7 @@
             - name: stats.user.pct
               type: scaled_float
               description: time the cgroup spent in user space, as a percentage of total CPU time
-            
+
             - name: stats.user.norm.pct
               type: scaled_float
               description: time the cgroup spent in user space, as a percentage of total CPU time, normalized by CPU count.
@@ -419,7 +423,7 @@
               type: long
               format: bytes
               description: memory max threshhold
-            
+
             - name: mem.events
               type: group
               description: number of times the controller tripped a given usage level
