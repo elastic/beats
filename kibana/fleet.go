@@ -356,8 +356,10 @@ func (client *Client) UnEnrollAgent(ctx context.Context, request UnEnrollAgentRe
 
 // UpgradeAgentRequest is the JSON request for an agent upgrade
 type UpgradeAgentRequest struct {
-	ID      string `json:"-"` // ID is not part of the request body send to the Fleet API
-	Version string `json:"version"`
+	ID        string `json:"-"` // ID is not part of the request body send to the Fleet API
+	Version   string `json:"version"`
+	SourceURI string `json:"source_uri"`
+	Force     bool   `json:"force"`
 }
 
 // UpgradeAgentResponse is currently unused
