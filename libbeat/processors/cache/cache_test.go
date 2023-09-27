@@ -130,7 +130,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -191,7 +191,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -210,7 +210,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -271,7 +271,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -290,7 +290,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -351,7 +351,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -379,7 +379,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: errors.New("error applying cache get processor: target field 'crowdstrike.metadata_new' already exists and overwrite_keys is false"),
 			},
@@ -441,7 +441,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -465,7 +465,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -527,7 +527,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: nil,
 			},
@@ -547,7 +547,7 @@ var cacheTests = []struct {
 					},
 				},
 				wantCacheVal: map[string]*CacheEntry{
-					"one": {key: "one", value: "metadata_value"},
+					"one": {Key: "one", Value: "metadata_value"},
 				},
 				wantErr: errors.New("error applying cache get processor: expected map but type is string"),
 			},
@@ -613,7 +613,7 @@ func TestCache(t *testing.T) {
 					switch got := p.(*cache).store.(type) {
 					case *memStore:
 						allow := cmp.AllowUnexported(CacheEntry{})
-						ignore := cmpopts.IgnoreFields(CacheEntry{}, "expires", "index")
+						ignore := cmpopts.IgnoreFields(CacheEntry{}, "Expires", "index")
 						if !cmp.Equal(step.wantCacheVal, got.cache, allow, ignore) {
 							t.Errorf("unexpected cache state result %d:\n--- want\n+++ got\n%s", i, cmp.Diff(step.wantCacheVal, got.cache, allow, ignore))
 						}
