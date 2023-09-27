@@ -41,7 +41,7 @@ func makeES(
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	if !cfg.HasField("bulk_max_size") {
-		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
+		_ = cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
 	index, pipeline, err := buildSelectors(im, beat, cfg)
