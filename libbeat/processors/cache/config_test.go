@@ -43,6 +43,20 @@ put:
 		want: nil,
 	},
 	{
+		name: "put_file_with_periodic_write_out",
+		cfg: `
+backend:
+  file:
+    id: aidmaster
+    write_frequency: 15m
+put:
+  ttl: 168h
+  key_field: crowdstrike.aid
+  value_field: crowdstrike.metadata
+`,
+		want: nil,
+	},
+	{
 		name: "put_memory",
 		cfg: `
 backend:

@@ -33,9 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-// TODO: Consider having a periodic write-out (per time or per n puts) to
-// reduce loss of state due to crashes.
-
 var fileStores = fileStoreSet{stores: map[string]*fileStore{}}
 
 // fileStoreSet is a collection of shared fileStore caches.
@@ -81,8 +78,14 @@ func (s *fileStoreSet) free(id string) {
 
 // fileStore is a file-backed cache store.
 type fileStore struct {
-	path string
 	memStore
+
+	path string
+	// cancel stops periodic write out operations.
+	// Write out operations are protected by the
+	// memStore's mutex.
+	cancel context.CancelFunc
+
 	log *logp.Logger
 }
 
@@ -108,6 +111,12 @@ func newFileStore(cfg config, id, path string, log *logp.Logger) *fileStore {
 			effort: -1,
 		},
 	}
+	s.cancel = noop
+	if cfg.Store.File.WriteOutEvery > 0 {
+		var ctx context.Context
+		ctx, s.cancel = context.WithCancel(context.Background())
+		go s.periodicWriteOut(ctx, cfg.Store.File.WriteOutEvery)
+	}
 	s.readState()
 	return &s
 }
@@ -123,7 +132,11 @@ func (c *fileStore) dropFrom(stores *fileStoreSet) {
 		panic("invalid reference count")
 	}
 	if c.refs == 0 {
-		c.writeState()
+		// Stop periodic writes
+		c.cancel()
+		// and do a final write out.
+		c.writeState(true)
+
 		stores.free(c.id)
 		// GC assists.
 		c.cache = nil
@@ -178,8 +191,28 @@ func (c *fileStore) readState() {
 	}
 }
 
-func (c *fileStore) writeState() {
-	if len(c.cache) == 0 {
+// periodicWriteOut writes the cache contents to the backing file at the
+// specified interval until the context is cancelled. periodicWriteOut is
+// safe for concurrent use.
+func (c *fileStore) periodicWriteOut(ctx context.Context, every time.Duration) {
+	tick := time.NewTicker(every)
+	defer tick.Stop()
+	for {
+		select {
+		case <-tick.C:
+			c.mu.Lock()
+			c.writeState(false)
+			c.mu.Unlock()
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+// writeState writes the current cache state to the backing file.
+// If final is true and the cache is empty, the file will be deleted.
+func (c *fileStore) writeState(final bool) {
+	if len(c.cache) == 0 && final {
 		err := os.Remove(c.path)
 		if err != nil {
 			c.log.Errorw("failed to delete write state when empty", "error", err)

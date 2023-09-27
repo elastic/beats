@@ -42,7 +42,7 @@ var memStoreTests = []struct {
 		name: "new_put",
 		cfg: config{
 			Store: &storeConfig{
-				Memory:   &id{"test"},
+				Memory:   &memConfig{"test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -63,7 +63,7 @@ var memStoreTests = []struct {
 		name: "new_get",
 		cfg: config{
 			Store: &storeConfig{
-				Memory:   &id{"test"},
+				Memory:   &memConfig{"test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -83,7 +83,7 @@ var memStoreTests = []struct {
 		name: "new_delete",
 		cfg: config{
 			Store: &storeConfig{
-				Memory:   &id{"test"},
+				Memory:   &memConfig{"test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -103,7 +103,7 @@ var memStoreTests = []struct {
 		name: "new_get_add_put",
 		cfg: config{
 			Store: &storeConfig{
-				Memory:   &id{"test"},
+				Memory:   &memConfig{"test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -123,7 +123,7 @@ var memStoreTests = []struct {
 				doTo: func(s *memStore) error {
 					putCfg := config{
 						Store: &storeConfig{
-							Memory:   &id{"test"},
+							Memory:   &memConfig{"test"},
 							Capacity: 1000,
 							Effort:   10,
 						},
@@ -149,7 +149,7 @@ var memStoreTests = []struct {
 		name: "ensemble",
 		cfg: config{
 			Store: &storeConfig{
-				Memory:   &id{"test"},
+				Memory:   &memConfig{"test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -169,7 +169,7 @@ var memStoreTests = []struct {
 				doTo: func(s *memStore) error {
 					putCfg := config{
 						Store: &storeConfig{
-							Memory:   &id{"test"},
+							Memory:   &memConfig{"test"},
 							Capacity: 1000,
 							Effort:   10,
 						},

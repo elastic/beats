@@ -54,7 +54,7 @@ var fileStoreTests = []struct {
 		name: "new_put",
 		cfg: config{
 			Store: &storeConfig{
-				File:     &id{"test"},
+				File:     &fileConfig{ID: "test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -75,7 +75,7 @@ var fileStoreTests = []struct {
 		name: "new_get",
 		cfg: config{
 			Store: &storeConfig{
-				File:     &id{"test"},
+				File:     &fileConfig{ID: "test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -95,7 +95,7 @@ var fileStoreTests = []struct {
 		name: "new_delete",
 		cfg: config{
 			Store: &storeConfig{
-				File:     &id{"test"},
+				File:     &fileConfig{ID: "test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -115,7 +115,7 @@ var fileStoreTests = []struct {
 		name: "new_get_add_put",
 		cfg: config{
 			Store: &storeConfig{
-				File:     &id{"test"},
+				File:     &fileConfig{ID: "test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -135,7 +135,7 @@ var fileStoreTests = []struct {
 				doTo: func(s *fileStore) error {
 					putCfg := config{
 						Store: &storeConfig{
-							File:     &id{"test"},
+							File:     &fileConfig{ID: "test"},
 							Capacity: 1000,
 							Effort:   10,
 						},
@@ -161,7 +161,7 @@ var fileStoreTests = []struct {
 		name: "ensemble",
 		cfg: config{
 			Store: &storeConfig{
-				File:     &id{"test"},
+				File:     &fileConfig{ID: "test"},
 				Capacity: 1000,
 				Effort:   10,
 			},
@@ -181,7 +181,7 @@ var fileStoreTests = []struct {
 				doTo: func(s *fileStore) error {
 					putCfg := config{
 						Store: &storeConfig{
-							File:     &id{"test"},
+							File:     &fileConfig{ID: "test"},
 							Capacity: 1000,
 							Effort:   10,
 						},
@@ -361,7 +361,7 @@ func TestFileStore(t *testing.T) {
 	}
 
 	allow := cmp.AllowUnexported(fileStore{}, memStore{}, CacheEntry{})
-	ignoreInFileStore := cmpopts.IgnoreFields(fileStore{}, "log")
+	ignoreInFileStore := cmpopts.IgnoreFields(fileStore{}, "cancel", "log")
 	ignoreInMemStore := cmpopts.IgnoreFields(memStore{}, "mu")
 	ignoreInCacheEntry := cmpopts.IgnoreFields(CacheEntry{}, "Expires")
 
@@ -391,7 +391,7 @@ func TestFileStore(t *testing.T) {
 			if test.wantPersisted == nil {
 				return
 			}
-			store = nil
+
 			f, err := os.Open(path)
 			if err != nil {
 				t.Fatalf("failed to open persisted data: %v", err)
