@@ -37,12 +37,23 @@ import (
 			kgid_t		sgid;		// saved GID of the task
 			kuid_t		euid;		// effective UID of the task
 			kgid_t		egid;		// effective GID of the task
+			kuid_t		fsuid;		// UID for VFS ops
+			kgid_t		fsgid;		// GID for VFS ops
+			unsigned	securebits;	// SUID-less security management
+			kernel_cap_t	cap_inheritable; // caps our children can inherit
+			kernel_cap_t   	cap_permitted;	// caps we're permitted
+			kernel_cap_t   	cap_effective;	// caps we can actually use
+			kernel_cap_t   	cap_bset;	// capability bounding set
+			kernel_cap_t    cap_ambient;	// Ambient capability set
+
 
 	The output of this probe is a series of offsets within this structure:
 		"STRUCT_CRED_UID": 4
 		"STRUCT_CRED_GID": 8
 		"STRUCT_CRED_EUID": 20
 		"STRUCT_CRED_EGID": 24
+		"STRUCT_CRED_CAP_PERMITTED: 48
+		"STRUCT_CRED_CAP_EFFECTIVE: 56
 */
 
 // This should be multiple of 8 enough to fit up to egid on a struct cred.
@@ -71,6 +82,8 @@ func (g *guessStructCreds) Provides() []string {
 		"STRUCT_CRED_GID",
 		"STRUCT_CRED_EUID",
 		"STRUCT_CRED_EGID",
+		"STRUCT_CRED_CAP_PERMITTED",
+		"STRUCT_CRED_CAP_EFFECTIVE",
 	}
 }
 
@@ -135,6 +148,8 @@ func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
 		"STRUCT_CRED_GID":  offset + 4,
 		"STRUCT_CRED_EUID": offset + 16,
 		"STRUCT_CRED_EGID": offset + 20,
+		"STRUCT_CRED_CAP_PERMITTED": offset + 48,
+		"STRUCT_CRED_CAP_EFFECTIVE": offset + 56,
 	}, true
 }
 
