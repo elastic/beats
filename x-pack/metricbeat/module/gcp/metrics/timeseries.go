@@ -36,7 +36,8 @@ func createDimensionsKey(kv KeyValuePoint) string {
 	provider := getKeyValue(kv.ECS, "cloud.provider")
 	region := getKeyValue(kv.ECS, "cloud.region")
 
-	dimensionsKey := fmt.Sprintf("%s_%s_%s_%s_%s_%s",
+	dimensionsKey := fmt.Sprintf("%d_%s_%s_%s_%s_%s_%s",
+		kv.Timestamp.UnixNano(),
 		accountID,
 		az,
 		instanceID,
