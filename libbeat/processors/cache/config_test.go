@@ -93,6 +93,28 @@ delete:
 		want: nil,
 	},
 	{
+		name: "memory_no_id",
+		cfg: `
+backend:
+  memory:
+    id: ''
+delete:
+  key_field: crowdstrike.aid
+`,
+		want: errors.New("string value is not set accessing 'backend.memory.id'"),
+	},
+	{
+		name: "file_no_id",
+		cfg: `
+backend:
+  file:
+    id: ''
+delete:
+  key_field: crowdstrike.aid
+`,
+		want: errors.New("string value is not set accessing 'backend.file.id'"),
+	},
+	{
 		name: "no_op",
 		cfg: `
 backend:

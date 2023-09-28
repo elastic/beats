@@ -98,11 +98,11 @@ type storeConfig struct {
 }
 
 type memConfig struct {
-	ID string `config:"id"`
+	ID string `config:"id" validate:"required"`
 }
 
 type fileConfig struct {
-	ID            string        `config:"id"`
+	ID            string        `config:"id" validate:"required"`
 	WriteOutEvery time.Duration `config:"write_interval"`
 }
 
