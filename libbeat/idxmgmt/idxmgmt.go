@@ -126,7 +126,7 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 		}
 
 		// consider lifecycles enabled if the user has explicitly enabled them,
-		// or if no `enabled`` setting has been set by the user, thus reverting to a default of enabled.
+		// or if no `enabled` setting has been set by the user, thus reverting to a default of enabled.
 		enabled := false
 		if cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() {
 			enabled = true

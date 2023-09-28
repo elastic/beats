@@ -94,7 +94,7 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 	if lifecycleCfg.Enabled { // these are-enabled checks should happen elsewhere, but check again here just in case
 		policy, err = createPolicy(lifecycleCfg, info, defaultPolicy)
 		if err != nil {
-			return nil, fmt.Errorf("error creating DSL policy: %w", err)
+			return nil, fmt.Errorf("error creating a lifecycle policy: %w", err)
 		}
 	}
 
@@ -126,8 +126,8 @@ func (h *ESClientHandler) IsElasticsearch() bool {
 func (h *ESClientHandler) HasPolicy() (bool, error) {
 	status, b, err := h.client.Request("GET", h.putPath, "", nil, nil)
 	if err != nil && status != 404 {
-		return false, wrapErrf(err, ErrRequestFailed,
-			"failed to check for policy name '%v': (status=%v) %s", h.name, status, b)
+		return false, fmt.Errorf("%w: failed to check for policy name '%v': (status=%v) (err=%w) %s",
+			ErrRequestFailed, h.name, status, err, b)
 	}
 	return status == 200, nil
 }

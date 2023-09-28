@@ -19,16 +19,7 @@ package lifecycle
 
 import (
 	"errors"
-	"fmt"
 )
-
-// Error indicates an error + reason describing the last error.
-// The Reason() method returns a sentinal error value for comparison.
-type Error struct {
-	reason  error
-	cause   error
-	message string
-}
 
 var (
 	ErrESVersionNotSupported = errors.New("ILM is not supported by the Elasticsearch version in use")
@@ -38,38 +29,3 @@ var (
 	ErrRequestFailed         = errors.New("request failed")
 	ErrOpNotAvailable        = errors.New("operation not available, no lifecycle manager is enabled")
 )
-
-func errOf(reason error) error {
-	return &Error{reason: reason}
-}
-
-func errf(reason error, msg string, vs ...interface{}) error {
-	return wrapErrf(nil, reason, msg, vs...)
-}
-
-func wrapErrf(cause, reason error, msg string, vs ...interface{}) error {
-	return &Error{
-		cause:   cause,
-		reason:  reason,
-		message: fmt.Sprintf(msg, vs...),
-	}
-}
-
-// Cause returns the errors cause, if present.
-func (e *Error) Cause() error { return e.cause }
-
-// Reason returns a sentinal error value define within the ilm package.
-func (e *Error) Reason() error { return e.reason }
-
-// Error returns the formatted error string.
-func (e *Error) Error() string {
-	msg := e.message
-	if e.message == "" {
-		msg = e.reason.Error()
-	}
-
-	if e.cause != nil {
-		return fmt.Sprintf("%v: %+v", msg, e.cause)
-	}
-	return msg
-}

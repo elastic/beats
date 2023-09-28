@@ -82,7 +82,7 @@ func checkILMEnabled(enabled bool, c VersionCheckerClient) (bool, error) {
 
 	ver := c.GetVersion()
 	if ver.LessThan(esMinDefaultILMVersion) {
-		return false, errf(ErrESVersionNotSupported, "Elasticsearch %v does not support ILM", ver.String())
+		return false, fmt.Errorf("%w: Elasticsearch %v does not support ILM", ErrESVersionNotSupported, ver.String())
 	}
 	return true, nil
 }
@@ -100,12 +100,12 @@ func createPolicy(cfg Config, info beat.Info, defaultPolicy mapstr.M) (Policy, e
 	if path := cfg.PolicyFile; path != "" {
 		contents, err := os.ReadFile(path)
 		if err != nil {
-			return Policy{}, fmt.Errorf("failed to read policy file '%v': %w", path, err)
+			return Policy{}, fmt.Errorf("failed to read policy file '%s': %w", path, err)
 		}
 
 		var body map[string]interface{}
 		if err := json.Unmarshal(contents, &body); err != nil {
-			return Policy{}, fmt.Errorf("failed to decode policy file '%v': %w", path, err)
+			return Policy{}, fmt.Errorf("failed to decode policy file '%s': %w", path, err)
 		}
 
 		policy.Body = body

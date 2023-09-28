@@ -36,16 +36,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 
 		s := tmp.(*stdSupport)
 		assert := assert.New(t)
-		assert.Equal(true, s.Enabled())
-	})
-
-	t.Run("with custom alias config with fieldref", func(t *testing.T) {
-		tmp, err := DefaultSupport(nil, info, true)
-		require.NoError(t, err)
-
-		s := tmp.(*stdSupport)
-		assert := assert.New(t)
-		assert.Equal(true, s.Enabled())
+		assert.True(s.Enabled())
 	})
 
 }

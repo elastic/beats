@@ -46,7 +46,7 @@ func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil
 func (*noopManager) CheckEnabled() (bool, error) { return false, nil }
 
 // EnsurePolicy no-op
-func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, errOf(ErrOpNotAvailable) }
+func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, ErrOpNotAvailable }
 
 // Policyname no-op
 func (*noopManager) PolicyName() string { return "" }

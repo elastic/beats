@@ -268,7 +268,6 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 			require.NoError(t, err)
 			manager := support.Manager(clientHandler, nil)
 			ok, warn := manager.VerifySetup(setup.loadTmpl, setup.loadILM)
-			t.Logf("%s", warn)
 			assert.Equal(t, setup.ok, ok)
 			assert.Contains(t, warn, setup.warn)
 			clientHandler.assertInvariants(t)
