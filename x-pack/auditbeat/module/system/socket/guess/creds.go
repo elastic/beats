@@ -144,10 +144,10 @@ func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
 		return nil, false
 	}
 	return mapstr.M{
-		"STRUCT_CRED_UID":  offset,
-		"STRUCT_CRED_GID":  offset + 4,
-		"STRUCT_CRED_EUID": offset + 16,
-		"STRUCT_CRED_EGID": offset + 20,
+		"STRUCT_CRED_UID":           offset,
+		"STRUCT_CRED_GID":           offset + 4,
+		"STRUCT_CRED_EUID":          offset + 16,
+		"STRUCT_CRED_EGID":          offset + 20,
 		"STRUCT_CRED_CAP_PERMITTED": offset + 48,
 		"STRUCT_CRED_CAP_EFFECTIVE": offset + 56,
 	}, true
