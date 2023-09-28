@@ -12,10 +12,7 @@ batch of events in one transaction.
 You can configure the type and behavior of the internal queue by
 setting options in the `queue` section of the +{beatname_lc}.yml+
 config file or by setting options in the `queue` section of the
-output. Only one queue type can be configured.  If both the top level
-queue section and the output section are specified the output section
-takes precedence.
-
+output. Only one queue type can be configured.
 
 This sample configuration sets the memory queue to buffer up to 4096 events:
 
