@@ -93,10 +93,10 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "pods-low",
-			"quota": 0,
+			"name": "pods-medium",
+			"quota": 10,
 			"resource": "pods",
-			"type": "used"
+			"type": "hard"
 		},
 		"Index": "",
 		"ID": "",
@@ -115,10 +115,10 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "pods-medium",
-			"quota": 10,
+			"name": "pods-low",
+			"quota": 0,
 			"resource": "pods",
-			"type": "hard"
+			"type": "used"
 		},
 		"Index": "",
 		"ID": "",
@@ -203,10 +203,10 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "pods-low",
-			"quota": 10737418240,
-			"resource": "memory",
-			"type": "hard"
+			"name": "pods-medium",
+			"quota": 0,
+			"resource": "pods",
+			"type": "used"
 		},
 		"Index": "",
 		"ID": "",
@@ -247,32 +247,10 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "pods-medium",
-			"quota": 0,
-			"resource": "pods",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"name": "pods-high",
-			"quota": 0,
+			"name": "pods-low",
+			"quota": 10737418240,
 			"resource": "memory",
-			"type": "used"
+			"type": "hard"
 		},
 		"Index": "",
 		"ID": "",
@@ -313,7 +291,51 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
+			"name": "pods-high",
+			"quota": 0,
+			"resource": "memory",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
 			"name": "pods-low",
+			"quota": 0,
+			"resource": "memory",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"name": "pods-medium",
 			"quota": 0,
 			"resource": "memory",
 			"type": "used"
@@ -338,28 +360,6 @@
 			"name": "pods-low",
 			"quota": 0,
 			"resource": "cpu",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"name": "pods-medium",
-			"quota": 0,
-			"resource": "memory",
 			"type": "used"
 		},
 		"Index": "",

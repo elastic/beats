@@ -55,6 +55,7 @@ CHANGELOG*
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/cache/ @elastic/security-external-integrations
 /libbeat/processors/community_id/ @elastic/security-external-integrations
 /libbeat/processors/decode_xml/ @elastic/security-external-integrations
 /libbeat/processors/decode_xml_wineventlog/ @elastic/security-external-integrations
@@ -66,6 +67,7 @@ CHANGELOG*
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
 /metricbeat/module/ @elastic/integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
@@ -115,6 +117,8 @@ CHANGELOG*
 /x-pack/filebeat/input/gcs/ @elastic/security-external-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
 /x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/internal/httplog @elastic/security-external-integrations
+/x-pack/filebeat/input/internal/httpmon @elastic/security-external-integrations
 /x-pack/filebeat/input/lumberjack/ @elastic/security-external-integrations
 /x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
 /x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations

@@ -65,7 +65,7 @@ var (
 		Password:         "",
 		APIKey:           "",
 		MaxRetries:       3,
-		CompressionLevel: 0,
+		CompressionLevel: 1,
 		EscapeHTML:       false,
 		Kerberos:         nil,
 		LoadBalance:      true,

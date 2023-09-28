@@ -20,6 +20,7 @@ package eslegclient
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/base64"
 	"net/http"
 	"testing"
@@ -41,7 +42,7 @@ func TestAPIKeyEncoding(t *testing.T) {
 	httpClient := newMockClient()
 	conn.HTTP = httpClient
 
-	req, err := http.NewRequest("GET", "http://fakehost/some/path", nil)
+	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 	require.NoError(t, err)
 
 	_, _, err = conn.execHTTPRequest(req)
@@ -97,11 +98,63 @@ func TestHeaders(t *testing.T) {
 		httpClient := newMockClient()
 		conn.HTTP = httpClient
 
-		req, err := http.NewRequest("GET", "http://fakehost/some/path", nil)
+		req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 		require.NoError(t, err)
 		_, _, err = conn.execHTTPRequest(req)
 		require.NoError(t, err)
 
 		require.Equal(t, req.Header, http.Header(td.expected))
+	}
+}
+
+func BenchmarkExecHTTPRequest(b *testing.B) {
+	for _, td := range []struct {
+		input    map[string]string
+		expected map[string][]string
+	}{
+		{
+			input: map[string]string{
+				"Accept":             "application/vnd.elasticsearch+json;compatible-with=7",
+				"Content-Type":       "application/vnd.elasticsearch+json;compatible-with=7",
+				productorigin.Header: "elastic-product",
+				"X-My-Header":        "true",
+			},
+			expected: map[string][]string{
+				"Accept":             {"application/vnd.elasticsearch+json;compatible-with=7"},
+				"Content-Type":       {"application/vnd.elasticsearch+json;compatible-with=7"},
+				productorigin.Header: {"elastic-product"},
+				"X-My-Header":        {"true"},
+			},
+		},
+		{
+			input: map[string]string{
+				"X-My-Header": "true",
+			},
+			expected: map[string][]string{
+				"Accept":             {"application/json"},
+				productorigin.Header: {productorigin.Beats},
+				"X-My-Header":        {"true"},
+			},
+		},
+	} {
+		conn, err := NewConnection(ConnectionSettings{
+			Headers: td.input,
+		})
+		require.NoError(b, err)
+
+		httpClient := newMockClient()
+		conn.HTTP = httpClient
+
+		var bb []byte
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
+			require.NoError(b, err)
+			_, bb, err = conn.execHTTPRequest(req)
+			require.NoError(b, err)
+			require.Equal(b, req.Header, http.Header(td.expected))
+			require.NotEmpty(b, bb)
+		}
 	}
 }

@@ -217,13 +217,15 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
+			metrics := newInputMetrics("")
+			defer metrics.Close()
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					err := servers.serve(ctx, cfg, &pub)
+					err := servers.serve(ctx, cfg, &pub, metrics)
 					if err != http.ErrServerClosed {
 						select {
 						case fails <- err:
@@ -274,7 +276,7 @@ func TestServerPool(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					err := servers.serve(ctx, cfg, &pub)
+					err := servers.serve(ctx, cfg, &pub, metrics)
 					if err != nil && err != http.ErrServerClosed && test.wantErr == nil {
 						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
 					}

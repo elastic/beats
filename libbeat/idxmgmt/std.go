@@ -69,11 +69,14 @@ const (
 	componentILM                           //ilm
 )
 
+// feature determines what an index management feature is, and how it should be handled during setup
 type feature struct {
 	component                componentType
 	enabled, overwrite, load bool
 }
 
+// newFeature creates a feature config object from a list of settings,
+// returning a central object we use to determine how to perform setup for the feature
 func newFeature(c componentType, enabled, overwrite bool, mode LoadMode) feature {
 	if mode == LoadModeUnset && !enabled {
 		mode = LoadModeDisabled
@@ -88,6 +91,7 @@ func newFeature(c componentType, enabled, overwrite bool, mode LoadMode) feature
 	return feature{component: c, enabled: enabled, overwrite: overwrite, load: load}
 }
 
+// creates a supporter that can perform setup and management actions for index support features such as ILM, index templates, etc
 func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
@@ -120,10 +124,12 @@ func newIndexSupport(
 	}, nil
 }
 
+// Enabled returns true if some configured index management features are enabled
 func (s *indexSupport) Enabled() bool {
 	return s.enabled(componentTemplate) || s.enabled(componentILM)
 }
 
+// enabled checks if the given component is enabled in the config
 func (s *indexSupport) enabled(c componentType) bool {
 	switch c {
 	case componentTemplate:
@@ -134,6 +140,8 @@ func (s *indexSupport) enabled(c componentType) bool {
 	return false
 }
 
+// Manager returns an indexManager object that
+// can be used to perform the actual setup functions for the provided index management features
 func (s *indexSupport) Manager(
 	clientHandler ClientHandler,
 	assets Asseter,
@@ -146,6 +154,7 @@ func (s *indexSupport) Manager(
 	}
 }
 
+// BuildSelector creates an index selector
 func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error) {
 	var err error
 	// we construct our own configuration object based on the available settings
@@ -155,16 +164,19 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 	if cfg.HasField("indices") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error getting child value 'indices' in config: %w", err)
 		}
-		selCfg.SetChild("indices", -1, sub)
+		err = selCfg.SetChild("indices", -1, sub)
+		if err != nil {
+			return nil, fmt.Errorf("error setting child 'indices': %w", err)
+		}
 	}
 
 	var indexName string
 	if cfg.HasField("index") {
 		indexName, err = cfg.String("index", -1)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error getting config string 'index': %w", err)
 		}
 	}
 
@@ -174,7 +186,10 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 		indexName = s.defaultIndex
 	}
 
-	selCfg.SetString("index", -1, indexName)
+	err = selCfg.SetString("index", -1, indexName)
+	if err != nil {
+		return nil, fmt.Errorf("error setting 'index' in selector cfg: %w", err)
+	}
 	buildSettings := outil.Settings{
 		Key:              "index",
 		MultiKey:         "indices",
@@ -191,6 +206,7 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 	return indexSelector{indexSel, s.info}, nil
 }
 
+// VerifySetup verifies the given feature setup, will return an error string if it detects something suspect
 func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
 	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.support.ilm.Overwrite(), loadILM)
 
@@ -219,6 +235,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 	return warn == "", warn
 }
 
+// Setup performs ILM/DSL and index template setup
 func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	log := m.support.log
 
@@ -230,6 +247,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		log.Info("Auto ILM enable success.")
 	}
 
+	// create feature objects for ILM and template setup
 	ilmComponent := newFeature(componentILM, withILM, m.support.ilm.Overwrite(), loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
@@ -238,7 +256,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		// install ilm policy
 		policyCreated, err := m.ilm.EnsurePolicy(ilmComponent.overwrite)
 		if err != nil {
-			return err
+			return fmt.Errorf("EnsurePolicy failed during ILM setup: %w", err)
 		}
 
 		// The template should be updated if a new policy is created.
@@ -252,15 +270,15 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
 		if ilmComponent.enabled {
-			tmplCfg, err = applyILMSettings(log, tmplCfg, m.support.ilm.Policy())
+			tmplCfg, err = applyILMSettingsToTemplate(log, tmplCfg, m.support.ilm.Policy())
 			if err != nil {
-				return err
+				return fmt.Errorf("error applying ILM settings: %w", err)
 			}
 		}
 		fields := m.assets.Fields(m.support.info.Beat)
 		err = m.clientHandler.Load(tmplCfg, m.support.info, fields, m.support.migration)
 		if err != nil {
-			return fmt.Errorf("error loading template: %v", err)
+			return fmt.Errorf("error loading template: %w", err)
 		}
 
 		log.Info("Loaded index template.")
@@ -269,6 +287,8 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	return nil
 }
 
+// setupWithILM returns true if setup with ILM is expected
+// will return false if we're currently talking to a serverless ES instance
 func (m *indexManager) setupWithILM() (bool, error) {
 	var err error
 	withILM := m.support.st.withILM.Load()
@@ -321,7 +341,8 @@ func unpackTemplateConfig(info beat.Info, cfg *config.C) (config template.Templa
 	return config, err
 }
 
-func applyILMSettings(
+// applies the specified ILM policy to the provided template, returns a struct of the template config
+func applyILMSettingsToTemplate(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
 	policy ilm.Policy,

@@ -195,9 +195,10 @@ func baseMockEventMonitorValidator(id string, name string, status string) valida
 
 func mockEventMonitorValidator(id string, name string) validator.Validator {
 	return lookslike.Strict(lookslike.Compose(
+		hbtestllext.MaybeHasEventType,
 		baseMockEventMonitorValidator(id, name, "up"),
 		hbtestllext.MonitorTimespanValidator,
-		hbtest.SummaryChecks(1, 0),
+		hbtest.SummaryStateChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
 	))
 }

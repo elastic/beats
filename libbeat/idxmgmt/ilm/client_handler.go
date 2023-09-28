@@ -44,6 +44,7 @@ type VersionCheckerClient interface {
 // prepare a policy.
 type ESClient interface {
 	VersionCheckerClient
+	IsServerless() bool
 	Request(
 		method, path string,
 		pipeline string,
@@ -107,6 +108,7 @@ func (h *ESClientHandler) HasILMPolicy(name string) (bool, error) {
 }
 
 // CheckILMEnabled indicates whether or not ILM is supported for the configured mode and client version.
+// If the connected ES instance is serverless, this will return false
 func (h *FileClientHandler) CheckILMEnabled(enabled bool) (bool, error) {
 	return checkILMEnabled(enabled, h.client)
 }
@@ -114,6 +116,12 @@ func (h *FileClientHandler) CheckILMEnabled(enabled bool) (bool, error) {
 func checkILMEnabled(enabled bool, c VersionCheckerClient) (bool, error) {
 	if !enabled {
 		return false, nil
+	}
+
+	if esClient, ok := c.(ESClient); ok {
+		if esClient.IsServerless() {
+			return false, nil
+		}
 	}
 
 	ver := c.GetVersion()
@@ -127,7 +135,7 @@ func checkILMEnabled(enabled bool, c VersionCheckerClient) (bool, error) {
 func (h *FileClientHandler) CreateILMPolicy(policy Policy) error {
 	str := fmt.Sprintf("%s\n", policy.Body.StringToPrint())
 	if err := h.client.Write("policy", policy.Name, str); err != nil {
-		return fmt.Errorf("error printing policy : %v", err)
+		return fmt.Errorf("error printing policy : %w", err)
 	}
 	return nil
 }
