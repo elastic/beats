@@ -272,10 +272,11 @@ func (r *outputReloaderMock) Reload(
 	return nil
 }
 
-func TestMergeOutputQueueSettings(t *testing.T) {
+func TestPromoteOutputQueueSettings(t *testing.T) {
 	tests := map[string]struct {
-		input     []byte
-		memEvents int
+		input                 []byte
+		memEvents             int
+		expectValidationError bool
 	}{
 		"blank": {input: []byte(""),
 			memEvents: 4096},
@@ -322,7 +323,7 @@ output:
       mem:
         events: 8096
 `),
-			memEvents: 8096},
+			expectValidationError: true},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -331,9 +332,13 @@ output:
 
 			config := beatConfig{}
 			err = cfg.Unpack(&config)
+			if tc.expectValidationError {
+				require.Error(t, err)
+				return
+			}
 			require.NoError(t, err)
 
-			err = mergeOutputQueueSettings(&config)
+			err = promoteOutputQueueSettings(&config)
 			require.NoError(t, err)
 
 			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
