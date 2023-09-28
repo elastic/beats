@@ -26,6 +26,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -63,10 +64,31 @@ func (s *fileStoreSet) get(id string, cfg config, log *logp.Logger) (*fileStore,
 
 // pathFromConfig returns the mapping form a config to a file-system path.
 func pathFromConfig(cfg config, log *logp.Logger) string {
-	path := filepath.Join(paths.Resolve(paths.Data, "cache_processor"), cfg.Store.File.ID)
+	path := filepath.Join(paths.Resolve(paths.Data, "cache_processor"), cleanFilename(cfg.Store.File.ID))
 	log.Infow("mapping file-backed cache processor config to file path", "id", cfg.Store.File.ID, "path", path)
 	return path
 }
+
+// cleanFilename replaces illegal printable characters (and space or dot) in
+// filenames, with underscore.
+func cleanFilename(s string) string {
+	return pathCleaner.Replace(s)
+}
+
+var pathCleaner = strings.NewReplacer(
+	"/", "_",
+	"<", "_",
+	">", "_",
+	":", "_",
+	`"`, "_",
+	"/", "_",
+	`\`, "_",
+	"|", "_",
+	"?", "_",
+	"*", "_",
+	".", "_",
+	" ", "_",
+)
 
 // free removes the fileStore with the given ID from the set. free is safe
 // for concurrent use.
@@ -224,7 +246,7 @@ func (c *fileStore) writeState(final bool) {
 		}
 		return
 	}
-	f, err := os.CreateTemp(filepath.Dir(c.path), "")
+	f, err := os.CreateTemp(filepath.Dir(c.path), filepath.Base(c.path)+"-*.tmp")
 	if err != nil {
 		c.log.Errorw("failed to open file to write state", "error", err)
 		return
