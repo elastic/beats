@@ -33,15 +33,15 @@ const (
 
 func setFileSystemMetadata(fi os.FileInfo, fields mapstr.M) error {
 	osstate := file.GetOSState(fi)
-	_, err := fields.Put(idxhiKey, osstate.IdxHi)
+	_, err := fields.Put(idxhiKey, strconv.FormatUint(osstate.IdxHi, 10))
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", idxhiKey, err)
 	}
-	_, err = fields.Put(idxloKey, osstate.IdxLo)
+	_, err = fields.Put(idxloKey, strconv.FormatUint(osstate.IdxLo, 10))
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", idxloKey, err)
 	}
-	_, err = fields.Put(volKey, osstate.Vol)
+	_, err = fields.Put(volKey, strconv.FormatUint(osstate.Vol, 10))
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", volKey, err)
 	}
