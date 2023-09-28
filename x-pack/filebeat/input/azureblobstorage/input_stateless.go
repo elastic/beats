@@ -11,6 +11,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"golang.org/x/sync/errgroup"
 )
 
