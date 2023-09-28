@@ -773,8 +773,8 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	if err := mergeOutputQueueSettings(&b.Config); err != nil {
-		return fmt.Errorf("could not merge output queue settings: %w", err)
+	if err := promoteOutputQueueSettings(&b.Config); err != nil {
+		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
 
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
@@ -1471,7 +1471,7 @@ func sanitizeIPs(ips []string) []string {
 	return validIPs
 }
 
-func mergeOutputQueueSettings(bc *beatConfig) error {
+func promoteOutputQueueSettings(bc *beatConfig) error {
 	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
 		pc := pipeline.Config{}
 		err := bc.Output.Config().Unpack(&pc)
@@ -1479,7 +1479,22 @@ func mergeOutputQueueSettings(bc *beatConfig) error {
 			return fmt.Errorf("error unpacking output queue settings: %w", err)
 		}
 		if pc.Queue.IsSet() {
+			logp.Info("global queue settings replaced with output queue settings")
 			bc.Pipeline.Queue = pc.Queue
+		}
+	}
+	return nil
+}
+
+func (bc *beatConfig) Validate() error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		pc := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&pc)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if bc.Pipeline.Queue.IsSet() && pc.Queue.IsSet() {
+			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
 		}
 	}
 	return nil
