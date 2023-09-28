@@ -24,24 +24,25 @@ import (
 	"time"
 )
 
+var memStores = memStoreSet{stores: map[string]*memStore{}}
+
 // memStoreSet is a collection of shared memStore caches.
 type memStoreSet struct {
 	mu     sync.Mutex
 	stores map[string]*memStore
-	typ    string // TODO: Remove when a file-backed store exists.
 }
 
 // get returns a memStore cache with the provided ID based on the config.
 // If a memStore with the ID already exist, its configuration is adjusted
 // and its reference count is increased. The returned context.CancelFunc
-// reduces the reference count and deletes the memStore from set if the
+// reduces the reference count and deletes the memStore from the set if the
 // count reaches zero.
 func (s *memStoreSet) get(id string, cfg config) (*memStore, context.CancelFunc) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	store, ok := s.stores[id]
 	if !ok {
-		store = newMemStore(cfg, id, s.typ)
+		store = newMemStore(cfg, id)
 		s.stores[store.id] = store
 	}
 	store.add(cfg)
@@ -69,10 +70,6 @@ type memStore struct {
 
 	// id is the index into global cache store for the cache.
 	id string
-	// typ is a temporary tag to differentiate memory stores
-	// from the mocked file store.
-	// TODO: Remove when a file-backed store exists.
-	typ string
 
 	// cap is the maximum number of elements the cache
 	// will hold. If not positive, no limit.
@@ -85,10 +82,9 @@ type memStore struct {
 // newMemStore returns a new memStore configured to apply the give TTL duration.
 // The memStore is guaranteed not to grow larger than cap elements. id is the
 // look-up into the global cache store the memStore is held in.
-func newMemStore(cfg config, id, typ string) *memStore {
+func newMemStore(cfg config, id string) *memStore {
 	return &memStore{
 		id:    id,
-		typ:   typ,
 		cache: make(map[string]*CacheEntry),
 
 		// Mark the ttl as invalid until we have had a put
@@ -103,7 +99,7 @@ func newMemStore(cfg config, id, typ string) *memStore {
 	}
 }
 
-func (c *memStore) String() string { return c.typ + ":" + c.id }
+func (c *memStore) String() string { return "memory:" + c.id }
 
 // add updates the receiver for a new operation. It increases the reference
 // count for the receiver, and if the config is a put operation and has no
@@ -158,11 +154,11 @@ func (c *memStore) Get(key string) (any, error) {
 	if !ok {
 		return nil, ErrNoData
 	}
-	if time.Now().After(v.expires) {
+	if time.Now().After(v.Expires) {
 		delete(c.cache, key)
 		return nil, ErrNoData
 	}
-	return v.value, nil
+	return v.Value, nil
 }
 
 // Put stores the provided value in the cache associated with the given key.
@@ -174,9 +170,9 @@ func (c *memStore) Put(key string, val any) error {
 	now := time.Now()
 	c.evictExpired(now)
 	e := &CacheEntry{
-		key:     key,
-		value:   val,
-		expires: now.Add(c.ttl),
+		Key:     key,
+		Value:   val,
+		Expires: now.Add(c.ttl),
 	}
 	c.cache[key] = e
 	heap.Push(&c.expiries, e)
@@ -189,11 +185,11 @@ func (c *memStore) Put(key string, val any) error {
 // it under the capacity limit.
 func (c *memStore) evictExpired(now time.Time) {
 	for n := 0; (c.effort <= 0 || n < c.effort) && len(c.cache) != 0; n++ {
-		if c.expiries[0].expires.After(now) {
+		if c.expiries[0].Expires.After(now) {
 			break
 		}
 		e := c.expiries.pop()
-		delete(c.cache, e.key)
+		delete(c.cache, e.Key)
 	}
 	if c.cap <= 0 {
 		// No cap, so depend on effort.
@@ -201,7 +197,7 @@ func (c *memStore) evictExpired(now time.Time) {
 	}
 	for len(c.cache) >= c.cap {
 		e := c.expiries.pop()
-		delete(c.cache, e.key)
+		delete(c.cache, e.Key)
 	}
 }
 
@@ -237,7 +233,7 @@ func (h expiryHeap) Len() int {
 	return len(h)
 }
 func (h expiryHeap) Less(i, j int) bool {
-	return h[i].expires.Before(h[j].expires)
+	return h[i].Expires.Before(h[j].Expires)
 }
 func (h expiryHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]

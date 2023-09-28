@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -29,6 +30,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const name = "cache"
@@ -64,14 +66,14 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack the %s configuration: %w", name, err)
 	}
-	src, cancel, err := getStoreFor(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get the store for %s: %w", name, err)
-	}
-
 	// Logging (each processor instance has a unique ID).
 	id := int(instanceID.Inc())
 	log := logp.NewLogger(name).With("instance_id", id)
+
+	src, cancel, err := getStoreFor(config, log)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the store for %s: %w", name, err)
+	}
 
 	p := &cache{
 		config: config,
@@ -87,16 +89,18 @@ func New(cfg *conf.C) (beat.Processor, error) {
 // and a context cancellation that releases the cache resource when it
 // is no longer required. The cancellation should be called when the
 // processor is closed.
-func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
+func getStoreFor(cfg config, log *logp.Logger) (Store, context.CancelFunc, error) {
 	switch {
 	case cfg.Store.Memory != nil:
 		s, cancel := memStores.get(cfg.Store.Memory.ID, cfg)
 		return s, cancel, nil
 
 	case cfg.Store.File != nil:
-		logp.L().Warn("using memory store when file is configured")
-		// TODO: Replace place-holder code with a file-store.
-		s, cancel := fileStores.get(cfg.Store.File.ID, cfg)
+		err := os.MkdirAll(paths.Resolve(paths.Data, "cache_processor"), 0o700)
+		if err != nil {
+			return nil, noop, fmt.Errorf("cache processor could not create store directory: %w", err)
+		}
+		s, cancel := fileStores.get(cfg.Store.File.ID, cfg, log)
 		return s, cancel, nil
 
 	default:
@@ -104,11 +108,6 @@ func getStoreFor(cfg config) (Store, context.CancelFunc, error) {
 		return nil, noop, errors.New("no configured store")
 	}
 }
-
-var (
-	memStores  = memStoreSet{stores: map[string]*memStore{}, typ: "memory"}
-	fileStores = memStoreSet{stores: map[string]*memStore{}, typ: "file"} // This is a temporary mock.
-)
 
 // noop is a no-op context.CancelFunc.
 func noop() {}
@@ -126,9 +125,9 @@ type Store interface {
 }
 
 type CacheEntry struct {
-	key     string
-	value   any
-	expires time.Time
+	Key     string    `json:"key"`
+	Value   any       `json:"val"`
+	Expires time.Time `json:"expires"`
 	index   int
 }
 
