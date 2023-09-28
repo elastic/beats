@@ -39,6 +39,19 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		return nil, err
 	}
 
+	var capPermitted []string
+	var capEffective []string
+	if e, ok := proc.(types.Capabilities); ok {
+		if caps, _ := e.Capabilities(); caps != nil {
+		    for _, capName := range caps.Permitted {
+			    capPermitted = append(capPermitted, "CAP_" + strings.ToUpper(capName))
+		    }
+		    for _, capName := range caps.Effective {
+			    capEffective = append(capEffective, "CAP_" + strings.ToUpper(capName))
+		    }
+		}
+	}
+
 	var env map[string]string
 	if e, ok := proc.(types.Environment); ok {
 		env, _ = e.Environment()
@@ -56,6 +69,8 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		name:      info.Name,
 		args:      info.Args,
 		env:       env,
+		capPermitted: capPermitted,
+		capEffective: capEffective,
 		title:     strings.Join(info.Args, " "),
 		exe:       info.Exe,
 		pid:       info.PID,

@@ -48,6 +48,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 			exe:   "/usr/lib/systemd/systemd",
 			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			capPermitted: []string{"CAP_SYS_ADMIN", "CAP_CHOWN"},
+			capEffective: []string{"CAP_SYS_ADMIN", "CAP_CHOWN"},
 			env: map[string]string{
 				"HOME":       "/",
 				"TERM":       "linux",
@@ -65,6 +67,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 			exe:   "/usr/lib/systemd/systemd",
 			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			capPermitted: []string{"CAP_SYS_ADMIN", "CAP_CHOWN"},
+			capEffective: []string{"CAP_SYS_ADMIN", "CAP_CHOWN"},
 			env: map[string]string{
 				"HOME":       "/",
 				"TERM":       "linux",
