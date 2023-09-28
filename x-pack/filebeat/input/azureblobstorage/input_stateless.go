@@ -11,6 +11,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"golang.org/x/sync/errgroup"
 )
 
 type statelessInput struct {
@@ -43,6 +44,7 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher) error {
 	pub := statelessPublisher{wrapped: publisher}
 	var source cursor.Source
+	var g errgroup.Group
 	for _, c := range in.config.Containers {
 		container := tryOverrideOrDefault(in.config, c)
 		source = &Source{
@@ -76,10 +78,11 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		}
 
 		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, log)
-		err = scheduler.schedule(ctx)
-		if err != nil {
-			return err
-		}
+		// allows multiple containers to be scheduled concurrently while testing
+		g.Go(func() error {
+			return scheduler.schedule(ctx)
+		})
+
 	}
-	return nil
+	return g.Wait()
 }

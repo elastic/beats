@@ -438,6 +438,39 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_events_array_json[1]: true,
 			},
 		},
+		{
+			name: "MultiContainerWithMultiFileSelectors",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+						"file_selectors": []map[string]interface{}{
+							{
+								"regex": "docs/",
+							},
+						},
+					},
+					{
+						"name": beatsContainer2,
+						"file_selectors": []map[string]interface{}{
+							{
+								"regex": "data_3",
+							},
+						},
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+				mock.Beatscontainer_2_blob_data3_json:  true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -42,7 +42,7 @@ type job struct {
 	// offset value for an object, it points to the location inside the data stream
 	// from where we can start processing the object.
 	offset int64
-	// flag to denote if object is gZipped compressed or not
+	// flag to denote if object is gZip compressed or not
 	isCompressed bool
 	// flag to denote if object's root element is of an array type
 	isRootArray bool
@@ -136,8 +136,9 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
 	// we hardcode a retry count of 3 here
+	const maxRetries = 3
 	reader := get.NewRetryReader(ctx, &azblob.RetryReaderOptions{
-		MaxRetries: 3,
+		MaxRetries: maxRetries,
 	})
 	defer func() {
 		err = reader.Close()
@@ -155,8 +156,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
-	var err error
-	r, err = j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
@@ -174,6 +174,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	}
 
 	dec := json.NewDecoder(r)
+	dec.UseNumber()
 	// If array is present at root then read json token and advance decoder
 	if j.isRootArray {
 		_, err := dec.Token()
@@ -189,7 +190,6 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	if !j.isCompressed && !j.isRootArray {
 		relativeOffset = j.offset
 	}
-	dec.UseNumber()
 	for dec.More() && ctx.Err() == nil {
 		var item json.RawMessage
 		offset = dec.InputOffset()
@@ -237,15 +237,14 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	return nil
 }
 
-// splitEventList, splits the event list into individual events and publishes them
+// splitEventList splits the event list into individual events and publishes them
 func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
 		return err
 	}
 
-	var found bool
-	raw, found = jsonObject[key]
+	raw, found := jsonObject[key]
 	if !found {
 		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
 	}
@@ -321,7 +320,7 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	return gzip.NewReader(bufReader)
 }
 
-// evaluateJSON, uses a bufio.NewReader & reader.Peek to evaluate if the
+// evaluateJSON uses a bufio.NewReader & reader.Peek to evaluate if the
 // data stream contains a json array as the root element or not, without
 // advancing the reader. If the data stream contains an array as the root
 // element, the value of the boolean return type is set to true.

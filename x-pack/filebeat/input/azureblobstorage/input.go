@@ -23,6 +23,12 @@ type azurebsInput struct {
 	serviceURL string
 }
 
+// defines the valid range for Unix timestamps for 64 bit integers
+var (
+	minTimestamp = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+	maxTimestamp = time.Date(3000, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+)
+
 const (
 	inputName string = "azure-blob-storage"
 )
@@ -119,12 +125,8 @@ func tryOverrideOrDefault(cfg config, c container) container {
 
 // isValidUnixTimestamp checks if the timestamp is a valid Unix timestamp
 func isValidUnixTimestamp(timestamp int64) bool {
-	// defines the valid range for Unix timestamps
-	minTimestamp := time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
-	maxTimestamp := time.Date(2106, time.February, 7, 6, 28, 15, 0, time.UTC).Unix()
-
 	// checks if the timestamp is within the valid range
-	return timestamp >= minTimestamp && timestamp <= maxTimestamp
+	return minTimestamp <= timestamp && timestamp <= maxTimestamp
 }
 
 func (input *azurebsInput) Name() string {
