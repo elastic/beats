@@ -103,7 +103,7 @@ type memConfig struct {
 
 type fileConfig struct {
 	ID            string        `config:"id"`
-	WriteOutEvery time.Duration `config:"write_frequency"`
+	WriteOutEvery time.Duration `config:"write_interval"`
 }
 
 func (cfg *storeConfig) Validate() error {

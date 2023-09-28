@@ -48,7 +48,7 @@ put:
 backend:
   file:
     id: aidmaster
-    write_frequency: 15m
+    write_interval: 15m
 put:
   ttl: 168h
   key_field: crowdstrike.aid

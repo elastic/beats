@@ -169,7 +169,12 @@ func (c *fileStore) readState() {
 		err = dec.Decode(&e)
 		if err != nil {
 			if err != io.EOF {
-				c.log.Errorw("failed to read state element", "error", err)
+				switch err := err.(type) {
+				case *json.SyntaxError:
+					c.log.Errorw("failed to read state element", "error", err, "path", c.path, "offset", err.Offset)
+				default:
+					c.log.Errorw("failed to read state element", "error", err, "path", c.path)
+				}
 			}
 			break
 		}
@@ -219,12 +224,12 @@ func (c *fileStore) writeState(final bool) {
 		}
 		return
 	}
-	f, err := os.CreateTemp("", "")
+	f, err := os.CreateTemp(filepath.Dir(c.path), "")
 	if err != nil {
 		c.log.Errorw("failed to open file to write state", "error", err)
 		return
 	}
-	// We are writing into tmp, so make sure we are private.
+	// Try to make sure we are private.
 	err = os.Chmod(f.Name(), 0o600)
 	if err != nil {
 		c.log.Errorw("failed to set state file mode", "error", err)
@@ -232,6 +237,11 @@ func (c *fileStore) writeState(final bool) {
 	}
 	tmp := f.Name()
 	defer func() {
+		err = f.Sync()
+		if err != nil {
+			c.log.Errorw("failed to sync file after writing state", "error", err)
+			return
+		}
 		err = f.Close()
 		if err != nil {
 			c.log.Errorw("failed to close file after writing state", "error", err)
