@@ -202,6 +202,7 @@ func (c *fileStore) readState() {
 		}
 		if e.Expires.Before(time.Now()) {
 			// Don't retain expired elements.
+			c.dirty = true // The cache now does not reflect the file.
 			continue
 		}
 		c.cache[e.Key] = &e
@@ -239,6 +240,9 @@ func (c *fileStore) periodicWriteOut(ctx context.Context, every time.Duration) {
 // writeState writes the current cache state to the backing file.
 // If final is true and the cache is empty, the file will be deleted.
 func (c *fileStore) writeState(final bool) {
+	if !c.dirty {
+		return
+	}
 	if len(c.cache) == 0 && final {
 		err := os.Remove(c.path)
 		if err != nil {
@@ -291,4 +295,6 @@ func (c *fileStore) writeState(final bool) {
 			return
 		}
 	}
+	// Only mark as not dirty if we succeeded in the write.
+	c.dirty = false
 }
