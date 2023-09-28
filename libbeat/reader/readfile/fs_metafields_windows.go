@@ -20,6 +20,7 @@ package readfile
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
