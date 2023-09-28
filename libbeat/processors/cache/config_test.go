@@ -43,6 +43,20 @@ put:
 		want: nil,
 	},
 	{
+		name: "put_file_with_periodic_write_out",
+		cfg: `
+backend:
+  file:
+    id: aidmaster
+    write_interval: 15m
+put:
+  ttl: 168h
+  key_field: crowdstrike.aid
+  value_field: crowdstrike.metadata
+`,
+		want: nil,
+	},
+	{
 		name: "put_memory",
 		cfg: `
 backend:
@@ -77,6 +91,28 @@ delete:
   key_field: crowdstrike.aid
 `,
 		want: nil,
+	},
+	{
+		name: "memory_no_id",
+		cfg: `
+backend:
+  memory:
+    id: ''
+delete:
+  key_field: crowdstrike.aid
+`,
+		want: errors.New("string value is not set accessing 'backend.memory.id'"),
+	},
+	{
+		name: "file_no_id",
+		cfg: `
+backend:
+  file:
+    id: ''
+delete:
+  key_field: crowdstrike.aid
+`,
+		want: errors.New("string value is not set accessing 'backend.file.id'"),
 	},
 	{
 		name: "no_op",
