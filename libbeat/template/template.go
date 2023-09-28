@@ -22,6 +22,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 	"github.com/elastic/go-ucfg/yaml"
@@ -316,6 +317,7 @@ func buildIdxSettings(ver version.V, userSettings mapstr.M, isServerless bool) m
 
 	// deal with settings that aren't available on serverless
 	if isServerless {
+		logp.L().Infof("remote instance is severless, number_of_shards and max_docvalue_fields_search will be skipped in index template")
 		userSettings.Delete("number_of_shards")
 	} else {
 		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
