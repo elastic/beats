@@ -18,6 +18,7 @@
 package lifecycle
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -49,13 +50,13 @@ func (client *mockESClient) Request(method, path string, pipeline string, params
 
 	if method == "GET" {
 		if client.hasPolicy || client.foundPolicy != nil {
-			return 200, []byte{}, nil
+			return http.StatusOK, []byte{}, nil
 		} else {
-			return 404, []byte{}, nil
+			return http.StatusNotFound, []byte{}, nil
 		}
 	}
 
-	return 201, []byte{}, nil
+	return http.StatusCreated, []byte{}, nil
 }
 
 func TestESSetup(t *testing.T) {

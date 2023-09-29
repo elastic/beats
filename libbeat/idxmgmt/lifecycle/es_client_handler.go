@@ -20,6 +20,7 @@ package lifecycle
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -125,11 +126,11 @@ func (h *ESClientHandler) IsElasticsearch() bool {
 // HasPolicy queries Elasticsearch to see if policy with given name exists.
 func (h *ESClientHandler) HasPolicy() (bool, error) {
 	status, b, err := h.client.Request("GET", h.putPath, "", nil, nil)
-	if err != nil && status != 404 {
+	if err != nil && status != http.StatusNotFound {
 		return false, fmt.Errorf("%w: failed to check for policy name '%v': (status=%v) (err=%w) %s",
 			ErrRequestFailed, h.name, status, err, b)
 	}
-	return status == 200, nil
+	return status == http.StatusOK, nil
 }
 
 // CreatePolicyFromConfig creates a DSL policy from a raw setup config for the beat
@@ -186,7 +187,7 @@ func (h *ESClientHandler) createAndPutPolicy(cfg Config, info beat.Info) error {
 // performs the PUT operation to create a policy
 func (h *ESClientHandler) putPolicyToES(path string, policy Policy) error {
 	retCode, resp, err := h.client.Request("PUT", path, "", nil, policy.Body)
-	if retCode > 300 {
+	if retCode >= http.StatusMultipleChoices {
 		return fmt.Errorf("error creating lifecycle policy: got %d from elasticsearch: %s", retCode, resp)
 	}
 	if err != nil {
