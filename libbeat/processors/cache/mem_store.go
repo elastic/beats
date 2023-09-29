@@ -67,6 +67,9 @@ type memStore struct {
 	expiries expiryHeap
 	ttl      time.Duration // ttl is the time entries are valid for in the cache.
 	refs     int           // refs is the number of processors referring to this store.
+	// dirty marks the cache as changed from the
+	// state in a backing file if it exists.
+	dirty bool
 
 	// id is the index into global cache store for the cache.
 	id string
@@ -176,6 +179,7 @@ func (c *memStore) Put(key string, val any) error {
 	}
 	c.cache[key] = e
 	heap.Push(&c.expiries, e)
+	c.dirty = true
 	return nil
 }
 
@@ -212,6 +216,7 @@ func (c *memStore) Delete(key string) error {
 	}
 	heap.Remove(&c.expiries, v.index)
 	delete(c.cache, key)
+	c.dirty = true
 	return nil
 }
 
