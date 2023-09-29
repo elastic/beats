@@ -214,6 +214,12 @@ func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist *Twi
 	}
 }
 
+func (sdb *ScenarioDB) RunTagWithSeparateTwists(t *testing.T, tagName string, twists []*Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+	for _, twist := range twists {
+		sdb.RunTagWithATwist(t, tagName, twist, callback)
+	}
+}
+
 type MonitorTestRun struct {
 	StdFields stdfields.StdMonitorFields
 	Meta      ScenarioRunMeta
