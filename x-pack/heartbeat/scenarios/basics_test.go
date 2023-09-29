@@ -115,7 +115,7 @@ func TestLightweightSummaries(t *testing.T) {
 
 func TestBrowserSummaries(t *testing.T) {
 	t.Parallel()
-	scenarioDB.RunTag(t, "browser", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+	scenarioDB.RunTagWithATwist(t, "browser-down", TwistMaxAttempts(2), func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
 		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
 
@@ -125,6 +125,11 @@ func TestBrowserSummaries(t *testing.T) {
 				hbtest.URLChecks(t, mtr.Meta.URL),
 			),
 			lastEvent.Fields)
+
+		monStatus, _ := lastEvent.GetValue("monitor.status")
+		summaryIface, _ := lastEvent.GetValue("summary")
+		summary := summaryIface.(*jobsummary.JobSummary)
+		require.Equal(t, string(summary.Status), monStatus, "expected summary status and mon status to be equal in event: %v", lastEvent.Fields)
 
 		for _, e := range firstEvents {
 			summary, _ := e.GetValue("summary")

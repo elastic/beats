@@ -131,7 +131,7 @@ func TestSummarizer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			job, tracker, sf := setupTest(tt.statusSequence, tt.maxAttempts)
+			job, tracker, sf := setupHTTPJob(tt.statusSequence, tt.maxAttempts)
 
 			rcvdStatuses := ""
 			rcvdStates := ""
@@ -203,7 +203,7 @@ func TestSummarizer(t *testing.T) {
 	}
 }
 
-func setupTest(statusSequence string, maxAttempts int) (job jobs.Job, tracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) {
+func setupHTTPJob(statusSequence string, maxAttempts int) (job jobs.Job, tracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) {
 	// The job runs through each char in the status sequence and
 	// returns an error if it's set to 'd'
 	pos := 0
@@ -225,6 +225,31 @@ func setupTest(statusSequence string, maxAttempts int) (job jobs.Job, tracker *m
 
 	tracker = monitorstate.NewTracker(monitorstate.NilStateLoader, false)
 	sf = stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(maxAttempts)}
+	return job, tracker, sf
+}
+
+func setupBrowserJob(statusSequence string, maxAttempts int) (job jobs.Job, tracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) {
+	// The job runs through each char in the status sequence and
+	// returns an error if it's set to 'd'
+	pos := 0
+	job = func(event *beat.Event) (j []jobs.Job, retErr error) {
+		status := charToStatus(statusSequence[pos])
+		if status == monitorstate.StatusDown {
+			retErr = errDummy
+		}
+		event.Fields = mapstr.M{
+			"monitor": mapstr.M{
+				"id":     "test",
+				"status": string(status),
+			},
+		}
+
+		pos++
+		return nil, retErr
+	}
+
+	tracker = monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+	sf = stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "browser", MaxAttempts: uint16(maxAttempts)}
 	return job, tracker, sf
 }
 
