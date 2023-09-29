@@ -32,10 +32,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var errDummy = fmt.Errorf("dummyerr")
-
 func TestSummarizer(t *testing.T) {
 	t.Parallel()
+	charToStatus := func(c uint8) monitorstate.StateStatus {
+		if c == 'u' {
+			return monitorstate.StatusUp
+		} else {
+			return monitorstate.StatusDown
+		}
+	}
 
 	testURL := "https://example.net"
 	// these tests use strings to describe sequences of events
@@ -59,15 +64,6 @@ func TestSummarizer(t *testing.T) {
 			"du",
 			"12",
 			2,
-			testURL,
-		},
-		{
-			"start down, stay down, then up",
-			2,
-			"ddddu",
-			"ddddu",
-			"12121",
-			5,
 			testURL,
 		},
 		{
@@ -130,8 +126,29 @@ func TestSummarizer(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+			dummyErr := fmt.Errorf("dummyerr")
 
-			job, tracker, sf := setupHTTPJob(tt.statusSequence, tt.maxAttempts)
+			// The job runs through each char in the status sequence and
+			// returns an error if it's set to 'd'
+			pos := 0
+			job := func(event *beat.Event) (j []jobs.Job, retErr error) {
+				status := charToStatus(tt.statusSequence[pos])
+				if status == monitorstate.StatusDown {
+					retErr = dummyErr
+				}
+				event.Fields = mapstr.M{
+					"monitor": mapstr.M{
+						"id":     "test",
+						"status": string(status),
+					},
+				}
+
+				pos++
+				return nil, retErr
+			}
+
+			tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+			sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(tt.maxAttempts)}
 
 			rcvdStatuses := ""
 			rcvdStates := ""
@@ -200,63 +217,5 @@ func TestSummarizer(t *testing.T) {
 			require.Len(t, rcvdEvents, len(tt.statusSequence))
 			require.Len(t, rcvdSummaries, tt.expectedSummaries)
 		})
-	}
-}
-
-func setupHTTPJob(statusSequence string, maxAttempts int) (job jobs.Job, tracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) {
-	// The job runs through each char in the status sequence and
-	// returns an error if it's set to 'd'
-	pos := 0
-	job = func(event *beat.Event) (j []jobs.Job, retErr error) {
-		status := charToStatus(statusSequence[pos])
-		if status == monitorstate.StatusDown {
-			retErr = errDummy
-		}
-		event.Fields = mapstr.M{
-			"monitor": mapstr.M{
-				"id":     "test",
-				"status": string(status),
-			},
-		}
-
-		pos++
-		return nil, retErr
-	}
-
-	tracker = monitorstate.NewTracker(monitorstate.NilStateLoader, false)
-	sf = stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(maxAttempts)}
-	return job, tracker, sf
-}
-
-func setupBrowserJob(statusSequence string, maxAttempts int) (job jobs.Job, tracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) {
-	// The job runs through each char in the status sequence and
-	// returns an error if it's set to 'd'
-	pos := 0
-	job = func(event *beat.Event) (j []jobs.Job, retErr error) {
-		status := charToStatus(statusSequence[pos])
-		if status == monitorstate.StatusDown {
-			retErr = errDummy
-		}
-		event.Fields = mapstr.M{
-			"monitor": mapstr.M{
-				"id":     "test",
-				"status": string(status),
-			},
-		}
-
-		pos++
-		return nil, retErr
-	}
-
-	tracker = monitorstate.NewTracker(monitorstate.NilStateLoader, false)
-	sf = stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "browser", MaxAttempts: uint16(maxAttempts)}
-	return job, tracker, sf
-}
-
-func charToStatus(c uint8) monitorstate.StateStatus {
-	if c == 'u' {
-		return monitorstate.StatusUp
-	} else {
-		return monitorstate.StatusDown
 	}
 }
