@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
@@ -99,25 +100,22 @@ func TestLightweightUrls(t *testing.T) {
 
 func TestLightweightSummaries(t *testing.T) {
 	t.Parallel()
-	scenarioDB.RunTag(t, "lightweight", func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+	scenarioDB.RunTagWithSeparateTwists(t, "lightweight", StdAttemptTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
-		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
+		lastEvent := all[len(all)-1]
 		testslike.Test(t,
 			SummaryValidatorForStatus(mtr.Meta.Status),
 			lastEvent.Fields)
 
-		for _, e := range firstEvents {
-			summary, _ := e.GetValue("summary")
-			require.Nil(t, summary)
-		}
+		requireOneSummaryPerAttempt(t, all)
 	})
 }
 
 func TestBrowserSummaries(t *testing.T) {
 	t.Parallel()
-	scenarioDB.RunTagWithATwist(t, "browser-down", TwistMaxAttempts(2), func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
+	scenarioDB.RunTagWithSeparateTwists(t, "browser", StdAttemptTwists, func(t *testing.T, mtr *framework.MonitorTestRun, err error) {
 		all := mtr.Events()
-		lastEvent, firstEvents := all[len(all)-1], all[:len(all)-1]
+		lastEvent := all[len(all)-1]
 
 		testslike.Test(t,
 			lookslike.Compose(
@@ -131,11 +129,23 @@ func TestBrowserSummaries(t *testing.T) {
 		summary := summaryIface.(*jobsummary.JobSummary)
 		require.Equal(t, string(summary.Status), monStatus, "expected summary status and mon status to be equal in event: %v", lastEvent.Fields)
 
-		for _, e := range firstEvents {
-			summary, _ := e.GetValue("summary")
-			require.Nil(t, summary)
-		}
+		requireOneSummaryPerAttempt(t, all)
+
 	})
+}
+
+func requireOneSummaryPerAttempt(t *testing.T, events []*beat.Event) {
+	attemptCounter := uint16(1)
+	// ensure we only have one summary per attempt
+	for _, e := range events {
+		summaryIface, _ := e.GetValue("summary")
+		if summaryIface != nil {
+			summary := summaryIface.(*jobsummary.JobSummary)
+			require.Equal(t, attemptCounter, summary.Attempt)
+			require.LessOrEqual(t, summary.Attempt, summary.MaxAttempts)
+			attemptCounter++
+		}
+	}
 }
 
 func TestRunFromOverride(t *testing.T) {
