@@ -245,7 +245,7 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 		"ilm enabled but overwrite disabled": {
 			tmplEnabled: true,
 			ilmEnabled:  true, ilmOverwrite: false, loadILM: LoadModeEnabled,
-			warn:      "Overwriting ILM policy is disabled",
+			warn:      "Overwriting lifecycle policy is disabled",
 			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, Overwrite: false, PolicyName: *fmtstr.MustCompileEvent("test")}},
 		},
 		"everything enabled": {

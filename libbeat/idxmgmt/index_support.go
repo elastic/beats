@@ -207,8 +207,8 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 }
 
 // VerifySetup verifies the given feature setup, will return an error string if it detects something suspect
-func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
-	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.clientHandler.Overwrite(), loadILM)
+func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, string) {
+	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.clientHandler.Overwrite(), loadLifecycle)
 
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
@@ -225,9 +225,9 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 
 	var warn string
 	if !ilmComponent.load {
-		warn += "ILM policy loading not enabled.\n"
+		warn += "lifecycle policy loading not enabled.\n"
 	} else if !ilmComponent.overwrite {
-		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.\n"
+		warn += "Overwriting lifecycle policy is disabled. Set `setup.ilm.overwrite: true` or `setup.dsl.overwrite: true` to overwrite.\n"
 	}
 	if !templateComponent.load {
 		warn += "Template loading not enabled.\n"
