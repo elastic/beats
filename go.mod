@@ -20,7 +20,7 @@ require (
 )
 
 require (
-	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/elastic/go-ucfg v0.8.5 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
