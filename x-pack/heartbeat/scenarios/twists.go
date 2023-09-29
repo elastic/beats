@@ -36,7 +36,7 @@ func TwistMultiRun(times int) *framework.Twist {
 	})
 }
 
-// Test with both one and two twists
+// StdAttemptTwists is a list of real world attempt numbers, that is to say both one and two twists.
 var StdAttemptTwists = []*framework.Twist{TwistMaxAttempts(1), TwistMaxAttempts(2)}
 
 func TwistMaxAttempts(maxAttempts int) *framework.Twist {
