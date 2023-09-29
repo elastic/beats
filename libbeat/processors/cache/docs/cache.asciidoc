@@ -51,9 +51,10 @@ It has the following settings:
 
 One of `backend.memory.id` or `backend.file.id` must be provided.
 
+`backend.capacity`:: The number of elements that can be stored in the cache. `put` operations that would cause the capacity to be exceeded will result in evictions of the oldest elements. Values at or below zero indicate no limit. The capacity should not be lower than the number of elements that are expected to be referenced when processing the input as evicted elements are lost. The default is `0`, no limit.
 `backend.memory.id`:: The ID of a memory-based cache. Use the same ID across instance to reference the same cache.
 `backend.file.id`:: The ID of a file-based cache. Use the same ID across instance to reference the same cache.
-`backend.file.write_frequency`:: The frequency the cache is periodically written to the backing file. Valid time units are h, m, s, ms, us/µs and ns. Periodic writes are only made if `backend.file.write_frequency` is greater than zero. The contents are always written out to the backing file when the processor is closed. Default is zero, no periodic writes.
+`backend.file.write_period`:: The interval between periodic cache writes to the backing file. Valid time units are h, m, s, ms, us/µs and ns. Periodic writes are only made if `backend.file.write_period` is greater than zero. The contents are always written out to the backing file when the processor is closed. Default is zero, no periodic writes.
 
 One of `put`, `get` or `delete` must be provided.
 
@@ -88,6 +89,7 @@ processors:
           backend:
             memory:
               id: aidmaster
+            capacity: 10000
           put:
             ttl: 168h
             key_field: crowdstrike.aid
@@ -103,6 +105,7 @@ processors:
 -------------------------------------------------------------------------------
 
 This would enrich an event events with `log.file.path` not equal to
-"fdrv2/aidmaster" with the `crowdstrike.metadata` fields from events
-with `log.file.path` equal to that value where the `crowdstrike.aid`
-field matches between the source and destination documents.
+"fdrv2/aidmaster" with the `crowdstrike.metadata` fields from events with
+ `log.file.path` equal to that value where the `crowdstrike.aid` field
+ matches between the source and destination documents. The capacity allows up
+ to 10,000 metadata object to be cached between `put` and `get` operations.
