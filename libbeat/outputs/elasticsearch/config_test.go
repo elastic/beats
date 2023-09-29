@@ -97,6 +97,28 @@ non_indexable_policy.dead_letter_index:
 	}
 }
 
+func TestCompressionIsOnByDefault(t *testing.T) {
+	config := ""
+	c := conf.MustNewConfigFrom(config)
+	elasticsearchOutputConfig, err := readConfig(c)
+	if err != nil {
+		t.Fatalf("Can't create test configuration from valid input")
+	}
+	assert.Equal(t, 1, elasticsearchOutputConfig.CompressionLevel, "Default compression level should be 1")
+}
+
+func TestExplicitCompressionLevelOverridesDefault(t *testing.T) {
+	config := `
+compression_level: 0
+`
+	c := conf.MustNewConfigFrom(config)
+	elasticsearchOutputConfig, err := readConfig(c)
+	if err != nil {
+		t.Fatalf("Can't create test configuration from valid input")
+	}
+	assert.Equal(t, 0, elasticsearchOutputConfig.CompressionLevel, "Explicit compression level should override defaults")
+}
+
 func readConfig(cfg *conf.C) (*elasticsearchConfig, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
