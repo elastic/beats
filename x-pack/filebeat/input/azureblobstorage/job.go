@@ -39,9 +39,6 @@ type job struct {
 	blobURL string
 	// object hash, used in setting event id
 	hash string
-	// offset value for an object, it points to the location inside the data stream
-	// from where we can start processing the object.
-	offset int64
 	// flag to denote if object is gzip compressed or not
 	isCompressed bool
 	// flag to denote if object's root element is of an array type
@@ -87,9 +84,6 @@ func (j *job) do(ctx context.Context, id string) {
 		if *j.blob.Properties.ContentType == gzType || (j.blob.Properties.ContentEncoding != nil && *j.blob.Properties.ContentEncoding == encodingGzip) {
 			j.isCompressed = true
 		}
-		isRootArray, done := j.state.isRootArray(*j.blob.Name)
-		done()
-		j.isRootArray = isRootArray
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.log.Errorf(jobErrString, id, err)
@@ -125,13 +119,7 @@ func (j *job) timestamp() *time.Time {
 }
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
-	var err error
-	downloadOptions := &blob.DownloadStreamOptions{}
-	if !j.isCompressed && !j.isRootArray {
-		downloadOptions.Range.Offset = j.offset
-	}
-
-	get, err := j.client.DownloadStream(ctx, downloadOptions)
+	get, err := j.client.DownloadStream(ctx, &blob.DownloadStreamOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
@@ -160,16 +148,10 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
 	}
 
-	// if offset == 0, then this is a new stream which has not been processed previously
-	if j.offset == 0 {
-		r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
-		if err != nil {
-			return fmt.Errorf("failed to evaluate json for blob: %s, with error: %w", *j.blob.Name, err)
-		}
-		if j.isRootArray {
-			done := j.state.setRootArray(*j.blob.Name)
-			done()
-		}
+	// checks if the root element is an array or not
+	r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
+	if err != nil {
+		return fmt.Errorf("failed to evaluate json for blob: %s, with error: %w", *j.blob.Name, err)
 	}
 
 	dec := json.NewDecoder(r)
@@ -182,55 +164,37 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		}
 	}
 
-	var offset, relativeOffset int64
-	// uncompressed files use the client to directly set the offset, this
-	// in turn causes the offset to reset to 0 for the new stream, hence why
-	// we need to keep relative offsets to keep track of the actual offset
-	if !j.isCompressed && !j.isRootArray {
-		relativeOffset = j.offset
-	}
 	for dec.More() && ctx.Err() == nil {
 		var item json.RawMessage
-		offset = dec.InputOffset()
+		offset := dec.InputOffset()
 		if err := dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
 		// if expand_event_list_from_field is set, then split the event list
-		// here we assume that the field is always an array and it is the only field in the object
 		if j.src.ExpandEventListFromField != "" {
 			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
 				return err
 			}
-			continue
-		} else {
-			// manually seek offset only if file is compressed or if root element is an array
-			if (j.isCompressed || j.isRootArray) && offset < j.offset {
-				continue
-			}
+		}
 
-			data, err := item.MarshalJSON()
-			if err != nil {
-				return err
-			}
-			evt := j.createEvent(string(data), offset+relativeOffset)
-			// updates the offset after reading the file
-			// this avoids duplicates for the last read when resuming operation
-			offset = dec.InputOffset()
-			var (
-				done func()
-				cp   *Checkpoint
-			)
-			if !dec.More() {
-				// if this is the last object, then peform a complete state save
-				cp, done = j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
-			} else {
-				// partially saves read state using offset
-				cp, done = j.state.savePartialForTx(*j.blob.Name, offset+relativeOffset)
-			}
+		data, err := item.MarshalJSON()
+		if err != nil {
+			return err
+		}
+		evt := j.createEvent(string(data), offset)
+
+		if !dec.More() {
+			// if this is the last object, then perform a complete state save
+			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
 			if err := j.publisher.Publish(evt, cp); err != nil {
 				j.log.Errorf(jobErrString, id, err)
 			}
 			done()
+		} else {
+			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			if err := j.publisher.Publish(evt, nil); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
 		}
 	}
 	return nil

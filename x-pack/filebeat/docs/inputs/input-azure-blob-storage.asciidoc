@@ -27,6 +27,8 @@ even though it can get expensive with dealing with a very large number of files.
 3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
 
+NOTE: In the latest update the partial save mechanism has been removed for now due to concurrency issues, but will be added back in the future.
+
 [id="supported-types"]
 NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
 As for authentication types, we currently have support for `shared access keys` and `connection strings`.
@@ -279,7 +281,7 @@ filebeat.inputs:
     expand_event_list_from_field: Records
 ----
 
-NOTE: This attribute is only applicable for JSON file formats. You do not require to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events, with support for partial state saves. Using this setting, prevents partial state saves from occurring. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file/blob.
+NOTE: This attribute is only applicable for JSON file formats. You do not require to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file/blob.
 
 [id="attrib-timestamp_epoch"]
 [float]
