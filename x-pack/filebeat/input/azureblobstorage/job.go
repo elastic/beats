@@ -31,9 +31,9 @@ import (
 const jobErrString = "job with jobId %s encountered an error: %w"
 
 type job struct {
-	// azure blob client handle
+	// client is an azure blob handle
 	client *blob.Client
-	// azure blob item handle
+	// blob is an azure blob item handle
 	blob *azcontainer.BlobItem
 	// azure blob url for the resource
 	blobURL string
@@ -42,7 +42,7 @@ type job struct {
 	// offset value for an object, it points to the location inside the data stream
 	// from where we can start processing the object.
 	offset int64
-	// flag to denote if object is gZip compressed or not
+	// flag to denote if object is gzip compressed or not
 	isCompressed bool
 	// flag to denote if object's root element is of an array type
 	isRootArray bool
@@ -135,7 +135,6 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
-	// we hardcode a retry count of 3 here
 	const maxRetries = 3
 	reader := get.NewRetryReader(ctx, &azblob.RetryReaderOptions{
 		MaxRetries: maxRetries,
@@ -218,8 +217,8 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			// this avoids duplicates for the last read when resuming operation
 			offset = dec.InputOffset()
 			var (
-				cp   *Checkpoint
 				done func()
+				cp   *Checkpoint
 			)
 			if !dec.More() {
 				// if this is the last object, then peform a complete state save
@@ -277,7 +276,6 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 		if !dec.More() {
 			// if this is the last object, then save checkpoint
-			// we are not supporting partial saves atm for split event list op
 			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
 			if err := j.publisher.Publish(evt, cp); err != nil {
 				j.log.Errorf(jobErrString, id, err)
@@ -326,12 +324,15 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 // element, the value of the boolean return type is set to true.
 func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
 	eof := false
+	// readSize is the constant value in the incremental read operation, this value is arbitrary
+	// but works well for our use case
+	const readSize = 5
 	for i := 0; ; i++ {
-		b, err := reader.Peek((i + 1) * 5)
+		b, err := reader.Peek((i + 1) * readSize)
 		if errors.Is(err, io.EOF) {
 			eof = true
 		}
-		startByte := i * 5
+		startByte := i * readSize
 		for j := 0; j < len(b[startByte:]); j++ {
 			char := b[startByte+j : startByte+j+1]
 			switch {

@@ -7,12 +7,12 @@ package azureblobstorage
 import (
 	"context"
 
+	"golang.org/x/sync/errgroup"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-
-	"golang.org/x/sync/errgroup"
 )
 
 type statelessInput struct {
@@ -80,6 +80,8 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 
 		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, log)
 		// allows multiple containers to be scheduled concurrently while testing
+		// the stateless input is triggered only while testing and till now it did not mimic
+		// the real world concurrent execution of multiple containers. This fix allows it to do so.
 		g.Go(func() error {
 			return scheduler.schedule(ctx)
 		})

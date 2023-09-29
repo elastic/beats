@@ -118,7 +118,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		c.ExpandEventListFromField = cfg.ExpandEventListFromField
 	}
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) > 0 {
-		c.FileSelectors = append(c.FileSelectors, cfg.FileSelectors...)
+		c.FileSelectors = cfg.FileSelectors
 	}
 	return c
 }
