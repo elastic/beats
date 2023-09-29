@@ -169,7 +169,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
-	logp.L().Debugf("attempt info: %v == %v && %d < %d", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
+	logp.L().Debugf("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		return RetryBeforeSummary
