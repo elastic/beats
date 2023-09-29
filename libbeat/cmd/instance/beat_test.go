@@ -310,20 +310,6 @@ output:
         events: 8096
 `),
 			memEvents: 8096},
-		"topAndOutputLevelQueue": {input: []byte(`
-name: mockbeat
-queue:
-  mem:
-    events: 2048
-output:
-  elasticsearch:
-    hosts:
-      - "localhost:9200"
-    queue:
-      mem:
-        events: 8096
-`),
-			expectValidationError: true},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -344,6 +330,92 @@ output:
 			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
 			require.NoError(t, err)
 			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
+		})
+	}
+}
+
+func TestValidateBeatConfig(t *testing.T) {
+	tests := map[string]struct {
+		input                 []byte
+		expectValidationError string
+	}{
+		"blank": {input: []byte(""),
+			expectValidationError: "",
+		},
+		"defaults": {input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: ""},
+		"topAndOutputLevelQueue": {input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 2048
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			expectValidationError: "top level queue and output level queue settings defined, only one is allowed accessing config"},
+		"managementTopLevelDiskQueue": {input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+queue:
+  disk:
+    max_size: 1G
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config"},
+		"managementOutputLevelDiskQueue": {input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config"},
+		"managementFalseOutputLevelDiskQueue": {input: []byte(`
+name: mockbeat
+management:
+  enabled: false
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: ""},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			if tc.expectValidationError != "" {
+				require.Error(t, err)
+				require.Equal(t, tc.expectValidationError, err.Error())
+			} else {
+				require.NoError(t, err)
+			}
 		})
 	}
 }

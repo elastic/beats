@@ -64,7 +64,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/beats/v7/libbeat/pprof"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
@@ -840,10 +839,6 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return err
 	}
-	err = checkAgentDiskQueue(&b.Config)
-	if err != nil {
-		return err
-	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
@@ -1508,31 +1503,24 @@ func promoteOutputQueueSettings(bc *beatConfig) error {
 
 func (bc *beatConfig) Validate() error {
 	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
-		pc := pipeline.Config{}
-		err := bc.Output.Config().Unpack(&pc)
+		outputPC := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&outputPC)
 		if err != nil {
 			return fmt.Errorf("error unpacking output queue settings: %w", err)
 		}
-		if bc.Pipeline.Queue.IsSet() && pc.Queue.IsSet() {
+		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
 			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
 		}
+		//elastic-agent doesn't support disk queue yet
+		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
+			return fmt.Errorf("disk queue is not supported when management is enabled")
+		}
 	}
-	return nil
-}
 
-// checkAgentDiskQueue should be run after management.NewManager() so
-// that publisher.UnderAgent will be set with correct value
-func checkAgentDiskQueue(bc *beatConfig) error {
-	//restriction is only if under agent
-	if !publisher.UnderAgent() {
-		return nil
+	//elastic-agent doesn't support disk queue yet
+	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
+		return fmt.Errorf("disk queue is not supported when management is enabled")
 	}
-	//default queue settings are always allowed
-	if !bc.Pipeline.Queue.IsSet() {
-		return nil
-	}
-	if bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
-		return fmt.Errorf("disk queue is not supported under elastic-agent")
-	}
+
 	return nil
 }
