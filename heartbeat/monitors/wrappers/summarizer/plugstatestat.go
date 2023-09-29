@@ -64,11 +64,9 @@ func (ssp *BrowserStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSumm
 		ssp.cssp.js.Status = monitorstate.StatusUp
 	}
 
-	res := ssp.cssp.BeforeSummary(event, true)
-
-	if ssp.cssp.js.Status == monitorstate.StatusEmpty {
-		panic("Nil status")
-	}
+	res := ssp.cssp.BeforeSummary(event)
+	// Browsers don't set this prior, so we set this here, as opposed to lightweight monitors
+	_, _ = event.PutValue("monitor.status", string(ssp.cssp.js.Status))
 
 	_, _ = event.PutValue("synthetics", mapstr.M{"type": "heartbeat/summary"})
 	return res
@@ -110,7 +108,7 @@ func (ssp *LightweightStateStatusPlugin) EachEvent(event *beat.Event, jobErr err
 }
 
 func (ssp *LightweightStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
-	return ssp.cssp.BeforeSummary(event, false)
+	return ssp.cssp.BeforeSummary(event)
 }
 
 func (ssp *LightweightStateStatusPlugin) BeforeRetry() {
@@ -142,14 +140,11 @@ func (ssp *commonSSP) BeforeEach(event *beat.Event, err error) {
 	_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", ssp.checkGroup, ssp.js.Attempt))
 }
 
-func (ssp *commonSSP) BeforeSummary(event *beat.Event, setSummary bool) BeforeSummaryActions {
+func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	if ssp.js.Down > 0 {
 		ssp.js.Status = monitorstate.StatusDown
 	} else {
 		ssp.js.Status = monitorstate.StatusUp
-	}
-	if setSummary {
-		_, _ = event.PutValue("monitor.status", string(ssp.js.Status))
 	}
 
 	// Get the last status of this monitor, we use this later to
