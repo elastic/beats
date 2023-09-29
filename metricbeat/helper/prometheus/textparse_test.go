@@ -18,10 +18,11 @@
 package prometheus
 
 import (
-	"github.com/prometheus/prometheus/pkg/labels"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/stretchr/testify/require"
 )
 
 func stringp(x string) *string {

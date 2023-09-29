@@ -20,11 +20,12 @@ package prometheus
 import (
 	"bytes"
 	"compress/gzip"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/logp"
