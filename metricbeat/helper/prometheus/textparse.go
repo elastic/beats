@@ -18,6 +18,8 @@
 package prometheus
 
 import (
+	"fmt"
+	"io"
 	"math"
 	"mime"
 	"net/http"
@@ -333,6 +335,10 @@ func isTotal(name string) bool {
 	return strings.HasSuffix(name, suffixTotal)
 }
 
+func isCreated(name string) bool {
+	return strings.HasSuffix(name, suffixCreated)
+}
+
 func isGCount(name string) bool {
 	return strings.HasSuffix(name, suffixGCount)
 }
@@ -353,6 +359,10 @@ func isBucket(name string) bool {
 	return strings.HasSuffix(name, suffixBucket)
 }
 
+func isInfo(name string) bool {
+	return strings.HasSuffix(name, suffixInfo)
+}
+
 func summaryMetricName(name string, s float64, qv string, lbls string, summariesByName map[string]map[string]*OpenMetric) (string, *OpenMetric) {
 	var summary = &Summary{}
 	var quantile = []*Quantile{}
@@ -362,10 +372,10 @@ func summaryMetricName(name string, s float64, qv string, lbls string, summaries
 	case isCount(name):
 		u := uint64(s)
 		summary.SampleCount = &u
-		name = name[:len(name)-6]
+		name = strings.TrimSuffix(name, suffixCount)
 	case isSum(name):
 		summary.SampleSum = &s
-		name = name[:len(name)-4]
+		name = strings.TrimSuffix(name, suffixSum)
 	default:
 		f, err := strconv.ParseFloat(qv, 64)
 		if err != nil {
@@ -375,8 +385,8 @@ func summaryMetricName(name string, s float64, qv string, lbls string, summaries
 		quant.Value = &s
 	}
 
-	_, k := summariesByName[name]
-	if !k {
+	_, ok := summariesByName[name]
+	if !ok {
 		summariesByName[name] = make(map[string]*OpenMetric)
 	}
 	metric, ok := summariesByName[name][lbls]
@@ -489,6 +499,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		if et, err = parser.Next(); err != nil {
 			// TODO: log here
 			// if errors.Is(err, io.EOF) {}
+			if err == io.EOF {
+
+			} else {
+				fmt.Println("Error is: ", err)
+			}
 			break
 		}
 		switch et {
@@ -578,12 +593,23 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		var metric *OpenMetric
 
 		metricName := lset.Get(labels.MetricName)
-		var lookupMetricName string
+
+		// lookupMetricName will have the suffixes removed
+		lookupMetricName := metricName
+		//var lookupMetricName string
 		var exm *exemplar.Exemplar
 
+		fmt.Println("FAM NAME IS ", *fam.Name, " and metric name is ", metricName)
 		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {
 		case textparse.MetricTypeCounter:
+			if contentType == OpenMetricsType && !isTotal(metricName) && !isCreated(metricName) {
+				// Possible suffixes for counter in Open metrics are _created and _total.
+				// Otherwise, ignore.
+				// https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#counter-1
+				continue
+			}
+
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
@@ -600,33 +626,38 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		case textparse.MetricTypeGauge:
 			var gauge = &Gauge{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Gauge: gauge, Label: labelPairs}
-			lookupMetricName = metricName
+			//lookupMetricName = metricName
 		case textparse.MetricTypeInfo:
+			// Info only exists for Openmetrics. It must have the suffix _info
+			if !isInfo(metricName) {
+				continue
+			}
+			lookupMetricName = strings.TrimSuffix(metricName, suffixInfo)
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
 			// remove the _info suffix
-			lookupMetricName = strings.TrimSuffix(metricName, suffixInfo)
+			// lookupMetricName = strings.TrimSuffix(metricName, suffixInfo)
 		case textparse.MetricTypeSummary:
 			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), summariesByName)
 			metric.Label = labelPairs
 			if !isSum(metricName) {
+				// Avoid registering the metric multiple times.
 				continue
 			}
-			metricName = lookupMetricName
 		case textparse.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
 			lookupMetricName, metric = histogramMetricName(metricName, v, qv, lbls.String(), &t, false, exm, histogramsByName)
-			if metric == nil { // metric name does not have a suffix supported for the type histogram
+			if metric == nil {
 				continue
 			}
 			metric.Label = labelPairs
 			if !isSum(metricName) {
+				// Avoid registering the metric multiple times.
 				continue
 			}
-			metricName = lookupMetricName
 		case textparse.MetricTypeGaugeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
@@ -638,27 +669,41 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			metric.Label = labelPairs
 			metric.Histogram.IsGaugeHistogram = true
 			if !isGSum(metricName) {
+				// Avoid registering the metric multiple times.
 				continue
 			}
-			metricName = lookupMetricName
 		case textparse.MetricTypeStateset:
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Stateset: stateset, Label: labelPairs}
-			lookupMetricName = metricName
+			//lookupMetricName = metricName
 		case textparse.MetricTypeUnknown:
 			var unknown = &Unknown{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Unknown: unknown, Label: labelPairs}
-			lookupMetricName = metricName
+			//lookupMetricName = metricName
 		default:
-			lookupMetricName = metricName
+			//lookupMetricName = metricName
 		}
 
-		fam, ok = metricFamiliesByName[lookupMetricName]
+		/*fam, ok = metricFamiliesByName[lookupMetricName]
 		if !ok {
 			// If the family metric does not exist, create a new one with the lookup name
 			fam = &MetricFamily{Name: &lookupMetricName, Type: mt}
 			metricFamiliesByName[lookupMetricName] = fam
+		}*/
+
+		fam, ok = metricFamiliesByName[lookupMetricName]
+		if !ok {
+			// If the lookupMetricName is not in metricFamiliesByName, we check for metric name, in case
+			// the removed suffix is part of the name.
+			fam, ok = metricFamiliesByName[metricName]
+			if !ok {
+				// There is not any metadata for this metric. In this case, the name of the metric
+				// will remain metricName instead of the possible modified lookupMetricName
+				fam = &MetricFamily{Name: &metricName, Type: mt}
+				metricFamiliesByName[metricName] = fam
+
+			}
 		}
 
 		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram && metric != nil {
@@ -678,8 +723,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 
 	families := make([]*MetricFamily, 0, len(metricFamiliesByName))
 	for _, v := range metricFamiliesByName {
+		fmt.Println("Name of the family metric is ", *v.Name)
 		if v.Metric != nil {
 			families = append(families, v)
+		} else {
+			fmt.Println("\tFamily metric will not be added.")
 		}
 	}
 	return families, nil
