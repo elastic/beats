@@ -56,12 +56,10 @@ func (ssp *BrowserStateStatusPlugin) EachEvent(event *beat.Event, jobErr error) 
 }
 
 func (ssp *BrowserStateStatusPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
-	ssp.cssp.js.Status = monitorstate.StatusDown
 	if ssp.cssp.js.Down == 0 {
 		// Browsers don't have a prior increment of this, so set it to some
 		// non-zero value
 		ssp.cssp.js.Up = 1
-		ssp.cssp.js.Status = monitorstate.StatusUp
 	}
 
 	res := ssp.cssp.BeforeSummary(event)
