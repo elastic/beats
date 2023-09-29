@@ -18,8 +18,6 @@
 package prometheus
 
 import (
-	"fmt"
-	"io"
 	"math"
 	"mime"
 	"net/http"
@@ -499,11 +497,6 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		if et, err = parser.Next(); err != nil {
 			// TODO: log here
 			// if errors.Is(err, io.EOF) {}
-			if err == io.EOF {
-
-			} else {
-				fmt.Println("Error is: ", err)
-			}
 			break
 		}
 		switch et {
@@ -596,10 +589,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 
 		// lookupMetricName will have the suffixes removed
 		lookupMetricName := metricName
-		//var lookupMetricName string
 		var exm *exemplar.Exemplar
 
-		fmt.Println("FAM NAME IS ", *fam.Name, " and metric name is ", metricName)
 		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {
 		case textparse.MetricTypeCounter:
@@ -636,8 +627,6 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
-			// remove the _info suffix
-			// lookupMetricName = strings.TrimSuffix(metricName, suffixInfo)
 		case textparse.MetricTypeSummary:
 			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), summariesByName)
 			metric.Label = labelPairs
@@ -676,21 +665,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Stateset: stateset, Label: labelPairs}
-			//lookupMetricName = metricName
 		case textparse.MetricTypeUnknown:
 			var unknown = &Unknown{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Unknown: unknown, Label: labelPairs}
-			//lookupMetricName = metricName
 		default:
-			//lookupMetricName = metricName
 		}
-
-		/*fam, ok = metricFamiliesByName[lookupMetricName]
-		if !ok {
-			// If the family metric does not exist, create a new one with the lookup name
-			fam = &MetricFamily{Name: &lookupMetricName, Type: mt}
-			metricFamiliesByName[lookupMetricName] = fam
-		}*/
 
 		fam, ok = metricFamiliesByName[lookupMetricName]
 		if !ok {
@@ -723,11 +702,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 
 	families := make([]*MetricFamily, 0, len(metricFamiliesByName))
 	for _, v := range metricFamiliesByName {
-		fmt.Println("Name of the family metric is ", *v.Name)
 		if v.Metric != nil {
 			families = append(families, v)
-		} else {
-			fmt.Println("\tFamily metric will not be added.")
 		}
 	}
 	return families, nil
