@@ -35,9 +35,6 @@ type job struct {
 	objectURI string
 	// object hash, used in setting event id
 	hash string
-	// offset value for an object, it points to the location inside the data stream
-	// from where we can start processing the object.
-	offset int64
 	// flag to denote if object is gZipped compressed or not.
 	isCompressed bool
 	// flag to denote if object's root element is of an array type
@@ -86,9 +83,6 @@ func (j *job) do(ctx context.Context, id string) {
 		if j.object.ContentType == gzType || j.object.ContentEncoding == encodingGzip {
 			j.isCompressed = true
 		}
-		if result, ok := j.state.cp.IsRootArray[j.object.Name]; ok {
-			j.isRootArray = result
-		}
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.state.updateFailedJobs(j.object.Name)
@@ -129,17 +123,10 @@ func (j *job) Timestamp() time.Time {
 }
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
-	var err error
-	var offset int64
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
 	defer cancel()
 	obj := j.bucket.Object(j.object.Name)
-	// if object is compressed or object root element is an array, then we cannot use an
-	// offset to read as it will produce an erroneous data stream.
-	if !j.isCompressed && !j.isRootArray {
-		offset = j.offset
-	}
-	reader, err := obj.NewRangeReader(ctxWithTimeout, offset, -1)
+	reader, err := obj.NewReader(ctxWithTimeout)
 	if err != nil {
 		return fmt.Errorf("failed to open reader for object: %s, with error: %w", j.object.Name, err)
 	}
@@ -159,23 +146,18 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
-	var err error
-	r, err = j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
 		return fmt.Errorf("failed to add gzip decoder to object: %s, with error: %w", j.object.Name, err)
 	}
 
-	// if offset == 0, then this is a new stream which has not been processed previously
-	if j.offset == 0 {
-		r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
-		if err != nil {
-			return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
-		}
-		if j.isRootArray {
-			j.state.setRootArray(j.object.Name)
-		}
+	r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
+	if err != nil {
+		return fmt.Errorf("failed to evaluate json for object: %s, with error: %w", j.object.Name, err)
 	}
+
 	dec := json.NewDecoder(r)
+	dec.UseNumber()
 	// If array is present at root then read json token and advance decoder
 	if j.isRootArray {
 		_, err := dec.Token()
@@ -184,24 +166,13 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 		}
 	}
 
-	var offset, relativeOffset int64
-	// uncompressed files use the client to directly set the offset, this
-	// in turn causes the offset to reset to 0 for the new stream, hence why
-	// we need to keep relative offsets to keep track of the actual offset
-	if !j.isCompressed && !j.isRootArray {
-		relativeOffset = j.offset
-	}
-	dec.UseNumber()
 	for dec.More() && ctx.Err() == nil {
 		var item json.RawMessage
-		offset = dec.InputOffset()
+		offset := dec.InputOffset()
 		if err = dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
-		// manually seek offset only if file is compressed or if root element is an array
-		if (j.isCompressed || j.isRootArray) && offset < j.offset {
-			continue
-		}
+
 		var parsedData []mapstr.M
 		if j.src.ParseJSON {
 			parsedData, err = decodeJSON(bytes.NewReader(item))
@@ -209,27 +180,19 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 			}
 		}
-		evt := j.createEvent(item, parsedData, offset+relativeOffset)
-		// updates the offset after reading the file
-		// this avoids duplicates for the last read when resuming operation
-		offset = dec.InputOffset()
-		// locks while data is being saved and published to avoid concurrent map read/writes
-		var (
-			done func()
-			cp   *Checkpoint
-		)
+		evt := j.createEvent(item, parsedData, offset)
 		if !dec.More() {
-			// if this is the last object, then peform a complete state save
-			cp, done = j.state.saveForTx(j.object.Name, j.object.Updated)
-		} else {
-			// partially saves read state using offset
-			cp, done = j.state.savePartialForTx(j.object.Name, offset+relativeOffset)
+			// if this is the last object, then perform a complete state save
+			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
+			if err := j.publisher.Publish(evt, cp); err != nil {
+				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+			}
+			done()
 		}
-		if err := j.publisher.Publish(evt, cp); err != nil {
+		// since we don't update the cursor checkpoint, lack of a lock here should be fine
+		if err := j.publisher.Publish(evt, nil); err != nil {
 			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 		}
-		// unlocks after data is saved and published
-		done()
 	}
 	return nil
 }
