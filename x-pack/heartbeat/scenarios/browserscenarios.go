@@ -51,7 +51,7 @@ func init() {
 		framework.Scenario{
 			Name: "failing-browser",
 			Type: "browser",
-			Tags: []string{"browser", "browser-inline", "down"},
+			Tags: []string{"browser", "browser-inline", "down", "browser-down"},
 			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				err = os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
 				if err != nil {

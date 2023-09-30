@@ -49,6 +49,10 @@ system:
 
 include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 
+The commands shown are for AMD platforms, but ARM packages are also available.
+Refer to the https://www.elastic.co/downloads/beats/{beatname_lc}[download page]
+for the full list of available packages.
+
 [float]
 [[other-installation-options]]
 ==== Other installation options
