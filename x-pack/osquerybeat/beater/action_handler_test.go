@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
@@ -23,7 +24,7 @@ type mockExecutor struct {
 	receivedSql string
 }
 
-func (e *mockExecutor) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
+func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) ([]map[string]interface{}, error) {
 	e.receivedSql = sql
 
 	return e.result, e.err

@@ -7,7 +7,9 @@ package action
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 )
@@ -17,8 +19,10 @@ var (
 )
 
 type Action struct {
-	Query      string
-	ID         string
+	Query string
+	ID    string
+	// The optional action timeout in seconds
+	Timeout    time.Duration
 	ECSMapping ecs.Mapping
 }
 
@@ -29,11 +33,19 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 
 	var (
 		id, query string
+		timeout   int64
 	)
 
 	if v, ok := m["id"]; ok {
 		if id, ok = v.(string); !ok {
 			return a, fmt.Errorf("invalid id: %w", ErrActionRequest)
+		}
+	}
+
+	if v, ok := m["timeout"]; ok {
+		timeout, err = convertToInt64(v)
+		if err != nil {
+			return a, fmt.Errorf("invalid timeout value %v: %w", v, err)
 		}
 	}
 
@@ -72,11 +84,18 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		return a, fmt.Errorf("missing query: %w", ErrActionRequest)
 	}
 
-	return Action{
+	a = Action{
 		Query:      query,
 		ID:         id,
 		ECSMapping: ecsm,
-	}, nil
+	}
+
+	if timeout > 0 {
+		// Convert from seconds to duration
+		a.Timeout = time.Duration(timeout) * time.Second
+	}
+
+	return a, nil
 }
 
 func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
@@ -120,4 +139,32 @@ func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
 		}
 	}
 	return ecsm, err
+}
+
+func convertToInt64(i interface{}) (int64, error) {
+	switch v := i.(type) {
+	case int8:
+		return int64(v), nil
+	case int16:
+		return int64(v), nil
+	case int32:
+		return int64(v), nil
+	case int64:
+		return int64(v), nil
+	case uint8:
+		return int64(v), nil
+	case uint16:
+		return int64(v), nil
+	case uint32:
+		return int64(v), nil
+	case uint64:
+		return int64(v), nil
+	case float32:
+		return int64(v), nil
+	case float64:
+		return int64(v), nil
+	case string:
+		strconv.ParseInt(v, 10, 64)
+	}
+	return 0, fmt.Errorf("unexpected type: %T", i)
 }

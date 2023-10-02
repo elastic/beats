@@ -26,7 +26,7 @@ type publisher interface {
 }
 
 type queryExecutor interface {
-	Query(ctx context.Context, sql string) ([]map[string]interface{}, error)
+	Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error)
 }
 
 type namespaceProvider interface {
@@ -95,7 +95,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	start := time.Now()
 
-	hits, err := a.queryExec.Query(ctx, ac.Query)
+	hits, err := a.queryExec.Query(ctx, ac.Query, ac.Timeout)
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
