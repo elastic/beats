@@ -141,6 +141,7 @@ func fetchJobID(workerId int, bucketName string, objectName string) string {
 }
 
 func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
+	//nolint:prealloc // No need to preallocate the slice
 	var jobs []*job
 	fileSelectorLen := len(s.src.FileSelectors)
 	for _, obj := range objects {
