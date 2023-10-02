@@ -47,7 +47,7 @@ var fetchContainer = map[string]string{
 			<Blob>
 				<Name>ata.json</Name>
 				<Properties>
-					<Last-Modified>Wed, 14 Sep 2022 12:12:28 GMT</Last-Modified>
+					<Last-Modified>Wed, 12 Sep 2022 12:12:28 GMT</Last-Modified>
 					<Etag>0x8DA964A64516C82</Etag>
 					<Content-Length>643</Content-Length>
 					<Content-Type>application/json</Content-Type>
@@ -83,7 +83,7 @@ var fetchContainer = map[string]string{
 			<Blob>
 				<Name>docs/ata.json</Name>
 				<Properties>
-					<Last-Modified>Wed, 14 Sep 2022 12:13:07 GMT</Last-Modified>
+					<Last-Modified>Wed, 15 Sep 2022 12:13:07 GMT</Last-Modified>
 					<Etag>0x8DA964A7B8D8862</Etag>
 					<Content-Length>643</Content-Length>
 					<Content-Type>application/json</Content-Type>

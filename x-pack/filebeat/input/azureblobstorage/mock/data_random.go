@@ -66,7 +66,7 @@ func generateMetadata() []byte {
 
 // Helper function to create a random Blob
 func createRandomBlob(i int) Blob {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(12345))
 
 	return Blob{
 		Name: fmt.Sprintf("data_%d.json", i),
@@ -104,7 +104,7 @@ func generateRandomBlob() []byte {
 }
 
 func createRandomData() MyData {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(12345))
 
 	return MyData{
 		ID:          rand.Intn(1000) + 1,
@@ -119,6 +119,7 @@ func getRandomString(options []string) string {
 	if len(options) == 0 {
 		return ""
 	}
-	rand.Seed(time.Now().UnixNano())
+
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 	return options[rand.Intn(len(options))]
 }

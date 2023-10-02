@@ -36,14 +36,17 @@ func TwistMultiRun(times int) *framework.Twist {
 	})
 }
 
+// StdAttemptTwists is a list of real world attempt numbers, that is to say both one and two twists.
+var StdAttemptTwists = []*framework.Twist{TwistMaxAttempts(1), TwistMaxAttempts(2)}
+
 func TwistMaxAttempts(maxAttempts int) *framework.Twist {
 	return framework.MakeTwist(fmt.Sprintf("run with %d max_attempts", maxAttempts), func(s framework.Scenario) framework.Scenario {
 		s.Tags = append(s.Tags, "retry")
 		origRunner := s.Runner
-		s.Runner = func(t *testing.T) (config mapstr.M, close func(), err error) {
-			config, close, err = origRunner(t)
+		s.Runner = func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
+			config, meta, close, err = origRunner(t)
 			config["max_attempts"] = maxAttempts
-			return config, close, err
+			return config, meta, close, err
 		}
 		return s
 	})
