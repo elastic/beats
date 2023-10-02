@@ -169,9 +169,9 @@ Now let's explore the configuration attributes a bit more elaborately.
     8. <<attrib-poll-gcs,poll>>
     9. <<attrib-poll_interval-gcs,poll_interval>>
    10. <<attrib-parse_json,parse_json>>
-   11. <<attrib-file_selectors,file_selectors>>
-   12. <<attrib-expand_event_list_from_field,expand_event_list_from_field>>
-   13. <<attrib-timestamp_epoch,timestamp_epoch>>
+   11. <<attrib-file_selectors-gcs,file_selectors>>
+   12. <<attrib-expand_event_list_from_field-gcs,expand_event_list_from_field>>
+   13. <<attrib-timestamp_epoch-gcs,timestamp_epoch>>
 
 
 [id="attrib-project-id"]
@@ -257,7 +257,7 @@ highly nested json data. If this is set to `false` the *gcs.storage.object.json_
 applicable for json objects and has no effect on other types of objects. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
 The bucket level values will always take priority and override the root level values if both are specified.
 
-[id="attrib-file_selectors"]
+[id="attrib-file_selectors-gcs"]
 [float]
 ==== `file_selectors`
 
@@ -282,14 +282,14 @@ filebeat.inputs:
     - regex: '/Security-Logs/'
 ----
 
-[id="attrib-expand_event_list_from_field"]
+[id="attrib-expand_event_list_from_field-gcs"]
 [float]
 ==== `expand_event_list_from_field`
 
 If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if 
 you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
 
-["source","json"]
+[source, json]
 ----
 {
     "Records": [
@@ -309,7 +309,8 @@ you have logs that are in JSON format and events are found under the JSON object
 }
 ----
 
-["source","yaml",subs="attributes"]
+[source,yml]
+----
 filebeat.inputs:
 - type: gcs
   project_id: my_project_id
@@ -321,11 +322,12 @@ filebeat.inputs:
     poll_interval: 15s
     bucket_timeout: 60s
     expand_event_list_from_field: Records
+----
 
 NOTE: The `parse_json` setting does not work with `expand_event_list_from_field`. If enabled it will be ignored. This attribute is only applicable for JSON file formats. You do not require to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file/object.
 
 
-[id="attrib-timestamp_epoch"]
+[id="attrib-timestamp_epoch-gcs"]
 [float]
 ==== `timestamp_epoch`
 
