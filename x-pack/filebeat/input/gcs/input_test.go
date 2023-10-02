@@ -492,6 +492,32 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_latest_object_data3_json: true,
 			},
 		},
+		{
+			name: "FilterByFileSelectorEmptyRegex",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "5s",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "",
+					},
+				},
+				"buckets": []map[string]interface{}{
+					{
+						"name": bucketGcsTestNew,
+					},
+				},
+			},
+			mockHandler: mock.GCSServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

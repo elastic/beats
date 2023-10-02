@@ -157,6 +157,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 	}
 
 	dec := json.NewDecoder(r)
+	// UseNumber causes the Decoder to unmarshal a number into an interface{} as a Number instead of as a float64.
 	dec.UseNumber()
 	// If array is present at root then read json token and advance decoder
 	if j.isRootArray {
@@ -193,13 +194,13 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			// if this is the last object, then perform a complete state save
 			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
 			if err := j.publisher.Publish(evt, cp); err != nil {
-				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
 			done()
 		} else {
 			// since we don't update the cursor checkpoint, lack of a lock here should be fine
 			if err := j.publisher.Publish(evt, nil); err != nil {
-				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
 		}
 	}
@@ -210,7 +211,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
 	var jsonObject map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return err
+		return fmt.Errorf("job with job id %s encountered an unmarshaling error: %w", id, err)
 	}
 
 	raw, found := jsonObject[key]
@@ -219,11 +220,12 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))
+	// UseNumber causes the Decoder to unmarshal a number into an interface{} as a Number instead of as a float64.
 	dec.UseNumber()
 
 	tok, err := dec.Token()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
 	}
 	delim, ok := tok.(json.Delim)
 	if !ok || delim != '[' {
@@ -240,7 +242,7 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 
 		data, err := item.MarshalJSON()
 		if err != nil {
-			return err
+			return fmt.Errorf("job with job id %s encountered a marshaling error: %w", id, err)
 		}
 		evt := j.createEvent(data, nil, offset+arrayOffset)
 
@@ -248,13 +250,13 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 			// if this is the last object, then perform a complete state save
 			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
 			if err := j.publisher.Publish(evt, cp); err != nil {
-				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
 			done()
 		} else {
 			// since we don't update the cursor checkpoint, lack of a lock here should be fine
 			if err := j.publisher.Publish(evt, nil); err != nil {
-				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
 		}
 	}
