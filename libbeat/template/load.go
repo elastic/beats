@@ -148,7 +148,7 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 	if dataStreamExist {
 		l.log.Infof("Data stream with name %q already exists.", templateName)
-		// for serverless, we can update the lifetimes safely
+		// for serverless, we can update the lifecycle policy safely
 		// Note that updating the lifecycle will delete older documents
 		// if the policy requires it; i.e, changing the data_retention from 10d to 7d
 		// will delete the documents older than 7 days.

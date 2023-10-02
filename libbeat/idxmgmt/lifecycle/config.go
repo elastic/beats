@@ -50,8 +50,9 @@ type LifecycleConfig struct {
 // RawConfig half-unpacks the policy config, allowing us to tell if a user has explicitly
 // enabled a given config value
 type RawConfig struct {
-	ILM *config.C `config:"setup.ilm"`
-	DSL *config.C `config:"setup.dsl"`
+	ILM          *config.C `config:"setup.ilm"`
+	DSL          *config.C `config:"setup.dsl"`
+	TemplateName string    `config:"setup.template.name"`
 }
 
 // DefaultILMPolicy defines the default policy to be used if no custom policy is

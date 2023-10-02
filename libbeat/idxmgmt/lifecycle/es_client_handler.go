@@ -23,6 +23,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,11 +42,11 @@ type ESClientHandler struct {
 // NewESClientHandler initializes and returns an ESClientHandler
 func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHandler, error) {
 	if !cfg.DSL.Enabled() && cfg.ILM.Enabled() && c.IsServerless() {
-		return nil, fmt.Errorf("ILM is enabled but %s is connected to a serverless instance; ILM isn't supported on Serverless Elasticsearch", info.Beat)
+		return nil, fmt.Errorf("ILM is enabled/configured but %s is connected to a serverless instance; ILM isn't supported on Serverless Elasticsearch. Configure DSL or set setup.ilm.enabled to false", info.Beat)
 	}
 
 	if !cfg.ILM.Enabled() && cfg.DSL.Enabled() && !c.IsServerless() {
-		return nil, fmt.Errorf("DSL is enabled but %s is connected to a stateful instance; DSL is only supported on Serverless Elasticsearch", info.Beat)
+		return nil, fmt.Errorf("DSL is enabled/configured but %s is connected to a stateful instance; DSL is only supported on Serverless Elasticsearch. Configure ILM or set setup.dsl.enabled to false", info.Beat)
 	}
 
 	if cfg.ILM.Enabled() && cfg.DSL.Enabled() {
@@ -78,6 +79,14 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 	}
 	if name == "" && lifecycleCfg.Enabled {
 		return nil, errors.New("could not generate usable policy name from config. Check setup.*.policy_name fields")
+	}
+	// deal with conflicts between policy name and template name
+	// under serverless, it doesn't make sense to have a policy name that differs from the template name
+	// if the user has set both to different values, throw a warning, as overwrite operations will probably fail
+	if c.IsServerless() {
+		if cfg.TemplateName != "" && cfg.TemplateName != name {
+			logp.L().Warnf("policy name is %s but template name is %s; under serverless, non-default template and policy names should be the same. Updates & overwrites may not work.")
+		}
 	}
 
 	// set defaults

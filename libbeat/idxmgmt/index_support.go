@@ -232,6 +232,8 @@ func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, 
 	if !templateComponent.load {
 		warn += "Template loading not enabled.\n"
 	}
+	// remove last newline so we don't get weird formatting when this is printed to the console
+	warn = strings.TrimSuffix(warn, "\n")
 	return warn == "", warn
 }
 
