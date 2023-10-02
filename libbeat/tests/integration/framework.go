@@ -574,6 +574,42 @@ func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
 	return kibanaURL, kibanaUser
 }
 
+func GetProxyURL(t *testing.T) url.URL {
+	t.Helper()
+
+	scheme := os.Getenv("PROXY_SCHEME")
+	if scheme == "" {
+		scheme = "http"
+	}
+
+	proxyHost := os.Getenv("PROXY_HOST")
+	if proxyHost == "" {
+		proxyHost = "localhost"
+	}
+
+	proxyPort := os.Getenv("PROXY_PORT")
+	if proxyPort == "" {
+		proxyPort = "3128"
+	}
+
+	user := os.Getenv("PROXY_USER")
+	if user == "" {
+		user = "proxy"
+	}
+
+	pass := os.Getenv("PROXY_PASS")
+	if pass == "" {
+		pass = "testing"
+	}
+
+	proxyURL := url.URL{
+		Scheme: scheme,
+		Host:   fmt.Sprintf("%s:%s", proxyHost, proxyPort),
+		User:   url.UserPassword(user, pass),
+	}
+	return proxyURL
+}
+
 func HttpDo(t *testing.T, method string, targetURL url.URL) (statusCode int, body []byte, err error) {
 	t.Helper()
 	client := &http.Client{}

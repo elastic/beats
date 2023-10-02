@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
+	"golang.org/x/net/proxy"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
@@ -312,15 +313,55 @@ func (conn *Connection) Close() error {
 }
 
 func (conn *Connection) Test(d testing.Driver) {
+	testProxyDialer := func(d testing.Driver, forward transport.Dialer, settings *httpcommon.HTTPClientProxySettings) transport.Dialer {
+		switch scheme := settings.URL.Scheme; scheme {
+		case "http", "https":
+			proxy.RegisterDialerType(scheme, settings.ProxyDialer)
+		}
+		return transport.TestProxyDialer(d, forward, &transport.ProxyConfig{URL: settings.URL.String()})
+	}
+
 	d.Run("elasticsearch: "+conn.URL, func(d testing.Driver) {
 		u, err := url.Parse(conn.URL)
 		d.Fatal("parse url", err)
 
 		address := u.Host
 
+		if proxyURL := conn.Transport.Proxy.URL; proxyURL != nil && !conn.Transport.Proxy.Disable {
+			d.Run("proxy", func(d testing.Driver) {
+				dialer := transport.TestNetDialer(d, conn.Transport.Timeout)
+
+				if proxyURL.Scheme == "https" {
+					tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+					if err != nil {
+						d.Fatal("load tls config", err)
+					}
+					dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+				}
+
+				_, err := dialer.Dial("tcp", proxyURL.Host)
+				d.Fatal("dial up", err)
+			})
+		}
+
 		d.Run("connection", func(d testing.Driver) {
-			netDialer := transport.TestNetDialer(d, conn.Transport.Timeout)
-			_, err = netDialer.Dial("tcp", address)
+			var dialer transport.Dialer
+			if proxyURL := conn.Transport.Proxy.URL; proxyURL == nil || conn.Transport.Proxy.Disable {
+				dialer = transport.TestNetDialer(d, conn.Transport.Timeout)
+			} else {
+				dialer = transport.NetDialer(conn.Transport.Timeout)
+
+				if proxyURL.Scheme == "https" {
+					tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+					if err != nil {
+						d.Fatal("load tls config", err)
+					}
+					dialer = transport.TLSDialer(dialer, tls, conn.Transport.Timeout)
+				}
+
+				dialer = testProxyDialer(d, dialer, &conn.Transport.Proxy)
+			}
+			_, err := dialer.Dial("tcp", address)
 			d.Fatal("dial up", err)
 		})
 
@@ -333,9 +374,17 @@ func (conn *Connection) Test(d testing.Driver) {
 					d.Fatal("load tls config", err)
 				}
 
-				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
-				_, err = tlsDialer.Dial("tcp", address)
+				dialer := transport.NetDialer(conn.Transport.Timeout)
+
+				if proxyURL := conn.Transport.Proxy.URL; proxyURL != nil && !conn.Transport.Proxy.Disable {
+					if proxyURL.Scheme == "https" {
+						dialer = transport.TLSDialer(dialer, tls, conn.Transport.Timeout)
+					}
+					dialer = testProxyDialer(d, dialer, &conn.Transport.Proxy)
+				}
+
+				dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+				_, err = dialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
 		}

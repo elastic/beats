@@ -85,3 +85,56 @@ func TestCmdTestOutputBadHost(t *testing.T) {
 	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
 	mockbeat.WaitStdOutContains("dns lookup... ERROR", 10*time.Second)
 }
+
+func TestCmdTestOutputProxy(t *testing.T) {
+	esURL := GetESURL(t, "http")
+	proxyURL := GetProxyURL(t)
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
+	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url="+proxyURL.String())
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("proxy... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("TLS... WARN secure connection disabled", 10*time.Second)
+	mockbeat.WaitStdOutContains("talk to server... OK", 10*time.Second)
+}
+
+func TestCmdTestOutputProxyBadHost(t *testing.T) {
+	proxyURL := GetProxyURL(t)
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, "badhost:9200"))
+	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url="+proxyURL.String())
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("proxy... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("dial up... ERROR proxy server returned status code", 10*time.Second)
+}
+
+func TestCmdTestOutputBadProxy(t *testing.T) {
+	esURL := GetESURL(t, "http")
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
+	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url=http://badproxy:8080")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("dns lookup... ERROR", 10*time.Second)
+}
+
+func TestCmdTestOutputBadProxyDisable(t *testing.T) {
+	esURL := GetESURL(t, "http")
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
+	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url=http://badproxy:8080", "-E", "output.elasticsearch.proxy_disable=true")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("TLS... WARN secure connection disabled", 10*time.Second)
+	mockbeat.WaitStdOutContains("talk to server... OK", 10*time.Second)
+}
