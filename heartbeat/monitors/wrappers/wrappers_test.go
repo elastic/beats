@@ -351,6 +351,10 @@ func TestMultiJobConts(t *testing.T) {
 	})
 }
 
+// TestRetryMultiCont is of somewhat dubious utility at the moment,
+// it mostly tests that we __don't__ retry on an initial down.
+// retry logic is better and more completely tested in the summarizer
+// and scenario tests.
 func TestRetryMultiCont(t *testing.T) {
 	uniqScope := isdef.ScopedIsUnique()
 
@@ -460,12 +464,6 @@ func TestRetryMultiCont(t *testing.T) {
 			retryMonFields,
 			[]jobs.Job{makeContJob(t, "http://foo.com")},
 			[]validator.Validator{
-				contJobValidator("http://foo.com", "1st"),
-				lookslike.Compose(
-					contJobValidator("http://foo.com", "2nd"),
-					summarizertesthelper.SummaryValidator(expected.js.Up, expected.js.Down),
-					hbtestllext.MaybeHasDuration,
-				),
 				contJobValidator("http://foo.com", "1st"),
 				lookslike.Compose(
 					contJobValidator("http://foo.com", "2nd"),
