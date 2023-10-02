@@ -64,7 +64,7 @@ func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.RawConfig
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES handler: %w", err)
 	}
-	loader, err := template.NewESLoader(client)
+	loader, err := template.NewESLoader(client, esHandler)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES loader: %w", err)
 	}

@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -39,9 +40,10 @@ type Loader interface {
 
 // ESLoader implements Loader interface for loading templates to Elasticsearch.
 type ESLoader struct {
-	client  ESClient
-	builder *templateBuilder
-	log     *logp.Logger
+	client          ESClient
+	lifecycleClient lifecycle.ClientHandler
+	builder         *templateBuilder
+	log             *logp.Logger
 }
 
 // ESClient is a subset of the Elasticsearch client API capable of
@@ -75,11 +77,12 @@ type templateBuilder struct {
 }
 
 // NewESLoader creates a new template loader for ES
-func NewESLoader(client ESClient) (*ESLoader, error) {
+func NewESLoader(client ESClient, lifecycleClient lifecycle.ClientHandler) (*ESLoader, error) {
 	if client == nil {
 		return nil, errors.New("can not load template without active Elasticsearch client")
 	}
-	return &ESLoader{client: client, builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}, nil
+	return &ESLoader{client: client, lifecycleClient: lifecycleClient,
+		builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}, nil
 }
 
 // NewFileLoader creates a new template loader for the given file.
@@ -145,6 +148,17 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 	if dataStreamExist {
 		l.log.Infof("Data stream with name %q already exists.", templateName)
+		// for serverless, we can update the lifetimes safely
+		// Note that updating the lifecycle will delete older documents
+		// if the policy requires it; i.e, changing the data_retention from 10d to 7d
+		// will delete the documents older than 7 days.
+		if l.client.IsServerless() {
+			l.log.Infof("overwriting lifecycle policy")
+			err = l.lifecycleClient.CreatePolicyFromConfig()
+			if err != nil {
+				return fmt.Errorf("error updating lifecycle policy: %w", err)
+			}
+		}
 		return nil
 	}
 
