@@ -9,6 +9,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Breaking changes
 
 *Affecting all Beats*
+- The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
+
 
 *Auditbeat*
 
