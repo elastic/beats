@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build (darwin && cgo) || freebsd || linux || windows || aix
-// +build darwin,cgo freebsd linux windows aix
 
 package process
 
@@ -74,7 +73,7 @@ func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 	if !exists {
 		return "", ProcNotExist
 	}
-	//GetInfoForPid will return the smallest possible dataset for a PID
+	// GetInfoForPid will return the smallest possible dataset for a PID
 	procState, err := GetInfoForPid(hostfs, pid)
 	if err != nil {
 		return "", fmt.Errorf("error getting state info for pid %d: %w", pid, err)
@@ -85,7 +84,7 @@ func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 
 // Get fetches the configured processes and returns a list of formatted events and root ECS fields
 func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
-	//If the user hasn't configured any kind of process glob, return
+	// If the user hasn't configured any kind of process glob, return
 	if len(procStats.Procs) == 0 {
 		return nil, nil, nil
 	}
@@ -112,18 +111,17 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		} else {
 			totalPhyMem = memStats.Total
 		}
-
 	}
 
-	//Format the list to the MapStr type used by the outputs
-	procs := []mapstr.M{}
-	rootEvents := []mapstr.M{}
+	// Format the list to the MapStr type used by the outputs
+	var procs []mapstr.M
+	var rootEvents []mapstr.M
 
 	for _, process := range plist {
 		process := process
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
-		//Create the root event
+		// Create the root event
 		root := process.FormatForRoot()
 		rootMap := mapstr.M{}
 		_ = typeconv.Convert(&rootMap, root)
@@ -207,7 +205,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		}
 	}
 
-	//If we've passed the filter, continue to fill out the rest of the metrics
+	// If we've passed the filter, continue to fill out the rest of the metrics
 	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
 	if err != nil {
 		return status, true, fmt.Errorf("FillPidMetrics: %w", err)
@@ -216,7 +214,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		status.Cmdline = strings.Join(status.Args, " ")
 	}
 
-	//postprocess with cgroups and percentages
+	// postprocess with cgroups and percentages
 	last, ok := procStats.ProcsMap.GetPid(status.Pid.ValueOr(0))
 	status.SampleTime = time.Now()
 	if procStats.EnableCgroups {
@@ -343,7 +341,7 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 
 // isWhitelistedEnvVar returns true if the given variable name is a match for
 // the whitelist. If the whitelist is empty it returns false.
-func (procStats Stats) isWhitelistedEnvVar(varName string) bool {
+func (procStats *Stats) isWhitelistedEnvVar(varName string) bool {
 	if len(procStats.envRegexps) == 0 {
 		return false
 	}

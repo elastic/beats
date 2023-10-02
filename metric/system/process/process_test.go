@@ -16,14 +16,18 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows
-// +build darwin freebsd linux windows
 
 package process
 
 import (
+	"bytes"
+	"fmt"
 	"os"
+	"os/exec"
+	"path"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -38,11 +42,63 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+// BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
+// of the command line and environment variables.
+func BenchmarkGetProcess(b *testing.B) {
+	stat, err := initTestResolver()
+	if err != nil {
+		b.Fatalf("Failed init: %s", err)
+	}
+	procs := make(map[int]mapstr.M, 1)
+	pid := os.Getpid()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+
+		process, err := stat.GetOne(pid)
+		if err != nil {
+			continue
+		}
+
+		procs[pid] = process
+	}
+}
+
+func BenchmarkGetTop(b *testing.B) {
+	stat, err := initTestResolver()
+	if err != nil {
+		b.Fatalf("Failed init: %s", err)
+	}
+	procs := make(map[int][]mapstr.M)
+
+	for i := 0; i < b.N; i++ {
+		list, _, err := stat.Get()
+		if err != nil {
+			b.Fatalf("error: %s", err)
+		}
+		procs[i] = list
+	}
+}
+
 func TestGetState(t *testing.T) {
-	// Getpid is really the only way to test this in a cross-platform way
-	state, err := GetPIDState(resolve.NewTestResolver("/"), os.Getpid())
-	require.NoError(t, err)
-	require.Equal(t, Running, state)
+	want := Running
+	pid := os.Getpid()
+	hostfs := resolve.NewTestResolver("/")
+
+	var got PidState
+	var err error
+	test := func() bool {
+		// Getpid is really the only way to test this in a cross-platform way
+		got, err = GetPIDState(hostfs, pid)
+		if err != nil {
+			return false
+		}
+
+		return want == got
+	}
+
+	assert.Eventuallyf(t, test,
+		time.Second, 50*time.Millisecond,
+		"want process state %q, got %q. Last error: %v", want, got, err)
 }
 
 func TestGetOne(t *testing.T) {
@@ -122,7 +178,7 @@ func TestNetworkFilter(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	//The logic itself is os-independent, so we'll only test this on the platform least likly to have CI issues
+	// The logic itself is os-independent, so we'll only test this on the platform least likely to have CI issues
 	if runtime.GOOS != "linux" {
 		t.Skip("Run on Linux only")
 	}
@@ -288,7 +344,7 @@ func TestProcCpuPercentage(t *testing.T) {
 	}
 
 	newState := GetProcCPUPercentage(p1, p2)
-	//GetProcCPUPercentage wil return a number that varies based on the host, due to NumCPU()
+	// GetProcCPUPercentage wil return a number that varies based on the host, due to NumCPU()
 	// So "un-normalize" it, then re-normalized with a constant.
 	cpu := float64(runtime.NumCPU())
 	unNormalized := newState.CPU.Total.Norm.Pct.ValueOr(0) * cpu
@@ -296,43 +352,6 @@ func TestProcCpuPercentage(t *testing.T) {
 
 	assert.EqualValues(t, 0.0721, normalizedTest)
 	assert.EqualValues(t, 3.459, newState.CPU.Total.Pct.ValueOr(0))
-}
-
-// BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
-// of the command line and environment variables.
-func BenchmarkGetProcess(b *testing.B) {
-	stat, err := initTestResolver()
-	if err != nil {
-		b.Fatalf("Failed init: %s", err)
-	}
-	procs := make(map[int]mapstr.M, 1)
-	pid := os.Getpid()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-
-		process, err := stat.GetOne(pid)
-		if err != nil {
-			continue
-		}
-
-		procs[pid] = process
-	}
-}
-
-func BenchmarkGetTop(b *testing.B) {
-	stat, err := initTestResolver()
-	if err != nil {
-		b.Fatalf("Failed init: %s", err)
-	}
-	procs := make(map[int][]mapstr.M)
-
-	for i := 0; i < b.N; i++ {
-		list, _, err := stat.Get()
-		if err != nil {
-			b.Fatalf("error: %s", err)
-		}
-		procs[i] = list
-	}
 }
 
 func TestIncludeTopProcesses(t *testing.T) {
@@ -555,6 +574,54 @@ func TestIncludeTopProcesses(t *testing.T) {
 	}
 }
 
+// runThreads run the threads binary for the current GOOS.
+//
+//go:generate docker run --rm -v ./testdata:/app --entrypoint g++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads /app/threads.cpp
+//go:generate docker run --rm -v ./testdata:/app --entrypoint o64-clang++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-darwin -pthread -std=c++11 -o /app/threads-darwin /app/threads.cpp
+//go:generate docker run --rm -v ./testdata:/app --entrypoint x86_64-w64-mingw32-g++-posix docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads.exe /app/threads.cpp
+func runThreads(t *testing.T) *exec.Cmd {
+	t.Helper()
+
+	supportedPlatforms := []string{"linux/amd64", "darwin/amd64", "windows/amd64"}
+
+	platform := fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
+	if !sliceContains(supportedPlatforms, platform) {
+		t.Skipf("not supported for %s/%s. Supported patforms: %v",
+			runtime.GOOS, runtime.GOARCH, supportedPlatforms)
+	}
+
+	threads := path.Join("testdata", "threads")
+
+	switch runtime.GOOS {
+	case "linux":
+		// nothing to do
+	case "darwin":
+		threads += "-darwin"
+	case "windows":
+		threads += ".exe"
+	}
+
+	var b bytes.Buffer
+	cmd := exec.Command(threads)
+	cmd.Stdout = &b
+	cmd.Stderr = &b
+
+	err := cmd.Start()
+	require.NoErrorf(t, err, "failed to start %q", threads)
+
+	var log string
+	require.Eventually(t,
+		func() bool {
+			log += b.String()
+			return strings.Contains(log, "running")
+		},
+		time.Second, 50*time.Millisecond,
+		"could not determine if %q is running. Output: %q",
+		threads, log)
+
+	return cmd
+}
+
 func initTestResolver() (Stats, error) {
 	err := logp.DevelopmentSetup()
 	if err != nil {
@@ -579,4 +646,14 @@ func initTestResolver() (Stats, error) {
 	}
 	err = testConfig.Init()
 	return testConfig, err
+}
+
+func sliceContains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
+	}
+
+	return false
 }

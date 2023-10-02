@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build freebsd || linux
-// +build freebsd linux
 
 package process
 
@@ -121,7 +120,6 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 		return state, fmt.Errorf("error getting metadata for pid %d: %w", pid, err)
 	}
 
-	//username
 	state.Username, err = getUser(hostfs, pid)
 	if err != nil {
 		return state, fmt.Errorf("error creating username for pid %d: %w", pid, err)
@@ -129,56 +127,73 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 	return state, nil
 }
 
-// GetInfoForPid fetches the basic hostinfo from /proc/[PID]/stat
-func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
-	path := hostfs.Join("proc", strconv.Itoa(pid), "stat")
-	data, err := ioutil.ReadFile(path)
+// GetInfoForPid fetches and parses the process information of the process
+// identified by pid from /proc/[PID]/stat
+func GetInfoForPid(hostFS resolve.Resolver, pid int) (ProcState, error) {
+	path := hostFS.Join("proc", strconv.Itoa(pid), "stat")
+	data, err := os.ReadFile(path)
 	// Transform the error into a more sensible error in cases where the directory doesn't exist, i.e the process is gone
 	if err != nil {
 		if os.IsNotExist(err) {
 			return ProcState{}, syscall.ESRCH
 		}
 		return ProcState{}, fmt.Errorf("error reading procdir %s: %w", path, err)
-
 	}
 
+	state, err := parseProcStat(data)
+	state.Pid = opt.IntWith(pid)
+	if err != nil {
+		return state, fmt.Errorf("failed to parse information for pid %d': %w", pid, err)
+	}
+
+	return state, nil
+}
+
+func parseProcStat(data []byte) (ProcState, error) {
+	const minFields = 36
 	state := ProcState{}
 
 	// Extract the comm value with is surrounded by parentheses.
 	lIdx := bytes.Index(data, []byte("("))
 	rIdx := bytes.LastIndex(data, []byte(")"))
 	if lIdx < 0 || rIdx < 0 || lIdx >= rIdx || rIdx+2 >= len(data) {
-		return state, fmt.Errorf("failed to extract comm for pid %d from '%v': %w", pid, string(data), err)
+		return state, fmt.Errorf("failed to extract 'comm' field from '%v'",
+			string(data))
 	}
 	state.Name = string(data[lIdx+1 : rIdx])
 
 	// Extract the rest of the fields that we are interested in.
 	fields := bytes.Fields(data[rIdx+2:])
-	if len(fields) <= 36 {
-		return state, fmt.Errorf("expected more stat fields for pid %d from '%v': %w", pid, string(data), err)
+	if len(fields) <= minFields {
+		return state, fmt.Errorf("expected at least %d stat fields from '%v'",
+			minFields, string(data))
 	}
 
+	// See https://man7.org/linux/man-pages/man5/proc.5.html for all fields.
 	interests := bytes.Join([][]byte{
-		fields[0], // state
-		fields[1], // ppid
-		fields[2], // pgrp
+		fields[0],  // state
+		fields[1],  // ppid
+		fields[2],  // pgrp
+		fields[17], // num_threads
 	}, []byte(" "))
 
 	var procState string
-	var ppid, pgid int
-
-	_, err = fmt.Fscan(bytes.NewBuffer(interests),
+	var ppid, pgid, numThreads int
+	_, err := fmt.Fscan(bytes.NewBuffer(interests),
 		&procState,
 		&ppid,
 		&pgid,
+		&numThreads,
 	)
 	if err != nil {
-		return state, fmt.Errorf("failed to parse stat fields for pid %d from '%v': %w", pid, string(data), err)
+		return state, fmt.Errorf("failed to parse stat fields from '%s': %w",
+			string(data), err)
 	}
+
 	state.State = getProcState(procState[0])
 	state.Ppid = opt.IntWith(ppid)
 	state.Pgid = opt.IntWith(pgid)
-	state.Pid = opt.IntWith(pid)
+	state.NumThreads = opt.IntWith(numThreads)
 
 	return state, nil
 }
@@ -384,7 +399,7 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 
 	pathFD := hostfs.Join("proc", strconv.Itoa(pid), "fd")
 	fds, err := ioutil.ReadDir(pathFD)
-	if errors.Is(err, os.ErrPermission) { //ignore permission errors, passthrough other data
+	if errors.Is(err, os.ErrPermission) { // ignore permission errors, passthrough other data
 		return state, nil
 	} else if err != nil {
 		return state, fmt.Errorf("error reading FD directory for pid %d: %w", pid, err)

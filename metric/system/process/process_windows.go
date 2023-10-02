@@ -18,17 +18,17 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"syscall"
+	"unsafe"
+
+	xsyswindows "golang.org/x/sys/windows"
 
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/gosigar/sys/windows"
-)
-
-var (
-	processQueryLimitedInfoAccess = windows.PROCESS_QUERY_LIMITED_INFORMATION
 )
 
 // FetchPids returns a map and array of pids
@@ -40,7 +40,9 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 	procMap := make(ProcsMap, 0)
 	var plist []ProcState
-	// This is probably the only implementation that doesn't benefit from our little fillPid callback system. We'll need to iterate over everything manually.
+	// This is probably the only implementation that doesn't benefit from our
+	// little fillPid callback system. We'll need to iterate over everything
+	// manually.
 	for _, pid := range pids {
 		procMap, plist = procStats.pidIter(int(pid), procMap, plist)
 	}
@@ -50,23 +52,63 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 // GetInfoForPid returns basic info for the process
 func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
-	state := ProcState{}
+	var err error
+	var errs []error
+	state := ProcState{Pid: opt.IntWith(pid)}
 
 	name, err := getProcName(pid)
 	if err != nil {
-		return state, fmt.Errorf("error fetching name: %w", err)
+		errs = append(errs, fmt.Errorf("error fetching name: %w", err))
+	} else {
+		state.Name = name
 	}
-	state.Name = name
-	state.Pid = opt.IntWith(pid)
 
 	// system/process doesn't need this here, but system/process_summary does.
 	status, err := getPidStatus(pid)
 	if err != nil {
-		return state, fmt.Errorf("error fetching status: %w", err)
+		errs = append(errs, fmt.Errorf("error fetching status: %w", err))
+	} else {
+		state.State = status
 	}
-	state.State = status
+
+	if numThreads, err := FetchNumThreads(pid); err != nil {
+		errs = append(errs, fmt.Errorf("error fetching num threads: %w", err))
+	} else {
+		state.NumThreads = opt.IntWith(numThreads)
+	}
+
+	if err := errors.Join(errs...); err != nil {
+		return state, fmt.Errorf("could not get all information for PID %d: %w",
+			pid, err)
+	}
 
 	return state, nil
+}
+
+func FetchNumThreads(pid int) (int, error) {
+	pHandle, err := syscall.OpenProcess(
+		xsyswindows.PROCESS_QUERY_INFORMATION,
+		false,
+		uint32(pid))
+	if err != nil {
+		return 0, fmt.Errorf("OpenProcess failed for PID %d: %w", pid, err)
+	}
+	defer syscall.CloseHandle(pHandle)
+
+	var snapshotHandle syscall.Handle
+	err = PssCaptureSnapshot(pHandle, PSSCaptureThreads, 0, &snapshotHandle)
+	if err != nil {
+		return 0, fmt.Errorf("PssCaptureSnapshot failed: %w", err)
+	}
+
+	info := PssThreadInformation{}
+	buffSize := unsafe.Sizeof(info)
+	err = PssQuerySnapshot(snapshotHandle, PssQueryThreadInformation, &info, uint32(buffSize))
+	if err != nil {
+		return 0, fmt.Errorf("PssQuerySnapshot failed: %w", err)
+	}
+
+	return int(info.ThreadsCaptured), nil
 }
 
 // FillPidMetrics is the windows implementation
@@ -107,8 +149,11 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string)
 }
 
 func getProcArgs(pid int) ([]string, error) {
-
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess|windows.PROCESS_VM_READ, false, uint32(pid))
+	handle, err := syscall.OpenProcess(
+		windows.PROCESS_QUERY_LIMITED_INFORMATION|
+			windows.PROCESS_VM_READ,
+		false,
+		uint32(pid))
 	if err != nil {
 		return nil, fmt.Errorf("OpenProcess failed: %w", err)
 	}
@@ -137,7 +182,7 @@ func getProcArgs(pid int) ([]string, error) {
 }
 
 func getProcTimes(pid int) (uint64, uint64, uint64, error) {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -155,7 +200,11 @@ func getProcTimes(pid int) (uint64, uint64, uint64, error) {
 }
 
 func procMem(pid int) (uint64, uint64, error) {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess|windows.PROCESS_VM_READ, false, uint32(pid))
+	handle, err := syscall.OpenProcess(
+		windows.PROCESS_QUERY_LIMITED_INFORMATION|
+			windows.PROCESS_VM_READ,
+		false,
+		uint32(pid))
 	if err != nil {
 		return 0, 0, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -172,7 +221,7 @@ func procMem(pid int) (uint64, uint64, error) {
 
 // getProcName returns the process name associated with the PID.
 func getProcName(pid int) (string, error) {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return "", fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -190,7 +239,7 @@ func getProcName(pid int) (string, error) {
 
 // getProcStatus returns the status of a process.
 func getPidStatus(pid int) (PidState, error) {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return Unknown, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
@@ -204,7 +253,7 @@ func getPidStatus(pid int) (PidState, error) {
 		return Unknown, fmt.Errorf("GetExitCodeProcess failed for pid=%v: %w", pid, err)
 	}
 
-	if exitCode == 259 { //still active
+	if exitCode == 259 { // still active
 		return Running, nil
 	}
 	return Sleeping, nil
@@ -212,7 +261,7 @@ func getPidStatus(pid int) (PidState, error) {
 
 // getParentPid returns the parent process ID of a process.
 func getParentPid(pid int) (int, error) {
-	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return 0, fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}

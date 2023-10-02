@@ -85,9 +85,15 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	info := C.struct_proc_taskallinfo{}
 
-	err := taskInfo(pid, &info)
-	if err != nil {
-		return ProcState{}, fmt.Errorf("could not read task for pid %d", pid)
+	size := C.int(unsafe.Sizeof(info))
+	ptr := unsafe.Pointer(&info)
+
+	// For docs, see the link below. Check the `proc_taskallinfo` struct, which
+	// is a composition of `proc_bsdinfo` and `proc_taskinfo`.
+	// https://opensource.apple.com/source/xnu/xnu-1504.3.12/bsd/sys/proc_info.h.auto.html
+	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
+	if n != size {
+		return ProcState{}, fmt.Errorf("could not read process info for pid %d: proc_pidinfo returned %d", int(n), pid)
 	}
 
 	status := ProcState{}
@@ -112,6 +118,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	status.Ppid = opt.IntWith(int(info.pbsd.pbi_ppid))
 	status.Pid = opt.IntWith(pid)
 	status.Pgid = opt.IntWith(int(info.pbsd.pbi_pgid))
+	status.NumThreads = opt.IntWith(int(info.ptinfo.pti_threadnum))
 
 	// Get process username. Fallback to UID if username is not available.
 	uid := strconv.Itoa(int(info.pbsd.pbi_uid))
@@ -222,18 +229,6 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 	}
 
 	return argv, exeName, envVars, nil
-}
-
-func taskInfo(pid int, info *C.struct_proc_taskallinfo) error {
-	size := C.int(unsafe.Sizeof(*info))
-	ptr := unsafe.Pointer(info)
-
-	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
-	if n != size {
-		return fmt.Errorf("could not read process info for pid %d", pid)
-	}
-
-	return nil
 }
 
 func sysctl(mib []C.int, old *byte, oldlen *uintptr,

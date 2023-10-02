@@ -29,12 +29,13 @@ import (
 // ProcState is the main struct for process information and metrics.
 type ProcState struct {
 	// Basic Process data
-	Name     string   `struct:"name,omitempty"`
-	State    PidState `struct:"state,omitempty"`
-	Username string   `struct:"username,omitempty"`
-	Pid      opt.Int  `struct:"pid,omitempty"`
-	Ppid     opt.Int  `struct:"ppid,omitempty"`
-	Pgid     opt.Int  `struct:"pgid,omitempty"`
+	Name       string   `struct:"name,omitempty"`
+	State      PidState `struct:"state,omitempty"`
+	Username   string   `struct:"username,omitempty"`
+	Pid        opt.Int  `struct:"pid,omitempty"`
+	Ppid       opt.Int  `struct:"ppid,omitempty"`
+	Pgid       opt.Int  `struct:"pgid,omitempty"`
+	NumThreads opt.Int  `struct:"num_threads,omitempty"`
 
 	// Extended Process Data
 	Args    []string `struct:"args,omitempty"`

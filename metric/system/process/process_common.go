@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows || aix || netbsd || openbsd
-// +build darwin freebsd linux windows aix netbsd openbsd
 
 package process
 
@@ -31,13 +30,13 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/go-sysinfo/types"
 
-	sysinfo "github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo"
 )
 
 // ProcNotExist indicates that a process was not found.
 var ProcNotExist = errors.New("process does not exist")
 
-//ProcsMap is a convinence wrapper for the oft-used ideom of map[int]ProcState
+// ProcsMap is a convenience wrapper for the oft-used idiom of map[int]ProcState
 type ProcsMap map[int]ProcState
 
 // ProcsTrack is a thread-safe wrapper for a process Stat object's internal map of processes.
@@ -109,31 +108,31 @@ type Stats struct {
 	host         types.Host
 }
 
-//PidState are the constants for various PID states
+// PidState are the constants for various PID states
 type PidState string
 
 var (
-	//Dead state, on linux this is both "x" and "X"
+	// Dead state, on linux this is both "x" and "X"
 	Dead PidState = "dead"
-	//Running state
+	// Running state
 	Running PidState = "running"
-	//Sleeping state
+	// Sleeping state
 	Sleeping PidState = "sleeping"
-	//Idle state.
+	// Idle state.
 	Idle PidState = "idle"
-	//DiskSleep is uninterruptible disk sleep
+	// DiskSleep is uninterruptible disk sleep
 	DiskSleep PidState = "disk_sleep"
-	//Stopped state.
+	// Stopped state.
 	Stopped PidState = "stopped"
-	//Zombie state.
+	// Zombie state.
 	Zombie PidState = "zombie"
-	//WakeKill is a linux state only found on kernels 2.6.33-3.13
+	// WakeKill is a linux state only found on kernels 2.6.33-3.13
 	WakeKill PidState = "wakekill"
-	//Waking  is a linux state only found on kernels 2.6.33-3.13
+	// Waking  is a linux state only found on kernels 2.6.33-3.13
 	Waking PidState = "waking"
-	//Parked is a linux state. On the proc man page, it says it's available on 3.9-3.13, but it appears to still be in the code.
+	// Parked is a linux state. On the proc man page, it says it's available on 3.9-3.13, but it appears to still be in the code.
 	Parked PidState = "parked"
-	//Unknown state
+	// Unknown state
 	Unknown PidState = "unknown"
 )
 
@@ -163,7 +162,7 @@ func (procStats *Stats) Init() error {
 		procStats.logger.Warnf("Getting host details: %v", err)
 	}
 
-	//footcannon prevention
+	// footcannon prevention
 	if procStats.Hostfs == nil {
 		procStats.Hostfs = resolve.NewTestResolver("/")
 	}

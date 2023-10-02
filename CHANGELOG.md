@@ -15,15 +15,69 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Fix thread safety in process code #43
-- Fix process package build on AIX #54
-- Ensure correct devID width in cgv2 #74
+## [0.7.0]
+
+### Added
+
+- Collect the number of threads as part of the information collected per process
+on `metric/system/process.GetInfoForPid`.
+
+### Fixed
+
+## [0.6.1]
+
+### Changed
+
+-Bump up go-sysinfo dependency version #86
+
+## [0.6.0]
+
+### Added
+
+- Add user data to monitoring setup #80
+
+### Changed
+- Update host functions with `go-sysinfo` API changes #81
+- Move SetupInfoUserMetrics out of a cgo build constraint #82
+- Bumping up version for go-sysinfo dependency #84
+
+### Fixed
+
+-Ensure correct devID width in cgv2 #74
+
+## [0.4.6]
+
+### Fixed
+
+- Fix type issues for MIPS platforms
+- metric/system/cgroup/cgv2: ensure Rdev is correct width
+
+## [0.4.5]
+
+### Added
+
+- add network data to process metrics
+- add Process State API
+
+### Changed
+- Go version 1.18.4
+- move exported helpers to _common.go file
+
+### Removed
+
+- remove hostfs checks
+
+### Fixed
+
+- fix(process): Typo in getargs error message
+- fix(process): Make process package buildable on AIX
 
 ## [0.4.4]
 
 ### Fixed
 
 - Fix thread safety in process code #43
+
 ## [0.4.3]
 
 ## Fixed

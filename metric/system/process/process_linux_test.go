@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows
-// +build darwin freebsd linux windows
 
 package process
 
@@ -26,10 +25,12 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func TestFetchProcessFromOtherUser(t *testing.T) {
@@ -96,4 +97,39 @@ func TestFetchProcessFromOtherUser(t *testing.T) {
 	pidData, err := testConfig.GetOne(testPid)
 	require.NoError(t, err)
 	t.Logf("got: %s", pidData.StringToPrint())
+}
+
+func TestGetInfoForPid_NumThreads(t *testing.T) {
+	want := ProcState{
+		Name:       "elastic-agent",
+		State:      "sleeping",
+		Pid:        opt.IntWith(42),
+		Ppid:       opt.IntWith(1),
+		Pgid:       opt.IntWith(4067478),
+		NumThreads: opt.IntWith(26),
+	}
+
+	got, err := GetInfoForPid(resolve.NewTestResolver("testdata"), 42)
+	require.NoError(t, err, "GetInfoForPid returned an error when it should have succeeded")
+
+	assert.Equal(t, want, got)
+}
+
+func TestParseProcStat(t *testing.T) {
+	data := []byte("4067478 (elastic-agent) S 1 4067478 4067478 0 -1 4194560 151900 " +
+		"1587 0 0 8229 3989 0 1 32 12 26" +
+		" 0 200791940 2675654656 15487 18446744073709551615 1 1 0 0 0 0 0 0 2143420159 0 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 0")
+
+	want := ProcState{
+		Name:       "elastic-agent",
+		State:      getProcState(byte('S')),
+		Ppid:       opt.IntWith(1),
+		Pgid:       opt.IntWith(4067478),
+		NumThreads: opt.IntWith(26),
+	}
+
+	got, err := parseProcStat(data)
+	require.NoError(t, err, "parseProcStat returned and error")
+
+	assert.Equal(t, want, got, "")
 }
