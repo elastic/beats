@@ -175,6 +175,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
 				return err
 			}
+			continue
 		}
 
 		data, err := item.MarshalJSON()
