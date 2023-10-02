@@ -1,5 +1,5 @@
 [[migrate-to-filestream]]
-== Migrate `log` input configurations to `filestream`
+== Migrate `log` or `container` input configurations to `filestream`
 
 The `filestream` input has been generally available since 7.14 and it is highly recommended
 you migrate your existing `log` input configurations. The `filestream` input comes with many
@@ -8,10 +8,14 @@ improvements over the old `log` input, such as configurable order for parsers an
 The `log` input is deprecated and will eventually be removed from Filebeat. We are not fixing
 new issues or adding any enhancements to the `log` input. Our focus is on `filestream`.
 
+NOTE: The `container` input is based on the `log` input, so everything in this guide applies to the `container` input too. Additionally, you can migrate a `container` input to a `container-v2` input since it's based on `filestream` and supports the same options.
+
 This manual migration is required only if you've defined `log` inputs manually
 in your stand-alone Filebeat configuration. All the integrations or modules that are still using
 `log` inputs under the hood will be eventually migrated automatically without any additional actions
 required from the user.
+
+WARNING: This migration would not work if you dynamically add inputs during the runtime (e.g. running under Elastic Agent or using the `autodiscover` feature. Migration happens only on Filebeat's startup because it requires exclusive access to the registry.
 
 In this guide, you'll learn how to migrate an existing `log` input configuration.
 

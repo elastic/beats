@@ -1,0 +1,83 @@
+:type: container-v2
+
+[id="{beatname_lc}-input-{type}"]
+=== Container V2 input
+
+++++
+<titleabbrev>Container V2</titleabbrev>
+++++
+
+WARNING: This input is still in Beta and the configuration options/defaults might change in the future.
+
+Use the `container-v2` input to read container log files.
+
+Unlike its predecessor <<{beatname_lc}-input-container,`container` input>>, this input is based on the <<{beatname_lc}-input-filestream,`filestream` input>> and it uses the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint mode>> to identify files, which proved itself to be more reliable, especially in containerized environments.
+
+This input is practically a configuration preset for the <<{beatname_lc}-input-filestream,`filestream` input>>, ready to be used for container logs without much of configuration.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: container-v2
+  id: 'unique-identifier' <1>
+  paths: <2>
+    - '/var/log/containers/*.log'
+----
+
+<1> `id` is not required but highly recommended. If you decide to use the <<{beatname_lc}-input-filestream-take-over, take-over mode>> it requires a unique ID.
+
+<2> `paths` are required
+
+
+NOTE: The <<{beatname_lc}-input-filestream-take-over, take-over mode>> is able to migrate states of the old <<{beatname_lc}-input-container,`container` input>> since it's based on the <<{beatname_lc}-input-log, log input>>. See <<migrate-to-filestream>> for more details about the migration process.
+
+NOTE: '/var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log',
+so above path can be edited accordingly
+
+==== Configuration options
+
+The `container-v2` input supports the following configuration options plus all the
+<<{beatname_lc}-input-filestream,`filestream` input>> options, however this input has different defaults for some of the `filestream` configuration options:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: container-v2
+  id: 'unique-identifier'
+  paths:
+    - '/var/log/containers/*.log'
+  # container V2 input options mapped to `parsers.container.*` options in `filestream`
+  stream: all
+  format: auto
+  # different defaults for the underlying `filestream` input
+  prospector.scanner.symlinks: true
+  prospector.scanner.fingerprint.enabled: true
+  file_identity.fingerprint: ~
+----
+
+===== `stream`
+
+Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+===== `format`
+
+Use the given format when reading the log file: `auto`, `docker` or `cri`. The
+default is `auto`, it will automatically detect the format. To disable
+autodetection, set any of the other options.
+
+The following input configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Kubernetes logs path:
+
+[source,yaml]
+----
+- type: container-v2
+  id: 'my-container-logs'
+  stream: stdout
+  paths:
+    - "/var/log/containers/*.log"
+----
+
+:type!:

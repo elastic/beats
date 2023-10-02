@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const containerPluginName = "container_v2"
+const containerPluginName = "container-v2"
 
 func defaultContainerConfig() containerConfig {
 	return containerConfig{

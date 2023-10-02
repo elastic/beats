@@ -74,6 +74,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-cometd>>
 * <<{beatname_lc}-input-container>>
+* <<{beatname_lc}-input-container-v2>>
 * <<{beatname_lc}-input-entity-analytics>>
 * <<{beatname_lc}-input-filestream>>
 * <<{beatname_lc}-input-gcp-pubsub>>
@@ -109,6 +110,8 @@ include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-cometd.asciidoc[]
 
 include::inputs/input-container.asciidoc[]
+
+include::inputs/input-container-v2.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-entity-analytics.asciidoc[]
 
