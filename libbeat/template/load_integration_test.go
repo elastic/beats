@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -68,7 +69,8 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	loader, err := NewESLoader(client)
+	handler := &mockClientHandler{severless: false, mode: lifecycle.ILM}
+	loader, err := NewESLoader(client, handler)
 	require.NoError(t, err)
 	s := testSetup{t: t, client: client, loader: loader, config: cfg}
 	// don't care if the cleanup fails, since they might just return a 404
@@ -84,7 +86,8 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	loader, err := NewESLoader(client)
+	handler := &mockClientHandler{severless: false, mode: lifecycle.ILM}
+	loader, err := NewESLoader(client, handler)
 	require.NoError(t, err)
 	return &testSetup{t: t, client: client, loader: loader, config: cfg}
 }
@@ -559,6 +562,22 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 
 	return conn
 }
+
+type mockClientHandler struct {
+	severless bool
+	mode      lifecycle.Mode
+}
+
+func (cli *mockClientHandler) IsServerless() bool            { return cli.severless }
+func (cli *mockClientHandler) CheckEnabled() (bool, error)   { return true, nil }
+func (cli *mockClientHandler) Mode() lifecycle.Mode          { return cli.mode }
+func (cli *mockClientHandler) IsElasticsearch() bool         { return true }
+func (cli *mockClientHandler) CheckExists() bool             { return true }
+func (cli *mockClientHandler) PolicyName() string            { return "test" }
+func (cli *mockClientHandler) HasPolicy() (bool, error)      { return false, nil }
+func (cli *mockClientHandler) CreatePolicyFromConfig() error { return nil }
+func (cli *mockClientHandler) Policy() lifecycle.Policy      { return lifecycle.Policy{Name: "test"} }
+func (cli *mockClientHandler) Overwrite() bool               { return true }
 
 func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int, body []byte) *eslegclient.Connection {
 	server := esMock(t, method, endpoint, code, body)
