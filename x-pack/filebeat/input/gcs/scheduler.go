@@ -248,7 +248,7 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 
 func (s *scheduler) isFileSelected(name string) bool {
 	for _, sel := range s.src.FileSelectors {
-		if sel.Regex == nil || sel.Regex.MatchString(name) {
+		if sel.Regex.MatchString(name) {
 			return true
 		}
 	}
