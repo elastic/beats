@@ -47,7 +47,7 @@ func makeKafka(
 	log := logp.NewLogger(logSelector)
 	log.Debug("initialize kafka output")
 
-	config, err := readConfig(cfg)
+	kConfig, err := readConfig(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -57,7 +57,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(log, config)
+	libCfg, err := newSaramaConfig(log, kConfig)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -67,21 +67,21 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	codec, err := codec.CreateEncoder(beat, config.Codec)
+	codec, err := codec.CreateEncoder(beat, kConfig.Codec)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, config.Headers, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
 	retry := 0
-	if config.MaxRetries < 0 {
+	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(config.BulkMaxSize, retry, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, client)
 }
 
 func buildTopicSelector(cfg *config.C) (outil.Selector, error) {

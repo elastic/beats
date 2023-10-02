@@ -166,8 +166,8 @@ is collected by it.
 - Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
   Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
-- allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36693[36693]
-- elasticsearch output now supports `idle_connection_timeout`. {issue}35615[35615] {pull}36693[36693]
+- allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
+- elasticsearch output now supports `idle_connection_timeout`. {issue}35615[35615] {pull}36788[36788]
 
 *Auditbeat*
 

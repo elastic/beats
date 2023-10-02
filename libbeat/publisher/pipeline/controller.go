@@ -60,8 +60,9 @@ type outputController struct {
 
 	workerChan chan publisher.Batch
 
-	consumer *eventConsumer
-	workers  []outputWorker
+	consumer       *eventConsumer
+	workers        []outputWorker
+	inputQueueSize int
 }
 
 type producerRequest struct {
@@ -81,6 +82,7 @@ func newOutputController(
 	observer outputObserver,
 	eventWaitGroup *sync.WaitGroup,
 	queueFactory queue.QueueFactory,
+	inputQueueSize int,
 ) (*outputController, error) {
 	controller := &outputController{
 		beat:           beat,
@@ -90,6 +92,7 @@ func newOutputController(
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
 		consumer:       newEventConsumer(monitors.Logger, observer),
+		inputQueueSize: inputQueueSize,
 	}
 
 	return controller, nil
@@ -258,11 +261,11 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 		factory = c.queueFactory
 	}
 
-	queue, err := factory(logger, c.onACK)
+	queue, err := factory(logger, c.onACK, c.inputQueueSize)
 	if err != nil {
 		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		queue = memqueue.NewQueue(logger, c.onACK, s)
+		queue = memqueue.NewQueue(logger, c.onACK, s, c.inputQueueSize)
 	}
 	c.queue = queue
 
