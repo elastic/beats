@@ -142,8 +142,16 @@ func fetchJobID(workerId int, bucketName string, objectName string) string {
 
 func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
 	var jobs []*job
-
+	fileSelectorLen := len(s.src.FileSelectors)
 	for _, obj := range objects {
+		// if file selectors are present, then only select the files that match the regex
+		if fileSelectorLen != 0 && !s.isFileSelected(obj.Name) {
+			continue
+		}
+		// date filter is applied on last modified time of the blob
+		if s.src.TimeStampEpoch != nil && obj.Updated.Unix() < *s.src.TimeStampEpoch {
+			continue
+		}
 		// check required to ignore directories & sub folders, since there is no inbuilt option to
 		// do so. In gcs all the directories are emulated and represented by a prefix, we can
 		// define specific prefix's & delimiters to ignore known directories but there is no generic
@@ -235,4 +243,13 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		}
 	}
 	return jobs
+}
+
+func (s *scheduler) isFileSelected(name string) bool {
+	for _, sel := range s.src.FileSelectors {
+		if sel.Regex == nil || sel.Regex.MatchString(name) {
+			return true
+		}
+	}
+	return false
 }

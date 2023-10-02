@@ -173,6 +173,14 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
 
+		// if expand_event_list_from_field is set, then split the event list
+		if j.src.ExpandEventListFromField != "" {
+			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
+				return err
+			}
+			continue
+		}
+
 		var parsedData []mapstr.M
 		if j.src.ParseJSON {
 			parsedData, err = decodeJSON(bytes.NewReader(item))
@@ -188,12 +196,69 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
 			}
 			done()
-		}
-		// since we don't update the cursor checkpoint, lack of a lock here should be fine
-		if err := j.publisher.Publish(evt, nil); err != nil {
-			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+		} else {
+			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			if err := j.publisher.Publish(evt, nil); err != nil {
+				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+			}
 		}
 	}
+	return nil
+}
+
+// splitEventList splits the event list into individual events and publishes them
+func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
+	var jsonObject map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &jsonObject); err != nil {
+		return err
+	}
+
+	raw, found := jsonObject[key]
+	if !found {
+		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+
+	tok, err := dec.Token()
+	if err != nil {
+		return err
+	}
+	delim, ok := tok.(json.Delim)
+	if !ok || delim != '[' {
+		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+	}
+
+	for dec.More() {
+		arrayOffset := dec.InputOffset()
+
+		var item json.RawMessage
+		if err := dec.Decode(&item); err != nil {
+			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+		}
+
+		data, err := item.MarshalJSON()
+		if err != nil {
+			return err
+		}
+		evt := j.createEvent(data, nil, offset+arrayOffset)
+
+		if !dec.More() {
+			// if this is the last object, then perform a complete state save
+			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
+			if err := j.publisher.Publish(evt, cp); err != nil {
+				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+			}
+			done()
+		} else {
+			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			if err := j.publisher.Publish(evt, nil); err != nil {
+				j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+			}
+		}
+	}
+
 	return nil
 }
 
