@@ -237,7 +237,7 @@ filebeat.inputs:
   containers:
   - name: container_1
     file_selectors:
-    - regex: '/CloudTrail/'
+    - regex: '/Monitoring/'
     - regex: 'docs/'
     - regex: '/Security-Logs/'
 ----
