@@ -143,13 +143,12 @@ func fetchJobID(workerId int, bucketName string, objectName string) string {
 func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
 	//nolint:prealloc // No need to preallocate the slice
 	var jobs []*job
-	fileSelectorLen := len(s.src.FileSelectors)
 	for _, obj := range objects {
 		// if file selectors are present, then only select the files that match the regex
-		if fileSelectorLen != 0 && !s.isFileSelected(obj.Name) {
+		if len(s.src.FileSelectors) != 0 && !s.isFileSelected(obj.Name) {
 			continue
 		}
-		// date filter is applied on last modified time of the blob
+		// date filter is applied on last updated time of the object
 		if s.src.TimeStampEpoch != nil && obj.Updated.Unix() < *s.src.TimeStampEpoch {
 			continue
 		}

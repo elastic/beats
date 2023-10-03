@@ -198,7 +198,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			}
 			done()
 		} else {
-			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			// since we don't update the cursor checkpoint, lack of a lock here is not a problem
 			if err := j.publisher.Publish(evt, nil); err != nil {
 				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
@@ -254,7 +254,7 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objH
 			}
 			done()
 		} else {
-			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			// since we don't update the cursor checkpoint, lack of a lock here is not a problem
 			if err := j.publisher.Publish(evt, nil); err != nil {
 				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
