@@ -7,8 +7,8 @@
 #setup.dsl.enabled: true
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
-# The default data stream pattern is %{[beat.name]}-%{[beat.version]}"
-#setup.dsl.data_stream_pattern: "{{.BeatName}}"
+# The default data stream pattern is {{.BeatName}}-%{[agent.version]}"
+#setup.dsl.data_stream_pattern: "{{.BeatName}}-%{[agent.version]}"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
 # to load your own lifecycle policy.
