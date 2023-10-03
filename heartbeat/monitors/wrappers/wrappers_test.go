@@ -140,11 +140,12 @@ func TestSimpleJob(t *testing.T) {
 			require.NoError(t, err)
 
 			expectedMonitor := logger.MonitorRunInfo{
-				MonitorID: testMonFields.ID,
-				Type:      testMonFields.Type,
-				Duration:  durationUs.(int64),
-				Status:    "up",
-				Attempt:   1,
+				MonitorID:   testMonFields.ID,
+				Type:        testMonFields.Type,
+				Duration:    durationUs.(int64),
+				Status:      "up",
+				Attempt:     1,
+				NetworkInfo: logger.NetworkInfo{},
 			}
 			require.ElementsMatch(t, []zap.Field{
 				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
