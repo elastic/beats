@@ -51,6 +51,14 @@ func NewFileClientHandler(c FileClient, info beat.Info, cfg RawConfig) (*FileCli
 	if cfg.DSL.Enabled() {
 		lifecycleCfg = DefaultDSLConfig(info).DSL
 		err = cfg.DSL.Unpack(&lifecycleCfg)
+
+		// unpack name value separately
+		dsName := DefaultDSLName()
+		err := cfg.DSL.Unpack(&dsName)
+		if err != nil {
+			return nil, fmt.Errorf("error unpacking DSL data stream name: %w", err)
+		}
+		lifecycleCfg.PolicyName = dsName.DataStreamPattern
 	} else if cfg.ILM.Enabled() {
 		lifecycleCfg = DefaultILMConfig(info).ILM
 		err = cfg.ILM.Unpack(&lifecycleCfg)

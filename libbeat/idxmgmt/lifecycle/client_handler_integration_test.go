@@ -49,7 +49,7 @@ func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
 		cfg := RawConfig{
 			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
-			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 		}
 		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
@@ -61,7 +61,7 @@ func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("with ilm if enabled", func(t *testing.T) {
 		cfg := RawConfig{
 			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
-			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 		}
 		h, err := newESClientHandler(t, cfg)
 		require.NoError(t, err)
@@ -80,7 +80,7 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 		}
 		cfg := RawConfig{
 			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
-			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 		}
 		rawClient := newRawESClient(t)
 		h, err := NewESClientHandler(rawClient, beat.Info{Beat: "testbeat"}, cfg)
@@ -102,7 +102,7 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 		}
 		cfg := RawConfig{
 			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
-			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 		}
 		rawClient := newRawESClient(t)
 		h, err := NewESClientHandler(rawClient, beat.Info{Beat: "testbeat"}, cfg)
@@ -186,7 +186,7 @@ func getEnv(name, def string) string {
 func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 	defaultCfg := RawConfig{
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
-		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
 	for name, test := range map[string]struct {
 		version    string

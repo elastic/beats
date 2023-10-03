@@ -26,7 +26,8 @@ import (
 
 // Config is used for unpacking a config.C.
 type Config struct {
-	Enabled    bool                     `config:"enabled"`
+	Enabled bool `config:"enabled"`
+	// PolicyName, used by ILM
 	PolicyName fmtstr.EventFormatString `config:"policy_name"`
 	PolicyFile string                   `config:"policy_file"`
 	// used only for testing
@@ -39,6 +40,18 @@ type Config struct {
 
 	// Enable always overwrite policy mode. This required manage_ilm privileges.
 	Overwrite bool `config:"overwrite"`
+}
+
+// DSLNameConfig just stores the datastream name for the DSL policy
+// as this is the only config value that differs between ILM and DSL
+type DSLNameConfig struct {
+	DataStreamPattern fmtstr.EventFormatString `config:"data_stream_pattern"`
+}
+
+func DefaultDSLName() DSLNameConfig {
+	return DSLNameConfig{
+		DataStreamPattern: *fmtstr.MustCompileEvent("%{[beat.name]}-%{[beat.version]}"),
+	}
 }
 
 // LifecycleConfig maps all possible ILM/DSL config values present in a config

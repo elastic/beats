@@ -62,6 +62,14 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 			err = cfg.DSL.Unpack(&lifecycleCfg)
 		}
 
+		// unpack name value separately
+		dsName := DefaultDSLName()
+		err := cfg.DSL.Unpack(&dsName)
+		if err != nil {
+			return nil, fmt.Errorf("error unpacking DSL data stream name: %w", err)
+		}
+		lifecycleCfg.PolicyName = dsName.DataStreamPattern
+
 	} else {
 		lifecycleCfg = DefaultILMConfig(info).ILM
 		if cfg.ILM != nil {

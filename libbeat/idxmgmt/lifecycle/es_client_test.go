@@ -64,22 +64,22 @@ func TestESSetup(t *testing.T) {
 
 	defaultILMCfg := RawConfig{
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
-		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
 
 	defaultDSLCfg := RawConfig{
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
-		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
 
 	bothDisabledConfig := RawConfig{
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
-		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
 
 	bothEnabledConfig := RawConfig{
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
-		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
 
 	cases := map[string]struct {
@@ -158,7 +158,7 @@ func TestESSetup(t *testing.T) {
 			serverless: true,
 			cfg: RawConfig{
 				DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "overwrite": true,
-					"check_exists": true, "policy_name": "test"}),
+					"check_exists": true, "data_stream_pattern": "test"}),
 			},
 			err:            false,
 			existingPolicy: mapstr.M{"existing": "policy"},
