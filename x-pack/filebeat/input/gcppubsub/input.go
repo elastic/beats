@@ -154,6 +154,11 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 				}
 			}),
 		),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -322,3 +327,6 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 
 	return pubsub.NewClient(ctx, in.ProjectID, opts...)
 }
+
+// boolPtr returns a pointer to b.
+func boolPtr(b bool) *bool { return &b }

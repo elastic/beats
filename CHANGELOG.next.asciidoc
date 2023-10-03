@@ -9,12 +9,15 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
+
 
 *Auditbeat*
 
 
 *Filebeat*
 
+- Switch types of `log.file.device`, `log.file.inode`, `log.file.idxhi`, `log.file.idxlo` and `log.file.vol` fields to strings to better align with ECS and integrations. {pull}36697[36697]
 
 *Heartbeat*
 
@@ -135,7 +138,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-- Prevent panic when more than one interface is configured in fleet. {issue}36574[36574] {pull}36575[36575]
 
 *Winlogbeat*
 
@@ -147,7 +149,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Upgrade Go to 1.20.8 {pull}36597[36597]
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - When running under Elastic-Agent the status is now reported per Unit instead of the whole Beat {issue}35874[35874] {pull}36183[36183]
 - Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
@@ -218,7 +219,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - For request tracer logging in CEL and httpjson the request and response body are no longer included in `event.original`. The body is still present in `http.{request,response}.body.content`. {pull}36531[36531]
 - Added support for Okta OAuth2 provider in the CEL input. {issue}36336[36336] {pull}36521[36521]
 - Improve error logging in HTTPJSON input. {pull}36529[36529]
+- Disable warning message about ingest pipeline loading when running under Elastic Agent. {pull}36659[36659]
 - Add input metrics to http_endpoint input. {issue}36402[36402] {pull}36427[36427]
+- Remove Event Normalization from GCP PubSub Input. {pull}36716[36716]
+- Update mito CEL extension library to v1.6.0. {pull}36651[36651]
+- Added support for new features & removed partial save mechanism in the Azure Blob Storage input. {issue}35126[35126] {pull}36690[36690]
+- Improve template evaluation logging for HTTPJSON input. {pull}36668[36668]
+- Add CEL partial value debug function. {pull}36652[36652]
 
 *Auditbeat*
 
@@ -241,10 +248,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-
-*Packetbeat*
-
 - Improve efficiency of sniffers by deduplicating interface configurations. {issue}36574[36574] {pull}36576[36576]
+- Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
 
 *Winlogbeat*
 
@@ -291,6 +296,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 

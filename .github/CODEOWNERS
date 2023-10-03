@@ -55,6 +55,7 @@ CHANGELOG*
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/cache/ @elastic/security-external-integrations
 /libbeat/processors/community_id/ @elastic/security-external-integrations
 /libbeat/processors/decode_xml/ @elastic/security-external-integrations
 /libbeat/processors/decode_xml_wineventlog/ @elastic/security-external-integrations

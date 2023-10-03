@@ -27,6 +27,8 @@ even though it can get expensive with dealing with a very large number of files.
 3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
 
+NOTE: In the latest update the partial save mechanism has been removed for now due to concurrency issues, but will be added back in the future.
+
 [id="supported-types"]
 NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
 As for authentication types, we currently have support for `shared access keys` and `connection strings`.
@@ -138,6 +140,9 @@ Now let's explore the configuration attributes a bit more elaborately.
     7. <<attrib-max_workers,max_workers>>
     8. <<attrib-poll,poll>>
     9. <<attrib-poll_interval,poll_interval>>
+   10. <<attrib-file_selectors,file_selectors>>
+   11. <<attrib-expand_event_list_from_field,expand_event_list_from_field>>
+   12. <<attrib-timestamp_epoch,timestamp_epoch>>
 
 
 [id="attrib-account-name"]
@@ -214,6 +219,88 @@ Example : `10s` would mean we would like the polling to occur every 10 seconds. 
 This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always 
 take priority and override the root level values if both are specified.
 
+[id="attrib-file_selectors"]
+[float]
+==== `file_selectors`
+
+If the Azure blob storage container will have blobs that correspond to files that {beatname_uc} shouldn't process, `file_selectors` can be used to limit
+the files that are downloaded. This is a list of selectors which are based on a `regex` pattern. The `regex` should match the blob name or should be a part of the blob name (ideally a prefix). The `regex` syntax is the same as used in the Go programming language. Files that don't match any configured regex won't be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+[source, yml]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    file_selectors:
+    - regex: '/Monitoring/'
+    - regex: 'docs/'
+    - regex: '/Security-Logs/'
+----
+
+[id="attrib-expand_event_list_from_field"]
+[float]
+==== `expand_event_list_from_field`
+
+If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if 
+you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+["source","json"]
+----
+{
+    "Records": [
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:51:00Z",
+            "region": "us-east-1",
+            "eventID": "EXAMPLE8-9621-4d00-b913-beca2EXAMPLE",
+        },
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:52:00Z",
+            "region": "us-east-1",
+            "eventID": "EXAMPLEc-28be-486c-8928-49ce6EXAMPLE",
+        }
+    ]
+}
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    expand_event_list_from_field: Records
+----
+
+NOTE: This attribute is only applicable for JSON file formats. You do not require to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file/blob.
+
+[id="attrib-timestamp_epoch"]
+[float]
+==== `timestamp_epoch`
+
+This attribute can be used to filter out files/blobs which have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `LastModified Timestamp` obtained from the blob metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    timestamp_epoch: 1627233600
+----
 
 [id="container-overrides"]
 *The sample configs below will explain the container level overriding of attributes a bit further :-*
