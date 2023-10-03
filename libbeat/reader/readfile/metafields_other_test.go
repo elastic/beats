@@ -44,13 +44,13 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 
 	dev, err := actual.GetValue(deviceIDKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(17), dev)
+	require.Equal(t, "17", dev)
 	err = actual.Delete(deviceIDKey)
 	require.NoError(t, err)
 
 	inode, err := actual.GetValue(inodeKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(999), inode)
+	require.Equal(t, "999", inode)
 	err = actual.Delete(inodeKey)
 	require.NoError(t, err)
 

@@ -6,6 +6,7 @@ package okta
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -41,10 +42,10 @@ type conf struct {
 	OktaDomain string `config:"okta_domain" validate:"required"`
 	OktaToken  string `config:"okta_token" validate:"required"`
 
-	// WantDevices indicates that device details
-	// should be collected. This is optional as
-	// the devices API is not necessarily activated.
-	WantDevices bool `config:"collect_device_details"`
+	// Dataset specifies the datasets to collect from
+	// the API. It can be ""/"all", "users", or
+	// "devices".
+	Dataset string `config:"dataset"`
 
 	// SyncInterval is the time between full
 	// synchronisation operations.
@@ -159,7 +160,11 @@ func (c *conf) Validate() error {
 		return errInvalidUpdateInterval
 	case c.SyncInterval <= c.UpdateInterval:
 		return errSyncBeforeUpdate
-	default:
+	}
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users", "devices":
 		return nil
+	default:
+		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 }

@@ -1189,6 +1189,41 @@ var inputTests = []struct {
 		},
 	},
 
+	{
+		name: "debug",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": 1+debug("partial sum", 2+3)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": 6.0, // float64 due to json encoding.
+			},
+		}},
+	},
+	{
+		name: "debug_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": "division by zero",
+			},
+		}},
+	},
+
 	// not yet done from httpjson (some are redundant since they are compositional products).
 	//
 	// cursor/pagination (place above auth test block)
@@ -1207,6 +1242,7 @@ func TestInput(t *testing.T) {
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
 
+	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {

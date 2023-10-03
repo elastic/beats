@@ -128,6 +128,9 @@ type ProcessingConfig struct {
 	// is applied to events. If nil the Beat's default behavior prevails.
 	EventNormalization *bool
 
+	// Disables the addition of input.type
+	DisableType bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}

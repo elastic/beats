@@ -74,7 +74,6 @@ func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 
 // schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) schedule(ctx context.Context) error {
-	defer s.limiter.wait()
 	if !s.src.Poll {
 		return s.scheduleOnce(ctx)
 	}
@@ -93,16 +92,30 @@ func (s *scheduler) schedule(ctx context.Context) error {
 }
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
+	defer s.limiter.wait()
 	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
+	fileSelectorLen := len(s.src.FileSelectors)
+	var numBlobs, numJobs int
+
 	for pager.More() {
 		resp, err := pager.NextPage(ctx)
 		if err != nil {
 			return err
 		}
 
+		numBlobs += len(resp.Segment.BlobItems)
+		s.log.Debugf("scheduler: %d blobs fetched for current batch", len(resp.Segment.BlobItems))
+
 		var jobs []*job
 		for _, v := range resp.Segment.BlobItems {
-
+			// if file selectors are present, then only select the files that match the regex
+			if fileSelectorLen != 0 && !s.isFileSelected(*v.Name) {
+				continue
+			}
+			// date filter is applied on last modified time of the blob
+			if s.src.TimeStampEpoch != nil && v.Properties.LastModified.Unix() < *s.src.TimeStampEpoch {
+				continue
+			}
 			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
 			blobCreds := &blobCredentials{
 				serviceCreds:  s.credential,
@@ -125,6 +138,8 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			jobs = s.moveToLastSeenJob(jobs)
 		}
 
+		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
 			id := fetchJobID(i, s.src.ContainerName, job.name())
@@ -134,6 +149,11 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				defer s.limiter.release()
 				job.do(ctx, id)
 			}()
+		}
+
+		s.log.Debugf("scheduler: total objects read till now: %d\nscheduler: total jobs scheduled till now: %d", numBlobs, numJobs)
+		if len(jobs) != 0 {
+			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].name(), jobs[len(jobs)-1].name())
 		}
 	}
 
@@ -177,10 +197,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	ignore := false
 
 	for _, job := range jobs {
-		switch offset, isPartial := s.state.cp.PartiallyProcessed[*job.blob.Name]; {
-		case isPartial:
-			job.offset = offset
-			latestJobs = append(latestJobs, job)
+		switch {
 		case job.timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
 		case job.name() == s.state.checkpoint().BlobName:
@@ -200,12 +217,21 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 		jobsToReturn = jobs
 	}
 
-	// in a senario where there are some jobs which have a later time stamp
+	// in a senario where there are some jobs which have a greater timestamp
 	// but lesser alphanumeric order and some jobs have greater alphanumeric order
-	// than the current checkpoint or partially completed jobs are present
+	// than the current checkpoint blob name, then we append the latest jobs
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}
 
 	return jobsToReturn
+}
+
+func (s *scheduler) isFileSelected(name string) bool {
+	for _, sel := range s.src.FileSelectors {
+		if sel.Regex == nil || sel.Regex.MatchString(name) {
+			return true
+		}
+	}
+	return false
 }

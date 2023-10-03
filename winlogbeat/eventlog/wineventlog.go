@@ -580,6 +580,11 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	return string(l.outputBuf.Bytes()), err
 }
 
+func (l *winEventLog) Reset() error {
+	debugf("%s Closing handle for reset", l.logPrefix)
+	return win.Close(l.subscription)
+}
+
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
 	l.metrics.close()

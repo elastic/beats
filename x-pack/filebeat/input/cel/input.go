@@ -150,7 +150,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log)
 	if err != nil {
 		return err
 	}
@@ -861,7 +861,7 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger) (cel.Program, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -875,6 +875,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
+		lib.Debug(debug(log)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
 		lib.Regexp(patterns),
@@ -904,6 +905,17 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		return nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
 	return prg, nil
+}
+
+func debug(log *logp.Logger) func(string, any) {
+	log = log.Named("cel_debug")
+	return func(tag string, value any) {
+		level := "DEBUG"
+		if _, ok := value.(error); ok {
+			level = "ERROR"
+		}
+		log.Debugw(level, "tag", tag, "value", value)
+	}
 }
 
 func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {

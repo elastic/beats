@@ -84,8 +84,7 @@ func (t *configuredJob) Start(pubClient beat.Client) {
 		return
 	}
 
-	tf := t.makeSchedulerTaskFunc() //nolint:typecheck // this is used, linter just doesn't seem to see it
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, t.makeSchedulerTaskFunc(), t.config.Type)
 	if err != nil {
 		logp.L().Info("could not start monitor: %v", err)
 	}
