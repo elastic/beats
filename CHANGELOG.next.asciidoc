@@ -83,6 +83,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 - Fix panic in HTTP protocol parsing when host header has empty host part. {issue}36497[36497] {issue}36518[36518]
+- Fix default cache size calculation. {pull}36723[36723]
 
 *Winlogbeat*
 
