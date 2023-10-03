@@ -137,6 +137,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix default cache size calculation. {pull}36723[36723]
 
 *Winlogbeat*
 
