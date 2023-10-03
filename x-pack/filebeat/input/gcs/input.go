@@ -54,8 +54,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
-	//nolint:prealloc // No need to preallocate the slice
-	var sources []cursor.Source
+	sources := make([]cursor.Source, 0, len(config.Buckets))
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
 		if bucket.TimeStampEpoch != nil && !isValidUnixTimestamp(*bucket.TimeStampEpoch) {

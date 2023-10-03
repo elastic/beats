@@ -224,7 +224,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added support for new features & removed partial save mechanism in the Azure Blob Storage input. {issue}35126[35126] {pull}36690[36690]
 - Improve template evaluation logging for HTTPJSON input. {pull}36668[36668]
 - Add CEL partial value debug function. {pull}36652[36652]
-- Added support for new features & removed partial save mechanism in the Gcs input. {issue}35847[35847] {pull}36713[36713]
+- Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 
 *Auditbeat*
 

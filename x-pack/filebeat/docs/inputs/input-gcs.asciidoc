@@ -76,10 +76,7 @@ which will in turn use the `max_workers` value to initialize an in-memory worker
 one per bucket, each having 3 workers. These `workers` will be responsible for performing `jobs` that process a file (in this case read and output the contents of a file).
 
 NOTE: The scheduler is responsible for scheduling jobs, and uses the `maximum available workers` in the pool, at each iteration, to decide the number of files to retrieve and 
-process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. The `bucket_timeout` value is used to timeout
-calls to the bucket list api if it exceeds the given value. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
-
-NOTE: In the latest update the partial save mechanism has been removed for now due to concurrency issues, but will be added back in the future.
+process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. The `bucket_timeout` value is used to timeout calls to the bucket list api if it exceeds the given value. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
 
 *A Sample Response :-*
 ["source","json"]
@@ -261,7 +258,7 @@ The bucket level values will always take priority and override the root level va
 [float]
 ==== `file_selectors`
 
-If the GCS buckets have objects that correspond to files that {beatname_uc} shouldn't process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a `regex` pattern. The `regex` should match the object name or should be a part of the object name (ideally a prefix). The `regex` syntax is the same as used in the Go programming language. Files that don't match any configured regex won't be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+If the GCS buckets have objects that correspond to files that {beatname_uc} shouldn't process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don't match any configured expression won't be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
 
 [source, yml]
 ----
@@ -322,14 +319,14 @@ filebeat.inputs:
     expand_event_list_from_field: Records
 ----
 
-NOTE: The `parse_json` setting does not work with `expand_event_list_from_field`. If enabled it will be ignored. This attribute is only applicable for JSON file formats. You do not require to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file/object.
+NOTE: The `parse_json` setting is incompatible with `expand_event_list_from_field`. If enabled it will be ignored. This attribute is only applicable for JSON file formats. You do not need to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file or object.
 
 
 [id="attrib-timestamp_epoch-gcs"]
 [float]
 ==== `timestamp_epoch`
 
-This attribute can be used to filter out files/object which have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+This attribute can be used to filter out files and objects that have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
 
 [source, yml]
 ----
