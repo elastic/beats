@@ -21,7 +21,7 @@ var (
 type Action struct {
 	Query string
 	ID    string
-	// The optional action timeout in seconds
+	// The optional action timeout
 	Timeout    time.Duration
 	ECSMapping ecs.Mapping
 }
@@ -33,19 +33,11 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 
 	var (
 		id, query string
-		timeout   int64
 	)
 
 	if v, ok := m["id"]; ok {
 		if id, ok = v.(string); !ok {
 			return a, fmt.Errorf("invalid id: %w", ErrActionRequest)
-		}
-	}
-
-	if v, ok := m["timeout"]; ok {
-		timeout, err = convertToInt64(v)
-		if err != nil {
-			return a, fmt.Errorf("invalid timeout value %v: %w", v, err)
 		}
 	}
 
@@ -90,9 +82,15 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		ECSMapping: ecsm,
 	}
 
-	if timeout > 0 {
-		// Convert from seconds to duration
-		a.Timeout = time.Duration(timeout) * time.Second
+	if v, ok := m["timeout"]; ok {
+		timeout, err := convertToInt64(v)
+		if err != nil {
+			return a, fmt.Errorf("invalid timeout value %v: %w", v, err)
+		}
+		if timeout > 0 {
+			// Convert from seconds to duration
+			a.Timeout = time.Duration(timeout) * time.Second
+		}
 	}
 
 	return a, nil

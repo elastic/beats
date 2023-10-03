@@ -24,7 +24,7 @@ const (
 	// The default query timeout
 	defaultTimeout = 1 * time.Minute
 
-	// The longest the query is allowed to run. Since queries are run one at a time, this will block all other queries until this quiery completes.
+	// The longest the query is allowed to run. Since queries are run one at a time, this will block all other queries until this query completes.
 	defaultMaxTimeout     = 15 * time.Minute
 	defaultConnectRetries = 10
 )
@@ -153,12 +153,12 @@ func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (c
 		log:       c.log.With("context", "osquery client connect"),
 	}
 
-	err = r.Run(ctx, func(ctx context.Context) error {
-		var er error
-		cli, er = osquery.NewClient(c.socketPath, timeout)
-		if er != nil {
-			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", er)
-			return er
+	err = r.Run(ctx, func(_ context.Context) error {
+		var err error
+		cli, err = osquery.NewClient(c.socketPath, timeout)
+		if err != nil {
+			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", err)
+			return err
 		}
 		return nil
 	})
@@ -195,7 +195,7 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 	}
 	defer c.cliLimiter.Release(limit)
 
-	// If query timeout is <= 0, then use client timeout (default is 1 munute)
+	// If query timeout is <= 0, then use client timeout (default is 1 minute)
 	if timeout <= 0 {
 		timeout = c.timeout
 	}
