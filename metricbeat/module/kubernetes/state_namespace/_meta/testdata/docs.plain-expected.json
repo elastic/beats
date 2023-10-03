@@ -1,40 +1,13 @@
 [
     {
         "event": {
-            "dataset": "kubernetes.namespace_state",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-node-lease",
-            "namespace_state": {
-                "created": {
-                    "sec": 1691566337
-                },
-                "status": {
-                    "active": true,
-                    "terminating": false
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_namespace",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.namespace_state",
+            "dataset": "kubernetes.state_namespace",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "default",
-            "namespace_state": {
+            "state_namespace": {
                 "created": {
                     "sec": 1691566338
                 },
@@ -55,40 +28,13 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.namespace_state",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "namespace_state": {
-                "created": {
-                    "sec": 1691566337
-                },
-                "status": {
-                    "active": true,
-                    "terminating": false
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_namespace",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.namespace_state",
+            "dataset": "kubernetes.state_namespace",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "local-path-storage",
-            "namespace_state": {
+            "state_namespace": {
                 "created": {
                     "sec": 1691566342
                 },
@@ -109,13 +55,67 @@
     },
     {
         "event": {
-            "dataset": "kubernetes.namespace_state",
+            "dataset": "kubernetes.state_namespace",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "state_namespace": {
+                "created": {
+                    "sec": 1691566337
+                },
+                "status": {
+                    "active": true,
+                    "terminating": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_namespace",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.state_namespace",
             "duration": 115000,
             "module": "kubernetes"
         },
         "kubernetes": {
             "namespace": "kube-public",
-            "namespace_state": {
+            "state_namespace": {
+                "created": {
+                    "sec": 1691566337
+                },
+                "status": {
+                    "active": true,
+                    "terminating": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_namespace",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.state_namespace",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-node-lease",
+            "state_namespace": {
                 "created": {
                     "sec": 1691566337
                 },

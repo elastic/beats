@@ -46036,13 +46036,13 @@ type: keyword
 --
 
 [float]
-=== namespace_state
+=== state_namespace
 
 Kubernetes namespace metrics.
 
 
 
-*`kubernetes.namespace_state.created.sec`*::
+*`kubernetes.state_namespace.created.sec`*::
 +
 --
 Unix creation timestamp.
@@ -46053,7 +46053,7 @@ type: double
 --
 
 
-*`kubernetes.namespace_state.status.active`*::
+*`kubernetes.state_namespace.status.active`*::
 +
 --
 Whether the namespace is active (true or false).
@@ -46062,7 +46062,7 @@ type: boolean
 
 --
 
-*`kubernetes.namespace_state.status.terminating`*::
+*`kubernetes.state_namespace.status.terminating`*::
 +
 --
 Whether the namespace is terminating (true or false).

@@ -1,4 +1,4 @@
-- name: namespace_state
+- name: state_namespace
   type: group
   release: ga
   description: >

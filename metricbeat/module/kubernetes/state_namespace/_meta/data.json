@@ -1,15 +1,15 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
-        "dataset": "kubernetes.namespace_state",
+        "dataset": "kubernetes.state_namespace",
         "duration": 115000,
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-node-lease",
-        "namespace_state": {
+        "namespace": "default",
+        "state_namespace": {
             "created": {
-                "sec": 1691566337
+                "sec": 1691566338
             },
             "status": {
                 "active": true,

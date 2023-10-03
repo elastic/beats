@@ -15,7 +15,7 @@
 		},
 		"Index": "",
 		"ID": "",
-		"Namespace": "kubernetes.namespace_state",
+		"Namespace": "kubernetes.state_namespace",
 		"Timestamp": "0001-01-01T00:00:00Z",
 		"Error": null,
 		"Host": "",
@@ -40,32 +40,7 @@
 		},
 		"Index": "",
 		"ID": "",
-		"Namespace": "kubernetes.namespace_state",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "local-path-storage"
-		},
-		"MetricSetFields": {
-			"created": {
-				"sec": 1673879567
-			},
-			"status": {
-				"active": true,
-				"terminating": false
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.namespace_state",
+		"Namespace": "kubernetes.state_namespace",
 		"Timestamp": "0001-01-01T00:00:00Z",
 		"Error": null,
 		"Host": "",
@@ -90,7 +65,32 @@
 		},
 		"Index": "",
 		"ID": "",
-		"Namespace": "kubernetes.namespace_state",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "local-path-storage"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1673879567
+			},
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
 		"Timestamp": "0001-01-01T00:00:00Z",
 		"Error": null,
 		"Host": "",
@@ -115,7 +115,7 @@
 		},
 		"Index": "",
 		"ID": "",
-		"Namespace": "kubernetes.namespace_state",
+		"Namespace": "kubernetes.state_namespace",
 		"Timestamp": "0001-01-01T00:00:00Z",
 		"Error": null,
 		"Host": "",

@@ -105,7 +105,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	if resourceName != util.NamespaceResource {
 		resourceName = strings.ReplaceAll(resourceName, prefix, "")
 	} else {
-		resourceName = "namespace_state"
+		resourceName = "state_namespace"
 	}
 
 	m.enricher.Start()
