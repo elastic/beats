@@ -339,7 +339,7 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	// Register config and logger extensions
 	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath, osquery.ServerTimeout(timeout))
 	if err != nil {
-		return
+		return err
 	}
 
 	// Register osquery configuration plugin

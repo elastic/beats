@@ -7,7 +7,6 @@ package beater
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
@@ -68,7 +67,7 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
-		return 0, fmt.Errorf("%v: %w", err, ErrQueryExecution)
+		return 0, errors.Join(err, ErrQueryExecution)
 	}
 
 	var namespace string

@@ -150,7 +150,7 @@ func convertToInt64(i interface{}) (int64, error) {
 	case int32:
 		return int64(v), nil
 	case int64:
-		return int64(v), nil
+		return v, nil
 	case uint8:
 		return int64(v), nil
 	case uint16:
@@ -164,7 +164,7 @@ func convertToInt64(i interface{}) (int64, error) {
 	case float64:
 		return int64(v), nil
 	case string:
-		strconv.ParseInt(v, 10, 64)
+		return strconv.ParseInt(v, 10, 64)
 	}
 	return 0, fmt.Errorf("unexpected type: %T", i)
 }
