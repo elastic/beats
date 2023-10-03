@@ -1402,9 +1402,9 @@ setup.template.settings:
 # Enable DSL support. Valid values are true, or false.
 #setup.dsl.enabled: true
 
-# Set the lifecycle policy name. The default policy name is
-# 'auditbeat'.
-#setup.dsl.policy_name: "auditbeat"
+# Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
+# The default data stream pattern is %{[beat.name]}-%{[beat.version]}"
+#setup.dsl.data_stream_pattern: "auditbeat"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
 # to load your own lifecycle policy.
