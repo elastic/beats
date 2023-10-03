@@ -62,8 +62,7 @@ The prefix for a group of log group names. Note: `region_name` is required when
 log_group_name_prefix is given. The number of workers that will process the
 log groups under this prefix is set through the `number_of_workers` config.
 
-Only one of `log_group_name` and `log_group_name_prefix` should be configured.
-If both are set, `log_group_name` takes precidence.
+Only one of `log_group_name` and `log_group_name_prefix` can be configured.
 
 [float]
 ==== `region_name`
