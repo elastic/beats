@@ -11,12 +11,10 @@
     },
     "openmetrics": {
         "labels": {
-            "job": "openmetrics",
-            "listener_name": "http"
+            "job": "openmetrics"
         },
         "metrics": {
-            "net_conntrack_listener_conn_accepted_total": 3,
-            "net_conntrack_listener_conn_closed_total": 0
+            "up": 1
         }
     },
     "service": {

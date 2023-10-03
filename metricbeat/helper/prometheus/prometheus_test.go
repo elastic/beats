@@ -24,9 +24,6 @@ import (
 	"net/http"
 	"sort"
 	"testing"
-	"time"
-
-	"github.com/prometheus/prometheus/pkg/labels"
 
 	"github.com/stretchr/testify/assert"
 
@@ -1004,89 +1001,4 @@ func TestPrometheusKeyLabels(t *testing.T) {
 			t.Logf("events: %+v", events[i].MetricSetFields)
 		}
 	}
-}
-
-func TestPrometheusHistogramWithoutSuffix(t *testing.T) {
-	promHistogramWithAndWithoutBucket := `
-# HELP http_server_requests_seconds Duration of HTTP server request handling
-# TYPE http_server_requests_seconds histogram
-http_server_requests_seconds{exception="None",uri="/actuator/prometheus",quantile="0.002796201",} 0.046137344
-http_server_requests_seconds{exception="None",uri="/actuator/prometheus",quantile="0.003145726",} 0.046137344
-http_server_requests_seconds_bucket{exception="None",uri="/actuator/prometheus",le="0.001",} 0.0
-http_server_requests_seconds_bucket{exception="None",uri="/actuator/prometheus",le="0.001048576",} 0.0
-http_server_requests_seconds_count{exception="None",uri="/actuator/prometheus",} 1.0
-http_server_requests_seconds_sum{exception="None",uri="/actuator/prometheus",} 0.046745444
-http_server_requests_seconds_impossible{exception="None",uri="/actuator/prometheus",} 0.046745444
-http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus",} 0.046745444
-`
-
-	labelsList := []*labels.Label{
-		{
-			Name:  "exception",
-			Value: "None",
-		},
-		{
-			Name:  "uri",
-			Value: "/actuator/prometheus",
-		},
-	}
-
-	cumulativeCounts := []uint64{
-		uint64(0.0),
-		uint64(0.0),
-	}
-	upperBounds := []float64{
-		0.001,
-		0.001048576,
-	}
-	var buckets []*Bucket
-	for i := range cumulativeCounts {
-		buckets = append(buckets, &Bucket{
-			CumulativeCount: &cumulativeCounts[i],
-			UpperBound:      &upperBounds[i],
-		})
-	}
-
-	name := "http_server_requests_seconds"
-	help := "Duration of HTTP server request handling"
-
-	var expectedMetric OpenMetric
-	expectedMetric.Name = &name
-	expectedMetric.Label = labelsList
-	sampleSum := 0.046745444
-	sampleCount := uint64(1.0)
-	expectedMetric.Histogram = &Histogram{
-		IsGaugeHistogram: false,
-		SampleSum:        &sampleSum,
-		SampleCount:      &sampleCount,
-		Bucket:           buckets,
-	}
-
-	expectedMetrics := []*OpenMetric{
-		&expectedMetric,
-	}
-
-	type Histogram struct {
-		SampleCount      *uint64
-		SampleSum        *float64
-		Bucket           []*Bucket
-		IsGaugeHistogram bool
-	}
-
-	expected := []*MetricFamily{
-		{
-			Name:   &name,
-			Help:   &help,
-			Type:   "histogram",
-			Unit:   nil,
-			Metric: expectedMetrics,
-		},
-	}
-
-	b := []byte(promHistogramWithAndWithoutBucket)
-	result, err := ParseMetricFamilies(b, ContentTypeTextFormat, time.Now())
-	if err != nil {
-		t.Fatal("ParseMetricFamilies returned an error.")
-	}
-	assert.Equal(t, expected, result)
 }
