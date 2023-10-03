@@ -233,6 +233,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 - Added status to monitor run log report.
+- Capture and log the individual connection metrics for all the lightweight monitors
 
 
 *Metricbeat*
