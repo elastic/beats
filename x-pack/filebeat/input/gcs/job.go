@@ -86,7 +86,7 @@ func (j *job) do(ctx context.Context, id string) {
 		err := j.processAndPublishData(ctx, id)
 		if err != nil {
 			j.state.updateFailedJobs(j.object.Name)
-			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+			j.log.Errorw("job encountered an error while publishing data and has been added to a failed jobs list", "gcs.jobId", id, "error", err)
 			return
 		}
 
@@ -103,7 +103,7 @@ func (j *job) do(ctx context.Context, id string) {
 		// locks while data is being saved and published to avoid concurrent map read/writes
 		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
 		if err := j.publisher.Publish(event, cp); err != nil {
-			j.log.Errorw("job encountered an error", "gcs.jobId", id, "error", err)
+			j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 		}
 		// unlocks after data is saved and published
 		done()
