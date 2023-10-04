@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
 	"github.com/stretchr/testify/mock"
@@ -23,6 +23,9 @@ import (
 
 type mockHandler struct {
 	mock.Mock
+	cfg        LifecycleConfig
+	testPolicy Policy
+	mode       Mode
 }
 
 type onCall struct {
@@ -36,30 +39,57 @@ func (c onCall) Return(values ...interface{}) onCall {
 	return c
 }
 
-func newMockHandler(calls ...onCall) *mockHandler {
-	m := &mockHandler{}
+func newMockHandler(cfg LifecycleConfig, testPolicy Policy, calls ...onCall) *mockHandler {
+	m := &mockHandler{cfg: cfg}
 	for _, c := range calls {
 		m.On(c.name, c.args...).Return(c.returns...)
 	}
 	return m
 }
 
-func onCheckILMEnabled(enabled bool) onCall { return makeOnCall("CheckILMEnabled", enabled) }
-func (h *mockHandler) CheckILMEnabled(enabled bool) (bool, error) {
-	args := h.Called(enabled)
+func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
+func (h *mockHandler) CheckEnabled() (bool, error) {
+	args := h.Called()
 	return args.Bool(0), args.Error(1)
 }
 
-func onHasILMPolicy(name string) onCall { return makeOnCall("HasILMPolicy", name) }
-func (h *mockHandler) HasILMPolicy(name string) (bool, error) {
-	args := h.Called(name)
+func onHasPolicy() onCall { return makeOnCall("HasPolicy") }
+func (h *mockHandler) HasPolicy() (bool, error) {
+	args := h.Called()
 	return args.Bool(0), args.Error(1)
 }
 
-func onCreateILMPolicy(policy Policy) onCall { return makeOnCall("CreateILMPolicy", policy) }
-func (h *mockHandler) CreateILMPolicy(policy Policy) error {
-	args := h.Called(policy)
+func onCreatePolicyFromConfig() onCall { return makeOnCall("CreatePolicyFromConfig") }
+func (h *mockHandler) CreatePolicyFromConfig() error {
+	args := h.Called()
 	return args.Error(0)
+
+}
+
+func (h *mockHandler) Overwrite() bool {
+	return h.cfg.ILM.Overwrite || h.cfg.DSL.Overwrite
+}
+
+func (h *mockHandler) PolicyName() string {
+	return h.testPolicy.Name
+}
+
+func (h *mockHandler) Policy() Policy {
+	return h.testPolicy
+}
+
+func (h *mockHandler) Mode() Mode {
+	return h.mode
+}
+
+func (h *mockHandler) IsElasticsearch() bool {
+	return false
+}
+
+func onCheckExists() onCall { return makeOnCall("CheckExists") }
+func (h *mockHandler) CheckExists() bool {
+	args := h.Called()
+	return args.Bool(0)
 }
 
 func makeOnCall(name string, args ...interface{}) onCall {

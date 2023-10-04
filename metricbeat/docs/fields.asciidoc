@@ -46036,6 +46036,42 @@ type: keyword
 --
 
 [float]
+=== state_namespace
+
+Kubernetes namespace metrics.
+
+
+
+*`kubernetes.state_namespace.created.sec`*::
++
+--
+Unix creation timestamp.
+
+
+type: double
+
+--
+
+
+*`kubernetes.state_namespace.status.active`*::
++
+--
+Whether the namespace is active (true or false).
+
+type: boolean
+
+--
+
+*`kubernetes.state_namespace.status.terminating`*::
++
+--
+Whether the namespace is terminating (true or false).
+
+type: boolean
+
+--
+
+[float]
 === node
 
 kubernetes node metrics
@@ -62017,6 +62053,16 @@ alias to: process.parent.pid
 type: alias
 
 alias to: process.pgid
+
+--
+
+*`system.process.num_threads`*::
++
+--
+Number of threads in the process
+
+
+type: integer
 
 --
 

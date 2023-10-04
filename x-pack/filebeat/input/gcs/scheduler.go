@@ -141,9 +141,17 @@ func fetchJobID(workerId int, bucketName string, objectName string) string {
 }
 
 func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
+	//nolint:prealloc // No need to preallocate the slice
 	var jobs []*job
-
 	for _, obj := range objects {
+		// if file selectors are present, then only select the files that match the regex
+		if len(s.src.FileSelectors) != 0 && !s.isFileSelected(obj.Name) {
+			continue
+		}
+		// date filter is applied on last updated time of the object
+		if s.src.TimeStampEpoch != nil && obj.Updated.Unix() < *s.src.TimeStampEpoch {
+			continue
+		}
 		// check required to ignore directories & sub folders, since there is no inbuilt option to
 		// do so. In gcs all the directories are emulated and represented by a prefix, we can
 		// define specific prefix's & delimiters to ignore known directories but there is no generic
@@ -180,10 +188,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	ignore := false
 
 	for _, job := range jobs {
-		switch offset, isPartial := s.state.cp.LastProcessedOffset[job.object.Name]; {
-		case isPartial:
-			job.offset = offset
-			latestJobs = append(latestJobs, job)
+		switch {
 		case job.Timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
 		case job.Name() == s.state.checkpoint().ObjectName:
@@ -205,7 +210,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 	// in a senario where there are some jobs which have a later time stamp
 	// but lesser lexicographic order and some jobs have greater lexicographic order
-	// than the current checkpoint or if partially completed jobs are present
+	// than the current checkpoint object name, then we append the latest jobs
 	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}
@@ -238,4 +243,13 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		}
 	}
 	return jobs
+}
+
+func (s *scheduler) isFileSelected(name string) bool {
+	for _, sel := range s.src.FileSelectors {
+		if sel.Regex.MatchString(name) {
+			return true
+		}
+	}
+	return false
 }
