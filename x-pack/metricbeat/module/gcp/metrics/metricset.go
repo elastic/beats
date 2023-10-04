@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"strings"
 	"time"
 
@@ -224,10 +225,10 @@ func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWith
 	// Group the time series values by common traits.
 	timeSeriesGroups := m.groupTimeSeries(ctx, timeSeries, metadataService, mapper)
 
-	// Generate a `created` event timestamp for all events collected in this batch.
+	// Generate a batch ID for all events collected in this collection.
 	//
-	// Why do we need keep track of the event creation timestamp?
-	// ----------------------------------------------------------
+	// Why do we need keep track in which batch the metricset collected the event?
+	// ---------------------------------------------------------------------------
 	//
 	// GCP metrics have different ingestion delays; after GCP collects a metric from
 	// a resource, it takes some time to be available for ingestion.
@@ -247,13 +248,16 @@ func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWith
 	// times.
 	//
 	// The metricset cannot group the events from different collections, so we need
-	// to add an `event.created` field to avoid having two documents with the same timestamp
-	// and dimensions.
+	// to add an `event.batch_id` field to avoid having two documents with the same
+	// timestamp and dimensions.
 	//
-	eventCreatedTime := time.Now().UTC()
+	eventBatchID, err := uuid.NewUUID()
+	if err != nil {
+		return nil, fmt.Errorf("error generating batch ID: %w", err)
+	}
 
 	// Create single events for each time series group.
-	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups, eventCreatedTime)
+	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups, eventBatchID.String())
 
 	return events, nil
 }

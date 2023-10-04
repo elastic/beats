@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"time"
 )
 
 func getKeyValue(m mapstr.M, field string) string {
@@ -74,7 +73,7 @@ func groupMetricsByDimensions(keyValues []KeyValuePoint) map[string][]KeyValuePo
 // Collapsing the metrics in each group into a single event should not cause
 // any loss of information, since all metrics in a group share the same timestamp
 // and dimensions.
-func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, eventCreatedTime time.Time) []mb.Event {
+func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, eventBatchID string) []mb.Event {
 	events := make([]mb.Event, 0, len(groups))
 
 	for _, group := range groups {
@@ -96,7 +95,7 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, e
 			event.RootFields = group[0].ECS
 		}
 
-		_, _ = event.RootFields.Put("event.created", eventCreatedTime)
+		_, _ = event.RootFields.Put("event.batch_id", eventBatchID)
 
 		events = append(events, event)
 	}
