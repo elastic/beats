@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Update mito CEL extension library to v1.6.0. {pull}36651[36651]
+- Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 
 *Auditbeat*
 
