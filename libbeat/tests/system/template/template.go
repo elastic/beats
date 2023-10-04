@@ -48,7 +48,7 @@ func testTemplateDefaultFieldLength(beatName string, elasticLicensed bool) func(
 		}
 
 		// Generate a template based on the embedded fields.yml data.
-		tmpl, err := template.New(version.GetDefaultVersion(), beatName, elasticLicensed, *esVersion, template.TemplateConfig{}, false)
+		tmpl, err := template.New(false, version.GetDefaultVersion(), beatName, elasticLicensed, *esVersion, template.TemplateConfig{}, false)
 		if err != nil {
 			t.Fatal(err)
 		}
