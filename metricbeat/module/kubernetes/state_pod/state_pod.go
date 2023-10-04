@@ -27,6 +27,8 @@ import (
 // mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
+		// Make everything in "kube_pod_owner" available for use in the Labels section, below.
+		"kube_pod_owner":            p.InfoMetric(),
 		"kube_pod_info":             p.InfoMetric(),
 		"kube_pod_status_phase":     p.LabelMetric("status.phase", "phase", p.OpLowercaseValue()),
 		"kube_pod_status_ready":     p.LabelMetric("status.ready", "condition", p.OpLowercaseValue()),
@@ -40,6 +42,10 @@ var mapping = &p.MetricsMapping{
 		"node":    p.Label(mb.ModuleDataKey + ".node.name"),
 		"pod_ip":  p.Label("ip"),
 		"host_ip": p.Label("host_ip"),
+		// Add owner information provided by the "kube_pob_owner" InfoMetric.
+		"owner_kind":          p.Label("owner.kind"),
+		"owner_name":          p.Label("owner.name"),
+		"owner_is_controller": p.Label("owner.is_controller"),
 	},
 }
 

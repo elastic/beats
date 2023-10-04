@@ -27,6 +27,8 @@ import (
 // mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
+		// Make everything in "kube_replicaset_owner" available for use in the Labels section, below.
+		"kube_replicaset_owner":                         p.InfoMetric(),
 		"kube_replicaset_metadata_generation":           p.InfoMetric(),
 		"kube_replicaset_status_fully_labeled_replicas": p.Metric("replicas.labeled"),
 		"kube_replicaset_status_observed_generation":    p.Metric("replicas.observed"),
@@ -38,6 +40,10 @@ var mapping = &p.MetricsMapping{
 	Labels: map[string]p.LabelMap{
 		"replicaset": p.KeyLabel("name"),
 		"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+		// Add owner information provided by the "kube_replicaset_owner" InfoMetric.
+		"owner_kind":          p.Label("owner.kind"),
+		"owner_name":          p.Label("owner.name"),
+		"owner_is_controller": p.Label("owner.is_controller"),
 	},
 }
 

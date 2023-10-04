@@ -29,3 +29,20 @@
           type: long
           description: >
             The number of fully labeled replicas per ReplicaSet
+        - name: owner
+          type: group
+          description: >
+            Kubernetes job owner information
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                The name of the resource that owns this job
+            - name: kind
+              type: keyword
+              description: >
+                The kind of resource that owns this job (eg. "CronJob")
+            - name: is_controller
+              type: keyword
+              description: >
+                Owner is controller ("true", "false", or "<none>")
