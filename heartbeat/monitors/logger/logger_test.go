@@ -37,6 +37,7 @@ import (
 func generateFakeNetworkInfo() NetworkInfo {
 	networkInfo := NetworkInfo{
 		// All network info available in HB documentation
+		"resolve.ip":                  "192.168.1.254",
 		"resolve.rtt.us":              123,
 		"tls.rtt.handshake.us":        456,
 		"icmp.rtt.us":                 111,
