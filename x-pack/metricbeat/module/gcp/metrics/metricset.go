@@ -182,45 +182,78 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		for _, v := range sdc.MetricTypes {
 			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
 		}
-		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
+
+		// Collect time series values from Google Cloud Monitoring API
+		timeSeries, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
 			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc)
+		events, err := m.mapToEvents(ctx, timeSeries, sdc)
 		if err != nil {
-			err = fmt.Errorf("eventMapping failed: %w", err)
+			err = fmt.Errorf("mapToEvents failed: %w", err)
 			m.Logger().Error(err)
 			return err
 		}
 
+		// Publish events to Elasticsearch
 		m.Logger().Debugf("Total %d of events are created for service name = %s and metric type = %s.", len(events), sdc.ServiceName, sdc.MetricTypes)
 		for _, event := range events {
 			reporter.Event(event)
 		}
 	}
+
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger(), sdc)
+// mapToEvents maps time series data from GCP into events for Elasticsearch.
+func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
+		if metadataService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}
 
-	tsGrouped := m.timeSeriesGrouped(ctx, gcpService, tss, e)
+	// Group the time series values by common traits.
+	timeSeriesGroups := m.groupTimeSeries(ctx, timeSeries, metadataService, mapper)
 
-	//Create single events for each group of data that matches some common patterns like labels and timestamp
+	// Generate a `created` event timestamp for all events collected in this batch.
+	//
+	// Why do we need keep track of the event creation timestamp?
+	// ----------------------------------------------------------
+	//
+	// GCP metrics have different ingestion delays; after GCP collects a metric from
+	// a resource, it takes some time to be available for ingestion.
+	//
+	// Some metrics have no ingestion delay, while others have a delay of up to multiple
+	// minutes.
+	//
+	// For example,
+	//  - `container/memory.limit.bytes` has no ingest delay, while
+	//  - `container/memory/request_bytes` has two minutes ingest delay.
+	//
+	// So, even if the metricset collects these metrics at two minutes apart, the metrics
+	// will have the same timestamp.
+	//
+	// When metrics have the same timestamp and dimensions, the metricset will group them
+	// into a single event. However, the metricset cannot group metrics collected at different
+	// times.
+	//
+	// The metricset cannot group the events from different collections, so we need
+	// to add an `event.created` field to avoid having two documents with the same timestamp
+	// and dimensions.
+	//
+	eventCreatedTime := time.Now().UTC()
 
-	events := createEventsFromGroups(sdc.ServiceName, tsGrouped)
+	// Create single events for each time series group.
+	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups, eventCreatedTime)
 
 	return events, nil
 }

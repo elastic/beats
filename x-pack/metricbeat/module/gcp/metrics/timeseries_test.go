@@ -9,6 +9,7 @@ import (
 )
 
 func TestCreateDimensionsKey(t *testing.T) {
+	timestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
 	kv := KeyValuePoint{
 		Key:   "metric1",
 		Value: 1,
@@ -29,14 +30,15 @@ func TestCreateDimensionsKey(t *testing.T) {
 			"cloud.provider":          "gcp",
 			"cloud.region":            "us-west",
 		},
-		Timestamp: time.Time{},
+		Timestamp: timestamp,
 	}
 
-	dimensionsKey := createDimensionsKey(kv)
-	require.Equal(t, "obs_us-west-1_1_gcp_us-west_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}", dimensionsKey)
+	dimensionsKey := createGroupingKey(kv)
+	require.Equal(t, "1696422896000000000_obs_us-west-1_1_gcp_us-west_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}", dimensionsKey)
 }
 
 func TestGroupMetricsByDimensions(t *testing.T) {
+	timestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
 	t.Run("same dimensions", func(t *testing.T) {
 		kvs := []KeyValuePoint{
 			{
@@ -59,7 +61,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 			{
 				Key:   "metric2",
@@ -81,7 +83,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 			{
 				Key:   "metric3",
@@ -103,7 +105,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 		}
 
@@ -112,13 +114,14 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 		groups := groupMetricsByDimensions(kvs)
 		require.Len(t, groups, 1)
 
-		group1, ok := groups["obs_us-west-1_1_gcp_us-west_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
+		group1, ok := groups["1696422896000000000_obs_us-west-1_1_gcp_us-west_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
 		require.True(t, ok)
 		require.Len(t, group1, 3) // all 3 metrics in this group
 		require.ElementsMatch(t, group1, expectedGroup1)
 	})
 
 	t.Run("different dimensions", func(t *testing.T) {
+		timestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
 		kvs := []KeyValuePoint{
 			{
 				Key:   "metric1",
@@ -140,7 +143,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 			{
 				Key:   "metric2",
@@ -162,7 +165,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 			{
 				Key:   "metric3",
@@ -184,7 +187,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 			{
 				Key:   "metric4",
@@ -206,7 +209,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 			{
 				Key:   "metric5",
@@ -228,7 +231,7 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 				},
-				Timestamp: time.Time{},
+				Timestamp: timestamp,
 			},
 		}
 
@@ -244,27 +247,88 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 
 		require.Len(t, groups, 3)
 
-		group1, ok := groups["obs_us-west-1_1_gcp_us-west_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
+		group1, ok := groups["1696422896000000000_obs_us-west-1_1_gcp_us-west_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
 		require.True(t, ok)
 		require.Len(t, group1, 2) // should have 2 metrics
 		require.ElementsMatch(t, group1, expectedGroup1)
 
-		group2, ok := groups["obs_us-east-1_1_gcp_us-east_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
+		group2, ok := groups["1696422896000000000_obs_us-east-1_1_gcp_us-east_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
 		require.True(t, ok)
 		require.Len(t, group2, 2) // should have 2 metrics
 		require.ElementsMatch(t, group2, expectedGroup2)
 
-		group3, ok := groups["obs_us-east-1_2_gcp_us-east_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
+		group3, ok := groups["1696422896000000000_obs_us-east-1_2_gcp_us-east_{\"user.deployment\":\"deploy-1\",\"user.division\":\"div-1\",\"user.index\":\"n0\",\"user.instance_group\":\"ig1\",\"user.job\":\"j1\",\"user.name\":\"name-1\",\"user.org\":\"obs\",\"user.project\":\"project-1\"}"]
 		require.True(t, ok)
 		require.Len(t, group3, 1) // should have 1 metric
 		require.ElementsMatch(t, group3, expectedGroup3)
 	})
 }
 
+func TestWithDifferentOrdering(t *testing.T) {
+	timestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
+	eventCreatedTimestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
+
+	t.Run("Having labels in a different order should make no difference", func(t *testing.T) {
+		kvs := []KeyValuePoint{
+			{
+				Key:   "metric1",
+				Value: 1,
+				Labels: mapstr.M{
+					"user.deployment":     "deploy-1",
+					"user.division":       "div-1",
+					"user.index":          "n0",
+					"user.instance_group": "ig1",
+					"user.job":            "j1",
+					"user.name":           "name-1",
+					"user.org":            "obs",
+					"user.project":        "project-1",
+				},
+				ECS: mapstr.M{
+					"cloud.account.id":        "obs",
+					"cloud.availability_zone": "us-west-1",
+					"cloud.instance.id":       "1",
+					"cloud.provider":          "gcp",
+					"cloud.region":            "us-west",
+				},
+				Timestamp: timestamp,
+			},
+			{
+				Key:   "metric2",
+				Value: 2,
+				Labels: mapstr.M{
+					"user.project":        "project-1",
+					"user.org":            "obs",
+					"user.name":           "name-1",
+					"user.job":            "j1",
+					"user.instance_group": "ig1",
+					"user.index":          "n0",
+					"user.division":       "div-1",
+					"user.deployment":     "deploy-1",
+				},
+				ECS: mapstr.M{
+					"cloud.account.id":        "obs",
+					"cloud.availability_zone": "us-west-1",
+					"cloud.instance.id":       "1",
+					"cloud.provider":          "gcp",
+					"cloud.region":            "us-west",
+				},
+				Timestamp: timestamp,
+			},
+		}
+
+		groups := groupMetricsByDimensions(kvs)
+
+		events := createEventsFromGroups("redis", groups, eventCreatedTimestamp)
+		require.Len(t, events, 1)
+	})
+}
+
 func TestCreateEventsFromGroup(t *testing.T) {
-	timestampGroup1 := time.Now()
-	timestampGroup2 := time.Now().Add(5 * time.Minute)
-	timestampGroup3 := time.Now().Add(10 * time.Minute)
+	timestampGroup1, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
+	timestampGroup2 := timestampGroup1.Add(5 * time.Minute)
+	timestampGroup3 := timestampGroup1.Add(10 * time.Minute)
+
+	eventCreatedTimestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
 
 	t.Run("different dimensions", func(t *testing.T) {
 		kvs := []KeyValuePoint{
@@ -407,6 +471,9 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.instance.id":       "1",
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
+					"event": mapstr.M{
+						"created": eventCreatedTimestamp,
+					},
 				},
 			},
 			{
@@ -433,6 +500,9 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.instance.id":       "1",
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
+					"event": mapstr.M{
+						"created": eventCreatedTimestamp,
+					},
 				},
 			},
 			{
@@ -458,11 +528,14 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.instance.id":       "2",
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
+					"event": mapstr.M{
+						"created": eventCreatedTimestamp,
+					},
 				},
 			},
 		}
 
-		events := createEventsFromGroups("redis", groups)
+		events := createEventsFromGroups("redis", groups, eventCreatedTimestamp)
 		require.Len(t, events, 3)
 		require.ElementsMatch(t, events, expectedEvents)
 	})

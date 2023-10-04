@@ -8,9 +8,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"time"
 )
 
 func getKeyValue(m mapstr.M, field string) string {
@@ -27,9 +27,12 @@ func getKeyValue(m mapstr.M, field string) string {
 	return strVal
 }
 
-func createDimensionsKey(kv KeyValuePoint) string {
-	// Figure the list of dimensions that we want to group by from kv.ECS and kv.Labels
-
+// createGroupingKey returns a key to group metrics by dimensions.
+//
+// At a high level, the key is made of the following components:
+//   - @timestamp
+//   - list dimension values
+func createGroupingKey(kv KeyValuePoint) string {
 	accountID := getKeyValue(kv.ECS, "cloud.account.id")
 	az := getKeyValue(kv.ECS, "cloud.availability_zone")
 	instanceID := getKeyValue(kv.ECS, "cloud.instance.id")
@@ -49,18 +52,29 @@ func createDimensionsKey(kv KeyValuePoint) string {
 	return dimensionsKey
 }
 
+// groupMetricsByDimensions returns a map of metrics grouped by dimensions.
 func groupMetricsByDimensions(keyValues []KeyValuePoint) map[string][]KeyValuePoint {
 	groupedMetrics := make(map[string][]KeyValuePoint)
 
 	for _, kv := range keyValues {
-		dimensionsKey := createDimensionsKey(kv)
+		dimensionsKey := createGroupingKey(kv)
 		groupedMetrics[dimensionsKey] = append(groupedMetrics[dimensionsKey], kv)
 	}
 
 	return groupedMetrics
 }
 
-func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) []mb.Event {
+// createEventsFromGroups returns a slice of events from the metric groups.
+//
+// Each group is made or one or more metrics, so the function collapses the
+// metrics in each group into a single event:
+//
+//	[]KeyValuePoint -> mb.Event
+//
+// Collapsing the metrics in each group into a single event should not cause
+// any loss of information, since all metrics in a group share the same timestamp
+// and dimensions.
+func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, eventCreatedTime time.Time) []mb.Event {
 	events := make([]mb.Event, 0, len(groups))
 
 	for _, group := range groups {
@@ -82,28 +96,31 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) [
 			event.RootFields = group[0].ECS
 		}
 
+		_, _ = event.RootFields.Put("event.created", eventCreatedTime)
+
 		events = append(events, event)
 	}
 
 	return events
 }
 
-// timeSeriesGrouped groups TimeSeries responses into common Elasticsearch friendly events. This is to avoid sending
-// events with a single metric that shares info (like timestamp) with another event with a single metric too
-func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.MetadataService, tsas []timeSeriesWithAligner, e *incomingFieldExtractor) map[string][]KeyValuePoint {
-	metadataService := gcpService
+// groupTimeSeries groups TimeSeries into Elasticsearch friendly events.
+//
+// By grouping multiple TimeSeries (according to @timestamp and dimensions) into single event,
+// we can avoid sending events with a single metric.
+func (m *MetricSet) groupTimeSeries(ctx context.Context, timeSeries []timeSeriesWithAligner, defaultMetadataService gcp.MetadataService, mapper *incomingFieldMapper) map[string][]KeyValuePoint {
+	metadataService := defaultMetadataService
 
 	var kvs []KeyValuePoint
 
-	for _, tsa := range tsas {
+	for _, tsa := range timeSeries {
 		aligner := tsa.aligner
 		for _, ts := range tsa.timeSeries {
-			keyValues := e.extractTimeSeriesMetricValues(ts, aligner)
-
-			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region, m.config.Regions)
-			if gcpService == nil {
+			if defaultMetadataService == nil {
 				metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(ts)
 			}
+			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region, m.config.Regions)
+			keyValues := mapper.mapTimeSeriesToKeyValuesPoints(ts, aligner)
 
 			for i := range keyValues {
 				sdCollectorInputData.Timestamp = &keyValues[i].Timestamp
@@ -116,7 +133,6 @@ func (m *MetricSet) timeSeriesGrouped(ctx context.Context, gcpService gcp.Metada
 
 				keyValues[i].ECS = metadataCollectorData.ECS
 				keyValues[i].Labels = metadataCollectorData.Labels
-
 			}
 
 			kvs = append(kvs, keyValues...)
