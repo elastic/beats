@@ -43,7 +43,7 @@ CHANGELOG*
 /filebeat/module/mysql @elastic/security-external-integrations
 /filebeat/module/nats @elastic/integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
-/filebeat/module/osquery @elastic/security-asset-management
+/filebeat/module/osquery @elastic/security-external-integrations
 /filebeat/module/pensando @elastic/security-external-integrations
 /filebeat/module/postgresql @elastic/obs-infraobs-integrations
 /filebeat/module/redis @elastic/obs-infraobs-integrations
