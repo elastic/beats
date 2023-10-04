@@ -832,15 +832,14 @@ func BenchmarkGetFiles(b *testing.B) {
 		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
 		require.NoError(b, err)
 	}
-
-	s := fileScanner{
-		paths: []string{filepath.Join(dir, "*.log")},
-		cfg: fileScannerConfig{
-			Fingerprint: fingerprintConfig{
-				Enabled: false,
-			},
+	paths := []string{filepath.Join(dir, "*.log")}
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: false,
 		},
 	}
+	s, err := newFileScanner(paths, cfg)
+	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
 		files := s.GetFiles()
@@ -858,17 +857,16 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
 		require.NoError(b, err)
 	}
-
-	s := fileScanner{
-		paths: []string{filepath.Join(dir, "*.log")},
-		cfg: fileScannerConfig{
-			Fingerprint: fingerprintConfig{
-				Enabled: true,
-				Offset:  0,
-				Length:  1024,
-			},
+	paths := []string{filepath.Join(dir, "*.log")}
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  1024,
 		},
 	}
+	s, err := newFileScanner(paths, cfg)
+	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
 		files := s.GetFiles()
@@ -948,16 +946,16 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 	err := os.WriteFile(filename, []byte(strings.Repeat("a", 1024)), 0777)
 	require.NoError(b, err)
 
-	s := fileScanner{
-		paths: []string{filename},
-		cfg: fileScannerConfig{
-			Fingerprint: fingerprintConfig{
-				Enabled: true,
-				Offset:  0,
-				Length:  1024,
-			},
+	paths := []string{filename}
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  1024,
 		},
 	}
+	s, err := newFileScanner(paths, cfg)
+	require.NoError(b, err)
 
 	it, err := s.getIngestTarget(filename)
 	require.NoError(b, err)

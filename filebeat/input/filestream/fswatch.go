@@ -18,10 +18,10 @@
 package filestream
 
 import (
-	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 	"path/filepath"
@@ -282,16 +282,19 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths []string
-	cfg   fileScannerConfig
-	log   *logp.Logger
+	paths      []string
+	cfg        fileScannerConfig
+	log        *logp.Logger
+	hasher     hash.Hash
+	readBuffer []byte
 }
 
-func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner, error) {
+func newFileScanner(paths []string, config fileScannerConfig) (*fileScanner, error) {
 	s := fileScanner{
-		paths: paths,
-		cfg:   config,
-		log:   logp.NewLogger(scannerDebugKey),
+		paths:  paths,
+		cfg:    config,
+		log:    logp.NewLogger(scannerDebugKey),
+		hasher: sha256.New(),
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -300,6 +303,7 @@ func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner,
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
 		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
+		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
 	}
 
 	err := s.resolveRecursiveGlobs(config)
@@ -463,6 +467,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 	if s.cfg.Fingerprint.Enabled {
 		fileSize := it.info.Size()
+		// we should not open the file if we know it's too small
 		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 		if fileSize < minSize {
 			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
@@ -481,10 +486,9 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			}
 		}
 
-		bfile := bufio.NewReaderSize(file, int(s.cfg.Fingerprint.Length))
-		r := io.LimitReader(bfile, s.cfg.Fingerprint.Length)
-		h := sha256.New()
-		written, err := io.Copy(h, r)
+		s.hasher.Reset()
+		lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
+		written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
 		if err != nil {
 			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
 		}
@@ -492,7 +496,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
 		}
 
-		fd.Fingerprint = hex.EncodeToString(h.Sum(nil))
+		fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
 	}
 
 	return fd, nil
