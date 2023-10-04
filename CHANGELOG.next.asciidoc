@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 
 *Heartbeat*
 
