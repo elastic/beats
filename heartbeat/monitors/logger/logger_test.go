@@ -39,6 +39,7 @@ func generateFakeNetworkInfo() NetworkInfo {
 		// All network info available in HB documentation
 		"resolve.rtt.us":              123,
 		"tls.rtt.handshake.us":        456,
+		"icmp.rtt.us":                 111,
 		"tcp.rtt.connect.us":          789,
 		"tcp.rtt.validate.us":         1234,
 		"http.rtt.content.us":         4567,

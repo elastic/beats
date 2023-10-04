@@ -142,7 +142,7 @@ func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
 	}
 
 	fields := []string{
-		"resolve.rtt.us", "tls.rtt.handshake.us",
+		"resolve.rtt.us", "tls.rtt.handshake.us", "icmp.rtt.us",
 		"tcp.rtt.connect.us", "tcp.rtt.validate.us", "http.rtt.content.us", "http.rtt.validate.us",
 		"http.rtt.validate_body.us", "http.rtt.write_request.us", "http.rtt.response_header.us",
 		"http.rtt.total.us", "socks5.rtt.connect.us",
