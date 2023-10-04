@@ -62056,6 +62056,16 @@ alias to: process.pgid
 
 --
 
+*`system.process.num_threads`*::
++
+--
+Number of threads in the process
+
+
+type: integer
+
+--
+
 *`system.process.cmdline`*::
 +
 --

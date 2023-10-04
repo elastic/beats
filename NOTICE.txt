@@ -13026,11 +13026,11 @@ these terms.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.6.1
+Version: v0.7.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.6.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.7.0/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -34256,11 +34256,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/cyphar/filepath-securejoin
-Version: v0.2.3
+Version: v0.2.4
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.2.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.2.4/LICENSE:
 
 Copyright (C) 2014-2015 Docker Inc & Go Authors. All rights reserved.
 Copyright (C) 2017 SUSE LLC. All rights reserved.
