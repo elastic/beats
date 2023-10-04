@@ -120,10 +120,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
 - Add oracle authentication messages parsing {pull}35127[35127]
 - Update mito CEL extension library to v1.6.0. {pull}36651[36651]
-- Added support for new features & removed partial save mechanism in the Azure Blob Storage input. {issue}35126[35126] {pull}36690[36690]
-- Improve template evaluation logging for HTTPJSON input. {pull}36668[36668]
-- Add CEL partial value debug function. {pull}36652[36652]
-- Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 
 *Auditbeat*
