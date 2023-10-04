@@ -150,7 +150,7 @@ func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
 	networkInfo := make(NetworkInfo)
 	for _, field := range fields {
 		value, err := event.GetValue(field)
-		if err == nil {
+		if err == nil && value != nil {
 			networkInfo[field] = value
 		}
 	}
