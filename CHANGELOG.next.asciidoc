@@ -239,6 +239,7 @@ is collected by it.
 
 *Heartbeat*
 - Added status to monitor run log report.
+- Capture and log the individual connection metrics for all the lightweight monitors
 
 
 *Metricbeat*
