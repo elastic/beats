@@ -35303,6 +35303,17 @@ GCP module
 
 
 
+*`event.batch_id`*::
++
+--
+The ID of the batch of events created during metrics collection. Every <period> seconds, the metricset fetches new metrics values from GCP and makes a new batch of events. The batch ID is a UUID, for example, 8f7a8c7c-ff6f-11e9-8f0b-0242ac120005.
+
+
+type: keyword
+
+--
+
+
 *`gcp.labels`*::
 +
 --
