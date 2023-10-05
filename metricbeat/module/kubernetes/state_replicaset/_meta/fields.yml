@@ -41,7 +41,7 @@
             - name: kind
               type: keyword
               description: >
-                The kind of resource that owns this job (eg. "Deployment")
+                The kind of resource that owns this replicaset (eg. "Deployment")
             - name: is_controller
               type: keyword
               description: >
