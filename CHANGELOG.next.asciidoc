@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
 
 
 *Auditbeat*
