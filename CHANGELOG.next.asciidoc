@@ -51,14 +51,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
-- Do not print context cancelled error message when running under agent {pull}36006[36006]
-- Fix recovering from invalid output configuration when running under Elastic-Agent {pull}36016[36016]
-- Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
-- Eliminate cloning of event in deepUpdate {pull}35945[35945]
-- Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
-- Support build of projects outside of beats directory {pull}36126[36126]
-- Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
-- Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
 - syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
 
 
