@@ -41,9 +41,9 @@ var mapping = &p.MetricsMapping{
 		"replicaset": p.KeyLabel("name"),
 		"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 		// Add owner information provided by the "kube_replicaset_owner" InfoMetric.
-		"owner_kind":          p.Label("owner.kind"),
-		"owner_name":          p.Label("owner.name"),
-		"owner_is_controller": p.Label("owner.is_controller"),
+		"owner_kind":          p.Label("replicas.owner.kind"),
+		"owner_name":          p.Label("replicas.owner.name"),
+		"owner_is_controller": p.Label("replicas.owner.is_controller"),
 	},
 }
 
