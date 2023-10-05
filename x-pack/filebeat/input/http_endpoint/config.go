@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/textproto"
 	"strings"
 
@@ -20,8 +21,9 @@ var crcProviders = map[string]func(string) *crcValidator{
 	"zoom": newZoomCRC,
 }
 
-// Config contains information about httpjson configuration
+// Config contains information about http_endpoint configuration
 type config struct {
+	Method                string                  `config:"method"`
 	TLS                   *tlscommon.ServerConfig `config:"ssl"`
 	BasicAuth             bool                    `config:"basic_auth"`
 	Username              string                  `config:"username"`
@@ -47,6 +49,7 @@ type config struct {
 
 func defaultConfig() config {
 	return config{
+		Method:        http.MethodPost,
 		BasicAuth:     false,
 		Username:      "",
 		Password:      "",
@@ -71,6 +74,12 @@ func defaultConfig() config {
 func (c *config) Validate() error {
 	if !json.Valid([]byte(c.ResponseBody)) {
 		return errors.New("response_body must be valid JSON")
+	}
+
+	switch c.Method {
+	case http.MethodPost, http.MethodPut, http.MethodPatch:
+	default:
+		return fmt.Errorf("method must be POST, PUT or PATCH: %s", c.Method)
 	}
 
 	if c.BasicAuth {
