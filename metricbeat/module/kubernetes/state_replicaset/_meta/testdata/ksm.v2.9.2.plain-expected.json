@@ -9,6 +9,11 @@
             "namespace": "kube-system",
             "replicaset": {
                 "name": "coredns-787d4945fb",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "coredns"
+                },
                 "replicas": {
                     "available": 2,
                     "desired": 2,
@@ -34,9 +39,14 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "kube-system",
+            "namespace": "local-path-storage",
             "replicaset": {
-                "name": "kube-state-metrics-7bc9d484b6",
+                "name": "local-path-provisioner-75f5b54ffd",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "local-path-provisioner"
+                },
                 "replicas": {
                     "available": 1,
                     "desired": 1,
@@ -62,9 +72,14 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "local-path-storage",
+            "namespace": "kube-system",
             "replicaset": {
-                "name": "local-path-provisioner-75f5b54ffd",
+                "name": "kube-state-metrics-7bc9d484b6",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "kube-state-metrics"
+                },
                 "replicas": {
                     "available": 1,
                     "desired": 1,

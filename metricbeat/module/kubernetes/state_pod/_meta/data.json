@@ -6,17 +6,22 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "default",
+        "namespace": "kube-system",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
             "host_ip": "172.18.0.2",
-            "ip": "10.244.0.22",
-            "name": "hello-28192809-jbn5z",
+            "ip": "10.244.0.3",
+            "name": "coredns-787d4945fb-kx4f4",
+            "owner": {
+                "is_controller": "true",
+                "kind": "ReplicaSet",
+                "name": "coredns-787d4945fb"
+            },
             "status": {
-                "phase": "succeeded",
-                "ready": "false",
+                "phase": "running",
+                "ready": "true",
                 "scheduled": "true"
             }
         }

@@ -8,35 +8,12 @@
         "kubernetes": {
             "namespace": "kube-system",
             "replicaset": {
-                "name": "kube-state-metrics-fb945547c",
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "labeled": 1,
-                    "observed": 1,
-                    "ready": 1
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_replicaset",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.replicaset",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "replicaset": {
                 "name": "coredns-787d4945fb",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "coredns"
+                },
                 "replicas": {
                     "available": 2,
                     "desired": 2,
@@ -65,6 +42,44 @@
             "namespace": "local-path-storage",
             "replicaset": {
                 "name": "local-path-provisioner-75f5b54ffd",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "local-path-provisioner"
+                },
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "labeled": 1,
+                    "observed": 1,
+                    "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "replicaset": {
+                "name": "kube-state-metrics-fb945547c",
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "kube-state-metrics"
+                },
                 "replicas": {
                     "available": 1,
                     "desired": 1,
