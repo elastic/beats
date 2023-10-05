@@ -76,8 +76,7 @@ which will in turn use the `max_workers` value to initialize an in-memory worker
 one per bucket, each having 3 workers. These `workers` will be responsible for performing `jobs` that process a file (in this case read and output the contents of a file).
 
 NOTE: The scheduler is responsible for scheduling jobs, and uses the `maximum available workers` in the pool, at each iteration, to decide the number of files to retrieve and 
-process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. The `bucket_timeout` value is used to timeout
-calls to the bucket list api if it exceeds the given value. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
+process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. The `bucket_timeout` value is used to timeout calls to the bucket list api if it exceeds the given value. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
 
 *A Sample Response :-*
 ["source","json"]
@@ -167,6 +166,9 @@ Now let's explore the configuration attributes a bit more elaborately.
     8. <<attrib-poll-gcs,poll>>
     9. <<attrib-poll_interval-gcs,poll_interval>>
    10. <<attrib-parse_json,parse_json>>
+   11. <<attrib-file_selectors-gcs,file_selectors>>
+   12. <<attrib-expand_event_list_from_field-gcs,expand_event_list_from_field>>
+   13. <<attrib-timestamp_epoch-gcs,timestamp_epoch>>
 
 
 [id="attrib-project-id"]
@@ -252,6 +254,94 @@ highly nested json data. If this is set to `false` the *gcs.storage.object.json_
 applicable for json objects and has no effect on other types of objects. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
 The bucket level values will always take priority and override the root level values if both are specified.
 
+[id="attrib-file_selectors-gcs"]
+[float]
+==== `file_selectors`
+
+If the GCS buckets have objects that correspond to files that {beatname_uc} shouldn't process, `file_selectors` can be used to limit the files that are downloaded. This is a list of selectors which are based on a regular expression pattern. The regular expression should match the object name or should be a part of the object name (ideally a prefix). The regular expression syntax used is [RE2](https://github.com/google/re2/wiki/Syntax). Files that don't match any configured expression won't be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+[source, yml]
+----
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  buckets:
+  - name: obs-bucket
+    max_workers: 3
+    poll: true
+    poll_interval: 15s
+    bucket_timeout: 60s
+    file_selectors:
+    - regex: '/Monitoring/'
+    - regex: 'docs/'
+    - regex: '/Security-Logs/'
+----
+
+[id="attrib-expand_event_list_from_field-gcs"]
+[float]
+==== `expand_event_list_from_field`
+
+If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+[source, json]
+----
+{
+    "Records": [
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:51:00Z",
+            "region": "us-east-1",
+            "eventID": "EXAMPLE8-9621-4d00-b913-beca2EXAMPLE",
+        },
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:52:00Z",
+            "region": "us-east-1",
+            "eventID": "EXAMPLEc-28be-486c-8928-49ce6EXAMPLE",
+        }
+    ]
+}
+----
+
+[source,yml]
+----
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  buckets:
+  - name: obs-bucket
+    max_workers: 3
+    poll: true
+    poll_interval: 15s
+    bucket_timeout: 60s
+    expand_event_list_from_field: Records
+----
+
+NOTE: The `parse_json` setting is incompatible with `expand_event_list_from_field`. If enabled it will be ignored. This attribute is only applicable for JSON file formats. You do not need to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file or object.
+
+
+[id="attrib-timestamp_epoch-gcs"]
+[float]
+==== `timestamp_epoch`
+
+This attribute can be used to filter out files and objects that have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `object.Updated` field obtained from the object metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+[source, yml]
+----
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  buckets:
+  - name: obs-bucket
+    max_workers: 3
+    poll: true
+    poll_interval: 15s
+    bucket_timeout: 60s
+    timestamp_epoch: 1630444800
+----
 
 [id="bucket-overrides"]
 *The sample configs below will explain the bucket level overriding of attributes a bit further :-*
@@ -260,7 +350,7 @@ The bucket level values will always take priority and override the root level va
 
 Here `bucket_1` is using root level attributes while `bucket_2` overrides the values :
 
-["source","yaml",subs="attributes"]
+[source, yml]
 ----
 filebeat.inputs:
 - type: gcs
@@ -288,7 +378,7 @@ of using the root values.
 
 Here both `bucket_1` and `bucket_2` overrides the root values :
 
-["source","yaml",subs="attributes"]
+[source, yml]
 ----
 filebeat.inputs:
   - type: gcs

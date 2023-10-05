@@ -17,10 +17,9 @@
 
 //go:build integration
 
-package ilm_test
+package lifecycle
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -30,9 +29,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -40,76 +40,94 @@ import (
 
 const (
 	// ElasticsearchDefaultHost is the default host for elasticsearch.
-	ElasticsearchDefaultHost = "localhost"
+	ElasticsearchDefaultHost = "http://localhost"
 	// ElasticsearchDefaultPort is the default port for elasticsearch.
 	ElasticsearchDefaultPort = "9200"
 )
 
 func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
-		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(false)
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		h, err := newESClientHandler(t, cfg)
+		require.NoError(t, err)
+		b, err := h.CheckEnabled()
 		assert.NoError(t, err)
 		assert.False(t, b)
 	})
 
 	t.Run("with ilm if enabled", func(t *testing.T) {
-		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(true)
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		h, err := newESClientHandler(t, cfg)
+		require.NoError(t, err)
+		b, err := h.CheckEnabled()
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 }
 
 func TestESClientHandler_ILMPolicy(t *testing.T) {
-	t.Run("does not exist", func(t *testing.T) {
-		name := makeName("esch-policy-no")
-		h := newESClientHandler(t)
-		b, err := h.HasILMPolicy(name)
-		assert.NoError(t, err)
-		assert.False(t, b)
-	})
 
 	t.Run("create new", func(t *testing.T) {
-		policy := ilm.Policy{
+		policy := Policy{
 			Name: makeName("esch-policy-create"),
-			Body: ilm.DefaultPolicy,
+			Body: DefaultILMPolicy,
 		}
-		h := newESClientHandler(t)
-		err := h.CreateILMPolicy(policy)
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		rawClient := newRawESClient(t)
+		h, err := NewESClientHandler(rawClient, beat.Info{Beat: "testbeat"}, cfg)
+		require.NoError(t, err)
+		h.cfg.policyRaw = &policy
+
+		err = h.CreatePolicyFromConfig()
 		require.NoError(t, err)
 
-		b, err := h.HasILMPolicy(policy.Name)
+		b, err := h.HasPolicy()
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 
 	t.Run("overwrite", func(t *testing.T) {
-		policy := ilm.Policy{
+		policy := Policy{
 			Name: makeName("esch-policy-overwrite"),
-			Body: ilm.DefaultPolicy,
+			Body: DefaultILMPolicy,
 		}
-		h := newESClientHandler(t)
+		cfg := RawConfig{
+			ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+			DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+		}
+		rawClient := newRawESClient(t)
+		h, err := NewESClientHandler(rawClient, beat.Info{Beat: "testbeat"}, cfg)
+		require.NoError(t, err)
+		h.cfg.policyRaw = &policy
 
-		err := h.CreateILMPolicy(policy)
+		err = h.CreatePolicyFromConfig()
 		require.NoError(t, err)
 
 		// check second 'create' does not throw (assuming race with other beat)
-		err = h.CreateILMPolicy(policy)
+		err = h.CreatePolicyFromConfig()
 		require.NoError(t, err)
 
-		b, err := h.HasILMPolicy(policy.Name)
+		b, err := h.HasPolicy()
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 }
 
-func newESClientHandler(t *testing.T) ilm.ClientHandler {
+func newESClientHandler(t *testing.T, cfg RawConfig) (ClientHandler, error) {
 	client := newRawESClient(t)
-	return ilm.NewESClientHandler(client)
+	return NewESClientHandler(client, beat.Info{Beat: "testbeat"}, cfg)
 }
 
-func newRawESClient(t *testing.T) ilm.ESClient {
+func newRawESClient(t *testing.T) ESClient {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 60 * time.Second
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
@@ -166,29 +184,32 @@ func getEnv(name, def string) string {
 }
 
 func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
+	defaultCfg := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
 	for name, test := range map[string]struct {
-		enabled    bool
 		version    string
 		ilmEnabled bool
 		err        bool
+		cfg        RawConfig
 	}{
 		"ilm enabled": {
-			enabled:    true,
+			cfg: defaultCfg,
+
 			ilmEnabled: true,
 		},
-		"ilm disabled": {
-			enabled:    false,
-			ilmEnabled: false,
-		},
+
 		"ilm enabled, version too old": {
-			enabled: true,
 			version: "5.0.0",
 			err:     true,
+			cfg:     defaultCfg,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			h := ilm.NewFileClientHandler(newMockClient(test.version))
-			b, err := h.CheckILMEnabled(test.enabled)
+			h, err := NewFileClientHandler(newMockClient(test.version), beat.Info{Beat: "test"}, test.cfg)
+			require.NoError(t, err)
+			b, err := h.CheckEnabled()
 			assert.Equal(t, test.ilmEnabled, b)
 			if test.err {
 				assert.Error(t, err)
@@ -197,20 +218,6 @@ func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestFileClientHandler_CreateILMPolicy(t *testing.T) {
-	c := newMockClient("")
-	h := ilm.NewFileClientHandler(c)
-	name := "test-policy"
-	body := mapstr.M{"foo": "bar"}
-	h.CreateILMPolicy(ilm.Policy{Name: name, Body: body})
-
-	assert.Equal(t, name, c.name)
-	assert.Equal(t, "policy", c.component)
-	var out mapstr.M
-	json.Unmarshal([]byte(c.body), &out)
-	assert.Equal(t, body, out)
 }
 
 type mockClient struct {

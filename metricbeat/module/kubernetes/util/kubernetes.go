@@ -93,6 +93,7 @@ const (
 	PersistentVolumeResource      = "persistentvolume"
 	PersistentVolumeClaimResource = "persistentvolumeclaim"
 	StorageClassResource          = "storageclass"
+	NamespaceResource             = "state_namespace"
 )
 
 func getResource(resourceName string) kubernetes.Resource {
@@ -121,6 +122,8 @@ func getResource(resourceName string) kubernetes.Resource {
 		return &kubernetes.StorageClass{}
 	case NodeResource:
 		return &kubernetes.Node{}
+	case NamespaceResource:
+		return &kubernetes.Namespace{}
 	default:
 		return nil
 	}
@@ -238,7 +241,7 @@ func NewResourceMetadataEnricher(
 			case *kubernetes.StatefulSet:
 				m[id] = metaGen.Generate(StatefulSetResource, r)
 			case *kubernetes.Namespace:
-				m[id] = metaGen.Generate("namespace", r)
+				m[id] = metaGen.Generate(NamespaceResource, r)
 			case *kubernetes.ReplicaSet:
 				m[id] = metaGen.Generate(ReplicaSetResource, r)
 			case *kubernetes.DaemonSet:
