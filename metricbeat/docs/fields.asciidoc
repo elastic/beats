@@ -46339,6 +46339,43 @@ type: keyword
 --
 
 [float]
+=== owner
+
+Kubernetes job owner information
+
+
+
+*`kubernetes.pod.owner.name`*::
++
+--
+The name of the resource that owns this job
+
+
+type: keyword
+
+--
+
+*`kubernetes.pod.owner.kind`*::
++
+--
+The kind of resource that owns this job (eg. "CronJob")
+
+
+type: keyword
+
+--
+
+*`kubernetes.pod.owner.is_controller`*::
++
+--
+Owner is controller ("true", "false", or "<none>")
+
+
+type: keyword
+
+--
+
+[float]
 === replicaset
 
 kubernetes replica set metrics
@@ -46399,6 +46436,43 @@ The number of fully labeled replicas per ReplicaSet
 
 
 type: long
+
+--
+
+[float]
+=== owner
+
+Kubernetes job owner information
+
+
+
+*`kubernetes.replicaset.replicas.owner.name`*::
++
+--
+The name of the resource that owns this job
+
+
+type: keyword
+
+--
+
+*`kubernetes.replicaset.replicas.owner.kind`*::
++
+--
+The kind of resource that owns this job (eg. "CronJob")
+
+
+type: keyword
+
+--
+
+*`kubernetes.replicaset.replicas.owner.is_controller`*::
++
+--
+Owner is controller ("true", "false", or "<none>")
+
+
+type: keyword
 
 --
 
