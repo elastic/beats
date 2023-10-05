@@ -8,6 +8,8 @@
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is {{.BeatName}}-%{[agent.version]}"
+# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "{{.BeatName}}-%{[agent.version]}"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
