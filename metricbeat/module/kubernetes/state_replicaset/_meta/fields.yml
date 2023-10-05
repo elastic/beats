@@ -32,16 +32,16 @@
         - name: owner
           type: group
           description: >
-            Kubernetes job owner information
+            Kubernetes replicaset owner information
           fields:
             - name: name
               type: keyword
               description: >
-                The name of the resource that owns this job
+                The name of the resource that owns this replicaset
             - name: kind
               type: keyword
               description: >
-                The kind of resource that owns this job (eg. "CronJob")
+                The kind of resource that owns this job (eg. "Deployment")
             - name: is_controller
               type: keyword
               description: >

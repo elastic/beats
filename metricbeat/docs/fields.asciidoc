@@ -46341,14 +46341,14 @@ type: keyword
 [float]
 === owner
 
-Kubernetes job owner information
+Kubernetes pob owner information
 
 
 
 *`kubernetes.pod.owner.name`*::
 +
 --
-The name of the resource that owns this job
+The name of the resource that owns this pob
 
 
 type: keyword
@@ -46358,7 +46358,7 @@ type: keyword
 *`kubernetes.pod.owner.kind`*::
 +
 --
-The kind of resource that owns this job (eg. "CronJob")
+The kind of resource that owns this pob (eg. "Replicaset")
 
 
 type: keyword
@@ -46442,14 +46442,14 @@ type: long
 [float]
 === owner
 
-Kubernetes job owner information
+Kubernetes replicaset owner information
 
 
 
 *`kubernetes.replicaset.replicas.owner.name`*::
 +
 --
-The name of the resource that owns this job
+The name of the resource that owns this replicaset
 
 
 type: keyword
@@ -46459,7 +46459,7 @@ type: keyword
 *`kubernetes.replicaset.replicas.owner.kind`*::
 +
 --
-The kind of resource that owns this job (eg. "CronJob")
+The kind of resource that owns this job (eg. "Deployment")
 
 
 type: keyword
