@@ -14,6 +14,11 @@
                 "desired": 2,
                 "labeled": 2,
                 "observed": 1,
+                "owner": {
+                    "is_controller": "true",
+                    "kind": "Deployment",
+                    "name": "coredns"
+                },
                 "ready": 2
             }
         }

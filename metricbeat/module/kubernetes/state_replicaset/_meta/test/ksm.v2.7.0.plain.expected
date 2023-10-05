@@ -2,20 +2,20 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "local-path-storage"
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "local-path-provisioner-684f458cdd",
-			"owner": {
-				"is_controller": "true",
-				"kind": "Deployment",
-				"name": "local-path-provisioner"
-			},
+			"name": "kube-state-metrics-548546fc89",
 			"replicas": {
 				"available": 1,
 				"desired": 1,
 				"labeled": 1,
 				"observed": 1,
+				"owner": {
+					"is_controller": "true",
+					"kind": "Deployment",
+					"name": "kube-state-metrics"
+				},
 				"ready": 1
 			}
 		},
@@ -33,20 +33,20 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": "local-path-storage"
 		},
 		"MetricSetFields": {
-			"name": "kube-state-metrics-548546fc89",
-			"owner": {
-				"is_controller": "true",
-				"kind": "Deployment",
-				"name": "kube-state-metrics"
-			},
+			"name": "local-path-provisioner-684f458cdd",
 			"replicas": {
 				"available": 1,
 				"desired": 1,
 				"labeled": 1,
 				"observed": 1,
+				"owner": {
+					"is_controller": "true",
+					"kind": "Deployment",
+					"name": "local-path-provisioner"
+				},
 				"ready": 1
 			}
 		},
@@ -68,16 +68,16 @@
 		},
 		"MetricSetFields": {
 			"name": "coredns-565d847f94",
-			"owner": {
-				"is_controller": "true",
-				"kind": "Deployment",
-				"name": "coredns"
-			},
 			"replicas": {
 				"available": 2,
 				"desired": 2,
 				"labeled": 2,
 				"observed": 1,
+				"owner": {
+					"is_controller": "true",
+					"kind": "Deployment",
+					"name": "coredns"
+				},
 				"ready": 2
 			}
 		},
