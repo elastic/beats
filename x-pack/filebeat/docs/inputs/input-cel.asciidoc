@@ -676,7 +676,8 @@ filebeat.inputs:
     user: user@domain.tld
     password: P@$$W0₹D
   redact:
-    fields: password
+    fields:
+      - password
     delete: true
 ----
 
