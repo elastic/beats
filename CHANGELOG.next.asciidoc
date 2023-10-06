@@ -232,7 +232,6 @@ is collected by it.
 - Add CEL partial value debug function. {pull}36652[36652]
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
-- Allow http_endpoint input to receive PUT and PATCH requests. {pull}36734[36734]
 - Add cache processor. {pull}36786[36786]
 
 *Auditbeat*
