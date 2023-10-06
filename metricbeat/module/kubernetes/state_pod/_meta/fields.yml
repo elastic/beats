@@ -33,7 +33,7 @@
         - name: name
           type: keyword
           description: >
-            The name of the resource that owns this pob
+            The name of the resource that owns this Pod
         - name: kind
           type: keyword
           description: >
