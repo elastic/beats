@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	"regexp"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -106,15 +107,20 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	if len(r.config.IncludeLabels) == 0 {
 		labelMap = GenerateMap(accessor.GetLabels(), r.config.LabelsDedot)
 	} else {
-		labelMap = generateMapSubset(accessor.GetLabels(), r.config.IncludeLabels, r.config.LabelsDedot)
+		labelMap = generateMapSubset(accessor.GetLabels(), r.config.IncludeLabels, r.config.LabelsDedot, r.config.UseRegexInclude)
+	}
+
+	var labelMaptoExclude mapstr.M
+	if len(r.config.ExcludeLabels) != 0 {
+		labelMaptoExclude = generateMapSubset(accessor.GetLabels(), r.config.ExcludeLabels, r.config.LabelsDedot, r.config.UseRegexExclude)
 	}
 
 	// Exclude any labels that are present in the exclude_labels config
-	for _, label := range r.config.ExcludeLabels {
+	for label := range labelMaptoExclude {
 		_ = labelMap.Delete(label)
 	}
 
-	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.AnnotationsDedot)
+	annotationsMap := generateMapSubset(accessor.GetAnnotations(), r.config.IncludeAnnotations, r.config.AnnotationsDedot, r.config.UseRegexInclude)
 
 	meta := mapstr.M{
 		strings.ToLower(kind): mapstr.M{
@@ -166,24 +172,42 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	return meta
 }
 
-func generateMapSubset(input map[string]string, keys []string, dedot bool) mapstr.M {
+func generateMapSubset(input map[string]string, keys []string, dedot bool, useregex bool) mapstr.M {
 	output := mapstr.M{}
 	if input == nil {
 		return output
 	}
 
 	for _, key := range keys {
-		value, ok := input[key]
-		if ok {
-			if dedot {
-				dedotKey := utils.DeDot(key)
-				_, _ = output.Put(dedotKey, value)
-			} else {
-				_ = safemapstr.Put(output, key, value)
+		//This is the part where use_regex is enabled
+		if useregex {
+			pattern, err := regexp.Compile(key)
+			if err == nil {
+				for label, value := range input {
+					matched := pattern.MatchString(label)
+					if matched {
+						if dedot {
+							dedotKey := utils.DeDot(label)
+							_, _ = output.Put(dedotKey, value)
+						} else {
+							_ = safemapstr.Put(output, label, value)
+						}
+					}
+
+				}
+			}
+		} else {
+			value, ok := input[key]
+			if ok {
+				if dedot {
+					dedotKey := utils.DeDot(key)
+					_, _ = output.Put(dedotKey, value)
+				} else {
+					_ = safemapstr.Put(output, key, value)
+				}
 			}
 		}
 	}
-
 	return output
 }
 
