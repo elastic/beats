@@ -212,12 +212,10 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 		return err
 	}
 
-	wantUsers := p.conf.wantUsers()
-	wantDevices := p.conf.wantDevices()
-	if (updatedUsers.Len() != 0 && wantUsers) || (updatedDevices.Len() != 0 && wantDevices) {
+	if updatedUsers.Len() != 0 || updatedDevices.Len() != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 
-		if updatedUsers.Len() != 0 && wantUsers {
+		if updatedUsers.Len() != 0 {
 			updatedUsers.ForEach(func(id uuid.UUID) {
 				u, ok := state.users[id]
 				if !ok {
@@ -228,7 +226,7 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 			})
 		}
 
-		if updatedDevices.Len() != 0 && wantDevices {
+		if updatedDevices.Len() != 0 {
 			updatedDevices.ForEach(func(id uuid.UUID) {
 				d, ok := state.devices[id]
 				if !ok {
