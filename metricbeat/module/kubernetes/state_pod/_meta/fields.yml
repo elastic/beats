@@ -37,7 +37,7 @@
         - name: kind
           type: keyword
           description: >
-            The kind of resource that owns this pob (eg. "Replicaset")
+            The kind of resource that owns this Pob (eg. "Replicaset")
         - name: is_controller
           type: keyword
           description: >
