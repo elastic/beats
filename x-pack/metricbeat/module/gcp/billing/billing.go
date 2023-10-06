@@ -144,6 +144,11 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		return fmt.Errorf("getTables failed: %w", err)
 	}
 
+	if len(tableMetas) == 0 {
+		m.logger.Errorf("no tables found in dataset %s with pattern %s; check your settings and see if the service account has permission to list datasets", m.config.DatasetID, m.config.TablePattern)
+		return nil
+	}
+
 	var events []mb.Event
 	for _, tableMeta := range tableMetas {
 		eventsPerQuery, err := m.queryBigQuery(ctx, client, tableMeta, month, m.config.CostType)
@@ -158,6 +163,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	for _, event := range events {
 		reporter.Event(event)
 	}
+
 	return nil
 }
 
@@ -213,6 +219,7 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 			}
 		}
 	}
+
 	return tables, nil
 }
 
