@@ -234,6 +234,7 @@ is collected by it.
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 - Allow http_endpoint input to receive PUT and PATCH requests. {pull}36734[36734]
 - Add cache processor. {pull}36786[36786]
+- Avoid unwanted publication of Azure entity records. {pull}36753[36753]
 
 *Auditbeat*
 
