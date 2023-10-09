@@ -4,7 +4,11 @@
 ################################################################################
 ARG BASE_REGISTRY=registry1.dsop.io
 ARG BASE_IMAGE=ironbank/redhat/ubi/ubi8
+<<<<<<< HEAD
 ARG BASE_TAG=8.7
+=======
+ARG BASE_TAG=9.2
+>>>>>>> 239357688c (change base image to ubi 9.2 (#36797))
 
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG} as builder
 
