@@ -7,166 +7,25 @@
 === Beats version 8.10.3
 https://github.com/elastic/beats/compare/v8.10.2\...v8.10.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
 - syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
 
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
 *Packetbeat*
 
 - Fix default cache size calculation. {pull}36723[36723]
 
-*Winlogbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Update mito CEL extension library to v1.6.0. {pull}36651[36651]
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 
-*Auditbeat*
-
-*Libbeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 *Packetbeat*
 
 - Improve efficiency of sniffers by deduplicating interface configurations. {issue}36574[36574] {pull}36576[36576]
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.10.2]]
