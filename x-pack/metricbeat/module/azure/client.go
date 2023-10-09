@@ -9,9 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -173,13 +170,14 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 
 // MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
 func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, subResourceId string, namespace string, dim []Dimension, timegrain string) []Metric {
-	var clientMetrics []Metric
 
 	metricGroups := make(map[string][]armmonitor.MetricDefinition)
 
 	for _, met := range metrics {
 		metricGroups[string(*met.PrimaryAggregationType)] = append(metricGroups[string(*met.PrimaryAggregationType)], met)
 	}
+
+	clientMetrics := make([]Metric, 0, len(metricGroups))
 
 	for key, metricGroup := range metricGroups {
 		var metricNames []string
