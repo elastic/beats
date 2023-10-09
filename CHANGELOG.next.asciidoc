@@ -235,6 +235,7 @@ is collected by it.
 - Allow http_endpoint input to receive PUT and PATCH requests. {pull}36734[36734]
 - Add cache processor. {pull}36786[36786]
 - Avoid unwanted publication of Azure entity records. {pull}36753[36753]
+- Avoid unwanted publication of Okta entity records. {pull}36770[36770]
 
 *Auditbeat*
 
