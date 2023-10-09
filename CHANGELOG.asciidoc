@@ -12,31 +12,11 @@ https://github.com/elastic/beats/compare/v7.17.13\...v7.17.14[View commits]
 *Affecting all Beats*
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
 
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
 
 - Eliminate cloning of event in deepUpdate {pull}35945[35945]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -72,78 +52,16 @@ https://github.com/elastic/beats/compare/v7.17.13\...v7.17.14[View commits]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Revert error introduced in {pull}35734[35734] when symlinks can't be resolved in filestream. {pull}36557[36557]
 
-*Heartbeat*
-
-
-*Metricbeat*
-
-
 *Packetbeat*
 
 - Fix panic in HTTP protocol parsing when host header has empty host part. {issue}36497[36497] {issue}36518[36518]
 - Fix default cache size calculation. {pull}36723[36723]
 
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
 
 
 [[release-notes-7.17.13]]
