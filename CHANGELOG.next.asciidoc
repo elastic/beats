@@ -65,6 +65,7 @@ is collected by it.
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
+- syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
 
 
 *Auditbeat*
@@ -232,6 +233,8 @@ is collected by it.
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 - Allow http_endpoint input to receive PUT and PATCH requests. {pull}36734[36734]
+- Add cache processor. {pull}36786[36786]
+- Avoid unwanted publication of Azure entity records. {pull}36753[36753]
 
 *Auditbeat*
 
@@ -239,6 +242,7 @@ is collected by it.
 
 *Heartbeat*
 - Added status to monitor run log report.
+- Capture and log the individual connection metrics for all the lightweight monitors
 
 
 *Metricbeat*
