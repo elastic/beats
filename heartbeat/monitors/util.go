@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -114,7 +114,7 @@ func MakeByIPJob(
 		"monitor": mapstr.M{"ip": addr.String()},
 	}
 
-	return wrappers.WithFields(fields, pingFactory(addr)), nil
+	return wraputil.WithFields(fields, pingFactory(addr)), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -165,7 +165,7 @@ func makeByHostAnyIPJob(
 		resolveRTT := resolveEnd.Sub(resolveStart)
 
 		ipFields := resolveIPEvent(ip.String(), resolveRTT)
-		return wrappers.WithFields(ipFields, pingFactory(ip))(event)
+		return wraputil.WithFields(ipFields, pingFactory(ip))(event)
 	}
 }
 
@@ -206,7 +206,7 @@ func makeByHostAllIPJob(
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
-			cont[i] = wrappers.WithFields(ipFields, pingFactory(addr))
+			cont[i] = wraputil.WithFields(ipFields, pingFactory(addr))
 		}
 		// Ideally we would test this invocation. This function however is really hard to to test given all the extra context it takes in
 		// In a future refactor we could perhaps test that this in correctly invoked.

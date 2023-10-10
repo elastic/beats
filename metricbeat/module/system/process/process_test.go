@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
@@ -32,7 +33,9 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	require.NoError(t, err, "could not set the logger to DevelopmentSetup")
+
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
@@ -44,6 +47,7 @@ func TestFetch(t *testing.T) {
 	assert.Empty(t, errs)
 	assert.NotEmpty(t, events)
 
+	t.Logf("fetched %d events, showing events[0]:", len(events))
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "process").Fields.StringToPrint())
 }

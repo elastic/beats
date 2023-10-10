@@ -54,6 +54,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -132,6 +133,9 @@ type beatConfig struct {
 
 	// monitoring settings
 	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
+
+	// ILM settings
+	LifecycleConfig lifecycle.RawConfig `config:",inline"`
 
 	// central management settings
 	Management *config.C `config:"management"`
@@ -651,6 +655,19 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return err
 			}
 
+			// other components know to skip ILM setup under serverless, this logic block just helps us print an error message
+			// in instances where ILM has been explicitly enabled
+			var ilmCfg struct {
+				Ilm *config.C `config:"setup.ilm"`
+			}
+			err = b.RawConfig.Unpack(&ilmCfg)
+			if err != nil {
+				return fmt.Errorf("error unpacking ILM config: %w", err)
+			}
+			if ilmCfg.Ilm.Enabled() && esClient.IsServerless() {
+				fmt.Println("WARNING: ILM is not supported in Serverless projects")
+			}
+
 			loadTemplate, loadILM := idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 			if setup.IndexManagement || setup.Template {
 				loadTemplate = idxmgmt.LoadModeOverwrite
@@ -658,7 +675,13 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if setup.IndexManagement || setup.ILMPolicy {
 				loadILM = idxmgmt.LoadModeEnabled
 			}
-			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+			if err != nil {
+				return fmt.Errorf("error creating index management handler: %w", err)
+			}
+
+			m := b.IdxSupporter.Manager(mgmtHandler, idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
 				fmt.Println(warn)
 			}
@@ -1052,7 +1075,11 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection) error {
-		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+		if err != nil {
+			return fmt.Errorf("error creating index management handler: %w", err)
+		}
+		m := b.IdxSupporter.Manager(mgmtHandler, idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
 }

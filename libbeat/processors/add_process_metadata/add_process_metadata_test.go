@@ -21,11 +21,14 @@ import (
 	"errors"
 	"math"
 	"os"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -36,7 +39,8 @@ import (
 )
 
 func TestAddProcessMetadata(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	startTime := time.Now()
 	testProcs := testProvider{
 		1: {
@@ -80,7 +84,6 @@ func TestAddProcessMetadata(t *testing.T) {
 		testMap := map[int]cgroup.PathList{
 			1: {
 				V1: map[string]cgroup.ControllerPath{
-
 					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -98,7 +101,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 			2: {
 				V1: map[string]cgroup.ControllerPath{
-
 					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -112,6 +114,11 @@ func TestAddProcessMetadata(t *testing.T) {
 					"devices":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"memory":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"name=systemd": {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				},
+			},
+			6: {
+				V2: map[string]cgroup.ControllerPath{
+					"Docker": {IsV2: true, ControllerPath: "/custom_path/123456abc"},
 				},
 			},
 		}
@@ -712,6 +719,30 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "invalid cgroup_regex configured",
+			config: mapstr.M{
+				"cgroup_regex": "",
+			},
+			initErr: errors.New("fail to unpack the add_process_metadata configuration: cgroup_regexp must contain exactly one capturing group for the container ID accessing config"),
+		},
+		{
+			description: "cgroup_prefixes configured",
+			config: mapstr.M{
+				"match_pids":      []string{"pid"},
+				"include_fields":  []string{"container.id"},
+				"cgroup_prefixes": []string{"/custom_path"},
+			},
+			event: mapstr.M{
+				"pid": "6",
+			},
+			expected: mapstr.M{
+				"pid": "6",
+				"container": mapstr.M{
+					"id": "123456abc",
+				},
+			},
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := conf.NewConfigFrom(test.config)
@@ -786,7 +817,7 @@ func TestAddProcessMetadata(t *testing.T) {
 }
 
 func TestUsingCache(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
 
 	selfPID := os.Getpid()
 
@@ -794,7 +825,6 @@ func TestUsingCache(t *testing.T) {
 	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
 		testStruct := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
-
 				"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -819,9 +849,10 @@ func TestUsingCache(t *testing.T) {
 	}
 
 	config, err := conf.NewConfigFrom(mapstr.M{
-		"match_pids":     []string{"system.process.ppid"},
-		"include_fields": []string{"container.id"},
-		"target":         "meta",
+		"match_pids":        []string{"system.process.ppid"},
+		"include_fields":    []string{"container.id", "process.env"},
+		"target":            "meta",
+		"restricted_fields": true,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -853,6 +884,24 @@ func TestUsingCache(t *testing.T) {
 	}
 	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
 
+	// check environment for GOOSes that support it.
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		env, err := result.Fields.GetValue("meta.process.env")
+		if err != nil {
+			t.Fatal(err)
+		}
+		// The event is for this process, so we can just grab our env to compare.
+		want := make(map[string]string)
+		for _, kv := range os.Environ() {
+			k, v, ok := strings.Cut(kv, "=")
+			if ok {
+				want[k] = v
+			}
+		}
+		assert.Equal(t, want, env)
+	}
+
 	ev = beat.Event{
 		Fields: mapstr.M{
 			"system": mapstr.M{
@@ -877,7 +926,8 @@ func TestUsingCache(t *testing.T) {
 }
 
 func TestSelf(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -910,7 +960,8 @@ func TestSelf(t *testing.T) {
 }
 
 func TestBadProcess(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
+	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -1097,8 +1148,54 @@ func TestV2CID(t *testing.T) {
 		}
 		return testMap, nil
 	}
-	provider := newCidProvider(resolve.NewTestResolver(""), []string{}, "", processCgroupPaths, nil)
+	provider := newCidProvider(resolve.NewTestResolver(""), nil, defaultCgroupRegex, processCgroupPaths, nil)
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
+}
+
+// TestDefaultCgroupRegex verifies that defaultCgroupRegex matches the most common
+// container runtime and container orchestrator cgroup paths.
+func TestDefaultCgroupRegex(t *testing.T) {
+	testCases := []struct {
+		TestName    string
+		CgroupPath  string
+		ContainerID string
+	}{
+		{
+			TestName:    "kubernetes-docker",
+			CgroupPath:  "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/docker-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope",
+			ContainerID: "80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460",
+		},
+		{
+			TestName:    "kubernetes-cri-containerd",
+			CgroupPath:  "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod2d5133c0_65f3_40b2_b375_c04866d418e1.slice/cri-containerd-e01a26336924e2fb8089bcf4cf943954fd9ea616cc5678f38f65928307979459.scope",
+			ContainerID: "e01a26336924e2fb8089bcf4cf943954fd9ea616cc5678f38f65928307979459",
+		},
+		{
+			TestName:    "kubernetes-crio",
+			CgroupPath:  "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/crio-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope",
+			ContainerID: "80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460",
+		},
+		{
+			TestName:    "podman",
+			CgroupPath:  "/user.slice/user-1000.slice/user@1000.service/user.slice/libpod-conmon-ee059a097566fdc5ac9141bfcdfbed0c972163da891de076e0849d7b53597aac.scope",
+			ContainerID: "ee059a097566fdc5ac9141bfcdfbed0c972163da891de076e0849d7b53597aac",
+		},
+		{
+			TestName:    "docker",
+			CgroupPath:  "/docker/485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+			ContainerID: "485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.TestName, func(t *testing.T) {
+			matches := defaultCgroupRegex.FindStringSubmatch(tc.CgroupPath)
+			if len(matches) < 2 || matches[1] != tc.ContainerID {
+				t.Errorf("container.id not matched in cgroup path %s", tc.CgroupPath)
+			}
+		})
+	}
 }

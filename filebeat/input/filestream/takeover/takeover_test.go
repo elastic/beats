@@ -21,7 +21,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/filebeat/backup"
-	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -31,62 +30,74 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func newInputConfigFrom(t *testing.T, str ...string) []*conf.C {
+	results := make([]*conf.C, 0, len(str))
+	for _, s := range str {
+		c, err := conf.NewConfigFrom(s)
+		require.NoError(t, err)
+		results = append(results, c)
+	}
+	return results
+}
+
 func TestTakeOverLogInputStates(t *testing.T) {
-	empty, err := conf.NewConfigFrom(``)
-	require.NoError(t, err)
+	empty := newInputConfigFrom(t)
 
-	noTakeOver, err := conf.NewConfigFrom(`
-inputs:
-  - type: log
-    paths:
-      - "/path/log*.log"
-  - type: filestream
-    id: filestream-id-1
-    enabled: true
-    paths:
-      - "/path/filestream1-*.log"
+	noTakeOver := newInputConfigFrom(t,
+		`
+type: log
+paths:
+  - "/path/log*.log"
+`,
+		`
+type: filestream
+id: filestream-id-1
+enabled: true
+paths:
+  - "/path/filestream1-*.log"
 `)
-	require.NoError(t, err)
 
-	takeOver, err := conf.NewConfigFrom(`
-inputs:
-  - type: filestream
-    id: filestream-id-1
-    enabled: true
-    paths:
-      - "/path/filestream1-*.log"
-  - type: filestream
-    id: filestream-id-2
-    take_over: true
-    enabled: true
-    paths:
-      - "/path/filestream2-*.log"
-      - "/path/log*.log" # taking over from the log input
-
+	takeOver := newInputConfigFrom(t,
+		`
+type: filestream
+id: filestream-id-1
+enabled: true
+paths:
+  - "/path/filestream1-*.log"
+`,
+		`
+type: filestream
+id: filestream-id-2
+take_over: true
+enabled: true
+paths:
+  - "/path/filestream2-*.log"
+  - "/path/log*.log" # taking over from the log input
 `)
-	require.NoError(t, err)
 
-	noUniqueID, err := conf.NewConfigFrom(`
-inputs:
-  - type: filestream
-    id: filestream-id-2
-    take_over: true
-    enabled: true
-    paths:
-      - "/path/filestream2-*.log"
-  - type: filestream
-    id: filestream-id-2 # not unique
-    take_over: true
-    enabled: true
-    paths:
-      - "/path/filestream3-*.log"
-  - type: filestream
-    take_over: true # no ID
-    enabled: true
-    paths:
-      - "/path/filestream-*.log"
+	noUniqueID := newInputConfigFrom(t, `
+type: filestream
+id: filestream-id-2
+take_over: true
+enabled: true
+paths:
+  - "/path/filestream2-*.log"
+`,
+		`
+type: filestream
+id: filestream-id-2 # not unique
+take_over: true
+enabled: true
+paths:
+  - "/path/filestream3-*.log"
+`,
+		`
+type: filestream
+take_over: true # no ID
+enabled: true
+paths:
+  - "/path/filestream-*.log"
 `)
-	require.NoError(t, err)
 
 	states := []state{
 		// this state is to make sure the filestreams without `take_over` remain untouched
@@ -162,7 +173,7 @@ inputs:
 
 	cases := []struct {
 		name       string
-		cfg        *conf.C
+		cfg        []*conf.C
 		states     []state
 		mustBackup bool
 		mustRemove []string
@@ -236,15 +247,11 @@ inputs:
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			config := cfg.DefaultConfig
-			err := tc.cfg.Unpack(&config)
-			require.NoError(t, err)
-
 			store := storeMock{
 				states: tc.states,
 			}
 			backuper := backuperMock{}
-			err = TakeOverLogInputStates(log, &store, &backuper, &config)
+			err := TakeOverLogInputStates(log, &store, &backuper, tc.cfg)
 			if tc.expErr != "" {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), tc.expErr)

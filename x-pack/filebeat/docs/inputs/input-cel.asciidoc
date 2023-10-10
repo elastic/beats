@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.5.0
+:mito_version: v1.6.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -234,6 +234,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-Try[Try]
 ** {mito_docs}/lib#hdr-Is_Error[Is Error]
 
+* {mito_docs}/lib#Debug[Debug] — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+** {mito_docs}/lib#hdr-Debug[Debug]
+
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the {beatname_lc} user-agent string.
 
 Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
@@ -409,19 +412,19 @@ the `auth.oauth2` section is missing.
 
 Used to configure supported oauth2 providers.
 Each supported provider will require specific settings. It is not set by default.
-Supported providers are: `azure`, `google`.
+Supported providers are: `azure`, `google`, `okta`.
 
 [float]
 ==== `auth.oauth2.client.id`
 
 The client ID used as part of the authentication flow. It is always required
-except if using `google` as provider. Required for providers: `default`, `azure`.
+except if using `google` as provider. Required for providers: `default`, `azure`, `okta`.
 
 [float]
 ==== `auth.oauth2.client.secret`
 
 The client secret used as part of the authentication flow. It is always required
-except if using `google` as provider. Required for providers: `default`, `azure`.
+except if using `google` or `okta` as provider. Required for providers: `default`, `azure`.
 
 [float]
 ==== `auth.oauth2.user`
@@ -527,6 +530,20 @@ how to provide Google credentials, please refer to https://cloud.google.com/docs
 
 Email of the delegated account used to create the credentials (usually an admin). Used in combination
 with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
+
+[float]
+==== `auth.oauth2.okta.jwk_file`
+
+The RSA JWK Private Key file for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
+==== `auth.oauth2.okta.jwk_json`
+
+The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [[resource-parameters]]
 [float]
@@ -676,7 +693,8 @@ filebeat.inputs:
     user: user@domain.tld
     password: P@$$W0₹D
   redact:
-    fields: password
+    fields:
+      - password
     delete: true
 ----
 

@@ -1,7 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
+//go:build linux || darwin || synthetics
 
 package synthexec
 
@@ -16,7 +16,6 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
-	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -24,10 +23,9 @@ import (
 type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
-	je           *journeyEnricher
-	journeyCount int
-	sFields      stdfields.StdMonitorFields
-	checkGroup   string
+	je         *journeyEnricher
+	sFields    stdfields.StdMonitorFields
+	checkGroup string
 }
 
 func newStreamEnricher(sFields stdfields.StdMonitorFields) *streamEnricher {
@@ -39,31 +37,13 @@ func (senr *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		senr.je = newJourneyEnricher(senr)
 	}
 
-	// TODO: Remove this when zip monitors are removed and we have 1:1 monitor / journey
-	if se != nil && se.Type == JourneyStart {
-		senr.journeyCount++
-		if senr.journeyCount > 1 {
-			senr.checkGroup = makeUuid()
-		}
-	}
-
-	eventext.MergeEventFields(event, map[string]interface{}{"monitor": map[string]interface{}{"check_group": senr.checkGroup}})
 	return senr.je.enrich(event, se)
 }
 
 // journeyEnricher holds state across received SynthEvents retaining fields
 // where relevant to properly enrich *beat.Event instances.
 type journeyEnricher struct {
-	journeyComplete bool
-	journey         *Journey
-	errorCount      int
-	error           error
-	stepCount       int
-	// The first URL we visit is the URL for this journey, which is set on the summary event.
-	// We store the URL fields here for use on the summary event.
-	urlFields      mapstr.M
-	start          time.Time
-	end            time.Time
+	journey        *Journey
 	streamEnricher *streamEnricher
 }
 
@@ -91,11 +71,8 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case JourneyStart:
-			je.error = nil
 			je.journey = se.Journey
-			je.start = event.Timestamp
 		case JourneyEnd, CmdStatus:
-			je.end = event.Timestamp
 		}
 	} else {
 		event.Timestamp = time.Now()
@@ -112,9 +89,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
-		if je.error == nil {
-			je.error = jobErr
-		}
 	}
 
 	// Needed for the edge case where a console log is emitted after one journey ends
@@ -130,20 +104,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	switch se.Type {
 	case CmdStatus:
-		// If a command failed _after_ the journey was complete, as it happens
-		// when an `afterAll` hook fails, for example, we don't wan't to include
-		// a summary in the cmd/status event.
-		if !je.journeyComplete {
-			if se.Error != nil {
-				je.error = se.Error.toECSErr()
-			}
-			return je.createSummary(event)
-		}
-	case JourneyEnd:
-		je.journeyComplete = true
-		return je.createSummary(event)
-	case StepEnd:
-		je.stepCount++
+		// noop
 	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
 		add_data_stream.SetEventDataset(event, "browser.screenshot")
 	case JourneyNetworkInfo:
@@ -159,48 +120,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 
 	eventext.MergeEventFields(event, se.ToMap())
 
-	if len(je.urlFields) == 0 {
-		if urlFields, err := event.GetValue("url"); err == nil {
-			if ufMap, ok := urlFields.(mapstr.M); ok {
-				je.urlFields = ufMap
-			}
-		}
-	}
 	return jobErr
-}
-
-func (je *journeyEnricher) createSummary(event *beat.Event) error {
-	// In case of syntax errors or incorrect runner options, the Synthetics
-	// runner would exit immediately with exitCode 1 and we do not set the duration
-	// to inform the journey never ran
-	if !je.start.IsZero() {
-		duration := je.end.Sub(je.start)
-		eventext.MergeEventFields(event, mapstr.M{
-			"monitor": mapstr.M{
-				"duration": mapstr.M{
-					"us": duration.Microseconds(),
-				},
-			},
-		})
-	}
-	eventext.MergeEventFields(event, mapstr.M{
-		"url": je.urlFields,
-		"event": mapstr.M{
-			"type": "heartbeat/summary",
-		},
-		"synthetics": mapstr.M{
-			"type":    "heartbeat/summary",
-			"journey": je.journey,
-		},
-	})
-
-	// Add step count meta for log wrapper
-	eventext.SetMeta(event, logger.META_STEP_COUNT, je.stepCount)
-
-	if je.journeyComplete {
-		return je.error
-	}
-	return fmt.Errorf("journey did not finish executing, %d steps ran: %w", je.stepCount, je.error)
 }
 
 func stepError(e *SynthError) error {

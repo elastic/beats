@@ -19,6 +19,7 @@ package fields
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -30,9 +31,9 @@ var indentByModule = map[string]int{
 	"protos":     8,
 }
 
-// GetModules returns a the list of modules for the given modules directory
+// GetModules returns a list of modules for the given modules directory
 func GetModules(modulesDir string) ([]string, error) {
-	moduleInfos, err := ioutil.ReadDir(modulesDir)
+	moduleInfos, err := os.ReadDir(modulesDir)
 	if err != nil {
 		return nil, err
 	}

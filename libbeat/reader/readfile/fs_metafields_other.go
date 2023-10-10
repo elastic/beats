@@ -22,6 +22,7 @@ package readfile
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -34,11 +35,11 @@ const (
 
 func setFileSystemMetadata(fi os.FileInfo, fields mapstr.M) error {
 	osstate := file.GetOSState(fi)
-	_, err := fields.Put(deviceIDKey, osstate.Device)
+	_, err := fields.Put(deviceIDKey, strconv.FormatUint(osstate.Device, 10))
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", deviceIDKey, err)
 	}
-	_, err = fields.Put(inodeKey, osstate.Inode)
+	_, err = fields.Put(inodeKey, osstate.InodeString())
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", inodeKey, err)
 	}
