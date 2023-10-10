@@ -141,7 +141,6 @@ is collected by it.
 
 *Packetbeat*
 
-- Fix default cache size calculation. {pull}36723[36723]
 
 *Winlogbeat*
 
@@ -258,6 +257,9 @@ is collected by it.
 - Improve efficiency of sniffers by deduplicating interface configurations. {issue}36574[36574] {pull}36576[36576]
 - Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
 
+*Packetbeat*
+
+
 *Winlogbeat*
 
 
@@ -303,6 +305,9 @@ is collected by it.
 
 
 ==== Known Issues
+
+
+
 
 
 
