@@ -21,8 +21,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -36,8 +35,8 @@ type onCall struct {
 	returns []interface{}
 }
 
-func makeMockILMSupport(calls ...onCall) ilm.SupportFactory {
-	return func(_ *logp.Logger, _ beat.Info, _ *config.C) (ilm.Supporter, error) {
+func makeMockILMSupport(calls ...onCall) lifecycle.SupportFactory {
+	return func(_ *logp.Logger, _ beat.Info, _ bool) (lifecycle.Supporter, error) {
 		m := &mockILMSupport{}
 		for _, c := range calls {
 			m.On(c.name, c.args...).Return(c.returns...)
@@ -58,30 +57,42 @@ func (m *mockILMSupport) Enabled() bool {
 }
 
 func onPolicy() onCall { return makeOnCall("Policy") }
-func (m *mockILMSupport) Policy() ilm.Policy {
+func (m *mockILMSupport) Policy() lifecycle.Policy {
 	args := m.Called()
-	return args.Get(0).(ilm.Policy)
+	return args.Get(0).(lifecycle.Policy)
 }
 
-func onOverwrite() onCall { return makeOnCall("Overwrite") }
+// func onMode() onCall { return makeOnCall("Mode") }
+func (m *mockILMSupport) Mode() lifecycle.Mode {
+	args := m.Called()
+	return args.Get(0).(lifecycle.Mode)
+}
+
+// func onOverwrite() onCall { return makeOnCall("Overwrite") }
 func (m *mockILMSupport) Overwrite() bool {
 	return m.Called().Bool(0)
 }
 
-func (m *mockILMSupport) Manager(_ ilm.ClientHandler) ilm.Manager {
+func (m *mockILMSupport) Manager(_ lifecycle.ClientHandler) lifecycle.Manager {
 	return m
 }
 
-func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
+// func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
 func (m *mockILMSupport) CheckEnabled() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
 }
 
-func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }
+// func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }
 func (m *mockILMSupport) EnsurePolicy(overwrite bool) (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
+}
+
+// func onPolicyName() onCall { return makeOnCall("PolicyName") }
+func (m *mockILMSupport) PolicyName() string {
+	args := m.Called()
+	return args.String(0)
 }
 
 func makeOnCall(name string, args ...interface{}) onCall {

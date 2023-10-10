@@ -105,7 +105,7 @@ The compression level must be in the range of `1` (best speed) to `9` (best comp
 
 Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
-The default value is `0`.
+The default value is `1`.
 
 ===== `escape_html`
 

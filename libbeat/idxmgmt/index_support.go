@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/template"
@@ -35,7 +35,7 @@ import (
 
 type indexSupport struct {
 	log          *logp.Logger
-	ilm          ilm.Supporter
+	ilm          lifecycle.Supporter
 	info         beat.Info
 	migration    bool
 	templateCfg  template.TemplateConfig
@@ -50,7 +50,7 @@ type indexState struct {
 
 type indexManager struct {
 	support *indexSupport
-	ilm     ilm.Manager
+	ilm     lifecycle.Manager
 
 	clientHandler ClientHandler
 	assets        Asseter
@@ -95,23 +95,23 @@ func newFeature(c componentType, enabled, overwrite bool, mode LoadMode) feature
 func newIndexSupport(
 	log *logp.Logger,
 	info beat.Info,
-	ilmFactory ilm.SupportFactory,
+	ilmFactory lifecycle.SupportFactory,
 	tmplConfig *config.C,
-	ilmConfig *config.C,
+	lifecyclesEnabled bool,
 	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
-		ilmFactory = ilm.DefaultSupport
+		ilmFactory = lifecycle.DefaultSupport
 	}
 
-	ilmSupporter, err := ilmFactory(log, info, ilmConfig)
+	ilmSupporter, err := ilmFactory(log, info, lifecyclesEnabled)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating lifecycle supporter: %w", err)
 	}
 
 	tmplCfg, err := unpackTemplateConfig(info, tmplConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error unpacking template config: %w", err)
 	}
 
 	return &indexSupport{
@@ -207,14 +207,14 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 }
 
 // VerifySetup verifies the given feature setup, will return an error string if it detects something suspect
-func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
-	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.support.ilm.Overwrite(), loadILM)
+func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, string) {
+	ilmComponent := newFeature(componentILM, m.support.enabled(componentILM), m.clientHandler.Overwrite(), loadLifecycle)
 
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
 
 	if ilmComponent.load && !templateComponent.load {
-		return false, "Loading ILM policy without loading template is not recommended. Check your configuration."
+		return false, "Loading lifecycle policy without loading template is not recommended. Check your configuration."
 	}
 
 	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
@@ -225,13 +225,15 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 
 	var warn string
 	if !ilmComponent.load {
-		warn += "ILM policy loading not enabled.\n"
+		warn += "lifecycle policy loading not enabled.\n"
 	} else if !ilmComponent.overwrite {
-		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.\n"
+		warn += "Overwriting lifecycle policy is disabled. Set `setup.ilm.overwrite: true` or `setup.dsl.overwrite: true` to overwrite.\n"
 	}
 	if !templateComponent.load {
 		warn += "Template loading not enabled.\n"
 	}
+	// remove last newline so we don't get weird formatting when this is printed to the console
+	warn = strings.TrimSuffix(warn, "\n")
 	return warn == "", warn
 }
 
@@ -244,15 +246,23 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		return err
 	}
 	if withILM {
-		log.Info("Auto ILM enable success.")
+		log.Info("Auto lifecycle enable success.")
 	}
 
 	// create feature objects for ILM and template setup
-	ilmComponent := newFeature(componentILM, withILM, m.support.ilm.Overwrite(), loadILM)
+	ilmComponent := newFeature(componentILM, withILM, m.clientHandler.Overwrite(), loadILM)
 	templateComponent := newFeature(componentTemplate, m.support.enabled(componentTemplate),
 		m.support.templateCfg.Overwrite, loadTemplate)
 
-	if ilmComponent.load {
+	if m.clientHandler.Mode() == lifecycle.DSL {
+		log.Info("setting up DSL")
+	}
+
+	// on DSL, the template load will create the lifecycle policy
+	// this is because the DSL API directly references the datastream,
+	// so the datastream must be created first under DSL
+	// If we're writing to a file, it doesn't matter
+	if ilmComponent.load && (m.clientHandler.Mode() == lifecycle.ILM || !m.clientHandler.IsElasticsearch()) {
 		// install ilm policy
 		policyCreated, err := m.ilm.EnsurePolicy(ilmComponent.overwrite)
 		if err != nil {
@@ -270,7 +280,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
 		if ilmComponent.enabled {
-			tmplCfg, err = applyILMSettingsToTemplate(log, tmplCfg, m.support.ilm.Policy())
+			tmplCfg, err = applyLifecycleSettingsToTemplate(log, tmplCfg, m.clientHandler)
 			if err != nil {
 				return fmt.Errorf("error applying ILM settings: %w", err)
 			}
@@ -342,17 +352,17 @@ func unpackTemplateConfig(info beat.Info, cfg *config.C) (config template.Templa
 }
 
 // applies the specified ILM policy to the provided template, returns a struct of the template config
-func applyILMSettingsToTemplate(
+func applyLifecycleSettingsToTemplate(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
-	policy ilm.Policy,
+	policymgr lifecycle.ClientHandler,
 ) (template.TemplateConfig, error) {
 	if !tmpl.Enabled {
 		return tmpl, nil
 	}
 
-	if policy.Name == "" {
-		return tmpl, errors.New("no ilm policy name configured")
+	if policymgr.PolicyName() == "" {
+		return tmpl, errors.New("no policy name configured")
 	}
 
 	// init/copy index settings
@@ -368,23 +378,28 @@ func applyILMSettingsToTemplate(
 	}
 	tmpl.Settings.Index = idxSettings
 
-	// init/copy index.lifecycle settings
-	var lifecycle map[string]interface{}
-	if ifcLifecycle := idxSettings["lifecycle"]; ifcLifecycle == nil {
-		lifecycle = map[string]interface{}{}
-	} else if tmp, ok := ifcLifecycle.(map[string]interface{}); ok {
-		lifecycle = make(map[string]interface{}, len(tmp))
-		for k, v := range tmp {
-			lifecycle[k] = v
+	if policymgr.Mode() == lifecycle.ILM {
+		// init/copy index.lifecycle settings
+		var lifecycle map[string]interface{}
+		if ifcLifecycle := idxSettings["lifecycle"]; ifcLifecycle == nil {
+			lifecycle = map[string]interface{}{}
+		} else if tmp, ok := ifcLifecycle.(map[string]interface{}); ok {
+			lifecycle = make(map[string]interface{}, len(tmp))
+			for k, v := range tmp {
+				lifecycle[k] = v
+			}
+		} else {
+			return tmpl, errors.New("settings.index.lifecycle must be an object")
+		}
+		idxSettings["lifecycle"] = lifecycle
+
+		if _, exists := lifecycle["name"]; !exists {
+			log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policymgr.PolicyName())
+			lifecycle["name"] = policymgr.PolicyName()
 		}
 	} else {
-		return tmpl, errors.New("settings.index.lifecycle must be an object")
-	}
-	idxSettings["lifecycle"] = lifecycle
-
-	if _, exists := lifecycle["name"]; !exists {
-		log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policy)
-		lifecycle["name"] = policy.Name
+		// when we're in DSL mode, this is what actually creates the policy
+		tmpl.Settings.Lifecycle = policymgr.Policy().Body
 	}
 
 	return tmpl, nil

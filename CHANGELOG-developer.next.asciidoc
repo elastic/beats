@@ -69,6 +69,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Bugfixes
 
+- Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
 - Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
@@ -87,9 +88,12 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Renamed an httpjson input metric to follow naming conventions. `httpjson_interval_pages_total` was renamed to `httpjson_interval_pages` because the `_total` suffix is reserved for counters. {issue}35933[35933] {pull}36169[36169]
 - Fixed some race conditions in tests {pull}36185[36185]
 - Re-enable HTTPJSON fixed flakey test. {issue}34929[34929] {pull}36525[36525]
+- Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
+- Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714] 
 
 ==== Added
 
+- Add new metricset in Kubernetes module, `state_namespace`. {pull}36406[36406]
 - Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
@@ -170,6 +174,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Skip dependabot updates for github.com/elastic/mito. {pull}36158[36158]
 - Add device handling to Okta API package for entity analytics. {pull}35980[35980]
 - Make Filebeat HTTPJSON input process responses sequentially. {pull}36493[36493]
+- Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
+- Add file-backed cache for cache enrichment processor. {pull}36686[36686] {pull}36696[36696]
 
 ==== Deprecated
 

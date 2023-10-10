@@ -13,7 +13,7 @@ from idxmgmt import IdxMgmt
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
-MSG_ILM_POLICY_LOADED = re.compile('ILM policy .* successfully created.')
+MSG_ILM_POLICY_LOADED = re.compile('lifecycle policy .* successfully created.')
 
 
 class TestRunILM(BaseTest):

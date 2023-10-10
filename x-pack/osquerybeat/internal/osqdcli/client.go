@@ -21,7 +21,11 @@ import (
 )
 
 const (
-	defaultTimeout        = 30 * time.Second
+	// The default query timeout
+	defaultTimeout = 1 * time.Minute
+
+	// The longest the query is allowed to run. Since queries are run one at a time, this will block all other queries until this query completes.
+	defaultMaxTimeout     = 15 * time.Minute
 	defaultConnectRetries = 10
 )
 
@@ -50,8 +54,13 @@ func (e *ErrorQueryFailure) Error() string {
 }
 
 type Client struct {
-	socketPath     string
+	socketPath string
+
+	// Query timeout, currently can only be set at the transport level.
+	// This means that while the query will return with error the osqueryd internally continues to execute the query until completion.
+	// This is a known issue with osquery/osquery-go/thrift RPC implementation at the moment: there is effectively no way to cancel the long running query
 	timeout        time.Duration
+	maxTimeout     time.Duration
 	connectRetries int
 
 	log *logp.Logger
@@ -72,6 +81,13 @@ func WithTimeout(to time.Duration) Option {
 	}
 }
 
+// WithMaxTimeout allows to define the max timeout per query, default is defaultMaxTimeout
+func WithMaxTimeout(maxTimeout time.Duration) Option {
+	return func(c *Client) {
+		c.maxTimeout = maxTimeout
+	}
+}
+
 func WithLogger(log *logp.Logger) Option {
 	return func(c *Client) {
 		c.log = log
@@ -88,6 +104,7 @@ func New(socketPath string, opts ...Option) *Client {
 	c := &Client{
 		socketPath:     socketPath,
 		timeout:        defaultTimeout,
+		maxTimeout:     defaultMaxTimeout,
 		connectRetries: defaultConnectRetries,
 		cache:          &nullSafeCache{},
 		cliLimiter:     semaphore.NewWeighted(limit),
@@ -121,22 +138,31 @@ func (c *Client) Connect(ctx context.Context) error {
 
 func (c *Client) reconnect(ctx context.Context) error {
 	c.close()
+	cli, err := c.connectWithRetry(ctx, c.timeout)
+	if err != nil {
+		return err
+	}
+	c.cli = cli
+	return nil
+}
 
+func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (cli *osquery.ExtensionManagerClient, err error) {
 	r := retry{
 		maxRetry:  c.connectRetries,
 		retryWait: retryWait,
 		log:       c.log.With("context", "osquery client connect"),
 	}
 
-	return r.Run(ctx, func(ctx context.Context) error {
-		cli, err := osquery.NewClient(c.socketPath, c.timeout)
+	err = r.Run(ctx, func(_ context.Context) error {
+		var err error
+		cli, err = osquery.NewClient(c.socketPath, timeout)
 		if err != nil {
 			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", err)
 			return err
 		}
-		c.cli = cli
 		return nil
 	})
+	return cli, err
 }
 
 func (c *Client) Close() {
@@ -153,12 +179,15 @@ func (c *Client) close() {
 }
 
 // Query executes a given query, resolves the types
-func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
+//
+// In order to workaround the issue https://github.com/elastic/beats/issues/36622
+// each query creates it's own RPC connection to osqueryd, allowing it to set a custom timeout per query.
+// Current implementation of osqueryd RPC returns the error when the long running query times out, but this timeout is a transport timeout,
+// that doesn't cancel the query execution itself.
+// This also makes the client RPC unusable until the long running query finishes, returning errors for each subsequent query.
+func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error) {
 	c.mx.Lock()
 	defer c.mx.Unlock()
-	if c.cli == nil {
-		return nil, ErrClientClosed
-	}
 
 	err := c.cliLimiter.Acquire(ctx, limit)
 	if err != nil {
@@ -166,11 +195,31 @@ func (c *Client) Query(ctx context.Context, sql string) ([]map[string]interface{
 	}
 	defer c.cliLimiter.Release(limit)
 
+	// If query timeout is <= 0, then use client timeout (default is 1 minute)
+	if timeout <= 0 {
+		timeout = c.timeout
+	}
+
+	// If query timeout is greater that the maxTimeout, set it to the max timeout value
+	if timeout > c.maxTimeout {
+		timeout = c.maxTimeout
+	}
+
+	c.log.Debugf("osquery connect, query: %s, timeout: %v", sql, timeout)
+
+	// Use a separate connection for queries in order to be able to recover from timed out queries
+	cli, err := c.connectWithRetry(ctx, timeout)
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+
 	var res *genosquery.ExtensionResponse
-	res, err = c.cli.Client.Query(ctx, sql)
+	res, err = cli.QueryContext(ctx, sql)
 	if err != nil {
 		return nil, fmt.Errorf("osquery failed: %w", err)
 	}
+
 	if res.Status.Code != int32(0) {
 		return nil, &ErrorQueryFailure{
 			code:    res.Status.Code,
@@ -226,7 +275,7 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 			err   error
 		)
 
-		exres, err = c.cli.Client.GetQueryColumns(ctx, sql)
+		exres, err = c.cli.GetQueryColumnsContext(ctx, sql)
 
 		if err != nil {
 			return nil, fmt.Errorf("osquery get query columns failed: %w", err)

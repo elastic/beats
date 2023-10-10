@@ -10,6 +10,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	gax "github.com/googleapis/gax-go/v2"
+	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -47,16 +48,20 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher, client *storage.Client) error {
 	pub := statelessPublisher{wrapped: publisher}
 	var source cursor.Source
+	var g errgroup.Group
 	for _, b := range in.config.Buckets {
 		bucket := tryOverrideOrDefault(in.config, b)
 		source = &Source{
-			ProjectId:     in.config.ProjectId,
-			BucketName:    bucket.Name,
-			BucketTimeOut: *bucket.BucketTimeOut,
-			MaxWorkers:    *bucket.MaxWorkers,
-			Poll:          *bucket.Poll,
-			PollInterval:  *bucket.PollInterval,
-			ParseJSON:     *bucket.ParseJSON,
+			ProjectId:                in.config.ProjectId,
+			BucketName:               bucket.Name,
+			BucketTimeOut:            *bucket.BucketTimeOut,
+			MaxWorkers:               *bucket.MaxWorkers,
+			Poll:                     *bucket.Poll,
+			PollInterval:             *bucket.PollInterval,
+			ParseJSON:                *bucket.ParseJSON,
+			TimeStampEpoch:           bucket.TimeStampEpoch,
+			ExpandEventListFromField: bucket.ExpandEventListFromField,
+			FileSelectors:            bucket.FileSelectors,
 		}
 
 		st := newState()
@@ -80,8 +85,12 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		)
 
 		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, log)
-
-		return scheduler.schedule(ctx)
+		// allows multiple containers to be scheduled concurrently while testing
+		// the stateless input is triggered only while testing and till now it did not mimic
+		// the real world concurrent execution of multiple containers. This fix allows it to do so.
+		g.Go(func() error {
+			return scheduler.schedule(ctx)
+		})
 	}
-	return nil
+	return g.Wait()
 }

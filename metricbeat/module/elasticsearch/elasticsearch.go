@@ -170,18 +170,20 @@ func getNodeName(http *helper.HTTP, uri string) (string, error) {
 		Nodes map[string]interface{} `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err = json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return "", err
+	}
 
 	// _local will only fetch one node info. First entry is node name
 	for k := range nodesStruct.Nodes {
 		return k, nil
 	}
-	return "", fmt.Errorf("No local node found")
+	return "", fmt.Errorf("no local node found")
 }
 
 func getMasterName(http *helper.HTTP, uri string) (string, error) {
-	// TODO: evaluate on why when run with ?local=true request does not contain master_node field
-	content, err := fetchPath(http, uri, "_cluster/state/master_node", "")
+	content, err := fetchPath(http, uri, "_cluster/state/master_node", "local=true")
 	if err != nil {
 		return "", err
 	}
@@ -190,7 +192,10 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 		MasterNode string `json:"master_node"`
 	}{}
 
-	json.Unmarshal(content, &clusterStruct)
+	err = json.Unmarshal(content, &clusterStruct)
+	if err != nil {
+		return "", err
+	}
 
 	return clusterStruct.MasterNode, nil
 }
@@ -236,7 +241,10 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 		Nodes map[string]*NodeInfo `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err = json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return nil, err
+	}
 
 	// _local will only fetch one node info. First entry is node name
 	for k, v := range nodesStruct.Nodes {
@@ -283,11 +291,11 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 // GetClusterState returns cluster state information.
 func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (mapstr.M, error) {
 	clusterStateURI := "_cluster/state"
-	if metrics != nil && len(metrics) > 0 {
+	if len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	content, err := fetchPath(http, resetURI, clusterStateURI, "")
+	content, err := fetchPath(http, resetURI, clusterStateURI, "local=true")
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +318,7 @@ func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool
 		queryParams = append(queryParams, "include_defaults=true")
 	}
 
-	if filterPaths != nil && len(filterPaths) > 0 {
+	if len(filterPaths) > 0 {
 		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
 		queryParams = append(queryParams, filterPathQueryParam)
 	}
@@ -451,7 +459,7 @@ func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
 		return "", err
 	}
 
-	for nodeID, _ := range response.Nodes {
+	for nodeID := range response.Nodes {
 		return nodeID, nil
 	}
 

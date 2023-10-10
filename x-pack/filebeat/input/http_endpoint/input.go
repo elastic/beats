@@ -289,7 +289,7 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *in
 		basicAuth:    c.BasicAuth,
 		username:     c.Username,
 		password:     c.Password,
-		method:       http.MethodPost,
+		method:       c.Method,
 		contentType:  c.ContentType,
 		secretHeader: c.SecretHeader,
 		secretValue:  c.SecretValue,
