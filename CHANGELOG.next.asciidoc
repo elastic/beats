@@ -141,7 +141,6 @@ is collected by it.
 
 *Packetbeat*
 
-- Fix default cache size calculation. {pull}36723[36723]
 
 *Winlogbeat*
 
@@ -233,6 +232,9 @@ is collected by it.
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
 - Allow http_endpoint input to receive PUT and PATCH requests. {pull}36734[36734]
+- Add cache processor. {pull}36786[36786]
+- Avoid unwanted publication of Azure entity records. {pull}36753[36753]
+- Avoid unwanted publication of Okta entity records. {pull}36770[36770]
 
 *Auditbeat*
 
@@ -258,6 +260,9 @@ is collected by it.
 
 - Improve efficiency of sniffers by deduplicating interface configurations. {issue}36574[36574] {pull}36576[36576]
 - Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
+
+*Packetbeat*
+
 
 *Winlogbeat*
 
@@ -304,6 +309,9 @@ is collected by it.
 
 
 ==== Known Issues
+
+
+
 
 
 
