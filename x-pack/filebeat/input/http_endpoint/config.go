@@ -110,6 +110,10 @@ func (c *config) Validate() error {
 		return errors.New("crc.provider is required when crc.secret is defined")
 	}
 
+	if c.URL == "" {
+		return fmt.Errorf("webhook path URL can not be empty")
+	}
+
 	return nil
 }
 
