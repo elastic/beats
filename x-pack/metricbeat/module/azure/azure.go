@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -96,6 +97,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return nil
 	}
 
+	// Generate a batch ID for this run.
+	// This is used to correlate events from the same run.
+	// The batch ID is a UUID v4.
+	batchId, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+
 	// Group metrics by cloud resource ID.
 	metricsGroup := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
 
@@ -104,7 +113,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		metricValues := m.Client.GetMetricValues(metrics, report)
 
 		//if err := mapToEvents(metricValues, m.Client, report); err != nil {
-		if err := mapToEvents2(metricValues, m.Client, report); err != nil {
+		if err := mapToEvents2(metricValues, m.Client, report, batchId.String()); err != nil {
 			return fmt.Errorf("error mapping metrics to events: %w", err)
 		}
 	}
