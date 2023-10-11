@@ -31,6 +31,7 @@ import (
 //   - undoing counters accumulation for each bucket (counts)
 //     - `counts` is respresenting an array of rates, where rate of the first bucket is always 0, meaning that it
 // 		  was not increased as it is the first
+// More details on the histogram transformation logic - https://github.com/elastic/apm-agent-python/pull/1165#discussion_r651397014
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/master/histogram.html
 
