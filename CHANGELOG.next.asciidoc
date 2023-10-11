@@ -251,6 +251,7 @@ is collected by it.
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 
 
 *Osquerybeat*
