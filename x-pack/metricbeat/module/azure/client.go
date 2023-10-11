@@ -111,9 +111,10 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		if t := convertTimegrainToDuration(metric.TimeGrain); t > interval*2 {
 			interval = t
 		}
-		//endTime := time.Now().UTC()
+		// Fetch in the range [{-2xINTERVAL},{-INTERVAL}) with a delay of {INTERVAL}
+		// It results in one data point {-2xINTERVAL} per call
 		endTime := time.Now().UTC().Add(interval * (-1))
-		startTime := endTime.Add(interval * (-2))
+		startTime := endTime.Add(interval * (-1))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured
