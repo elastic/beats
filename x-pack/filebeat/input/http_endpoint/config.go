@@ -32,7 +32,7 @@ type config struct {
 	ResponseBody          string                  `config:"response_body"`
 	ListenAddress         string                  `config:"listen_address"`
 	ListenPort            string                  `config:"listen_port"`
-	URL                   string                  `config:"url"`
+	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
 	SecretHeader          string                  `config:"secret.header"`
