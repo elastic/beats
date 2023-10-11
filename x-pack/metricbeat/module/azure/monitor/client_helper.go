@@ -70,7 +70,8 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metricDefinitions []*armmonitor.MetricDefinition) ([]string, error) {
 	var supportedMetricNames []string
 	var unsupportedMetricNames []string
-	// check if all metric names are selected (*)
+	// If users selected the wildcard option (*), we add
+	// all the metric definitions to the supported metric.
 	if strings.Contains(strings.Join(metricConfig.Name, " "), "*") {
 		for _, definition := range metricDefinitions {
 			supportedMetricNames = append(supportedMetricNames, *definition.Name.Value)

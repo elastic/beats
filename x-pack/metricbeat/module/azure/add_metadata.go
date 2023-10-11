@@ -30,7 +30,7 @@ func addHostMetadata(event *mb.Event, metricList mapstr.M) {
 			if metricName == "percentage_cpu.avg" {
 				value = value / 100
 			}
-			event.RootFields.Put(hostName, value)
+			_, _ = event.RootFields.Put(hostName, value)
 		}
 	}
 }

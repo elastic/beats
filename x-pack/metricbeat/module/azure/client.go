@@ -72,7 +72,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			client.Log.Error(err)
 			continue
 		}
-		//map resources to the client
+		// Map resources to the client
 		for _, resource := range resourceList {
 			if !containsResource(*resource.ID, client.Resources) {
 				client.Resources = append(client.Resources, Resource{
@@ -111,7 +111,8 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		if t := convertTimegrainToDuration(metric.TimeGrain); t > interval*2 {
 			interval = t
 		}
-		endTime := time.Now().UTC()
+		//endTime := time.Now().UTC()
+		endTime := time.Now().UTC().Add(interval * (-1))
 		startTime := endTime.Add(interval * (-2))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
@@ -124,8 +125,15 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			}
 			filter = strings.Join(filterList, " AND ")
 		}
-		resp, timegrain, err := client.AzureMonitorService.GetMetricValues(metric.ResourceSubId, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
-			metric.Aggregations, filter)
+		resp, timegrain, err := client.AzureMonitorService.GetMetricValues(
+			metric.ResourceSubId,
+			metric.Namespace,
+			metric.TimeGrain,
+			timespan,
+			metric.Names,
+			metric.Aggregations,
+			filter,
+		)
 		if err != nil {
 			err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metric.ResourceSubId, metric.Namespace, err)
 			client.Log.Error(err)
@@ -248,6 +256,15 @@ func (client *Client) GetVMForMetaData(resource *Resource, metricValues []Metric
 func (client *Client) GetResourceForMetaData(grouped Metric) Resource {
 	for _, res := range client.Resources {
 		if res.Id == grouped.ResourceId {
+			return res
+		}
+	}
+	return Resource{}
+}
+
+func (client *Client) LookupResource(resourceId string) Resource {
+	for _, res := range client.Resources {
+		if res.Id == resourceId {
 			return res
 		}
 	}

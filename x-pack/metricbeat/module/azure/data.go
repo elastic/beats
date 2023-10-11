@@ -22,22 +22,195 @@ const (
 	replaceUpperCaseRegex = `(?:[^A-Z_\W])([A-Z])[^A-Z]`
 )
 
-// EventsMapping will map metric values to beats events
-func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error {
+type KeyValuePoint struct {
+	Key           string
+	Value         interface{}
+	Namespace     string
+	ResourceId    string
+	ResourceSubId string
+	Dimensions    mapstr.M
+	TimeGrain     string
+	Timestamp     time.Time
+	//Labels    mapstr.M
+	//ECS       mapstr.M
+}
+
+func mapMetrics(metrics []Metric) []KeyValuePoint {
+	var points []KeyValuePoint
+	for _, metric := range metrics {
+		for _, value := range metric.Values {
+			point := KeyValuePoint{
+				Timestamp: value.timestamp,
+			}
+
+			metricName := fmt.Sprintf("%s", managePropertyName(value.name))
+			switch {
+			case value.min != nil:
+				point.Key = fmt.Sprintf("%s.%s", metricName, "min")
+				point.Value = value.avg
+			case value.max != nil:
+				point.Key = fmt.Sprintf("%s.%s", metricName, "max")
+				point.Value = value.avg
+			case value.avg != nil:
+				point.Key = fmt.Sprintf("%s.%s", metricName, "avg")
+				point.Value = value.avg
+			case value.total != nil:
+				point.Key = fmt.Sprintf("%s.%s", metricName, "total")
+				point.Value = value.total
+			case value.count != nil:
+				point.Key = fmt.Sprintf("%s.%s", metricName, "count")
+				point.Value = value.count
+			}
+
+			point.Namespace = metric.Namespace
+			point.ResourceId = metric.ResourceId
+			point.ResourceSubId = metric.ResourceSubId
+			point.TimeGrain = metric.TimeGrain
+
+			for _, dim := range value.dimensions {
+				_, _ = point.Dimensions.Put(dim.Name, dim.Value)
+			}
+
+			points = append(points, point)
+		}
+	}
+
+	return points
+}
+
+func mapToEvents2(metrics []Metric, client *Client, report mb.ReporterV2) error {
+	// Unpack the metrics into a list of key/value points.
+	// This makes it easier to group the metrics by timestamp and dimensions.
+	points := mapMetrics(metrics)
+
+	// Group the points by a grouping key made up of the timestamp and
+	// other fields.
+	groupedPoints := make(map[string][]KeyValuePoint)
+	for _, point := range points {
+		groupingKey := fmt.Sprintf(
+			"%s,%s,%s,%s,%s,%s",
+			point.Timestamp,
+			point.Namespace,
+			point.ResourceId,
+			point.ResourceSubId,
+			point.Dimensions,
+			point.TimeGrain,
+		)
+		//
+		groupedPoints[groupingKey] = append(groupedPoints[groupingKey], point)
+	}
+
+	// Create an event for each group of points and report it (send
+	// to Elasticsearch).
+	for _, _points := range groupedPoints {
+		if len(_points) == 0 {
+			// This should never happen, but I don't feel like
+			// writing points[0] without checking the length first.
+			continue
+		}
+
+		// We assume that all points have the same timestamp and dimensions
+		// because they were grouped by the same key.
+		referencePoint := _points[0]
+
+		// Look up the full resource information in the cache.
+		resource := client.LookupResource(referencePoint.ResourceId)
+
+		event, err := buildEventFrom(referencePoint, _points, resource, client.Config.DefaultResourceType)
+		if err != nil {
+			return err
+		}
+
+		// Reports the successful event to Elasticsearch.
+		report.Event(event)
+	}
+
+	return nil
+}
+
+// buildEventFrom build an event from a group of points.
+func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resource Resource, defaultResourceType string) (mb.Event, error) {
+	event := mb.Event{
+		ModuleFields: mapstr.M{
+			"timegrain": referencePoint.TimeGrain,
+			"namespace": referencePoint.Namespace,
+			"resource": mapstr.M{
+				"type":  resource.Type,
+				"group": resource.Group,
+				"name":  resource.Name,
+			},
+			"subscription_id": resource.Subscription,
+		},
+		MetricSetFields: mapstr.M{},
+		Timestamp:       referencePoint.Timestamp,
+		RootFields: mapstr.M{
+			"cloud": mapstr.M{
+				"provider": "azure",
+				"region":   resource.Location,
+			},
+		},
+	}
+
+	if referencePoint.ResourceSubId != "" {
+		_, _ = event.ModuleFields.Put("resource.id", referencePoint.ResourceSubId)
+	} else {
+		_, _ = event.ModuleFields.Put("resource.id", resource.Id)
+	}
+	if len(resource.Tags) > 0 {
+		_, _ = event.ModuleFields.Put("resource.tags", resource.Tags)
+	}
+
+	if len(referencePoint.Dimensions) > 0 {
+		for key, value := range referencePoint.Dimensions {
+			if value == "*" {
+				// TODO: add support for wildcard dimensions
+				//_, _ = event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(key)), getDimensionValue2(key, referencePoint.Dimensions)
+			} else {
+				_, _ = event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(key)), value)
+			}
+		}
+	}
+
+	metricList := mapstr.M{}
+	for _, point := range points {
+		_, _ = metricList.Put(point.Key, point.Value)
+	}
+
+	// TODO: clarify what this is for, keeping it for now for backwards compatibility.
+	if defaultResourceType == "" {
+		_, _ = event.ModuleFields.Put("metrics", metricList)
+	} else {
+		for key, metric := range metricList {
+			_, _ = event.MetricSetFields.Put(key, metric)
+		}
+	}
+
+	addHostMetadata(&event, metricList)
+
+	return event, nil
+}
+
+func manageAndReportEvent2(client *Client, report mb.ReporterV2, points []KeyValuePoint) error {
+	return nil
+}
+
+// mapToEvents will map metric values to beats events
+func mapToEvents(metrics []Metric, client *Client, report mb.ReporterV2) error {
 	// metrics and metric values are currently grouped relevant to the azure REST API calls (metrics with the same aggregations per call)
 	// multiple metrics can be mapped in one event depending on the resource, namespace, dimensions and timestamp
 
 	// grouping metrics by resource and namespace
 	groupByResourceNamespace := make(map[string][]Metric)
 	for _, metric := range metrics {
-		// check if any values are returned
+		// Skip metrics with no values
 		if len(metric.Values) == 0 {
 			continue
 		}
 		// build a resource key with unique resource namespace combination
-		resNamkey := fmt.Sprintf("%s,%s", metric.ResourceId, metric.Namespace)
-		groupByResourceNamespace[resNamkey] = append(groupByResourceNamespace[resNamkey], metric)
+		groupingKey := fmt.Sprintf("%s,%s", metric.ResourceId, metric.Namespace)
+		groupByResourceNamespace[groupingKey] = append(groupByResourceNamespace[groupingKey], metric)
 	}
+
 	// grouping metrics by the dimensions configured
 	groupByDimensions := make(map[string][]Metric)
 	for resNamKey, resourceMetrics := range groupByResourceNamespace {
@@ -51,24 +224,29 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 				}
 				groupByDimensions[resNamKey+dimKey] = append(groupByDimensions[resNamKey+dimKey], resourceMetric)
 			}
-
 		}
 	}
 
-	// grouping metric values by timestamp and creating events (for each metric the REST api can retrieve multiple metric values for same aggregation  but different timeframes)
+	// Grouping metric values by timestamp and creating events
+	// (for each metric the REST api can retrieve multiple metric values
+	// for same aggregation  but different timeframes).
 	for _, grouped := range groupByDimensions {
+
 		defaultMetric := grouped[0]
 		resource := client.GetResourceForMetaData(defaultMetric)
 		groupByTimeMetrics := make(map[time.Time][]MetricValue)
+
 		for _, metric := range grouped {
 			for _, m := range metric.Values {
 				groupByTimeMetrics[m.timestamp] = append(groupByTimeMetrics[m.timestamp], m)
 			}
 		}
+
 		for timestamp, groupTimeValues := range groupByTimeMetrics {
 			var event mb.Event
 			var metricList mapstr.M
 			var vm VmResource
+
 			// group events by dimension values
 			exists, validDimensions := returnAllDimensions(defaultMetric.Dimensions)
 			if exists {
@@ -78,6 +256,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 						dimKey := fmt.Sprintf("%s,%s", selectedDimension.Name, getDimensionValue(selectedDimension.Name, dimGroupValue.dimensions))
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
+
 					for _, groupDimValues := range groupByDimensions {
 						manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupDimValues)
 					}
@@ -87,6 +266,7 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -97,6 +277,7 @@ func manageAndReportEvent(client *Client, report mb.ReporterV2, event mb.Event, 
 		vm = client.GetVMForMetaData(&resource, groupedValues)
 		addCloudVMMetadata(&event, vm, resource.Subscription)
 	}
+
 	if client.Config.DefaultResourceType == "" {
 		event.ModuleFields.Put("metrics", metricList)
 	} else {
@@ -104,6 +285,7 @@ func manageAndReportEvent(client *Client, report mb.ReporterV2, event mb.Event, 
 			event.MetricSetFields.Put(key, metric)
 		}
 	}
+
 	report.Event(event)
 }
 
@@ -226,6 +408,17 @@ func getDimensionValue(dimension string, dimensions []Dimension) string {
 			return dim.Value
 		}
 	}
+	return ""
+}
+
+// getDimensionValue2 will return dimension value for the key provided
+func getDimensionValue2(dimension string, dimensions mapstr.M) string {
+	for key, value := range dimensions {
+		if strings.ToLower(key) == strings.ToLower(dimension) {
+			return fmt.Sprintf("%v", value)
+		}
+	}
+
 	return ""
 }
 

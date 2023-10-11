@@ -95,14 +95,17 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// error message is previously logged in the InitResources, no error event should be created
 		return nil
 	}
-	// retrieve metrics
-	groupedMetrics := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
 
-	for _, metrics := range groupedMetrics {
-		results := m.Client.GetMetricValues(metrics, report)
-		err := EventsMapping(results, m.Client, report)
-		if err != nil {
-			return fmt.Errorf("error running EventsMapping: %w", err)
+	// Group metrics by cloud resource ID.
+	metricsGroup := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
+
+	for _, metrics := range metricsGroup {
+		// Fetch metric values for each resource.
+		metricValues := m.Client.GetMetricValues(metrics, report)
+
+		//if err := mapToEvents(metricValues, m.Client, report); err != nil {
+		if err := mapToEvents2(metricValues, m.Client, report); err != nil {
+			return fmt.Errorf("error mapping metrics to events: %w", err)
 		}
 	}
 	return nil
