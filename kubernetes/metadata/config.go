@@ -63,7 +63,7 @@ func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
 	return &AddResourceMetadataConfig{
 		Node:       metaCfg,
 		Namespace:  metaCfg,
-		Deployment: true,
-		CronJob:    true,
+		Deployment: false,
+		CronJob:    false,
 	}
 }

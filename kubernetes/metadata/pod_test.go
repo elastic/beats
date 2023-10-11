@@ -345,9 +345,10 @@ func TestPod_Generate(t *testing.T) {
 						"ip":   "127.0.0.5",
 					},
 					"namespace": defaultNs,
-					"deployment": mapstr.M{
-						"name": "nginx-deployment",
-					},
+					// We comment below block because add_resource_metadata.deployment: false by default
+					// "deployment": mapstr.M{
+					// 	"name": "nginx-deployment",
+					// },
 					"replicaset": mapstr.M{
 						"name": "nginx-rs",
 					},
@@ -403,9 +404,10 @@ func TestPod_Generate(t *testing.T) {
 						"ip":   "127.0.0.5",
 					},
 					"namespace": defaultNs,
-					"deployment": mapstr.M{
-						"name": "nginx-deployment",
-					},
+					// We comment below block because add_resource_metadata.deployment: false by default
+					// "deployment": mapstr.M{
+					// 	"name": "nginx-deployment",
+					// },
 					"replicaset": mapstr.M{
 						"name": "nginx-rs",
 					},
