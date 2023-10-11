@@ -9,9 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -115,7 +112,7 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		// Fetch in the range [{-2xINTERVAL},{-INTERVAL}) with a delay of {INTERVAL}
 		// It results in one data point {-2xINTERVAL} per call
 		endTime := time.Now().UTC().Add(interval * (-1))
-		startTime := endTime.Add(interval * (-2))
+		startTime := endTime.Add(interval * (-1))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured
