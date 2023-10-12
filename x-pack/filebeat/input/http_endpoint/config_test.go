@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"testing"
 
-	confpkg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
+
+	confpkg "github.com/elastic/elastic-agent-libs/config"
 )
 
 func Test_validateConfig(t *testing.T) {
