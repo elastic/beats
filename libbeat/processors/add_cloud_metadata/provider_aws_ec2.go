@@ -28,7 +28,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -75,12 +74,9 @@ func fetchRawProviderMetadata(
 	client http.Client,
 	result *result,
 ) {
-	logger := logp.NewLogger("add_cloud_metadata")
-
 	// LoadDefaultConfig loads the EC2 role credentials
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
-		logger.Warnf("error loading AWS default configuration: %s.", err)
 		result.err = fmt.Errorf("failed loading AWS default configuration: %w", err)
 		return
 	}
@@ -88,7 +84,6 @@ func fetchRawProviderMetadata(
 
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
-		logger.Warnf("error fetching EC2 Identity Document: %s.", err)
 		result.err = fmt.Errorf("failed fetching EC2 Identity Document: %w", err)
 		return
 	}
@@ -97,10 +92,7 @@ func fetchRawProviderMetadata(
 	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
 	awsConfig.Region = awsRegion
 
-	clusterName, err := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
-	if err != nil {
-		logger.Warnf("error fetching cluster name metadata: %s.", err)
-	}
+	clusterName, _ := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
 
 	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
 
