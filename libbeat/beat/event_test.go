@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -79,33 +80,32 @@ func newEvent(e mapstr.M) *Event {
 	}
 }
 
-func BenchmarkTestEventPutGetTimestamp(b *testing.B) {
+func TestEventPutGetTimestamp(t *testing.T) {
 	evt := newEmptyEvent()
 	ts := time.Now()
 
-	evt.PutValue("@timestamp", ts)
+	prev, err := evt.PutValue("@timestamp", ts)
+	require.NoError(t, err)
+	require.Equal(t, time.Time{}, prev, "previous timestamp should be empty")
 
 	v, err := evt.GetValue("@timestamp")
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	assert.Equal(b, ts, v)
-	assert.Equal(b, ts, evt.Timestamp)
+	require.NoError(t, err)
+	require.Equal(t, ts, v)
+	require.Equal(t, ts, evt.Timestamp)
 
 	// The @timestamp is not written into Fields.
-	assert.Nil(b, evt.Fields["@timestamp"])
+	require.Nil(t, evt.Fields["@timestamp"])
 }
 
-func BenchmarkTestDeepUpdate(b *testing.B) {
+func TestDeepUpdate(t *testing.T) {
 	ts := time.Now()
 
 	cases := []struct {
-		name      string
-		event     *Event
-		update    mapstr.M
-		overwrite bool
-		expected  *Event
+		name     string
+		event    *Event
+		update   mapstr.M
+		mode     updateMode
+		expected *Event
 	}{
 		{
 			name:     "does nothing if no update",
@@ -119,7 +119,7 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 			update: mapstr.M{
 				timestampFieldKey: ts,
 			},
-			overwrite: true,
+			mode: updateModeOverwrite,
 			expected: &Event{
 				Timestamp: ts,
 				Fields: mapstr.M{
@@ -135,7 +135,7 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 			update: mapstr.M{
 				timestampFieldKey: time.Now().Add(time.Hour),
 			},
-			overwrite: false,
+			mode: updateModeNoOverwrite,
 			expected: &Event{
 				Timestamp: ts,
 				Fields: mapstr.M{
@@ -175,7 +175,7 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 					"second": 42,
 				},
 			},
-			overwrite: false,
+			mode: updateModeNoOverwrite,
 			expected: &Event{
 				Meta: mapstr.M{
 					"first":  "initial",
@@ -199,7 +199,7 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 					"second": 42,
 				},
 			},
-			overwrite: true,
+			mode: updateModeOverwrite,
 			expected: &Event{
 				Meta: mapstr.M{
 					"first":  "new",
@@ -221,7 +221,7 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 				"first":  "new",
 				"second": 42,
 			},
-			overwrite: false,
+			mode: updateModeNoOverwrite,
 			expected: &Event{
 				Fields: mapstr.M{
 					"first":      "initial",
@@ -241,7 +241,7 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 				"first":  "new",
 				"second": 42,
 			},
-			overwrite: true,
+			mode: updateModeOverwrite,
 			expected: &Event{
 				Fields: mapstr.M{
 					"first":      "new",
@@ -268,101 +268,15 @@ func BenchmarkTestDeepUpdate(b *testing.B) {
 	}
 
 	for _, tc := range cases {
-		b.Run(tc.name, func(b *testing.B) {
-			tc.event.deepUpdate(tc.update, tc.overwrite)
-			assert.Equal(b, tc.expected.Timestamp, tc.event.Timestamp)
-			assert.Equal(b, tc.expected.Fields, tc.event.Fields)
-			assert.Equal(b, tc.expected.Meta, tc.event.Meta)
+		t.Run(tc.name, func(t *testing.T) {
+			tc.event.deepUpdate(tc.update, tc.mode)
+			assert.Equal(t, tc.expected.Timestamp, tc.event.Timestamp)
+			assert.Equal(t, tc.expected.Fields, tc.event.Fields)
+			assert.Equal(t, tc.expected.Meta, tc.event.Meta)
 		})
 	}
 }
 
-func BenchmarkTestEventMetadata(b *testing.B) {
-	const id = "123"
-	newMeta := func() mapstr.M { return mapstr.M{"_id": id} }
-
-	b.Run("put", func(b *testing.B) {
-		evt := newEmptyEvent()
-		meta := newMeta()
-
-		evt.PutValue("@metadata", meta)
-
-		assert.Equal(b, meta, evt.Meta)
-		assert.Empty(b, evt.Fields)
-	})
-
-	b.Run("get", func(b *testing.B) {
-		evt := newEmptyEvent()
-		evt.Meta = newMeta()
-
-		meta, err := evt.GetValue("@metadata")
-
-		assert.NoError(b, err)
-		assert.Equal(b, evt.Meta, meta)
-	})
-
-	b.Run("put sub-key", func(b *testing.B) {
-		evt := newEmptyEvent()
-
-		evt.PutValue("@metadata._id", id)
-
-		assert.Equal(b, newMeta(), evt.Meta)
-		assert.Empty(b, evt.Fields)
-	})
-
-	b.Run("get sub-key", func(b *testing.B) {
-		evt := newEmptyEvent()
-		evt.Meta = newMeta()
-
-		v, err := evt.GetValue("@metadata._id")
-
-		assert.NoError(b, err)
-		assert.Equal(b, id, v)
-	})
-
-	b.Run("delete", func(b *testing.B) {
-		evt := newEmptyEvent()
-		evt.Meta = newMeta()
-
-		err := evt.Delete("@metadata")
-
-		assert.NoError(b, err)
-		assert.Nil(b, evt.Meta)
-	})
-
-	b.Run("delete sub-key", func(b *testing.B) {
-		evt := newEmptyEvent()
-		evt.Meta = newMeta()
-
-		err := evt.Delete("@metadata._id")
-
-		assert.NoError(b, err)
-		assert.Empty(b, evt.Meta)
-	})
-
-	b.Run("setID", func(b *testing.B) {
-		evt := newEmptyEvent()
-
-		evt.SetID(id)
-
-		assert.Equal(b, newMeta(), evt.Meta)
-	})
-
-	b.Run("put non-metadata", func(b *testing.B) {
-		evt := newEmptyEvent()
-
-		evt.PutValue("@metadataSpecial", id)
-
-		assert.Equal(b, mapstr.M{"@metadataSpecial": id}, evt.Fields)
-	})
-
-	b.Run("delete non-metadata", func(b *testing.B) {
-		evt := newEmptyEvent()
-		evt.Meta = newMeta()
-
-		err := evt.Delete("@metadataSpecial")
-
-		assert.Error(b, err)
-		assert.Equal(b, newMeta(), evt.Meta)
-	})
+func TestEventFieldsAndMetadata(t *testing.T) {
+	// TODO re-write all these tests using a case list
 }

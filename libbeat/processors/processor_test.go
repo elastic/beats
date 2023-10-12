@@ -18,13 +18,16 @@
 package processors_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -565,4 +568,63 @@ func TestDropMissingFields(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedEvent, processedEvent.Fields)
+}
+
+const (
+	fieldCount   = 10000
+	nestingLevel = 3
+)
+
+func BenchmarkProcessorsRun(b *testing.B) {
+	processors := processors.NewList(nil)
+	key1 := "added.field"
+	proc1 := actions.NewAddFields(mapstr.M{key1: "first"}, true, true)
+	processors.AddProcessor(proc1)
+	key2 := "field-0.field-0"
+	proc2 := actions.NewAddFields(mapstr.M{key2: "second"}, true, true)
+	processors.AddProcessor(proc2)
+
+	event := &beat.Event{
+		Timestamp: time.Now(),
+		Meta:      mapstr.M{},
+		Fields:    mapstr.M{},
+	}
+
+	generateFields(b, event.Meta, 100, 2)
+	generateFields(b, event.Fields, 100, 2)
+
+	var (
+		processed *beat.Event
+		err       error
+	)
+
+	b.Run("processors.Run", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			processed, err = processors.Run(event)
+			require.NoError(b, err)
+			require.NotNil(b, processed)
+		}
+	})
+
+	added, err := processed.GetValue(key1)
+	require.NoError(b, err)
+	require.Equal(b, "first", added)
+
+	added, err = processed.GetValue(key2)
+	require.NoError(b, err)
+	require.Equal(b, "second", added)
+}
+
+func generateFields(t require.TestingT, m mapstr.M, count, nesting int) {
+	for i := 0; i < count; i++ {
+		var err error
+		if nesting == 0 {
+			_, err = m.Put(fmt.Sprintf("field-%d", i), fmt.Sprintf("value-%d", i))
+		} else {
+			nested := mapstr.M{}
+			generateFields(t, nested, count, nesting-1)
+			_, err = m.Put(fmt.Sprintf("field-%d", i), nested)
+		}
+		require.NoError(t, err)
+	}
 }
