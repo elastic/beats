@@ -64,6 +64,7 @@ https://github.com/elastic/beats/compare/v8.9.2\...v8.10.0[View commits]
 ==== Bugfixes
 
 *Affecting all Beats*
+
 - Improve StreamBuf append to improve performance when reading long lines from files. {pull}35928[35928]
 - Eliminate cloning of event in deepUpdate {pull}35945[35945]
 - Fix ndjson parser to store JSON fields correctly under `target` {issue}29395[29395]
