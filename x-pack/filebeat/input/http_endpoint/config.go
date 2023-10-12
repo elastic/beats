@@ -51,8 +51,6 @@ func defaultConfig() config {
 	return config{
 		Method:        http.MethodPost,
 		BasicAuth:     false,
-		Username:      "",
-		Password:      "",
 		ResponseCode:  200,
 		ResponseBody:  `{"message": "success"}`,
 		ListenAddress: "127.0.0.1",
@@ -60,14 +58,6 @@ func defaultConfig() config {
 		URL:           "/",
 		Prefix:        "json",
 		ContentType:   "application/json",
-		SecretHeader:  "",
-		SecretValue:   "",
-		HMACHeader:    "",
-		HMACKey:       "",
-		HMACType:      "",
-		HMACPrefix:    "",
-		CRCProvider:   "",
-		CRCSecret:     "",
 	}
 }
 
@@ -108,10 +98,6 @@ func (c *config) Validate() error {
 		}
 	} else if c.CRCSecret != "" {
 		return errors.New("crc.provider is required when crc.secret is defined")
-	}
-
-	if c.URL == "" {
-		return fmt.Errorf("webhook path URL can not be empty")
 	}
 
 	return nil

@@ -5,10 +5,10 @@
 package http_endpoint
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 
+	confpkg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,16 +16,16 @@ func Test_validateConfig(t *testing.T) {
 	testCases := []struct {
 		name      string // Sub-test name.
 		config    config // Load config parameters.
-		wantError error  // Expected error
+		wantError string // Expected error
 	}{
 		{
-			name: "invalid URL",
+			name: "empty URL",
 			config: config{
 				URL:          "",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
 			},
-			wantError: fmt.Errorf("webhook path URL can not be empty"),
+			wantError: "string value is not set accessing 'url'",
 		},
 		{
 			name: "invalid method",
@@ -34,27 +34,29 @@ func Test_validateConfig(t *testing.T) {
 				ResponseBody: `{"message": "success"}`,
 				Method:       "random",
 			},
-			wantError: fmt.Errorf("method must be POST, PUT or PATCH: random"),
+			wantError: "method must be POST, PUT or PATCH: random",
 		},
 		{
-			name: "invalid URL",
+			name: "invalid ResponseBody",
 			config: config{
 				URL:          "/",
 				ResponseBody: "",
 				Method:       http.MethodPost,
 			},
-			wantError: fmt.Errorf("response_body must be valid JSON"),
+			wantError: "response_body must be valid JSON",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.config.URL = ""
-			// Execute config validation
-			err := tc.config.Validate()
+			c := confpkg.MustNewConfigFrom(tc.config)
+			config := defaultConfig()
+			err := c.Unpack(&config)
 
 			// Validate responses
-			assert.Equal(t, tc.wantError, err)
+			if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), tc.wantError)
+			}
 		})
 	}
 }
