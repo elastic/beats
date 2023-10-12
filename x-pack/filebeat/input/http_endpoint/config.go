@@ -32,7 +32,7 @@ type config struct {
 	ResponseBody          string                  `config:"response_body"`
 	ListenAddress         string                  `config:"listen_address"`
 	ListenPort            string                  `config:"listen_port"`
-	URL                   string                  `config:"url"`
+	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
 	SecretHeader          string                  `config:"secret.header"`
@@ -51,8 +51,6 @@ func defaultConfig() config {
 	return config{
 		Method:        http.MethodPost,
 		BasicAuth:     false,
-		Username:      "",
-		Password:      "",
 		ResponseCode:  200,
 		ResponseBody:  `{"message": "success"}`,
 		ListenAddress: "127.0.0.1",
@@ -60,14 +58,6 @@ func defaultConfig() config {
 		URL:           "/",
 		Prefix:        "json",
 		ContentType:   "application/json",
-		SecretHeader:  "",
-		SecretValue:   "",
-		HMACHeader:    "",
-		HMACKey:       "",
-		HMACType:      "",
-		HMACPrefix:    "",
-		CRCProvider:   "",
-		CRCSecret:     "",
 	}
 }
 

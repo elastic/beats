@@ -109,6 +109,7 @@ is collected by it.
 - Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
 - Revert error introduced in {pull}35734[35734] when symlinks can't be resolved in filestream. {pull}36557[36557]
 - Fix ignoring external input configuration in `take_over: true` mode {issue}36378[36378] {pull}36395[36395]
+- Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
 
 *Heartbeat*
 
