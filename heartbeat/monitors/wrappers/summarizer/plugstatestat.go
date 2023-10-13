@@ -150,12 +150,13 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
 	curCheckDown := ssp.js.Status == monitorstate.StatusDown
-	lastStateUp := ssp.stateTracker.GetCurrentStatus(ssp.sf) == monitorstate.StatusUp
+	lastStateUpOrEmpty := ssp.stateTracker.GetCurrentStatus(ssp.sf) == monitorstate.StatusUp ||
+		ssp.stateTracker.GetCurrentStatus(ssp.sf) == monitorstate.StatusEmpty
 	hasAttemptsRemaining := ssp.js.Attempt < ssp.js.MaxAttempts
 
 	// retry if...
 	retry := curCheckDown && // the current check is down
-		lastStateUp && // we were previously up, if we were previously down we just check once
+		lastStateUpOrEmpty && // we were previously up or had no previous state, if we were previously down we just check once
 		hasAttemptsRemaining // and we are configured to actually make multiple attempts
 	// if we aren't retrying this is the final attempt
 	ssp.js.FinalAttempt = !retry
