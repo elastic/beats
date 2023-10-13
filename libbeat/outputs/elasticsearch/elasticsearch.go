@@ -105,7 +105,6 @@ func makeES(
 				Observer:         observer,
 				EscapeHTML:       esConfig.EscapeHTML,
 				Transport:        esConfig.Transport,
-				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
 			},
 			Index:              index,
 			Pipeline:           pipeline,
