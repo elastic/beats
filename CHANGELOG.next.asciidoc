@@ -113,6 +113,7 @@ is collected by it.
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix retries to trigger on a down monitor with no previous state. {pull}36842[36842]
 
 *Metricbeat*
 

@@ -60,10 +60,10 @@ func TestSummarizer(t *testing.T) {
 		{
 			"start down, transition to up",
 			2,
-			"du",
-			"du",
-			"11",
-			2,
+			"duu",
+			"duu",
+			"121",
+			3,
 			testURL,
 		},
 		{
@@ -80,7 +80,7 @@ func TestSummarizer(t *testing.T) {
 			2,
 			"dddddddd",
 			"dddddddd",
-			"11111111",
+			"12111111",
 			8,
 			testURL,
 		},
