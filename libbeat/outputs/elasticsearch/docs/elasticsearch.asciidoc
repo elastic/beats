@@ -689,6 +689,12 @@ default is `1s`.
 The maximum number of seconds to wait before attempting to connect to
 Elasticsearch after a network error. The default is `60s`.
 
+===== `idle_connection_timeout`
+
+The maximum amount of time an idle connection will remain idle before closing itself.
+Zero means no limit. The format is a Go language duration (example 60s is 60 seconds).
+The default is 0.
+
 ===== `timeout`
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.

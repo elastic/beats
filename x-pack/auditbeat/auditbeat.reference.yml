@@ -578,6 +578,11 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
+  # The maximum amount of time an idle connection will remain idle
+  # before closing itself.  Zero means no limit. The format is a Go
+  # language duration (example 60s is 60 seconds). The default is 0.
+  #idle_connection_timeout: 0
+
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
