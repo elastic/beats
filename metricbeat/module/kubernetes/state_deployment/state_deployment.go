@@ -32,6 +32,7 @@ var mapping = &p.MetricsMapping{
 		"kube_deployment_status_replicas_unavailable": p.Metric("replicas.unavailable"),
 		"kube_deployment_status_replicas_available":   p.Metric("replicas.available"),
 		"kube_deployment_spec_replicas":               p.Metric("replicas.desired"),
+		"kube_deployment_created":                     p.Metric("time.created", p.OpUnixTimestampValue()),
 		/*
 			This is how deployment_status_condition field will be exported:
 

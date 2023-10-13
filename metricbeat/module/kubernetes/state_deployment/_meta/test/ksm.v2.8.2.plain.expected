@@ -6,6 +6,9 @@
 		},
 		"MetricSetFields": {
 			"name": "local-path-provisioner",
+			"time": {
+					"created": "0001-01-01T00:00:00Z"
+			},
 			"paused": false,
 			"replicas": {
 				"available": 1,
@@ -36,6 +39,9 @@
 		},
 		"MetricSetFields": {
 			"name": "coredns",
+			"time": {
+					"created": "0001-01-01T00:00:00Z"
+			},
 			"paused": false,
 			"replicas": {
 				"available": 2,
@@ -66,6 +72,9 @@
 		},
 		"MetricSetFields": {
 			"name": "kube-state-metrics",
+			"time": {
+					"created": "0001-01-01T00:00:00Z"
+			},
 			"paused": false,
 			"replicas": {
 				"available": 1,
