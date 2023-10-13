@@ -150,8 +150,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
 	curCheckDown := ssp.js.Status == monitorstate.StatusDown
-	lastStateUpOrEmpty := ssp.stateTracker.GetCurrentStatus(ssp.sf) == monitorstate.StatusUp ||
-		ssp.stateTracker.GetCurrentStatus(ssp.sf) == monitorstate.StatusEmpty
+	lastStateUpOrEmpty := lastStatus == monitorstate.StatusUp || lastStatus == monitorstate.StatusEmpty
 	hasAttemptsRemaining := ssp.js.Attempt < ssp.js.MaxAttempts
 
 	// retry if...
@@ -175,7 +174,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
-	logp.L().Debugf("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
+	logp.L().Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		return RetryBeforeSummary
