@@ -274,21 +274,25 @@ func (r *outputReloaderMock) Reload(
 
 func TestPromoteOutputQueueSettings(t *testing.T) {
 	tests := map[string]struct {
-		input                 []byte
-		memEvents             int
-		expectValidationError bool
+		input     []byte
+		memEvents int
 	}{
-		"blank": {input: []byte(""),
-			memEvents: 4096},
-		"defaults": {input: []byte(`
+		"blank": {
+			input:     []byte(""),
+			memEvents: 4096,
+		},
+		"defaults": {
+			input: []byte(`
 name: mockbeat
 output:
   elasticsearch:
     hosts:
       - "localhost:9200"
 `),
-			memEvents: 4096},
-		"topLevelQueue": {input: []byte(`
+			memEvents: 4096,
+		},
+		"topLevelQueue": {
+			input: []byte(`
 name: mockbeat
 queue:
   mem:
@@ -298,8 +302,10 @@ output:
     hosts:
       - "localhost:9200"
 `),
-			memEvents: 8096},
-		"outputLevelQueue": {input: []byte(`
+			memEvents: 8096,
+		},
+		"outputLevelQueue": {
+			input: []byte(`
 name: mockbeat
 output:
   elasticsearch:
@@ -309,7 +315,8 @@ output:
       mem:
         events: 8096
 `),
-			memEvents: 8096},
+			memEvents: 8096,
+		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -318,10 +325,6 @@ output:
 
 			config := beatConfig{}
 			err = cfg.Unpack(&config)
-			if tc.expectValidationError {
-				require.Error(t, err)
-				return
-			}
 			require.NoError(t, err)
 
 			err = promoteOutputQueueSettings(&config)
@@ -339,18 +342,22 @@ func TestValidateBeatConfig(t *testing.T) {
 		input                 []byte
 		expectValidationError string
 	}{
-		"blank": {input: []byte(""),
+		"blank": {
+			input:                 []byte(""),
 			expectValidationError: "",
 		},
-		"defaults": {input: []byte(`
+		"defaults": {
+			input: []byte(`
 name: mockbeat
 output:
   elasticsearch:
     hosts:
       - "localhost:9200"
 `),
-			expectValidationError: ""},
-		"topAndOutputLevelQueue": {input: []byte(`
+			expectValidationError: "",
+		},
+		"topAndOutputLevelQueue": {
+			input: []byte(`
 name: mockbeat
 queue:
   mem:
@@ -363,8 +370,10 @@ output:
       mem:
         events: 8096
 `),
-			expectValidationError: "top level queue and output level queue settings defined, only one is allowed accessing config"},
-		"managementTopLevelDiskQueue": {input: []byte(`
+			expectValidationError: "top level queue and output level queue settings defined, only one is allowed accessing config",
+		},
+		"managementTopLevelDiskQueue": {
+			input: []byte(`
 name: mockbeat
 management:
   enabled: true
@@ -376,8 +385,10 @@ output:
     hosts:
       - "localhost:9200"
 `),
-			expectValidationError: "disk queue is not supported when management is enabled accessing config"},
-		"managementOutputLevelDiskQueue": {input: []byte(`
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementOutputLevelDiskQueue": {
+			input: []byte(`
 name: mockbeat
 management:
   enabled: true
@@ -389,8 +400,10 @@ output:
       disk:
         max_size: 1G
 `),
-			expectValidationError: "disk queue is not supported when management is enabled accessing config"},
-		"managementFalseOutputLevelDiskQueue": {input: []byte(`
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementFalseOutputLevelDiskQueue": {
+			input: []byte(`
 name: mockbeat
 management:
   enabled: false
@@ -402,7 +415,8 @@ output:
       disk:
         max_size: 1G
 `),
-			expectValidationError: ""},
+			expectValidationError: "",
+		},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {

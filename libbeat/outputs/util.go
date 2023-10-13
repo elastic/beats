@@ -32,6 +32,7 @@ import (
 func Fail(err error) (Group, error) { return Group{}, err }
 
 // Success create a valid output Group response for a set of client instances.
+// The first argument is expected to contain a queue config.Namespace.
 func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Group, error) {
 	var q queue.QueueFactory
 	if cfg.IsSet() && cfg.Config().Enabled() {
@@ -73,6 +74,7 @@ func NetworkClients(netclients []NetworkClient) []Client {
 }
 
 // SuccessNet create a valid output Group and creates client instances
+// The first argument is expected to contain a queue config.Namespace.
 func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
