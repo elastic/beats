@@ -219,6 +219,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
+	github.com/zeebo/xxh3 v1.0.2
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.4
 	go.elastic.co/apm/v2 v2.4.4
@@ -355,7 +356,6 @@ require (
 	github.com/xdg/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.19.0 // indirect
