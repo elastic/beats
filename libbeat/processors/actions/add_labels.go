@@ -51,7 +51,7 @@ func createAddLabels(c *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to flatten labels: %w", err)
 	}
 
-	return makeFieldsProcessor(LabelsKey, flatLabels, true), nil
+	return makeFieldsProcessor(LabelsKey, flatLabels), nil
 }
 
 // NewAddLabels creates a new processor adding the given object to events. Set
@@ -60,7 +60,7 @@ func createAddLabels(c *conf.C) (beat.Processor, error) {
 // If labels contains nested objects, NewAddLabels will flatten keys into labels by
 // by joining names with a dot ('.') .
 // The labels will be inserted into the 'labels' field.
-func NewAddLabels(labels mapstr.M, shared bool) (beat.Processor, error) {
+func NewAddLabels(labels mapstr.M) (beat.Processor, error) {
 	flatLabels, err := flattenLabels(labels)
 	if err != nil {
 		return nil, fmt.Errorf("failed to flatten labels: %w", err)
@@ -68,7 +68,7 @@ func NewAddLabels(labels mapstr.M, shared bool) (beat.Processor, error) {
 
 	return NewAddFields(mapstr.M{
 		LabelsKey: flatLabels,
-	}, shared, true), nil
+	}, true), nil
 }
 
 func flattenLabels(labels mapstr.M) (mapstr.M, error) {

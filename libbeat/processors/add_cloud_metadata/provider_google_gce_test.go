@@ -325,10 +325,11 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	event := &beat.Event{Fields: mapstr.M{}}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expected := mapstr.M{
 		"cloud": mapstr.M{
@@ -353,7 +354,8 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+	ed.Apply()
+	assert.Equal(t, expected, event.Fields)
 }
 
 func TestRetrieveGCEMetadataInK8s(t *testing.T) {
@@ -374,10 +376,11 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	event := &beat.Event{Fields: mapstr.M{}}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expected := mapstr.M{
 		"cloud": mapstr.M{
@@ -408,7 +411,8 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+	ed.Apply()
+	assert.Equal(t, expected, event.Fields)
 }
 
 func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
@@ -429,21 +433,20 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(
-		&beat.Event{
-			Fields: mapstr.M{
-				"orchestrator": mapstr.M{
-					"cluster": mapstr.M{
-						"name": "production-marketing-k8s",
-						"url":  "https://35.223.150.35",
-					},
+	event := &beat.Event{
+		Fields: mapstr.M{
+			"orchestrator": mapstr.M{
+				"cluster": mapstr.M{
+					"name": "production-marketing-k8s",
+					"url":  "https://35.223.150.35",
 				},
 			},
 		},
-	)
-	if err != nil {
-		t.Fatal(err)
 	}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expected := mapstr.M{
 		"cloud": mapstr.M{
@@ -474,7 +477,8 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+	ed.Apply()
+	assert.Equal(t, expected, event.Fields)
 }
 
 func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
@@ -495,10 +499,11 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	event := &beat.Event{Fields: mapstr.M{}}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expected := mapstr.M{
 		"cloud": mapstr.M{
@@ -528,5 +533,6 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+	ed.Apply()
+	assert.Equal(t, expected, event.Fields)
 }

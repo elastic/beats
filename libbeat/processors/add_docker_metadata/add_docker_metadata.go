@@ -133,21 +133,21 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 	}
 }
 
-func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
+func (d *addDockerMetadata) Run(event *beat.EventEditor) (dropped bool, err error) {
 	if !d.dockerAvailable {
-		return event, nil
+		return false, nil
 	}
 	var cid string
-	var err error
 
 	// Extract CID from the filepath contained in the "log.file.path" field.
 	if d.sourceProcessor != nil {
-		lfp, _ := event.Fields.GetValue("log.file.path")
+		lfp, _ := event.GetValue("log.file.path")
 		if lfp != nil {
-			event, err = d.sourceProcessor.Run(event)
+			// should never drop events
+			_, err = d.sourceProcessor.Run(event)
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
-				return event, nil
+				return false, nil
 			}
 
 			if v, err := event.GetValue(dockerContainerIDKey); err == nil {
@@ -160,7 +160,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if cid == "" && len(d.pidFields) > 0 {
 		id, err := d.lookupContainerIDByPID(event)
 		if err != nil {
-			return nil, fmt.Errorf("error reading container ID: %w", err)
+			return true, fmt.Errorf("error reading container ID: %w", err)
 		}
 		if id != "" {
 			cid = id
@@ -184,7 +184,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	if cid == "" {
-		return event, nil
+		return false, nil
 	}
 
 	container := d.watcher.Container(cid)
@@ -207,12 +207,13 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		_, _ = meta.Put("container.id", container.ID)
 		_, _ = meta.Put("container.image.name", container.Image)
 		_, _ = meta.Put("container.name", container.Name)
-		event.Fields.DeepUpdate(meta.Clone())
+
+		event.DeepUpdate(meta.Clone())
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
 	}
 
-	return event, nil
+	return false, nil
 }
 
 func (d *addDockerMetadata) Close() error {
@@ -237,7 +238,7 @@ func (d *addDockerMetadata) String() string {
 
 // lookupContainerIDByPID finds the container ID based on PID fields contained
 // in the event.
-func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, error) {
+func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.EventEditor) (string, error) {
 	var cgroups cgroup.PathList
 	for _, field := range d.pidFields {
 		v, err := event.GetValue(field)

@@ -36,6 +36,7 @@ func TestTruncateFields(t *testing.T) {
 		Input        mapstr.M
 		Output       mapstr.M
 		ShouldError  bool
+		ExpErrMsg    string
 		TruncateFunc truncater
 	}{
 		"truncate bytes of too long string line": {
@@ -97,6 +98,7 @@ func TestTruncateFields(t *testing.T) {
 				"message": 42,
 			},
 			ShouldError:  true,
+			ExpErrMsg:    `[processor=truncate_fields=messagemax_bytes=5] [field="message"] Failed to truncate field: value cannot be truncated: 42`,
 			TruncateFunc: (*truncateFields).truncateBytes,
 		},
 		"do not truncate characters of short byte line": {
@@ -168,14 +170,21 @@ func TestTruncateFields(t *testing.T) {
 				Fields: test.Input,
 			}
 
-			newEvent, err := p.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := p.Run(ed)
 			if test.ShouldError {
 				assert.Error(t, err)
+				if test.ExpErrMsg != "" {
+					assert.Equal(t, test.ExpErrMsg, err.Error())
+				}
+				ed.Reset()
 			} else {
 				assert.NoError(t, err)
+				ed.Apply()
 			}
-
-			assert.Equal(t, test.Output, newEvent.Fields)
+			assert.False(t, dropped)
+			ed.Apply()
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 
@@ -207,10 +216,13 @@ func TestTruncateFields(t *testing.T) {
 			"message": "too",
 		}
 
-		newEvent, err := p.Run(event)
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err)
+		assert.False(t, dropped)
 
-		assert.Equal(t, expFields, newEvent.Fields)
-		assert.Equal(t, expMeta, newEvent.Meta)
+		ed.Apply()
+		assert.Equal(t, expFields, event.Fields)
+		assert.Equal(t, expMeta, event.Meta)
 	})
 }

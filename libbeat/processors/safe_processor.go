@@ -34,9 +34,9 @@ type SafeProcessor struct {
 }
 
 // Run allows to run processor only when `Close` was not called prior
-func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (p *SafeProcessor) Run(event *beat.EventEditor) (dropped bool, err error) {
 	if atomic.LoadUint32(&p.closed) == 1 {
-		return nil, ErrClosed
+		return true, ErrClosed
 	}
 	return p.Processor.Run(event)
 }

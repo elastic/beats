@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
 )
 
 var log = logp.NewLogger("append_test")
@@ -174,7 +175,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 				config: tt.fields.config,
 				logger: tt.fields.logger,
 			}
-			if err := f.appendValues(tt.args.target, tt.args.fields, tt.args.values, tt.args.event); (err != nil) != tt.wantErr {
+			if err := f.appendValues(tt.args.target, tt.args.fields, tt.args.values, beat.NewEventEditor(tt.args.event)); (err != nil) != tt.wantErr {
 				t.Errorf("appendProcessor.appendValues() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -195,6 +196,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 		args        args
 		want        *beat.Event
 		wantErr     bool
+		wantErrMsg  string
 	}{
 		{
 			description: "positive flow",
@@ -378,14 +380,11 @@ func Test_appendProcessor_Run(t *testing.T) {
 					Fields: mapstr.M{},
 				},
 			},
-			wantErr: true,
+			wantErr:    true,
+			wantErrMsg: "[processor=append=target] failed to append fields in append processor: could not fetch value for key: missing-field, Error: key not found",
 			want: &beat.Event{
-				Meta: mapstr.M{},
-				Fields: mapstr.M{
-					"error": mapstr.M{
-						"message": "failed to append fields in append processor: could not fetch value for key: missing-field, Error: key not found",
-					},
-				},
+				Meta:   mapstr.M{},
+				Fields: mapstr.M{},
 			},
 		},
 	}
@@ -395,14 +394,17 @@ func Test_appendProcessor_Run(t *testing.T) {
 				config: tt.fields.config,
 				logger: tt.fields.logger,
 			}
-			got, err := f.Run(tt.args.event)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("appendProcessor.Run() error = %v, wantErr %v", err, tt.wantErr)
+			ed := beat.NewEventEditor(tt.args.event)
+			_, err := f.Run(ed)
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.wantErrMsg != "" {
+					assert.Equal(t, tt.wantErrMsg, err.Error())
+				}
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("appendProcessor.Run() = %v, want %v", got, tt.want)
-			}
+			ed.Apply()
+			assert.Equal(t, tt.want, tt.args.event)
 		})
 	}
 }

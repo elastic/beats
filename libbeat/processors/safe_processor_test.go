@@ -32,9 +32,9 @@ type mockProcessor struct {
 	runCount int
 }
 
-func (p *mockProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (p *mockProcessor) Run(event *beat.EventEditor) (bool, error) {
 	p.runCount++
-	return mockEvent, nil
+	return false, nil
 }
 
 func (p *mockProcessor) String() string {
@@ -100,12 +100,13 @@ func TestSafeProcessor(t *testing.T) {
 	t.Run("propagates Run to a processor", func(t *testing.T) {
 		require.Equal(t, 0, p.runCount)
 
-		e, err := sp.Run(nil)
+		dropped, err := sp.Run(nil)
 		require.NoError(t, err)
-		require.Equal(t, e, mockEvent)
-		e, err = sp.Run(nil)
+		require.False(t, dropped)
+
+		dropped, err = sp.Run(nil)
 		require.NoError(t, err)
-		require.Equal(t, e, mockEvent)
+		require.False(t, dropped)
 
 		require.Equal(t, 2, p.runCount)
 	})
@@ -123,8 +124,8 @@ func TestSafeProcessor(t *testing.T) {
 
 	t.Run("does not propagate Run when closed", func(t *testing.T) {
 		require.Equal(t, 2, p.runCount) // still 2 from the previous test case
-		e, err := sp.Run(nil)
-		require.Nil(t, e)
+		dropped, err := sp.Run(nil)
+		require.True(t, dropped)
 		require.ErrorIs(t, err, ErrClosed)
 		require.Equal(t, 2, p.runCount)
 	})

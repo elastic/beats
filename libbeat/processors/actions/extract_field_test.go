@@ -91,21 +91,18 @@ func TestCommonPaths(t *testing.T) {
 			test.Field: test.Value,
 		}
 
-		event, err := runExtractField(t, testConfig, input)
+		event, dropped, err := runExtractField(t, testConfig, input)
 		if test.Error {
 			assert.Error(t, err)
 		} else {
-
 			assert.NoError(t, err)
-			result, err := event.Fields.GetValue(test.Target)
+			result, err := event.GetValue(test.Target)
 			if err != nil {
 				t.Fatalf("could not get target field: %s", err)
 			}
 			assert.Equal(t, result.(string), test.Result)
 		}
-
-		// Event must be present, even on error
-		assert.NotNil(t, event)
+		assert.False(t, dropped)
 	}
 
 	t.Run("supports a metadata field", func(t *testing.T) {
@@ -135,14 +132,17 @@ func TestCommonPaths(t *testing.T) {
 			t.Fatalf("error initializing extract_field: %s", err)
 		}
 
-		newEvent, err := p.Run(event)
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedFields, newEvent.Fields)
-		assert.Equal(t, expectedMeta, newEvent.Meta)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, expectedFields, event.Fields)
+		assert.Equal(t, expectedMeta, event.Meta)
 	})
 }
 
-func runExtractField(t *testing.T, config *conf.C, input mapstr.M) (*beat.Event, error) {
+func runExtractField(t *testing.T, config *conf.C, input mapstr.M) (event *beat.Event, dropped bool, err error) {
 	logp.TestingSetup()
 
 	p, err := NewExtractField(config)
@@ -150,5 +150,9 @@ func runExtractField(t *testing.T, config *conf.C, input mapstr.M) (*beat.Event,
 		t.Fatalf("error initializing extract_field: %s", err)
 	}
 
-	return p.Run(&beat.Event{Fields: input})
+	event = &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err = p.Run(ed)
+	ed.Apply()
+	return event, dropped, err
 }

@@ -94,10 +94,11 @@ func assertOpenstackNova(t *testing.T, config *conf.C) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	event := &beat.Event{Fields: mapstr.M{}}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expected := mapstr.M{
 		"cloud": mapstr.M{
@@ -115,5 +116,6 @@ func assertOpenstackNova(t *testing.T, config *conf.C) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+	ed.Apply()
+	assert.Equal(t, expected, event.Fields)
 }

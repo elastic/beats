@@ -117,7 +117,7 @@ func TestDeepUpdate(t *testing.T) {
 			name:  "updates timestamp",
 			event: newEvent(mapstr.M{}),
 			update: mapstr.M{
-				timestampFieldKey: ts,
+				TimestampFieldKey: ts,
 			},
 			mode: updateModeOverwrite,
 			expected: &Event{
@@ -133,7 +133,7 @@ func TestDeepUpdate(t *testing.T) {
 				"Timestamp": ts,
 			}),
 			update: mapstr.M{
-				timestampFieldKey: time.Now().Add(time.Hour),
+				TimestampFieldKey: time.Now().Add(time.Hour),
 			},
 			mode: updateModeNoOverwrite,
 			expected: &Event{
@@ -147,7 +147,7 @@ func TestDeepUpdate(t *testing.T) {
 			name:  "initializes metadata if nil",
 			event: newEvent(mapstr.M{}),
 			update: mapstr.M{
-				metadataFieldKey: mapstr.M{
+				MetadataFieldKey: mapstr.M{
 					"first":  "new",
 					"second": 42,
 				},
@@ -170,7 +170,7 @@ func TestDeepUpdate(t *testing.T) {
 				},
 			}),
 			update: mapstr.M{
-				metadataFieldKey: mapstr.M{
+				MetadataFieldKey: mapstr.M{
 					"first":  "new",
 					"second": 42,
 				},
@@ -194,7 +194,7 @@ func TestDeepUpdate(t *testing.T) {
 				},
 			}),
 			update: mapstr.M{
-				metadataFieldKey: mapstr.M{
+				MetadataFieldKey: mapstr.M{
 					"first":  "new",
 					"second": 42,
 				},

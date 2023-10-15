@@ -60,17 +60,18 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 			if test.eventMeta != nil {
 				current.Meta = test.eventMeta.Clone()
 			}
+			ed := beat.NewEventEditor(current)
 			for i, processor := range ps {
 				var err error
-				current, err = processor.Run(current)
+				dropped, err := processor.Run(ed)
 				if err != nil {
 					t.Fatal(err)
 				}
-				if current == nil {
+				if dropped {
 					t.Fatalf("Event dropped(%v)", i)
 				}
 			}
-
+			ed.Apply()
 			assert.Equal(t, test.wantFields, current.Fields)
 			assert.Equal(t, test.wantMeta, current.Meta)
 		})

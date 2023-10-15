@@ -49,6 +49,7 @@ func TestEventEditor(t *testing.T) {
 	event := &Event{
 		Timestamp: time.Now(),
 		Meta: mapstr.M{
+			"a.b":             "c",
 			"metaLevel0Map":   metadataNestedMap,
 			"metaLevel0Value": "metavalue1",
 			// this key should never be edited by the tests
@@ -58,6 +59,7 @@ func TestEventEditor(t *testing.T) {
 			"metaUntouchedMap": metaUntouchedMap,
 		},
 		Fields: mapstr.M{
+			"a.b":               "c",
 			"fieldsLevel0Map":   fieldsNestedMap,
 			"fieldsLevel0Value": "fieldsvalue1",
 			// this key should never be edited by the tests
@@ -69,25 +71,56 @@ func TestEventEditor(t *testing.T) {
 	}
 
 	t.Run("rootKey", func(t *testing.T) {
+		event := event.Clone()
+		event.Meta["some.dot.metakey"] = mapstr.M{
+			"that.should": mapstr.M{
+				"be": "supported",
+			},
+		}
+		event.Fields["some.dot.key"] = mapstr.M{
+			"that.should": mapstr.M{
+				"be": "supported",
+			},
+		}
 		cases := []struct {
 			val string
 			exp string
 		}{
 			{
-				val: "@metadata.some",
-				exp: "@metadata.some",
+				val: "@metadata.a.b",
+				exp: "@metadata.a.b",
 			},
 			{
-				val: "@metadata.some.nested",
-				exp: "@metadata.some",
+				val: "@metadata.metaLevel0Value",
+				exp: "@metadata.metaLevel0Value",
 			},
 			{
-				val: "some.nested.key",
-				exp: "some",
+				val: "@metadata.metaLevel0Map.metaLevel1Map",
+				exp: "@metadata.metaLevel0Map",
 			},
 			{
-				val: "key",
-				exp: "key",
+				val: "@metadata.some.dot.metakey.that.should.be",
+				exp: "@metadata.some.dot.metakey",
+			},
+			{
+				val: "a.b",
+				exp: "a.b",
+			},
+			{
+				val: "fieldsLevel0Map.fieldsLevel1Value",
+				exp: "fieldsLevel0Map",
+			},
+			{
+				val: "fieldsLevel0Map.fieldsLevel1Map.fieldsLevel2Value",
+				exp: "fieldsLevel0Map",
+			},
+			{
+				val: "fieldsLevel0Value",
+				exp: "fieldsLevel0Value",
+			},
+			{
+				val: "some.dot.key.that.should.be",
+				exp: "some.dot.key",
 			},
 		}
 
@@ -196,6 +229,13 @@ func TestEventEditor(t *testing.T) {
 				})
 			})
 
+			t.Run("gets a root-level dot-key", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				requireMapValues(t, editor, map[string]interface{}{
+					"@metadata.a.b": "c",
+				})
+			})
+
 			t.Run("gets a nested map", func(t *testing.T) {
 				editor := NewEventEditor(event)
 				nested, err := editor.GetValue("@metadata.metaLevel0Map")
@@ -246,6 +286,13 @@ func TestEventEditor(t *testing.T) {
 				editor := NewEventEditor(event)
 				requireMapValues(t, editor, map[string]interface{}{
 					"fieldsLevel0Value": "fieldsvalue1",
+				})
+			})
+
+			t.Run("gets a root-level dot-key", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				requireMapValues(t, editor, map[string]interface{}{
+					"a.b": "c",
 				})
 			})
 
@@ -320,6 +367,29 @@ func TestEventEditor(t *testing.T) {
 				editor := NewEventEditor(event)
 				key := "@metadata.metaLevel0Value"
 				value := "metavalue1"
+
+				val1, err := editor.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val1)
+
+				err = editor.Delete(key)
+				require.NoError(t, err)
+
+				val2, err := editor.GetValue(key)
+				require.Error(t, err)
+				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
+				require.Nil(t, val2)
+
+				// checking if the original event still has it
+				val3, err := event.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val3)
+			})
+
+			t.Run("root-level dot-key", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				key := "@metadata.a.b"
+				value := "c"
 
 				val1, err := editor.GetValue(key)
 				require.NoError(t, err)
@@ -433,6 +503,29 @@ func TestEventEditor(t *testing.T) {
 				editor := NewEventEditor(event)
 				key := "fieldsLevel0Value"
 				value := "fieldsvalue1"
+
+				val1, err := editor.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val1)
+
+				err = editor.Delete(key)
+				require.NoError(t, err)
+
+				val2, err := editor.GetValue(key)
+				require.Error(t, err)
+				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
+				require.Nil(t, val2)
+
+				// checking if the original event still has it
+				val3, err := event.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val3)
+			})
+
+			t.Run("root-level dot-key", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				key := "a.b"
+				value := "c"
 
 				val1, err := editor.GetValue(key)
 				require.NoError(t, err)
@@ -595,7 +688,27 @@ func TestEventEditor(t *testing.T) {
 				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 			})
 
-			t.Run("new nested value", func(t *testing.T) {
+			t.Run("existing root-level dot-key", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				key := "@metadata.a.b"
+				value := mapstr.M{
+					"some": "value",
+				}
+				prevVal, err := editor.PutValue(key, value)
+				require.NoError(t, err)
+				require.Equal(t, "c", prevVal)
+
+				val, err := editor.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val)
+
+				// the original event should have the previous value
+				val, err = event.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, "c", val)
+			})
+
+			t.Run("new nested value in existing map", func(t *testing.T) {
 				editor := NewEventEditor(event)
 				key := "@metadata.metaLevel0Map.metaLevel1Map.new"
 				value := "newvalue"
@@ -617,6 +730,25 @@ func TestEventEditor(t *testing.T) {
 				val, err = editor.GetValue("@metadata.metaLevel0Map")
 				require.NoError(t, err)
 				requireNotSameMap(t, metadataNestedMap, val)
+			})
+
+			t.Run("absolutely new nested value", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				key := "@metadata.new1.new2.new3"
+				value := "newvalue"
+
+				prevVal, err := editor.PutValue(key, value)
+				require.NoError(t, err)
+				require.Nil(t, prevVal)
+
+				val, err := editor.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val)
+
+				// the original event should not have it
+				_, err = event.GetValue(key)
+				require.Error(t, err)
+				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 			})
 
 			t.Run("new nested map", func(t *testing.T) {
@@ -710,7 +842,27 @@ func TestEventEditor(t *testing.T) {
 				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 			})
 
-			t.Run("new nested value", func(t *testing.T) {
+			t.Run("existing root-level dot-key", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				key := "a.b"
+				value := mapstr.M{
+					"some": "value",
+				}
+				prevVal, err := editor.PutValue(key, value)
+				require.NoError(t, err)
+				require.Equal(t, "c", prevVal)
+
+				val, err := editor.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val)
+
+				// the original event should have the previous value
+				val, err = event.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, "c", val)
+			})
+
+			t.Run("new nested value in existing map", func(t *testing.T) {
 				editor := NewEventEditor(event)
 				key := "fieldsLevel0Map.fieldsLevel1Map.new"
 				value := "newvalue"
@@ -731,7 +883,26 @@ func TestEventEditor(t *testing.T) {
 				// the original `fieldsLevel0Map` should be cloned/checkedout now
 				val, err = editor.GetValue("fieldsLevel0Map")
 				require.NoError(t, err)
-				requireNotSameMap(t, metadataNestedMap, val)
+				requireNotSameMap(t, fieldsNestedMap, val)
+			})
+
+			t.Run("absolutely new nested value", func(t *testing.T) {
+				editor := NewEventEditor(event)
+				key := "new1.new2.new3"
+				value := "newvalue"
+
+				prevVal, err := editor.PutValue(key, value)
+				require.NoError(t, err)
+				require.Nil(t, prevVal)
+
+				val, err := editor.GetValue(key)
+				require.NoError(t, err)
+				require.Equal(t, value, val)
+
+				// the original event should not have it
+				_, err = event.GetValue(key)
+				require.Error(t, err)
+				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 			})
 
 			t.Run("new nested map", func(t *testing.T) {
@@ -785,6 +956,27 @@ func TestEventEditor(t *testing.T) {
 				requireNotSameMap(t, fieldsNestedMap, val)
 			})
 		})
+
+		t.Run("type conflict", func(t *testing.T) {
+			event := &Event{
+				Meta: mapstr.M{
+					"a": 9,
+					"c": 10,
+				},
+				Fields: mapstr.M{
+					"a": 9,
+					"c": 10,
+				},
+			}
+
+			editor := NewEventEditor(event)
+			_, err := editor.PutValue("a.c", 10)
+			require.Error(t, err)
+			require.Equal(t, "expected map but type is int", err.Error())
+			_, err = editor.PutValue("a.value", 9)
+			require.Error(t, err)
+			require.Equal(t, "expected map but type is int", err.Error())
+		})
 	})
 
 	t.Run("Apply", func(t *testing.T) {
@@ -836,6 +1028,7 @@ func TestEventEditor(t *testing.T) {
 		expEvent := &Event{
 			Timestamp: newTs,
 			Meta: mapstr.M{
+				"a.b": "c",
 				"metaLevel0Map": mapstr.M{
 					"metaLevel1Map": mapstr.M{
 						"new1": "newmetavalue1",
@@ -847,6 +1040,7 @@ func TestEventEditor(t *testing.T) {
 				"metaUntouchedMap": metaUntouchedMap,
 			},
 			Fields: mapstr.M{
+				"a.b": "c",
 				"fieldsLevel0Map": mapstr.M{
 					"fieldsLevel1Map": mapstr.M{
 						"new3": "newfieldsvalue1",
@@ -983,6 +1177,7 @@ func TestEventEditor(t *testing.T) {
 			expEvent := &Event{
 				Timestamp: newTs,
 				Meta: mapstr.M{
+					"a.b": "c",
 					"metaLevel0Map": mapstr.M{
 						"metaLevel1Map": mapstr.M{
 							"metaLevel2Value": "metavalue3",
@@ -995,6 +1190,7 @@ func TestEventEditor(t *testing.T) {
 					"metaUntouchedMap": metaUntouchedMap,
 				},
 				Fields: mapstr.M{
+					"a.b": "c",
 					"fieldsLevel0Map": mapstr.M{
 						"fieldsLevel1Map": mapstr.M{
 							"fieldsLevel2Value": "fieldsvalue3",
@@ -1032,6 +1228,7 @@ func TestEventEditor(t *testing.T) {
 				// should have the original/non-overwritten timestamp value
 				Timestamp: event.Timestamp,
 				Meta: mapstr.M{
+					"a.b": "c",
 					"metaLevel0Map": mapstr.M{
 						"metaLevel1Map": mapstr.M{
 							"metaLevel2Value": "metavalue3",
@@ -1044,6 +1241,7 @@ func TestEventEditor(t *testing.T) {
 					"metaUntouchedMap": metaUntouchedMap,
 				},
 				Fields: mapstr.M{
+					"a.b": "c",
 					"fieldsLevel0Map": mapstr.M{
 						"fieldsLevel1Map": mapstr.M{
 							"fieldsLevel2Value": "fieldsvalue3",
@@ -1071,6 +1269,32 @@ func TestEventEditor(t *testing.T) {
 			requireClonedMaps(t, expEvent.Meta, cloned.Meta)
 			requireClonedMaps(t, expEvent.Fields, cloned.Fields)
 		})
+	})
+
+	t.Run("hierarchy", func(t *testing.T) {
+		event := &Event{
+			Fields: mapstr.M{
+				"a.b": 1,
+			},
+		}
+		editor := NewEventEditor(event)
+		err := editor.Delete("a.b")
+		require.NoError(t, err)
+
+		prev, err := editor.PutValue("a.b.c", 1)
+		require.NoError(t, err)
+		require.Nil(t, prev)
+
+		expFields := mapstr.M{
+			"a": mapstr.M{
+				"b": mapstr.M{
+					"c": 1,
+				},
+			},
+		}
+
+		editor.Apply()
+		requireClonedMaps(t, expFields, event.Fields)
 	})
 }
 
@@ -1100,11 +1324,21 @@ func requireNotSameMap(t *testing.T, expected, actual interface{}) {
 	require.NotEqualf(t, expectedAddr, actualAddr, "should reference different maps: %s == %s", expectedAddr, actualAddr)
 }
 
-func requireMapValues(t *testing.T, e EventAccessor, expected map[string]interface{}) {
+func requireMapValues(t *testing.T, e *EventEditor, expected map[string]interface{}) {
 	t.Helper()
 	for key := range expected {
 		val, err := e.GetValue(key)
 		require.NoError(t, err)
 		require.Equal(t, expected[key], val)
+	}
+}
+
+func (e *Event) Clone() *Event {
+	return &Event{
+		Timestamp:  e.Timestamp,
+		Meta:       e.Meta.Clone(),
+		Fields:     e.Fields.Clone(),
+		Private:    e.Private,
+		TimeSeries: e.TimeSeries,
 	}
 }

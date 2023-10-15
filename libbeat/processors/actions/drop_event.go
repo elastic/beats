@@ -37,9 +37,8 @@ func newDropEvent(c *conf.C) (beat.Processor, error) {
 	return dropEventsSingleton, nil
 }
 
-func (*dropEvent) Run(_ *beat.Event) (*beat.Event, error) {
-	// return event=nil to delete the entire event
-	return nil, nil
+func (*dropEvent) Run(*beat.EventEditor) (dropped bool, err error) {
+	return true, nil
 }
 
 func (*dropEvent) String() string { return "drop_event" }

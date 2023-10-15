@@ -31,7 +31,6 @@ import (
 
 type addFields struct {
 	fields    mapstr.M
-	shared    bool
 	overwrite bool
 }
 
@@ -61,34 +60,26 @@ func CreateAddFields(c *conf.C) (beat.Processor, error) {
 	return makeFieldsProcessor(
 		optTarget(config.Target, FieldsKey),
 		config.Fields,
-		true,
 	), nil
 }
 
 // NewAddFields creates a new processor adding the given fields to events.
-// Set `shared` true if there is the chance of labels being changed/modified by
-// subsequent processors.
-func NewAddFields(fields mapstr.M, shared bool, overwrite bool) beat.Processor {
-	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
+func NewAddFields(fields mapstr.M, overwrite bool) beat.Processor {
+	return &addFields{fields: fields, overwrite: overwrite}
 }
 
-func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
+func (af *addFields) Run(event *beat.EventEditor) (dropped bool, err error) {
 	if event == nil || len(af.fields) == 0 {
-		return event, nil
-	}
-
-	fields := af.fields
-	if af.shared {
-		fields = fields.Clone()
+		return false, nil
 	}
 
 	if af.overwrite {
-		event.DeepUpdate(fields)
+		event.DeepUpdate(af.fields)
 	} else {
-		event.DeepUpdateNoOverwrite(fields)
+		event.DeepUpdateNoOverwrite(af.fields)
 	}
 
-	return event, nil
+	return false, nil
 }
 
 func (af *addFields) String() string {
@@ -103,12 +94,12 @@ func optTarget(opt *string, def string) string {
 	return *opt
 }
 
-func makeFieldsProcessor(target string, fields mapstr.M, shared bool) beat.Processor {
+func makeFieldsProcessor(target string, fields mapstr.M) beat.Processor {
 	if target != "" {
 		fields = mapstr.M{
 			target: fields,
 		}
 	}
 
-	return NewAddFields(fields, shared, true)
+	return NewAddFields(fields, true)
 }

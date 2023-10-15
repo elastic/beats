@@ -31,10 +31,12 @@ import (
 // conflicts (i.e. a common prefix where one field is an object and another
 // is a non-object), an error key is added to the event if add_error_key
 // is enabled.
-func ExpandFields(logger *logp.Logger, event *beat.Event, m mapstr.M, addErrorKey bool) {
+func ExpandFields(logger *logp.Logger, event *beat.EventEditor, m mapstr.M, addErrorKey bool) {
 	if err := expandFields(m); err != nil {
 		logger.Errorf("JSON: failed to expand fields: %s", err)
-		event.SetErrorWithOption(err.Error(), addErrorKey, "", "")
+		if addErrorKey {
+			event.AddError(beat.EventError{Message: err.Error()})
+		}
 	}
 }
 

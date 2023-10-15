@@ -66,7 +66,7 @@ func newIncludeFields(c *conf.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *includeFields) Run(event *beat.Event) (*beat.Event, error) {
+func (f *includeFields) Run(event *beat.EventEditor) (dropped bool, err error) {
 	filtered := mapstr.M{}
 	var errs []string
 
@@ -82,11 +82,15 @@ func (f *includeFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
-	event.Fields = filtered
-	if len(errs) > 0 {
-		return event, fmt.Errorf(strings.Join(errs, ", "))
+	// does not apply the changes yet, only marks
+	event.DeleteAll()
+	for key := range filtered {
+		_, _ = event.PutValue(key, filtered[key])
 	}
-	return event, nil
+	if len(errs) > 0 {
+		return false, fmt.Errorf(strings.Join(errs, ", "))
+	}
+	return false, nil
 }
 
 func (f *includeFields) String() string {

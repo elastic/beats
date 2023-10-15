@@ -77,9 +77,9 @@ func NewConditionRule(
 }
 
 // Run executes this WhenProcessor.
-func (r *WhenProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (r *WhenProcessor) Run(event *beat.EventEditor) (dropped bool, err error) {
 	if !(r.condition).Check(event) {
-		return event, nil
+		return false, nil
 	}
 	return r.p.Run(event)
 }
@@ -162,13 +162,13 @@ func NewIfElseThenProcessor(cfg *config.C) (*IfThenElseProcessor, error) {
 
 // Run checks the if condition and executes the processors attached to the
 // then statement or the else statement based on the condition.
-func (p *IfThenElseProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (p *IfThenElseProcessor) Run(event *beat.EventEditor) (dropped bool, err error) {
 	if p.cond.Check(event) {
 		return p.then.Run(event)
 	} else if p.els != nil {
 		return p.els.Run(event)
 	}
-	return event, nil
+	return false, nil
 }
 
 func (p *IfThenElseProcessor) String() string {

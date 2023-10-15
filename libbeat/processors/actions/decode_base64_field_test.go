@@ -211,14 +211,16 @@ func TestDecodeBase64Run(t *testing.T) {
 				Fields: test.Input,
 			}
 
-			newEvent, err := f.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := f.Run(ed)
 			if !test.error {
 				assert.NoError(t, err)
 			} else {
 				assert.Error(t, err)
 			}
-
-			assert.Equal(t, test.Output, newEvent.Fields)
+			assert.False(t, dropped)
+			ed.Apply()
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 
@@ -236,6 +238,7 @@ func TestDecodeBase64Run(t *testing.T) {
 				"field1": "Y29ycmVjdCBkYXRh",
 			},
 		}
+		ed := beat.NewEventEditor(event)
 
 		f := &decodeBase64Field{
 			log:    logp.NewLogger(processorName),
@@ -249,9 +252,12 @@ func TestDecodeBase64Run(t *testing.T) {
 			"field": "correct data",
 		}
 
-		newEvent, err := f.Run(event)
+		dropped, err := f.Run(ed)
+
 		assert.NoError(t, err)
-		assert.Equal(t, expectedFields, newEvent.Fields)
-		assert.Equal(t, expectedMeta, newEvent.Meta)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, expectedFields, event.Fields)
+		assert.Equal(t, expectedMeta, event.Meta)
 	})
 }

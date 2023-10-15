@@ -63,13 +63,15 @@ func TestNetworkDirection(t *testing.T) {
 				"internal_networks": tt.InternalNetworks,
 			}))
 			require.NoError(t, err)
-			observed, err := p.Run(&evt)
+			ed := beat.NewEventEditor(&evt)
+			dropped, err := p.Run(ed)
 			if tt.Error {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
+				require.False(t, dropped)
 			}
-			enriched, err := observed.Fields.GetValue("direction")
+			enriched, err := ed.GetValue("direction")
 			if tt.Direction == "" {
 				require.Error(t, err)
 			} else {
@@ -98,10 +100,14 @@ func TestNetworkDirection(t *testing.T) {
 		expectedMeta := mapstr.M{
 			"direction": "external",
 		}
+		expectedFields := evt.Fields.Clone()
 
-		observed, err := p.Run(&evt)
+		ed := beat.NewEventEditor(&evt)
+		dropped, err := p.Run(ed)
 		require.NoError(t, err)
-		require.Equal(t, expectedMeta, observed.Meta)
-		require.Equal(t, evt.Fields, observed.Fields)
+		require.False(t, dropped)
+		ed.Apply()
+		require.Equal(t, expectedMeta, evt.Meta)
+		require.Equal(t, expectedFields, evt.Fields)
 	})
 }

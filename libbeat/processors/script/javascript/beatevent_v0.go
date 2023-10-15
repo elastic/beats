@@ -36,7 +36,7 @@ import (
 type beatEventV0 struct {
 	vm        *goja.Runtime
 	obj       *goja.Object
-	inner     *beat.Event
+	inner     *beat.EventEditor
 	cancelled bool
 }
 
@@ -73,7 +73,7 @@ func newBeatEventV0Constructor(s Session) func(call goja.ConstructorCall) *goja.
 			obj: call.This,
 		}
 		evt.init()
-		evt.reset(&beat.Event{Fields: fields})
+		evt.reset(beat.NewEventEditor(&beat.Event{Fields: fields}))
 		return nil
 	}
 }
@@ -89,16 +89,15 @@ func (e *beatEventV0) init() {
 }
 
 // reset the event so that it can be reused to wrap another event.
-func (e *beatEventV0) reset(b *beat.Event) error {
-	e.inner = b
+func (e *beatEventV0) reset(ed *beat.EventEditor) error {
+	e.inner = ed
 	e.cancelled = false
 	e.obj.Set("_private", e)
-	e.obj.Set("fields", e.vm.ToValue(e.inner.Fields))
 	return nil
 }
 
-// Wrapped returns the wrapped beat.Event.
-func (e *beatEventV0) Wrapped() *beat.Event {
+// Wrapped returns the wrapped beat.EventEditor.
+func (e *beatEventV0) Wrapped() *beat.EventEditor {
 	return e.inner
 }
 
@@ -116,8 +115,8 @@ func (e *beatEventV0) JSObject() goja.Value {
 func (e *beatEventV0) get(call goja.FunctionCall) goja.Value {
 	a0 := call.Argument(0)
 	if goja.IsUndefined(a0) {
-		// event.Get() is the same as event.fields (but slower).
-		return e.vm.ToValue(e.inner.Fields)
+		// event.Get() returns the whole fields map, it's slow and expensive
+		return e.vm.ToValue(e.inner.Fields())
 	}
 
 	v, err := e.inner.GetValue(a0.String())
@@ -234,7 +233,7 @@ func (e *beatEventV0) tag(call goja.FunctionCall) goja.Value {
 
 	tag := call.Argument(0).String()
 
-	if err := appendString(e.inner.Fields, "tags", tag, true); err != nil {
+	if err := appendString(e.inner, "tags", tag, true); err != nil {
 		panic(err)
 	}
 	return goja.Undefined()
@@ -255,24 +254,24 @@ func (e *beatEventV0) appendTo(call goja.FunctionCall) goja.Value {
 	field := call.Argument(0).String()
 	value := call.Argument(1).String()
 
-	if err := appendString(e.inner.Fields, field, value, false); err != nil {
+	if err := appendString(e.inner, field, value, false); err != nil {
 		panic(err)
 	}
 	return goja.Undefined()
 }
 
-func appendString(m mapstr.M, field, value string, alwaysArray bool) error {
-	list, _ := m.GetValue(field)
+func appendString(ed *beat.EventEditor, field, value string, alwaysArray bool) error {
+	list, _ := ed.GetValue(field)
 	switch v := list.(type) {
 	case nil:
 		if alwaysArray {
-			m.Put(field, []string{value})
+			ed.PutValue(field, []string{value})
 		} else {
-			m.Put(field, value)
+			ed.PutValue(field, value)
 		}
 	case string:
 		if value != v {
-			m.Put(field, []string{v, value})
+			ed.PutValue(field, []string{v, value})
 		}
 	case []string:
 		for _, existingTag := range v {
@@ -281,7 +280,7 @@ func appendString(m mapstr.M, field, value string, alwaysArray bool) error {
 				return nil
 			}
 		}
-		m.Put(field, append(v, value))
+		ed.PutValue(field, append(v, value))
 	case []interface{}:
 		for _, existingTag := range v {
 			if value == existingTag {
@@ -289,7 +288,7 @@ func appendString(m mapstr.M, field, value string, alwaysArray bool) error {
 				return nil
 			}
 		}
-		m.Put(field, append(v, value))
+		ed.PutValue(field, append(v, value))
 	default:
 		return fmt.Errorf("unexpected type %T found for %v field", list, field)
 	}

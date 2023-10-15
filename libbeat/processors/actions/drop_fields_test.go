@@ -44,10 +44,18 @@ func TestDropFieldRun(t *testing.T) {
 			Fields: []string{"field"},
 		}
 
-		newEvent, err := p.Run(event)
+		cloned := &beat.Event{
+			Fields: event.Fields.Clone(),
+			Meta:   event.Meta.Clone(),
+		}
+		ed := beat.NewEventEditor(cloned)
+
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err)
-		assert.Equal(t, mapstr.M{}, newEvent.Fields)
-		assert.Equal(t, event.Meta, newEvent.Meta)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, mapstr.M{}, cloned.Fields)
+		assert.Equal(t, event.Meta, cloned.Meta)
 	})
 
 	t.Run("supports a metadata field", func(t *testing.T) {
@@ -55,10 +63,18 @@ func TestDropFieldRun(t *testing.T) {
 			Fields: []string{"@metadata.meta_field"},
 		}
 
-		newEvent, err := p.Run(event)
+		cloned := &beat.Event{
+			Fields: event.Fields.Clone(),
+			Meta:   event.Meta.Clone(),
+		}
+		ed := beat.NewEventEditor(cloned)
+
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err)
-		assert.Equal(t, mapstr.M{}, newEvent.Meta)
-		assert.Equal(t, event.Fields, newEvent.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, mapstr.M{}, cloned.Meta)
+		assert.Equal(t, event.Fields, cloned.Fields)
 	})
 
 	t.Run("supports a regexp field", func(t *testing.T) {
@@ -80,17 +96,28 @@ func TestDropFieldRun(t *testing.T) {
 		}
 
 		p := dropFields{
-			RegexpFields: []match.Matcher{match.MustCompile("field_2$"), match.MustCompile("field_1\\.(.*)\\.subfield_2_1"), match.MustCompile("field_1\\.subfield_3(.*)")},
-			Fields:       []string{},
+			RegexpFields: []match.Matcher{
+				match.MustCompile("field_2$"),
+				match.MustCompile("field_1\\.(.*)\\.subfield_2_1"),
+				match.MustCompile("field_1\\.subfield_3(.*)"),
+			},
+			Fields: []string{},
 		}
 
-		newEvent, err := p.Run(event)
-		assert.NoError(t, err)
-		assert.Equal(t, mapstr.M{
+		expFields := mapstr.M{
 			"field_1": mapstr.M{
 				"subfield_1": "sf_1_value",
 			},
-		}, newEvent.Fields)
+		}
+
+		ed := beat.NewEventEditor(event)
+
+		dropped, err := p.Run(ed)
+		assert.NoError(t, err)
+		assert.False(t, dropped)
+		ed.Apply()
+
+		assert.Equal(t, expFields, event.Fields)
 	})
 }
 

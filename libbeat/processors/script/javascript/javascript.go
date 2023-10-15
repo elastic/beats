@@ -164,31 +164,28 @@ func annotateError(id string, err error) error {
 
 // Run executes the processor on the given it event. It invokes the
 // process function defined in the Javascript source.
-func (p *jsProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (p *jsProcessor) Run(event *beat.EventEditor) (dropped bool, err error) {
 	s := p.sessionPool.Get()
 	defer p.sessionPool.Put(s)
 
-	var rtn *beat.Event
-	var err error
-
 	if p.stats == nil {
-		rtn, err = s.runProcessFunc(event)
+		dropped, err = s.runProcessFunc(event)
 	} else {
-		rtn, err = p.runWithStats(s, event)
+		dropped, err = p.runWithStats(s, event)
 	}
-	return rtn, annotateError(p.Tag, err)
+	return dropped, annotateError(p.Tag, err)
 }
 
-func (p *jsProcessor) runWithStats(s *session, event *beat.Event) (*beat.Event, error) {
+func (p *jsProcessor) runWithStats(s *session, event *beat.EventEditor) (dropped bool, err error) {
 	start := time.Now()
-	event, err := s.runProcessFunc(event)
+	dropped, err = s.runProcessFunc(event)
 	elapsed := time.Since(start)
 
 	p.stats.processTime.Update(int64(elapsed))
 	if err != nil {
 		p.stats.exceptions.Inc()
 	}
-	return event, err
+	return dropped, err
 }
 
 func (p *jsProcessor) String() string {

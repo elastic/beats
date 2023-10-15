@@ -158,22 +158,31 @@ func (procs *Processors) Close() error {
 	return errs.Err()
 }
 
-// Run executes the all processors serially and returns the event and possibly
-// an error. If the event has been dropped (canceled) by a processor in the
-// list then a nil event is returned.
-func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
-	var err error
+// Run executes all processors from the list serially and applies changes of each
+// successfully run processor to the event through the event editor.
+// If one of the processors drops the event, this processor also returns `dropped=true` and no error.
+func (procs *Processors) Run(event *beat.EventEditor) (dropped bool, err error) {
 	for _, p := range procs.List {
-		event, err = p.Run(event)
+		dropped, err = p.Run(event)
+		if dropped {
+			return dropped, err
+		}
 		if err != nil {
-			return event, fmt.Errorf("failed applying processor %v: %w", p, err)
+			// if the processor returns an error
+			// most-likely the changes are incomplete and we don't want
+			// them to be applied to the event.
+			event.Reset()
+			// however, we want to document the error if the processor returned an `EventError`
+			ee, isEventError := err.(beat.EventError)
+			if isEventError {
+				event.AddError(ee)
+				event.Apply()
+			}
+			return dropped, fmt.Errorf("failed applying processor %s: %w", p.String(), err)
 		}
-		if event == nil {
-			// Drop.
-			return nil, nil
-		}
+		event.Apply()
 	}
-	return event, nil
+	return false, nil
 }
 
 func (procs Processors) String() string {

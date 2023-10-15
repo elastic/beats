@@ -128,9 +128,9 @@ func TestIncludeFields(t *testing.T) {
 			"type": "process",
 		},
 	}
-
-	processedEvent, err := processors.Run(event)
-	if err != nil {
+	ed := beat.NewEventEditor(event)
+	dropped, err := processors.Run(ed)
+	if err != nil || dropped {
 		t.Fatal(err)
 	}
 
@@ -148,8 +148,8 @@ func TestIncludeFields(t *testing.T) {
 		},
 		"type": "process",
 	}
-
-	assert.Equal(t, expectedEvent, processedEvent.Fields)
+	ed.Apply()
+	assert.Equal(t, expectedEvent, event.Fields)
 }
 
 func TestIncludeFields1(t *testing.T) {
@@ -198,13 +198,14 @@ func TestIncludeFields1(t *testing.T) {
 		},
 	}
 
-	processedEvent, _ := processors.Run(event)
+	ed := beat.NewEventEditor(event)
+	_, _ = processors.Run(ed)
 
 	expectedEvent := mapstr.M{
 		"type": "process",
 	}
-
-	assert.Equal(t, expectedEvent, processedEvent.Fields)
+	ed.Apply()
+	assert.Equal(t, expectedEvent, event.Fields)
 }
 
 func TestDropFields(t *testing.T) {
@@ -216,7 +217,7 @@ func TestDropFields(t *testing.T) {
 						"beat.hostname": "mar",
 					},
 				},
-				"fields": []string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat", "dd"},
+				"fields": []string{"proc.cpu.start_time", "mem", "proc.cmdline", "beat"},
 			},
 		},
 	}
@@ -251,7 +252,10 @@ func TestDropFields(t *testing.T) {
 		},
 	}
 
-	processedEvent, _ := processors.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := processors.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expectedEvent := mapstr.M{
 		"proc": mapstr.M{
@@ -265,7 +269,7 @@ func TestDropFields(t *testing.T) {
 		"type": "process",
 	}
 
-	assert.Equal(t, expectedEvent, processedEvent.Fields)
+	assert.Equal(t, expectedEvent, event.Fields)
 }
 
 func TestMultipleIncludeFields(t *testing.T) {
@@ -294,7 +298,6 @@ func TestMultipleIncludeFields(t *testing.T) {
 	event1 := &beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
-			"@timestamp": "2016-01-24T18:35:19.308Z",
 			"beat": mapstr.M{
 				"hostname": "mar",
 				"name":     "my-shipper-1",
@@ -358,11 +361,13 @@ func TestMultipleIncludeFields(t *testing.T) {
 		"type": "process",
 	}
 
-	actual1, _ := processors.Run(event1)
-	actual2, _ := processors.Run(event2)
+	ed1 := beat.NewEventEditor(event1)
+	ed2 := beat.NewEventEditor(event2)
+	_, _ = processors.Run(ed1)
+	_, _ = processors.Run(ed2)
 
-	assert.Equal(t, expected1, actual1.Fields)
-	assert.Equal(t, expected2, actual2.Fields)
+	assert.Equal(t, expected1, event1.Fields)
+	assert.Equal(t, expected2, event2.Fields)
 }
 
 func TestDropEvent(t *testing.T) {
@@ -412,9 +417,10 @@ func TestDropEvent(t *testing.T) {
 		},
 	}
 
-	processedEvent, _ := processors.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, _ := processors.Run(ed)
 
-	assert.Nil(t, processedEvent)
+	assert.True(t, dropped)
 }
 
 func TestEmptyCondition(t *testing.T) {
@@ -456,9 +462,10 @@ func TestEmptyCondition(t *testing.T) {
 		},
 	}
 
-	processedEvent, _ := processors.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, _ := processors.Run(ed)
 
-	assert.Nil(t, processedEvent)
+	assert.True(t, dropped)
 }
 
 func TestBadCondition(t *testing.T) {
@@ -523,7 +530,8 @@ func TestDropMissingFields(t *testing.T) {
 	yml := []map[string]interface{}{
 		{
 			"drop_fields": map[string]interface{}{
-				"fields": []string{"foo.bar", "proc.cpu", "proc.sss", "beat", "mem"},
+				"ignore_missing": true,
+				"fields":         []string{"foo.bar", "proc.cpu", "proc.sss", "beat", "mem"},
 			},
 		},
 	}
@@ -558,7 +566,10 @@ func TestDropMissingFields(t *testing.T) {
 		},
 	}
 
-	processedEvent, _ := processors.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := processors.Run(ed)
+	assert.False(t, dropped)
+	assert.NoError(t, err)
 
 	expectedEvent := mapstr.M{
 		"proc": mapstr.M{
@@ -567,7 +578,7 @@ func TestDropMissingFields(t *testing.T) {
 		"type": "process",
 	}
 
-	assert.Equal(t, expectedEvent, processedEvent.Fields)
+	assert.Equal(t, expectedEvent, event.Fields)
 }
 
 const (
@@ -578,10 +589,10 @@ const (
 func BenchmarkProcessorsRun(b *testing.B) {
 	processors := processors.NewList(nil)
 	key1 := "added.field"
-	proc1 := actions.NewAddFields(mapstr.M{key1: "first"}, true, true)
+	proc1 := actions.NewAddFields(mapstr.M{key1: "first"}, true)
 	processors.AddProcessor(proc1)
 	key2 := "field-0.field-0"
-	proc2 := actions.NewAddFields(mapstr.M{key2: "second"}, true, true)
+	proc2 := actions.NewAddFields(mapstr.M{key2: "second"}, true)
 	processors.AddProcessor(proc2)
 
 	event := &beat.Event{
@@ -593,24 +604,26 @@ func BenchmarkProcessorsRun(b *testing.B) {
 	generateFields(b, event.Meta, 100, 2)
 	generateFields(b, event.Fields, 100, 2)
 
+	ed := beat.NewEventEditor(event)
+
 	var (
-		processed *beat.Event
-		err       error
+		dropped bool
+		err     error
 	)
 
 	b.Run("processors.Run", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			processed, err = processors.Run(event)
+			dropped, err = processors.Run(ed)
 			require.NoError(b, err)
-			require.NotNil(b, processed)
+			require.False(b, dropped)
 		}
 	})
 
-	added, err := processed.GetValue(key1)
+	added, err := ed.GetValue(key1)
 	require.NoError(b, err)
 	require.Equal(b, "first", added)
 
-	added, err = processed.GetValue(key2)
+	added, err = ed.GetValue(key2)
 	require.NoError(b, err)
 	require.Equal(b, "second", added)
 }

@@ -71,10 +71,13 @@ func TestInitializationNoDocker(t *testing.T) {
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
-	assert.Equal(t, mapstr.M{}, result.Fields)
+	assert.False(t, dropped)
+	ed.Apply()
+	assert.Equal(t, mapstr.M{}, event.Fields)
 }
 
 func TestInitialization(t *testing.T) {
@@ -84,10 +87,13 @@ func TestInitialization(t *testing.T) {
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := mapstr.M{}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
-	assert.Equal(t, mapstr.M{}, result.Fields)
+	assert.False(t, dropped)
+	ed.Apply()
+	assert.Equal(t, mapstr.M{}, event.Fields)
 }
 
 func TestNoMatch(t *testing.T) {
@@ -102,10 +108,13 @@ func TestNoMatch(t *testing.T) {
 	input := mapstr.M{
 		"field": "value",
 	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
-	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+	assert.False(t, dropped)
+	ed.Apply()
+	assert.Equal(t, mapstr.M{"field": "value"}, event.Fields)
 }
 
 func TestMatchNoContainer(t *testing.T) {
@@ -120,10 +129,13 @@ func TestMatchNoContainer(t *testing.T) {
 	input := mapstr.M{
 		"foo": "garbage",
 	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
-	assert.Equal(t, mapstr.M{"foo": "garbage"}, result.Fields)
+	assert.False(t, dropped)
+	ed.Apply()
+	assert.Equal(t, mapstr.M{"foo": "garbage"}, event.Fields)
 }
 
 func TestMatchContainer(t *testing.T) {
@@ -151,9 +163,12 @@ func TestMatchContainer(t *testing.T) {
 	input := mapstr.M{
 		"foo": "container_id",
 	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
+	assert.False(t, dropped)
+	ed.Apply()
 	assert.EqualValues(t, mapstr.M{
 		"container": mapstr.M{
 			"id": "container_id",
@@ -172,7 +187,7 @@ func TestMatchContainer(t *testing.T) {
 			"name": "name",
 		},
 		"foo": "container_id",
-	}, result.Fields)
+	}, event.Fields)
 }
 
 func TestMatchContainerWithDedot(t *testing.T) {
@@ -199,9 +214,12 @@ func TestMatchContainerWithDedot(t *testing.T) {
 	input := mapstr.M{
 		"foo": "container_id",
 	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
+	assert.False(t, dropped)
+	ed.Apply()
 	assert.EqualValues(t, mapstr.M{
 		"container": mapstr.M{
 			"id": "container_id",
@@ -216,7 +234,7 @@ func TestMatchContainerWithDedot(t *testing.T) {
 			"name": "name",
 		},
 		"foo": "container_id",
-	}, result.Fields)
+	}, event.Fields)
 }
 
 func TestMatchSource(t *testing.T) {
@@ -253,9 +271,12 @@ func TestMatchSource(t *testing.T) {
 		},
 	}
 
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
+	assert.False(t, dropped)
+	ed.Apply()
 	assert.EqualValues(t, mapstr.M{
 		"container": mapstr.M{
 			"id": "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
@@ -273,7 +294,7 @@ func TestMatchSource(t *testing.T) {
 				"path": inputSource,
 			},
 		},
-	}, result.Fields)
+	}, event.Fields)
 }
 
 func TestDisableSource(t *testing.T) {
@@ -300,11 +321,14 @@ func TestDisableSource(t *testing.T) {
 	input := mapstr.M{
 		"source": "/var/lib/docker/containers/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b/foo.log",
 	}
-	result, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err, "processing an event")
-
+	assert.False(t, dropped)
+	ed.Apply()
 	// remains unchanged
-	assert.EqualValues(t, input, result.Fields)
+	assert.EqualValues(t, input, event.Fields)
 }
 
 func TestMatchPIDs(t *testing.T) {
@@ -345,9 +369,13 @@ func TestMatchPIDs(t *testing.T) {
 		expected := mapstr.M{}
 		expected.DeepUpdate(input)
 
-		result, err := p.Run(&beat.Event{Fields: input})
+		event := &beat.Event{Fields: input}
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err, "processing an event")
-		assert.EqualValues(t, expected, result.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.EqualValues(t, expected, event.Fields)
 	})
 
 	t.Run("pid does not exist", func(t *testing.T) {
@@ -357,9 +385,13 @@ func TestMatchPIDs(t *testing.T) {
 		expected := mapstr.M{}
 		expected.DeepUpdate(input)
 
-		result, err := p.Run(&beat.Event{Fields: input})
+		event := &beat.Event{Fields: input}
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err, "processing an event")
-		assert.EqualValues(t, expected, result.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.EqualValues(t, expected, event.Fields)
 	})
 
 	t.Run("pid is containerized", func(t *testing.T) {
@@ -370,9 +402,13 @@ func TestMatchPIDs(t *testing.T) {
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		event := &beat.Event{Fields: fields}
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err, "processing an event")
-		assert.EqualValues(t, expected, result.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.EqualValues(t, expected, event.Fields)
 	})
 
 	t.Run("pid exited and ppid is containerized", func(t *testing.T) {
@@ -384,9 +420,13 @@ func TestMatchPIDs(t *testing.T) {
 		expected.DeepUpdate(dockerMetadata)
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		event := &beat.Event{Fields: fields}
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err, "processing an event")
-		assert.EqualValues(t, expected, result.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.EqualValues(t, expected, event.Fields)
 	})
 
 	t.Run("cgroup error", func(t *testing.T) {
@@ -396,9 +436,13 @@ func TestMatchPIDs(t *testing.T) {
 		expected := mapstr.M{}
 		expected.DeepUpdate(fields)
 
-		result, err := p.Run(&beat.Event{Fields: fields})
+		event := &beat.Event{Fields: fields}
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err, "processing an event")
-		assert.EqualValues(t, expected, result.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.EqualValues(t, expected, event.Fields)
 	})
 }
 

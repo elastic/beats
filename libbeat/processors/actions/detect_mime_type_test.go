@@ -28,7 +28,7 @@ import (
 )
 
 func TestMimeTypeFromTo(t *testing.T) {
-	evt := beat.Event{
+	evt := &beat.Event{
 		Fields: mapstr.M{
 			"foo.bar.baz": "hello world!",
 		},
@@ -38,15 +38,20 @@ func TestMimeTypeFromTo(t *testing.T) {
 		"target": "bar.baz.zoiks",
 	}))
 	require.NoError(t, err)
-	observed, err := p.Run(&evt)
+
+	ed := beat.NewEventEditor(evt)
+	dropped, err := p.Run(ed)
 	require.NoError(t, err)
-	enriched, err := observed.Fields.GetValue("bar.baz.zoiks")
+	require.False(t, dropped)
+
+	ed.Apply()
+	enriched, err := evt.Fields.GetValue("bar.baz.zoiks")
 	require.NoError(t, err)
 	require.Equal(t, "text/plain; charset=utf-8", enriched)
 }
 
 func TestMimeTypeFromToMetadata(t *testing.T) {
-	evt := beat.Event{
+	evt := &beat.Event{
 		Meta: mapstr.M{},
 		Fields: mapstr.M{
 			"foo.bar.baz": "hello world!",
@@ -55,20 +60,25 @@ func TestMimeTypeFromToMetadata(t *testing.T) {
 	expectedMeta := mapstr.M{
 		"field": "text/plain; charset=utf-8",
 	}
+	expectedFields := evt.Fields.Clone()
+
 	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "@metadata.field",
 	}))
 	require.NoError(t, err)
 
-	observed, err := p.Run(&evt)
+	ed := beat.NewEventEditor(evt)
+	dropped, err := p.Run(ed)
 	require.NoError(t, err)
-	require.Equal(t, expectedMeta, observed.Meta)
-	require.Equal(t, evt.Fields, observed.Fields)
+	require.False(t, dropped)
+	ed.Apply()
+	require.Equal(t, expectedMeta, evt.Meta)
+	require.Equal(t, expectedFields, evt.Fields)
 }
 
 func TestMimeTypeTestNoMatch(t *testing.T) {
-	evt := beat.Event{
+	evt := &beat.Event{
 		Fields: mapstr.M{
 			"foo.bar.baz": string([]byte{0, 0}),
 		},
@@ -78,8 +88,13 @@ func TestMimeTypeTestNoMatch(t *testing.T) {
 		"target": "bar.baz.zoiks",
 	}))
 	require.NoError(t, err)
-	observed, err := p.Run(&evt)
+
+	ed := beat.NewEventEditor(evt)
+	dropped, err := p.Run(ed)
 	require.NoError(t, err)
-	hasKey, _ := observed.Fields.HasKey("bar.baz.zoiks")
+	require.False(t, dropped)
+	ed.Apply()
+
+	hasKey, _ := evt.Fields.HasKey("bar.baz.zoiks")
 	require.False(t, hasKey)
 }

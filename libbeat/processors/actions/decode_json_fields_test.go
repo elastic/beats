@@ -65,7 +65,7 @@ func TestMissingKey(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"pipeline": "us1",
@@ -80,7 +80,7 @@ func TestFieldNotString(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"msg":      123,
@@ -96,7 +96,7 @@ func TestInvalidJSON(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "unexpected EOF")
 
 	expected := mapstr.M{
 		"msg":      "{\"log\":\"{\\\"level\\\":\\\"info\\\"}\",\"stream\":\"stderr\",\"count\":3",
@@ -111,7 +111,7 @@ func TestInvalidJSONMultiple(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "multiple json elements found")
 
 	expected := mapstr.M{
 		"msg":      "11:38:04,323 |-INFO testing",
@@ -138,8 +138,11 @@ func TestDocumentID(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: input})
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	require.NoError(t, err)
+	require.False(t, dropped)
 
 	wantFields := mapstr.M{
 		"msg": map[string]interface{}{"log": "message"},
@@ -148,8 +151,9 @@ func TestDocumentID(t *testing.T) {
 		"_id": "myDocumentID",
 	}
 
-	assert.Equal(t, wantFields, actual.Fields)
-	assert.Equal(t, wantMeta, actual.Meta)
+	ed.Apply()
+	assert.Equal(t, wantFields, event.Fields)
+	assert.Equal(t, wantMeta, event.Meta)
 }
 
 func TestValidJSONDepthOne(t *testing.T) {
@@ -158,7 +162,7 @@ func TestValidJSONDepthOne(t *testing.T) {
 		"pipeline": "us1",
 	}
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"msg": map[string]interface{}{
@@ -184,7 +188,7 @@ func TestValidJSONDepthTwo(t *testing.T) {
 		"max_depth":     2,
 	})
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"msg": map[string]interface{}{
@@ -213,7 +217,7 @@ func TestTargetOption(t *testing.T) {
 		"target":        "doc",
 	})
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"doc": map[string]interface{}{
@@ -243,7 +247,7 @@ func TestTargetRootOption(t *testing.T) {
 		"target":        "",
 	})
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"log": map[string]interface{}{
@@ -282,7 +286,10 @@ func TestTargetMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, _ := p.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	require.NoError(t, err)
+	require.False(t, dropped)
 
 	expectedMeta := mapstr.M{
 		"json": map[string]interface{}{
@@ -293,9 +300,12 @@ func TestTargetMetadata(t *testing.T) {
 			"count":  int64(3),
 		},
 	}
+	expectedFields := event.Fields.Clone()
 
-	assert.Equal(t, expectedMeta, actual.Meta)
-	assert.Equal(t, event.Fields, actual.Fields)
+	ed.Apply()
+
+	assert.Equal(t, expectedMeta, event.Meta)
+	assert.Equal(t, expectedFields, event.Fields)
 }
 
 func TestNotJsonObjectOrArray(t *testing.T) {
@@ -353,7 +363,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 				"max_depth":     testCase.MaxDepth,
 			})
 
-			actual := getActualValue(t, testConfig, input)
+			actual := getActualValue(t, testConfig, input, "")
 			assert.Equal(t, testCase.Expected.String(), actual.String())
 		})
 	}
@@ -372,7 +382,7 @@ func TestArrayWithArraysDisabled(t *testing.T) {
 		"process_array": false,
 	})
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"msg": mapstr.M{
@@ -396,7 +406,7 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 		"process_array": true,
 	})
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"msg": mapstr.M{
@@ -420,7 +430,7 @@ func TestArrayWithInvalidArray(t *testing.T) {
 		"process_array": true,
 	})
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	expected := mapstr.M{
 		"msg": mapstr.M{
@@ -438,7 +448,7 @@ func TestAddErrKeyOption(t *testing.T) {
 		expectedOutput mapstr.M
 	}{
 		{name: "With add_error_key option", addErrOption: true, expectedOutput: mapstr.M{
-			"error": mapstr.M{"message": "@timestamp not overwritten (parse error on {})", "type": "json"},
+			"error": mapstr.M{"message": "timestamp parse error on {}", "field": "@timestamp"},
 			"msg":   "{\"@timestamp\":\"{}\"}",
 		}},
 		{name: "Without add_error_key option", addErrOption: false, expectedOutput: mapstr.M{
@@ -457,7 +467,7 @@ func TestAddErrKeyOption(t *testing.T) {
 				"overwrite_keys": true,
 				"target":         "",
 			})
-			actual := getActualValue(t, testConfig, input)
+			actual := getActualValue(t, testConfig, input, "")
 
 			assert.Equal(t, test.expectedOutput.String(), actual.String())
 
@@ -481,7 +491,7 @@ func TestExpandKeys(t *testing.T) {
 			},
 		},
 	}
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 	assert.Equal(t, expected, actual)
 }
 
@@ -503,7 +513,7 @@ func TestExpandKeysWithTarget(t *testing.T) {
 			},
 		},
 	}
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 	assert.Equal(t, expected, actual)
 }
 
@@ -521,11 +531,10 @@ func TestExpandKeysError(t *testing.T) {
 				"msg": `{"a.b": "c", "a.b.c": "d"}`,
 				"error": mapstr.M{
 					"message": "cannot expand ...",
-					"type":    "json",
 				},
 			}
 
-			actual := getActualValue(t, testConfig, input)
+			actual := getActualValue(t, testConfig, input, "")
 			assert.Contains(t, actual, "error")
 			errorField := actual["error"].(mapstr.M)
 			assert.Contains(t, errorField, "message")
@@ -553,7 +562,7 @@ func TestOverwriteMetadata(t *testing.T) {
 	expected := mapstr.M{
 		"msg": "overwrite metadata test",
 	}
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "")
 
 	assert.Equal(t, expected, actual)
 }
@@ -568,7 +577,7 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 		"message": "Broken JSON [[",
 	}
 
-	actual := getActualValue(t, testConfig, input)
+	actual := getActualValue(t, testConfig, input, "invalid character 'B' looking for beginning of value")
 
 	errObj, ok := actual["error"].(mapstr.M)
 	require.True(t, ok, "'error' field not present or of invalid type")
@@ -579,7 +588,7 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 	assert.NotNil(t, errObj["message"])
 }
 
-func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
+func getActualValue(t *testing.T, config *conf.C, input mapstr.M, expErr string) mapstr.M {
 	log := logp.NewLogger("decode_json_fields_test")
 
 	p, err := NewDecodeJSONFields(config)
@@ -588,6 +597,16 @@ func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
 		t.Fatal(err)
 	}
 
-	actual, _ := p.Run(&beat.Event{Fields: input})
-	return actual.Fields
+	event := &beat.Event{Fields: input}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	if expErr != "" {
+		require.Error(t, err)
+		require.Equal(t, expErr, err.Error())
+	} else {
+		require.NoError(t, err)
+	}
+	require.False(t, dropped)
+	ed.Apply()
+	return event.Fields
 }

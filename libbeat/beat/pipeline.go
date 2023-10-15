@@ -155,7 +155,7 @@ type ProcessorList interface {
 // registered with the publisher pipeline.
 type Processor interface {
 	String() string // print full processor description
-	Run(in *Event) (event *Event, err error)
+	Run(*EventEditor) (dropped bool, err error)
 }
 
 // PublishMode enum sets some requirements on the client connection to the beats

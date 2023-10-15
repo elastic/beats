@@ -60,30 +60,32 @@ func TestConfigDefault(t *testing.T) {
 		return
 	}
 
-	newEvent, err := p.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
-
-	v, err := newEvent.GetValue("host.os.family")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.os.kernel")
+	assert.False(t, dropped)
+	ed.Apply()
+	v, err := event.GetValue("host.os.family")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.os.name")
+	v, err = event.GetValue("host.os.kernel")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.ip")
+	v, err = event.GetValue("host.os.name")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.mac")
+	v, err = event.GetValue("host.ip")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.os.type")
+	v, err = event.GetValue("host.mac")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = event.GetValue("host.os.type")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 }
@@ -107,30 +109,33 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 		return
 	}
 
-	newEvent, err := p.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
-	v, err := newEvent.GetValue("host.os.family")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.os.kernel")
-	assert.NoError(t, err)
-	assert.NotNil(t, v)
-
-	v, err = newEvent.GetValue("host.os.name")
+	v, err := event.GetValue("host.os.family")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 
-	v, err = newEvent.GetValue("host.ip")
+	v, err = event.GetValue("host.os.kernel")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = event.GetValue("host.os.name")
+	assert.NoError(t, err)
+	assert.NotNil(t, v)
+
+	v, err = event.GetValue("host.ip")
 	assert.Error(t, err)
 	assert.Nil(t, v)
 
-	v, err = newEvent.GetValue("host.mac")
+	v, err = event.GetValue("host.mac")
 	assert.Error(t, err)
 	assert.Nil(t, v)
 
-	v, err = newEvent.GetValue("host.os.type")
+	v, err = event.GetValue("host.os.type")
 	assert.NoError(t, err)
 	assert.NotNil(t, v)
 }
@@ -151,14 +156,17 @@ func TestConfigName(t *testing.T) {
 	p, err := New(testConfig)
 	require.NoError(t, err)
 
-	newEvent, err := p.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
 	for configKey, configValue := range config {
 		t.Run(fmt.Sprintf("Check of %s", configKey), func(t *testing.T) {
-			v, err := newEvent.GetValue(fmt.Sprintf("host.%s", configKey))
+			v, err := event.GetValue(fmt.Sprintf("host.%s", configKey))
 			assert.NoError(t, err)
-			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
+			assert.Equal(t, configValue, v, "Could not find in %s", event)
 		})
 	}
 }
@@ -186,10 +194,13 @@ func TestConfigGeoEnabled(t *testing.T) {
 	p, err := New(testConfig)
 	require.NoError(t, err)
 
-	newEvent, err := p.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
-	eventGeoField, err := newEvent.GetValue("host.geo")
+	eventGeoField, err := event.GetValue("host.geo")
 	require.NoError(t, err)
 
 	assert.Len(t, eventGeoField, len(config))
@@ -209,11 +220,13 @@ func TestConfigGeoDisabled(t *testing.T) {
 	p, err := New(testConfig)
 	require.NoError(t, err)
 
-	newEvent, err := p.Run(event)
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
-	require.NoError(t, err)
-
-	eventGeoField, err := newEvent.GetValue("host.geo")
+	eventGeoField, err := event.GetValue("host.geo")
 	assert.Error(t, err)
 	assert.Equal(t, nil, eventGeoField)
 }
@@ -235,14 +248,14 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 	cases := []struct {
 		title                   string
-		event                   beat.Event
+		event                   *beat.Event
 		hostLengthLargerThanOne bool
 		hostLengthEqualsToOne   bool
 		expectedHostFieldLength int
 	}{
 		{
 			"replace_fields=false with only host.name",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"name": hostName,
@@ -255,7 +268,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		},
 		{
 			"replace_fields=false with only host.id",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"id": hostID,
@@ -268,7 +281,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		},
 		{
 			"replace_fields=false with host.name and host.id",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"name": hostName,
@@ -284,10 +297,13 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			newEvent, err := p.Run(&c.event)
+			ed := beat.NewEventEditor(c.event)
+			dropped, err := p.Run(ed)
 			assert.NoError(t, err)
+			assert.False(t, dropped)
+			ed.Apply()
 
-			v, err := newEvent.GetValue("host")
+			v, err := c.event.GetValue("host")
 			assert.NoError(t, err)
 			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
 			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
@@ -315,13 +331,13 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 	cases := []struct {
 		title                   string
-		event                   beat.Event
+		event                   *beat.Event
 		hostLengthLargerThanOne bool
 		hostLengthEqualsToOne   bool
 	}{
 		{
 			"replace_fields=true with host.name",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"name": hostName,
@@ -333,7 +349,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		},
 		{
 			"replace_fields=true with host.id",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"id": hostID,
@@ -345,7 +361,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		},
 		{
 			"replace_fields=true with host.name and host.id",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"name": hostName,
@@ -360,10 +376,13 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			newEvent, err := p.Run(&c.event)
+			ed := beat.NewEventEditor(c.event)
+			dropped, err := p.Run(ed)
 			assert.NoError(t, err)
+			assert.False(t, dropped)
+			ed.Apply()
 
-			v, err := newEvent.GetValue("host")
+			v, err := c.event.GetValue("host")
 			assert.NoError(t, err)
 			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
 			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
@@ -384,12 +403,12 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 
 	cases := []struct {
 		title        string
-		event        beat.Event
+		event        *beat.Event
 		expectedSkip bool
 	}{
 		{
 			"event only with host.name",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"name": hostName,
@@ -400,7 +419,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		},
 		{
 			"event only with host.id",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"id": hostID,
@@ -411,7 +430,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		},
 		{
 			"event with host.name and host.id",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": mapstr.M{
 						"name": hostName,
@@ -423,14 +442,14 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		},
 		{
 			"event without host field",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{},
 			},
 			false,
 		},
 		{
 			"event with field type map[string]string hostID",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": hostIDMap,
 				},
@@ -439,7 +458,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		},
 		{
 			"event with field type map[string]string host name",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": hostNameMap,
 				},
@@ -448,7 +467,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		},
 		{
 			"event with field type map[string]string host ID and name",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": hostIDNameMap,
 				},
@@ -457,7 +476,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		},
 		{
 			"event with field type string",
-			beat.Event{
+			&beat.Event{
 				Fields: mapstr.M{
 					"host": "string",
 				},
@@ -468,7 +487,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			skip := skipAddingHostMetadata(&c.event)
+			ed := beat.NewEventEditor(c.event)
+			skip := skipAddingHostMetadata(ed)
 			assert.Equal(t, c.expectedSkip, skip)
 		})
 	}
@@ -516,11 +536,15 @@ func TestFQDNEventSync(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		checkWait.Add(1)
 		go func() {
-			resp, err := p.Run(&beat.Event{
+			event := &beat.Event{
 				Fields: mapstr.M{},
-			})
+			}
+			ed := beat.NewEventEditor(event)
+			dropped, err := p.Run(ed)
 			require.NoError(t, err)
-			name, err := resp.Fields.GetValue("host.name")
+			require.False(t, dropped)
+			ed.Apply()
+			name, err := event.GetValue("host.name")
 			require.NoError(t, err)
 			require.Equal(t, "foo.bar.baz", name)
 			checkWait.Done()
@@ -594,10 +618,12 @@ func TestFQDNLookup(t *testing.T) {
 				Fields:    mapstr.M{},
 				Timestamp: time.Now(),
 			}
-			newEvent, err := p.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := p.Run(ed)
 			require.NoError(t, err)
-
-			v, err := newEvent.GetValue("host.name")
+			require.False(t, dropped)
+			ed.Apply()
+			v, err := event.GetValue("host.name")
 			require.NoError(t, err)
 			require.Equal(t, test.expectedHostName, v)
 		})

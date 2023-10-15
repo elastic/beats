@@ -169,11 +169,11 @@ func newNativeProcessor(constructor processors.Constructor, call gojaCall) (proc
 }
 
 func (p *nativeProcessor) run(event javascript.Event) error {
-	out, err := p.Processor.Run(event.Wrapped())
+	dropped, err := p.Processor.Run(event.Wrapped())
 	if err != nil {
 		return err
 	}
-	if out == nil {
+	if dropped {
 		event.Cancel()
 	}
 	return nil

@@ -121,23 +121,23 @@ func New(cfg *config.C) (beat.Processor, error) {
 }
 
 // Run enriches the given event with the host metadata
-func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
+func (p *addHostMetadata) Run(event *beat.EventEditor) (dropped bool, err error) {
 	// check replace_host_fields field
 	if !p.config.ReplaceFields && skipAddingHostMetadata(event) {
-		return event, nil
+		return false, nil
 	}
 
-	err := p.loadData(true, features.FQDN())
+	err = p.loadData(true, features.FQDN())
 	if err != nil {
-		return nil, fmt.Errorf("error loading data during event update: %w", err)
+		return true, fmt.Errorf("error loading data during event update: %w", err)
 	}
 
-	event.Fields.DeepUpdate(p.data.Get().Clone())
+	event.DeepUpdate(p.data.Get().Clone())
 
 	if len(p.geoData) > 0 {
-		event.Fields.DeepUpdate(p.geoData)
+		event.DeepUpdate(p.geoData)
 	}
-	return event, nil
+	return false, nil
 }
 
 // Ideally we'd be able to implement the Closer interface here and
@@ -283,9 +283,9 @@ func (p *addHostMetadata) updateOrExpire(useFQDN bool) {
 
 }
 
-func skipAddingHostMetadata(event *beat.Event) bool {
+func skipAddingHostMetadata(event *beat.EventEditor) bool {
 	// If host fields exist(besides host.name added by libbeat) in event, skip add_host_metadata.
-	hostFields, err := event.Fields.GetValue("host")
+	hostFields, err := event.GetValue("host")
 
 	// Don't skip if there are no fields
 	if err != nil || hostFields == nil {

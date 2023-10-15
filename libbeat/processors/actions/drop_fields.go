@@ -91,27 +91,51 @@ func newDropFields(c *conf.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
+func (f *dropFields) Run(event *beat.EventEditor) (dropped bool, err error) {
 	var errs []error
 
+	droppedKeys := make(map[string]struct{})
 	// remove exact match fields
 	for _, field := range f.Fields {
+		if f.checkAlreadyDropped(droppedKeys, field) {
+			continue
+		}
+		droppedKeys[field] = struct{}{}
 		f.deleteField(event, field, &errs)
 	}
 
 	// remove fields contained in regexp expressions
-	for _, regex := range f.RegexpFields {
-		for _, field := range *event.Fields.FlattenKeys() {
-			if regex.MatchString(field) {
-				f.deleteField(event, field, &errs)
+	for _, field := range event.FlattenKeys() {
+		if f.checkAlreadyDropped(droppedKeys, field) {
+			continue
+		}
+		for _, regex := range f.RegexpFields {
+			if !regex.MatchString(field) {
+				continue
 			}
+			droppedKeys[field] = struct{}{}
+			f.deleteField(event, field, &errs)
 		}
 	}
 
-	return event, multierr.Combine(errs...)
+	return false, multierr.Combine(errs...)
 }
 
-func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {
+func (f *dropFields) checkAlreadyDropped(droppedKeys map[string]struct{}, key string) bool {
+	_, dropped := droppedKeys[key]
+	if dropped {
+		return true
+	}
+	for droppedKey := range droppedKeys {
+		if strings.HasPrefix(key, droppedKey) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (f *dropFields) deleteField(event *beat.EventEditor, field string, errs *[]error) {
 	if err := event.Delete(field); err != nil {
 		if !f.IgnoreMissing || !errors.Is(err, mapstr.ErrKeyNotFound) {
 			*errs = append(*errs, fmt.Errorf("failed to drop field [%v], error: %w", field, err))

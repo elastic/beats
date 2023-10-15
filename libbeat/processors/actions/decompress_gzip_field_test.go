@@ -178,14 +178,16 @@ func TestDecompressGzip(t *testing.T) {
 				Fields: test.input,
 			}
 
-			newEvent, err := f.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := f.Run(ed)
 			if !test.error {
 				assert.NoError(t, err)
 			} else {
 				assert.Error(t, err)
 			}
-
-			assert.Equal(t, test.output, newEvent.Fields)
+			assert.False(t, dropped)
+			ed.Apply()
+			assert.Equal(t, test.output, event.Fields)
 		})
 	}
 
@@ -202,6 +204,7 @@ func TestDecompressGzip(t *testing.T) {
 		expectedMeta := mapstr.M{
 			"field": "decompressed data",
 		}
+		expectedFields := event.Fields.Clone()
 
 		config := decompressGzipFieldConfig{
 			Field: fromTo{
@@ -216,10 +219,13 @@ func TestDecompressGzip(t *testing.T) {
 			config: config,
 		}
 
-		newEvent, err := f.Run(event)
+		ed := beat.NewEventEditor(event)
+		dropped, err := f.Run(ed)
 		assert.NoError(t, err)
+		assert.False(t, dropped)
 
-		assert.Equal(t, expectedMeta, newEvent.Meta)
-		assert.Equal(t, event.Fields, newEvent.Fields)
+		ed.Apply()
+		assert.Equal(t, expectedMeta, event.Meta)
+		assert.Equal(t, expectedFields, event.Fields)
 	})
 }

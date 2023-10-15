@@ -18,7 +18,6 @@
 package actions
 
 import (
-	"reflect"
 	"regexp"
 	"testing"
 
@@ -39,6 +38,7 @@ func TestReplaceRun(t *testing.T) {
 		Input         mapstr.M
 		Output        mapstr.M
 		error         bool
+		expErrMsg     string
 	}{
 		{
 			description: "simple field replacing",
@@ -129,11 +129,9 @@ func TestReplaceRun(t *testing.T) {
 			Output: mapstr.M{
 				"m": "abc",
 				"n": "def",
-				"error": mapstr.M{
-					"message": "Failed to replace fields in processor: could not fetch value for key: f, Error: key not found",
-				},
 			},
 			error:         true,
+			expErrMsg:     "[processor=replace=[{Field:f Pattern:abc Replacement:xyz} {Field:g Pattern:def Replacement:}]] Failed to replace fields in processor: could not fetch value for key: f, Error: key not found",
 			IgnoreMissing: false,
 			FailOnError:   true,
 		},
@@ -153,14 +151,21 @@ func TestReplaceRun(t *testing.T) {
 				Fields: test.Input,
 			}
 
-			newEvent, err := f.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := f.Run(ed)
 			if !test.error {
 				assert.NoError(t, err)
+				ed.Apply()
 			} else {
 				assert.Error(t, err)
+				if test.expErrMsg != "" {
+					assert.Equal(t, test.expErrMsg, err.Error())
+				}
+				ed.Reset()
 			}
-
-			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
+			assert.False(t, dropped)
+			ed.Apply()
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 }
@@ -240,17 +245,20 @@ func TestReplaceField(t *testing.T) {
 				},
 			}
 
-			err := f.replaceField(test.Field, test.Pattern, test.Replacement, &beat.Event{Fields: test.Input})
+			event := &beat.Event{Fields: test.Input.Clone()}
+			ed := beat.NewEventEditor(event)
+			err := f.replaceField(test.Field, test.Pattern, test.Replacement, ed)
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
-
-			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
+			ed.Apply()
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		event := &beat.Event{
+			Fields: mapstr.M{},
 			Meta: mapstr.M{
 				"f": "abc",
 			},
@@ -259,6 +267,8 @@ func TestReplaceField(t *testing.T) {
 		expectedMeta := mapstr.M{
 			"f": "bbc",
 		}
+
+		expectedFields := event.Fields.Clone()
 
 		f := &replaceString{
 			config: replaceStringConfig{
@@ -272,9 +282,12 @@ func TestReplaceField(t *testing.T) {
 			},
 		}
 
-		newEvent, err := f.Run(event)
+		ed := beat.NewEventEditor(event)
+		dropped, err := f.Run(ed)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedMeta, newEvent.Meta)
-		assert.Equal(t, event.Fields, newEvent.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, expectedMeta, event.Meta)
+		assert.Equal(t, expectedFields, event.Fields)
 	})
 }

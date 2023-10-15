@@ -72,26 +72,26 @@ func NewExtractField(c *conf.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *extract_field) Run(event *beat.Event) (*beat.Event, error) {
+func (f *extract_field) Run(event *beat.EventEditor) (dropped bool, err error) {
 	fieldValue, err := event.GetValue(f.Field)
 	if err != nil {
-		return event, fmt.Errorf("error getting field '%s' from event", f.Field)
+		return false, fmt.Errorf("error getting field '%s' from event", f.Field)
 	}
 
 	value, ok := fieldValue.(string)
 	if !ok {
-		return event, fmt.Errorf("could not get a string from field '%s'", f.Field)
+		return false, fmt.Errorf("could not get a string from field '%s'", f.Field)
 	}
 
 	parts := strings.Split(value, f.Separator)
 	parts = deleteEmpty(parts)
 	if len(parts) < f.Index+1 {
-		return event, fmt.Errorf("index is out of range for field '%s'", f.Field)
+		return false, fmt.Errorf("index is out of range for field '%s'", f.Field)
 	}
 
 	_, _ = event.PutValue(f.Target, parts[f.Index])
 
-	return event, nil
+	return false, nil
 }
 
 func (f extract_field) String() string {

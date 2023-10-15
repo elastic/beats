@@ -161,11 +161,12 @@ func TestCopyFields(t *testing.T) {
 			event := &beat.Event{
 				Fields: test.Input,
 			}
-
-			newEvent, err := p.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := p.Run(ed)
 			assert.NoError(t, err)
-
-			assert.Equal(t, test.Expected, newEvent.Fields)
+			assert.False(t, dropped)
+			ed.Apply()
+			assert.Equal(t, test.Expected, event.Fields)
 		})
 	}
 
@@ -187,16 +188,19 @@ func TestCopyFields(t *testing.T) {
 				"message": "please copy this line",
 			},
 		}
+		ed := beat.NewEventEditor(event)
 
 		expMeta := mapstr.M{
 			"message":        "please copy this line",
 			"message_copied": "please copy this line",
 		}
 
-		newEvent, err := p.Run(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err)
+		assert.False(t, dropped)
 
-		assert.Equal(t, expMeta, newEvent.Meta)
-		assert.Equal(t, event.Fields, newEvent.Fields)
+		ed.Apply()
+		assert.Equal(t, expMeta, event.Meta)
+		assert.Equal(t, event.Fields, event.Fields)
 	})
 }

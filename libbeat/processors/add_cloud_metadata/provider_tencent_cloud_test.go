@@ -69,10 +69,11 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
-	if err != nil {
-		t.Fatal(err)
-	}
+	event := &beat.Event{Fields: mapstr.M{}}
+	ed := beat.NewEventEditor(event)
+	dropped, err := p.Run(ed)
+	assert.NoError(t, err)
+	assert.False(t, dropped)
 
 	expected := mapstr.M{
 		"cloud": mapstr.M{
@@ -87,5 +88,6 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, actual.Fields)
+	ed.Apply()
+	assert.Equal(t, expected, event.Fields)
 }

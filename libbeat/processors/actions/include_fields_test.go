@@ -68,9 +68,11 @@ func TestIncludeFields(t *testing.T) {
 			Fields: test.Input,
 		}
 
-		newEvent, err := p.Run(event)
+		ed := beat.NewEventEditor(event)
+		dropped, err := p.Run(ed)
 		assert.NoError(t, err)
-
-		assert.Equal(t, test.Output, newEvent.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, test.Output, event.Fields)
 	}
 }

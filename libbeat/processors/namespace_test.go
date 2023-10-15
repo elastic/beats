@@ -29,7 +29,7 @@ import (
 
 type testFilterRule struct {
 	str func() string
-	run func(*beat.Event) (*beat.Event, error)
+	run func(*beat.EventEditor) (dropped bool, err error)
 }
 
 func TestNamespace(t *testing.T) {
@@ -132,9 +132,9 @@ func (r *testFilterRule) String() string {
 	return r.str()
 }
 
-func (r *testFilterRule) Run(evt *beat.Event) (*beat.Event, error) {
+func (r *testFilterRule) Run(evt *beat.EventEditor) (dropped bool, err error) {
 	if r.run == nil {
-		return evt, nil
+		return false, nil
 	}
 	return r.Run(evt)
 }

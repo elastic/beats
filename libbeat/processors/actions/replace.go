@@ -75,13 +75,7 @@ func NewReplaceString(c *conf.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	// Creates a copy of the event to revert in case of failure
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
+func (f *replaceString) Run(event *beat.EventEditor) (dropped bool, err error) {
 	for _, field := range f.config.Fields {
 		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
 		if err != nil {
@@ -90,17 +84,15 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 				f.log.Debug(errMsg.Error())
 			}
 			if f.config.FailOnError {
-				event = backup
-				_, _ = event.PutValue("error.message", errMsg.Error())
-				return event, err
+				return false, beat.EventError{Message: errMsg.Error(), Processor: f.String()}
 			}
 		}
 	}
 
-	return event, nil
+	return false, nil
 }
 
-func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, replacement string, event *beat.Event) error {
+func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, replacement string, event *beat.EventEditor) error {
 	currentValue, err := event.GetValue(field)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors

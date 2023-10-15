@@ -359,11 +359,14 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				t.Fatalf("error creating new metadata processor: %s", err.Error())
 			}
 
-			actual, err := cmp.Run(&beat.Event{Fields: tc.previousEvent})
-			if err != nil {
-				t.Fatalf("error running processor: %s", err.Error())
-			}
-			assert.Equal(t, tc.expectedEvent, actual.Fields)
+			event := &beat.Event{Fields: tc.previousEvent}
+			ed := beat.NewEventEditor(event)
+			dropped, err := cmp.Run(ed)
+			assert.NoError(t, err)
+			assert.False(t, dropped)
+
+			ed.Apply()
+			assert.Equal(t, tc.expectedEvent, event.Fields)
 		})
 	}
 }

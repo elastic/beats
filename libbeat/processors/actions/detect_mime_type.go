@@ -49,21 +49,21 @@ func NewDetectMimeType(cfg *conf.C) (beat.Processor, error) {
 	return mimeType, nil
 }
 
-func (m *mimeTypeProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (m *mimeTypeProcessor) Run(event *beat.EventEditor) (dropped bool, err error) {
 	valI, err := event.GetValue(m.Field)
 	if err != nil {
 		//nolint:nilerr // doesn't have the required field value to analyze
-		return event, nil
+		return false, nil
 	}
 	val, _ := valI.(string)
 	if val == "" {
 		// wrong type or not set
-		return event, nil
+		return false, nil
 	}
 	if mimeType := mime.Detect(val); mimeType != "" {
 		_, err = event.PutValue(m.Target, mimeType)
 	}
-	return event, err
+	return false, err
 }
 
 func (m *mimeTypeProcessor) String() string {

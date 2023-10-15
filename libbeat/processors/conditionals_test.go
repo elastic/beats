@@ -33,9 +33,9 @@ type countFilter struct {
 	N int
 }
 
-func (c *countFilter) Run(e *beat.Event) (*beat.Event, error) {
+func (c *countFilter) Run(e *beat.EventEditor) (dropped bool, err error) {
 	c.N++
-	return e, nil
+	return false, nil
 }
 
 func (c *countFilter) String() string { return "count" }
@@ -100,10 +100,10 @@ func TestWhenProcessor(t *testing.T) {
 		}
 
 		for _, fields := range test.events {
-			event := &beat.Event{
+			event := beat.NewEventEditor(&beat.Event{
 				Timestamp: time.Now(),
 				Fields:    fields,
-			}
+			})
 			_, err := filter.Run(event)
 			if err != nil {
 				t.Error(err)
@@ -149,11 +149,13 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 				t.Fatal(err)
 			}
 
-			result, err := processor.Run(&beat.Event{Fields: test.event.Clone()})
+			ed := beat.NewEventEditor(&beat.Event{Fields: test.event})
+			dropped, err := processor.Run(ed)
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, test.want, result.Fields)
+			assert.False(t, dropped)
+			assert.Equal(t, test.want, ed.Fields())
 		})
 	}
 }

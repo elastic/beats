@@ -26,7 +26,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -40,24 +39,17 @@ const (
 type testCase struct {
 	name   string
 	source string
-	assert func(t testing.TB, evt *beat.Event, err error)
+	assert func(t testing.TB, evt *beat.EventEditor, dropped bool, err error)
 }
 
 var eventV0Tests = []testCase{
 	{
 		name:   "Put",
 		source: `evt.Put("hello", "world");`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
 			v, _ := evt.GetValue("hello")
 			assert.Equal(t, "world", v)
-		},
-	},
-	{
-		name:   "Object Put Key",
-		source: `evt.fields["hello"] = "world";`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
-			v, _ := evt.GetValue("hello")
-			assert.Equal(t, "world", v)
+			assert.False(t, dropped)
 		},
 	},
 	{
@@ -88,28 +80,21 @@ var eventV0Tests = []testCase{
   			}`,
 	},
 	{
-		name: "fields get key",
-		source: `
-			var ip = evt.fields.source.ip;
-
-  			if ("192.0.2.1" !== ip) {
-    			throw "failed to get IP";
-  			}`,
-	},
-	{
 		name:   "Delete",
 		source: `if (!evt.Delete("source.ip")) { throw "delete failed"; }`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
 			ip, _ := evt.GetValue("source.ip")
 			assert.Nil(t, ip)
+			assert.False(t, dropped)
 		},
 	},
 	{
 		name:   "Rename",
 		source: `if (!evt.Rename("source", "destination")) { throw "rename failed"; }`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
 			ip, _ := evt.GetValue("destination.ip")
 			assert.Equal(t, "192.0.2.1", ip)
+			assert.False(t, dropped)
 		},
 	},
 	{
@@ -121,48 +106,58 @@ var eventV0Tests = []testCase{
 	{
 		name:   "Put @metadata",
 		source: `evt.Put("@metadata.foo", "bar");`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
-			assert.Equal(t, "bar", evt.Meta["foo"])
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
+			meta, _ := evt.GetValue("@metadata.foo")
+			assert.Equal(t, "bar", meta)
+			assert.False(t, dropped)
 		},
 	},
 	{
 		name:   "Delete @metadata",
 		source: `evt.Delete("@metadata.pipeline");`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
-			assert.Nil(t, evt.Meta[events.FieldMetaPipeline])
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
+			val, getErr := evt.GetValue("@metadata.pipeline")
+			assert.Nil(t, val)
+			assert.NoError(t, err)
+			assert.Error(t, getErr)
+			assert.ErrorIs(t, getErr, mapstr.ErrKeyNotFound)
+			assert.False(t, dropped)
 		},
 	},
 	{
 		name:   "Cancel",
 		source: `evt.Cancel();`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
 			assert.NoError(t, err)
-			assert.Nil(t, evt)
+			assert.True(t, dropped)
 		},
 	},
 	{
 		name:   "Tag",
 		source: `evt.Tag("foo"); evt.Tag("bar"); evt.Tag("foo");`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
-			if assert.NoError(t, err) {
-				assert.Equal(t, []string{"foo", "bar"}, evt.Fields["tags"])
-			}
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
+			assert.NoError(t, err)
+			val, getErr := evt.GetValue(mapstr.TagsKey)
+			assert.NoError(t, getErr)
+			assert.Equal(t, []string{"foo", "bar"}, val)
+			assert.False(t, dropped)
 		},
 	},
 	{
 		name:   "AppendTo",
 		source: `evt.AppendTo("source.ip", "10.0.0.1");`,
-		assert: func(t testing.TB, evt *beat.Event, err error) {
+		assert: func(t testing.TB, evt *beat.EventEditor, dropped bool, err error) {
 			if assert.NoError(t, err) {
 				srcIP, _ := evt.GetValue("source.ip")
 				assert.Equal(t, []string{"192.0.2.1", "10.0.0.1"}, srcIP)
 			}
+			assert.False(t, dropped)
 		},
 	},
 }
 
-func testEvent() *beat.Event {
-	return &beat.Event{
+func testEvent() *beat.EventEditor {
+	return beat.NewEventEditor(&beat.Event{
 		Meta: mapstr.M{
 			"pipeline": "beat-1.2.3-module",
 		},
@@ -171,7 +166,7 @@ func testEvent() *beat.Event {
 				"ip": "192.0.2.1",
 			},
 		},
-	}
+	})
 }
 
 func TestBeatEventV0(t *testing.T) {
@@ -184,9 +179,10 @@ func TestBeatEventV0(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			evt, err := p.Run(testEvent())
+			evt := testEvent()
+			dropped, err := p.Run(evt)
 			if tc.assert != nil {
-				tc.assert(t, evt, err)
+				tc.assert(t, evt, dropped, err)
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, evt)

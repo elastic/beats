@@ -41,10 +41,11 @@ func TestSessionTagOnException(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evt, err := p.Run(testEvent())
+	evt := testEvent()
+	_, err = p.Run(evt)
 	assert.Error(t, err)
 
-	tags, _ := evt.GetValue("tags")
+	tags, _ := evt.GetValue(mapstr.TagsKey)
 	assert.Equal(t, []string{"_js_exception"}, tags)
 }
 
@@ -109,7 +110,7 @@ func TestSessionTestFunction(t *testing.T) {
 		function test() {
 			var event = process(new Event({"hello": "earth"}));
 
-			if (event.fields.hello !== "world") {
+			if (event.Get("hello") !== "world") {
 				throw "invalid hello world";
  			}
 		}
@@ -149,8 +150,8 @@ func TestSessionTimeout(t *testing.T) {
 	logp.TestingSetup()
 
 	const runawayLoop = `
-		while (!evt.fields.stop) {
-			evt.Put("hello", "world");			
+		while (!evt.Get("stop")) {
+			evt.Put("hello", "world");
 		}
     `
 
@@ -163,14 +164,14 @@ func TestSessionTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evt := &beat.Event{
+	evt := beat.NewEventEditor(&beat.Event{
 		Fields: mapstr.M{
 			"stop": false,
 		},
-	}
+	})
 
 	// Execute and expect a timeout.
-	evt, err = p.Run(evt)
+	_, err = p.Run(evt)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), timeoutError)
 
@@ -189,7 +190,7 @@ func TestSessionTimeout(t *testing.T) {
 
 func TestSessionParallel(t *testing.T) {
 	const script = `
-		evt.Put("host.name", "workstation");			
+		evt.Put("host.name", "workstation");
     `
 
 	p, err := NewFromConfig(Config{
@@ -210,11 +211,11 @@ func TestSessionParallel(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for ctx.Err() == nil {
-				evt := &beat.Event{
+				evt := beat.NewEventEditor(&beat.Event{
 					Fields: mapstr.M{
 						"host": mapstr.M{"name": "computer"},
 					},
-				}
+				})
 				_, err := p.Run(evt)
 				assert.NoError(t, err)
 			}

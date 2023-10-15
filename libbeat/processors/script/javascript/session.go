@@ -60,14 +60,14 @@ type Event interface {
 
 	// Wrapped returns the underlying beat.Event being wrapped. The wrapped
 	// event is replaced each time a new event is processed.
-	Wrapped() *beat.Event
+	Wrapped() *beat.EventEditor
 
 	// JSObject returns the Value that represents this object within the
 	// runtime.
 	JSObject() goja.Value
 
 	// reset replaces the inner beat.Event and resets the state.
-	reset(*beat.Event) error
+	reset(*beat.EventEditor) error
 }
 
 // session is a javascript runtime environment used throughout the life of
@@ -192,7 +192,7 @@ func (s *session) executeTestFunction() error {
 }
 
 // setEvent replaces the beat event handle present in the runtime.
-func (s *session) setEvent(b *beat.Event) error {
+func (s *session) setEvent(b *beat.EventEditor) error {
 	if s.evt == nil {
 		var err error
 		s.evt, err = s.makeEvent(s)
@@ -205,28 +205,28 @@ func (s *session) setEvent(b *beat.Event) error {
 }
 
 // runProcessFunc executes process() from the JS script.
-func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
+func (s *session) runProcessFunc(b *beat.EventEditor) (dropped bool, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			s.log.Errorw("The javascript processor caused an unexpected panic "+
 				"while processing an event. Recovering, but please report this.",
-				"event", mapstr.M{"original": b.Fields.String()},
+				"event", b.String(),
 				"panic", r,
 				zap.Stack("stack"))
 			if !s.evt.IsCancelled() {
-				out = b
+				b.Reset()
 			}
 			err = fmt.Errorf("unexpected panic in javascript processor: %v", r)
 			if s.tagOnException != "" {
-				mapstr.AddTags(b.Fields, []string{s.tagOnException})
+				b.AddTags(s.tagOnException)
 			}
-			appendString(b.Fields, "error.message", err.Error(), false)
+			appendString(b, "error.message", err.Error(), false)
 		}
 	}()
 
 	if err = s.setEvent(b); err != nil {
 		// Always return the event even if there was an error.
-		return b, err
+		return false, err
 	}
 
 	// Interrupt the JS code if execution exceeds timeout.
@@ -239,16 +239,16 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 
 	if _, err = s.processFunc(goja.Undefined(), s.evt.JSObject()); err != nil {
 		if s.tagOnException != "" {
-			mapstr.AddTags(b.Fields, []string{s.tagOnException})
+			b.AddTags(s.tagOnException)
 		}
-		appendString(b.Fields, "error.message", err.Error(), false)
-		return b, fmt.Errorf("failed in process function: %w", err)
+		appendString(b, "error.message", err.Error(), false)
+		return dropped, fmt.Errorf("failed in process function: %w", err)
 	}
 
 	if s.evt.IsCancelled() {
-		return nil, nil
+		return true, nil
 	}
-	return b, nil
+	return false, nil
 }
 
 // Runtime returns the Javascript runtime used for this session.

@@ -60,14 +60,14 @@ func New(cfg *conf.C) (beat.Processor, error) {
 }
 
 // Run enriches the given event with an ID
-func (p *addID) Run(event *beat.Event) (*beat.Event, error) {
+func (p *addID) Run(event *beat.EventEditor) (dropped bool, err error) {
 	id := p.gen.NextID()
 
 	if _, err := event.PutValue(p.config.TargetField, id); err != nil {
-		return nil, makeErrComputeID(err)
+		return true, makeErrComputeID(err)
 	}
 
-	return event, nil
+	return false, nil
 }
 
 func (p *addID) String() string {

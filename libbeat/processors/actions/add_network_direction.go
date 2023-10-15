@@ -61,45 +61,45 @@ func NewAddNetworkDirection(cfg *conf.C) (beat.Processor, error) {
 	return networkDirection, nil
 }
 
-func (m *networkDirectionProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (m *networkDirectionProcessor) Run(event *beat.EventEditor) (dropped bool, err error) {
 	sourceI, err := event.GetValue(m.Source)
 	if err != nil {
 		//nolint:nilerr // doesn't have the required field value to analyze
-		return event, nil
+		return false, nil
 	}
 	source, _ := sourceI.(string)
 	if source == "" {
 		// wrong type or not set
-		return event, nil
+		return false, nil
 	}
 	destinationI, err := event.GetValue(m.Destination)
 	if err != nil {
 		//nolint:nilerr // doesn't have the required field value to analyze
-		return event, nil
+		return false, nil
 	}
 	destination, _ := destinationI.(string)
 	if destination == "" {
 		// wrong type or not set
-		return event, nil
+		return false, nil
 	}
 	sourceIP := net.ParseIP(source)
 	destinationIP := net.ParseIP(destination)
 	if sourceIP == nil || destinationIP == nil {
 		// bad ip address
-		return event, nil
+		return false, nil
 	}
 
 	internalSource, err := conditions.NetworkContains(sourceIP, m.InternalNetworks...)
 	if err != nil {
-		return event, err
+		return false, err
 	}
 	internalDestination, err := conditions.NetworkContains(destinationIP, m.InternalNetworks...)
 	if err != nil {
-		return event, err
+		return false, err
 	}
 
 	_, _ = event.PutValue(m.Target, networkDirection(internalSource, internalDestination))
-	return event, nil
+	return false, nil
 }
 
 func networkDirection(internalSource, internalDestination bool) string {

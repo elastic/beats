@@ -81,27 +81,22 @@ func NewTruncateFields(c *conf.C) (beat.Processor, error) {
 	}, nil
 }
 
-func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
+func (f *truncateFields) Run(event *beat.EventEditor) (dropped bool, err error) {
 	for _, field := range f.config.Fields {
 		err := f.truncateSingleField(field, event)
 		if err != nil {
-			f.logger.Debugf("Failed to truncate fields: %s", err)
+			errMsg := fmt.Errorf("Failed to truncate field: %s", err)
+			f.logger.Debugf(errMsg.Error())
 			if f.config.FailOnError {
-				event = backup
-				return event, err
+				return false, beat.EventError{Message: errMsg.Error(), Field: field, Processor: f.String()}
 			}
 		}
 	}
 
-	return event, nil
+	return false, nil
 }
 
-func (f *truncateFields) truncateSingleField(field string, event *beat.Event) error {
+func (f *truncateFields) truncateSingleField(field string, event *beat.EventEditor) error {
 	v, err := event.GetValue(field)
 	if err != nil {
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
@@ -121,7 +116,7 @@ func (f *truncateFields) truncateSingleField(field string, event *beat.Event) er
 
 }
 
-func (f *truncateFields) addTruncatedString(field, value string, event *beat.Event) error {
+func (f *truncateFields) addTruncatedString(field, value string, event *beat.EventEditor) error {
 	truncated, isTruncated, err := f.truncate(f, []byte(value))
 	if err != nil {
 		return err
@@ -132,12 +127,12 @@ func (f *truncateFields) addTruncatedString(field, value string, event *beat.Eve
 	}
 
 	if isTruncated {
-		_ = mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		_ = event.AddTagsWithKey("log.flags", "truncated")
 	}
 	return nil
 }
 
-func (f *truncateFields) addTruncatedByte(field string, value []byte, event *beat.Event) error {
+func (f *truncateFields) addTruncatedByte(field string, value []byte, event *beat.EventEditor) error {
 	truncated, isTruncated, err := f.truncate(f, value)
 	if err != nil {
 		return err
@@ -148,7 +143,7 @@ func (f *truncateFields) addTruncatedByte(field string, value []byte, event *bea
 	}
 
 	if isTruncated {
-		_ = mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		_ = event.AddTagsWithKey("log.flags", "truncated")
 	}
 	return nil
 }

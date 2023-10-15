@@ -18,7 +18,6 @@
 package actions
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -39,6 +38,7 @@ func TestRenameRun(t *testing.T) {
 		Input         mapstr.M
 		Output        mapstr.M
 		error         bool
+		expErrMsg     string
 	}{
 		{
 			description: "simple field renaming",
@@ -95,11 +95,9 @@ func TestRenameRun(t *testing.T) {
 			Output: mapstr.M{
 				"a": 2,
 				"b": "q",
-				"error": mapstr.M{
-					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
-				},
 			},
 			error:         true,
+			expErrMsg:     "[processor=rename=[{From:a To:b}]] Failed to rename fields in processor: target field b already exists, drop or rename this field first",
 			FailOnError:   true,
 			IgnoreMissing: false,
 		},
@@ -194,11 +192,9 @@ func TestRenameRun(t *testing.T) {
 			Output: mapstr.M{
 				"a": 9,
 				"c": 10,
-				"error": mapstr.M{
-					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
-				},
 			},
 			error:         true,
+			expErrMsg:     "[processor=rename=[{From:c To:a.c} {From:a To:a.value}]] Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
 			IgnoreMissing: false,
 			FailOnError:   true,
 		},
@@ -240,17 +236,25 @@ func TestRenameRun(t *testing.T) {
 				logger: log,
 			}
 			event := &beat.Event{
-				Fields: test.Input,
+				Meta:   mapstr.M{},
+				Fields: test.Input.Clone(),
 			}
 
-			newEvent, err := f.Run(event)
+			ed := beat.NewEventEditor(event)
+			dropped, err := f.Run(ed)
 			if !test.error {
 				assert.NoError(t, err)
+				ed.Apply()
 			} else {
 				assert.Error(t, err)
+				if test.expErrMsg != "" {
+					assert.Equal(t, test.expErrMsg, err.Error())
+				}
+				ed.Reset()
 			}
-
-			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
+			assert.False(t, dropped)
+			ed.Apply()
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 }
@@ -281,7 +285,7 @@ func TestRenameField(t *testing.T) {
 			ignoreMissing: false,
 		},
 		{
-			description: "Add hierarchy to event",
+			description: "add hierarchy to event",
 			From:        "a.b",
 			To:          "a.b.c",
 			Input: mapstr.M{
@@ -358,17 +362,21 @@ func TestRenameField(t *testing.T) {
 				},
 			}
 
-			err := f.renameField(test.From, test.To, &beat.Event{Fields: test.Input})
+			event := &beat.Event{Fields: test.Input.Clone()}
+			ed := beat.NewEventEditor(event)
+			err := f.renameField(test.From, test.To, ed)
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
 
-			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
+			ed.Apply()
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
 		event := &beat.Event{
+			Fields: mapstr.M{},
 			Meta: mapstr.M{
 				"a": "c",
 			},
@@ -377,6 +385,8 @@ func TestRenameField(t *testing.T) {
 		expMeta := mapstr.M{
 			"b": "c",
 		}
+
+		expFields := event.Fields.Clone()
 
 		f := &renameFields{
 			config: renameFieldsConfig{
@@ -389,9 +399,12 @@ func TestRenameField(t *testing.T) {
 			},
 		}
 
-		newEvent, err := f.Run(event)
+		ed := beat.NewEventEditor(event)
+		dropped, err := f.Run(ed)
 		assert.NoError(t, err)
-		assert.Equal(t, expMeta, newEvent.Meta)
-		assert.Equal(t, event.Fields, newEvent.Fields)
+		assert.False(t, dropped)
+		ed.Apply()
+		assert.Equal(t, expMeta, event.Meta)
+		assert.Equal(t, expFields, event.Fields)
 	})
 }

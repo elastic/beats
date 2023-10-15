@@ -100,7 +100,7 @@ func NewDecodeJSONFields(c *cfg.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
+func (f *decodeJSONFields) Run(event *beat.EventEditor) (dropped bool, err error) {
 	var errs []string
 
 	for _, field := range f.fields {
@@ -122,7 +122,13 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
-			event.SetErrorWithOption(fmt.Sprintf("parsing input as JSON: %s", err.Error()), f.addErrorKey, text, field)
+			if f.addErrorKey {
+				event.AddError(beat.EventError{
+					Message: fmt.Sprintf("parsing input as JSON: %s", err.Error()),
+					Data:    text,
+					Field:   field,
+				})
+			}
 			continue
 		}
 
@@ -169,17 +175,14 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		if id != "" {
-			if event.Meta == nil {
-				event.Meta = mapstr.M{}
-			}
-			event.Meta[events.FieldMetaID] = id
+			_, _ = event.PutValue(beat.MetadataFieldKey+"."+events.FieldMetaID, id)
 		}
 	}
 
 	if len(errs) > 0 {
-		return event, fmt.Errorf(strings.Join(errs, ", "))
+		return false, fmt.Errorf(strings.Join(errs, ", "))
 	}
-	return event, nil
+	return false, nil
 }
 
 func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {

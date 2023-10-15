@@ -73,13 +73,7 @@ func NewRenameFields(c *conf.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	// Creates a copy of the event to revert in case of failure
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
+func (f *renameFields) Run(event *beat.EventEditor) (dropped bool, err error) {
 	for _, field := range f.config.Fields {
 		err := f.renameField(field.From, field.To, event)
 		if err != nil {
@@ -88,17 +82,15 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 				f.logger.Debug(errMsg.Error())
 			}
 			if f.config.FailOnError {
-				event = backup
-				_, _ = event.PutValue("error.message", errMsg.Error())
-				return event, err
+				return false, beat.EventError{Message: errMsg.Error(), Processor: f.String()}
 			}
 		}
 	}
 
-	return event, nil
+	return false, nil
 }
 
-func (f *renameFields) renameField(from string, to string, event *beat.Event) error {
+func (f *renameFields) renameField(from string, to string, event *beat.EventEditor) error {
 	// Fields cannot be overwritten. Either the target field has to be dropped first or renamed first
 	_, err := event.GetValue(to)
 	if err == nil {

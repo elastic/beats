@@ -33,11 +33,13 @@ func TestDefaultTargetField(t *testing.T) {
 	assert.NoError(t, err)
 
 	testEvent := &beat.Event{}
-
-	newEvent, err := p.Run(testEvent)
+	ed := beat.NewEventEditor(testEvent)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
-	v, err := newEvent.GetValue("@metadata._id")
+	v, err := testEvent.GetValue("@metadata._id")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, v)
 }
@@ -49,19 +51,20 @@ func TestNonDefaultTargetField(t *testing.T) {
 	p, err := New(cfg)
 	assert.NoError(t, err)
 
-	testEvent := &beat.Event{
-		Fields: mapstr.M{},
-	}
-
-	newEvent, err := p.Run(testEvent)
+	testEvent := &beat.Event{}
+	ed := beat.NewEventEditor(testEvent)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
-	v, err := newEvent.GetValue("foo")
+	v, err := testEvent.GetValue("foo")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, v)
 
-	v, err = newEvent.GetValue("@metadata._id")
-	assert.NoError(t, err)
+	v, err = testEvent.GetValue("@metadata._id")
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 	assert.Empty(t, v)
 }
 
@@ -72,17 +75,18 @@ func TestNonDefaultMetadataTarget(t *testing.T) {
 	p, err := New(cfg)
 	assert.NoError(t, err)
 
-	testEvent := &beat.Event{
-		Meta: mapstr.M{},
-	}
-
-	newEvent, err := p.Run(testEvent)
+	testEvent := &beat.Event{}
+	ed := beat.NewEventEditor(testEvent)
+	dropped, err := p.Run(ed)
 	assert.NoError(t, err)
+	assert.False(t, dropped)
+	ed.Apply()
 
-	v, err := newEvent.Meta.GetValue("foo")
+	v, err := testEvent.GetValue("@metadata.foo")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, v)
 
-	v, err = newEvent.GetValue("@metadata._id")
+	v, err = testEvent.GetValue("@metadata._id")
 	assert.Error(t, err)
+	assert.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 }
