@@ -209,7 +209,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
-				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Fingerprint: "4a5d6b09a9587a1c",
 				Info:        testFileInfo{name: basename, size: 1024},
 			},
 		}
@@ -332,7 +332,7 @@ scanner:
 			Op:      loginp.OpCreate,
 			Descriptor: loginp.FileDescriptor{
 				Filename:    filename,
-				Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+				Fingerprint: "4a5d6b09a9587a1c",
 				Info:        testFileInfo{name: basename, size: 1024},
 			},
 		}
@@ -710,7 +710,7 @@ scanner:
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
 					Filename:    normalFilename,
-					Fingerprint: "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a",
+					Fingerprint: "4a5d6b09a9587a1c",
 					Info: testFileInfo{
 						size: sizes[normalFilename],
 						name: normalBasename,
@@ -718,7 +718,7 @@ scanner:
 				},
 				excludedFilename: {
 					Filename:    excludedFilename,
-					Fingerprint: "bd151321c3bbdb44185414a1b56b5649a00206dd4792e7230db8904e43987336",
+					Fingerprint: "ee27f4225466784b",
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
 						name: excludedBasename,
@@ -726,7 +726,7 @@ scanner:
 				},
 				excludedIncludedFilename: {
 					Filename:    excludedIncludedFilename,
-					Fingerprint: "bfdb99a65297062658c26dfcea816d76065df2a2da2594bfd9b96e9e405da1c2",
+					Fingerprint: "ca73e3b89412a146",
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						name: excludedIncludedBasename,
@@ -734,7 +734,7 @@ scanner:
 				},
 				travelerSymlinkFilename: {
 					Filename:    travelerSymlinkFilename,
-					Fingerprint: "c4058942bffcea08810a072d5966dfa5c06eb79b902bf0011890dd8d22e1a5f8",
+					Fingerprint: "17266f18ab59157c",
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
 						name: travelerSymlinkBasename,
@@ -756,7 +756,7 @@ scanner:
 			expDesc: map[string]loginp.FileDescriptor{
 				normalFilename: {
 					Filename:    normalFilename,
-					Fingerprint: "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb",
+					Fingerprint: "2dddcef07d26ee8c",
 					Info: testFileInfo{
 						size: sizes[normalFilename],
 						name: normalBasename,
@@ -765,7 +765,7 @@ scanner:
 				// undersizedFilename got excluded because of the matching fingerprint
 				excludedFilename: {
 					Filename:    excludedFilename,
-					Fingerprint: "9c225a1e6a7df9c869499e923565b93937e88382bb9188145f117195cd41dcd1",
+					Fingerprint: "76b9ce4d9391017b",
 					Info: testFileInfo{
 						size: sizes[excludedFilename],
 						name: excludedBasename,
@@ -773,7 +773,7 @@ scanner:
 				},
 				excludedIncludedFilename: {
 					Filename:    excludedIncludedFilename,
-					Fingerprint: "7985b2b9750bdd3c76903db408aff3859204d6334279eaf516ecaeb618a218d5",
+					Fingerprint: "3a1afe7e8c462bab",
 					Info: testFileInfo{
 						size: sizes[excludedIncludedFilename],
 						name: excludedIncludedBasename,
@@ -781,7 +781,7 @@ scanner:
 				},
 				travelerSymlinkFilename: {
 					Filename:    travelerSymlinkFilename,
-					Fingerprint: "da437600754a8eed6c194b7241b078679551c06c7dc89685a9a71be7829ad7e5",
+					Fingerprint: "6b033983515fc44f",
 					Info: testFileInfo{
 						size: sizes[travelerFilename],
 						name: travelerSymlinkBasename,
@@ -798,7 +798,7 @@ scanner:
 		})
 	}
 
-	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
+	t.Run("returns nil when creating scanner with a fingerprint smaller than blocksize of XXH3)", func(t *testing.T) {
 		cfgStr := `
 scanner:
   fingerprint:
@@ -814,8 +814,7 @@ scanner:
 		require.NoError(t, err)
 
 		_, err = newFileWatcher(paths, ns)
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
+		require.NoError(t, err)
 	})
 }
 
@@ -856,16 +855,20 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 		err := os.WriteFile(filename, []byte(strings.Repeat(content, 1024)), 0777)
 		require.NoError(b, err)
 	}
-	paths := []string{filepath.Join(dir, "*.log")}
-	cfg := fileScannerConfig{
+
+	fsConfig := fileScannerConfig{
 		Fingerprint: fingerprintConfig{
 			Enabled: true,
 			Offset:  0,
 			Length:  1024,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+
+	paths := []string{filepath.Join(dir, "*.log")}
+	s, err := newFileScanner(paths, fsConfig)
 	require.NoError(b, err)
+
+	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
 		files := s.GetFiles()
@@ -962,6 +965,6 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		fd, err := s.toFileDescriptor(&it)
 		require.NoError(b, err)
-		require.Equal(b, "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a", fd.Fingerprint)
+		require.Equal(b, "4a5d6b09a9587a1c", fd.Fingerprint)
 	}
 }

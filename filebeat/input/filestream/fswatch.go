@@ -18,17 +18,16 @@
 package filestream
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"hash"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
+	"github.com/zeebo/xxh3"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -285,7 +284,7 @@ type fileScanner struct {
 	paths      []string
 	cfg        fileScannerConfig
 	log        *logp.Logger
-	hasher     hash.Hash
+	hasher     *xxh3.Hasher
 	readBuffer []byte
 }
 
@@ -294,14 +293,10 @@ func newFileScanner(paths []string, config fileScannerConfig) (*fileScanner, err
 		paths:  paths,
 		cfg:    config,
 		log:    logp.NewLogger(scannerDebugKey),
-		hasher: sha256.New(),
+		hasher: xxh3.New(),
 	}
 
 	if s.cfg.Fingerprint.Enabled {
-		if s.cfg.Fingerprint.Length < sha256.BlockSize {
-			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
-			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
-		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
 		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
 	}
@@ -355,14 +350,29 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 	return nil
 }
 
-// GetFiles returns a map of file descriptors by filenames that
-// match the configured paths.
+// GetFiles returns a map of file descriptors by filenames that match the
+// configured paths.
 func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
-	fdByName := map[string]loginp.FileDescriptor{}
-	// used to determine if a symlink resolves in a already known target
-	uniqueIDs := map[string]string{}
-	// used to filter out duplicate matches
-	uniqueFiles := map[string]struct{}{}
+
+	var (
+		// mapSz is the capacity for maps below so that each map should need to
+		// avoid being copied/resized on the fly until a certain limit.
+		//
+		// Number is decided based on having 1024 unique files per path. Not a very
+		// small or a big number.
+		//
+		// TODO: Decide a better number?
+		mapSz = len(s.paths) * 1024
+
+		fdByName = make(map[string]loginp.FileDescriptor, mapSz)
+
+		// Used to determine if a symlink resolves in a already known target.
+		uniqueIDs = make(map[string]string, mapSz)
+
+		// Used to filter out duplicate matches.
+		uniqueFiles = make(map[string]struct{}, mapSz)
+	)
+
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -371,7 +381,7 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 
 		for _, filename := range matches {
-			// in case multiple globs match on the same file we filter out duplicates
+			// In case multiple globs match on the same file we filter out duplicates
 			if _, knownFile := uniqueFiles[filename]; knownFile {
 				continue
 			}
@@ -406,7 +416,7 @@ type ingestTarget struct {
 	filename         string
 	originalFilename string
 	symlink          bool
-	info             os.FileInfo
+	info             fs.FileInfo
 }
 
 func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
@@ -434,7 +444,7 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 
 	if it.symlink {
 		if !s.cfg.Symlinks {
-			return it, fmt.Errorf("file %q is a symlink and they're disabled", it.filename)
+			return it, fmt.Errorf("file %q is a symlink but symlink option is not configured", it.filename)
 		}
 
 		// now we know it's a symlink, we stat with link resolution
@@ -461,13 +471,13 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	return it, nil
 }
 
-func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
+func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, _ error) {
 	fd.Filename = it.filename
 	fd.Info = it.info
 
 	if s.cfg.Fingerprint.Enabled {
 		fileSize := it.info.Size()
-		// we should not open the file if we know it's too small
+		// Do not open the file if we know it's too small.
 		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 		if fileSize < minSize {
 			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
@@ -487,6 +497,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		s.hasher.Reset()
+
 		lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
 		written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
 		if err != nil {
@@ -496,7 +507,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
 		}
 
-		fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
+		fd.Fingerprint = fmt.Sprintf("%x", s.hasher.Sum64())
 	}
 
 	return fd, nil
