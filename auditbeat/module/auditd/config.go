@@ -32,6 +32,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-libaudit/v2/rule"
 	"github.com/elastic/go-libaudit/v2/rule/flags"
 )
@@ -48,6 +49,7 @@ type Config struct {
 	RuleFiles    []string `config:"audit_rule_files"`    // List of rule files.
 	SocketType   string   `config:"socket_type"`         // Socket type to use with the kernel (unicast or multicast).
 	Immutable    bool     `config:"immutable"`           // Sets kernel audit config immutable.
+	IgnoreErrors bool     `config:"ignore_errors"`       // Ignore errors when reading and parsing rules, equivalent to auditctl -i.
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
@@ -122,11 +124,19 @@ func (c Config) rules() []auditRule {
 }
 
 func (c *Config) loadRules() error {
+	var log *logp.Logger
+	if c.IgnoreErrors {
+		log = logp.NewLogger(moduleName)
+	}
+
 	var paths []string
 	for _, pattern := range c.RuleFiles {
 		absPattern, err := filepath.Abs(pattern)
 		if err != nil {
-			return fmt.Errorf("unable to get the absolute path for %s: %w", pattern, err)
+			if log == nil {
+				return fmt.Errorf("unable to get the absolute path for %s: %w", pattern, err)
+			}
+			log.Warnf("unable to get the absolute path for %s: %v", pattern, err)
 		}
 		files, err := filepath.Glob(absPattern)
 		if err != nil {
@@ -138,7 +148,7 @@ func (c *Config) loadRules() error {
 
 	knownRules := ruleSet{}
 
-	rules, err := readRules(bytes.NewBufferString(c.RulesBlob), "(audit_rules at auditbeat.yml)", knownRules)
+	rules, err := readRules(bytes.NewBufferString(c.RulesBlob), "(audit_rules at auditbeat.yml)", knownRules, log)
 	if err != nil {
 		return err
 	}
@@ -147,9 +157,13 @@ func (c *Config) loadRules() error {
 	for _, filename := range paths {
 		fHandle, err := os.Open(filename)
 		if err != nil {
-			return fmt.Errorf("unable to open rule file '%s': %w", filename, err)
+			if log == nil {
+				return fmt.Errorf("unable to open rule file '%s': %w", filename, err)
+			}
+			log.Warnf("unable to open rule file '%s': %v", filename, err)
+			continue
 		}
-		rules, err = readRules(fHandle, filename, knownRules)
+		rules, err = readRules(fHandle, filename, knownRules, log)
 		if err != nil {
 			return err
 		}
@@ -172,7 +186,11 @@ func (c Config) failureMode() (uint32, error) {
 	}
 }
 
-func readRules(reader io.Reader, source string, knownRules ruleSet) (rules []auditRule, err error) {
+// readRules reads the audit rules from reader, adding them to knownRules. If
+// log is nil, errors will result in an empty rules set being returned. Otherwise
+// errors will be logged as warnings and any successfully parsed rules will be
+// returned.
+func readRules(reader io.Reader, source string, knownRules ruleSet, log *logp.Logger) (rules []auditRule, err error) {
 	var errs multierror.Errors
 
 	s := bufio.NewScanner(reader)
@@ -209,8 +227,11 @@ func readRules(reader io.Reader, source string, knownRules ruleSet) (rules []aud
 		rules = append(rules, rule)
 	}
 
-	if len(errs) > 0 {
-		return nil, fmt.Errorf("failed loading rules: %w", errs.Err())
+	if len(errs) != 0 {
+		if log == nil {
+			return nil, fmt.Errorf("failed loading rules: %w", errs.Err())
+		}
+		log.Warnf("errors loading rules: %v", errs.Err())
 	}
 	return rules, nil
 }
