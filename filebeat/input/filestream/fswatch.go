@@ -25,9 +25,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/zeebo/xxh3"
+
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
-	"github.com/zeebo/xxh3"
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
