@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/golang/protobuf/ptypes/duration"
@@ -226,39 +224,8 @@ func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWith
 	// Group the time series values by common traits.
 	timeSeriesGroups := m.groupTimeSeries(ctx, timeSeries, metadataService, mapper)
 
-	// Generate a batch ID for all events collected in this collection.
-	//
-	// Why do we need keep track in which batch the metricset collected the event?
-	// ---------------------------------------------------------------------------
-	//
-	// GCP metrics have different ingestion delays; after GCP collects a metric from
-	// a resource, it takes some time to be available for ingestion.
-	//
-	// Some metrics have no ingestion delay, while others have a delay of up to multiple
-	// minutes.
-	//
-	// For example,
-	//  - `container/memory.limit.bytes` has no ingest delay, while
-	//  - `container/memory/request_bytes` has two minutes ingest delay.
-	//
-	// So, even if the metricset collects these metrics at two minutes apart, the metrics
-	// will have the same timestamp.
-	//
-	// When metrics have the same timestamp and dimensions, the metricset will group them
-	// into a single event. However, the metricset cannot group metrics collected at different
-	// times.
-	//
-	// The metricset cannot group the events from different collections, so we need
-	// to add an `event.batch_id` field to avoid having two documents with the same
-	// timestamp and dimensions.
-	//
-	eventBatchID, err := uuid.NewUUID()
-	if err != nil {
-		return nil, fmt.Errorf("error generating batch ID: %w", err)
-	}
-
 	// Create single events for each time series group.
-	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups, eventBatchID.String())
+	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups)
 
 	return events, nil
 }

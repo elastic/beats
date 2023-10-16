@@ -7,6 +7,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -74,7 +75,7 @@ func groupMetricsByDimensions(keyValues []KeyValuePoint) map[string][]KeyValuePo
 // Collapsing the metrics in each group into a single event should not cause
 // any loss of information, since all metrics in a group share the same timestamp
 // and dimensions.
-func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, eventBatchID string) []mb.Event {
+func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) []mb.Event {
 	events := make([]mb.Event, 0, len(groups))
 
 	for _, group := range groups {
@@ -86,8 +87,51 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, e
 			MetricSetFields: mapstr.M{},
 		}
 
+		// Collect the metric names in the event and add them to the event
+		// as `event.metric_names` field.
+		//
+		// Why do we need keep track of all the metric names in the event?
+		// ===============================================================
+		//
+		// Context
+		// -------
+		//
+		// GCP metrics have different ingestion delays; some metrics have zero delay,
+		// while others have a non-zero delay of up to a few minutes.
+		//
+		// For example,
+		//  - `container/memory.limit.bytes` has no ingest delay, while
+		//  - `container/memory/request_bytes` has two minutes ingest delay.
+		//
+		// Since the metricset collects metrics every 60 seconds, the metricset collects
+		// `container/memory.limit.bytes` and `container/memory/request_bytes`
+		// in different iterations, even if they have the same timestamp.
+		//
+		// Problem
+		// -------
+		//
+		// When TSDB is enabled, two documents cannot have the same timestamp and dimensions.
+		// If they do, the second document is dropped.
+		//
+		// Unfortunately, this is exactly what happens when the metricset collects
+		// `container/memory.limit.bytes` and `container/memory/request_bytes` in different
+		// iterations.
+		//
+		// Solution
+		// --------
+		//
+		// Since the metricset collects different metrics in different iterations, we need
+		// to add an `event.metric_names` field to make sure that the events have different
+		// dimensions.
+		//
+		metricNames := []string{}
+
 		for _, singleEvent := range group {
+			// Add the metric values to the event.
 			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
+
+			// Add the metric name to build the `event.metric_names` field.
+			metricNames = append(metricNames, singleEvent.Key)
 		}
 
 		if service == "compute" {
@@ -96,7 +140,7 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint, e
 			event.RootFields = group[0].ECS
 		}
 
-		_, _ = event.RootFields.Put("event.batch_id", eventBatchID)
+		_, _ = event.RootFields.Put("event.metric_names", strings.Join(metricNames, ","))
 
 		events = append(events, event)
 	}
