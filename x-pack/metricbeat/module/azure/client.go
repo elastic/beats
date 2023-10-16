@@ -103,18 +103,26 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 // GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
 func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []Metric {
 	var resultedMetrics []Metric
+
+	// Same end time for all metrics in the same batch
+	endTime := time.Now().UTC()
+
 	// loop over the set of metrics
 	for _, metric := range metrics {
 		// select period to collect metrics, will double the interval value in order to retrieve any missing values
 		//if timegrain is larger than intervalx2 then interval will be assigned the timegrain value
 		interval := client.Config.Period
-		if t := convertTimegrainToDuration(metric.TimeGrain); t > interval*2 {
-			interval = t
+		duration := convertTimegrainToDuration(metric.TimeGrain)
+		if t := duration; t > interval*2 {
+			//interval = t
 		}
+
+		// Adjust end time based on timegrain
+		endTime = endTime.Add(interval * (-1))
 
 		// Fetch in the range [{-2xINTERVAL},{-INTERVAL}) with a delay of {INTERVAL}
 		// It results in one data point {-2xINTERVAL} per call
-		endTime := time.Now().UTC().Add(interval * (-1))
+		// Adjust start time based on timegrain for the current metric
 		startTime := endTime.Add(interval * (-1))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
@@ -127,6 +135,44 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			}
 			filter = strings.Join(filterList, " AND ")
 		}
+
+		increment := time.Minute
+
+		// TODO if timegrain is unit 1 day
+
+		// Interval math for interval > timegrain
+		if duration > client.Config.Period {
+
+			in_flag := false
+
+			for d := startTime; d.After(endTime) == false; d = d.Add(increment) {
+				// if timegrain is in unit hours
+				if duration >= time.Hour {
+					// if hour mark is within the timespan
+					if d.Minute() == 0 {
+						in_flag = true
+						break
+					}
+				}
+
+				// TODO if timegrain is in unit minutes
+			}
+
+			// if the timegrain mark is not within the sampling timespan, remove that metric from the list in this batch and skip to the next one
+			if !in_flag {
+				// Remove metric from list
+				ind_to_remove := 0
+				for i, currentMetric := range client.ResourceConfigurations.Metrics {
+					if matchMetrics(currentMetric, metric) {
+						ind_to_remove = i
+						break
+					}
+				}
+				client.ResourceConfigurations.Metrics = append(client.ResourceConfigurations.Metrics[:ind_to_remove], client.ResourceConfigurations.Metrics[ind_to_remove+1:]...)
+				continue
+			}
+		}
+
 		resp, timegrain, err := client.AzureMonitorService.GetMetricValues(metric.ResourceSubId, metric.Namespace, metric.TimeGrain, timespan, metric.Names,
 			metric.Aggregations, filter)
 		if err != nil {
@@ -136,7 +182,7 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		} else {
 			for i, currentMetric := range client.ResourceConfigurations.Metrics {
 				if matchMetrics(currentMetric, metric) {
-					current := mapMetricValues(resp, currentMetric.Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))
+					current := mapMetricValues(resp, currentMetric.Values)
 					client.ResourceConfigurations.Metrics[i].Values = current
 					if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
 						client.ResourceConfigurations.Metrics[i].TimeGrain = timegrain
