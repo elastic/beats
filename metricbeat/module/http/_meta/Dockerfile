@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.19.12
+=======
+FROM golang:1.20.10
+>>>>>>> 6be0d18448 ([Automation] Bump Golang version to 1.20.10 (#36846))
 
 COPY test/main.go main.go
 
