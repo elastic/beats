@@ -139,7 +139,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			kubernetes.ShouldPut(tempCfg, json, jsonOpts, l.log)
 		}
 		// Merge config template with the configs from the annotations
-		// AppendValues option is used to append arrays to existing arrays while merging
+		// AppendValues option is used to append arrays from annotations to existing arrays while merging
 		if err := config.MergeWithOpts(tempCfg, ucfg.AppendValues); err != nil {
 			logp.Debug("hints.builder", "config merge failed with error: %v", err)
 			continue
