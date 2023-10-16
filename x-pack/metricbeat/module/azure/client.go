@@ -9,9 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -113,9 +110,6 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		//if timegrain is larger than intervalx2 then interval will be assigned the timegrain value
 		interval := client.Config.Period
 		duration := convertTimegrainToDuration(metric.TimeGrain)
-		if t := duration; t > interval*2 {
-			//interval = t
-		}
 
 		// Adjust end time based on timegrain
 		endTime = endTime.Add(interval * (-1))
@@ -145,7 +139,7 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 
 			in_flag := false
 
-			for d := startTime; d.After(endTime) == false; d = d.Add(increment) {
+			for d := startTime; !d.After(endTime); d = d.Add(increment) {
 				// if timegrain is in unit hours
 				if duration >= time.Hour {
 					// if hour mark is within the timespan
