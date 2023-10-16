@@ -95,7 +95,7 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 	// if the user has set both to different values, throw a warning, as overwrite operations will probably fail
 	if c.IsServerless() {
 		if cfg.TemplateName != "" && cfg.TemplateName != name {
-			logp.L().Warnf("policy name is %s but template name is %s; under serverless, non-default template and policy names should be the same. Updates & overwrites may not work.")
+			logp.L().Warnf("policy name is %s but template name is %s; under serverless, non-default template and policy names should be the same. Updates & overwrites may not work.", name, cfg.TemplateName)
 		}
 	}
 
