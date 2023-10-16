@@ -133,39 +133,47 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			filter = strings.Join(filterList, " AND ")
 		}
 
-		increment := time.Minute
-
-		// TODO if timegrain is unit 1 day
-
 		// Interval math for interval > timegrain
 		if duration > client.Config.Period {
 
-			in_flag := false
+			inTimespan := false
 
-			for d := startTime; !d.After(endTime); d = d.Add(increment) {
-				// if timegrain is in unit hours
-				if duration >= time.Hour {
-					// if hour mark is within the timespan
-					if d.Minute() == 0 {
-						in_flag = true
-						break
-					}
+			var diffSec int64 = int64(endTime.Second() - startTime.Second())
+
+			var diffMin int64 = int64(endTime.Minute() - startTime.Minute())
+			var diffMinDuration time.Duration = time.Duration(diffMin) * time.Minute
+
+			var diffHour int64 = int64(endTime.Hour() - startTime.Hour())
+			var diffHourDuration time.Duration = time.Duration(diffHour) * time.Hour
+
+			// If timegrain is unit 1 day, 1 hour or 1 min
+			if duration == 24*time.Hour {
+				startOfDay := endTime.Truncate(24 * time.Hour)
+				if (startOfDay.Equal(startTime) || startOfDay.After(startTime)) && startOfDay.Before(endTime) {
+					inTimespan = true
 				}
 
-				// TODO if timegrain is in unit minutes
+			} else if duration >= time.Hour {
+				if diffMin < 0 && diffHourDuration > 0 && diffHourDuration%duration == 0 {
+					inTimespan = true
+				}
+			} else {
+				if diffSec < 0 && diffMinDuration%duration == 0 {
+					inTimespan = true
+				}
 			}
 
 			// if the timegrain mark is not within the sampling timespan, remove that metric from the list in this batch and skip to the next one
-			if !in_flag {
+			if !inTimespan {
 				// Remove metric from list
-				ind_to_remove := 0
+				ind := 0
 				for i, currentMetric := range client.ResourceConfigurations.Metrics {
 					if matchMetrics(currentMetric, metric) {
-						ind_to_remove = i
+						ind = i
 						break
 					}
 				}
-				client.ResourceConfigurations.Metrics = append(client.ResourceConfigurations.Metrics[:ind_to_remove], client.ResourceConfigurations.Metrics[ind_to_remove+1:]...)
+				client.ResourceConfigurations.Metrics = append(client.ResourceConfigurations.Metrics[:ind], client.ResourceConfigurations.Metrics[ind+1:]...)
 				continue
 			}
 		}
