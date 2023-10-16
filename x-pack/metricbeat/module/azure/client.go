@@ -138,13 +138,13 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 
 			inTimespan := false
 
-			var diffSec int64 = int64(endTime.Second() - startTime.Second())
+			var diffSec = int64(endTime.Second() - startTime.Second())
 
-			var diffMin int64 = int64(endTime.Minute() - startTime.Minute())
-			var diffMinDuration time.Duration = time.Duration(diffMin) * time.Minute
+			var diffMin = int64(endTime.Minute() - startTime.Minute())
+			var diffMinDuration = time.Duration(diffMin) * time.Minute
 
-			var diffHour int64 = int64(endTime.Hour() - startTime.Hour())
-			var diffHourDuration time.Duration = time.Duration(diffHour) * time.Hour
+			var diffHour = int64(endTime.Hour() - startTime.Hour())
+			var diffHourDuration = time.Duration(diffHour) * time.Hour
 
 			// If timegrain is unit 1 day, 1 hour or 1 min
 			if duration == 24*time.Hour {
