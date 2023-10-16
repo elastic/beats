@@ -272,7 +272,6 @@ func TestGroupMetricsByDimensions(t *testing.T) {
 
 func TestWithDifferentOrdering(t *testing.T) {
 	timestamp, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
-	eventBatchID := "2f05755c-07e1-4c97-af9c-b1b38079322a"
 
 	t.Run("Having labels in a different order should make no difference", func(t *testing.T) {
 		kvs := []KeyValuePoint{
@@ -324,7 +323,7 @@ func TestWithDifferentOrdering(t *testing.T) {
 
 		groups := groupMetricsByDimensions(kvs)
 
-		events := createEventsFromGroups("redis", groups, eventBatchID)
+		events := createEventsFromGroups("redis", groups)
 		require.Len(t, events, 1)
 	})
 }
@@ -333,8 +332,6 @@ func TestCreateEventsFromGroup(t *testing.T) {
 	timestampGroup1, _ := time.Parse(time.RFC3339, "2023-10-04T12:34:56Z")
 	timestampGroup2 := timestampGroup1.Add(5 * time.Minute)
 	timestampGroup3 := timestampGroup1.Add(10 * time.Minute)
-
-	eventBatchID := "2f05755c-07e1-4c97-af9c-b1b38079322a"
 
 	t.Run("different dimensions", func(t *testing.T) {
 		kvs := []KeyValuePoint{
@@ -478,7 +475,7 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 					"event": mapstr.M{
-						"batch_id": eventBatchID,
+						"metric_names": "metric1,metric2",
 					},
 				},
 			},
@@ -507,7 +504,7 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 					"event": mapstr.M{
-						"batch_id": eventBatchID,
+						"metric_names": "metric3,metric4",
 					},
 				},
 			},
@@ -535,13 +532,13 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 					"event": mapstr.M{
-						"batch_id": eventBatchID,
+						"metric_names": "metric5",
 					},
 				},
 			},
 		}
 
-		events := createEventsFromGroups("redis", groups, eventBatchID)
+		events := createEventsFromGroups("redis", groups)
 		require.Len(t, events, 3)
 		require.ElementsMatch(t, events, expectedEvents)
 	})
