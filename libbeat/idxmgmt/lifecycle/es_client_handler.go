@@ -95,7 +95,7 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 	// if the user has set both to different values, throw a warning, as overwrite operations will probably fail
 	if c.IsServerless() {
 		if cfg.TemplateName != "" && cfg.TemplateName != name {
-			logp.L().Warnf("setup.dsl.data_stream_pattern is %s, but setup.template.name is %s; under serverless, non-default template and DSL pattern names should be the same. Updates & overwrites to this config may not work.", name, cfg.TemplateName)
+			logp.L().Warnf("setup.dsl.data_stream_pattern is %s, but setup.template.name is %s; under serverless, non-default template and DSL pattern names should be the same. Additional updates & overwrites to this config will not work.", name, cfg.TemplateName)
 		}
 	}
 
