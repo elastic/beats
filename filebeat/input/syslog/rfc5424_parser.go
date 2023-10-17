@@ -8910,29 +8910,6 @@ func ParserRFC5424(data []byte, event *event) {
 			goto st571
 		}
 		goto st0
-<<<<<<< HEAD
-=======
-	tr580:
-		// line-disable-directive parser/common.rl:39
-
-		event.SetSecond(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st571
-	tr590:
-		// line-disable-directive parser/common.rl:43
-
-		event.SetNanosecond(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st571
->>>>>>> a278734f11 (upgrade Go to 1.20.6 (#36000))
 	st571:
 		if (p)++; (p) == (pe) {
 			goto _test_eof571

@@ -302,14 +302,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		coverToHTML := sh.RunCmd("go", "tool", "cover",
 			"-html="+params.CoverageProfileFile,
 			"-o", htmlCoverReport)
-<<<<<<< HEAD
-		if err = coverToHTML(); err != nil {
-			return errors.Wrap(err, "failed to write HTML code coverage report")
-=======
 
 		if err := coverToHTML(); err != nil {
 			return fmt.Errorf("failed to write HTML code coverage report: %w", err)
->>>>>>> a278734f11 (upgrade Go to 1.20.6 (#36000))
 		}
 	}
 
