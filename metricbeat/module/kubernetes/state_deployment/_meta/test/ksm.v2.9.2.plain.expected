@@ -2,23 +2,23 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "local-path-storage"
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "local-path-provisioner",
-			"time": {
-					"created": "0001-01-01T00:00:00Z"
-			},
+			"name": "coredns",
 			"paused": false,
 			"replicas": {
-				"available": 1,
-				"desired": 1,
+				"available": 2,
+				"desired": 2,
 				"unavailable": 0,
-				"updated": 1
+				"updated": 2
 			},
 			"status": {
 				"available": "true",
 				"progressing": "true"
+			},
+			"time": {
+				"created": "2023-08-09T07:32:20.000Z"
 			}
 		},
 		"Index": "",
@@ -35,23 +35,23 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": "local-path-storage"
 		},
 		"MetricSetFields": {
-			"name": "coredns",
-			"time": {
-					"created": "0001-01-01T00:00:00Z"
-			},
+			"name": "local-path-provisioner",
 			"paused": false,
 			"replicas": {
-				"available": 2,
-				"desired": 2,
+				"available": 1,
+				"desired": 1,
 				"unavailable": 0,
-				"updated": 2
+				"updated": 1
 			},
 			"status": {
 				"available": "true",
 				"progressing": "true"
+			},
+			"time": {
+				"created": "2023-08-09T07:32:22.000Z"
 			}
 		},
 		"Index": "",
@@ -72,9 +72,6 @@
 		},
 		"MetricSetFields": {
 			"name": "kube-state-metrics",
-			"time": {
-					"created": "0001-01-01T00:00:00Z"
-			},
 			"paused": false,
 			"replicas": {
 				"available": 1,
@@ -85,6 +82,9 @@
 			"status": {
 				"available": "true",
 				"progressing": "true"
+			},
+			"time": {
+				"created": "2023-08-09T08:08:46.000Z"
 			}
 		},
 		"Index": "",

@@ -7,10 +7,7 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "kube-state-metrics",
-                "time": {
-                    "created": "2023-01-18T09:46:19.000Z"
-                },
+                "name": "local-path-provisioner",
                 "paused": false,
                 "replicas": {
                     "available": 1,
@@ -21,6 +18,44 @@
                 "status": {
                     "available": "true",
                     "progressing": "true"
+                },
+                "time": {
+                    "created": "2023-01-16T14:32:47.000Z"
+                }
+            },
+            "namespace": "local-path-storage"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kube-state-metrics",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                },
+                "status": {
+                    "available": "true",
+                    "progressing": "true"
+                },
+                "time": {
+                    "created": "2023-01-18T09:46:19.000Z"
                 }
             },
             "namespace": "kube-system"
@@ -43,9 +78,6 @@
         "kubernetes": {
             "deployment": {
                 "name": "coredns",
-                "time": {
-                    "created": "2023-01-16T14:32:42.000Z"
-                },
                 "paused": false,
                 "replicas": {
                     "available": 2,
@@ -56,44 +88,12 @@
                 "status": {
                     "available": "true",
                     "progressing": "true"
+                },
+                "time": {
+                    "created": "2023-01-16T14:32:42.000Z"
                 }
             },
             "namespace": "kube-system"
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "local-path-provisioner",
-                "time": {
-                    "created": "2023-01-16T14:32:47.000Z"
-                },
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                },
-                "status": {
-                    "available": "true",
-                    "progressing": "true"
-                }
-            },
-            "namespace": "local-path-storage"
         },
         "metricset": {
             "name": "state_deployment",
