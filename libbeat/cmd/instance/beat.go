@@ -1039,7 +1039,7 @@ func (b *Beat) registerESVersionCheckCallback() error {
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
-			return fmt.Errorf("error fetching version from elasticsearch")
+			return fmt.Errorf("error fetching version from elasticsearch: %w", err)
 		}
 		if esVersion.LessThanMajorMinor(beatVersion) {
 			return fmt.Errorf("%w ES=%s, Beat=%s", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
