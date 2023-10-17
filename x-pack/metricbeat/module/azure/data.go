@@ -78,7 +78,7 @@ func mapMetrics(metrics []Metric) []KeyValuePoint {
 	return points
 }
 
-func mapToEvents2(metrics []Metric, client *Client, report mb.ReporterV2, batchId string) error {
+func mapToEvents2(metrics []Metric, client *Client, report mb.ReporterV2) error {
 	// Unpack the metrics into a list of key/value points.
 	// This makes it easier to group the metrics by timestamp and dimensions.
 	points := mapMetrics(metrics)
@@ -116,7 +116,7 @@ func mapToEvents2(metrics []Metric, client *Client, report mb.ReporterV2, batchI
 		// Look up the full resource information in the cache.
 		resource := client.LookupResource(referencePoint.ResourceId)
 
-		event, err := buildEventFrom(referencePoint, _points, resource, client.Config.DefaultResourceType, batchId)
+		event, err := buildEventFrom(referencePoint, _points, resource, client.Config.DefaultResourceType)
 		if err != nil {
 			return err
 		}
@@ -129,7 +129,7 @@ func mapToEvents2(metrics []Metric, client *Client, report mb.ReporterV2, batchI
 }
 
 // buildEventFrom build an event from a group of points.
-func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resource Resource, defaultResourceType string, eventBatchId string) (mb.Event, error) {
+func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resource Resource, defaultResourceType string) (mb.Event, error) {
 	event := mb.Event{
 		ModuleFields: mapstr.M{
 			"timegrain": referencePoint.TimeGrain,
@@ -148,7 +148,6 @@ func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resour
 				"provider": "azure",
 				"region":   resource.Location,
 			},
-			"event.batch_id": eventBatchId,
 		},
 	}
 
