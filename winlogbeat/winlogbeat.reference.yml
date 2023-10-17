@@ -409,7 +409,7 @@ output.elasticsearch:
 
   # winlogbeat expects Elasticsearch to be the same version or newer than the Beat.
   # Lift the version restriction by setting allow_older_versions to true.
-  #allow_older_versions: false
+  #allow_older_versions: true
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
