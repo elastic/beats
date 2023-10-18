@@ -145,10 +145,10 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				//    kibana queries
 				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
 				delayedRootJob := func(event *beat.Event) ([]jobs.Job, error) {
+					time.Sleep(s.retryDelay)
 					for _, p := range s.plugins {
 						p.BeforeRetry()
 					}
-					time.Sleep(s.retryDelay)
 					return s.rootJob(event)
 				}
 
