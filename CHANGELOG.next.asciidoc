@@ -117,7 +117,7 @@ is collected by it.
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix retries to trigger on a down monitor with no previous state. {pull}36842[36842]
-- Fix monitor duration calculation with retries. {pull}36842[36842]
+- Fix monitor duration calculation with retries. {pull}36900[36900]
 
 *Metricbeat*
 
