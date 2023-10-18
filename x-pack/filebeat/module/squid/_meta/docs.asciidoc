@@ -5,6 +5,8 @@
 
 == Squid module
 
+deprecated::[8.12.0,"This module is deprecated."]
+
 experimental[]
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
