@@ -201,7 +201,7 @@ require (
 	github.com/aws/smithy-go v1.13.5
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/elastic-agent-autodiscover v0.6.2
+	github.com/elastic/elastic-agent-autodiscover v0.6.4
 	github.com/elastic/elastic-agent-libs v0.3.13
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.6.1
@@ -259,7 +259,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.10 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect

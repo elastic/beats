@@ -9,6 +9,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36880[36880]
 
 *Auditbeat*
 
@@ -144,6 +145,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Improve efficiency of sniffers by deduplicating interface configurations. {issue}36574[36574] {pull}36576[36576]
+- Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
 
 *Winlogbeat*
 
