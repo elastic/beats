@@ -68,7 +68,7 @@ is collected by it.
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
 - syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
-
+- upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request.  {pull}99999[99999]
 
 *Auditbeat*
 
