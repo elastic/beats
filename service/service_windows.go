@@ -50,13 +50,15 @@ func (m *beatService) Execute(args []string, r <-chan svc.ChangeRequest, changes
 	log := logp.NewLogger("service_windows")
 	combinedChan := make(chan svc.ChangeRequest)
 	go func() {
-		select {
-		case c := <-r:
-			combinedChan <- c
-		case <-m.done:
-			// exits consumption loop on termination and reports stopping
-			combinedChan <- svc.ChangeRequest{Cmd: svc.Shutdown}
-			return
+		for {
+			select {
+			case c := <-r:
+				combinedChan <- c
+			case <-m.done:
+				// exits consumption loop on termination and reports stopping
+				combinedChan <- svc.ChangeRequest{Cmd: svc.Shutdown}
+				return
+			}
 		}
 	}()
 
