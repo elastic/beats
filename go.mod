@@ -201,7 +201,7 @@ require (
 	github.com/aws/smithy-go v1.13.5
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/elastic-agent-autodiscover v0.6.2
+	github.com/elastic/elastic-agent-autodiscover v0.6.4
 	github.com/elastic/elastic-agent-libs v0.3.15-0.20230913212237-dbdaf18c898b
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.7.0
