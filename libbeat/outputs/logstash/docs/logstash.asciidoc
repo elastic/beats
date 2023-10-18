@@ -286,7 +286,7 @@ list of configured hosts over time, use this option in conjunction with the
 `ttl` setting to close the connection at the configured interval and choose
 a new target host.
 
-The default value is `true`.
+The default value is `false`.
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
