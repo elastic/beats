@@ -272,6 +272,7 @@ is collected by it.
 
 *Winlogbeat*
 
+- Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 
 *Functionbeat*
 
