@@ -133,7 +133,7 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			filter = strings.Join(filterList, " AND ")
 		}
 
-		// Interval math for interval > timegrain
+		// Interval math for timegrain > period
 		if duration > client.Config.Period {
 
 			inTimespan := false
