@@ -326,8 +326,7 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
 	sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "http", MaxAttempts: uint16(2)}
 
-	// We simplify these to always down since hook order should not be
-	// determined by status
+	// We simplify these to always down
 	job := func(event *beat.Event) (j []jobs.Job, retErr error) {
 		time.Sleep(1 * time.Second)
 
