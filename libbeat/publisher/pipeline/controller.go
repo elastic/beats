@@ -60,8 +60,14 @@ type outputController struct {
 
 	workerChan chan publisher.Batch
 
-	consumer       *eventConsumer
-	workers        []outputWorker
+	consumer *eventConsumer
+	workers  []outputWorker
+	// The InputQueueSize can be set when the Beat is started, in
+	// libbeat/cmd/instance/Settings we need to preserve that
+	// value and pass it into the queue factory.  The queue
+	// factory could be made from elastic-agent output
+	// configuration reloading which doesn't have access to this
+	// setting.
 	inputQueueSize int
 }
 

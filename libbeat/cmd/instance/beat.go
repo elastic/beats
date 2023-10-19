@@ -1486,6 +1486,11 @@ func sanitizeIPs(ips []string) []string {
 	return validIPs
 }
 
+// promoteOutputQueueSettings checks to see if the output
+// configuration has queue settings defined and if so it promotes them
+// to the top level queue settings.  This is done to allow existing
+// behavior of specifying queue settings at the top level or like
+// elastic-agent that specifies queue settings under the output
 func promoteOutputQueueSettings(bc *beatConfig) error {
 	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
 		pc := pipeline.Config{}
