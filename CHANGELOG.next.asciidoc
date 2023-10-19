@@ -242,6 +242,7 @@ is collected by it.
 - Add cache processor. {pull}36786[36786]
 - Avoid unwanted publication of Azure entity records. {pull}36753[36753]
 - Avoid unwanted publication of Okta entity records. {pull}36770[36770]
+- Add support for Digest Authentication to CEL input. {issue}35514[35514] {pull}36932[36932]
 
 *Auditbeat*
 
