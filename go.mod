@@ -206,6 +206,7 @@ require (
 	github.com/elastic/elastic-agent-system-metrics v0.9.1
 	github.com/elastic/go-elasticsearch/v8 v8.11.1
 	github.com/elastic/mito v1.7.0
+	github.com/elastic/tk-btf v0.0.0-20231227125805-e670603a8cde
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/google/cel-go v0.17.7
@@ -217,6 +218,7 @@ require (
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.16
 	github.com/pkg/xattr v0.4.9
+	github.com/pkoutsovasilis/go-perf v0.0.0-20231227130624-06b8694b7453
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.7
@@ -264,6 +266,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
+	github.com/cilium/ebpf v0.12.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect

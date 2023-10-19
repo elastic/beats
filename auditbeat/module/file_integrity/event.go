@@ -65,11 +65,13 @@ const (
 	// SourceFSNotify identifies events triggered by a notification from the
 	// file system.
 	SourceFSNotify
+	SourceKProbes
 )
 
 var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
+	SourceKProbes:  "kprobes",
 }
 
 // Type identifies the file type (e.g. dir, file, symlink).
