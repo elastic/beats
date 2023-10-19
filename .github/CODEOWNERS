@@ -200,3 +200,4 @@ CHANGELOG*
 /x-pack/packetbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 /x-pack/libbeat/reader/parquet/ @elastic/security-external-integrations
+/x-pack/libbeat/reader/etw/ @elastic/security-external-integrations
