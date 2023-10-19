@@ -27,6 +27,11 @@ custom_definitions:
 {{end}}
 {{end}}
 
+{{if .pipeline}}
+pipeline: '{{.pipeline}}'
+{{end}}
+
+
 detect_sequence_reset: {{.detect_sequence_reset}}
 
 tags: {{.tags | tojson}}
