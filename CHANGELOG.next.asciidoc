@@ -166,6 +166,7 @@ is collected by it.
 - Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
   Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 
 *Auditbeat*
@@ -216,8 +217,7 @@ is collected by it.
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 - Add device handling to Okta input package for entity analytics. {pull}36049[36049]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}36286[36286]
+- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30916[30916] {pull}36286[36286]
 - [Azure] Add input metrics to the azure-eventhub input. {pull}35739[35739]
 - Reduce HTTPJSON metrics allocations. {pull}36282[36282]
 - Add support for a simplified input configuraton when running under Elastic-Agent {pull}36390[36390]

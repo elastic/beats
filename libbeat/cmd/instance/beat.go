@@ -66,6 +66,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
@@ -783,6 +784,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	if err := promoteOutputQueueSettings(&b.Config); err != nil {
+		return fmt.Errorf("could not promote output queue settings: %w", err)
+	}
+
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
@@ -1481,4 +1486,48 @@ func sanitizeIPs(ips []string) []string {
 		validIPs = append(validIPs, ip)
 	}
 	return validIPs
+}
+
+// promoteOutputQueueSettings checks to see if the output
+// configuration has queue settings defined and if so it promotes them
+// to the top level queue settings.  This is done to allow existing
+// behavior of specifying queue settings at the top level or like
+// elastic-agent that specifies queue settings under the output
+func promoteOutputQueueSettings(bc *beatConfig) error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		pc := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&pc)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if pc.Queue.IsSet() {
+			logp.Info("global queue settings replaced with output queue settings")
+			bc.Pipeline.Queue = pc.Queue
+		}
+	}
+	return nil
+}
+
+func (bc *beatConfig) Validate() error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		outputPC := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&outputPC)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
+			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
+		}
+		//elastic-agent doesn't support disk queue yet
+		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
+			return fmt.Errorf("disk queue is not supported when management is enabled")
+		}
+	}
+
+	//elastic-agent doesn't support disk queue yet
+	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
+		return fmt.Errorf("disk queue is not supported when management is enabled")
+	}
+
+	return nil
 }
