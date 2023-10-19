@@ -238,7 +238,7 @@ func TestReloader(t *testing.T) {
 elasticsearch:
   hosts: ["https://127.0.0.1:9200"]
   username: "elastic"
-  allow_older_versions: true
+  allow_older_versions: false
 `
 		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
 		require.NoError(t, err)
@@ -250,13 +250,13 @@ elasticsearch:
 		reloader := b.makeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
-		require.False(t, b.isConnectionToOlderVersionAllowed(), "the flag should not be present in the empty configuration")
+		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
 		err = reloader.Reload(update)
 		require.NoError(t, err)
 		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
 		require.Equal(t, outCfg, b.Config.Output.Config())
 		require.Same(t, c, m.cfg.Config)
-		require.True(t, b.isConnectionToOlderVersionAllowed(), "the flag should be present")
+		require.False(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should now be set to false")
 	})
 }
 

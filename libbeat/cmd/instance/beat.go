@@ -1033,16 +1033,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 func (b *Beat) registerESVersionCheckCallback() error {
 	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		if !isElasticsearchOutput(b.Config.Output.Name()) {
-			return errors.New("Elasticsearch output is not configured")
+			return errors.New("elasticsearch output is not configured")
 		}
-		if b.isConnectionToOlderVersionAllowed() {
+		// if we allow older versions, return early and don't check versions
+		// versions don't matter on serverless, so always bypass
+		if b.isConnectionToOlderVersionAllowed() || conn.IsServerless() {
 			return nil
 		}
 
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
-			return err
+			return fmt.Errorf("error fetching version from elasticsearch: %w", err)
 		}
 		if esVersion.LessThanMajorMinor(beatVersion) {
 			return fmt.Errorf("%w ES=%s, Beat=%s", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
@@ -1056,7 +1058,7 @@ func (b *Beat) registerESVersionCheckCallback() error {
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 	config := struct {
 		AllowOlder bool `config:"allow_older_versions"`
-	}{false}
+	}{true}
 
 	_ = b.Config.Output.Config().Unpack(&config)
 
