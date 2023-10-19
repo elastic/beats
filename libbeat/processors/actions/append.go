@@ -73,31 +73,27 @@ func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
 	return f, nil
 }
 
-func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
-	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
+func (f *appendProcessor) Run(event *beat.Event) (out *beat.Event, err error) {
+	ed := beat.NewEventEditor(event)
+	err = f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, ed)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
 		if publisher.LogWithTrace() {
 			f.logger.Debug(errMsg.Error())
 		}
 		if f.config.FailOnError {
-			event = backup
+			ed.Reset()
 			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {
 				return nil, fmt.Errorf("failed to append fields in append processor: %w", err)
 			}
 			return event, err
 		}
 	}
-
+	ed.Apply()
 	return event, nil
 }
 
-func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.Event) error {
+func (f *appendProcessor) appendValues(target string, fields []string, values []interface{}, event *beat.EventEditor) error {
 	var arr []interface{}
 
 	// get the existing value of target field

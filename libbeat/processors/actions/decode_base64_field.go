@@ -75,24 +75,22 @@ func NewDecodeBase64Field(c *cfg.C) (beat.Processor, error) {
 }
 
 func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	// Creates a copy of the event to revert in case of failure
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
+	ed := beat.NewEventEditor(event)
 
-	err := f.decodeField(event)
+	err := f.decodeField(ed)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %w", err)
 		if publisher.LogWithTrace() {
 			f.log.Debug(errMsg.Error())
 		}
 		if f.config.FailOnError {
-			event = backup
+			ed.Reset()
 			_, _ = event.PutValue("error.message", errMsg.Error())
 			return event, err
 		}
 	}
+
+	ed.Apply()
 	return event, nil
 }
 
@@ -100,7 +98,7 @@ func (f decodeBase64Field) String() string {
 	return fmt.Sprintf("%s=%+v", processorName, f.config.Field)
 }
 
-func (f *decodeBase64Field) decodeField(event *beat.Event) error {
+func (f *decodeBase64Field) decodeField(event *beat.EventEditor) error {
 	value, err := event.GetValue(f.config.Field.From)
 	if err != nil {
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {

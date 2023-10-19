@@ -74,30 +74,26 @@ func New(c *config.C) (beat.Processor, error) {
 }
 
 func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if p.config.FailOnError {
-		backup = event.Clone()
-	}
-
+	ed := beat.NewEventEditor(event)
 	for _, field := range p.config.Fields {
-		err := p.decodeField(field.From, field.To, event)
+		err := p.decodeField(field.From, field.To, ed)
 		if err != nil {
 			errMsg := fmt.Errorf("failed to decode fields in urldecode processor: %w", err)
 			if publisher.LogWithTrace() {
 				p.log.Debug(errMsg.Error())
 			}
 			if p.config.FailOnError {
-				event = backup
+				ed.Reset()
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
 		}
 	}
-
+	ed.Apply()
 	return event, nil
 }
 
-func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error {
+func (p *urlDecode) decodeField(from string, to string, event *beat.EventEditor) error {
 	value, err := event.GetValue(from)
 	if err != nil {
 		if p.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {

@@ -98,19 +98,18 @@ func NewDecodeCSVField(c *config.C) (beat.Processor, error) {
 
 // Run applies the decode_csv_field processor to an event.
 func (f *decodeCSVFields) Run(event *beat.Event) (*beat.Event, error) {
-	var saved *beat.Event
-	if f.FailOnError {
-		saved = event.Clone()
-	}
+	ed := beat.NewEventEditor(event)
 	for src, dest := range f.fields {
-		if err := f.decodeCSVField(src, dest, event); err != nil && f.FailOnError {
-			return saved, err
+		if err := f.decodeCSVField(src, dest, ed); err != nil && f.FailOnError {
+			ed.Reset()
+			return event, err
 		}
 	}
+	ed.Apply()
 	return event, nil
 }
 
-func (f *decodeCSVFields) decodeCSVField(src, dest string, event *beat.Event) error {
+func (f *decodeCSVFields) decodeCSVField(src, dest string, event *beat.EventEditor) error {
 	data, err := event.GetValue(src)
 	if err != nil {
 		if f.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {

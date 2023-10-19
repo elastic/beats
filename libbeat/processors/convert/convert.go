@@ -79,22 +79,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	// Backup original event.
-	saved := event
-
-	if len(p.Fields) > 1 && p.FailOnError {
-		// Clone the fields to allow the processor to undo the operation on
-		// failure (like a transaction). If there is only one conversion then
-		// cloning is unnecessary because there are no previous changes to
-		// rollback (so avoid the expensive clone operation).
-		saved = event.Clone()
-	}
+	ed := beat.NewEventEditor(event)
 
 	// Update the event with the converted values.
-	if err := p.writeToEvent(event, converted); err != nil {
-		return saved, err
+	if err := p.writeToEvent(ed, converted); err != nil {
+		ed.Reset()
+		return event, err
 	}
-
+	ed.Apply()
 	return event, nil
 }
 
@@ -134,7 +126,7 @@ func (p *processor) convertField(event *beat.Event, conversion field) (interface
 	return v, nil
 }
 
-func (p *processor) writeToEvent(event *beat.Event, converted []interface{}) error {
+func (p *processor) writeToEvent(event *beat.EventEditor, converted []interface{}) error {
 	for i, conversion := range p.Fields {
 		v := converted[i]
 		if v == ignoredFailure {

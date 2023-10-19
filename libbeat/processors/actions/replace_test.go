@@ -240,12 +240,15 @@ func TestReplaceField(t *testing.T) {
 				},
 			}
 
-			err := f.replaceField(test.Field, test.Pattern, test.Replacement, &beat.Event{Fields: test.Input})
+			event := &beat.Event{Fields: test.Input}
+			ed := beat.NewEventEditor(event)
+			err := f.replaceField(test.Field, test.Pattern, test.Replacement, ed)
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
 
-			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
+			ed.Apply()
+			assert.Equal(t, test.Output, test.Input)
 		})
 	}
 

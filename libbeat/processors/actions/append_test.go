@@ -174,7 +174,8 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 				config: tt.fields.config,
 				logger: tt.fields.logger,
 			}
-			if err := f.appendValues(tt.args.target, tt.args.fields, tt.args.values, tt.args.event); (err != nil) != tt.wantErr {
+			ed := beat.NewEventEditor(tt.args.event)
+			if err := f.appendValues(tt.args.target, tt.args.fields, tt.args.values, ed); (err != nil) != tt.wantErr {
 				t.Errorf("appendProcessor.appendValues() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

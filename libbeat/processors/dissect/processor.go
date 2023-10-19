@@ -104,21 +104,24 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	backup := event.Clone()
+	ed := beat.NewEventEditor(event)
 
 	if convertDataType {
-		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
+		err = p.mapper(ed, mapInterfaceToMapStr(mc))
 	} else {
-		event, err = p.mapper(event, mapToMapStr(m))
+		err = p.mapper(ed, mapToMapStr(m))
 	}
 	if err != nil {
-		return backup, err
+		ed.Reset()
+		return event, err
 	}
+
+	ed.Apply()
 
 	return event, nil
 }
 
-func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
+func (p *processor) mapper(event *beat.EventEditor, m mapstr.M) error {
 	prefix := ""
 	if p.config.TargetPrefix != "" {
 		prefix = p.config.TargetPrefix + "."
@@ -131,13 +134,13 @@ func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 		} else {
 			// When the target key exists but is a string instead of a map.
 			if err != nil {
-				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
+				return fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
-			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
+			return fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}
 	}
 
-	return event, nil
+	return nil
 }
 
 func (p *processor) String() string {

@@ -130,10 +130,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, fmt.Errorf("unsupported type for field %s: got: %s needed: array", f.config.Field, t.String())
 	}
 
-	saved := event
-	if f.config.FailOnError {
-		saved = event.Clone()
-	}
+	ed := beat.NewEventEditor(event)
 
 	n := array.Len()
 	for _, mapping := range f.mappings {
@@ -141,7 +138,8 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			if !f.config.FailOnError {
 				continue
 			}
-			return saved, fmt.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
+			ed.Reset()
+			return event, fmt.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
 		}
 		cell := array.Index(mapping.from)
 		// checking for CanInterface() here is done to prevent .Interface() from
@@ -151,20 +149,23 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			continue
 		}
 		if !f.config.OverwriteKeys {
-			if _, err = event.GetValue(mapping.to); err == nil {
+			if _, err = ed.GetValue(mapping.to); err == nil {
 				if !f.config.FailOnError {
 					continue
 				}
-				return saved, fmt.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
+				ed.Reset()
+				return event, fmt.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
 			}
 		}
-		if _, err = event.PutValue(mapping.to, clone(cell.Interface())); err != nil {
+		if _, err = ed.PutValue(mapping.to, clone(cell.Interface())); err != nil {
 			if !f.config.FailOnError {
 				continue
 			}
-			return saved, fmt.Errorf("failed setting field %s: %w", mapping.to, err)
+			ed.Reset()
+			return event, fmt.Errorf("failed setting field %s: %w", mapping.to, err)
 		}
 	}
+	ed.Apply()
 	return event, nil
 }
 

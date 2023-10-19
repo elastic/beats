@@ -70,30 +70,27 @@ func NewCopyFields(c *conf.C) (beat.Processor, error) {
 }
 
 func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
+	ed := beat.NewEventEditor(event)
 	for _, field := range f.config.Fields {
-		err := f.copyField(field.From, field.To, event)
+		err := f.copyField(field.From, field.To, ed)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %w", err)
 			if publisher.LogWithTrace() {
 				f.logger.Debug(errMsg.Error())
 			}
 			if f.config.FailOnError {
-				event = backup
+				ed.Reset()
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
 		}
 	}
 
+	ed.Apply()
 	return event, nil
 }
 
-func (f *copyFields) copyField(from string, to string, event *beat.Event) error {
+func (f *copyFields) copyField(from string, to string, event *beat.EventEditor) error {
 	_, err := event.GetValue(to)
 	if err == nil {
 		return fmt.Errorf("target field %s already exists, drop or rename this field first", to)

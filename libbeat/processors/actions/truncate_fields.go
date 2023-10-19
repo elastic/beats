@@ -82,26 +82,22 @@ func NewTruncateFields(c *conf.C) (beat.Processor, error) {
 }
 
 func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
+	ed := beat.NewEventEditor(event)
 	for _, field := range f.config.Fields {
-		err := f.truncateSingleField(field, event)
+		err := f.truncateSingleField(field, ed)
 		if err != nil {
 			f.logger.Debugf("Failed to truncate fields: %s", err)
 			if f.config.FailOnError {
-				event = backup
+				ed.Reset()
 				return event, err
 			}
 		}
 	}
-
+	ed.Apply()
 	return event, nil
 }
 
-func (f *truncateFields) truncateSingleField(field string, event *beat.Event) error {
+func (f *truncateFields) truncateSingleField(field string, event *beat.EventEditor) error {
 	v, err := event.GetValue(field)
 	if err != nil {
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
@@ -121,7 +117,7 @@ func (f *truncateFields) truncateSingleField(field string, event *beat.Event) er
 
 }
 
-func (f *truncateFields) addTruncatedString(field, value string, event *beat.Event) error {
+func (f *truncateFields) addTruncatedString(field, value string, event *beat.EventEditor) error {
 	truncated, isTruncated, err := f.truncate(f, []byte(value))
 	if err != nil {
 		return err
@@ -132,12 +128,12 @@ func (f *truncateFields) addTruncatedString(field, value string, event *beat.Eve
 	}
 
 	if isTruncated {
-		_ = mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		_ = event.AddTagsWithKey("log.flags", "truncated")
 	}
 	return nil
 }
 
-func (f *truncateFields) addTruncatedByte(field string, value []byte, event *beat.Event) error {
+func (f *truncateFields) addTruncatedByte(field string, value []byte, event *beat.EventEditor) error {
 	truncated, isTruncated, err := f.truncate(f, value)
 	if err != nil {
 		return err
@@ -148,7 +144,7 @@ func (f *truncateFields) addTruncatedByte(field string, value []byte, event *bea
 	}
 
 	if isTruncated {
-		_ = mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		_ = event.AddTagsWithKey("log.flags", "truncated")
 	}
 	return nil
 }

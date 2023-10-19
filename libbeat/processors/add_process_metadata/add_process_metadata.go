@@ -217,7 +217,7 @@ func pidToInt(value interface{}) (pid int, err error) {
 	return pid, nil
 }
 
-func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result *beat.Event, err error) {
+func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (*beat.Event, error) {
 	pidIf, err := event.GetValue(pidField)
 	if err != nil {
 		return nil, err
@@ -253,7 +253,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 		return nil, ErrNoProcess
 	}
 
-	result = event.Clone()
+	ed := beat.NewEventEditor(event)
 	for dest, sourceIf := range p.mappings {
 		source, castOk := sourceIf.(string)
 		if !castOk {
@@ -261,7 +261,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 			return nil, errors.New("source is not a string")
 		}
 		if !p.config.OverwriteKeys {
-			if _, err := result.GetValue(dest); err == nil {
+			if _, err := ed.GetValue(dest); err == nil {
 				return nil, fmt.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
 			}
 		}
@@ -272,12 +272,13 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 			continue
 		}
 
-		if _, err = result.PutValue(dest, value); err != nil {
+		if _, err = ed.PutValue(dest, value); err != nil {
 			return nil, err
 		}
 	}
 
-	return result, nil
+	ed.Apply()
+	return event, nil
 }
 
 func (p *addProcessMetadata) getContainerID(pid int) (string, error) {

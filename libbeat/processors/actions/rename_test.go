@@ -358,12 +358,14 @@ func TestRenameField(t *testing.T) {
 				},
 			}
 
-			err := f.renameField(test.From, test.To, &beat.Event{Fields: test.Input})
+			event := &beat.Event{Fields: test.Input}
+			ed := beat.NewEventEditor(event)
+			err := f.renameField(test.From, test.To, ed)
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}
-
-			assert.True(t, reflect.DeepEqual(test.Input, test.Output))
+			ed.Apply()
+			assert.Equal(t, test.Output, test.Input)
 		})
 	}
 
