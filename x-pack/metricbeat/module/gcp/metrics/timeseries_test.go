@@ -475,7 +475,7 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
 					"event": mapstr.M{
-						"metric_names": "metric1,metric2",
+						"metric_names_hash": "2a990d0ce61c177d3bc05def9f536de164d3ea10056b7120414ad370a0f686c0",
 					},
 				},
 			},
@@ -504,7 +504,7 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 					"event": mapstr.M{
-						"metric_names": "metric3,metric4",
+						"metric_names_hash": "f7c8d8a9a75411effbd2171a8fa984a5e618eeca3911829b03c7e3e3d6e74522",
 					},
 				},
 			},
@@ -532,7 +532,7 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
 					"event": mapstr.M{
-						"metric_names": "metric5",
+						"metric_names_hash": "ce7dee36d9ab56de52176bf05d21c0bc446da9a3134727bf5e300604f2ca63ef",
 					},
 				},
 			},

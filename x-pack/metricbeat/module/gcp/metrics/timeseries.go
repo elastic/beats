@@ -6,6 +6,8 @@ package metrics
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -140,7 +142,12 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) [
 			event.RootFields = group[0].ECS
 		}
 
-		_, _ = event.RootFields.Put("event.metric_names", strings.Join(metricNames, ","))
+		// Hashes metric names string using SHA-256 to always have
+		// a constant length value and avoid overflowing the
+		// current TSDB dimension field limit (1024).
+		metricNamesHash := hash(strings.Join(metricNames, ","))
+
+		_, _ = event.RootFields.Put("event.metric_names_hash", metricNamesHash)
 
 		events = append(events, event)
 	}
@@ -187,4 +194,11 @@ func (m *MetricSet) groupTimeSeries(ctx context.Context, timeSeries []timeSeries
 	groupedMetrics := groupMetricsByDimensions(kvs)
 
 	return groupedMetrics
+}
+
+// hash return the SHA-256 hash of the input string.
+func hash(s string) string {
+	h := sha256.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }

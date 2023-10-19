@@ -7,10 +7,10 @@
     - name: event
       type: group
       fields:
-        - name: metric_names
+        - name: metric_names_hash
           type: keyword
           description: >
-            The comma-separated list metric names collected in the batch. For example, l3.external.ingress_packets.count,l3.external.ingress.bytes. Required to support TSDB.
+            The SHA-256 hash of the comma-separated list metric names collected in the batch. For example, l3.external.ingress_packets.count,l3.external.ingress.bytes > 24848afd85b65b9e168fa5dee12bd3e121c58a504cc0b4386a15bd9bcd065a5d. Required to support TSDB.
     - name: gcp
       type: group
       fields:
