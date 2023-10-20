@@ -43,28 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
-- Add GCP CloudSQL region filter {pull}32943[32943]
-- Fix logstash cgroup mappings {pull}33131[33131]
-- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
-- Make generic SQL GA {pull}34637[34637]
-- Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-- Add context with timeout in AWS API calls {pull}35425[35425]
-- Fix EC2 host.cpu.usage {pull}35717[35717]
-- Resolve statsd module's prematurely halting of metrics parsing upon encountering an invalid packet. {pull}35075[35075]
-- Fix the gap in fetching forecast API metrics at the end of each month for Azure billing module  {pull}36142[36142]
-- Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
-- Fix Azure Monitor empty metricnamespace. {pull}36295[36295]
-- Fix GCP compute metadata. {pull}36338[36338]
-- Add support for api_key authentication in elasticsearch module  {pull}36274[36274]
-- Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
-- Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
-- Add log error when statsd server fails to start {pull}36477[36477]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
-
-*Osquerybeat*
 
 
 *Packetbeat*
