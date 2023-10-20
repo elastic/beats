@@ -40,7 +40,8 @@ func mapMetrics(metrics []Metric) []KeyValuePoint {
 	for _, metric := range metrics {
 		for _, value := range metric.Values {
 			point := KeyValuePoint{
-				Timestamp: value.timestamp,
+				Timestamp:  value.timestamp,
+				Dimensions: mapstr.M{},
 			}
 
 			metricName := fmt.Sprintf("%s", managePropertyName(value.name))
