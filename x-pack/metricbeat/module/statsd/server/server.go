@@ -95,7 +95,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	mappings, err := buildMappings(config.Mappings)
 	if err != nil {
-		return nil, fmt.Errorf("invalid mapping configuration for `statsd.mapping`: %w", err)
+		return nil, fmt.Errorf("invalid mapping configuration for `statsd.mappings`: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -165,28 +165,26 @@ func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
 
 func (m *MetricSet) getEvents() []*mb.Event {
 	groups := m.processor.GetAll()
-	events := make([]*mb.Event, len(groups))
-
-	for idx, tagGroup := range groups {
-
-		mapstrTags := mapstr.M{}
+	if len(groups) == 0 {
+		return nil
+	}
+	events := make([]*mb.Event, 0, len(groups))
+	for _, tagGroup := range groups {
+		mapstrTags := make(mapstr.M, len(tagGroup.tags))
 		for k, v := range tagGroup.tags {
 			mapstrTags[k] = v
 		}
 
-		sanitizedMetrics := mapstr.M{}
 		for k, v := range tagGroup.metrics {
-			eventMapping(k, v, sanitizedMetrics, m.mappings)
-		}
-
-		if len(sanitizedMetrics) == 0 {
-			continue
-		}
-
-		events[idx] = &mb.Event{
-			MetricSetFields: sanitizedMetrics,
-			RootFields:      mapstr.M{"labels": mapstrTags},
-			Namespace:       m.Module().Name(),
+			ms := eventMapping(k, v, m.mappings)
+			if ms == nil || len(*ms) == 0 {
+				continue
+			}
+			events = append(events, &mb.Event{
+				MetricSetFields: *ms,
+				RootFields:      mapstr.M{"labels": mapstrTags},
+				Namespace:       m.Module().Name(),
+			})
 		}
 	}
 	return events
