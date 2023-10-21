@@ -1130,7 +1130,7 @@ func TestTagsGrouping(t *testing.T) {
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 2)
+	assert.Len(t, events, 4)
 
 	actualTags := []mapstr.M{}
 	for _, e := range events {
@@ -1142,6 +1142,18 @@ func TestTagsGrouping(t *testing.T) {
 			"labels": mapstr.M{
 				"k1": "v1",
 				"k2": "v2",
+			},
+		},
+		{
+			"labels": mapstr.M{
+				"k1": "v1",
+				"k2": "v2",
+			},
+		},
+		{
+			"labels": mapstr.M{
+				"k1": "v2",
+				"k2": "v3",
 			},
 		},
 		{
@@ -1222,7 +1234,7 @@ func TestData(t *testing.T) {
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 1)
+	assert.Len(t, events, 10)
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
