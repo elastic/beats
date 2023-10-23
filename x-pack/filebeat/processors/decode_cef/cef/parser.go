@@ -68,12 +68,12 @@ func (e *Event) unpack(data string) error {
 
 	e.init(data)
 
-// line-disable-directive parser.go:70
+	// line-disable-directive parser.go:70
 	{
 		cs = cef_start
 	}
 
-// line-disable-directive parser.go:75
+	// line-disable-directive parser.go:75
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -978,72 +978,72 @@ func (e *Event) unpack(data string) error {
 		goto f26
 
 	f0:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
 		goto _again
 	f4:
-// line-disable-directive cef.rl:55
+		// line-disable-directive cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f6:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
 		goto _again
 	f1:
-// line-disable-directive cef.rl:61
+		// line-disable-directive cef.rl:61
 
 		e.Version, _ = strconv.Atoi(data[mark:p])
 
 		goto _again
 	f5:
-// line-disable-directive cef.rl:64
+		// line-disable-directive cef.rl:64
 
 		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f10:
-// line-disable-directive cef.rl:68
+		// line-disable-directive cef.rl:68
 
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f13:
-// line-disable-directive cef.rl:72
+		// line-disable-directive cef.rl:72
 
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f16:
-// line-disable-directive cef.rl:76
+		// line-disable-directive cef.rl:76
 
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f19:
-// line-disable-directive cef.rl:80
+		// line-disable-directive cef.rl:80
 
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f22:
-// line-disable-directive cef.rl:84
+		// line-disable-directive cef.rl:84
 
 		e.Severity = data[mark:p]
 
 		goto _again
 	f23:
-// line-disable-directive cef.rl:87
+		// line-disable-directive cef.rl:87
 
 		// A new extension key marks the end of the last extension value.
 		if len(state.key) > 0 && state.valueStart <= mark-1 {
@@ -1054,20 +1054,20 @@ func (e *Event) unpack(data string) error {
 
 		goto _again
 	f29:
-// line-disable-directive cef.rl:95
+		// line-disable-directive cef.rl:95
 
 		state.valueStart = p
 		state.valueEnd = p
 
 		goto _again
 	f25:
-// line-disable-directive cef.rl:99
+		// line-disable-directive cef.rl:99
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f24:
-// line-disable-directive cef.rl:109
+		// line-disable-directive cef.rl:109
 
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
@@ -1075,7 +1075,7 @@ func (e *Event) unpack(data string) error {
 
 		goto _again
 	f26:
-// line-disable-directive cef.rl:113
+		// line-disable-directive cef.rl:113
 
 		state.reset()
 		// Resume processing at p, the start of the next extension key.
@@ -1084,193 +1084,193 @@ func (e *Event) unpack(data string) error {
 
 		goto _again
 	f2:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:55
+		// line-disable-directive cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f3:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:64
+		// line-disable-directive cef.rl:64
 
 		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f9:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:68
+		// line-disable-directive cef.rl:68
 
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f12:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:72
+		// line-disable-directive cef.rl:72
 
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f15:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:76
+		// line-disable-directive cef.rl:76
 
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f18:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:80
+		// line-disable-directive cef.rl:80
 
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f21:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:84
+		// line-disable-directive cef.rl:84
 
 		e.Severity = data[mark:p]
 
 		goto _again
 	f33:
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
-// line-disable-directive cef.rl:99
+		// line-disable-directive cef.rl:99
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f7:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:55
+		// line-disable-directive cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f8:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:64
+		// line-disable-directive cef.rl:64
 
 		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f11:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:68
+		// line-disable-directive cef.rl:68
 
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f14:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:72
+		// line-disable-directive cef.rl:72
 
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f17:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:76
+		// line-disable-directive cef.rl:76
 
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f20:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:80
+		// line-disable-directive cef.rl:80
 
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
 		goto _again
 	f35:
-// line-disable-directive cef.rl:58
+		// line-disable-directive cef.rl:58
 
 		state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:99
+		// line-disable-directive cef.rl:99
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f30:
-// line-disable-directive cef.rl:95
+		// line-disable-directive cef.rl:95
 
 		state.valueStart = p
 		state.valueEnd = p
 
-// line-disable-directive cef.rl:55
+		// line-disable-directive cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f28:
-// line-disable-directive cef.rl:95
+		// line-disable-directive cef.rl:95
 
 		state.valueStart = p
 		state.valueEnd = p
 
-// line-disable-directive cef.rl:99
+		// line-disable-directive cef.rl:99
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f32:
-// line-disable-directive cef.rl:99
+		// line-disable-directive cef.rl:99
 
 		state.valueEnd = p + 1
 
-// line-disable-directive cef.rl:52
+		// line-disable-directive cef.rl:52
 
 		mark = p
 
@@ -1289,7 +1289,7 @@ func (e *Event) unpack(data string) error {
 		if (p) == eof {
 			switch _cef_eof_actions[cs] {
 			case 32:
-// line-disable-directive cef.rl:102
+				// line-disable-directive cef.rl:102
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -1298,18 +1298,18 @@ func (e *Event) unpack(data string) error {
 				}
 
 			case 25:
-// line-disable-directive cef.rl:109
+				// line-disable-directive cef.rl:109
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
 				cs = 33
 
 			case 35:
-// line-disable-directive cef.rl:58
+				// line-disable-directive cef.rl:58
 
 				state.pushEscape(mark_slash, p)
 
-// line-disable-directive cef.rl:102
+				// line-disable-directive cef.rl:102
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -1318,12 +1318,12 @@ func (e *Event) unpack(data string) error {
 				}
 
 			case 28:
-// line-disable-directive cef.rl:95
+				// line-disable-directive cef.rl:95
 
 				state.valueStart = p
 				state.valueEnd = p
 
-// line-disable-directive cef.rl:102
+				// line-disable-directive cef.rl:102
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -1331,7 +1331,7 @@ func (e *Event) unpack(data string) error {
 					state.reset()
 				}
 
-// line-disable-directive parser.go:1130
+				// line-disable-directive parser.go:1130
 			}
 		}
 
@@ -1340,7 +1340,7 @@ func (e *Event) unpack(data string) error {
 		}
 	}
 
-// line-disable-directive cef.rl:175
+	// line-disable-directive cef.rl:175
 
 	// Check if state machine completed.
 	if cs < cef_first_final {
