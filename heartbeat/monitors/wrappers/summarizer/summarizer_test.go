@@ -223,7 +223,7 @@ func TestSummarizer(t *testing.T) {
 }
 
 // Test wrapper plugin hook order. Guaranteed order for plugins to be called upon determines
-// what data can be appended to the event at each stage through retries. With this guarentee,
+// what data can be appended to the event at each stage through retries. With this guarantee,
 // plugins just need to ascertain that their invariants apply through hook execution order
 func TestSummarizerPluginOrder(t *testing.T) {
 	t.Parallel()
