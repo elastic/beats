@@ -247,11 +247,10 @@ Example configurations with authentication:
 ----
 filebeat.inputs:
 - type: cel
+  auth.basic:
+    user: user@domain.tld
+    password: P@$$W0₹D
   resource.url: http://localhost
-  request.transforms:
-    - set:
-        target: header.Authorization
-        value: 'Basic aGVsbG86d29ybGQ='
 ----
 
 ["source","yaml",subs="attributes"]
