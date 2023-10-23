@@ -223,8 +223,6 @@ func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, 
 			"Check your configuration."
 	}
 
-	m.clientHandler.Mode()
-
 	var warn string
 	if !ilmComponent.load {
 		warn += "lifecycle policy loading not enabled.\n"
