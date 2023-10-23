@@ -164,6 +164,7 @@ is collected by it.
 - Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
   Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 
 *Auditbeat*
 
