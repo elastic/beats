@@ -370,7 +370,7 @@ func getCurrentDate() string {
 func generateEventID(currentDate string, row row) string {
 	// create eventID using hash of current_date + invoice.month + project.id + project.name
 	// This will prevent more than one billing metric getting collected in the same day.
-	eventID := currentDate + row.InvoiceMonth + row.ProjectId + row.ProjectName
+	eventID := currentDate + row.InvoiceMonth + row.ProjectId + row.ProjectName + row.SkuId + row.ServiceId
 	h := sha256.New()
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
