@@ -739,7 +739,7 @@ func TestEventMapping(t *testing.T) {
 		t.Run(test.metricName, func(t *testing.T) {
 			builtMappings, _ := buildMappings(mappings)
 			ms := eventMapping(test.metricName, test.metricValue, builtMappings)
-			assert.Equal(t, test.expected, *ms)
+			assert.Equal(t, test.expected, ms)
 		})
 	}
 }

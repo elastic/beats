@@ -177,11 +177,11 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 		for k, v := range tagGroup.metrics {
 			ms := eventMapping(k, v, m.mappings)
-			if ms == nil || len(*ms) == 0 {
+			if ms == nil || len(ms) == 0 {
 				continue
 			}
 			events = append(events, &mb.Event{
-				MetricSetFields: *ms,
+				MetricSetFields: ms,
 				RootFields:      mapstr.M{"labels": mapstrTags},
 				Namespace:       m.Module().Name(),
 			})
