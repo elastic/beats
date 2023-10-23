@@ -24,6 +24,7 @@ import (
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
@@ -686,6 +687,19 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
+	}
+
+	if cfg.Auth.Digest.isEnabled() {
+		var noReuse bool
+		if cfg.Auth.Digest.NoReuse != nil {
+			noReuse = *cfg.Auth.Digest.NoReuse
+		}
+		c.Transport = &digest.Transport{
+			Transport: c.Transport,
+			Username:  cfg.Auth.Digest.User,
+			Password:  cfg.Auth.Digest.Password,
+			NoReuse:   noReuse,
+		}
 	}
 
 	if cfg.Resource.Tracer != nil {
