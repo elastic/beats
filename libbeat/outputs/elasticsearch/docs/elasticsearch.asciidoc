@@ -754,7 +754,7 @@ output.elasticsearch:
 [[es-apis]]
 ==== Elasticsearch APIs
 {beatname_uc} will use the `_bulk` API from {es}, the events are sent
-in the order they arrive the publishing pipeline, a single `_bulk`
+in the order they arrive to the publishing pipeline, a single `_bulk`
 request may contain events from different inputs/modules. Temporary
 failures are re-tried.
 
