@@ -227,7 +227,12 @@ func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, 
 	if !ilmComponent.load {
 		warn += "lifecycle policy loading not enabled.\n"
 	} else if !ilmComponent.overwrite {
-		warn += "Overwriting lifecycle policy is disabled. Set `setup.ilm.overwrite: true` or `setup.dsl.overwrite: true` to overwrite.\n"
+		if m.clientHandler.Mode() == lifecycle.DSL {
+			warn += "Overwriting lifecycle policy is disabled. Set `setup.dsl.overwrite: true` to overwrite.\n"
+		} else {
+			warn += "Overwriting lifecycle policy is disabled. Set `setup.ilm.overwrite: true` to overwrite.\n"
+		}
+
 	}
 	if !templateComponent.load {
 		warn += "Template loading not enabled.\n"
