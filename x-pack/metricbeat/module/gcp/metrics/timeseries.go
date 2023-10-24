@@ -147,7 +147,7 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) [
 		// current TSDB dimension field limit (1024).
 		metricNamesHash := hash(strings.Join(metricNames, ","))
 
-		_, _ = event.RootFields.Put("event.metric_names_hash", metricNamesHash)
+		_, _ = event.ModuleFields.Put("metric_names_fingerprint", metricNamesHash)
 
 		events = append(events, event)
 	}

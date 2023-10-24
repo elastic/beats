@@ -35303,7 +35303,7 @@ GCP module
 
 
 
-*`event.metric_names_hash`*::
+*`gcp.metric_names_fingerprint`*::
 +
 --
 The SHA-256 hash of the comma-separated list metric names collected in the batch. For example, l3.external.ingress_packets.count,l3.external.ingress.bytes > 24848afd85b65b9e168fa5dee12bd3e121c58a504cc0b4386a15bd9bcd065a5d. Required to support TSDB.
@@ -35312,7 +35312,6 @@ The SHA-256 hash of the comma-separated list metric names collected in the batch
 type: keyword
 
 --
-
 
 *`gcp.labels`*::
 +

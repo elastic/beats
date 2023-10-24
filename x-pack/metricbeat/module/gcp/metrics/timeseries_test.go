@@ -453,6 +453,7 @@ func TestCreateEventsFromGroup(t *testing.T) {
 			{
 				Timestamp: timestampGroup1,
 				ModuleFields: mapstr.M{
+					"metric_names_fingerprint": "2a990d0ce61c177d3bc05def9f536de164d3ea10056b7120414ad370a0f686c0",
 					"labels": mapstr.M{
 						"user.deployment":     "deploy-1",
 						"user.division":       "div-1",
@@ -474,14 +475,12 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.instance.id":       "1",
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-west",
-					"event": mapstr.M{
-						"metric_names_hash": "2a990d0ce61c177d3bc05def9f536de164d3ea10056b7120414ad370a0f686c0",
-					},
 				},
 			},
 			{
 				Timestamp: timestampGroup2,
 				ModuleFields: mapstr.M{
+					"metric_names_fingerprint": "f7c8d8a9a75411effbd2171a8fa984a5e618eeca3911829b03c7e3e3d6e74522",
 					"labels": mapstr.M{
 						"user.deployment":     "deploy-1",
 						"user.division":       "div-1",
@@ -503,14 +502,12 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.instance.id":       "1",
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
-					"event": mapstr.M{
-						"metric_names_hash": "f7c8d8a9a75411effbd2171a8fa984a5e618eeca3911829b03c7e3e3d6e74522",
-					},
 				},
 			},
 			{
 				Timestamp: timestampGroup3,
 				ModuleFields: mapstr.M{
+					"metric_names_fingerprint": "ce7dee36d9ab56de52176bf05d21c0bc446da9a3134727bf5e300604f2ca63ef",
 					"labels": mapstr.M{
 						"user.deployment":     "deploy-1",
 						"user.division":       "div-1",
@@ -531,9 +528,6 @@ func TestCreateEventsFromGroup(t *testing.T) {
 					"cloud.instance.id":       "2",
 					"cloud.provider":          "gcp",
 					"cloud.region":            "us-east",
-					"event": mapstr.M{
-						"metric_names_hash": "ce7dee36d9ab56de52176bf05d21c0bc446da9a3134727bf5e300604f2ca63ef",
-					},
 				},
 			},
 		}
