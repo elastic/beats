@@ -285,24 +285,23 @@ func (s *server) getErr() error {
 }
 
 func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
-	validator := &apiValidator{
-		basicAuth:    c.BasicAuth,
-		username:     c.Username,
-		password:     c.Password,
-		method:       c.Method,
-		contentType:  c.ContentType,
-		secretHeader: c.SecretHeader,
-		secretValue:  c.SecretValue,
-		hmacHeader:   c.HMACHeader,
-		hmacKey:      c.HMACKey,
-		hmacType:     c.HMACType,
-		hmacPrefix:   c.HMACPrefix,
-	}
-
-	handler := &httpHandler{
-		log:                   log,
-		publisher:             pub,
-		metrics:               metrics,
+	return &handler{
+		log:       log,
+		publisher: pub,
+		metrics:   metrics,
+		validator: apiValidator{
+			basicAuth:    c.BasicAuth,
+			username:     c.Username,
+			password:     c.Password,
+			method:       c.Method,
+			contentType:  c.ContentType,
+			secretHeader: c.SecretHeader,
+			secretValue:  c.SecretValue,
+			hmacHeader:   c.HMACHeader,
+			hmacKey:      c.HMACKey,
+			hmacType:     c.HMACType,
+			hmacPrefix:   c.HMACPrefix,
+		},
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
 		responseBody:          c.ResponseBody,
@@ -310,8 +309,6 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *in
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
-
-	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
 }
 
 // inputMetrics handles the input's metric reporting.

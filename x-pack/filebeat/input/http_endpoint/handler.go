@@ -29,10 +29,11 @@ var (
 	errNotCRC          = errors.New("event not processed as CRC request")
 )
 
-type httpHandler struct {
-	log       *logp.Logger
-	publisher stateless.Publisher
+type handler struct {
 	metrics   *inputMetrics
+	publisher stateless.Publisher
+	log       *logp.Logger
+	validator apiValidator
 
 	messageField          string
 	responseCode          int
@@ -42,8 +43,12 @@ type httpHandler struct {
 	crc                   *crcValidator
 }
 
-// Triggers if middleware validation returns successful
-func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
+func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if status, err := h.validator.validateRequest(r); err != nil {
+		sendAPIErrorResponse(w, r, h.log, status, err)
+		return
+	}
+
 	start := time.Now()
 	h.metrics.batchesReceived.Add(1)
 	h.metrics.contentLength.Update(r.ContentLength)
@@ -101,7 +106,18 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	h.metrics.batchesPublished.Add(1)
 }
 
-func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {
+func sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(false)
+	if err := enc.Encode(map[string]interface{}{"message": apiError.Error()}); err != nil {
+		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
+	}
+}
+
+func (h *handler) sendResponse(w http.ResponseWriter, status int, message string) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 	if _, err := io.WriteString(w, message); err != nil {
@@ -109,7 +125,7 @@ func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message st
 	}
 }
 
-func (h *httpHandler) publishEvent(obj, headers mapstr.M) error {
+func (h *handler) publishEvent(obj, headers mapstr.M) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields:    mapstr.M{},
