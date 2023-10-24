@@ -74,8 +74,7 @@ func (a *azureInput) runWithEPH() error {
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
 			var onEventErr error
-			// partitionID is not yet mapped in the azure-eventhub sdk
-			ok := a.processEvents(e, "")
+			ok := a.processEvents(e, *e.PartitionKey)
 			if !ok {
 				onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
 				a.log.Error(onEventErr.Error())

@@ -194,8 +194,7 @@ func (a *azureInput) Wait() {
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
 	processingStartTime := time.Now()
 	azure := mapstr.M{
-		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
-		//"partition_id":   partitionID,
+		"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}

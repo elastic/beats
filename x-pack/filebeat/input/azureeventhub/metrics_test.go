@@ -25,13 +25,14 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 	now := time.Now()
 	var off int64 = 1234
 	var pID int16 = 1
+	var pKey string = "1"
 
 	properties := eventhub.SystemProperties{
 		SequenceNumber: &sn,
 		EnqueuedTime:   &now,
 		Offset:         &off,
 		PartitionID:    &pID,
-		PartitionKey:   nil,
+		PartitionKey:   &pKey,
 	}
 
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
@@ -134,9 +135,10 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		ev := eventhub.Event{
 			Data:             tc.event,
 			SystemProperties: &properties,
+			PartitionKey:     properties.PartitionKey,
 		}
 
-		ok := input.processEvents(&ev, "0")
+		ok := input.processEvents(&ev, *ev.PartitionKey)
 		if !ok {
 			t.Fatal("OnEvent function returned false")
 		}

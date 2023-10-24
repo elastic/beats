@@ -53,21 +53,23 @@ func TestProcessEvents(t *testing.T) {
 	now := time.Now()
 	var off int64 = 1234
 	var pID int16 = 1
+	var pKey string = "1"
 
 	properties := eventhub.SystemProperties{
 		SequenceNumber: &sn,
 		EnqueuedTime:   &now,
 		Offset:         &off,
 		PartitionID:    &pID,
-		PartitionKey:   nil,
+		PartitionKey:   &pKey,
 	}
 	single := "{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"
 	msg := fmt.Sprintf("{\"records\":[%s]}", single)
 	ev := eventhub.Event{
 		Data:             []byte(msg),
 		SystemProperties: &properties,
+		PartitionKey:     properties.PartitionKey,
 	}
-	ok := input.processEvents(&ev, "0")
+	ok := input.processEvents(&ev, *ev.PartitionKey)
 	if !ok {
 		t.Fatal("OnEvent function returned false")
 	}
