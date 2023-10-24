@@ -35,7 +35,7 @@ func (lwdsp *LightweightDurationPlugin) EachEvent(event *beat.Event, _ error) Ea
 }
 
 func (lwdsp *LightweightDurationPlugin) BeforeEachEvent(event *beat.Event) {
-	// Effectively capture on the first event, on the first event
+	// Effectively capture on the first event
 	if lwdsp.startedAt == nil {
 		now := time.Now()
 		lwdsp.startedAt = &now

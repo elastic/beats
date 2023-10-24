@@ -232,7 +232,6 @@ func TestSummarizerPluginOrder(t *testing.T) {
 	tests := []struct {
 		name        string
 		maxAttempts int
-		// the attempt number of the given event
 		expectedOrder []string
 	}{
 		{
