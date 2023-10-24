@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
@@ -42,14 +43,14 @@ func getConfig() map[string]interface{} {
 	}
 }
 
-func createEvent(t *testing.T) {
+func createEvent(data string, t *testing.T) {
 	udpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", STATSD_HOST, STATSD_PORT))
 	require.NoError(t, err)
 
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	require.NoError(t, err)
 
-	_, err = fmt.Fprint(conn, "dagrun.duration.failed.a_dagid:200|ms|#k1:v1,k2:v2")
+	_, err = fmt.Fprint(conn, data)
 	require.NoError(t, err)
 }
 
@@ -70,14 +71,17 @@ func TestData(t *testing.T) {
 		wg.Done()
 
 		go ms.Run(reporter)
-		events = reporter.(*mbtest.CapturingPushReporterV2).BlockingCapture(1)
+		events = reporter.(*mbtest.CapturingPushReporterV2).BlockingCapture(2)
 
 		close(done)
 	}(wg)
 
 	wg.Wait()
-	createEvent(t)
+	createEvent("dagrun.duration.failed.a_dagid:200|ms|#k1:v1,k2:v2", t)
+	createEvent("dagrun.duration.failed.b_dagid:500|ms|#k3:v3,k4:v4", t)
 	<-done
+
+	assert.Len(t, events, 2)
 
 	if len(events) == 0 {
 		t.Fatal("received no events")
