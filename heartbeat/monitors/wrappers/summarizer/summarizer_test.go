@@ -327,6 +327,10 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 
 	// We simplify these to always down
 	job := func(event *beat.Event) (j []jobs.Job, retErr error) {
+
+		// some platforms don't have enough precision to track immediate monitors time
+		time.Sleep(100 * time.Millisecond)
+
 		event.Fields = mapstr.M{
 			"monitor": mapstr.M{
 				"id":     "test",
