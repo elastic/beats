@@ -15,14 +15,13 @@ understanding of these formats, consult the https://cloud.google.com/billing/doc
 standard] and https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables/detailed-usage#detailed-usage-cost-data-schema[
 detailed] data schema documentation.
 
-For regular cost monitoring and analysis, standard tables utilize the
-`gcp_billing_export_v1_<BILLING_ACCOUNT_ID>` format, presenting a comprehensive
-view of Google Cloud expenses.
+For standard usage cost data, set the table pattern format to
+`gcp_billing_export_v1`. This table pattern is set as the default when no other
+is specified.
 
-Alternatively, detailed tables, identifiable by the `gcp_billing_export_resource_v1_<BILLING_ACCOUNT_ID>`
-format, offer richer data. They include additional fields, such as `effective_price`,
-enabling a more granular view of expenses.
-
+For detailed usage cost data, set the table pattern to `gcp_billing_export_resource_v1`.
+Detailed tables include the standard fields and additional fields, such as
+`effective_price`, enabling a more granular view of expenses.
 
 [float]
 === Metricset-specific configuration notes
