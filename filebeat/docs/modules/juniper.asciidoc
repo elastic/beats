@@ -189,7 +189,7 @@ will be found under `rsa.raw`. The default is false.
 [float]
 ==== `netscreen` fileset settings
 
-deprecated::[8.12.0,"This fileset is deprecated. See <<migrate-from-deprecated-module,Migrate from a Deprecated Module>> for migration options."]
+deprecated::[8.12.0,"This fileset is deprecated."]
 
 experimental[]
 
