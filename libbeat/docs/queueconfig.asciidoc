@@ -9,10 +9,10 @@ queue is responsible for buffering and combining events into batches that can
 be consumed by the outputs. The outputs will use bulk operations to send a
 batch of events in one transaction.
 
-You can configure the type and behavior of the internal queue by setting
-options in the `queue` section of the +{beatname_lc}.yml+ config file. Only one
-queue type can be configured.
-
+You can configure the type and behavior of the internal queue by
+setting options in the `queue` section of the +{beatname_lc}.yml+
+config file or by setting options in the `queue` section of the
+output. Only one queue type can be configured.
 
 This sample configuration sets the memory queue to buffer up to 4096 events:
 

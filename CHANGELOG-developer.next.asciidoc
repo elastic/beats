@@ -176,6 +176,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Make Filebeat HTTPJSON input process responses sequentially. {pull}36493[36493]
 - Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
 - Add file-backed cache for cache enrichment processor. {pull}36686[36686] {pull}36696[36696]
+- Elide retryable HTTP client construction in Filebeat HTTPJSON and CEL inputs if not needed. {pull}36916[36916]
 
 ==== Deprecated
 
