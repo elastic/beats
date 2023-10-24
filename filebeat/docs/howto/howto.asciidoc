@@ -46,4 +46,5 @@ include::{libbeat-dir}/yaml.asciidoc[]
 
 include::migrate-to-filestream.asciidoc[]
 
+include::migrate-from-deprecated-module.asciidoc
 
