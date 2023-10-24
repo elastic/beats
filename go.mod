@@ -213,6 +213,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.11.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
+	github.com/icholy/digest v0.1.22
 	github.com/lestrrat-go/jwx/v2 v2.0.11
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.16
