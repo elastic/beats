@@ -95,8 +95,22 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []mapstr.M{
 				{
-					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
-					"type":  "container",
+					"id":    "kubernetes-container-logs-abc",
+					"paths": []interface{}{"/var/log/containers/*-abc.log"},
+					"parsers": []interface{}{
+						map[string]interface{}{
+							"container": map[string]interface{}{
+								"format": "auto",
+								"stream": "all",
+							},
+						},
+					},
+					"prospector": map[string]interface{}{
+						"scanner": map[string]interface{}{
+							"symlinks": true,
+						},
+					},
+					"type": "filestream",
 				},
 			},
 		},
@@ -144,9 +158,23 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []mapstr.M{
 				{
-					"type":          "container",
-					"paths":         []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+					"id":    "kubernetes-container-logs-abc",
+					"paths": []interface{}{"/var/log/containers/*-abc.log"},
+					"parsers": []interface{}{
+						map[string]interface{}{
+							"container": map[string]interface{}{
+								"format": "auto",
+								"stream": "all",
+							},
+						},
+					},
+					"prospector": map[string]interface{}{
+						"scanner": map[string]interface{}{
+							"symlinks": true,
+						},
+					},
 					"exclude_lines": []interface{}{"^test2", "^test3"},
+					"type":          "filestream",
 				},
 			},
 		},
@@ -643,21 +671,43 @@ func TestGenerateHints(t *testing.T) {
 					"error": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+								},
+							},
+							"type": "filestream",
 						},
 					},
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+								},
+							},
+							"type": "filestream",
 						},
 					},
 				},
@@ -692,21 +742,43 @@ func TestGenerateHints(t *testing.T) {
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+								},
+							},
+							"type": "filestream",
 						},
 					},
 					"error": map[string]interface{}{
 						"enabled": false,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+								},
+							},
+							"type": "filestream",
 						},
 					},
 				},
@@ -742,21 +814,43 @@ func TestGenerateHints(t *testing.T) {
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "stdout",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "stdout",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+								},
+							},
+							"type": "filestream",
 						},
 					},
 					"error": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "stderr",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "stderr",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+								},
+							},
+							"type": "filestream",
 						},
 					},
 				},

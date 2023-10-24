@@ -17,7 +17,9 @@
 
 package hints
 
-import conf "github.com/elastic/elastic-agent-libs/config"
+import (
+	conf "github.com/elastic/elastic-agent-libs/config"
+)
 
 type config struct {
 	Key           string  `config:"key"`
@@ -25,12 +27,22 @@ type config struct {
 }
 
 func defaultConfig() config {
+	var parsers []map[string]interface{}
+	filestreamContainerParser := map[string]interface{}{
+		"container": map[string]interface{}{
+			"stream": "all",
+			"format": "auto",
+		},
+	}
+	parsers = append(parsers, filestreamContainerParser)
+
 	defaultCfgRaw := map[string]interface{}{
-		"type": "container",
+		"type":                        "filestream",
+		"id":                          "kubernetes-container-logs-${data.kubernetes.container.id}",
+		"prospector.scanner.symlinks": true,
+		"parsers":                     parsers,
 		"paths": []string{
-			// To be able to use this builder with CRI-O replace paths with:
-			// /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
-			"/var/lib/docker/containers/${data.container.id}/*-json.log",
+			"/var/log/containers/*-${data.kubernetes.container.id}.log",
 		},
 	}
 	defaultCfg, _ := conf.NewConfigFrom(defaultCfgRaw)
