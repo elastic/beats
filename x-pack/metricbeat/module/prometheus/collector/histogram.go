@@ -23,16 +23,24 @@ import (
 //	}
 //
 // This code takes a Prometheus histogram and tries to accommodate it into an ES histogram by:
+//
 //   - calculating centroids for each bucket (values)
+//     - for +Inf "le" bucket, use the preceding bucket's value
+//     - for the first bucket only: if it has a negative "le", use the value as-is; otherwise use half its value
+//     - for all other buckets, use the midpoint from that bucket's value to the preceding bucket's
 //   - undoing counters accumulation for each bucket (counts)
+//     - `counts` is respresenting an array of rates, where rate of the first bucket is always 0, meaning that it
+// 		  was not increased as it is the first
+// More details on the histogram transformation logic - https://github.com/elastic/apm-agent-python/pull/1165#discussion_r651397014
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/master/histogram.html
+
 func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram *p.Histogram) mapstr.M {
 	var values []float64
 	var counts []uint64
 
 	// calculate centroids and rated counts
-	var lastUpper, prevUpper float64
+	var lastUpper float64
 	var sumCount, prevCount uint64
 	for _, bucket := range histogram.GetBucket() {
 		// Ignore non-numbers
@@ -40,18 +48,23 @@ func PromHistogramToES(cc CounterCache, name string, labels mapstr.M, histogram 
 			continue
 		}
 
-		if bucket.GetUpperBound() == math.Inf(0) {
-			// Report +Inf bucket as a point, interpolating its value
-			values = append(values, lastUpper+(lastUpper-prevUpper))
+		bucketUpperBound := bucket.GetUpperBound()
+		if bucketUpperBound == math.Inf(0) {
+			// Report +Inf bucket as a point, use the preceding bucket's value
+			values = append(values, lastUpper)
 		} else {
-			// calculate bucket centroid
-			values = append(values, lastUpper+(bucket.GetUpperBound()-lastUpper)/2.0)
-			prevUpper = lastUpper
-			lastUpper = bucket.GetUpperBound()
+			// for the first bucket only: if it has a negative "le", use the value as-is
+			if bucketUpperBound < 0 && len(values) == 0 {
+				values = append(values, bucketUpperBound)
+			} else {
+				// calculate bucket centroid
+				values = append(values, lastUpper+(bucketUpperBound-lastUpper)/2.0)
+			}
+			lastUpper = bucketUpperBound
 		}
 
 		// Take count for this period (rate)
-		countRate, found := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucket.GetUpperBound()), bucket.GetCumulativeCount())
+		countRate, found := cc.RateUint64(name+labels.String()+fmt.Sprintf("%f", bucketUpperBound), bucket.GetCumulativeCount())
 
 		switch {
 		case !found:

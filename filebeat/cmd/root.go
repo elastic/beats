@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.
+	_ "github.com/elastic/beats/v7/libbeat/processors/cache"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 

@@ -149,8 +149,15 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	// determine if a retry is needed
 	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
-	// FinalAttempt is true if no retries will occur
-	retry := ssp.js.Status == monitorstate.StatusDown && ssp.js.Attempt < ssp.js.MaxAttempts
+	curCheckDown := ssp.js.Status == monitorstate.StatusDown
+	lastStateUpOrEmpty := lastStatus == monitorstate.StatusUp || lastStatus == monitorstate.StatusEmpty
+	hasAttemptsRemaining := ssp.js.Attempt < ssp.js.MaxAttempts
+
+	// retry if...
+	retry := curCheckDown && // the current check is down
+		lastStateUpOrEmpty && // we were previously up or had no previous state, if we were previously down we just check once
+		hasAttemptsRemaining // and we are configured to actually make multiple attempts
+	// if we aren't retrying this is the final attempt
 	ssp.js.FinalAttempt = !retry
 
 	ms := ssp.stateTracker.RecordStatus(ssp.sf, ssp.js.Status, ssp.js.FinalAttempt)
@@ -167,7 +174,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
-	logp.L().Debugf("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
+	logp.L().Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		return RetryBeforeSummary

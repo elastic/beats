@@ -43,6 +43,24 @@ func TestGenerateHints(t *testing.T) {
 		},
 	})
 
+	customProcessorCfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"default_config": map[string]interface{}{
+			"type": "container",
+			"paths": []string{
+				"/var/lib/docker/containers/${data.container.id}/*-json.log",
+			},
+			"close_timeout": "true",
+			"processors": []interface{}{
+				map[string]interface{}{
+					"add_tags": map[string]interface{}{
+						"tags":   []string{"web"},
+						"target": "environment",
+					},
+				},
+			},
+		},
+	})
+
 	defaultCfg := conf.NewConfig()
 
 	defaultDisabled := conf.MustNewConfigFrom(map[string]interface{}{
@@ -377,6 +395,61 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"close_timeout": "true",
 					"processors": []interface{}{
+						map[string]interface{}{
+							"dissect": map[string]interface{}{
+								"tokenizer": "%{key1} %{key2}",
+							},
+						},
+						map[string]interface{}{
+							"drop_event": nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Processors in hints must be appended in the processors of the default config",
+			config: customProcessorCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": mapstr.M{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"processors": mapstr.M{
+							"1": mapstr.M{
+								"dissect": mapstr.M{
+									"tokenizer": "%{key1} %{key2}",
+								},
+							},
+							"drop_event": mapstr.M{},
+						},
+					},
+				},
+			},
+			len: 1,
+			result: []mapstr.M{
+				{
+					"type": "container",
+					"paths": []interface{}{
+						"/var/lib/docker/containers/abc/*-json.log",
+					},
+					"close_timeout": "true",
+					"processors": []interface{}{
+						map[string]interface{}{
+							"add_tags": map[string]interface{}{
+								"tags":   []interface{}{"web"},
+								"target": "environment",
+							},
+						},
 						map[string]interface{}{
 							"dissect": map[string]interface{}{
 								"tokenizer": "%{key1} %{key2}",

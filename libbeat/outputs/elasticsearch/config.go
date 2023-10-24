@@ -45,6 +45,7 @@ type elasticsearchConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+	Queue     config.Namespace                 `config:"queue"`
 }
 
 type Backoff struct {

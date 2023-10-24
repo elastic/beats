@@ -44,7 +44,9 @@ var lock sync.RWMutex
 // Init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func Init(name string, mapping *prometheus.MetricsMapping) {
-	name = prefix + name
+	if name != util.NamespaceResource {
+		name = prefix + name
+	}
 	lock.Lock()
 	mappings[name] = mapping
 	lock.Unlock()
@@ -77,11 +79,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	mapping := mappings[base.Name()]
 	lock.Unlock()
 
+	resourceName := base.Name()
+	if resourceName != util.NamespaceResource {
+		resourceName = strings.ReplaceAll(resourceName, prefix, "")
+	}
+
 	return &MetricSet{
 		BaseMetricSet:     base,
 		prometheusClient:  prometheusClient,
 		prometheusMapping: mapping,
-		enricher:          util.NewResourceMetadataEnricher(base, strings.ReplaceAll(base.Name(), prefix, ""), mod.GetMetricsRepo(), false),
+		enricher:          util.NewResourceMetadataEnricher(base, resourceName, mod.GetMetricsRepo(), false),
 		mod:               mod,
 	}, nil
 }
@@ -90,6 +97,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+	// The name of the metric state can be obtained by using m.BaseMetricSet.Name(). However, names that start with state_* (e.g. state_cronjob)
+	// need to have that prefix removed. So, for example, strings.ReplaceAll("state_cronjob", "state_", "") would result in just cronjob.
+	// Exception is state_namespace, as field kubernetes.namespace already exists, and we need to create a new object
+	// for the state_namespace metricset.
+	resourceName := m.BaseMetricSet.Name()
+	if resourceName != util.NamespaceResource {
+		resourceName = strings.ReplaceAll(resourceName, prefix, "")
+	} else {
+		resourceName = "state_namespace"
+	}
+
 	m.enricher.Start()
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheusClient)
@@ -107,9 +125,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		// The name of the metric state can be obtained by using m.BaseMetricSet.Name(). However, names that start with state_* (e.g. state_cronjob)
-		// need to have that prefix removed. So, for example, strings.ReplaceAll("state_cronjob", "state_", "") would result in just cronjob.
-		e, err := util.CreateEvent(event, "kubernetes."+strings.ReplaceAll(m.BaseMetricSet.Name(), "state_", ""))
+		e, err := util.CreateEvent(event, "kubernetes."+resourceName)
 		if err != nil {
 			m.Logger().Error(err)
 		}

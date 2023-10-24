@@ -15,11 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ilm
+package lifecycle
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type noopSupport struct{}
@@ -27,14 +26,27 @@ type noopManager struct{}
 
 // NewNoopSupport creates a noop ILM implementation with ILM support being always
 // disabled.  Attempts to install a policy will fail.
-func NewNoopSupport(info beat.Info, config *config.C) (Supporter, error) {
+func NewNoopSupport(info beat.Info, c bool) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 
-func (*noopSupport) Enabled() bool                   { return false }
-func (*noopSupport) Policy() Policy                  { return Policy{} }
-func (*noopSupport) Overwrite() bool                 { return false }
+// Enabled no-op
+func (*noopSupport) Enabled() bool { return false }
+
+// Policy no-op
+func (*noopSupport) Policy() Policy { return Policy{} }
+
+// Overwrite no-op
+func (*noopSupport) Overwrite() bool { return false }
+
+// Manager no-op
 func (*noopSupport) Manager(_ ClientHandler) Manager { return (*noopManager)(nil) }
 
-func (*noopManager) CheckEnabled() (bool, error)       { return false, nil }
-func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, errOf(ErrOpNotAvailable) }
+// CheckEnabled no-op
+func (*noopManager) CheckEnabled() (bool, error) { return false, nil }
+
+// EnsurePolicy no-op
+func (*noopManager) EnsurePolicy(_ bool) (bool, error) { return false, ErrOpNotAvailable }
+
+// Policyname no-op
+func (*noopManager) PolicyName() string { return "" }

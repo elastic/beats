@@ -250,7 +250,8 @@
                 "share": 14946304,
                 "size": 1725992960
             },
-            "state": "sleeping"
+            "state": "sleeping",
+            "num_threads": 42
         }
     },
     "user": {

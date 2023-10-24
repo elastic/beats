@@ -39,13 +39,16 @@ type DurationLoggable struct {
 	Mills int64 `json:"ms"`
 }
 
+type NetworkInfo map[string]interface{}
+
 type MonitorRunInfo struct {
-	MonitorID string `json:"id"`
-	Type      string `json:"type"`
-	Duration  int64  `json:"-"`
-	Steps     *int   `json:"steps,omitempty"`
-	Status    string `json:"status"`
-	Attempt   int    `json:"attempt"`
+	MonitorID   string      `json:"id"`
+	Type        string      `json:"type"`
+	Duration    int64       `json:"-"`
+	Steps       *int        `json:"steps,omitempty"`
+	Status      string      `json:"status"`
+	Attempt     int         `json:"attempt"`
+	NetworkInfo NetworkInfo `json:"network_info,omitempty"`
 }
 
 func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
@@ -113,12 +116,14 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		return nil, fmt.Errorf("logErrors: %+v", errors)
 	}
 
+	networkInfo := extractNetworkInfo(event, monType.(string))
 	monitor := MonitorRunInfo{
-		MonitorID: monitorID.(string),
-		Type:      monType.(string),
-		Duration:  durationUs.(int64),
-		Status:    status.(string),
-		Attempt:   attempt,
+		MonitorID:   monitorID.(string),
+		Type:        monType.(string),
+		Duration:    durationUs.(int64),
+		Status:      status.(string),
+		Attempt:     attempt,
+		NetworkInfo: networkInfo,
 	}
 
 	sc, _ := event.Meta.GetValue(META_STEP_COUNT)
@@ -128,6 +133,29 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	}
 
 	return &monitor, nil
+}
+
+func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
+	// Only relevant for lightweight monitors
+	if monitorType == "browser" {
+		return nil
+	}
+
+	fields := []string{
+		"resolve.ip", "resolve.rtt.us", "tls.rtt.handshake.us", "icmp.rtt.us",
+		"tcp.rtt.connect.us", "tcp.rtt.validate.us", "http.rtt.content.us", "http.rtt.validate.us",
+		"http.rtt.validate_body.us", "http.rtt.write_request.us", "http.rtt.response_header.us",
+		"http.rtt.total.us", "socks5.rtt.connect.us",
+	}
+	networkInfo := make(NetworkInfo)
+	for _, field := range fields {
+		value, err := event.GetValue(field)
+		if err == nil && value != nil {
+			networkInfo[field] = value
+		}
+	}
+
+	return networkInfo
 }
 
 func LogRun(event *beat.Event) {
