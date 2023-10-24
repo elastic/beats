@@ -230,8 +230,8 @@ func TestSummarizerPluginOrder(t *testing.T) {
 
 	// these tests use strings to describe sequences of events
 	tests := []struct {
-		name        string
-		maxAttempts int
+		name          string
+		maxAttempts   int
 		expectedOrder []string
 	}{
 		{
