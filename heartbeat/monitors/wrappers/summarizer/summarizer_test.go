@@ -328,8 +328,6 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 
 	// We simplify these to always down
 	job := func(event *beat.Event) (j []jobs.Job, retErr error) {
-		time.Sleep(1 * time.Second)
-
 		event.Fields = mapstr.M{
 			"monitor": mapstr.M{
 				"id":     "test",
@@ -370,6 +368,8 @@ func TestRetryLightweightMonitorDuration(t *testing.T) {
 		}
 	}
 	require.Greater(t, rcvdDuration, int64(0))
+	// Ensures monitor duration only takes into account the last attempt execution time
+	// by comparing it to the time spent after last retry started (retryElapsed)
 	require.GreaterOrEqual(t, look.RTTMS(retryElapsed), rcvdDuration)
 }
 
