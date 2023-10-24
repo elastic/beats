@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
 - Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
-
+- Improve Beat `test output` command to honor proxy_url setting for output.logstash and output.elasticsearch. {issue}24751[24751] {pull}36715[36715]
 
 
 *Auditbeat*
