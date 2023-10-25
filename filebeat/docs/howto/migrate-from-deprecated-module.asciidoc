@@ -28,4 +28,3 @@ be superseded by a new module. The deprecation notice will link to an appropriat
 module, if one exists.
 
 4. Use a custom Filebeat input, processors, and ingest pipeline (if necessary).
-##
