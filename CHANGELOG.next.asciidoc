@@ -113,6 +113,7 @@ is collected by it.
 - Fix ignoring external input configuration in `take_over: true` mode {issue}36378[36378] {pull}36395[36395]
 - Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
 - Fix merging of array fields(processors, paths, parsers) in configurations generated from hints and default config. {issue}36838[36838] {pull}36857[36857]
+- Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 
 *Heartbeat*
 
