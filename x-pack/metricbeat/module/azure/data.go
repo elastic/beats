@@ -35,7 +35,8 @@ type KeyValuePoint struct {
 	//ECS       mapstr.M
 }
 
-func mapMetrics(metrics []Metric) []KeyValuePoint {
+// mapToKeyValuePoints maps a list of metrics to a list of key/value points.
+func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 	var points []KeyValuePoint
 	for _, metric := range metrics {
 		for _, value := range metric.Values {
@@ -68,8 +69,12 @@ func mapMetrics(metrics []Metric) []KeyValuePoint {
 			point.ResourceSubId = metric.ResourceSubId
 			point.TimeGrain = metric.TimeGrain
 
-			for _, dim := range value.dimensions {
-				_, _ = point.Dimensions.Put(dim.Name, dim.Value)
+			if len(metric.Dimensions) == len(value.dimensions) {
+				// Take the dimension name from the metric definition and the
+				// dimension value from the metric value.
+				for i, dim := range metric.Dimensions {
+					_, _ = point.Dimensions.Put(dim.Name, value.dimensions[i].Value)
+				}
 			}
 
 			points = append(points, point)
@@ -82,7 +87,7 @@ func mapMetrics(metrics []Metric) []KeyValuePoint {
 func mapToEvents2(metrics []Metric, client *Client, report mb.ReporterV2) error {
 	// Unpack the metrics into a list of key/value points.
 	// This makes it easier to group the metrics by timestamp and dimensions.
-	points := mapMetrics(metrics)
+	points := mapToKeyValuePoints(metrics)
 
 	// Group the points by a grouping key made up of the timestamp and
 	// other fields.
@@ -164,8 +169,7 @@ func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resour
 	if len(referencePoint.Dimensions) > 0 {
 		for key, value := range referencePoint.Dimensions {
 			if value == "*" {
-				// TODO: add support for wildcard dimensions
-				//_, _ = event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(key)), getDimensionValue2(key, referencePoint.Dimensions)
+				_, _ = event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(key)), getDimensionValue2(key, referencePoint.Dimensions))
 			} else {
 				_, _ = event.ModuleFields.Put(fmt.Sprintf("dimensions.%s", managePropertyName(key)), value)
 			}
