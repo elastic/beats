@@ -31,8 +31,6 @@ type KeyValuePoint struct {
 	Dimensions    mapstr.M
 	TimeGrain     string
 	Timestamp     time.Time
-	//Labels    mapstr.M
-	//ECS       mapstr.M
 }
 
 // mapToKeyValuePoints maps a list of metrics to a list of key/value points.
@@ -72,8 +70,11 @@ func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 			if len(metric.Dimensions) == len(value.dimensions) {
 				// Take the dimension name from the metric definition and the
 				// dimension value from the metric value.
-				for i, dim := range metric.Dimensions {
-					_, _ = point.Dimensions.Put(dim.Name, value.dimensions[i].Value)
+				for _, dim := range metric.Dimensions {
+					// Dimensions from metric definition and metric value are
+					// not guaranteed to be in the same order, so we need to
+					// find the right value for each dimension.
+					_, _ = point.Dimensions.Put(dim.Name, getDimensionValue(dim.Name, value.dimensions))
 				}
 			}
 
