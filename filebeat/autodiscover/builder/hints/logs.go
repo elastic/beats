@@ -119,9 +119,18 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 
 		inputType, _ := config.String("type", -1)
 		tempCfg := mapstr.M{}
-		mline := l.getMultiline(h)
-		if len(mline) != 0 {
-			kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
+
+		if mline := l.getMultiline(h); len(mline) != 0 {
+			if inputType == harvester.FilestreamType {
+				// multiline options should be under multiline parser in filestream input
+				parsersTempCfg := []mapstr.M{}
+				mlineTempCfg := mapstr.M{}
+				kubernetes.ShouldPut(mlineTempCfg, multiline, mline, l.log)
+				parsersTempCfg = append(parsersTempCfg, mlineTempCfg)
+				kubernetes.ShouldPut(tempCfg, parsers, parsersTempCfg, l.log)
+			} else {
+				kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
+			}
 		}
 		if ilines := l.getIncludeLines(h); len(ilines) != 0 {
 			kubernetes.ShouldPut(tempCfg, includeLines, ilines, l.log)

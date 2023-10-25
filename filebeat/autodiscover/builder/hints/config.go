@@ -27,20 +27,18 @@ type config struct {
 }
 
 func defaultConfig() config {
-	var parsers []map[string]interface{}
-	filestreamContainerParser := map[string]interface{}{
-		"container": map[string]interface{}{
-			"stream": "all",
-			"format": "auto",
-		},
-	}
-	parsers = append(parsers, filestreamContainerParser)
-
 	defaultCfgRaw := map[string]interface{}{
 		"type":                        "filestream",
 		"id":                          "kubernetes-container-logs-${data.kubernetes.container.id}",
 		"prospector.scanner.symlinks": true,
-		"parsers":                     parsers,
+		"parsers": []interface{}{
+			map[string]interface{}{
+				"container": map[string]interface{}{
+					"stream": "all",
+					"format": "auto",
+				},
+			},
+		},
 		"paths": []string{
 			"/var/log/containers/*-${data.kubernetes.container.id}.log",
 		},
