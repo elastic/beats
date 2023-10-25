@@ -251,6 +251,8 @@ is collected by it.
 
 *Auditbeat*
 
+- Upgrade go-libaudit to v2.4.0. {issue}36776[36776] {pull}36964[36964]
+
 *Libbeat*
 
 *Heartbeat*
