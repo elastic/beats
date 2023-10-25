@@ -81,6 +81,14 @@ func TestESSetup(t *testing.T) {
 		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": true, "policy_name": "test", "check_exists": true}),
 		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": true, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
 	}
+	withDSLBlank := RawConfig{
+		ILM: config.MustNewConfigFrom(mapstr.M{"enabled": false, "policy_name": "test", "check_exists": true}),
+		DSL: nil,
+	}
+	withILMBlank := RawConfig{
+		ILM: nil,
+		DSL: config.MustNewConfigFrom(mapstr.M{"enabled": false, "data_stream_pattern": "%{[beat.name]}-%{[beat.version]}", "check_exists": true}),
+	}
 
 	cases := map[string]struct {
 		serverless      bool
@@ -172,6 +180,16 @@ func TestESSetup(t *testing.T) {
 		"all-disabled-no-fail-serverless": {
 			serverless: true,
 			cfg:        bothDisabledConfig,
+			err:        false,
+		},
+		"serverless-with-bare-config": {
+			serverless: true,
+			cfg:        withDSLBlank,
+			err:        false,
+		},
+		"stateful-with-bare-config": {
+			serverless: false,
+			cfg:        withILMBlank,
 			err:        false,
 		},
 	}

@@ -69,7 +69,7 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	if err := client.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	handler := &mockClientHandler{severless: false, mode: lifecycle.ILM}
+	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
 	loader, err := NewESLoader(client, handler)
 	require.NoError(t, err)
 	s := testSetup{t: t, client: client, loader: loader, config: cfg}
@@ -86,7 +86,7 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	handler := &mockClientHandler{severless: false, mode: lifecycle.ILM}
+	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
 	loader, err := NewESLoader(client, handler)
 	require.NoError(t, err)
 	return &testSetup{t: t, client: client, loader: loader, config: cfg}
@@ -564,11 +564,11 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 }
 
 type mockClientHandler struct {
-	severless bool
-	mode      lifecycle.Mode
+	serverless bool
+	mode       lifecycle.Mode
 }
 
-func (cli *mockClientHandler) IsServerless() bool            { return cli.severless }
+func (cli *mockClientHandler) IsServerless() bool            { return cli.serverless }
 func (cli *mockClientHandler) CheckEnabled() (bool, error)   { return true, nil }
 func (cli *mockClientHandler) Mode() lifecycle.Mode          { return cli.mode }
 func (cli *mockClientHandler) IsElasticsearch() bool         { return true }

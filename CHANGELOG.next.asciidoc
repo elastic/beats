@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
-
+- - Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36879[36879]
 
 *Auditbeat*
 
@@ -65,7 +65,8 @@ is collected by it.
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
-
+- syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
+- upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request. {pull}36896[36896]
 
 *Auditbeat*
 
@@ -112,6 +113,7 @@ is collected by it.
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix retries to trigger on a down monitor with no previous state. {pull}36842[36842]
 
 *Metricbeat*
 
@@ -134,13 +136,13 @@ is collected by it.
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
 - Add log error when statsd server fails to start {pull}36477[36477]
+- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 
 *Osquerybeat*
 
 
 *Packetbeat*
 
-- Fix default cache size calculation. {pull}36723[36723]
 
 *Winlogbeat*
 
@@ -152,6 +154,7 @@ is collected by it.
 
 *Affecting all Beats*
 
+- Upgrade to Go 1.20.10. {pull}36846[36846]
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - When running under Elastic-Agent the status is now reported per Unit instead of the whole Beat {issue}35874[35874] {pull}36183[36183]
 - Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
@@ -161,6 +164,7 @@ is collected by it.
 - Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
   Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 
 *Auditbeat*
 
@@ -231,6 +235,7 @@ is collected by it.
 - Add CEL partial value debug function. {pull}36652[36652]
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 - Re-use buffers to optimise memory allocation in fingerprint mode of filestream {pull}36736[36736]
+- Add cache processor. {pull}36786[36786]
 
 *Auditbeat*
 
@@ -255,6 +260,9 @@ is collected by it.
 
 - Improve efficiency of sniffers by deduplicating interface configurations. {issue}36574[36574] {pull}36576[36576]
 - Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
+
+*Packetbeat*
+
 
 *Winlogbeat*
 
@@ -301,6 +309,12 @@ is collected by it.
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 

@@ -407,9 +407,8 @@ output.elasticsearch:
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
-  # winlogbeat expects Elasticsearch to be the same version or newer than the Beat.
-  # Lift the version restriction by setting allow_older_versions to true.
-  #allow_older_versions: false
+  # Prevents winlogbeat from connecting to older Elasticsearch versions when set to `false`
+  #allow_older_versions: true
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -1230,6 +1229,8 @@ setup.template.settings:
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is winlogbeat-%{[agent.version]}"
+# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "winlogbeat-%{[agent.version]}"
 
 # The path to a JSON file that contains a lifecycle policy configuration. Used
@@ -1244,6 +1245,7 @@ setup.template.settings:
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.dsl.overwrite: false
+
 # =================================== Kibana ===================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
