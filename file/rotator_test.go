@@ -134,6 +134,7 @@ func TestDailyRotation(t *testing.T) {
 		logname + "-" + twoDaysAgo + "-1.ndjson",
 		logname + "-" + twoDaysAgo + "-2.ndjson",
 		logname + "-" + twoDaysAgo + "-3.ndjson",
+		logname + "-diagnostic-" + twoDaysAgo + ".zip",
 	}
 
 	for _, f := range files {
@@ -153,26 +154,26 @@ func TestDailyRotation(t *testing.T) {
 
 	Rotate(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-12.ndjson", logname+"-"+yesterday+"-13.ndjson")
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-12.ndjson", logname+"-"+yesterday+"-13.ndjson", logname+"-diagnostic-"+twoDaysAgo+".zip")
 
 	WriteMsg(t, r)
 
 	today := time.Now().Format(file.DateFormat)
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-12.ndjson", logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson")
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-12.ndjson", logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson", logname+"-diagnostic-"+twoDaysAgo+".zip")
 
 	Rotate(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson")
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson", logname+"-diagnostic-"+twoDaysAgo+".zip")
 
 	WriteMsg(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson", logname+"-"+today+"-1.ndjson")
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson", logname+"-"+today+"-1.ndjson", logname+"-diagnostic-"+twoDaysAgo+".zip")
 
 	for i := 0; i < (int(maxSizeBytes)/len(logMessage))+1; i++ {
 		WriteMsg(t, r)
 	}
 
-	AssertDirContents(t, dir, logname+"-"+today+"-1.ndjson", logname+"-"+today+"-2.ndjson", logname+"-"+today+"-3.ndjson")
+	AssertDirContents(t, dir, logname+"-"+today+"-1.ndjson", logname+"-"+today+"-2.ndjson", logname+"-"+today+"-3.ndjson", logname+"-diagnostic-"+twoDaysAgo+".zip")
 }
 
 // Tests the FileConfig.RotateOnStartup parameter

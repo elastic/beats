@@ -482,7 +482,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 }
 
 func (d *dateRotator) RotatedFiles() []string {
-	files, err := filepath.Glob(d.filenamePrefix + "*")
+	files, err := filepath.Glob(d.filenamePrefix + "*" + d.extension)
 	if err != nil {
 		if d.log != nil {
 			d.log.Debugw("failed to list existing logs: %+v", err)
