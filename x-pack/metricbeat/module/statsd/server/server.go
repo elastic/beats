@@ -163,8 +163,13 @@ func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
 	return mappings, nil
 }
 
+// It processes metric groups, applies event mappings, and creates Metricbeat events.
+// The generated events include metric fields, labels, and the namespace associated with the MetricSet.
+// Returns a slice of Metricbeat events.
 func (m *MetricSet) getEvents() []*mb.Event {
 	groups := m.processor.GetAll()
+
+	// If there are no groups, return an empty slice.
 	if len(groups) == 0 {
 		return nil
 	}
@@ -176,7 +181,10 @@ func (m *MetricSet) getEvents() []*mb.Event {
 		}
 
 		for k, v := range tagGroup.metrics {
+			// Apply event mapping to the metric and get MetricSetFields.
 			ms := eventMapping(k, v, m.mappings)
+
+			// If no MetricSetFields were generated, continue to the next metric.
 			if len(ms) == 0 {
 				continue
 			}
