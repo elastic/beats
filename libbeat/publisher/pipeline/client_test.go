@@ -144,7 +144,7 @@ func TestClientWaitClose(t *testing.T) {
 	err := logp.TestingSetup()
 	assert.Nil(t, err)
 
-	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1})
+	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0)
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 

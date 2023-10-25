@@ -68,7 +68,7 @@ is collected by it.
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
 - syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
-
+- upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request. {pull}36896[36896]
 
 *Auditbeat*
 
@@ -112,6 +112,8 @@ is collected by it.
 - Revert error introduced in {pull}35734[35734] when symlinks can't be resolved in filestream. {pull}36557[36557]
 - Fix ignoring external input configuration in `take_over: true` mode {issue}36378[36378] {pull}36395[36395]
 - Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
+- Fix merging of array fields(processors, paths, parsers) in configurations generated from hints and default config. {issue}36838[36838] {pull}36857[36857]
+- Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 
 *Heartbeat*
 
@@ -140,6 +142,7 @@ is collected by it.
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
 - Add log error when statsd server fails to start {pull}36477[36477]
+- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 
 *Osquerybeat*
 
@@ -167,6 +170,9 @@ is collected by it.
 - Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
   Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
+- Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
+- Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 
 *Auditbeat*
 
@@ -216,8 +222,7 @@ is collected by it.
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 - Add device handling to Okta input package for entity analytics. {pull}36049[36049]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}36286[36286]
+- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30916[30916] {pull}36286[36286]
 - [Azure] Add input metrics to the azure-eventhub input. {pull}35739[35739]
 - Reduce HTTPJSON metrics allocations. {pull}36282[36282]
 - Add support for a simplified input configuraton when running under Elastic-Agent {pull}36390[36390]
@@ -241,6 +246,7 @@ is collected by it.
 - Add cache processor. {pull}36786[36786]
 - Avoid unwanted publication of Azure entity records. {pull}36753[36753]
 - Avoid unwanted publication of Okta entity records. {pull}36770[36770]
+- Add support for Digest Authentication to CEL input. {issue}35514[35514] {pull}36932[36932]
 
 *Auditbeat*
 
@@ -273,6 +279,7 @@ is collected by it.
 
 *Winlogbeat*
 
+- Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 
 *Functionbeat*
 
