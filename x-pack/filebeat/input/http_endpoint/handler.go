@@ -13,10 +13,13 @@ import (
 	"net/http"
 	"time"
 
+	"go.uber.org/zap"
+
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -35,6 +38,9 @@ type handler struct {
 	log       *logp.Logger
 	validator apiValidator
 
+	reqLogger    *zap.Logger
+	host, scheme string
+
 	messageField          string
 	responseCode          int
 	responseBody          string
@@ -47,6 +53,10 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if status, err := h.validator.validateRequest(r); err != nil {
 		sendAPIErrorResponse(w, r, h.log, status, err)
 		return
+	}
+
+	if h.reqLogger != nil {
+		h.logRequest(r)
 	}
 
 	start := time.Now()
@@ -104,6 +114,27 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.sendResponse(w, respCode, respBody)
 	h.metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 	h.metrics.batchesPublished.Add(1)
+}
+
+func (h *handler) logRequest(r *http.Request) {
+	// Populate and preserve scheme and host if they are missing;
+	// they are required for httputil.DumpRequestOut.
+	var scheme, host string
+	if r.URL.Scheme == "" {
+		scheme = r.URL.Scheme
+		r.URL.Scheme = h.scheme
+	}
+	if r.URL.Host == "" {
+		host = r.URL.Host
+		r.URL.Host = h.host
+	}
+	httplog.LogRequest(h.reqLogger, r)
+	if scheme != "" {
+		r.URL.Scheme = scheme
+	}
+	if host != "" {
+		r.URL.Host = host
+	}
 }
 
 func sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {

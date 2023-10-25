@@ -7,6 +7,7 @@ package http_endpoint
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -316,13 +317,14 @@ func Test_apiResponse(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()
-			apiHandler := newHandler(tc.conf, pub, logp.NewLogger("http_endpoint.test"), metrics)
+			apiHandler := newHandler(ctx, tc.conf, pub, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()
