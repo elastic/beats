@@ -67,7 +67,7 @@ func (c *config) Unpack(from *conf.C) error {
 		if len(fields) == 1 && fields[0] == "enabled" {
 			// only enabling/disabling default config:
 			if err := c.DefaultConfig.Merge(config); err != nil {
-				return nil
+				return err
 			}
 		} else {
 			// full config provided, discard default. It must be a clone of the
