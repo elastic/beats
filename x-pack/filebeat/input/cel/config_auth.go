@@ -24,12 +24,23 @@ import (
 )
 
 type authConfig struct {
-	Basic  *basicAuthConfig `config:"basic"`
-	OAuth2 *oAuth2Config    `config:"oauth2"`
+	Basic  *basicAuthConfig  `config:"basic"`
+	Digest *digestAuthConfig `config:"digest"`
+	OAuth2 *oAuth2Config     `config:"oauth2"`
 }
 
 func (c authConfig) Validate() error {
-	if c.Basic.isEnabled() && c.OAuth2.isEnabled() {
+	var n int
+	if c.Basic.isEnabled() {
+		n++
+	}
+	if c.Digest.isEnabled() {
+		n++
+	}
+	if c.OAuth2.isEnabled() {
+		n++
+	}
+	if n > 1 {
 		return errors.New("only one kind of auth can be enabled")
 	}
 	return nil
@@ -41,7 +52,7 @@ type basicAuthConfig struct {
 	Password string `config:"password"`
 }
 
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
+// isEnabled returns true if the `enable` field is set to true in the yaml.
 func (b *basicAuthConfig) isEnabled() bool {
 	return b != nil && (b.Enabled == nil || *b.Enabled)
 }
@@ -53,6 +64,31 @@ func (b *basicAuthConfig) Validate() error {
 	}
 
 	if b.User == "" || b.Password == "" {
+		return errors.New("both user and password must be set")
+	}
+
+	return nil
+}
+
+type digestAuthConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	User     string `config:"user"`
+	Password string `config:"password"`
+	NoReuse  *bool  `config:"no_reuse"`
+}
+
+// isEnabled returns true if the `enable` field is set to true in the yaml.
+func (d *digestAuthConfig) isEnabled() bool {
+	return d != nil && (d.Enabled == nil || *d.Enabled)
+}
+
+// Validate checks if oauth2 config is valid.
+func (d *digestAuthConfig) Validate() error {
+	if !d.isEnabled() {
+		return nil
+	}
+
+	if d.User == "" || d.Password == "" {
 		return errors.New("both user and password must be set")
 	}
 
@@ -107,7 +143,7 @@ type oAuth2Config struct {
 	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
 }
 
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
+// isEnabled returns true if the `enable` field is set to true in the yaml.
 func (o *oAuth2Config) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
