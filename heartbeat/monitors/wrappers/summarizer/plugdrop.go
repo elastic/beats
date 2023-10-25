@@ -43,3 +43,7 @@ func (d DropBrowserExtraEvents) BeforeSummary(event *beat.Event) BeforeSummaryAc
 func (d DropBrowserExtraEvents) BeforeRetry() {
 	// noop
 }
+
+func (d DropBrowserExtraEvents) BeforeEachEvent(event *beat.Event) {
+	// noop
+}
