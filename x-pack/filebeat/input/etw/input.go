@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
+
 package etw_input
 
 import (
@@ -92,10 +94,10 @@ func (e *etw_input) Run(ctx input.Context, publisher stateless.Publisher) error 
 
 	// Define callback that will process ETW events
 	// Callback which receives every ETW event from the reading source
-	eventReceivedCallback := func(er *etw.EventRecord) {
+	eventReceivedCallback := func(er *etw.EventRecord) uintptr {
 		if er == nil {
 			e.log.Error("received null event record")
-			return
+			return 1
 		}
 
 		e.log.Debugf("received event %d with length %d", er.EventHeader.EventDescriptor.Id, er.UserDataLength)
@@ -107,7 +109,7 @@ func (e *etw_input) Run(ctx input.Context, publisher stateless.Publisher) error 
 			event["EventProperties"] = data
 		} else {
 			e.log.Errorf("failed to read event properties: %s", err)
-			return
+			return 1
 		}
 
 		evt := beat.Event{
@@ -119,7 +121,7 @@ func (e *etw_input) Run(ctx input.Context, publisher stateless.Publisher) error 
 		}
 		publisher.Publish(evt)
 
-		return
+		return 0
 	}
 
 	e.etwSession.Callback = syscall.NewCallback(eventReceivedCallback)
