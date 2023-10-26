@@ -142,6 +142,8 @@ This is a list of JunOS fields that are mapped to ECS.
 [float]
 ==== `junos` fileset settings
 
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/juniper_srx[Juniper SRX] Elastic integration instead."]
+
 experimental[]
 
 NOTE: This was converted from RSA NetWitness log parser XML "junosrouter" device revision 134.
@@ -186,6 +188,8 @@ will be found under `rsa.raw`. The default is false.
 
 [float]
 ==== `netscreen` fileset settings
+
+deprecated::[8.12.0,"This fileset is deprecated. See <<migrate-from-deprecated-module>> for migration options."]
 
 experimental[]
 
