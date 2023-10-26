@@ -182,8 +182,6 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 			}
 			msID := id.String()
 			metrics := monitoring.NewRegistry()
-			monitoring.NewString(metrics, "module").Set(m.Name())
-			monitoring.NewString(metrics, "metricset").Set(name)
 			monitoring.NewString(metrics, "input").Set(m.Name() + "/" + name)
 			if host != "" {
 				monitoring.NewString(metrics, "host").Set(host)
