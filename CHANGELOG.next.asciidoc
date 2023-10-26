@@ -302,6 +302,7 @@ is collected by it.
 
 *Filebeat*
 
+- Deprecate rsa2elk Filebeat modules. {issue}36125[36125] {pull}36887[36887]
 
 *Heartbeat*
 
