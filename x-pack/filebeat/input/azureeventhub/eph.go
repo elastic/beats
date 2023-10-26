@@ -74,6 +74,10 @@ func (a *azureInput) runWithEPH() error {
 	handlerID, err := a.processor.RegisterHandler(a.workerCtx,
 		func(c context.Context, e *eventhub.Event) error {
 			var onEventErr error
+
+			a.log.Infof("*****Event PartitionKey: %q \n", *e.PartitionKey)
+			a.log.Infof("#####Event PartitionKey from SystemProperties: %q \n", *e.SystemProperties.PartitionKey)
+
 			ok := a.processEvents(e, *e.PartitionKey)
 			if !ok {
 				onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
