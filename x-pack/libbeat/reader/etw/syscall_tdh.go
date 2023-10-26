@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
+
 package etw
 
 import (
@@ -10,8 +12,6 @@ import (
 
 	"golang.org/x/sys/windows"
 )
-
-var _ unsafe.Pointer
 
 var (
 	tdh                                  = windows.NewLazySystemDLL("tdh.dll")
@@ -24,6 +24,7 @@ var (
 )
 
 const ANYSIZE_ARRAY = 1 << 25
+const DEFAULT_PROPERTY_BUFFER_SIZE = 256
 
 type ProviderEnumerationInfo struct {
 	NumberOfProviders      uint32
@@ -43,7 +44,7 @@ type EventRecord struct {
 	BufferContext     EtwBufferContext
 	ExtendedDataCount uint16
 	UserDataLength    uint16
-	ExtendedData      EventHeaderExtendedDataItem
+	ExtendedData      *EventHeaderExtendedDataItem
 	UserData          uintptr // Event data
 	UserContext       uintptr
 }
@@ -246,7 +247,7 @@ func _TdhFormatProperty(
 	userDataLength uint16,
 	userData *byte,
 	bufferSize *uint32,
-	buffer *uint16,
+	buffer *uint8,
 	userDataConsumed *uint16) error {
 	r0, _, _ := tdhFormatProperty.Call(
 		uintptr(unsafe.Pointer(eventInfo)),

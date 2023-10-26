@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
+
 package etw
 
 import (
@@ -55,11 +57,10 @@ func DefaultCallback(er *EventRecord) {
 
 // propertyParser is used for parsing properties from raw EVENT_RECORD structure.
 type propertyParser struct {
-	er          *EventRecord
-	info        *TraceEventInfo
-	data        []byte
-	ptrSize     uint32
-	parseBuffer []byte
+	er      *EventRecord
+	info    *TraceEventInfo
+	data    []byte
+	ptrSize uint32
 }
 
 func GetEventProperties(er *EventRecord) (map[string]interface{}, error) {
@@ -109,7 +110,7 @@ func getEventInformation(er *EventRecord) (info *TraceEventInfo, err error) {
 	if err = _TdhGetEventInformation(er, 0, nil, nil, &bufSize); err == ERROR_INSUFFICIENT_BUFFER {
 		// Allocate memory for TRACE_EVENT_INFO
 		buff := make([]byte, bufSize)
-		info := ((*TraceEventInfo)(unsafe.Pointer(&buff[0])))
+		info = ((*TraceEventInfo)(unsafe.Pointer(&buff[0])))
 		// Get the event information
 		err = _TdhGetEventInformation(er, 0, nil, info, &bufSize)
 	}
@@ -263,8 +264,8 @@ func (p *propertyParser) parseSimpleType(propertyInfo EventPropertyInfo) (string
 	var userDataConsumed uint16
 
 	// Initialize parse buffer with a size that should be sufficient for most properties.
-	formattedDataSize := uint32(len(p.parseBuffer))
-	formattedData := make([]uint16, int(formattedDataSize))
+	formattedDataSize := uint32(DEFAULT_PROPERTY_BUFFER_SIZE)
+	formattedData := make([]byte, int(formattedDataSize))
 
 retryLoop:
 	for {
@@ -272,7 +273,6 @@ retryLoop:
 		if len(p.data) > 0 {
 			dataPtr = &p.data[0]
 		}
-		formattedData := make([]uint16, int(formattedDataSize))
 		err := _TdhFormatProperty(
 			p.info,
 			mapInfo,
@@ -292,7 +292,7 @@ retryLoop:
 			break retryLoop
 
 		case ERROR_INSUFFICIENT_BUFFER:
-			p.parseBuffer = make([]byte, formattedDataSize)
+			formattedData = make([]byte, formattedDataSize)
 			continue
 
 		case ERROR_EVT_INVALID_EVENT_DATA:

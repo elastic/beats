@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
+
 package etw
 
 import (
@@ -10,8 +12,6 @@ import (
 
 	"golang.org/x/sys/windows"
 )
-
-var _ unsafe.Pointer
 
 var (
 	advapi32 = windows.NewLazySystemDLL("advapi32.dll")

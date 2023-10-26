@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
+
 package etw
 
 import (
@@ -97,6 +99,7 @@ func NewSessionProperties(sessionName string) *EventTraceProperties {
 	sessionProperties := (*EventTraceProperties)(unsafe.Pointer(&propertiesBuf[0]))
 
 	// Mandatory fields for SessionProperties struct
+	// Filled based on https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
 	sessionProperties.Wnode.BufferSize = uint32(bufSize)
 	sessionProperties.Wnode.Guid = GUID{}     // Not needed to create GUID if other than private or kernel session
 	sessionProperties.Wnode.ClientContext = 1 // Clock resolution for timestamp (defaults to QPC)

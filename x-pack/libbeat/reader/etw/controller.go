@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
+
 package etw
 
 import (
@@ -18,7 +20,7 @@ func isValidHandler(handler uint64) bool {
 }
 
 // Create a real-time session
-func (s Session) CreateRealtimeSession() error {
+func (s *Session) CreateRealtimeSession() error {
 	sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
 	if err != nil {
 		return fmt.Errorf("failed to convert session name '%s'", s.Name)
@@ -59,7 +61,7 @@ func (s Session) CreateRealtimeSession() error {
 }
 
 // Closes handles and session if created
-func (s Session) StopSession() error {
+func (s *Session) StopSession() error {
 	if s.Realtime {
 		if isValidHandler(s.TraceHandler) {
 			if err := _CloseTrace(s.TraceHandler); err != nil && err != ERROR_CTX_CLOSE_PENDING {
