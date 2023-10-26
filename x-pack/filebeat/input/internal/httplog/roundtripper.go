@@ -158,9 +158,9 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	switch len(errorsMessages) {
 	case 0:
 	case 1:
-		respParts = append(reqParts, zap.String("error.message", errorsMessages[0]))
+		respParts = append(respParts, zap.String("error.message", errorsMessages[0]))
 	default:
-		respParts = append(reqParts, zap.Strings("error.message", errorsMessages))
+		respParts = append(respParts, zap.Strings("error.message", errorsMessages))
 	}
 	log.Debug("HTTP response", respParts...)
 

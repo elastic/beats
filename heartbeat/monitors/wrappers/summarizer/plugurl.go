@@ -52,3 +52,5 @@ func (busp *BrowserURLPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActi
 func (busp *BrowserURLPlugin) BeforeRetry() {
 	busp.urlFields = nil
 }
+
+func (busp *BrowserURLPlugin) BeforeEachEvent(event *beat.Event) {} //noop
