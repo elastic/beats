@@ -41,7 +41,9 @@ func makeES(
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	if !cfg.HasField("bulk_max_size") {
-		_ = cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
+		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
+			return outputs.Fail(err)
+		}
 	}
 
 	index, pipeline, err := buildSelectors(im, beat, cfg)
@@ -105,6 +107,7 @@ func makeES(
 				Observer:         observer,
 				EscapeHTML:       esConfig.EscapeHTML,
 				Transport:        esConfig.Transport,
+				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
 			},
 			Index:              index,
 			Pipeline:           pipeline,
