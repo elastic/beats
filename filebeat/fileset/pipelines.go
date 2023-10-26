@@ -66,16 +66,17 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			// check that all the required Ingest Node plugins are available
 			requiredProcessors := fileset.GetRequiredProcessors()
 			reg.log.Debugf("Required processors: %s", requiredProcessors)
+			// APIs do not exist on serverless
 			if len(requiredProcessors) > 0 && !esClient.IsServerless() {
 				err := checkAvailableProcessors(esClient, requiredProcessors)
 				if err != nil {
-					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+					return fmt.Errorf("error loading pipeline for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 				}
 			}
 
 			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
-				return fmt.Errorf("error getting pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+				return fmt.Errorf("error getting pipeline for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 			}
 
 			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
@@ -89,7 +90,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			for _, pipeline := range pipelines {
 				err = LoadPipeline(esClient, pipeline.id, pipeline.contents, overwrite, reg.log.With("pipeline", pipeline.id))
 				if err != nil {
-					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 					break
 				}
 				pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
