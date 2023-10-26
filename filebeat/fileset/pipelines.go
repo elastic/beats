@@ -171,7 +171,7 @@ func interpretError(initialErr error, body []byte) error {
 				"This is the response I got from Elasticsearch: %s", body)
 		}
 
-		return fmt.Errorf("couldn't load pipeline: %v. Additionally, error decoding response body: %s",
+		return fmt.Errorf("couldn't load pipeline: %w. Additionally, error decoding response body: %s",
 			initialErr, body)
 	}
 
@@ -196,5 +196,5 @@ func interpretError(initialErr error, body []byte) error {
 			"This is the response I got from Elasticsearch: %s", body)
 	}
 
-	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
+	return fmt.Errorf("couldn't load pipeline: %w. Response body: %s", initialErr, body)
 }
