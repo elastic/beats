@@ -21,7 +21,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -276,7 +275,7 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 				controllerPath = r.rootfsMountpoint.ResolveHostFS(filepath.Join("/sys/fs/cgroup/unified", path))
 			}
 
-			cgpaths, err := ioutil.ReadDir(controllerPath)
+			cgpaths, err := os.ReadDir(controllerPath)
 			if err != nil {
 				return cPaths, fmt.Errorf("error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s': %w", r.cgroupMountpoints.V2Loc, line, err)
 			}

@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"strconv"
@@ -246,7 +245,7 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 
 func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (mapstr.M, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrPermission) { // pass through permission errors
 		return nil, err
 	} else if err != nil {
@@ -277,7 +276,7 @@ func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 	// Memory data
 	state := ProcMemInfo{}
 	path := hostfs.Join("proc", strconv.Itoa(pid), "statm")
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return state, fmt.Errorf("error opening file %s: %w", path, err)
 	}
@@ -306,7 +305,7 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 	state := ProcCPUInfo{}
 
 	pathCPU := hostfs.Join("proc", strconv.Itoa(pid), "stat")
-	data, err := ioutil.ReadFile(pathCPU)
+	data, err := os.ReadFile(pathCPU)
 	if err != nil {
 		return state, fmt.Errorf("error opening file %s: %w", pathCPU, err)
 	}
@@ -347,7 +346,7 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 
 func getArgs(hostfs resolve.Resolver, pid int) ([]string, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "cmdline")
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
@@ -371,7 +370,7 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 	state := ProcFDInfo{}
 
 	path := hostfs.Join("proc", strconv.Itoa(pid), "limits")
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return state, fmt.Errorf("error opening file %s: %w", path, err)
 	}
@@ -398,7 +397,7 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 	}
 
 	pathFD := hostfs.Join("proc", strconv.Itoa(pid), "fd")
-	fds, err := ioutil.ReadDir(pathFD)
+	fds, err := os.ReadDir(pathFD)
 	if errors.Is(err, os.ErrPermission) { // ignore permission errors, passthrough other data
 		return state, nil
 	} else if err != nil {
@@ -416,7 +415,7 @@ func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 
 	path := hostfs.Join("proc", "stat")
 	// grab system boot time
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return 0, fmt.Errorf("error opening file %s: %w", path, err)
 	}
@@ -440,7 +439,7 @@ func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) {
 	status := make(map[string]string, 42)
 	path := hostfs.Join("proc", strconv.Itoa(pid), "status")
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}

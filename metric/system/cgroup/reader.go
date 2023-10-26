@@ -19,7 +19,7 @@ package cgroup
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -142,7 +142,7 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 	cgPath := filepath.Join("/proc/", strconv.Itoa(pid), "cgroup")
 	cgPath = r.rootfsMountpoint.ResolveHostFS(cgPath)
-	cgraw, err := ioutil.ReadFile(cgPath)
+	cgraw, err := os.ReadFile(cgPath)
 	if err != nil {
 		return CgroupsV1, fmt.Errorf("error reading %s: %w", cgPath, err)
 	}
@@ -358,7 +358,7 @@ func readControllerList(cgroupsFile string, v2path string) ([]string, error) {
 		return []string{}, nil
 	}
 	file := filepath.Join(v2path, cgpath, "cgroup.controllers")
-	controllersRaw, err := ioutil.ReadFile(file)
+	controllersRaw, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("error reading %s: %w", file, err)
 	}

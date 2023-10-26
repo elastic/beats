@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -249,7 +248,7 @@ func fetchEventsFile(path, file string) (Events, error) {
 // Some values, such as mem.max and mem.high, can be set to "max," which disables the metric.
 func maxOrValue(path, file string) (opt.Uint, error) {
 	var finalMetric opt.Uint
-	highRaw, err := ioutil.ReadFile(filepath.Join(path, file))
+	highRaw, err := os.ReadFile(filepath.Join(path, file))
 	if err != nil {
 		return finalMetric, fmt.Errorf("error reading %s.high file: %w", path, err)
 	}
@@ -272,7 +271,7 @@ func maxOrValue(path, file string) (opt.Uint, error) {
 // Note that this assumes all the values in the struct are either `uint64`, `opt.Bytes` or `opt.BytesOpt`
 func fillStatStruct(path string) (MemoryStat, error) {
 	statPath := filepath.Join(path, "memory.stat")
-	raw, err := ioutil.ReadFile(statPath)
+	raw, err := os.ReadFile(statPath)
 	if err != nil {
 		return MemoryStat{}, fmt.Errorf("error reading memory.stat: %w", err)
 	}

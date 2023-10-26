@@ -22,7 +22,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -58,7 +58,7 @@ func ParseMeminfo(rootfs resolve.Resolver) (map[string]uint64, error) {
 }
 
 func readFile(file string, handler func(string) bool) error {
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("error reading file %s: %w", file, err)
 	}

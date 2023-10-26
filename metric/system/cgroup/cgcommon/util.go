@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -36,7 +35,7 @@ var (
 
 // ParseUintFromFile reads a single uint value from a file.
 func ParseUintFromFile(path ...string) (uint64, error) {
-	value, err := ioutil.ReadFile(filepath.Join(path...))
+	value, err := os.ReadFile(filepath.Join(path...))
 	if err != nil {
 		// Not all features are implemented/enabled by each OS.
 		if os.IsNotExist(err) {

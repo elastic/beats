@@ -20,7 +20,6 @@ package numcpu
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -42,7 +41,7 @@ func getCPU() (int, bool, error) {
 		cpuPath = "/sys/devices/system/cpu/present"
 	}
 
-	rawFile, err := ioutil.ReadFile(cpuPath)
+	rawFile, err := os.ReadFile(cpuPath)
 	// if the file doesn't exist, assume it's a support issue and not a bug
 	if errors.Is(err, os.ErrNotExist) {
 		return -1, false, nil

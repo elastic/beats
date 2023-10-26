@@ -21,7 +21,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -106,7 +105,7 @@ func cpuacctUsage(path string, cpuacct *CPUAccountingSubsystem) error {
 }
 
 func cpuacctUsagePerCPU(path string, cpuacct *CPUAccountingSubsystem) error {
-	contents, err := ioutil.ReadFile(filepath.Join(path, "cpuacct.usage_percpu"))
+	contents, err := os.ReadFile(filepath.Join(path, "cpuacct.usage_percpu"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil

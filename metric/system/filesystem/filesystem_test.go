@@ -18,7 +18,6 @@
 package filesystem
 
 import (
-	"io/ioutil"
 	"os"
 	"runtime"
 	"testing"
@@ -56,9 +55,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 		t.Skip("These cases don't need to work on Windows")
 	}
 	_ = logp.DevelopmentSetup()
-	fakeDevDir, err := ioutil.TempDir(os.TempDir(), "dir")
-	assert.Empty(t, err)
-	defer os.RemoveAll(fakeDevDir)
+	fakeDevDir := t.TempDir()
 
 	cases := []struct {
 		description   string
