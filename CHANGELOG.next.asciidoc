@@ -120,6 +120,7 @@ is collected by it.
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix retries to trigger on a down monitor with no previous state. {pull}36842[36842]
 - Bump NodeJS minor version to 18.18.2. {pull}36961[36961]
+- Fix monitor duration calculation with retries. {pull}36900[36900]
 
 *Metricbeat*
 
@@ -173,6 +174,7 @@ is collected by it.
 - allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
+- elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 
 *Auditbeat*
 
@@ -250,6 +252,8 @@ is collected by it.
 
 *Auditbeat*
 
+- Upgrade go-libaudit to v2.4.0. {issue}36776[36776] {pull}36964[36964]
+
 *Libbeat*
 
 *Heartbeat*
@@ -299,6 +303,7 @@ is collected by it.
 
 *Filebeat*
 
+- Deprecate rsa2elk Filebeat modules. {issue}36125[36125] {pull}36887[36887]
 
 *Heartbeat*
 
