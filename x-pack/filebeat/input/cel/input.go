@@ -721,25 +721,27 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
-	client := &retryablehttp.Client{
-		HTTPClient:   c,
-		Logger:       newRetryLog(log),
-		RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
-		RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
-		RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
-		CheckRetry:   retryablehttp.DefaultRetryPolicy,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if cfg.Resource.Retry.getMaxAttempts() > 1 {
+		c = (&retryablehttp.Client{
+			HTTPClient:   c,
+			Logger:       newRetryLog(log),
+			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
+			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
+			RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+		}).StandardClient()
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		authClient, err := cfg.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
 			return nil, err
 		}
 		return authClient, nil
 	}
 
-	return client.StandardClient(), nil
+	return c, nil
 }
 
 func wantClient(cfg config) bool {
