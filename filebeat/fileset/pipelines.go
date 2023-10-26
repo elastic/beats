@@ -37,6 +37,7 @@ type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() version.V
+	IsServerless() bool
 }
 
 // MultiplePipelineUnsupportedError is an error returned when a fileset uses multiple pipelines but is
@@ -65,7 +66,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			// check that all the required Ingest Node plugins are available
 			requiredProcessors := fileset.GetRequiredProcessors()
 			reg.log.Debugf("Required processors: %s", requiredProcessors)
-			if len(requiredProcessors) > 0 {
+			if len(requiredProcessors) > 0 && !esClient.IsServerless() {
 				err := checkAvailableProcessors(esClient, requiredProcessors)
 				if err != nil {
 					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
