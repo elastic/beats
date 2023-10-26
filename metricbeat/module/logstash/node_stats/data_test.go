@@ -21,9 +21,9 @@ package node_stats
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	stdlibos "os"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
@@ -57,7 +57,7 @@ func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents
 
 	for _, f := range fixtureVersions {
 		path := fmt.Sprintf("./_meta/test/node_stats.%s.json", f)
-		input, err := ioutil.ReadFile(path)
+		input, err := stdlibos.ReadFile(path)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
@@ -75,13 +75,13 @@ func TestData(t *testing.T) {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := stdlibos.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 	}))
 
 	mux.Handle("/_node/stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/node_stats.710.json")
+			input, _ := stdlibos.ReadFile("./_meta/test/node_stats.710.json")
 			w.Write(input)
 		}))
 

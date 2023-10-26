@@ -18,9 +18,9 @@
 package routes
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -30,7 +30,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/test/routesmetrics.json")
+	content, err := os.ReadFile("./_meta/test/routesmetrics.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventMapping(reporter, content)
@@ -43,7 +43,7 @@ func TestEventMapping(t *testing.T) {
 func TestFetchEventContent(t *testing.T) {
 	absPath, _ := filepath.Abs("./_meta/test")
 
-	response, _ := ioutil.ReadFile(absPath + "/routesmetrics.json")
+	response, _ := os.ReadFile(absPath + "/routesmetrics.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")

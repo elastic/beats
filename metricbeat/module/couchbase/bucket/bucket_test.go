@@ -20,9 +20,9 @@
 package bucket
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -37,7 +37,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.NoError(t, err)
 
 	// response is a raw response from a couchbase
-	response, err := ioutil.ReadFile(absPath + "/sample_response.json")
+	response, err := os.ReadFile(absPath + "/sample_response.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

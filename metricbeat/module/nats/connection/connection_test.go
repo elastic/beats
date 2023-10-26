@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -30,7 +31,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/test/connectionsmetrics.json")
+	content, err := os.ReadFile("./_meta/test/connectionsmetrics.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(reporter, content)

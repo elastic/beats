@@ -18,9 +18,9 @@
 package cluster_status
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -34,7 +34,7 @@ func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/testdata/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/status_sample_response.json")
+	response, err := os.ReadFile(absPath + "/status_sample_response.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -18,13 +18,9 @@
 package system
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-var once sync.Once
 
 func init() {
 	// Register the ModuleFactory function for the "system" module.

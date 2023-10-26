@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/url"
 	"strings"
@@ -260,7 +259,7 @@ func (c *Client) GetInfo() (*Info, error) {
 		return nil, err
 	}
 
-	if b, err := ioutil.ReadAll(res); err == nil {
+	if b, err := io.ReadAll(res); err == nil {
 
 		resultMap := map[string]interface{}{}
 

@@ -19,7 +19,6 @@ package mb
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -260,7 +259,7 @@ func (s *LightModulesSource) moduleNames() ([]string, error) {
 			s.log.Debugf("Light modules directory '%d' doesn't exist", dir)
 			continue
 		}
-		files, err := ioutil.ReadDir(dir)
+		files, err := os.ReadDir(dir)
 		if err != nil {
 			return nil, fmt.Errorf("listing modules on path '%s': %w", dir, err)
 		}

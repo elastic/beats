@@ -18,7 +18,7 @@
 package ktest
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 
@@ -57,7 +57,7 @@ func GetTestCases(files []string) ptest.TestCases {
 func TestMetricsFamily(t *testing.T, files []string, mapping *p.MetricsMapping) {
 	metricsFiles := map[string][]string{}
 	for i := 0; i < len(files); i++ {
-		content, err := ioutil.ReadFile(files[i])
+		content, err := os.ReadFile(files[i])
 		if err != nil {
 			t.Fatalf("Unknown file %s.", files[i])
 		}

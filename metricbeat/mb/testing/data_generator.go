@@ -20,7 +20,6 @@ package testing
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -184,7 +183,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(p, output, 0644); err != nil {
+	if err = os.WriteFile(p, output, 0644); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -24,7 +24,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
@@ -212,6 +212,10 @@ func writeToServer(t *testing.T, message, host string, port int, connectionMetho
 	url := fmt.Sprintf("%s://%s:%d/", strings.ToLower(connectionType), host, port)
 	var str = []byte(message)
 	req, err := http.NewRequest(connectionMethod, url, bytes.NewBuffer(str))
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
 	req.Header.Set("Content-Type", "text/plain")
 	client := &http.Client{}
 	if connectionType == "HTTPS" {
@@ -230,7 +234,7 @@ func writeToServer(t *testing.T, message, host string, port int, connectionMetho
 
 	if connectionMethod == "GET" {
 		if resp.StatusCode == http.StatusOK {
-			bodyBytes, err2 := ioutil.ReadAll(resp.Body)
+			bodyBytes, err2 := io.ReadAll(resp.Body)
 			if err2 != nil {
 				t.Error(err)
 				t.FailNow()

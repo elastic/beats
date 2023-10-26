@@ -231,7 +231,7 @@ func topoPkgCPUMap(hostfs resolve.Resolver) (map[int][]int, error) {
 	sysdir := "/sys/devices/system/cpu/"
 	cpuMap := make(map[int][]int)
 
-	files, err := ioutil.ReadDir(hostfs.ResolveHostFS(sysdir))
+	files, err := os.ReadDir(hostfs.ResolveHostFS(sysdir))
 	if err != nil {
 		return nil, err
 	}

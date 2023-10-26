@@ -18,7 +18,6 @@
 package status
 
 import (
-	"io/ioutil"
 	"net"
 	"os"
 	"sync"
@@ -30,7 +29,7 @@ import (
 )
 
 func TestFetchDataUnixSock(t *testing.T) {
-	tmpfile, err := ioutil.TempFile("", "mb_uwsgi_status")
+	tmpfile, err := os.CreateTemp("", "mb_uwsgi_status")
 	assert.NoError(t, err)
 	fname := tmpfile.Name()
 	os.Remove(fname)

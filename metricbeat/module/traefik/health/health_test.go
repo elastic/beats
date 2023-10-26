@@ -21,9 +21,9 @@ package health
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -35,7 +35,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	mockResponse, err := ioutil.ReadFile("./_meta/test/simple.json")
+	mockResponse, err := os.ReadFile("./_meta/test/simple.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
