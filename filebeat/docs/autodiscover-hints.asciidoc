@@ -33,6 +33,7 @@ co.elastic.logs/json.message_key: "log"
 co.elastic.logs/json.add_error_key: "true"
 -----
 will lead to the following input configuration:
+
 * `filestream`
 [source,yaml]
 -----
@@ -41,6 +42,7 @@ parsers:
       message_key: "log"
       add_error_key: "true"
 -----
+
 * `log`
 [source,yaml]
 -----
@@ -48,7 +50,7 @@ json.message_key: "log"
 json.add_error_key: "true"
 -----
 
-NOTE: `keys_under_root` json option of `log` input is replace with `target` in filestream input. Read the documentation on how to use it correctly.
+NOTE: `keys_under_root` json option of `log` input is replaced with `target` option in filestream input. Read the documentation on how to use it correctly.
 
 [float]
 ===== `co.elastic.logs/include_lines`
