@@ -179,6 +179,7 @@ is collected by it.
 *Auditbeat*
 
 - Add `ignore_errors` option to audit module. {issue}15768[15768] {pull}36851[36851]
+- Fix copy arguments for strict aligned architectures. {pull}36976[36976]
 
 *Filebeat*
 
