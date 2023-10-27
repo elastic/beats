@@ -74,6 +74,8 @@ func (ssp *BrowserStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
+func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} //noop
+
 // LightweightStateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
 type LightweightStateStatusPlugin struct {
@@ -113,6 +115,8 @@ func (ssp *LightweightStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
+func (ssp *LightweightStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} // noop
+
 type commonSSP struct {
 	js           *jobsummary.JobSummary
 	stateTracker *monitorstate.Tracker
@@ -150,12 +154,12 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 	lastStatus := ssp.stateTracker.GetCurrentStatus(ssp.sf)
 
 	curCheckDown := ssp.js.Status == monitorstate.StatusDown
-	lastStateUp := ssp.stateTracker.GetCurrentStatus(ssp.sf) == monitorstate.StatusUp
+	lastStateUpOrEmpty := lastStatus == monitorstate.StatusUp || lastStatus == monitorstate.StatusEmpty
 	hasAttemptsRemaining := ssp.js.Attempt < ssp.js.MaxAttempts
 
 	// retry if...
 	retry := curCheckDown && // the current check is down
-		lastStateUp && // we were previously up, if we were previously down we just check once
+		lastStateUpOrEmpty && // we were previously up or had no previous state, if we were previously down we just check once
 		hasAttemptsRemaining // and we are configured to actually make multiple attempts
 	// if we aren't retrying this is the final attempt
 	ssp.js.FinalAttempt = !retry
@@ -174,7 +178,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
-	logp.L().Debugf("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
+	logp.L().Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
 		return RetryBeforeSummary
