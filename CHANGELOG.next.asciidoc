@@ -230,6 +230,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Packetbeat*
 
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
 
 *Packetbeat*
 
