@@ -103,7 +103,7 @@ func TestQueueMetricsBuffer(t *testing.T) {
 }
 
 func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, testName string) {
-	testQueue := NewQueue(nil, nil, settings)
+	testQueue := NewQueue(nil, nil, settings, 0)
 	defer testQueue.Close()
 
 	// Send events to queue
@@ -147,7 +147,7 @@ func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.Queu
 			Events:         sz,
 			FlushMinEvents: minEvents,
 			FlushTimeout:   flushTimeout,
-		})
+		}, 0)
 	}
 }
 
@@ -258,22 +258,22 @@ func TestEntryIDs(t *testing.T) {
 	}
 
 	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0)
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0)
 		testBackward(testQueue)
 	})
 
 	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond}, 0)
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond})
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond}, 0)
 		testBackward(testQueue)
 	})
 }

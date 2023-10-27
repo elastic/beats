@@ -74,6 +74,8 @@ func (ssp *BrowserStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
 
+func (ssp *BrowserStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} //noop
+
 // LightweightStateStatusPlugin encapsulates the writing of the primary fields used by the summary,
 // those being `state.*`, `status.*` , `event.type`, and `monitor.check_group`
 type LightweightStateStatusPlugin struct {
@@ -112,6 +114,8 @@ func (ssp *LightweightStateStatusPlugin) BeforeSummary(event *beat.Event) Before
 func (ssp *LightweightStateStatusPlugin) BeforeRetry() {
 	ssp.cssp.BeforeRetry()
 }
+
+func (ssp *LightweightStateStatusPlugin) BeforeEachEvent(event *beat.Event) {} // noop
 
 type commonSSP struct {
 	js           *jobsummary.JobSummary

@@ -74,7 +74,7 @@ type Queue interface {
 	Metrics() (Metrics, error)
 }
 
-type QueueFactory func(logger *logp.Logger, ack func(eventCount int)) (Queue, error)
+type QueueFactory func(logger *logp.Logger, ack func(eventCount int), inputQueueSize int) (Queue, error)
 
 // BufferConfig returns the pipelines buffering settings,
 // for the pipeline to use.
