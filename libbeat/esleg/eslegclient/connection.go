@@ -317,14 +317,14 @@ func (conn *Connection) Close() error {
 type httpClientProxySettings httpcommon.HTTPClientProxySettings
 
 // ProxyDialer is a dialer that can be registered to golang.org/x/net/proxy
-func (settings *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.Dialer) (proxy.Dialer, error) {
+func (h *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.Dialer) (proxy.Dialer, error) {
 	return transport.DialerFunc(func(_, address string) (net.Conn, error) {
 
 		// Headers given to the CONNECT request
-		hdr := settings.Headers.Headers()
-		if settings.URL.User != nil {
-			username := settings.URL.User.Username()
-			password, _ := settings.URL.User.Password()
+		hdr := h.Headers.Headers()
+		if h.URL.User != nil {
+			username := h.URL.User.Username()
+			password, _ := h.URL.User.Password()
 			if len(hdr) == 0 {
 				hdr = http.Header{}
 			}
@@ -339,7 +339,7 @@ func (settings *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.D
 		}
 
 		// Dial the proxy host
-		c, err := forward.Dial("tcp", settings.URL.Host)
+		c, err := forward.Dial("tcp", h.URL.Host)
 		if err != nil {
 			return nil, err
 		}
@@ -349,7 +349,6 @@ func (settings *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.D
 			c.Close()
 			return nil, err
 		}
-
 
 		res, err := http.ReadResponse(bufio.NewReader(c), req)
 		if err != nil {
