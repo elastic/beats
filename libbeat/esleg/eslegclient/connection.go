@@ -314,9 +314,7 @@ func (conn *Connection) Close() error {
 	return nil
 }
 
-type httpClientProxySettings struct {
-	*httpcommon.HTTPClientProxySettings
-}
+type httpClientProxySettings httpcommon.HTTPClientProxySettings
 
 // ProxyDialer is a dialer that can be registered to golang.org/x/net/proxy
 func (settings *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.Dialer) (proxy.Dialer, error) {
