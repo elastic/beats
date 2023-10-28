@@ -345,11 +345,11 @@ func (settings *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.D
 		}
 
 		// Write the CONNECT request
-		err = req.Write(c)
-		if err != nil {
+		if err := req.Write(c); err != nil {
 			c.Close()
 			return nil, err
 		}
+
 
 		res, err := http.ReadResponse(bufio.NewReader(c), req)
 		if err != nil {
