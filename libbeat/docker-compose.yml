@@ -27,7 +27,9 @@ services:
       interval: 1s
     ports:
       - 9200:9200
-      - 3128:3128 # Squid listens in the proxy service container.
+      # Squid listens on 3128 (HTTP) and 3129 (HTTPS) from the proxy service container.
+      - 3128:3128
+      - 3129:3129
 
   elasticsearchssl:
     extends:

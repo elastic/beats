@@ -88,7 +88,7 @@ func TestCmdTestOutputBadHost(t *testing.T) {
 
 func TestCmdTestOutputProxy(t *testing.T) {
 	esURL := GetESURL(t, "http")
-	proxyURL := GetProxyURL(t)
+	proxyURL := GetProxyURL(t, "http")
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
 	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url="+proxyURL.String())
@@ -101,8 +101,23 @@ func TestCmdTestOutputProxy(t *testing.T) {
 	mockbeat.WaitStdOutContains("talk to server... OK", 10*time.Second)
 }
 
+func TestCmdTestOutputProxyTLS(t *testing.T) {
+	esURL := GetESURL(t, "http")
+	proxyURL := GetProxyURL(t, "https")
+	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
+	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
+	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url="+proxyURL.String(), "-E", "output.elasticsearch.ssl.verification_mode=none")
+	procState, err := mockbeat.Process.Wait()
+	require.NoError(t, err)
+	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("proxy... OK", 10*time.Second)
+	mockbeat.WaitStdOutContains("TLS... WARN secure connection disabled", 10*time.Second)
+	mockbeat.WaitStdOutContains("talk to server... OK", 10*time.Second)
+}
+
 func TestCmdTestOutputProxyBadHost(t *testing.T) {
-	proxyURL := GetProxyURL(t)
+	proxyURL := GetProxyURL(t, "http")
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, "badhost:9200"))
 	mockbeat.Start("test", "output", "-E", "output.elasticsearch.proxy_url="+proxyURL.String())

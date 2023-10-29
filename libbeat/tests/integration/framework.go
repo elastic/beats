@@ -574,13 +574,8 @@ func GetKibana(t *testing.T) (url.URL, *url.Userinfo) {
 	return kibanaURL, kibanaUser
 }
 
-func GetProxyURL(t *testing.T) url.URL {
+func GetProxyURL(t *testing.T, scheme string) url.URL {
 	t.Helper()
-
-	scheme := os.Getenv("PROXY_SCHEME")
-	if scheme == "" {
-		scheme = "http"
-	}
 
 	proxyHost := os.Getenv("PROXY_HOST")
 	if proxyHost == "" {
@@ -589,7 +584,14 @@ func GetProxyURL(t *testing.T) url.URL {
 
 	proxyPort := os.Getenv("PROXY_PORT")
 	if proxyPort == "" {
-		proxyPort = "3128"
+		switch scheme {
+		case "http":
+			proxyPort = "3128"
+		case "https":
+			proxyPort = "3129"
+		default:
+			t.Fatalf("could not determine port from env variable: PROXY_PORT=%s", proxyPort)
+		}
 	}
 
 	user := os.Getenv("PROXY_USER")

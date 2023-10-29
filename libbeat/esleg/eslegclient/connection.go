@@ -367,19 +367,18 @@ func (h *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.Dialer) 
 }
 
 func (conn *Connection) testProxyDialer(d testing.Driver, forward transport.Dialer) transport.Dialer {
-	switch scheme := conn.Transport.Proxy.URL.Scheme; scheme {
-	case "http", "https":
-		proxy.RegisterDialerType(scheme, ((*httpClientProxySettings)(&conn.Transport.Proxy)).ProxyDialer)
-	}
-
 	dialer := forward
 
-	if conn.Transport.Proxy.URL.Scheme == "https" {
+	switch scheme := conn.Transport.Proxy.URL.Scheme; scheme {
+	case "https":
 		tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
 		if err != nil {
 			d.Fatal("load tls config", err)
 		}
 		dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+		fallthrough
+	case "http":
+		proxy.RegisterDialerType(scheme, ((*httpClientProxySettings)(&conn.Transport.Proxy)).ProxyDialer)
 	}
 
 	dialer, err := transport.ProxyDialer(logp.L(), &transport.ProxyConfig{URL: conn.Transport.Proxy.URL.String()}, dialer)
