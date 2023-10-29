@@ -366,28 +366,39 @@ func (h *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.Dialer) 
 	}), nil
 }
 
-func (conn *Connection) Test(d testing.Driver) {
-	testProxyDialer := func(d testing.Driver, forward transport.Dialer, settings *httpcommon.HTTPClientProxySettings) transport.Dialer {
-		switch scheme := settings.URL.Scheme; scheme {
-		case "http", "https":
-			proxy.RegisterDialerType(scheme, (&httpClientProxySettings{HTTPClientProxySettings: settings}).ProxyDialer)
-		}
-		dialer, err := transport.ProxyDialer(logp.L(), &transport.ProxyConfig{URL: settings.URL.String()}, forward)
-		d.Fatal("proxy", err)
-		return dialer
+func (conn *Connection) testProxyDialer(d testing.Driver, forward transport.Dialer) transport.Dialer {
+	switch scheme := conn.Transport.Proxy.URL.Scheme; scheme {
+	case "http", "https":
+		proxy.RegisterDialerType(scheme, ((*httpClientProxySettings)(&conn.Transport.Proxy)).ProxyDialer)
 	}
 
+	dialer := forward
+
+	if conn.Transport.Proxy.URL.Scheme == "https" {
+		tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+		if err != nil {
+			d.Fatal("load tls config", err)
+		}
+		dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+	}
+
+	dialer, err := transport.ProxyDialer(logp.L(), &transport.ProxyConfig{URL: conn.Transport.Proxy.URL.String()}, dialer)
+	d.Fatal("proxy", err)
+	return dialer
+}
+
+func (conn *Connection) Test(d testing.Driver) {
 	d.Run("elasticsearch: "+conn.URL, func(d testing.Driver) {
 		u, err := url.Parse(conn.URL)
 		d.Fatal("parse url", err)
 
-		address := u.Host
+		isPeerProxyServer := conn.Transport.Proxy.URL != nil && !conn.Transport.Proxy.Disable
 
-		if proxyURL := conn.Transport.Proxy.URL; proxyURL != nil && !conn.Transport.Proxy.Disable {
+		if isPeerProxyServer {
 			d.Run("proxy", func(d testing.Driver) {
 				dialer := transport.TestNetDialer(d, conn.Transport.Timeout)
 
-				if proxyURL.Scheme == "https" {
+				if conn.Transport.Proxy.URL.Scheme == "https" {
 					tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
 					if err != nil {
 						d.Fatal("load tls config", err)
@@ -395,28 +406,24 @@ func (conn *Connection) Test(d testing.Driver) {
 					dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
 				}
 
-				_, err := dialer.Dial("tcp", proxyURL.Host)
+				_, err := dialer.Dial("tcp", conn.Transport.Proxy.URL.Host)
 				d.Fatal("dial up", err)
 			})
 		}
 
+		address := u.Host
+
 		d.Run("connection", func(d testing.Driver) {
 			var dialer transport.Dialer
-			if proxyURL := conn.Transport.Proxy.URL; proxyURL == nil || conn.Transport.Proxy.Disable {
+
+			if !isPeerProxyServer {
+				// Hasn't examined connectivity to the direct peer yet.
 				dialer = transport.TestNetDialer(d, conn.Transport.Timeout)
 			} else {
 				dialer = transport.NetDialer(conn.Transport.Timeout)
-
-				if proxyURL.Scheme == "https" {
-					tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
-					if err != nil {
-						d.Fatal("load tls config", err)
-					}
-					dialer = transport.TLSDialer(dialer, tls, conn.Transport.Timeout)
-				}
-
-				dialer = testProxyDialer(d, dialer, &conn.Transport.Proxy)
+				dialer = conn.testProxyDialer(d, dialer)
 			}
+
 			_, err := dialer.Dial("tcp", address)
 			d.Fatal("dial up", err)
 		})
@@ -432,14 +439,12 @@ func (conn *Connection) Test(d testing.Driver) {
 
 				dialer := transport.NetDialer(conn.Transport.Timeout)
 
-				if proxyURL := conn.Transport.Proxy.URL; proxyURL != nil && !conn.Transport.Proxy.Disable {
-					if proxyURL.Scheme == "https" {
-						dialer = transport.TLSDialer(dialer, tls, conn.Transport.Timeout)
-					}
-					dialer = testProxyDialer(d, dialer, &conn.Transport.Proxy)
+				if isPeerProxyServer {
+					dialer = conn.testProxyDialer(d, dialer)
 				}
 
 				dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+
 				_, err = dialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
