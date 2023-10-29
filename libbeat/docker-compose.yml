@@ -70,26 +70,8 @@ services:
         condition: service_healthy
 
   proxy:
-    image: ubuntu/squid:latest
+    build: ${ES_BEATS}/testing/environments/docker/proxy
     network_mode: service:elasticsearch
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/3128 || exit 1"]
-      retries: 60
-      interval: 1s
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |-
-        cat << EOF >> /etc/squid/conf.d/00_proxy.conf
-        auth_param basic program /usr/lib/squid/basic_fake_auth
-        acl auth proxy_auth REQUIRED
-        http_access deny !auth
-        http_access allow auth
-        http_access deny all
-        acl SSL_ports port 9200
-        dns_timeout 3 seconds
-        EOF
-        exec /usr/local/bin/entrypoint.sh -f /etc/squid/squid.conf -NYC
 
   redis:
     build: ${ES_BEATS}/testing/environments/docker/redis
