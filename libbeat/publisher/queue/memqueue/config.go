@@ -32,9 +32,9 @@ type config struct {
 }
 
 var defaultConfig = config{
-	Events:         4 * 1024,
-	FlushMinEvents: 2 * 1024,
-	FlushTimeout:   1 * time.Second,
+	Events:         3200,
+	FlushMinEvents: 1600,
+	FlushTimeout:   10 * time.Second,
 }
 
 func (c *config) Validate() error {
