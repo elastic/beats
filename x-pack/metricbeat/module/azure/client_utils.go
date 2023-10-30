@@ -19,7 +19,7 @@ const DefaultTimeGrain = "PT5M"
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
+func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {

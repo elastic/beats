@@ -27,6 +27,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			if err != nil {
 				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s %w", *resource.ID, metric.Namespace, err)
 			}
+
 			if len(metricDefinitions.Value) == 0 {
 				if metric.IgnoreUnsupported {
 					client.Log.Infof(missingNamespace, *resource.ID, metric.Namespace)
@@ -63,6 +64,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 		}
 	}
+
 	return metrics, nil
 }
 
