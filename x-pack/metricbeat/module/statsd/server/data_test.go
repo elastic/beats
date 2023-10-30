@@ -737,11 +737,9 @@ func TestEventMapping(t *testing.T) {
 		},
 	} {
 		t.Run(test.metricName, func(t *testing.T) {
-			metricSetFields := mapstr.M{}
 			builtMappings, _ := buildMappings(mappings)
-			eventMapping(test.metricName, test.metricValue, metricSetFields, builtMappings)
-
-			assert.Equal(t, test.expected, metricSetFields)
+			ms := eventMapping(test.metricName, test.metricValue, builtMappings)
+			assert.Equal(t, test.expected, ms)
 		})
 	}
 }
@@ -1132,7 +1130,7 @@ func TestTagsGrouping(t *testing.T) {
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 2)
+	assert.Len(t, events, 4)
 
 	actualTags := []mapstr.M{}
 	for _, e := range events {
@@ -1144,6 +1142,18 @@ func TestTagsGrouping(t *testing.T) {
 			"labels": mapstr.M{
 				"k1": "v1",
 				"k2": "v2",
+			},
+		},
+		{
+			"labels": mapstr.M{
+				"k1": "v1",
+				"k2": "v2",
+			},
+		},
+		{
+			"labels": mapstr.M{
+				"k1": "v2",
+				"k2": "v3",
 			},
 		},
 		{
@@ -1224,7 +1234,7 @@ func TestData(t *testing.T) {
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 1)
+	assert.Len(t, events, 10)
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
