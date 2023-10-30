@@ -188,9 +188,8 @@
       ],
       "question": {
         "name": "static-global-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net",
-        "subdomain": "static-global-s-msn-com",
-        "top_level_domain": "net"
+        "registered_domain": "static-global-s-msn-com.akamaized.net",
+        "top_level_domain": "akamaized.net"
       },
       "resolved_ip": [
         "23.50.53.192",
@@ -10562,9 +10561,8 @@
       ],
       "question": {
         "name": "img-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net",
-        "subdomain": "img-s-msn-com",
-        "top_level_domain": "net"
+        "registered_domain": "img-s-msn-com.akamaized.net",
+        "top_level_domain": "akamaized.net"
       },
       "resolved_ip": [
         "23.50.53.185",
@@ -10648,9 +10646,8 @@
       ],
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net",
-        "subdomain": "static-entertainment-eus-s-msn-com",
-        "top_level_domain": "net"
+        "registered_domain": "static-entertainment-eus-s-msn-com.akamaized.net",
+        "top_level_domain": "akamaized.net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -10819,9 +10816,8 @@
       ],
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net",
-        "subdomain": "static-entertainment-eus-s-msn-com",
-        "top_level_domain": "net"
+        "registered_domain": "static-entertainment-eus-s-msn-com.akamaized.net",
+        "top_level_domain": "akamaized.net"
       },
       "resolved_ip": [
         "23.50.53.194",
