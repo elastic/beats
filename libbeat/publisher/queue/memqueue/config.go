@@ -53,6 +53,7 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
 		}
 	}
+	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
 	return Settings{
 		Events:         config.Events,
 		FlushMinEvents: config.FlushMinEvents,
