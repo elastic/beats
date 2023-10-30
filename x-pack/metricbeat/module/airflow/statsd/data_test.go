@@ -11,8 +11,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -20,7 +18,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
 )
 
 func init() {
