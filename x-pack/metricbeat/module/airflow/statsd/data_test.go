@@ -20,6 +20,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
 )
 
 func init() {
@@ -77,11 +78,9 @@ func TestData(t *testing.T) {
 
 	wg.Wait()
 	createEvent("dagrun.duration.failed.a_dagid:200|ms|#k1:v1,k2:v2", t)
-	createEvent("dagrun.duration.failed.b_dagid:500|ms|#k3:v3,k4:v4", t)
+	createEvent("dagrun.duration.failed.b_dagid:500|ms|#k1:v1,k2:v2", t)
 	<-done
-
 	assert.Len(t, events, 2)
-
 	if len(events) == 0 {
 		t.Fatal("received no events")
 	}
