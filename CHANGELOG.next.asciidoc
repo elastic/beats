@@ -143,6 +143,7 @@ is collected by it.
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
 - Add log error when statsd server fails to start {pull}36477[36477]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
+- Fix event mapping implementation for statsd module {pull}36925[36925]
 
 *Osquerybeat*
 
@@ -174,9 +175,11 @@ is collected by it.
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
+- Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 
 *Auditbeat*
 
+- Add `ignore_errors` option to audit module. {issue}15768[15768] {pull}36851[36851]
 
 *Filebeat*
 
@@ -252,6 +255,7 @@ is collected by it.
 *Auditbeat*
 
 - Upgrade go-libaudit to v2.4.0. {issue}36776[36776] {pull}36964[36964]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each dataset instance. {pull}36971[36971]
 
 *Libbeat*
 
@@ -268,6 +272,8 @@ is collected by it.
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
+
 
 *Osquerybeat*
 

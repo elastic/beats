@@ -362,6 +362,7 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
+	ID          string        `config:"id"` // Optional ID (not guaranteed to be unique).
 	Hosts       []string      `config:"hosts"`
 	Period      time.Duration `config:"period"     validate:"positive"`
 	Timeout     time.Duration `config:"timeout"    validate:"positive"`
@@ -375,8 +376,8 @@ type ModuleConfig struct {
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
-		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
+		`ID:"%s", Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
+		c.Module, c.MetricSets, c.Enabled, c.ID, len(c.Hosts), c.Period, c.Timeout,
 		c.Raw, c.Query)
 }
 

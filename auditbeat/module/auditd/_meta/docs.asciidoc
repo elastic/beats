@@ -205,6 +205,9 @@ loaded after the rules declared in `audit_rules` are loaded. Wildcards are
 supported and will expand in lexicographical order. The format is the same as
 that of the `audit_rules` field.
 
+*`ignore_errors`*:: This setting allows errors during rule loading and parsing
+to be ignored, but logged as warnings.
+
 *`backpressure_strategy`*:: Specifies the strategy that {beatname_uc} uses to
 prevent backpressure from propagating to the kernel and impacting audited
 processes.
