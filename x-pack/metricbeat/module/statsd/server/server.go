@@ -169,7 +169,7 @@ func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
 func (m *MetricSet) getEvents() []*mb.Event {
 	groups := m.processor.GetAll()
 
-	// If there are no groups, return an empty slice.
+	// If there are no metric groups, return nil to indicate no events.
 	if len(groups) == 0 {
 		return nil
 	}

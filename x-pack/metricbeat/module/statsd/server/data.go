@@ -111,7 +111,6 @@ func eventMapping(metricName string, metricValue interface{}, mappings map[strin
 
 	for _, mapping := range mappings {
 		// The metricname match the one with no labels in mappings
-		// Let's insert it dedotted and continue
 		if metricName == mapping.Metric {
 			m[mapping.Value.Field] = metricValue
 			return m
