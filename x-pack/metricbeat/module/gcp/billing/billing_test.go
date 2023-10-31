@@ -44,33 +44,39 @@ func TestCreateTagsMap(t *testing.T) {
 	testCases := []struct {
 		name     string
 		tagsItem bigquery.Value
-		want     mapstr.M
+		want     []tag
 	}{
 		{
 			name:     "valid tags",
 			tagsItem: "tag1.a:value1,tag2.b:value2",
-			want:     mapstr.M{"tag1.a": "value1", "tag2.b": "value2"},
+			want: []tag{
+				{Key: "tag1.a", Value: "value1"},
+				{Key: "tag2.b", Value: "value2"},
+			},
 		},
 		{
 			name:     "valid tags no values",
 			tagsItem: "tag1:,tag2:",
-			want:     mapstr.M{"tag1": "", "tag2": ""},
+			want: []tag{
+				{Key: "tag1", Value: ""},
+				{Key: "tag2", Value: ""},
+			},
 		},
 		{
 			name:     "no tags",
 			tagsItem: "",
-			want:     mapstr.M{},
+			want:     nil,
 		},
 		{
 			name:     "invalid format",
 			tagsItem: "tag1 value1,tag2 value2",
-			want:     mapstr.M{},
+			want:     nil,
 		},
 	}
 
 	for _, tt := range testCases {
 		t.Run(tt.name, func(t *testing.T) {
-			tags := createTagsMap(tt.tagsItem)
+			tags := createTags(tt.tagsItem)
 			assert.Equal(tt.want, tags)
 		})
 	}
@@ -141,10 +147,10 @@ func TestCreateEvents(t *testing.T) {
 				"sku_description":     "E2 Instance Ram running in Americas",
 				"service_id":          "6F81-5844-456A",
 				"service_description": "Compute Engine",
-				"tags": mapstr.M{
-					"tag1":       "value1",
-					"tag2.a.b/c": "value2",
-					"tag3":       "",
+				"tags": []tag{
+					{Key: "tag1", Value: "value1"},
+					{Key: "tag2.a.b/c", Value: "value2"},
+					{Key: "tag3", Value: ""},
 				},
 			},
 		}
@@ -191,10 +197,10 @@ func TestCreateEvents(t *testing.T) {
 				"service_id":          "6F81-5844-456A",
 				"service_description": "Compute Engine",
 				"effective_price":     123.45,
-				"tags": mapstr.M{
-					"tag1":       "value1",
-					"tag2.a.b/c": "value2",
-					"tag3":       "",
+				"tags": []tag{
+					{Key: "tag1", Value: "value1"},
+					{Key: "tag2.a.b/c", Value: "value2"},
+					{Key: "tag3", Value: ""},
 				},
 			},
 		}
