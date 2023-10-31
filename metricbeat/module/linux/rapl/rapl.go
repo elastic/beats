@@ -22,7 +22,6 @@ package rapl
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -242,7 +241,7 @@ func topoPkgCPUMap(hostfs resolve.Resolver) (map[int][]int, error) {
 		if file.IsDir() && re.MatchString(file.Name()) {
 
 			fullPkg := hostfs.ResolveHostFS(filepath.Join(sysdir, file.Name(), "/topology/physical_package_id"))
-			dat, err := ioutil.ReadFile(fullPkg)
+			dat, err := os.ReadFile(fullPkg)
 			if err != nil {
 				return nil, fmt.Errorf("error reading file %s: %w", fullPkg, err)
 			}

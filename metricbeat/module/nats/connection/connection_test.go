@@ -18,7 +18,6 @@
 package connection
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -41,7 +40,7 @@ func TestEventMapping(t *testing.T) {
 func TestFetchEventContent(t *testing.T) {
 	absPath, _ := filepath.Abs("./_meta/test")
 
-	response, _ := ioutil.ReadFile(absPath + "/connectionsmetrics.json")
+	response, _ := os.ReadFile(absPath + "/connectionsmetrics.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")

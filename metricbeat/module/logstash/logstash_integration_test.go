@@ -21,7 +21,7 @@ package logstash_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -105,7 +105,7 @@ func getESClusterUUID(t *testing.T, host string) string {
 		ClusterUUID string `json:"cluster_uuid"`
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 	json.Unmarshal(data, &body)
 
