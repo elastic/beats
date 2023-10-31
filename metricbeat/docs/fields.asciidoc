@@ -35379,7 +35379,7 @@ type: keyword
 --
 A description of the resource type used by the service. For example, a resource type for Cloud Storage is Standard Storage US.
 
-type: text
+type: keyword
 
 --
 
@@ -35397,7 +35397,7 @@ type: keyword
 --
 The Google Cloud service that reported the Cloud Billing data.
 
-type: text
+type: keyword
 
 --
 
@@ -35406,7 +35406,7 @@ type: text
 --
 A collection of key-value pairs that provide additional metadata.
 
-type: object
+type: nested
 
 --
 
