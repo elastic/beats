@@ -22,9 +22,12 @@
             "sku_description": "Network Inter Region Ingress from Jakarta to Americas",
             "service_description": "Compute Engine",
             "effective_price": 0.00292353,
-            "tags": {
-                "size": "medium"
-            }
+            "tags": [
+                {
+                    "key": "size",
+                    "value": "standard"
+                }
+            ]
         }
     },
     "metricset": {
