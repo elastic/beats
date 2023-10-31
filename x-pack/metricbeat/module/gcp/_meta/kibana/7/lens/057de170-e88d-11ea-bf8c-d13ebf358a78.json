@@ -14,7 +14,7 @@
                                     "dataType": "number",
                                     "isBucketed": false,
                                     "label": "Maximum of gcp.billing.total",
-                                    "operationType": "max",
+                                    "operationType": "sum",
                                     "scale": "ratio",
                                     "sourceField": "gcp.billing.total"
                                 },
