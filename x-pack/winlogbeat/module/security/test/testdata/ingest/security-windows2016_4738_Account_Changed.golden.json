@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4738",
-      "ingested": "2022-06-08T06:21:08.368099900Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -114,7 +113,6 @@
         "iam"
       ],
       "code": "4738",
-      "ingested": "2022-06-08T06:21:08.368122700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
