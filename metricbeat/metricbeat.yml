@@ -78,11 +78,11 @@ setup.kibana:
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
 # You can find the `cloud.id` in the Elastic Cloud web UI.
-cloud.id: SDH_Lack_of_KSM_metrics:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ1NDQ4ZDA4MTMyMjA0ZWI4OGI0NTNlNzUyNTI3MjdlNSRiNDM0MTc4MDBmMzE0NjQ2OGMwMzAzMjMwYWIyMjMwZg==
+#cloud.id:
 
 # The cloud.auth setting overwrites the `output.elasticsearch.username` and
 # `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
-cloud.auth: elastic:UONd26PebXS0Yumid26gYsVQ
+#cloud.auth:
 
 # ================================== Outputs ===================================
 
@@ -101,7 +101,6 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-output.elasticsearch.allow_older_versions: true
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # The Logstash hosts
