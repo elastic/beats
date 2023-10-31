@@ -56,8 +56,8 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "LOCKOUT",
-          "NORMAL_ACCOUNT"
+          "USER_NORMAL_ACCOUNT",
+          "USER_DONT_EXPIRE_PASSWORD"
         ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x210",
@@ -159,8 +159,8 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "LOCKOUT",
-          "NORMAL_ACCOUNT"
+          "USER_NORMAL_ACCOUNT",
+          "USER_DONT_EXPIRE_PASSWORD"
         ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x10",

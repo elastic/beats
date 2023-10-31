@@ -55,7 +55,8 @@
         "HomePath": "-",
         "LogonHours": "-",
         "NewUACList": [
-          "ENCRYPTED_TEXT_PWD_ALLOWED"
+          "USER_PASSWORD_NOT_REQUIRED",
+          "USER_WORKSTATION_TRUST_ACCOUNT"
         ],
         "NewUacValue": "0x84",
         "OldUacValue": "0x85",

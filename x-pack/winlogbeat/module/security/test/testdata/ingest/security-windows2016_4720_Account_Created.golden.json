@@ -55,8 +55,9 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "SCRIPT",
-          "LOCKOUT"
+          "USER_ACCOUNT_DISABLED",
+          "USER_PASSWORD_NOT_REQUIRED",
+          "USER_NORMAL_ACCOUNT"
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
@@ -159,8 +160,9 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "SCRIPT",
-          "LOCKOUT"
+          "USER_ACCOUNT_DISABLED",
+          "USER_PASSWORD_NOT_REQUIRED",
+          "USER_NORMAL_ACCOUNT"
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
