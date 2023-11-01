@@ -20,6 +20,7 @@ package add_cloud_metadata
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"net/http"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -74,6 +75,8 @@ func fetchRawProviderMetadata(
 	client http.Client,
 	result *result,
 ) {
+	logger := logp.NewLogger("add_cloud_metadata")
+
 	// LoadDefaultConfig loads the EC2 role credentials
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
@@ -91,10 +94,19 @@ func fetchRawProviderMetadata(
 	// AWS Region must be set to be able to get EC2 Tags
 	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
 	awsConfig.Region = awsRegion
-
-	clusterName, _ := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
-
 	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
+
+	clusterName, err := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
+	if err != nil {
+		logger.Warnf("error fetching cluster name metadata: %s.", err)
+	} else if clusterName != "" {
+		// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
+		// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
+		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
+
+		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
+		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
+	}
 
 	_, _ = result.metadata.Put("instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
 	_, _ = result.metadata.Put("machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
@@ -103,14 +115,6 @@ func fetchRawProviderMetadata(
 	_, _ = result.metadata.Put("account.id", accountID)
 	_, _ = result.metadata.Put("image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
 
-	// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
-	// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
-	if clusterName != "" {
-		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
-
-		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
-		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
-	}
 }
 
 func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string, error) {
