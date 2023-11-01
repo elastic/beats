@@ -279,7 +279,7 @@ func TestPromoteOutputQueueSettings(t *testing.T) {
 	}{
 		"blank": {
 			input:     []byte(""),
-			memEvents: 4096,
+			memEvents: 3200,
 		},
 		"defaults": {
 			input: []byte(`
@@ -289,7 +289,7 @@ output:
     hosts:
       - "localhost:9200"
 `),
-			memEvents: 4096,
+			memEvents: 3200,
 		},
 		"topLevelQueue": {
 			input: []byte(`

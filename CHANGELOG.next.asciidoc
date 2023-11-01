@@ -11,6 +11,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
 - Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
+- Defaults are changing for some options in the queue and Elasticsearch output, to improve typical performance based on current benchmark data. All changes can be overridden by setting them explicitly in the beat configuration. {pull}36990[36990] The changes are:
+  - `queue.mem.events` is changing from `4096` to `3200`.
+  - `queue.mem.flush.min_events` is changing from `2048` to `1600`.
+  - `queue.mem.flush.timeout` is changing from `1s` to `10s`.
+  - `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
+  - `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
 - Improve Beat `test output` command to honor proxy_url setting for output.logstash and output.elasticsearch. {issue}24751[24751] {pull}36715[36715]
 
 
@@ -113,11 +119,14 @@ is collected by it.
 - Fix ignoring external input configuration in `take_over: true` mode {issue}36378[36378] {pull}36395[36395]
 - Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
 - Fix merging of array fields(processors, paths, parsers) in configurations generated from hints and default config. {issue}36838[36838] {pull}36857[36857]
+- Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix retries to trigger on a down monitor with no previous state. {pull}36842[36842]
+- Bump NodeJS minor version to 18.18.2. {pull}36961[36961]
+- Fix monitor duration calculation with retries. {pull}36900[36900]
 
 *Metricbeat*
 
@@ -141,6 +150,7 @@ is collected by it.
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
 - Add log error when statsd server fails to start {pull}36477[36477]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
+- Fix event mapping implementation for statsd module {pull}36925[36925]
 
 *Osquerybeat*
 
@@ -150,6 +160,7 @@ is collected by it.
 
 *Winlogbeat*
 
+- Fix User Account Control Attributes Table values for Security module. {issue}36999[36999] {pull}37009[37009]
 
 *Elastic Logging Plugin*
 
@@ -171,9 +182,13 @@ is collected by it.
 - allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
+- elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
+- Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 
 *Auditbeat*
 
+- Add `ignore_errors` option to audit module. {issue}15768[15768] {pull}36851[36851]
+- Fix copy arguments for strict aligned architectures. {pull}36976[36976]
 
 *Filebeat*
 
@@ -245,8 +260,12 @@ is collected by it.
 - Avoid unwanted publication of Azure entity records. {pull}36753[36753]
 - Avoid unwanted publication of Okta entity records. {pull}36770[36770]
 - Add support for Digest Authentication to CEL input. {issue}35514[35514] {pull}36932[36932]
+- Use filestream input with file_identity.fingerprint as default for hints autodiscover. {issue}35984[35984] {pull}36950[36950]
 
 *Auditbeat*
+
+- Upgrade go-libaudit to v2.4.0. {issue}36776[36776] {pull}36964[36964]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each dataset instance. {pull}36971[36971]
 
 *Libbeat*
 
@@ -262,6 +281,7 @@ is collected by it.
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
 
 
 *Osquerybeat*
@@ -297,6 +317,7 @@ is collected by it.
 
 *Filebeat*
 
+- Deprecate rsa2elk Filebeat modules. {issue}36125[36125] {pull}36887[36887]
 
 *Heartbeat*
 

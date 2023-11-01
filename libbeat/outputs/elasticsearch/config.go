@@ -54,7 +54,7 @@ type Backoff struct {
 }
 
 const (
-	defaultBulkSize = 50
+	defaultBulkSize = 1600
 )
 
 var (
@@ -74,9 +74,17 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Transport: httpcommon.DefaultHTTPTransportSettings(),
+		Transport: esDefaultTransportSettings(),
 	}
 )
+
+func esDefaultTransportSettings() httpcommon.HTTPTransportSettings {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	// The ES output differs from the common transport settings by having
+	// a 3-second idle timeout
+	transport.IdleConnTimeout = 3 * time.Second
+	return transport
+}
 
 func (c *elasticsearchConfig) Validate() error {
 	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
