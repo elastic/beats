@@ -61,7 +61,7 @@ You can specify the following options in the `queue.mem` section of the +{beatna
 
 Number of events the queue can store. 
 
-The default value is 4096 events.
+The default value is 3200 events.
 
 [float]
 ===== `flush.min_events`
@@ -70,7 +70,7 @@ Minimum number of events required for publishing. If this value is set to 0, the
 output can start publishing events without additional waiting times. Otherwise
 the output has to wait for more events to become available.
 
-The default value is 2048.
+The default value is 1600.
 
 [float]
 ===== `flush.timeout`
@@ -78,7 +78,7 @@ The default value is 2048.
 Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events
 will be immediately available for consumption.
 
-The default value is 1s.
+The default value is 10s.
 
 [float]
 [[configuration-internal-queue-disk]]
