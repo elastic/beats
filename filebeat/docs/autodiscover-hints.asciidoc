@@ -50,7 +50,7 @@ json.message_key: "log"
 json.add_error_key: "true"
 -----
 
-NOTE: `keys_under_root` json option of `log` input is replaced with `target` option in filestream input. Read the documentation on how to use it correctly.
+NOTE: `keys_under_root` json option of `log` input is replaced with `target` option in filestream input. Read the documentation(<<filebeat-input-filestream-ndjson>>) on how to use it correctly.
 
 [float]
 ===== `co.elastic.logs/include_lines`
