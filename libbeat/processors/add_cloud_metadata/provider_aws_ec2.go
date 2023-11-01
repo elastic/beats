@@ -20,8 +20,9 @@ package add_cloud_metadata
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"net/http"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
