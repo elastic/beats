@@ -7,7 +7,7 @@
     },
     "kubernetes": {
         "deployment": {
-            "name": "kube-state-metrics",
+            "name": "local-path-provisioner",
             "paused": false,
             "replicas": {
                 "available": 1,
@@ -18,9 +18,12 @@
             "status": {
                 "available": "true",
                 "progressing": "true"
+            },
+            "time": {
+                "created": "2023-08-09T07:32:22.000Z"
             }
         },
-        "namespace": "kube-system"
+        "namespace": "local-path-storage"
     },
     "metricset": {
         "name": "state_deployment",

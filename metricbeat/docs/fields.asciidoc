@@ -45779,6 +45779,23 @@ kubernetes deployment metrics
 
 
 
+[float]
+=== time
+
+Kubernetes deployment timestamps
+
+
+
+*`kubernetes.deployment.time.created`*::
++
+--
+The time at which the deployment was created
+
+
+type: date
+
+--
+
 *`kubernetes.deployment.paused`*::
 +
 --

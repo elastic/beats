@@ -4,6 +4,15 @@
     kubernetes deployment metrics
   release: ga
   fields:
+    - name: time
+      type: group
+      description: >
+        Kubernetes deployment timestamps
+      fields:
+        - name: created
+          type: date
+          description: >
+            The time at which the deployment was created
     - name: paused
       type: boolean
       description: >
