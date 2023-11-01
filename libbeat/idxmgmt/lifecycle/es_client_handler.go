@@ -64,9 +64,11 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 
 		// unpack name value separately
 		dsName := DefaultDSLName()
-		err := cfg.DSL.Unpack(&dsName)
-		if err != nil {
-			return nil, fmt.Errorf("error unpacking DSL data stream name: %w", err)
+		if cfg.DSL != nil {
+			err := cfg.DSL.Unpack(&dsName)
+			if err != nil {
+				return nil, fmt.Errorf("error unpacking DSL data stream name: %w", err)
+			}
 		}
 		lifecycleCfg.PolicyName = dsName.DataStreamPattern
 
@@ -93,7 +95,7 @@ func NewESClientHandler(c ESClient, info beat.Info, cfg RawConfig) (*ESClientHan
 	// if the user has set both to different values, throw a warning, as overwrite operations will probably fail
 	if c.IsServerless() {
 		if cfg.TemplateName != "" && cfg.TemplateName != name {
-			logp.L().Warnf("policy name is %s but template name is %s; under serverless, non-default template and policy names should be the same. Updates & overwrites may not work.")
+			logp.L().Warnf("setup.dsl.data_stream_pattern is %s, but setup.template.name is %s; under serverless, non-default template and DSL pattern names should be the same. Additional updates & overwrites to this config will not work.", name, cfg.TemplateName)
 		}
 	}
 

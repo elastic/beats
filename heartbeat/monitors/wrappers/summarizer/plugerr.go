@@ -46,6 +46,8 @@ func NewBrowserErrPlugin() *BrowserErrPlugin {
 	}
 }
 
+func (esp *BrowserErrPlugin) BeforeEachEvent(event *beat.Event) {} // noop
+
 func (esp *BrowserErrPlugin) EachEvent(event *beat.Event, eventErr error) EachEventActions {
 	// track these to determine if the journey
 	// needs an error injected due to incompleteness
@@ -124,6 +126,10 @@ func (esp *LightweightErrPlugin) BeforeSummary(event *beat.Event) BeforeSummaryA
 }
 
 func (esp *LightweightErrPlugin) BeforeRetry() {
+	// noop
+}
+
+func (esp *LightweightErrPlugin) BeforeEachEvent(event *beat.Event) {
 	// noop
 }
 

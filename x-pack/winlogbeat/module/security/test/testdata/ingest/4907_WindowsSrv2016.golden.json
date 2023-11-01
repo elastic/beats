@@ -11,7 +11,6 @@
         "configuration"
       ],
       "code": "4907",
-      "ingested": "2022-06-08T06:21:08.129757100Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

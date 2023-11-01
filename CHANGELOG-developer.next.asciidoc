@@ -89,7 +89,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fixed some race conditions in tests {pull}36185[36185]
 - Re-enable HTTPJSON fixed flakey test. {issue}34929[34929] {pull}36525[36525]
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
-- Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714] 
+- Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714]
+- Fix copy arguments for strict aligned architectures. {pull}36976[36976]
 
 ==== Added
 
@@ -176,6 +177,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Make Filebeat HTTPJSON input process responses sequentially. {pull}36493[36493]
 - Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
 - Add file-backed cache for cache enrichment processor. {pull}36686[36686] {pull}36696[36696]
+- Elide retryable HTTP client construction in Filebeat HTTPJSON and CEL inputs if not needed. {pull}36916[36916]
 
 ==== Deprecated
 

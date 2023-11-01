@@ -10,7 +10,6 @@
         "authentication"
       ],
       "code": "4769",
-      "ingested": "2022-06-08T06:21:08.199357500Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

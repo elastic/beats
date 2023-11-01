@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
+- Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
+
 
 
 *Auditbeat*
@@ -66,7 +68,7 @@ is collected by it.
 - Add default cgroup regex for add_process_metadata processor {pull}36484[36484] {issue}32961[32961]
 - Fix environment capture by `add_process_metadata` processor. {issue}36469[36469] {pull}36471[36471]
 - syslog processor - Fix the ability to use `when` conditions on the processor. {issue}36762[36762]
-
+- upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request. {pull}36896[36896]
 
 *Auditbeat*
 
@@ -109,10 +111,16 @@ is collected by it.
 - Ensure winlog input retains metric collection when handling recoverable errors. {issue}36479[36479] {pull}36483[36483]
 - Revert error introduced in {pull}35734[35734] when symlinks can't be resolved in filestream. {pull}36557[36557]
 - Fix ignoring external input configuration in `take_over: true` mode {issue}36378[36378] {pull}36395[36395]
+- Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
+- Fix merging of array fields(processors, paths, parsers) in configurations generated from hints and default config. {issue}36838[36838] {pull}36857[36857]
+- Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix retries to trigger on a down monitor with no previous state. {pull}36842[36842]
+- Bump NodeJS minor version to 18.18.2. {pull}36961[36961]
+- Fix monitor duration calculation with retries. {pull}36900[36900]
 
 *Metricbeat*
 
@@ -135,6 +143,8 @@ is collected by it.
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
 - Add log error when statsd server fails to start {pull}36477[36477]
+- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
+- Fix event mapping implementation for statsd module {pull}36925[36925]
 
 *Osquerybeat*
 
@@ -144,6 +154,7 @@ is collected by it.
 
 *Winlogbeat*
 
+- Fix User Account Control Attributes Table values for Security module. {issue}36999[36999] {pull}37009[37009]
 
 *Elastic Logging Plugin*
 
@@ -152,6 +163,7 @@ is collected by it.
 
 *Affecting all Beats*
 
+- Upgrade to Go 1.20.10. {pull}36846[36846]
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - When running under Elastic-Agent the status is now reported per Unit instead of the whole Beat {issue}35874[35874] {pull}36183[36183]
 - Add warning message to SysV init scripts for RPM-based systems that lack `/etc/rc.d/init.d/functions`. {issue}35708[35708] {pull}36188[36188]
@@ -161,9 +173,16 @@ is collected by it.
 - Add support for AWS external IDs. {issue}36321[36321] {pull}36322[36322]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
   Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
+- Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
+- Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
+- elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
+- Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 
 *Auditbeat*
 
+- Add `ignore_errors` option to audit module. {issue}15768[15768] {pull}36851[36851]
+- Fix copy arguments for strict aligned architectures. {pull}36976[36976]
 
 *Filebeat*
 
@@ -210,8 +229,7 @@ is collected by it.
 - Added support for Okta OAuth2 provider in the httpjson input. {pull}36273[36273]
 - Add support of the interval parameter in Salesforce setupaudittrail-rest fileset. {issue}35917[35917] {pull}35938[35938]
 - Add device handling to Okta input package for entity analytics. {pull}36049[36049]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
-- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}36286[36286]
+- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30916[30916] {pull}36286[36286]
 - [Azure] Add input metrics to the azure-eventhub input. {pull}35739[35739]
 - Reduce HTTPJSON metrics allocations. {pull}36282[36282]
 - Add support for a simplified input configuraton when running under Elastic-Agent {pull}36390[36390]
@@ -235,8 +253,12 @@ is collected by it.
 - Add cache processor. {pull}36786[36786]
 - Avoid unwanted publication of Azure entity records. {pull}36753[36753]
 - Avoid unwanted publication of Okta entity records. {pull}36770[36770]
+- Add support for Digest Authentication to CEL input. {issue}35514[35514] {pull}36932[36932]
 
 *Auditbeat*
+
+- Upgrade go-libaudit to v2.4.0. {issue}36776[36776] {pull}36964[36964]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each dataset instance. {pull}36971[36971]
 
 *Libbeat*
 
@@ -252,6 +274,7 @@ is collected by it.
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
 
 
 *Osquerybeat*
@@ -267,6 +290,7 @@ is collected by it.
 
 *Winlogbeat*
 
+- Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 
 *Functionbeat*
 
@@ -286,6 +310,7 @@ is collected by it.
 
 *Filebeat*
 
+- Deprecate rsa2elk Filebeat modules. {issue}36125[36125] {pull}36887[36887]
 
 *Heartbeat*
 
@@ -310,6 +335,9 @@ is collected by it.
 
 
 ==== Known Issues
+
+
+
 
 
 

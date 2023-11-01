@@ -5,6 +5,8 @@
 
 == Netscout module
 
+deprecated::[8.12.0,"This module is deprecated. See <<migrate-from-deprecated-module>> for migration options."]
+
 experimental[]
 
 This is a module for receiving Arbor Peakflow SP logs over Syslog or a file.

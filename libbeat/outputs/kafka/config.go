@@ -76,6 +76,7 @@ type kafkaConfig struct {
 	Codec              codec.Config              `config:"codec"`
 	Sasl               kafka.SaslConfig          `config:"sasl"`
 	EnableFAST         bool                      `config:"enable_krb5_fast"`
+	Queue              config.Namespace          `config:"queue"`
 }
 
 type metaConfig struct {
@@ -100,12 +101,6 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
 }
-
-const (
-	saslTypePlaintext   = sarama.SASLTypePlaintext
-	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
-	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
-)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{

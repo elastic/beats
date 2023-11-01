@@ -380,7 +380,7 @@ func store(b datastore.Bucket, e *Event) error {
 	return nil
 }
 
-// load loads an Event from the datastore. It return a nil Event if the key was
+// load loads an Event from the datastore. It returns a nil Event if the key was
 // not found. It returns an error if there was a failure reading from the
 // datastore or decoding the data.
 func load(b datastore.Bucket, path string) (*Event, error) {
