@@ -63,9 +63,15 @@ func TestGenerateHints(t *testing.T) {
 
 	customFilestreamCfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"default_config": map[string]interface{}{
-			"type":                        "filestream",
-			"id":                          "kubernetes-container-logs-${data.kubernetes.container.id}",
-			"prospector.scanner.symlinks": true,
+			"type": "filestream",
+			"id":   "kubernetes-container-logs-${data.kubernetes.container.id}",
+			"prospector": map[string]interface{}{
+				"scanner": map[string]interface{}{
+					"fingerprint.enabled": true,
+					"symlinks":            true,
+				},
+			},
+			"file_identity.fingerprint": nil,
 			"paths": []string{
 				"/var/log/containers/*-${data.kubernetes.container.id}.log",
 			},
@@ -127,7 +133,13 @@ func TestGenerateHints(t *testing.T) {
 					"prospector": map[string]interface{}{
 						"scanner": map[string]interface{}{
 							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
 						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
 					},
 					"type": "filestream",
 				},
@@ -190,7 +202,13 @@ func TestGenerateHints(t *testing.T) {
 					"prospector": map[string]interface{}{
 						"scanner": map[string]interface{}{
 							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
 						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
 					},
 					"exclude_lines": []interface{}{"^test2", "^test3"},
 					"type":          "filestream",
@@ -416,7 +434,13 @@ func TestGenerateHints(t *testing.T) {
 					"prospector": map[string]interface{}{
 						"scanner": map[string]interface{}{
 							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
 						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
 					},
 					"type": "filestream",
 				},
@@ -468,7 +492,13 @@ func TestGenerateHints(t *testing.T) {
 					"prospector": map[string]interface{}{
 						"scanner": map[string]interface{}{
 							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
 						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
 					},
 					"type": "filestream",
 				},
@@ -854,7 +884,13 @@ func TestGenerateHints(t *testing.T) {
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
 									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
 								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
 							},
 							"type": "filestream",
 						},
@@ -875,7 +911,13 @@ func TestGenerateHints(t *testing.T) {
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
 									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
 								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
 							},
 							"type": "filestream",
 						},
@@ -925,7 +967,13 @@ func TestGenerateHints(t *testing.T) {
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
 									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
 								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
 							},
 							"type": "filestream",
 						},
@@ -946,7 +994,13 @@ func TestGenerateHints(t *testing.T) {
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
 									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
 								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
 							},
 							"type": "filestream",
 						},
@@ -997,7 +1051,13 @@ func TestGenerateHints(t *testing.T) {
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
 									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
 								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
 							},
 							"type": "filestream",
 						},
@@ -1018,7 +1078,13 @@ func TestGenerateHints(t *testing.T) {
 							"prospector": map[string]interface{}{
 								"scanner": map[string]interface{}{
 									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
 								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
 							},
 							"type": "filestream",
 						},
