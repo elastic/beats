@@ -29,7 +29,7 @@ func ListAll(path string) ([]MDDevice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not read directory: %w", err)
 	}
-	var mds []MDDevice
+	mds := make([]MDDevice, 0, len(dir))
 	for _, item := range dir {
 		testpath := filepath.Join(path, item.Name())
 		if !isMD(testpath) {
@@ -68,8 +68,5 @@ func getMDDevice(path string) (MDDevice, error) {
 // Right now, we're doing this by looking for an `md` directory in the device dir.
 func isMD(path string) bool {
 	_, err := os.Stat(filepath.Join(path, "md"))
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }

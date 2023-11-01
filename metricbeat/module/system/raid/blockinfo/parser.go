@@ -49,7 +49,7 @@ func parseIntVal(path string) (int64, error) {
 	}
 	strVal := strings.TrimSpace(string(raw))
 
-	value, err = strconv.ParseInt(string(strVal), 10, 64)
+	value, err = strconv.ParseInt(strVal, 10, 64)
 	if err != nil {
 		return value, err
 	}
