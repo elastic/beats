@@ -10,7 +10,6 @@
         "configuration"
       ],
       "code": "4739",
-      "ingested": "2022-06-08T06:21:07.963089600Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

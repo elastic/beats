@@ -149,6 +149,7 @@ is collected by it.
 
 *Winlogbeat*
 
+- Fix User Account Control Attributes Table values for Security module. {issue}36999[36999] {pull}37009[37009]
 
 *Elastic Logging Plugin*
 
