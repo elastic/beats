@@ -19,12 +19,13 @@ information is available (e.g. all types marked as `nodev` in
 `/proc/filesystems` in Linux systems). This setting affects the `fsstats`
 metricset.
 
+To have {metricbeat} report on all filesystems, regardless of type, set
+`filesystem.ignore_types` to an empty array (`[]`).
+
+
 To ignore unavailable volumes, such as CD-ROM drives, on Windows include
 `unavailable` as a value in the array. To ignore unknown filesystems on Windows,
 include `unknown` as a value in the array.
-
-To have {metricbeat} report on all filesystems, regardless of type, set
-`filesystem.ignore_types` to an empty array (`[]`).
 
 [float]
 === Filtering
