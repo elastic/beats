@@ -661,7 +661,7 @@ endif::[]
 
 ===== `bulk_max_size`
 
-The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
+The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 1600.
 
 Events can be collected into batches. {beatname_uc} will split batches larger than `bulk_max_size`
 into multiple batches.
@@ -693,7 +693,7 @@ Elasticsearch after a network error. The default is `60s`.
 
 The maximum amount of time an idle connection will remain idle before closing itself.
 Zero means no limit. The format is a Go language duration (example 60s is 60 seconds).
-The default is 0.
+The default is 3s.
 
 ===== `timeout`
 
