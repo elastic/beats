@@ -6,10 +6,7 @@ package metrics
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -89,51 +86,9 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) [
 			MetricSetFields: mapstr.M{},
 		}
 
-		// Collect the metric names in the event and add them to the event
-		// as `event.metric_names` field.
-		//
-		// Why do we need keep track of all the metric names in the event?
-		// ===============================================================
-		//
-		// Context
-		// -------
-		//
-		// GCP metrics have different ingestion delays; some metrics have zero delay,
-		// while others have a non-zero delay of up to a few minutes.
-		//
-		// For example,
-		//  - `container/memory.limit.bytes` has no ingest delay, while
-		//  - `container/memory/request_bytes` has two minutes ingest delay.
-		//
-		// Since the metricset collects metrics every 60 seconds, the metricset collects
-		// `container/memory.limit.bytes` and `container/memory/request_bytes`
-		// in different iterations, even if they have the same timestamp.
-		//
-		// Problem
-		// -------
-		//
-		// When TSDB is enabled, two documents cannot have the same timestamp and dimensions.
-		// If they do, the second document is dropped.
-		//
-		// Unfortunately, this is exactly what happens when the metricset collects
-		// `container/memory.limit.bytes` and `container/memory/request_bytes` in different
-		// iterations.
-		//
-		// Solution
-		// --------
-		//
-		// Since the metricset collects different metrics in different iterations, we need
-		// to add an `event.metric_names` field to make sure that the events have different
-		// dimensions.
-		//
-		metricNames := []string{}
-
 		for _, singleEvent := range group {
 			// Add the metric values to the event.
 			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
-
-			// Add the metric name to build the `event.metric_names` field.
-			metricNames = append(metricNames, singleEvent.Key)
 		}
 
 		if service == "compute" {
@@ -141,13 +96,6 @@ func createEventsFromGroups(service string, groups map[string][]KeyValuePoint) [
 		} else {
 			event.RootFields = group[0].ECS
 		}
-
-		// Hashes metric names string using SHA-256 to always have
-		// a constant length value and avoid overflowing the
-		// current TSDB dimension field limit (1024).
-		metricNamesHash := hash(strings.Join(metricNames, ","))
-
-		_, _ = event.ModuleFields.Put("metric_names_fingerprint", metricNamesHash)
 
 		events = append(events, event)
 	}
@@ -194,11 +142,4 @@ func (m *MetricSet) groupTimeSeries(ctx context.Context, timeSeries []timeSeries
 	groupedMetrics := groupMetricsByDimensions(kvs)
 
 	return groupedMetrics
-}
-
-// hash return the SHA-256 hash of the input string.
-func hash(s string) string {
-	h := sha256.New()
-	h.Write([]byte(s))
-	return hex.EncodeToString(h.Sum(nil))
 }
