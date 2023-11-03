@@ -144,6 +144,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		return fmt.Errorf("getTables failed: %w", err)
 	}
 
+	// Not finding any table is an error state for this metricset.
+	//
+	// It can happen because the user made a mistake in the configuration
+	// file or the service account lacks the needed permissions (the API
+	// does not report any error if the Service Account lacks the required
+	// permission).
+	//
+	// Regardless of the origin, it's a condition that we should
+	// report to the user and give hints for troubleshooting.
+	if len(tableMetas) == 0 {
+		m.logger.Errorf("no tables found in dataset %s with pattern %s; check your settings and see if the service account has permission to list datasets", m.config.DatasetID, m.config.TablePattern)
+		return nil
+	}
+
 	var events []mb.Event
 	for _, tableMeta := range tableMetas {
 		eventsPerQuery, err := m.queryBigQuery(ctx, client, tableMeta, month, m.config.CostType)
@@ -158,6 +172,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	for _, event := range events {
 		reporter.Event(event)
 	}
+
 	return nil
 }
 
@@ -213,6 +228,7 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 			}
 		}
 	}
+
 	return tables, nil
 }
 
