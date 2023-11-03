@@ -3,7 +3,7 @@ module github.com/elastic/elastic-agent-autodiscover
 go 1.20
 
 require (
-	github.com/docker/docker v20.10.24+incompatible
+	github.com/docker/docker v24.0.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/elastic/elastic-agent-libs v0.3.3
 	github.com/magefile/mage v1.13.0
@@ -43,7 +43,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.elastic.co/ecszap v1.0.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
