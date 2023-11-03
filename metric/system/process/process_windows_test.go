@@ -42,19 +42,24 @@ func TestGetInfoForPid_numThreads(t *testing.T) {
 	expected := 45
 
 	cmd := runThreads(t)
-	got, err := GetInfoForPid(
+	state, err := GetInfoForPid(
 		resolve.NewTestResolver("/"), cmd.Process.Pid)
 	require.NoError(t, err, "failed to GetInfoForPid")
 
-	if !got.NumThreads.Exists() {
-		bs, err := json.Marshal(got)
+	state, err = FillMetricsRequiringMoreAccess(cmd.Process.Pid, state)
+	if err != nil {
+		t.Fatalf("error calling FillMetricsRequiringMoreAccess: %s", err)
+	}
+
+	if !state.NumThreads.Exists() {
+		bs, err := json.Marshal(state)
 		if err != nil {
 			t.Logf("could not marshal ProcState: %v", err)
 		}
 		t.Fatalf("num_thread was not collected. Collected info: %s", bs)
 	}
 
-	numThreads := got.NumThreads.ValueOr(-1)
+	numThreads := state.NumThreads.ValueOr(-1)
 	if expected != numThreads {
 		// it might be an older Windows version or, by the time we got the num_threads,
 		// the program was indeed using only what it spawned

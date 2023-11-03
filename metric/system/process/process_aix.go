@@ -195,3 +195,7 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 
 	return state, nil
 }
+
+func FillMetricsRequiringMoreAccess(_ int, state ProcState) (ProcState, error) {
+	return state, nil
+}

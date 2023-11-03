@@ -21,6 +21,7 @@ package process
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -168,8 +169,11 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState) (ProcsMap, []ProcState) {
 	status, saved, err := procStats.pidFill(pid, true)
 	if err != nil {
-		procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
-		return procMap, proclist
+		if !errors.Is(err, NonFatalErr{}) {
+			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
+			return procMap, proclist
+		}
+		procStats.logger.Debugf("Non fatal error fetching PID some info for %d, metrics are valid, but partial: %s", pid, err)
 	}
 	if !saved {
 		procStats.logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
@@ -179,6 +183,28 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 	proclist = append(proclist, status)
 
 	return procMap, proclist
+}
+
+// NonFatalErr is returned when there was an error
+// collecting metrics, however the metrics already
+// gathered and returned are still valid.
+// This error can be safely ignored, this will result
+// in having partial metrics for a process rather than
+// no metrics at all.
+//
+// It was introduced to allow for partial metrics collection
+// on privileged process on Windows.
+type NonFatalErr struct {
+	Err error
+}
+
+func (c NonFatalErr) Error() string {
+	return "Not enough privileges to fetch information: " + c.Err.Error()
+}
+
+func (c NonFatalErr) Is(other error) bool {
+	_, is := other.(NonFatalErr)
+	return is
 }
 
 // pidFill is an entrypoint used by OS-specific code to fill out a pid.
@@ -213,10 +239,17 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if len(status.Args) > 0 && status.Cmdline == "" {
 		status.Cmdline = strings.Join(status.Args, " ")
 	}
+	if status.CPU.Total.Ticks.Exists() {
+		status.CPU.Total.Value = opt.FloatWith(metric.Round(float64(status.CPU.Total.Ticks.ValueOr(0))))
+	}
 
 	// postprocess with cgroups and percentages
 	last, ok := procStats.ProcsMap.GetPid(status.Pid.ValueOr(0))
 	status.SampleTime = time.Now()
+	if ok {
+		status = GetProcCPUPercentage(last, status)
+	}
+
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
@@ -227,6 +260,11 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 			status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
 		}
 	} // end cgroups processor
+
+	status, err = FillMetricsRequiringMoreAccess(pid, status)
+	if err != nil {
+		return status, true, fmt.Errorf("FillMetricsRequiringMoreAccess: %w", err)
+	}
 
 	// network data
 	if procStats.EnableNetwork {
@@ -243,13 +281,6 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 				}
 			}
 		}
-	}
-
-	if status.CPU.Total.Ticks.Exists() {
-		status.CPU.Total.Value = opt.FloatWith(metric.Round(float64(status.CPU.Total.Ticks.ValueOr(0))))
-	}
-	if ok {
-		status = GetProcCPUPercentage(last, status)
 	}
 
 	return status, true, nil

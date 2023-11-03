@@ -71,12 +71,6 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 		state.State = status
 	}
 
-	if numThreads, err := FetchNumThreads(pid); err != nil {
-		errs = append(errs, fmt.Errorf("error fetching num threads: %w", err))
-	} else {
-		state.NumThreads = opt.IntWith(numThreads)
-	}
-
 	if err := errors.Join(errs...); err != nil {
 		return state, fmt.Errorf("could not get all information for PID %d: %w",
 			pid, err)
@@ -140,11 +134,25 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string)
 
 	state.CPU.StartTime = unixTimeMsToTime(startTime)
 
+	return state, nil
+}
+
+// FillMetricsRequiringMoreAccess
+// All calls that need more access rights than
+// windows.PROCESS_QUERY_LIMITED_INFORMATION
+func FillMetricsRequiringMoreAccess(pid int, state ProcState) (ProcState, error) {
 	argList, err := getProcArgs(pid)
 	if err != nil {
-		return state, fmt.Errorf("error fetching process args: %w", err)
+		return state, fmt.Errorf("error fetching process args: %w", NonFatalErr{Err: err})
 	}
 	state.Args = argList
+
+	if numThreads, err := FetchNumThreads(pid); err != nil {
+		return state, fmt.Errorf("error fetching num threads: %w", NonFatalErr{Err: err})
+	} else {
+		state.NumThreads = opt.IntWith(numThreads)
+	}
+
 	return state, nil
 }
 
@@ -199,10 +207,14 @@ func getProcTimes(pid int) (uint64, uint64, uint64, error) {
 	return uint64(windows.FiletimeToDuration(&cpu.UserTime).Nanoseconds() / 1e6), uint64(windows.FiletimeToDuration(&cpu.KernelTime).Nanoseconds() / 1e6), uint64(cpu.CreationTime.Nanoseconds() / 1e6), nil
 }
 
+// procMem gets the memory usage for the given PID.
+// The current implementation calls
+// GetProcessMemoryInfo (https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getprocessmemoryinfo)
+// We only need `PROCESS_QUERY_LIMITED_INFORMATION` because we do not support
+// Windows Server 2003 or Windows XP
 func procMem(pid int) (uint64, uint64, error) {
 	handle, err := syscall.OpenProcess(
-		windows.PROCESS_QUERY_LIMITED_INFORMATION|
-			windows.PROCESS_VM_READ,
+		windows.PROCESS_QUERY_LIMITED_INFORMATION,
 		false,
 		uint32(pid))
 	if err != nil {
@@ -278,7 +290,7 @@ func getParentPid(pid int) (int, error) {
 }
 
 func getProcCredName(pid int) (string, error) {
-	handle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION, false, uint32(pid))
+	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
 	if err != nil {
 		return "", fmt.Errorf("OpenProcess failed for pid=%v: %w", pid, err)
 	}
