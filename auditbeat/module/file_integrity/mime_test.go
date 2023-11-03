@@ -18,7 +18,6 @@
 package file_integrity
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -46,7 +45,7 @@ func TestGetMimeType(t *testing.T) {
 		{"png", "image/png"},
 	}
 
-	dir, err := ioutil.TempDir("", "mime-samples")
+	dir, err := os.MkdirTemp("", "mime-samples")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +53,7 @@ func TestGetMimeType(t *testing.T) {
 
 	for extension, sample := range mimeSamples {
 		samplePath := filepath.Join(dir, "sample."+extension)
-		if err := ioutil.WriteFile(samplePath, sample, 0o700); err != nil {
+		if err := os.WriteFile(samplePath, sample, 0o700); err != nil {
 			t.Fatal(err)
 		}
 	}

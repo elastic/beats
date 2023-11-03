@@ -21,7 +21,6 @@ package monitor
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -37,7 +36,7 @@ func alwaysInclude(path string) bool {
 }
 
 func TestNonRecursive(t *testing.T) {
-	dir, err := ioutil.TempDir("", "monitor")
+	dir, err := os.MkdirTemp("", "monitor")
 	assertNoError(t, err)
 	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
 	// and the path returned in events has the symlink resolved
@@ -67,7 +66,7 @@ func TestNonRecursive(t *testing.T) {
 
 	// subdirs are not watched
 	subfile := filepath.Join(subdir, "file.dat")
-	assertNoError(t, ioutil.WriteFile(subfile, []byte("foo"), 0o640))
+	assertNoError(t, os.WriteFile(subfile, []byte("foo"), 0o640))
 
 	_, err = readTimeout(t, watcher)
 	assert.Error(t, err)
@@ -85,7 +84,7 @@ func TestRecursive(t *testing.T) {
 		// under Darwin uses fsevents instead of kqueue.
 		t.Skip("Disabled on Darwin")
 	}
-	dir, err := ioutil.TempDir("", "monitor")
+	dir, err := os.MkdirTemp("", "monitor")
 	assertNoError(t, err)
 	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
 	// and the path returned in events has the symlink resolved
@@ -127,7 +126,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 
 	// Create a watched dir
 
-	dir, err := ioutil.TempDir("", "monitor")
+	dir, err := os.MkdirTemp("", "monitor")
 	assertNoError(t, err)
 	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
 	// and the path returned in events has the symlink resolved
@@ -140,7 +139,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 
 	// Create a separate dir
 
-	linkedDir, err := ioutil.TempDir("", "linked")
+	linkedDir, err := os.MkdirTemp("", "linked")
 	assertNoError(t, err)
 	defer os.RemoveAll(linkedDir)
 
@@ -160,7 +159,7 @@ func TestRecursiveNoFollowSymlink(t *testing.T) {
 	// Create a file in the other dir
 
 	file := filepath.Join(linkedDir, "not.seen")
-	assertNoError(t, ioutil.WriteFile(file, []byte("hello"), 0o640))
+	assertNoError(t, os.WriteFile(file, []byte("hello"), 0o640))
 
 	// No event is received
 	ev, err := readTimeout(t, watcher)
@@ -178,7 +177,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	// Create dir to be watched
 
-	dir, err := ioutil.TempDir("", "monitor")
+	dir, err := os.MkdirTemp("", "monitor")
 	assertNoError(t, err)
 	if runtime.GOOS == "darwin" {
 		if dirAlt, err := filepath.EvalSymlinks(dir); err == nil {
@@ -189,7 +188,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	// Create not watched dir
 
-	outDir, err := ioutil.TempDir("", "non-watched")
+	outDir, err := os.MkdirTemp("", "non-watched")
 	assertNoError(t, err)
 	if runtime.GOOS == "darwin" {
 		if dirAlt, err := filepath.EvalSymlinks(outDir); err == nil {
@@ -203,7 +202,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 	for _, name := range []string{"a", "b", "c"} {
 		path := filepath.Join(outDir, name)
 		assertNoError(t, os.Mkdir(path, 0o755))
-		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0o644))
+		assertNoError(t, os.WriteFile(filepath.Join(path, name), []byte("Hello"), 0o644))
 	}
 
 	// Make a subdir not accessible
@@ -274,7 +273,7 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 
 	// Create dir to be watched
 
-	dir, err := ioutil.TempDir("", "monitor")
+	dir, err := os.MkdirTemp("", "monitor")
 	assertNoError(t, err)
 	if runtime.GOOS == "darwin" {
 		if dirAlt, err := filepath.EvalSymlinks(dir); err == nil {
@@ -285,7 +284,7 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 
 	// Create not watched dir
 
-	outDir, err := ioutil.TempDir("", "non-watched")
+	outDir, err := os.MkdirTemp("", "non-watched")
 	assertNoError(t, err)
 	if runtime.GOOS == "darwin" {
 		if dirAlt, err := filepath.EvalSymlinks(outDir); err == nil {
@@ -299,7 +298,7 @@ func TestRecursiveExcludedPaths(t *testing.T) {
 	for _, name := range []string{"a", "b", "c"} {
 		path := filepath.Join(outDir, name)
 		assertNoError(t, os.Mkdir(path, 0o755))
-		assertNoError(t, ioutil.WriteFile(filepath.Join(path, name), []byte("Hello"), 0o644))
+		assertNoError(t, os.WriteFile(filepath.Join(path, name), []byte("Hello"), 0o644))
 	}
 
 	// excludes file/dir named "b"
@@ -370,7 +369,7 @@ func testDirOps(t *testing.T, dir string, watcher Watcher) {
 	fpath2 := filepath.Join(dir, "file2.txt")
 
 	// Create
-	assertNoError(t, ioutil.WriteFile(fpath, []byte("hello"), 0o640))
+	assertNoError(t, os.WriteFile(fpath, []byte("hello"), 0o640))
 
 	ev, err := readTimeout(t, watcher)
 	assertNoError(t, err)

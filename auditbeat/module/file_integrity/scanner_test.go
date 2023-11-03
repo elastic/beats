@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -164,16 +163,16 @@ func TestScanner(t *testing.T) {
 }
 
 func setupTestDir(t *testing.T) string {
-	dir, err := ioutil.TempDir("", "audit-file-scan")
+	dir, err := os.MkdirTemp("", "audit-file-scan")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
+	if err = os.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
+	if err = os.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -185,7 +184,7 @@ func setupTestDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
+	if err = os.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 

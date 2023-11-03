@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"runtime"
@@ -30,7 +29,7 @@ import (
 )
 
 func TestNewMetadata(t *testing.T) {
-	f, err := ioutil.TempFile("", "metadata")
+	f, err := os.CreateTemp("", "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +95,7 @@ func TestNewMetadata(t *testing.T) {
 }
 
 func TestSetUIDSetGIDBits(t *testing.T) {
-	f, err := ioutil.TempFile("", "setuid")
+	f, err := os.CreateTemp("", "setuid")
 	if err != nil {
 		t.Fatal(err)
 	}

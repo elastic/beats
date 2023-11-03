@@ -21,7 +21,7 @@ package auditd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -166,7 +166,7 @@ audit_rules: |
 			makeRuleFlags(0, 2),
 		}, "\n")
 
-		dir1, err := ioutil.TempDir("", "rules1")
+		dir1, err := os.MkdirTemp("", "rules1")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -189,12 +189,12 @@ audit_rules: |
 				makeRuleFlags(1+file.order, 2),
 				makeRuleFlags(1+file.order, 3),
 			}, "\n"))
-			if err = ioutil.WriteFile(path, content, fileMode); err != nil {
+			if err = os.WriteFile(path, content, fileMode); err != nil {
 				t.Fatal(err)
 			}
 		}
 
-		dir2, err := ioutil.TempDir("", "rules0")
+		dir2, err := os.MkdirTemp("", "rules0")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -215,7 +215,7 @@ audit_rules: |
 				makeRuleFlags(10+file.order, 2),
 				makeRuleFlags(10+file.order, 3),
 			}, "\n"))
-			if err = ioutil.WriteFile(path, content, fileMode); err != nil {
+			if err = os.WriteFile(path, content, fileMode); err != nil {
 				t.Fatal(err)
 			}
 		}

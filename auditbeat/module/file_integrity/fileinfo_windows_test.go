@@ -18,7 +18,6 @@
 package file_integrity
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -32,7 +31,7 @@ import (
 // a method that doesn't need to open the file for reading.
 // (GetNamedSecurityInfo vs CreateFile+GetSecurityInfo)
 func TestFileInfoPermissions(t *testing.T) {
-	f, err := ioutil.TempFile("", "metadata")
+	f, err := os.CreateTemp("", "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}

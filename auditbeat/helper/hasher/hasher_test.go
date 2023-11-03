@@ -19,7 +19,6 @@ package hasher
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -28,14 +27,14 @@ import (
 )
 
 func TestHasher(t *testing.T) {
-	dir, err := ioutil.TempDir("", "auditbeat-hasher-test")
+	dir, err := os.MkdirTemp("", "auditbeat-hasher-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
 
 	file := filepath.Join(dir, "exe")
-	if err = ioutil.WriteFile(file, []byte("test exe\n"), 0o600); err != nil {
+	if err = os.WriteFile(file, []byte("test exe\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -62,14 +61,14 @@ func TestHasher(t *testing.T) {
 }
 
 func TestHasherLimits(t *testing.T) {
-	dir, err := ioutil.TempDir("", "auditbeat-hasher-test")
+	dir, err := os.MkdirTemp("", "auditbeat-hasher-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
 
 	file := filepath.Join(dir, "exe")
-	if err = ioutil.WriteFile(file, []byte("test exe\n"), 0o600); err != nil {
+	if err = os.WriteFile(file, []byte("test exe\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
