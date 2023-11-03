@@ -339,7 +339,7 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 
 	// Overriding the default ES request timeout:
 	// Higher values of timeouts cannot be applied on the SAAS Service
-	// where we are running in tight loops and want the next succesive check to be run for a given monitor
+	// where we are running in tight loops and want the next successive check to be run for a given monitor
 	// within the next scheduled interval which could be 1m or 3m
 	timeout := int64((10 * time.Second).Seconds())
 	if err := cfg.SetInt("timeout", -1, timeout); err != nil {
