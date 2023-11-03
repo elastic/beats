@@ -71,17 +71,19 @@ The default value is 3200 events.
 [float]
 ===== `flush.min_events`
 
-Minimum number of events required for publishing and the maximum batch size. If this value is set to
-0, the output can start publishing events without additional waiting times. Otherwise the output has
-to wait for more events to become available and cannot send a batch larger than this value.
+Minimum number of events required for publishing. If this value is set to 0 or 1, events are
+available to the output immediately. If this value is greater than 1 the output must wait for the
+queue to accumulate this minimum number of events or for `flush.timeout` to expire before
+publishing. When greater than `1` this value also defines the maximum possible batch that can be
+sent by the output.
 
 The default value is 1600.
 
 [float]
 ===== `flush.timeout`
 
-Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events
-will be immediately available for consumption.
+Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events are available to the
+output immediately.
 
 The default value is 10s.
 
