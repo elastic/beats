@@ -42,7 +42,7 @@ be sent to the output when the queue contains at least `flush.min_events` events
 `flush.timeout` period has expired. In this mode the maximum size batch that that can be sent by the
 output is `flush.min_events`. If the output supports a `bulk_max_size` parameter, values of
 `bulk_max_size` greater than `flush.min_events` have no effect. The value of `flush.min_events`
-should be evenly divisble by `bulk_max_size` to avoid sending partial batches to the output.
+should be evenly divisible by `bulk_max_size` to avoid sending partial batches to the output.
 
 This sample configuration forwards events to the output if 512 events are available or the oldest
 available event has been waiting for 5s in the queue:
@@ -63,7 +63,7 @@ You can specify the following options in the `queue.mem` section of the +{beatna
 [float]
 ===== `events`
 
-Number of events the queue can store. This value should be evenly divisble by `flush.min_events` to
+Number of events the queue can store. This value should be evenly divisible by `flush.min_events` to
 avoid sending partial batches to the output.
 
 The default value is 3200 events.
