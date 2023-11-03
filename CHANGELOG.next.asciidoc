@@ -150,6 +150,7 @@ is collected by it.
 - Add log error when statsd server fails to start {pull}36477[36477]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
+- The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
 
 *Osquerybeat*
 

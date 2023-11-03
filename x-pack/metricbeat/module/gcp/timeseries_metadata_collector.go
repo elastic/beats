@@ -62,12 +62,12 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	}
 
 	if availabilityZone != "" {
-		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAvailabilityZone, availabilityZone)
 
 		// Get region name from availability zone name
 		region := getRegionName(availabilityZone)
 		if region != "" {
-			ecs[ECSCloud+"."+ECSCloudRegion] = region
+			_, _ = ecs.Put(ECSCloud+"."+ECSCloudRegion, region)
 		}
 	}
 

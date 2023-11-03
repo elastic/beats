@@ -9,10 +9,10 @@
             "id": "8825965883407652424",
             "name": "heartbeat-los-angeles"
         },
-        "provider": "gcp"
+        "provider": "gcp",
+        "availability_zone": "us-west2-a",
+        "region": "us-west2-a"
     },
-    "cloud.availability_zone": "us-west2-a",
-    "cloud.region": "us-west2",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,
