@@ -273,6 +273,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				logger: log,
 				config: appendProcessorConfig{
 					Fields:      []string{"field"},
+					Values:      []interface{}{"value3", "value4"},
 					TargetField: "target",
 				},
 			},
@@ -281,7 +282,7 @@ func Test_appendProcessor_Run(t *testing.T) {
 				Meta: mapstr.M{},
 				Fields: mapstr.M{
 					"field":  "I'm being appended",
-					"target": []interface{}{"value1", "value2", "I'm being appended"},
+					"target": []interface{}{"value1", "value2", "I'm being appended", "value3", "value4"},
 				},
 			},
 		},

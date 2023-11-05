@@ -51,8 +51,8 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *c.C,
 ) (outputs.Group, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	foConfig := defaultConfig()
+	if err := cfg.Unpack(&foConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
@@ -64,14 +64,14 @@ func makeFileout(
 		beat:     beat,
 		observer: observer,
 	}
-	if err := fo.init(beat, config); err != nil {
+	if err := fo.init(beat, foConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(-1, 0, fo)
+	return outputs.Success(foConfig.Queue, -1, 0, fo)
 }
 
-func (out *fileOutput) init(beat beat.Info, c config) error {
+func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 	var path string
 	if c.Filename != "" {
 		path = filepath.Join(c.Path, c.Filename)

@@ -25,7 +25,7 @@ pipeline {
     TERRAFORM_VERSION = "1.0.2"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     KIND_VERSION = 'v0.20.0'
-    K8S_VERSION = 'v1.27.3'
+    K8S_VERSION = 'v1.28.0'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
@@ -353,7 +353,7 @@ def withTools(Map args = [:], Closure body) {
       body()
     }
   } else if (args.get('nodejs', false)) {
-    withNodeJSEnv() {
+    withNodeJSEnv(version: '18.17.1') {
       withEnv(["ELASTIC_SYNTHETICS_CAPABLE=true"]) {
         cmd(label: "Install @elastic/synthetics", script: "npm i -g @elastic/synthetics")
         body()

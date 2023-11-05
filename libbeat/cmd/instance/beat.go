@@ -54,6 +54,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -65,6 +66,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
@@ -132,6 +134,9 @@ type beatConfig struct {
 
 	// monitoring settings
 	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
+
+	// ILM settings
+	LifecycleConfig lifecycle.RawConfig `config:",inline"`
 
 	// central management settings
 	Management *config.C `config:"management"`
@@ -651,6 +656,19 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				return err
 			}
 
+			// other components know to skip ILM setup under serverless, this logic block just helps us print an error message
+			// in instances where ILM has been explicitly enabled
+			var ilmCfg struct {
+				Ilm *config.C `config:"setup.ilm"`
+			}
+			err = b.RawConfig.Unpack(&ilmCfg)
+			if err != nil {
+				return fmt.Errorf("error unpacking ILM config: %w", err)
+			}
+			if ilmCfg.Ilm.Enabled() && esClient.IsServerless() {
+				fmt.Println("WARNING: ILM is not supported in Serverless projects")
+			}
+
 			loadTemplate, loadILM := idxmgmt.LoadModeUnset, idxmgmt.LoadModeUnset
 			if setup.IndexManagement || setup.Template {
 				loadTemplate = idxmgmt.LoadModeOverwrite
@@ -658,7 +676,13 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if setup.IndexManagement || setup.ILMPolicy {
 				loadILM = idxmgmt.LoadModeEnabled
 			}
-			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+			if err != nil {
+				return fmt.Errorf("error creating index management handler: %w", err)
+			}
+
+			m := b.IdxSupporter.Manager(mgmtHandler, idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
 				fmt.Println(warn)
 			}
@@ -758,6 +782,10 @@ func (b *Beat) configure(settings Settings) error {
 	err = cfg.Unpack(&b.Config)
 	if err != nil {
 		return fmt.Errorf("error unpacking config data: %w", err)
+	}
+
+	if err := promoteOutputQueueSettings(&b.Config); err != nil {
+		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
 
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
@@ -1005,16 +1033,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 func (b *Beat) registerESVersionCheckCallback() error {
 	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		if !isElasticsearchOutput(b.Config.Output.Name()) {
-			return errors.New("Elasticsearch output is not configured")
+			return errors.New("elasticsearch output is not configured")
 		}
-		if b.isConnectionToOlderVersionAllowed() {
+		// if we allow older versions, return early and don't check versions
+		// versions don't matter on serverless, so always bypass
+		if b.isConnectionToOlderVersionAllowed() || conn.IsServerless() {
 			return nil
 		}
 
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
-			return err
+			return fmt.Errorf("error fetching version from elasticsearch: %w", err)
 		}
 		if esVersion.LessThanMajorMinor(beatVersion) {
 			return fmt.Errorf("%w ES=%s, Beat=%s", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
@@ -1028,7 +1058,7 @@ func (b *Beat) registerESVersionCheckCallback() error {
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 	config := struct {
 		AllowOlder bool `config:"allow_older_versions"`
-	}{false}
+	}{true}
 
 	_ = b.Config.Output.Config().Unpack(&config)
 
@@ -1052,7 +1082,11 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection) error {
-		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+		if err != nil {
+			return fmt.Errorf("error creating index management handler: %w", err)
+		}
+		m := b.IdxSupporter.Manager(mgmtHandler, idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
 }
@@ -1452,4 +1486,48 @@ func sanitizeIPs(ips []string) []string {
 		validIPs = append(validIPs, ip)
 	}
 	return validIPs
+}
+
+// promoteOutputQueueSettings checks to see if the output
+// configuration has queue settings defined and if so it promotes them
+// to the top level queue settings.  This is done to allow existing
+// behavior of specifying queue settings at the top level or like
+// elastic-agent that specifies queue settings under the output
+func promoteOutputQueueSettings(bc *beatConfig) error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		pc := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&pc)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if pc.Queue.IsSet() {
+			logp.Info("global queue settings replaced with output queue settings")
+			bc.Pipeline.Queue = pc.Queue
+		}
+	}
+	return nil
+}
+
+func (bc *beatConfig) Validate() error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		outputPC := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&outputPC)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
+			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
+		}
+		//elastic-agent doesn't support disk queue yet
+		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
+			return fmt.Errorf("disk queue is not supported when management is enabled")
+		}
+	}
+
+	//elastic-agent doesn't support disk queue yet
+	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
+		return fmt.Errorf("disk queue is not supported when management is enabled")
+	}
+
+	return nil
 }

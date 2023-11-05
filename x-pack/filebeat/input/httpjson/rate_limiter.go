@@ -16,12 +16,12 @@ import (
 )
 
 type rateLimiter struct {
-	log *logp.Logger
-
 	limit      *valueTpl
 	reset      *valueTpl
 	remaining  *valueTpl
 	earlyLimit *float64
+
+	log *logp.Logger
 }
 
 func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLimiter {
@@ -104,7 +104,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 	ctx := emptyTransformContext()
 	ctx.updateLastResponse(response{header: resp.Header.Clone()})
 
-	remaining, _ := r.remaining.Execute(ctx, tr, "", nil, r.log)
+	remaining, _ := r.remaining.Execute(ctx, tr, "rate-limit_remaining", nil, r.log)
 	if remaining == "" {
 		return 0, errors.New("remaining value is empty")
 	}
@@ -119,7 +119,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 	if r.earlyLimit != nil {
 		earlyLimit := *r.earlyLimit
 		if earlyLimit > 0 && earlyLimit < 1 {
-			limit, _ := r.limit.Execute(ctx, tr, "", nil, r.log)
+			limit, _ := r.limit.Execute(ctx, tr, "early_limit", nil, r.log)
 			if limit != "" {
 				l, err := strconv.ParseInt(limit, 10, 64)
 				if err == nil {
@@ -141,7 +141,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 		return 0, nil
 	}
 
-	reset, _ := r.reset.Execute(ctx, tr, "", nil, r.log)
+	reset, _ := r.reset.Execute(ctx, tr, "rate-limit_reset", nil, r.log)
 	if reset == "" {
 		return 0, errors.New("reset value is empty")
 	}

@@ -9,61 +9,15 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	stdxml "encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"unicode"
 
 	"github.com/elastic/mito/lib/xml"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-type encoderFunc func(trReq transformable) ([]byte, error)
-
-type decoderFunc func(p []byte, dst *response) error
-
-var (
-	registeredEncoders             = map[string]encoderFunc{}
-	registeredDecoders             = map[string]decoderFunc{}
-	defaultEncoder     encoderFunc = encodeAsJSON
-	defaultDecoder     decoderFunc = decodeAsJSON
-)
-
-func registerEncoder(contentType string, enc encoderFunc) error {
-	if contentType == "" {
-		return errors.New("content-type can't be empty")
-	}
-
-	if enc == nil {
-		return errors.New("encoder can't be nil")
-	}
-
-	if _, found := registeredEncoders[contentType]; found {
-		return errors.New("already registered")
-	}
-
-	registeredEncoders[contentType] = enc
-
-	return nil
-}
-
-func registerDecoder(contentType string, dec decoderFunc) error {
-	if contentType == "" {
-		return errors.New("content-type can't be empty")
-	}
-
-	if dec == nil {
-		return errors.New("decoder can't be nil")
-	}
-
-	if _, found := registeredDecoders[contentType]; found {
-		return errors.New("already registered")
-	}
-
-	registeredDecoders[contentType] = dec
-
-	return nil
-}
 
 func encode(contentType string, trReq transformable) ([]byte, error) {
 	enc, found := registeredEncoders[contentType]
@@ -81,35 +35,34 @@ func decode(contentType string, p []byte, dst *response) error {
 	return dec(p, dst)
 }
 
-func registerEncoders() {
-	log := logp.L().Named(logName)
-	log.Debugf("registering encoder 'application/json': returned error: %#v",
-		registerEncoder("application/json", encodeAsJSON))
+var (
+	// registeredEncoders is the set of available encoders.
+	registeredEncoders = map[string]encoderFunc{
+		"application/json":                  encodeAsJSON,
+		"application/x-www-form-urlencoded": encodeAsForm,
+	}
+	// defaultEncoder is the decoder used when no registers
+	// encoder is available.
+	defaultEncoder = encodeAsJSON
 
-	log.Debugf("registering encoder 'application/x-www-form-urlencoded': returned error: %#v",
-		registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
-}
+	// registeredDecoders is the set of available decoders.
+	registeredDecoders = map[string]decoderFunc{
+		"application/json":        decodeAsJSON,
+		"application/x-ndjson":    decodeAsNdjson,
+		"text/csv":                decodeAsCSV,
+		"application/zip":         decodeAsZip,
+		"application/xml":         decodeAsXML,
+		"text/xml; charset=utf-8": decodeAsXML,
+	}
+	// defaultDecoder is the decoder used when no registers
+	// decoder is available.
+	defaultDecoder = decodeAsJSON
+)
 
-func registerDecoders() {
-	log := logp.L().Named(logName)
-	log.Debugf("registering decoder 'application/json': returned error: %#v",
-		registerDecoder("application/json", decodeAsJSON))
+type encoderFunc func(trReq transformable) ([]byte, error)
+type decoderFunc func(p []byte, dst *response) error
 
-	log.Debugf("registering decoder 'application/x-ndjson': returned error: %#v",
-		registerDecoder("application/x-ndjson", decodeAsNdjson))
-
-	log.Debugf("registering decoder 'text/csv': returned error: %#v",
-		registerDecoder("text/csv", decodeAsCSV))
-
-	log.Debugf("registering decoder 'application/zip': returned error: %#v",
-		registerDecoder("application/zip", decodeAsZip))
-
-	log.Debugf("registering decoder 'application/xml': returned error: %#v",
-		registerDecoder("application/xml", decodeAsXML))
-	log.Debugf("registering decoder 'text/xml': returned error: %#v",
-		registerDecoder("text/xml; charset=utf-8", decodeAsXML))
-}
-
+// encodeAsJSON encodes trReq as a JSON message.
 func encodeAsJSON(trReq transformable) ([]byte, error) {
 	if len(trReq.body()) == 0 {
 		return nil, nil
@@ -120,10 +73,16 @@ func encodeAsJSON(trReq transformable) ([]byte, error) {
 	return json.Marshal(trReq.body())
 }
 
+// decodeAsJSON decodes the JSON message in p into dst.
 func decodeAsJSON(p []byte, dst *response) error {
-	return json.Unmarshal(p, &dst.body)
+	err := json.Unmarshal(p, &dst.body)
+	if err != nil {
+		return textContextError{error: err, body: p}
+	}
+	return nil
 }
 
+// encodeAsForm encodes trReq as a URL encoded form.
 func encodeAsForm(trReq transformable) ([]byte, error) {
 	url := trReq.url()
 	body := []byte(url.RawQuery)
@@ -135,13 +94,15 @@ func encodeAsForm(trReq transformable) ([]byte, error) {
 	return body, nil
 }
 
+// decodeAsNdjson decodes the message in p as a JSON object stream
+// It is more relaxed than NDJSON.
 func decodeAsNdjson(p []byte, dst *response) error {
 	var results []interface{}
 	dec := json.NewDecoder(bytes.NewReader(p))
 	for dec.More() {
 		var o interface{}
 		if err := dec.Decode(&o); err != nil {
-			return err
+			return textContextError{error: err, body: p}
 		}
 		results = append(results, o)
 	}
@@ -149,6 +110,7 @@ func decodeAsNdjson(p []byte, dst *response) error {
 	return nil
 }
 
+// decodeAsCSV decodes p as a headed CSV document into dst.
 func decodeAsCSV(p []byte, dst *response) error {
 	var results []interface{}
 
@@ -180,7 +142,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 
 	if err != nil {
 		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
-			return err
+			return textContextError{error: err, body: p}
 		}
 	}
 
@@ -189,6 +151,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 	return nil
 }
 
+// decodeAsZip decodes p as a ZIP archive into dst.
 func decodeAsZip(p []byte, dst *response) error {
 	var results []interface{}
 	r, err := zip.NewReader(bytes.NewReader(p), int64(len(p)))
@@ -209,7 +172,7 @@ func decodeAsZip(p []byte, dst *response) error {
 			var o interface{}
 			if err := dec.Decode(&o); err != nil {
 				rc.Close()
-				return err
+				return textContextError{error: err, body: p}
 			}
 			results = append(results, o)
 		}
@@ -225,12 +188,108 @@ func decodeAsZip(p []byte, dst *response) error {
 	return nil
 }
 
+// decodeAsXML decodes p as an XML document into dst.
 func decodeAsXML(p []byte, dst *response) error {
 	cdata, body, err := xml.Unmarshal(bytes.NewReader(p), dst.xmlDetails)
 	if err != nil {
-		return err
+		return textContextError{error: err, body: p}
 	}
 	dst.body = body
 	dst.header["XML-CDATA"] = []string{cdata}
 	return nil
+}
+
+// textContextError is an error that can provide the text context for
+// a decoding error from the csv, json and xml packages.
+type textContextError struct {
+	error
+	body []byte
+}
+
+func (e textContextError) Error() string {
+	var ctx []byte
+	switch err := e.error.(type) {
+	case nil:
+		return "<nil>"
+	case *json.SyntaxError:
+		ctx = textContext(e.body, err.Offset)
+	case *json.UnmarshalTypeError:
+		ctx = textContext(e.body, err.Offset)
+	case *csv.ParseError:
+		lines := bytes.Split(e.body, []byte{'\n'})
+		l := err.Line - 1 // Lines are 1-based.
+		if uint(l) >= uint(len(lines)) {
+			return err.Error()
+		}
+		ctx = textContext(lines[l], int64(err.Column))
+	case *stdxml.SyntaxError:
+		lines := bytes.Split(e.body, []byte{'\n'})
+		l := err.Line - 1 // Lines are 1-based.
+		if uint(l) >= uint(len(lines)) {
+			return err.Error()
+		}
+		// The xml package does not provide column-level context,
+		// so just point to first non-whitespace character of the
+		// line. This doesn't make a great deal of difference
+		// except in deeply indented XML documents.
+		pos := bytes.IndexFunc(lines[l], func(r rune) bool {
+			return !unicode.IsSpace(r)
+		})
+		if pos < 0 {
+			pos = 0
+		}
+		ctx = textContext(lines[l], int64(pos))
+	default:
+		return err.Error()
+	}
+	return fmt.Sprintf("%v: text context %q", e.error, ctx)
+}
+
+func (e textContextError) Unwrap() error {
+	return e.error
+}
+
+// textContext returns the context of text around the provided position starting
+// ten bytes before pos and ten bytes after, dependent on the length of the
+// text and the value of pos relative to bounds. If a text truncation is made,
+// an ellipsis is added to indicate this.
+func textContext(text []byte, pos int64) []byte {
+	if len(text) == 0 {
+		return text
+	}
+	const (
+		dots = "..."
+		span = 10
+	)
+	left := maxInt64(0, pos-span)
+	right := minInt(pos+span+1, int64(len(text)))
+	ctx := make([]byte, right-left+2*int64(len(dots)))
+	copy(ctx[3:], text[left:right])
+	if left != 0 {
+		copy(ctx, dots)
+		left = 0
+	} else {
+		left = int64(len(dots))
+	}
+	if right != int64(len(text)) {
+		copy(ctx[len(ctx)-len(dots):], dots)
+		right = int64(len(ctx))
+	} else {
+		right = int64(len(ctx) - len(dots))
+	}
+	return ctx[left:right]
+}
+
+func minInt(a, b int64) int64 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func maxInt64(a, b int64) int64 {
+	if a > b {
+		return a
+	}
+	return b
 }

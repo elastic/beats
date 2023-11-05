@@ -39,25 +39,44 @@ func TestGetProviderIsCanonical(t *testing.T) {
 }
 
 func TestIsEnabled(t *testing.T) {
-	oauth2 := oAuth2Config{}
-	if !oauth2.isEnabled() {
-		t.Errorf("OAuth2 not enabled by default")
+	type enabler interface {
+		isEnabled() bool
+		take(*bool)
 	}
+	for _, test := range []struct {
+		name string
+		auth enabler
+	}{
+		{name: "basic", auth: &basicAuthConfig{}},
+		{name: "digest", auth: &digestAuthConfig{}},
+		{name: "OAuth2", auth: &oAuth2Config{}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			if !test.auth.isEnabled() {
+				t.Errorf("auth not enabled by default")
+			}
 
-	var enabled bool
-	for i := 0; i < 4; i++ {
-		oauth2.Enabled = &enabled
-		if got := oauth2.isEnabled(); got != enabled {
-			t.Errorf("unexpected OAuth2 enabled state on iteration %d: got:%t want:%t", i, got, enabled)
-		}
-		enabled = !enabled
-	}
+			var enabled bool
+			for i := 0; i < 4; i++ {
+				test.auth.take(&enabled)
+				if got := test.auth.isEnabled(); got != enabled {
+					t.Errorf("unexpected auth enabled state on iteration %d: got:%t want:%t", i, got, enabled)
+				}
+				enabled = !enabled
+			}
 
-	oauth2.Enabled = nil
-	if !oauth2.isEnabled() {
-		t.Errorf("OAuth2 not enabled if nilled")
+			test.auth.take(nil)
+			if !test.auth.isEnabled() {
+				t.Errorf("auth not enabled if nilled")
+			}
+		})
 	}
 }
+
+// take methods are for testing only.
+func (b *basicAuthConfig) take(on *bool)  { b.Enabled = on }
+func (d *digestAuthConfig) take(on *bool) { d.Enabled = on }
+func (o *oAuth2Config) take(on *bool)     { o.Enabled = on }
 
 func TestOAuth2GetTokenURL(t *testing.T) {
 	const host = "http://localhost"
@@ -141,6 +160,31 @@ var oAuth2ValidationTests = []struct {
 					"secret": "a_client_secret",
 				},
 			},
+		},
+	},
+	{
+		name:    "can't_set_oauth2_and_digest_auth_together",
+		wantErr: errors.New("only one kind of auth can be enabled accessing 'auth'"),
+		input: map[string]interface{}{
+			"auth.digest.user":     "user",
+			"auth.digest.password": "pass",
+			"auth.oauth2": map[string]interface{}{
+				"token_url": "localhost",
+				"client": map[string]interface{}{
+					"id":     "a_client_id",
+					"secret": "a_client_secret",
+				},
+			},
+		},
+	},
+	{
+		name:    "can't_set_basic_and_digest_auth_together",
+		wantErr: errors.New("only one kind of auth can be enabled accessing 'auth'"),
+		input: map[string]interface{}{
+			"auth.basic.user":      "user",
+			"auth.basic.password":  "pass",
+			"auth.digest.user":     "user",
+			"auth.digest.password": "pass",
 		},
 	},
 	{
@@ -441,6 +485,43 @@ var oAuth2ValidationTests = []struct {
 				"provider":                 "google",
 				"google.jwt_file":          "./testdata/credentials.json",
 				"google.delegated_account": "delegated@account.com",
+			},
+		},
+	},
+	{
+		name:    "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
+		wantErr: errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'"),
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":  "okta",
+				"client.id": "a_client_id",
+				"token_url": "localhost",
+				"scopes":    []string{"foo"},
+			},
+		},
+	},
+	{
+		name:    "okta oauth2 validation fails if jwk_json is not a valid JSON",
+		wantErr: errors.New("the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'"),
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":      "okta",
+				"client.id":     "a_client_id",
+				"token_url":     "localhost",
+				"scopes":        []string{"foo"},
+				"okta.jwk_json": `"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
+			},
+		},
+	},
+	{
+		name: "okta successful oauth2 validation",
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":      "okta",
+				"client.id":     "a_client_id",
+				"token_url":     "localhost",
+				"scopes":        []string{"foo"},
+				"okta.jwk_json": `{"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
 			},
 		},
 	},

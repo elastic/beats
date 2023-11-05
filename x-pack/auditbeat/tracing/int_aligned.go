@@ -16,7 +16,7 @@ import (
 var errBadSize = errors.New("bad size for integer")
 
 func copyInt(dst unsafe.Pointer, src unsafe.Pointer, len uint8) error {
-	copy((*(*[maxIntSizeBytes]byte)(src))[:len], (*(*[maxIntSizeBytes]byte)(src))[:len])
+	copy((*(*[maxIntSizeBytes]byte)(dst))[:len], (*(*[maxIntSizeBytes]byte)(src))[:len])
 	return nil
 }
 

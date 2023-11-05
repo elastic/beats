@@ -252,16 +252,22 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		return err
 	}
 
-	if len(state.users) != 0 || len(state.devices) != 0 {
+	wantUsers := p.cfg.wantUsers()
+	wantDevices := p.cfg.wantDevices()
+	if (len(state.users) != 0 && wantUsers) || (len(state.devices) != 0 && wantDevices) {
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, u := range state.users {
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+		if wantUsers {
+			for _, u := range state.users {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			}
 		}
-		for _, d := range state.devices {
-			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		if wantDevices {
+			for _, d := range state.devices {
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			}
 		}
 
 		end := time.Now()
@@ -338,6 +344,11 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 // any existing deltaLink will be ignored, forcing a full synchronization from Okta.
 // Returns a set of modified users by ID.
 func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	if !p.cfg.wantUsers() {
+		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
+		return nil, nil
+	}
+
 	var (
 		query url.Values
 		err   error
@@ -418,7 +429,8 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 // synchronization from Okta.
 // Returns a set of modified devices by ID.
 func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*Device, error) {
-	if !p.cfg.WantDevices {
+	if !p.cfg.wantDevices() {
+		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
 		return nil, nil
 	}
 
@@ -482,7 +494,9 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				// Users are not stored in the state as they are in doFetchUsers. We expect
 				// them to already have been discovered/stored from that call and are stored
-				// associated with the device undecorated with discovery state.
+				// associated with the device undecorated with discovery state. Or, if the
+				// the dataset is set to "devices", then we have been asked not to care about
+				// this detail.
 				batch[i].Users = append(batch[i].Users, users...)
 
 				next, err := okta.Next(h)

@@ -24,6 +24,7 @@ import (
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
@@ -150,7 +151,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log)
 	if err != nil {
 		return err
 	}
@@ -688,6 +689,19 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		return nil, err
 	}
 
+	if cfg.Auth.Digest.isEnabled() {
+		var noReuse bool
+		if cfg.Auth.Digest.NoReuse != nil {
+			noReuse = *cfg.Auth.Digest.NoReuse
+		}
+		c.Transport = &digest.Transport{
+			Transport: c.Transport,
+			Username:  cfg.Auth.Digest.User,
+			Password:  cfg.Auth.Digest.Password,
+			NoReuse:   noReuse,
+		}
+	}
+
 	if cfg.Resource.Tracer != nil {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
@@ -707,25 +721,27 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
-	client := &retryablehttp.Client{
-		HTTPClient:   c,
-		Logger:       newRetryLog(log),
-		RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
-		RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
-		RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
-		CheckRetry:   retryablehttp.DefaultRetryPolicy,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if cfg.Resource.Retry.getMaxAttempts() > 1 {
+		c = (&retryablehttp.Client{
+			HTTPClient:   c,
+			Logger:       newRetryLog(log),
+			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
+			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
+			RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+		}).StandardClient()
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		authClient, err := cfg.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
 			return nil, err
 		}
 		return authClient, nil
 	}
 
-	return client.StandardClient(), nil
+	return c, nil
 }
 
 func wantClient(cfg config) bool {
@@ -861,7 +877,7 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger) (cel.Program, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -875,6 +891,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
+		lib.Debug(debug(log)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
 		lib.Regexp(patterns),
@@ -904,6 +921,17 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		return nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
 	return prg, nil
+}
+
+func debug(log *logp.Logger) func(string, any) {
+	log = log.Named("cel_debug")
+	return func(tag string, value any) {
+		level := "DEBUG"
+		if _, ok := value.(error); ok {
+			level = "ERROR"
+		}
+		log.Debugw(level, "tag", tag, "value", value)
+	}
 }
 
 func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {

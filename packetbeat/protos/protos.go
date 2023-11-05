@@ -33,7 +33,7 @@ import (
 )
 
 const (
-	DefaultTransactionHashSize                 = 2 ^ 16
+	DefaultTransactionHashSize                 = 1 << 16
 	DefaultTransactionExpiration time.Duration = 10 * time.Second
 )
 

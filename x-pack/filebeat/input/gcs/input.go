@@ -6,6 +6,7 @@ package gcs
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -21,6 +22,12 @@ import (
 type gcsInput struct {
 	config config
 }
+
+// defines the valid range for Unix timestamps for 64 bit integers
+var (
+	minTimestamp = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+	maxTimestamp = time.Date(3000, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+)
 
 const (
 	inputName = "gcs"
@@ -47,18 +54,23 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
-
-	var sources []cursor.Source
+	sources := make([]cursor.Source, 0, len(config.Buckets))
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
+		if bucket.TimeStampEpoch != nil && !isValidUnixTimestamp(*bucket.TimeStampEpoch) {
+			return nil, nil, fmt.Errorf("invalid timestamp epoch: %d", *bucket.TimeStampEpoch)
+		}
 		sources = append(sources, &Source{
-			ProjectId:     config.ProjectId,
-			BucketName:    bucket.Name,
-			BucketTimeOut: *bucket.BucketTimeOut,
-			MaxWorkers:    *bucket.MaxWorkers,
-			Poll:          *bucket.Poll,
-			PollInterval:  *bucket.PollInterval,
-			ParseJSON:     *bucket.ParseJSON,
+			ProjectId:                config.ProjectId,
+			BucketName:               bucket.Name,
+			BucketTimeOut:            *bucket.BucketTimeOut,
+			MaxWorkers:               *bucket.MaxWorkers,
+			Poll:                     *bucket.Poll,
+			PollInterval:             *bucket.PollInterval,
+			ParseJSON:                *bucket.ParseJSON,
+			TimeStampEpoch:           bucket.TimeStampEpoch,
+			ExpandEventListFromField: bucket.ExpandEventListFromField,
+			FileSelectors:            bucket.FileSelectors,
 		})
 	}
 
@@ -76,7 +88,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		}
 		b.MaxWorkers = &maxWorkers
 	}
-
 	if b.Poll == nil {
 		var poll bool
 		if cfg.Poll != nil {
@@ -84,7 +95,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		}
 		b.Poll = &poll
 	}
-
 	if b.PollInterval == nil {
 		interval := time.Second * 300
 		if cfg.PollInterval != nil {
@@ -92,7 +102,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		}
 		b.PollInterval = &interval
 	}
-
 	if b.ParseJSON == nil {
 		parse := false
 		if cfg.ParseJSON != nil {
@@ -100,7 +109,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		}
 		b.ParseJSON = &parse
 	}
-
 	if b.BucketTimeOut == nil {
 		timeOut := time.Second * 50
 		if cfg.BucketTimeOut != nil {
@@ -108,8 +116,23 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 		}
 		b.BucketTimeOut = &timeOut
 	}
+	if b.TimeStampEpoch == nil {
+		b.TimeStampEpoch = cfg.TimeStampEpoch
+	}
+	if b.ExpandEventListFromField == "" {
+		b.ExpandEventListFromField = cfg.ExpandEventListFromField
+	}
+	if len(b.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
+		b.FileSelectors = cfg.FileSelectors
+	}
 
 	return b
+}
+
+// isValidUnixTimestamp checks if the timestamp is a valid Unix timestamp
+func isValidUnixTimestamp(timestamp int64) bool {
+	// checks if the timestamp is within the valid range
+	return minTimestamp <= timestamp && timestamp <= maxTimestamp
 }
 
 func (input *gcsInput) Name() string {

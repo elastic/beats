@@ -31,7 +31,7 @@ import (
 )
 
 func TestGenerateHints(t *testing.T) {
-	customCfg := conf.MustNewConfigFrom(map[string]interface{}{
+	customDockerCfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"default_config": map[string]interface{}{
 			"type": "docker",
 			"containers": map[string]interface{}{
@@ -40,6 +40,49 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			"close_timeout": "true",
+		},
+	})
+
+	customContainerCfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"default_config": map[string]interface{}{
+			"type": "container",
+			"paths": []string{
+				"/var/lib/docker/containers/${data.container.id}/*-json.log",
+			},
+			"close_timeout": "true",
+			"processors": []interface{}{
+				map[string]interface{}{
+					"add_tags": map[string]interface{}{
+						"tags":   []string{"web"},
+						"target": "environment",
+					},
+				},
+			},
+		},
+	})
+
+	customFilestreamCfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"default_config": map[string]interface{}{
+			"type": "filestream",
+			"id":   "kubernetes-container-logs-${data.kubernetes.container.id}",
+			"prospector": map[string]interface{}{
+				"scanner": map[string]interface{}{
+					"fingerprint.enabled": true,
+					"symlinks":            true,
+				},
+			},
+			"file_identity.fingerprint": nil,
+			"paths": []string{
+				"/var/log/containers/*-${data.kubernetes.container.id}.log",
+			},
+			"parsers": []interface{}{
+				map[string]interface{}{
+					"container": map[string]interface{}{
+						"stream": "all",
+						"format": "auto",
+					},
+				},
+			},
 		},
 	})
 
@@ -59,7 +102,7 @@ func TestGenerateHints(t *testing.T) {
 		result []mapstr.M
 	}{
 		{
-			msg:    "Default config is correct",
+			msg:    "Default config is correct(default input)",
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -77,8 +120,28 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []mapstr.M{
 				{
-					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
-					"type":  "container",
+					"id":    "kubernetes-container-logs-abc",
+					"paths": []interface{}{"/var/log/containers/*-abc.log"},
+					"parsers": []interface{}{
+						map[string]interface{}{
+							"container": map[string]interface{}{
+								"format": "auto",
+								"stream": "all",
+							},
+						},
+					},
+					"prospector": map[string]interface{}{
+						"scanner": map[string]interface{}{
+							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
+						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
+					},
+					"type": "filestream",
 				},
 			},
 		},
@@ -102,7 +165,7 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{},
 		},
 		{
-			msg:    "Hint to enable when disabled by default works",
+			msg:    "Hint to enable when disabled by default works(filestream)",
 			config: defaultDisabled,
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -126,15 +189,35 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []mapstr.M{
 				{
-					"type":          "container",
-					"paths":         []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+					"id":    "kubernetes-container-logs-abc",
+					"paths": []interface{}{"/var/log/containers/*-abc.log"},
+					"parsers": []interface{}{
+						map[string]interface{}{
+							"container": map[string]interface{}{
+								"format": "auto",
+								"stream": "all",
+							},
+						},
+					},
+					"prospector": map[string]interface{}{
+						"scanner": map[string]interface{}{
+							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
+						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
+					},
 					"exclude_lines": []interface{}{"^test2", "^test3"},
+					"type":          "filestream",
 				},
 			},
 		},
 		{
 			msg:    "Hints without host should return nothing",
-			config: customCfg,
+			config: customDockerCfg,
 			event: bus.Event{
 				"hints": mapstr.M{
 					"metrics": mapstr.M{
@@ -147,7 +230,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		{
 			msg:    "Hints with logs.disable should return nothing",
-			config: customCfg,
+			config: customDockerCfg,
 			event: bus.Event{
 				"hints": mapstr.M{
 					"logs": mapstr.M{
@@ -159,8 +242,8 @@ func TestGenerateHints(t *testing.T) {
 			result: []mapstr.M{},
 		},
 		{
-			msg:    "Empty event hints should return default config",
-			config: customCfg,
+			msg:    "Empty event hints should return default config(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -186,8 +269,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with include|exclude_lines must be part of the input config",
-			config: customCfg,
+			msg:    "Hint with include|exclude_lines must be part of the input config(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -221,8 +304,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hints with  two sets of include|exclude_lines must be part of the input config",
-			config: customCfg,
+			msg:    "Hints with  two sets of include|exclude_lines must be part of the input config(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -267,8 +350,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with multiline config must have a multiline in the input config",
-			config: customCfg,
+			msg:    "Hint with multiline config must have a multiline in the input config(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -306,8 +389,171 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with inputs config as json must be accepted",
-			config: customCfg,
+			msg:    "Hint with multiline config must have a multiline in the input config parsers(filestream input)",
+			config: customFilestreamCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": mapstr.M{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"multiline": mapstr.M{
+							"pattern": "^test",
+							"negate":  "true",
+						},
+					},
+				},
+			},
+			len: 1,
+			result: []mapstr.M{
+				{
+					"id":    "kubernetes-container-logs-abc",
+					"paths": []interface{}{"/var/log/containers/*-abc.log"},
+					"parsers": []interface{}{
+						map[string]interface{}{
+							"container": map[string]interface{}{
+								"format": "auto",
+								"stream": "all",
+							},
+						},
+						map[string]interface{}{
+							"multiline": map[string]interface{}{
+								"pattern": "^test",
+								"negate":  "true",
+							},
+						},
+					},
+					"prospector": map[string]interface{}{
+						"scanner": map[string]interface{}{
+							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
+						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
+					},
+					"type": "filestream",
+				},
+			},
+		},
+		{
+			msg:    "Hint with json config options must include them in the input config ndjson parser(filestream input)",
+			config: customFilestreamCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": mapstr.M{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"json": mapstr.M{
+							"add_error_key": true,
+							"expand_keys":   true,
+						},
+					},
+				},
+			},
+			len: 1,
+			result: []mapstr.M{
+				{
+					"id":    "kubernetes-container-logs-abc",
+					"paths": []interface{}{"/var/log/containers/*-abc.log"},
+					"parsers": []interface{}{
+						map[string]interface{}{
+							"container": map[string]interface{}{
+								"format": "auto",
+								"stream": "all",
+							},
+						},
+						map[string]interface{}{
+							"ndjson": map[string]interface{}{
+								"add_error_key": true,
+								"expand_keys":   true,
+							},
+						},
+					},
+					"prospector": map[string]interface{}{
+						"scanner": map[string]interface{}{
+							"symlinks": true,
+							"fingerprint": map[string]interface{}{
+								"enabled": true,
+							},
+						},
+					},
+					"file_identity": map[string]interface{}{
+						"fingerprint": nil,
+					},
+					"type": "filestream",
+				},
+			},
+		},
+		{
+			msg:    "Hint with json config options must include them in the input config(container input)",
+			config: customContainerCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": mapstr.M{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"json": mapstr.M{
+							"add_error_key": true,
+							"expand_keys":   true,
+						},
+					},
+				},
+			},
+			len: 1,
+			result: []mapstr.M{
+				{
+					"type": "container",
+					"paths": []interface{}{
+						"/var/lib/docker/containers/abc/*-json.log",
+					},
+					"close_timeout": "true",
+					"json": map[string]interface{}{
+						"add_error_key": true,
+						"expand_keys":   true,
+					},
+					"processors": []interface{}{
+						map[string]interface{}{
+							"add_tags": map[string]interface{}{
+								"tags":   []interface{}{"web"},
+								"target": "environment",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with inputs config as json must be accepted(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -341,8 +587,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with processors config must have a processors in the input config",
-			config: customCfg,
+			msg:    "Hint with processors config must have a processors in the input config(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -390,8 +636,63 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with module should attach input to its filesets",
-			config: customCfg,
+			msg:    "Processors in hints must be appended in the processors of the default config(container input)",
+			config: customContainerCfg,
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
+						"name": "foobar",
+						"id":   "abc",
+					},
+				},
+				"container": mapstr.M{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": mapstr.M{
+					"logs": mapstr.M{
+						"processors": mapstr.M{
+							"1": mapstr.M{
+								"dissect": mapstr.M{
+									"tokenizer": "%{key1} %{key2}",
+								},
+							},
+							"drop_event": mapstr.M{},
+						},
+					},
+				},
+			},
+			len: 1,
+			result: []mapstr.M{
+				{
+					"type": "container",
+					"paths": []interface{}{
+						"/var/lib/docker/containers/abc/*-json.log",
+					},
+					"close_timeout": "true",
+					"processors": []interface{}{
+						map[string]interface{}{
+							"add_tags": map[string]interface{}{
+								"tags":   []interface{}{"web"},
+								"target": "environment",
+							},
+						},
+						map[string]interface{}{
+							"dissect": map[string]interface{}{
+								"tokenizer": "%{key1} %{key2}",
+							},
+						},
+						map[string]interface{}{
+							"drop_event": nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			msg:    "Hint with module should attach input to its filesets(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -440,8 +741,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with module should honor defined filesets",
-			config: customCfg,
+			msg:    "Hint with module should honor defined filesets(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -491,8 +792,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with module should honor defined filesets with streams",
-			config: customCfg,
+			msg:    "Hint with module should honor defined filesets with streams(docker input)",
+			config: customDockerCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"kubernetes": mapstr.M{
@@ -543,7 +844,7 @@ func TestGenerateHints(t *testing.T) {
 			},
 		},
 		{
-			msg:    "Hint with module should attach input to its filesets",
+			msg:    "Hint with module should attach input to its filesets(default input)",
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -570,28 +871,62 @@ func TestGenerateHints(t *testing.T) {
 					"error": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
+								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
+							},
+							"type": "filestream",
 						},
 					},
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
+								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
+							},
+							"type": "filestream",
 						},
 					},
 				},
 			},
 		},
 		{
-			msg:    "Hint with module should honor defined filesets",
+			msg:    "Hint with module should honor defined filesets(default input)",
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -619,28 +954,62 @@ func TestGenerateHints(t *testing.T) {
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
+								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
+							},
+							"type": "filestream",
 						},
 					},
 					"error": map[string]interface{}{
 						"enabled": false,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "all",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "all",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
+								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
+							},
+							"type": "filestream",
 						},
 					},
 				},
 			},
 		},
 		{
-			msg:    "Hint with module should honor defined filesets with streams",
+			msg:    "Hint with module should honor defined filesets with streams(default input)",
 			config: defaultCfg,
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -669,21 +1038,55 @@ func TestGenerateHints(t *testing.T) {
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "stdout",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "stdout",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
+								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
+							},
+							"type": "filestream",
 						},
 					},
 					"error": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
-							"type":   "container",
-							"stream": "stderr",
-							"paths": []interface{}{
-								"/var/lib/docker/containers/abc/*-json.log",
+							"id":    "kubernetes-container-logs-abc",
+							"paths": []interface{}{"/var/log/containers/*-abc.log"},
+							"parsers": []interface{}{
+								map[string]interface{}{
+									"container": map[string]interface{}{
+										"format": "auto",
+										"stream": "stderr",
+									},
+								},
 							},
+							"prospector": map[string]interface{}{
+								"scanner": map[string]interface{}{
+									"symlinks": true,
+									"fingerprint": map[string]interface{}{
+										"enabled": true,
+									},
+								},
+							},
+							"file_identity": map[string]interface{}{
+								"fingerprint": nil,
+							},
+							"type": "filestream",
 						},
 					},
 				},
