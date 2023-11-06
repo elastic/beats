@@ -461,8 +461,12 @@ def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+<<<<<<< HEAD
     def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
     def completeVariant = ['-complete' : 'beats']
+=======
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi9' : 'beats' ]
+>>>>>>> d4630af1cf (ironbank: move to ubi9 (#37017))
     if (beatsFolder.endsWith('auditbeat')) {
       tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('filebeat')) {
