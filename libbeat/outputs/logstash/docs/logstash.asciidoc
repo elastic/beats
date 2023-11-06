@@ -354,9 +354,10 @@ endif::[]
 
 The maximum number of events to bulk in a single {ls} request. The default is 2048.
 
-If the Beat sends single events, the events are collected into batches. If the Beat publishes
-a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split.
+Events can be collected into batches. When using the memory queue with `queue.mem.flush.min_events`
+set to a value greater than `1`, the maximum batch is is the value of `queue.mem.flush.min_events`.
+{beatname_uc} will split batches read from the queue which are larger than `bulk_max_size` into
+multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
