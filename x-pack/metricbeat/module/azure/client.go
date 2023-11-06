@@ -16,33 +16,54 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// NewMetricRegistry instantiates a new metric registry.
 func NewMetricRegistry() *MetricRegistry {
 	return &MetricRegistry{
 		collectionsInfo: make(map[string]MetricCollectionInfo),
 	}
 }
 
+// MetricRegistry keeps track of the last time a metric was collected and
+// the time grain used.
+//
+// This is used to avoid collecting the same metric values over and over again
+// when the time grain is larger than the collection interval.
 type MetricRegistry struct {
 	collectionsInfo map[string]MetricCollectionInfo
 }
 
-func (m *MetricRegistry) Register(metric Metric, info MetricCollectionInfo) {
+// Update updates the metric registry with the latest timestamp and
+// time grain for the given metric.
+func (m *MetricRegistry) Update(metric Metric, info MetricCollectionInfo) {
 	m.collectionsInfo[m.buildMetricKey(metric)] = info
 }
 
+// NeedsUpdate returns true if the metric needs to be updated.
 func (m *MetricRegistry) NeedsUpdate(metric Metric) bool {
+	// The key is a combination of the namespace,
+	// resource ID and metric names.
 	metricKey := m.buildMetricKey(metric)
 
 	if info, exists := m.collectionsInfo[metricKey]; exists {
-		duration := convertTimegrainToDuration(info.timeGrain)
+		duration := convertTimeGrainToDuration(info.timeGrain)
+
+		// Check if the metric has been collected within a
+		// time period defined by the time grain.
 		if info.timestamp.After(time.Now().Add(duration * (-1))) {
 			return false
 		}
 	}
 
+	// If the metric is not in the registry, it means that it has never
+	// been collected before.
+	//
+	// In this case, we need to collect the metric.
 	return true
 }
 
+// buildMetricKey builds a key for the metric registry.
+//
+// The key is a combination of the namespace, resource ID and metric names.
 func (m *MetricRegistry) buildMetricKey(metric Metric) string {
 	keyComponents := []string{
 		metric.Namespace,
@@ -53,6 +74,8 @@ func (m *MetricRegistry) buildMetricKey(metric Metric) string {
 	return strings.Join(keyComponents, ",")
 }
 
+// MetricCollectionInfo contains information about the last time
+// a metric was collected and the time grain used.
 type MetricCollectionInfo struct {
 	timestamp time.Time
 	timeGrain string
@@ -96,10 +119,12 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	if len(client.Config.Resources) == 0 {
 		return fmt.Errorf("no resource options defined")
 	}
+
 	// check if refresh interval has been set and if it has expired
 	if !client.ResourceConfigurations.Expired() {
 		return nil
 	}
+
 	var metrics []Metric
 	//reset client resources
 	client.Resources = []Resource{}
@@ -110,12 +135,14 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			err = fmt.Errorf("failed to retrieve resources: %w", err)
 			return err
 		}
+
 		if len(resourceList) == 0 {
 			err = fmt.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
 			continue
 		}
+
 		// Map resources to the client
 		for _, resource := range resourceList {
 			if !containsResource(*resource.ID, client.Resources) {
@@ -129,10 +156,13 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 					Subscription: client.Config.SubscriptionId})
 			}
 		}
+
+		// Collects and stores metrics definitions for the cloud resources.
 		resourceMetrics, err := fn(client, resourceList, resource)
 		if err != nil {
 			return err
 		}
+
 		metrics = append(metrics, resourceMetrics...)
 	}
 	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
@@ -145,90 +175,46 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	return nil
 }
 
-// GetMetricValues returns the specified metric data points for the specified resource ID/namespace.
-func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []Metric {
-	var resultedMetrics []Metric
+// GetMetricValues returns the metric values for the given cloud resources.
+func (client *Client) GetMetricValues(metrics []Metric, reporter mb.ReporterV2) []Metric {
+	var result []Metric
 
-	// Same end time for all metrics in the same batch
+	// Same end time for all metrics in the same batch.
 	referenceTime := time.Now().UTC()
 
-	// loop over the set of metrics
 	for _, metric := range metrics {
-		// select period to collect metrics, will double the interval value in order to retrieve any missing values
-		//if timegrain is larger than intervalx2 then interval will be assigned the timegrain value
 		interval := client.Config.Period
-		//duration := convertTimegrainToDuration(metric.TimeGrain)
-		//if t := convertTimegrainToDuration(metric.TimeGrain); t > interval*2 {
-		//	interval = t
-		//}
 
 		// copy the reference time
 		endTime := referenceTime
 
-		// Fetch in the range [{-2xINTERVAL},{-INTERVAL}) with a delay of {INTERVAL}
-		// It results in one data point {-2xINTERVAL} per call
+		// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
 		endTime = endTime.Add(interval * (-1))
 		startTime := endTime.Add(interval * (-1))
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
+		//
+		// Before fetching the metric values, check if the metric
+		// has been collected within the time grain.
+		//
+		// Why do we need this?
+		//
+		// Some metricsets contains metrics with long time grains (e.g. 1 hour).
+		//
+		// If we collect the metric values every 5 minutes, we will end up fetching
+		// the same data over and over again for all metrics with a time grain
+		// larger than 5 minutes.
+		//
+		// The registry keeps track of the last timestamp the metricset collected
+		// the metric values and the time grain used.
+		//
+		// By comparing the last collection time with the current time, and
+		// the time grain of the metric, we can determine if the metric needs
+		// to be collected again, or if we can skip it.
+		//
 		if !client.MetricRegistry.NeedsUpdate(metric) {
 			continue
 		}
-
-		//metricKey := strings.Join(metric.Names, ",")
-		//metricKey += metric.ResourceId
-		//
-		//if metricInfo, exists := client.MetricRegistry[metricKey]; exists {
-		//	duration := convertTimegrainToDuration(metricInfo.timeGrain)
-		//	if metricInfo.timestamp.After(referenceTime.Add(duration * (-1))) {
-		//		continue
-		//	}
-		//}
-
-		// Interval math for timegrain > period
-		//if duration > client.Config.Period {
-		//	inTimespan := false
-		//
-		//	var diffSec = int64(endTime.Second() - startTime.Second())
-		//
-		//	var diffMin = int64(endTime.Minute() - startTime.Minute())
-		//	var diffMinDuration = time.Duration(diffMin) * time.Minute
-		//
-		//	var diffHour = int64(endTime.Hour() - startTime.Hour())
-		//	var diffHourDuration = time.Duration(diffHour) * time.Hour
-		//
-		//	// If timegrain is unit 1 day, 1 hour or 1 min
-		//	if duration == 24*time.Hour {
-		//		startOfDay := endTime.Truncate(24 * time.Hour)
-		//		if (startOfDay.Equal(startTime) || startOfDay.After(startTime)) && startOfDay.Before(endTime) {
-		//			inTimespan = true
-		//		}
-		//
-		//	} else if duration >= time.Hour {
-		//		if diffMin < 0 && diffHourDuration > 0 && diffHourDuration%duration == 0 {
-		//			inTimespan = true
-		//		}
-		//	} else {
-		//		if diffSec < 0 && diffMinDuration%duration == 0 {
-		//			inTimespan = true
-		//		}
-		//	}
-		//
-		//	// if the time grain mark is not within the sampling timespan,
-		//	// remove that metric from the list in this batch and skip to the next one
-		//	if !inTimespan {
-		//		// Remove metric from list
-		//		ind := 0
-		//		for i, currentMetric := range client.ResourceConfigurations.Metrics {
-		//			if matchMetrics(currentMetric, metric) {
-		//				ind = i
-		//				break
-		//			}
-		//		}
-		//		client.ResourceConfigurations.Metrics = append(client.ResourceConfigurations.Metrics[:ind], client.ResourceConfigurations.Metrics[ind+1:]...)
-		//		continue
-		//	}
-		//}
 
 		// build the 'filter' parameter which will contain any dimensions configured
 		var filter string
@@ -240,6 +226,7 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 			filter = strings.Join(filterList, " AND ")
 		}
 
+		// Fetch the metric values from the Azure API.
 		resp, timeGrain, err := client.AzureMonitorService.GetMetricValues(
 			metric.ResourceSubId,
 			metric.Namespace,
@@ -252,35 +239,46 @@ func (client *Client) GetMetricValues(metrics []Metric, report mb.ReporterV2) []
 		if err != nil {
 			err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metric.ResourceSubId, metric.Namespace, err)
 			client.Log.Error(err)
-			report.Error(err)
+			reporter.Error(err)
 		} else {
 
-			// Update the metric registry with the latest timestamp and time grain.
-			client.MetricRegistry.Register(metric, MetricCollectionInfo{
+			// Update the metric registry with the latest timestamp and
+			// time grain for each metric.
+			//
+			// We track the time grain Azure used for this metric values from
+			// the API response.
+			client.MetricRegistry.Update(metric, MetricCollectionInfo{
 				timeGrain: timeGrain,
 				timestamp: referenceTime,
 			})
 
-			//client.MetricRegistry[metricKey] = MetricCollectionInfo{
-			//	timeGrain: timeGrain,
-			//	timestamp: referenceTime,
-			//}
-
 			for i, currentMetric := range client.ResourceConfigurations.Metrics {
 				if matchMetrics(currentMetric, metric) {
-					//current := mapMetricValues(resp, currentMetric.Values, endTime.Truncate(time.Minute).Add(interval*(-1)), endTime.Truncate(time.Minute))
+					// Map the metric values from the API response.
 					current := mapMetricValues(resp, currentMetric.Values)
 					client.ResourceConfigurations.Metrics[i].Values = current
+
+					// Some predefined metricsets configuration do not have a time grain.
+					// Here is an example:
+					// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
+					//
+					// Predefined metricsets sometimes have long lists of metrics
+					// with no time grains. Or users can configure their own
+					// custom metricsets with no time grain.
+					//
+					// In this case, we track the time grain returned by the API. Azure
+					// provides a default time grain for each metric.
 					if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
 						client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
 					}
-					resultedMetrics = append(resultedMetrics, client.ResourceConfigurations.Metrics[i])
+
+					result = append(result, client.ResourceConfigurations.Metrics[i])
 				}
 			}
 		}
 	}
 
-	return resultedMetrics
+	return result
 }
 
 // CreateMetric function will create a client metric based on the resource and metrics configured
@@ -328,20 +326,21 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricD
 	return clientMetrics
 }
 
-// GetVMForMetaData func will retrieve the vm details in order to fill in the cloud metadata and also update the client resources
-func (client *Client) GetVMForMetaData(resource *Resource, metricValues []MetricValue) VmResource {
+// GetVMForMetadata func will retrieve the VM details in order to fill in the cloud metadata
+// and also update the client resources
+func (client *Client) GetVMForMetadata(resource *Resource, referencePoint KeyValuePoint) VmResource {
 	var (
 		vm           VmResource
 		resourceName = resource.Name
 		resourceId   = resource.Id
 	)
 
-	// check first if this is a vm scaleset and the instance name is stored in the dimension value
-	if dimension, ok := getDimension("VMName", metricValues[0].dimensions); ok {
-		instanceId := getInstanceId(dimension.Value)
+	// Search the dimensions for the "VMName" dimension. This dimension is present for VM Scale Sets.
+	if dimensionValue, ok := getDimension("VMName", referencePoint.Dimensions); ok {
+		instanceId := getInstanceId(dimensionValue)
 		if instanceId != "" {
 			resourceId += fmt.Sprintf("/virtualMachines/%s", instanceId)
-			resourceName = dimension.Value
+			resourceName = dimensionValue
 		}
 	}
 
@@ -421,6 +420,7 @@ func NewMockClient() *Client {
 		AzureMonitorService: azureMockService,
 		Config:              Config{},
 		Log:                 logp.NewLogger("test azure monitor"),
+		MetricRegistry:      NewMetricRegistry(),
 	}
 	return client
 }

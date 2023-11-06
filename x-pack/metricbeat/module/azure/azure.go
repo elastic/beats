@@ -86,27 +86,43 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// Initialize cloud resources and monitor metrics
+	// information.
+	//
+	// The client collects and stores:
+	// - existing cloud resource definitions (e.g. VMs, DBs, etc.)
+	// - metric definitions for the resources (e.g. CPU, memory, etc.)
+	//
+	// The metricset periodically refreshes the information
+	// after `RefreshListInterval` (default 600s for
+	// most metricsets).
 	err := m.Client.InitResources(m.MapMetrics)
 	if err != nil {
 		return err
 	}
+
 	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
-		// error message is previously logged in the InitResources, no error event should be created
+		// error message is previously logged in the InitResources,
+		// no error event should be created
 		return nil
 	}
 
-	// Group metrics by cloud resource ID.
-	metricsGroup := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
+	// Group metric definitions by cloud resource ID.
+	//
+	// We group the metric definitions by resource ID to fetch
+	// metric values for each cloud resource in one API call.
+	metricsByResourceId := groupMetricsDefinitionsByResourceId(m.Client.ResourceConfigurations.Metrics)
 
-	for _, metrics := range metricsGroup {
+	for _, metricsDefinition := range metricsByResourceId {
 		// Fetch metric values for each resource.
-		metricValues := m.Client.GetMetricValues(metrics, report)
+		metricValues := m.Client.GetMetricValues(metricsDefinition, report)
 
-		//if err := mapToEvents(metricValues, m.Client, report); err != nil {
-		if err := mapToEvents2(metricValues, m.Client, report); err != nil {
+		// Turns metric values into events and sends them to Elasticsearch.
+		if err := mapToEvents(metricValues, m.Client, report); err != nil {
 			return fmt.Errorf("error mapping metrics to events: %w", err)
 		}
 	}
+
 	return nil
 }
 
