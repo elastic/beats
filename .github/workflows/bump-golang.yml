@@ -10,20 +10,23 @@ permissions:
   pull-requests: write
   contents: write
 
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
 jobs:
   bump:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Git
         uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
 
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@453502948b442d7b9a923de7b40cc7ce8628505c
+        uses: updatecli/updatecli-action@22fc20fc94d2482874876b66b797e2a4a7178445
 
       - name: Run Updatecli
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: updatecli apply --config ./.ci/bump-golang.yml
+        run: updatecli apply --config ./.github/workflows/updatecli.d/bump-golang.yml
