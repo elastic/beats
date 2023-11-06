@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 

@@ -138,7 +138,7 @@ func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 				Dimensions: mapstr.M{},
 			}
 
-			metricName := fmt.Sprintf("%s", managePropertyName(value.name))
+			metricName := managePropertyName(value.name)
 			switch {
 			case value.min != nil:
 				point.Key = fmt.Sprintf("%s.%s", metricName, "min")
@@ -541,7 +541,7 @@ func ReplaceUpperCase(src string) string {
 // getDimensionValue will return dimension value for the key provided
 func getDimensionValue(dimension string, dimensions []Dimension) string {
 	for _, dim := range dimensions {
-		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
+		if strings.EqualFold(dim.Name, dimension) {
 			return dim.Value
 		}
 	}
@@ -552,7 +552,7 @@ func getDimensionValue(dimension string, dimensions []Dimension) string {
 // getDimensionValue2 will return dimension value for the key provided
 func getDimensionValueForKeyValuePoint(dimension string, dimensions mapstr.M) string {
 	for key, value := range dimensions {
-		if strings.ToLower(key) == strings.ToLower(dimension) {
+		if strings.EqualFold(key, dimension) {
 			return fmt.Sprintf("%v", value)
 		}
 	}

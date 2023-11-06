@@ -307,8 +307,7 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 
 // MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
 func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, subResourceId string, namespace string, dim []Dimension, timeGrain string) []Metric {
-	var clientMetrics []Metric
-
+	clientMetrics := make([]Metric, 0)
 	metricGroups := make(map[string][]armmonitor.MetricDefinition)
 
 	for _, met := range metrics {

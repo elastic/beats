@@ -5,11 +5,12 @@
 package azure
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"reflect"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
