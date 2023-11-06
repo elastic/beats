@@ -45,11 +45,7 @@ func TestGetMimeType(t *testing.T) {
 		{"png", "image/png"},
 	}
 
-	dir, err := os.MkdirTemp("", "mime-samples")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	for extension, sample := range mimeSamples {
 		samplePath := filepath.Join(dir, "sample."+extension)

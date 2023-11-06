@@ -39,11 +39,7 @@ import (
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	dir, err := os.MkdirTemp("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
@@ -75,28 +71,10 @@ func TestActions(t *testing.T) {
 	defer bucket.Close()
 
 	// First directory
-	dir, err := os.MkdirTemp("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	// Second directory (to be reported with "initial_scan")
-	newDir, err := os.MkdirTemp("", "audit-file-new")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(newDir)
-
-	newDir, err = filepath.EvalSymlinks(newDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	newDir := t.TempDir()
 
 	createdFilepath := filepath.Join(dir, "created.txt")
 	updatedFilepath := filepath.Join(dir, "updated.txt")
@@ -184,16 +162,7 @@ func TestExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir, err := os.MkdirTemp("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
 
@@ -240,16 +209,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir, err := os.MkdirTemp("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0o700)
 	if err != nil {
@@ -310,16 +270,7 @@ func TestErrorReporting(t *testing.T) {
 	}
 	defer abtest.SetupDataDir(t)()
 
-	dir, err := os.MkdirTemp("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
 	f, err := os.Create(path)
@@ -441,6 +392,8 @@ func (t *testReporter) Clear() {
 }
 
 func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event, expected map[string]interface{}) {
+	t.Helper()
+
 	var reporter testReporter
 	if !ms.reportEvent(&reporter, input) {
 		t.Fatal("reportEvent failed", title)
@@ -492,6 +445,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
+
 	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {
@@ -764,6 +718,7 @@ func TestEventDelete(t *testing.T) {
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
+
 	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {

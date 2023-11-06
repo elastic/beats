@@ -42,18 +42,7 @@ const ErrorSharingViolation syscall.Errno = 32
 func TestEventReader(t *testing.T) {
 	t.Skip("Flaky test: about 1/10 of builds fails https://github.com/elastic/beats/issues/21302")
 	// Make dir to monitor.
-	dir, err := os.MkdirTemp("", "audit")
-	if err != nil {
-		t.Fatal(err)
-	}
-	// under macOS, temp dir has a symlink in the path (/var -> /private/var)
-	// and the path returned in events has the symlink resolved
-	if runtime.GOOS == "darwin" {
-		if dirAlt, err := filepath.EvalSymlinks(dir); err == nil {
-			dir = dirAlt
-		}
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	// Create a new EventProducer.
 	config := defaultConfig
@@ -251,21 +240,8 @@ func TestRaces(t *testing.T) {
 
 	dirs := make([]string, N)
 	for i := range dirs {
-		dir, err := os.MkdirTemp("", "audit")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if dir, err = filepath.EvalSymlinks(dir); err != nil {
-			t.Fatal(err)
-		}
-		dirs[i] = dir
+		dirs[i] = t.TempDir()
 	}
-
-	defer func() {
-		for _, dir := range dirs {
-			os.RemoveAll(dir)
-		}
-	}()
 
 	// Create a new EventProducer.
 	config := defaultConfig

@@ -31,15 +31,14 @@ import (
 // a method that doesn't need to open the file for reading.
 // (GetNamedSecurityInfo vs CreateFile+GetSecurityInfo)
 func TestFileInfoPermissions(t *testing.T) {
-	f, err := os.CreateTemp("", "metadata")
+	f, err := os.CreateTemp(t.TempDir(), "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer f.Close()
+
 	name := f.Name()
-	defer func() {
-		f.Close()
-		os.Remove(f.Name())
-	}()
+
 	makeFileNonReadable(t, f.Name())
 	info, err := os.Stat(name)
 	if err != nil {

@@ -29,11 +29,10 @@ import (
 )
 
 func TestNewMetadata(t *testing.T) {
-	f, err := os.CreateTemp("", "metadata")
+	f, err := os.CreateTemp(t.TempDir(), "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(f.Name())
 
 	_, err = f.WriteString("metadata test")
 	if err != nil {
@@ -95,11 +94,10 @@ func TestNewMetadata(t *testing.T) {
 }
 
 func TestSetUIDSetGIDBits(t *testing.T) {
-	f, err := os.CreateTemp("", "setuid")
+	f, err := os.CreateTemp(t.TempDir(), "setuid")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(f.Name())
 
 	_, err = f.WriteString("metadata test")
 	if err != nil {

@@ -176,7 +176,7 @@ func TestDiffEvents(t *testing.T) {
 }
 
 func TestHashFile(t *testing.T) {
-	f, err := os.CreateTemp("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -287,7 +287,7 @@ func TestHashFile(t *testing.T) {
 }
 
 func TestNewEventFromFileInfoHash(t *testing.T) {
-	f, err := os.CreateTemp("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -360,7 +360,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 }
 
 func BenchmarkHashFile(b *testing.B) {
-	f, err := os.CreateTemp("", "hash")
+	f, err := os.CreateTemp(b.TempDir(), "hash")
 	if err != nil {
 		b.Fatal(err)
 	}
