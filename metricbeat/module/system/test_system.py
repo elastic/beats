@@ -111,8 +111,9 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
+# num_threads may not be readable for some privileged process on Windows,
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "num_threads"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
@@ -430,6 +431,7 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("fd", None)
             process.pop("cmdline", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
