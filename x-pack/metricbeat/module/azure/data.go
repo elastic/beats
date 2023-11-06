@@ -40,8 +40,95 @@ type KeyValuePoint struct {
 
 // mapToKeyValuePoints maps a list of `azure.Metric` to a list of `azure.KeyValuePoint`.
 //
-// `azure.KeyValuePoint` makes grouping metrics by timestamp, dimensions,
+// `azure.KeyValuePoint` struct makes grouping metrics by timestamp, dimensions,
 // and other fields more straightforward than using `azure.Metric`.
+//
+// How?
+//
+// `azure.Metric` has the following structure (simplified):
+//
+//	{
+//	    "namespace": "Microsoft.Compute/virtualMachineScaleSets",
+//	    "resource_id": "/subscriptions/123/resourceGroups/ABC/providers/Microsoft.Compute/virtualMachineScaleSets/aks-agentpool-12628255-vmss",
+//	    "time_grain": "PT5M",
+//	    "aggregations": "Total",
+//	    "dimensions": [
+//	        {
+//	            "name": "VMName",
+//	            "displayName": "*"
+//	        }
+//	    ],
+//	    "names": [
+//	        "Network In",
+//	        "Network Out"
+//	    ],
+//	    "values": [
+//	        {
+//	            "name": "Network In",
+//	            "timestamp": "2021-03-04T14:00:00Z",
+//	            "total": 4211652,
+//	            "dimensions": [
+//	                {
+//	                    "name": "VMName",
+//	                    "value": "aks-agentpool-12628255-vmss_0"
+//	                }
+//	            ]
+//	        },
+//	        {
+//	            "name": "Network Out",
+//	            "timestamp": "2021-03-04T14:00:00Z",
+//	            "total": 1105888,
+//	            "dimensions": [
+//	                {
+//	                    "name": "VMName",
+//	                    "value": "aks-agentpool-12628255-vmss_0"
+//	                }
+//	            ]
+//	        }
+//	    ]
+//	}
+//
+// Here we have two metric values: "Network In" and "Network Out". Each metric value
+// has a timestamp, a total, and a list of dimensions.
+//
+// To group the metrics using the `azure.Metric` structure, we need to assume that
+// all metric values have the same timestamp and dimensions. This seems true during
+// our tests, but I'm not 100% sure this is always the case.
+//
+// The alternative is to unpack the metric values into a list of `azure.KeyValuePoint`.
+//
+// The `mapToKeyValuePoints` function turns the previous `azure.Metric` in the a
+// `azure.KeyValuePoint` list with the following structure (simplified):
+//
+// [
+//
+//	{
+//	    "key": "network_in_total.total",
+//	    "value": 4211652,
+//	    "namespace": "Microsoft.Compute/virtualMachineScaleSets",
+//	    "resource_id": "/subscriptions/123/resourceGroups/ABC/providers/Microsoft.Compute/virtualMachineScaleSets/aks-agentpool-12628255-vmss",
+//	    "time_grain": "PT5M",
+//	    "dimensions": {
+//	        "VMName": "aks-agentpool-12628255-vmss_0"
+//	    },
+//	    "time": "2021-03-04T14:00:00Z"
+//	},
+//	{
+//	    "key": "network_out_total.total",
+//	    "value": 1105888,
+//	    "namespace": "Microsoft.Compute/virtualMachineScaleSets",
+//	    "resource_id": "/subscriptions/123/resourceGroups/ABC/providers/Microsoft.Compute/virtualMachineScaleSets/aks-agentpool-12628255-vmss",
+//	    "time_grain": "PT5M",
+//	    "dimensions": {
+//	        "VMName": "aks-agentpool-12628255-vmss_0"
+//	    },
+//	    "time": "2021-03-04T14:00:00Z"
+//	}
+//
+// ]
+//
+// With this structure, we can group the metrics by timestamp, dimensions, and
+// other fields without making assumptions.
 func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 	var points []KeyValuePoint
 	for _, metric := range metrics {
