@@ -752,20 +752,3 @@ output.elasticsearch:
   non_indexable_policy.dead_letter_index:
     index: "my-dead-letter-index"
 ------------------------------------------------------------------------------
-<<<<<<< HEAD
-=======
-
-[[es-apis]]
-==== Elasticsearch APIs
-{beatname_uc} will use the `_bulk` API from {es}, the events are sent
-in the order they arrive to the publishing pipeline, a single `_bulk`
-request may contain events from different inputs/modules. Temporary
-failures are re-tried.
-
-The status code for each event is checked and handled as:
-
-* `< 300`: The event is counted as `events.acked`
-* `409` (Conflict): The event is counted as `events.duplicates`
-* `429` (Too Many Requests): The event is counted as `events.toomany`
-* `> 399 and < 500`: The `non_indexable_policy` is applied.
->>>>>>> 0f8fc26ca7 (Clarify the role of flush.min_events and bulk_max_size in docs (#37022))
