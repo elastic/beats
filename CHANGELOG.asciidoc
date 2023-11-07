@@ -13,43 +13,18 @@ https://github.com/elastic/beats/compare/v8.10.4\...v8.11.0[View commits]
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
 - - Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36879[36879]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Switch types of `log.file.device`, `log.file.inode`, `log.file.idxhi`, `log.file.idxlo` and `log.file.vol` fields to strings to better align with ECS and integrations. {pull}36697[36697]
 
-*Heartbeat*
-
-
 *Metricbeat*
 
-The elastic-agent-system-metrics was updated to v0.7.0 as the number of threads
-is collected by it.
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
+- The elastic-agent-system-metrics was updated to v0.7.0 as the number of threads is collected by it.
 
 ==== Bugfixes
 
 *Affecting all Beats*
 - upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request. {pull}36896[36896]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -71,18 +46,9 @@ is collected by it.
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
 
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Fix User Account Control Attributes Table values for Security module. {issue}36999[36999] {pull}37009[37009]
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -95,9 +61,6 @@ is collected by it.
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -119,97 +82,9 @@ is collected by it.
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
 - Add cache processor. {pull}36786[36786]
 
-*Auditbeat*
-
-*Libbeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-
-*Osquerybeat*
-
-
 *Packetbeat*
 
 - Bump Windows Npcap version to v1.76. {issue}36539[36539] {pull}36549[36549]
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.10.4]]
