@@ -279,6 +279,8 @@ func TestGetProcess(t *testing.T) {
 	case "linux":
 		assert.True(t, (len(process.Cwd) > 0))
 	}
+
+	assert.NotEmptyf(t, process.Cmdline, "cmdLine must be present")
 }
 
 func TestMatchProcs(t *testing.T) {

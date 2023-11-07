@@ -222,6 +222,9 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if procStats.skipExtended {
 		return status, true, nil
 	}
+
+	// Some OSes use the cache to avoid expensive system calls,
+	// cacheCmdLine reads from the cache.
 	status = procStats.cacheCmdLine(status)
 
 	// Filter based on user-supplied func
@@ -236,9 +239,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if err != nil {
 		return status, true, fmt.Errorf("FillPidMetrics: %w", err)
 	}
-	if len(status.Args) > 0 && status.Cmdline == "" {
-		status.Cmdline = strings.Join(status.Args, " ")
-	}
+
 	if status.CPU.Total.Ticks.Exists() {
 		status.CPU.Total.Value = opt.FloatWith(metric.Round(float64(status.CPU.Total.Ticks.ValueOr(0))))
 	}
@@ -264,6 +265,12 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	status, err = FillMetricsRequiringMoreAccess(pid, status)
 	if err != nil {
 		return status, true, fmt.Errorf("FillMetricsRequiringMoreAccess: %w", err)
+	}
+
+	// Generate `status.Cmdline` here for compatibility because on Windows
+	// `status.Args` is set by `FillMetricsRequiringMoreAccess`.
+	if len(status.Args) > 0 && status.Cmdline == "" {
+		status.Cmdline = strings.Join(status.Args, " ")
 	}
 
 	// network data

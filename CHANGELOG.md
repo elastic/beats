@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+ - Fix CmdLine generation and caching for system.process
+
 ## [0.7.0]
 
 ### Added
