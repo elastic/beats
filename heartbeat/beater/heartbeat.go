@@ -344,9 +344,12 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 
 	// Clone original config since we don't want this change to be global
 	newCfg, err := conf.NewConfigFrom(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error cloning config: %w", err)
+	}
 	timeout := int64((10 * time.Second).Seconds())
 	if err := newCfg.SetInt("timeout", -1, timeout); err != nil {
-		return nil, fmt.Errorf("error setting the ES timeout in config after %d attempts, with %s delay: %w", attempts, wait, err)
+		return nil, fmt.Errorf("error setting the ES timeout in config: %w", err)
 	}
 
 	for i := 0; i < attempts; i++ {

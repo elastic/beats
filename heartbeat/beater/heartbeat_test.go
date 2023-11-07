@@ -21,9 +21,10 @@ import (
 	"testing"
 	"time"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestMakeESClient(t *testing.T) {
@@ -38,7 +39,7 @@ func TestMakeESClient(t *testing.T) {
 		anyAttempt := 1
 		anyDuration := 1 * time.Second
 
-		makeESClient(origCfg, anyAttempt, anyDuration)
+		_, _ = makeESClient(origCfg, anyAttempt, anyDuration)
 
 		timeout, err := origCfg.Int("timeout", -1)
 		require.NoError(t, err)
