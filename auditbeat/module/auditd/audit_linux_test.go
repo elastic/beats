@@ -349,7 +349,7 @@ func TestBuildMetricbeatEvent(t *testing.T) {
 }
 
 func buildSampleEvent(t testing.TB, lines []string, filename string) {
-	var msgs []*auparse.AuditMessage
+	var msgs []*auparse.AuditMessage //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, txt := range lines {
 		m, err := auparse.ParseLogLine(txt)
 		if err != nil {

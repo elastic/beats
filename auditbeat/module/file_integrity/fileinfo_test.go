@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewMetadata(t *testing.T) {
@@ -38,7 +39,7 @@ func TestNewMetadata(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Sync()
+	require.NoError(t, f.Sync())
 	f.Close()
 
 	info, err := os.Lstat(f.Name())
@@ -103,7 +104,7 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Sync()
+	require.NoError(t, f.Sync())
 	f.Close()
 
 	info, err := os.Lstat(f.Name())

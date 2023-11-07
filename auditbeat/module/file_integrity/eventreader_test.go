@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -29,6 +30,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func init() {
@@ -133,8 +135,9 @@ func TestEventReader(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		f.WriteString(" world!")
-		f.Sync()
+		_, err = f.WriteString(" world!")
+		require.NoError(t, err)
+		require.NoError(t, f.Sync())
 		f.Close()
 
 		event := readTimeout(t, events)
@@ -186,8 +189,9 @@ func TestEventReader(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		f.WriteString("move-in")
-		f.Sync()
+		_, err = f.WriteString("move-in")
+		require.NoError(t, err)
+		require.NoError(t, f.Sync())
 		f.Close()
 		moveInOrig = f.Name()
 
@@ -261,7 +265,7 @@ func TestRaces(t *testing.T) {
 		for i := 0; i < 10; i++ {
 			for _, dir := range dirs {
 				fname := filepath.Join(dir, fmt.Sprintf("%d.dat", i))
-				os.WriteFile(fname, []byte("hello"), fileMode)
+				require.NoError(t, os.WriteFile(fname, []byte("hello"), fileMode))
 			}
 		}
 	}()
@@ -273,7 +277,7 @@ func TestRaces(t *testing.T) {
 	const marker = "test_file"
 	for _, dir := range dirs {
 		fname := filepath.Join(dir, marker)
-		os.WriteFile(fname, []byte("hello"), fileMode)
+		require.NoError(t, os.WriteFile(fname, []byte("hello"), fileMode))
 	}
 
 	got := 0
@@ -406,7 +410,7 @@ func rename(t *testing.T, oldPath, newPath string) {
 			return
 		}
 
-		if linkErr, ok := err.(*os.LinkError); ok && linkErr.Err == ErrorSharingViolation {
+		if errors.Is(err, ErrorSharingViolation) {
 			time.Sleep(time.Millisecond)
 			continue
 		}
