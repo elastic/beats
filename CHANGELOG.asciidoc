@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.10.4\...v8.11.0[View commits]
 
 *Affecting all Beats*
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
-- - Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36879[36879]
+- Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36879[36879]
 
 *Filebeat*
 
@@ -19,12 +19,13 @@ https://github.com/elastic/beats/compare/v8.10.4\...v8.11.0[View commits]
 
 *Metricbeat*
 
-- The elastic-agent-system-metrics was updated to v0.7.0 as the number of threads is collected by it.
+- System module now collects the number of threads per process. The elastic-agent-system-metrics was updated to v0.7.0 as the number of threads is collected by it.
 
 ==== Bugfixes
 
 *Affecting all Beats*
-- upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request. {pull}36896[36896]
+
+- Upgrade elastic-agent-libs to v0.6.0, allows beat running as a windows service to receive more than one change request. {pull}36896[36896]
 
 *Filebeat*
 
