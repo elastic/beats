@@ -5,7 +5,6 @@ Each Beat is a separately installable product. To learn how to get started, see:
 
 * {auditbeat-ref}/auditbeat-installation-configuration.html[Auditbeat]
 * {filebeat-ref}/filebeat-installation-configuration.html[Filebeat]
-* {functionbeat-ref}/functionbeat-installation-configuration.html[Functionbeat]
 * {heartbeat-ref}/heartbeat-installation-configuration.html[Heartbeat]
 * {metricbeat-ref}/metricbeat-installation-configuration.html[Metricbeat]
 * {packetbeat-ref}/packetbeat-installation-configuration.html[Packetbeat]
