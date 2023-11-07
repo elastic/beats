@@ -341,13 +341,16 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 	// Higher values of timeouts cannot be applied on the SAAS Service
 	// where we are running in tight loops and want the next successive check to be run for a given monitor
 	// within the next scheduled interval which could be 1m or 3m
+
+	// Clone original config since we don't want this change to be global
+	newCfg, err := conf.NewConfigFrom(cfg)
 	timeout := int64((10 * time.Second).Seconds())
-	if err := cfg.SetInt("timeout", -1, timeout); err != nil {
+	if err := newCfg.SetInt("timeout", -1, timeout); err != nil {
 		return nil, fmt.Errorf("error setting the ES timeout in config after %d attempts, with %s delay: %w", attempts, wait, err)
 	}
 
 	for i := 0; i < attempts; i++ {
-		esClient, err = eslegclient.NewConnectedClient(cfg, "Heartbeat")
+		esClient, err = eslegclient.NewConnectedClient(newCfg, "Heartbeat")
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil
