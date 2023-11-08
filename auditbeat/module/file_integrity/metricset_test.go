@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"crypto/sha1"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -40,16 +39,12 @@ import (
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
 		file := filepath.Join(dir, "file.data")
-		ioutil.WriteFile(file, []byte("hello world"), 0o600)
+		os.WriteFile(file, []byte("hello world"), 0o600)
 	}()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
@@ -76,28 +71,10 @@ func TestActions(t *testing.T) {
 	defer bucket.Close()
 
 	// First directory
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	// Second directory (to be reported with "initial_scan")
-	newDir, err := ioutil.TempDir("", "audit-file-new")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(newDir)
-
-	newDir, err = filepath.EvalSymlinks(newDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	newDir := t.TempDir()
 
 	createdFilepath := filepath.Join(dir, "created.txt")
 	updatedFilepath := filepath.Join(dir, "updated.txt")
@@ -136,8 +113,8 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0o600)
-	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0o600)
+	os.WriteFile(createdFilepath, []byte("hello world"), 0o600)
+	os.WriteFile(updatedFilepath, []byte("hello world"), 0o600)
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
@@ -185,23 +162,14 @@ func TestExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
 
 	go func() {
 		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
 			file := filepath.Join(dir, f)
-			ioutil.WriteFile(file, []byte("hello world"), 0o600)
+			os.WriteFile(file, []byte("hello world"), 0o600)
 		}
 	}()
 
@@ -241,16 +209,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0o700)
 	if err != nil {
@@ -264,7 +223,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 
 	for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
 		file := filepath.Join(dir, f)
-		err := ioutil.WriteFile(file, []byte("hello world"), 0o600)
+		err := os.WriteFile(file, []byte("hello world"), 0o600)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -311,16 +270,7 @@ func TestErrorReporting(t *testing.T) {
 	}
 	defer abtest.SetupDataDir(t)()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
 	f, err := os.Create(path)
@@ -442,6 +392,8 @@ func (t *testReporter) Clear() {
 }
 
 func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event, expected map[string]interface{}) {
+	t.Helper()
+
 	var reporter testReporter
 	if !ms.reportEvent(&reporter, input) {
 		t.Fatal("reportEvent failed", title)
@@ -487,12 +439,13 @@ func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
 type expectedEvents []expectedEvent
 
 func (e expectedEvents) validate(t *testing.T) {
-	store, err := ioutil.TempFile("", "bucket")
+	store, err := os.CreateTemp("", "bucket")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
+
 	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {
@@ -759,12 +712,13 @@ func TestEventFailedHash(t *testing.T) {
 }
 
 func TestEventDelete(t *testing.T) {
-	store, err := ioutil.TempFile("", "bucket")
+	store, err := os.CreateTemp("", "bucket")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
+
 	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {

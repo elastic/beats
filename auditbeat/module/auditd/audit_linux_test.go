@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"sort"
@@ -366,7 +365,7 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 		t.Fatal(err)
 	}
 
-	if err := ioutil.WriteFile(filename, output, 0o644); err != nil {
+	if err := os.WriteFile(filename, output, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
