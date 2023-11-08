@@ -488,6 +488,7 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("cmdline", None)
             process.pop("fd", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
