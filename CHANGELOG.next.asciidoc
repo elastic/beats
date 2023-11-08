@@ -201,6 +201,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Use filestream input with file_identity.fingerprint as default for hints autodiscover. {issue}35984[35984] {pull}36950[36950]
 - Add network processor in addition to interface based direction resolution. {pull}37023[37023]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
+- Make CEL input log current transaction ID when request tracing is turned on. {pull}37065[37065]
 
 *Auditbeat*
 
