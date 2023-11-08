@@ -19,7 +19,6 @@ package readjson
 
 import (
 	"bytes"
-	"encoding/json"
 	"runtime"
 	"time"
 
@@ -27,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
+	"github.com/mailru/easyjson"
 )
 
 // DockerJSONReader processor renames a given field
@@ -47,7 +47,7 @@ type DockerJSONReader struct {
 	stripNewLine func(msg *reader.Message)
 }
 
-type logLine struct {
+type LogLine struct {
 	Partial   bool      `json:"-"`
 	Timestamp time.Time `json:"-"`
 	Time      string    `json:"time"`
@@ -77,7 +77,7 @@ func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags b
 // parseCRILog parses logs in CRI log format.
 // CRI log format example :
 // 2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache
-func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) error {
+func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *LogLine) error {
 	split := 3
 	// read line tags if split is enabled:
 	if p.criflags {
@@ -132,10 +132,10 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 // parseReaderLog parses logs in Docker JSON log format.
 // Docker JSON log format example:
 // {"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}
-func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logLine) error {
-	dec := json.NewDecoder(bytes.NewReader(message.Content))
+func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *LogLine) error {
+	err := easyjson.Unmarshal(message.Content, msg)
 
-	if err := dec.Decode(&msg); err != nil {
+	if err != nil {
 		return errors.Wrap(err, "decoding docker JSON")
 	}
 
@@ -155,7 +155,7 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 	return nil
 }
 
-func (p *DockerJSONReader) parseLine(message *reader.Message, msg *logLine) error {
+func (p *DockerJSONReader) parseLine(message *reader.Message, msg *LogLine) error {
 	if p.forceCRI {
 		return p.parseCRILog(message, msg)
 	}
@@ -182,7 +182,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			return message, err
 		}
 
-		var logLine logLine
+		var logLine LogLine
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
 			return message, err

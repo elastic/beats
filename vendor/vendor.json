@@ -1598,6 +1598,12 @@
 			"revisionTime": "2014-01-24T17:37:10Z"
 		},
 		{
+			"checksumSHA1": "QbgKx5a8tWiQAQXyc2ccU3vJ4rQ=",
+			"path": "github.com/josharian/intern",
+			"revision": "42b52b674af5a7cef9ce7e197bc21c78394ae65d",
+			"revisionTime": "2021-11-09T04:42:30Z"
+		},
+		{
 			"checksumSHA1": "tUaGicGy0FLinVWKYFM5ejGzMcY=",
 			"path": "github.com/jstemmer/go-junit-report",
 			"revision": "385fac0ced9acaae6dc5b39144194008ded00697",
@@ -1699,6 +1705,38 @@
 			"path": "github.com/magefile/mage^",
 			"revision": "v1.8.0",
 			"version": "v1.8.0"
+		},
+		{
+			"checksumSHA1": "HLs7ZpHFXJvgbSXvRjfP+kihMfI=",
+			"path": "github.com/mailru/easyjson",
+			"revision": "c120ca7ced6051261161ce15e8f1542a4b2567fc",
+			"revisionTime": "2021-02-06T19:00:08Z",
+			"version": "v0.7.7",
+			"versionExact": "v0.7.7"
+		},
+		{
+			"checksumSHA1": "3k1F0suMjy94n0HEBgQTdFTg7EM=",
+			"path": "github.com/mailru/easyjson/buffer",
+			"revision": "c120ca7ced6051261161ce15e8f1542a4b2567fc",
+			"revisionTime": "2021-02-06T19:00:08Z",
+			"version": "v0.7.7",
+			"versionExact": "v0.7.7"
+		},
+		{
+			"checksumSHA1": "XOO9W3/f/LCPm+WJcQzgZ19vUfU=",
+			"path": "github.com/mailru/easyjson/jlexer",
+			"revision": "c120ca7ced6051261161ce15e8f1542a4b2567fc",
+			"revisionTime": "2021-02-06T19:00:08Z",
+			"version": "v0.7.7",
+			"versionExact": "v0.7.7"
+		},
+		{
+			"checksumSHA1": "7sWHaHjECe6oXJnfBU6rHcC9wog=",
+			"path": "github.com/mailru/easyjson/jwriter",
+			"revision": "c120ca7ced6051261161ce15e8f1542a4b2567fc",
+			"revisionTime": "2021-02-06T19:00:08Z",
+			"version": "v0.7.7",
+			"versionExact": "v0.7.7"
 		},
 		{
 			"checksumSHA1": "qNkx9+OTwZI6aFv7K9zuFCGODUw=",
@@ -2484,5 +2522,5 @@
 			"revision": ""
 		}
 	],
-	"rootPath": "github.com/elastic/beats"
+	"rootPath": "beats"
 }
