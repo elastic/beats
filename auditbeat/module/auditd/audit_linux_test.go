@@ -72,7 +72,7 @@ var (
 )
 
 func TestImmutable(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -107,7 +107,7 @@ func TestImmutable(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -140,7 +140,7 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -259,7 +259,7 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -289,7 +289,7 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
