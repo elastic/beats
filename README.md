@@ -11,6 +11,7 @@ Provided packages:
 * `github.com/elastic/elastic-agent-libs/file` is responsible for rotating and writing input and output files.
 * `github.com/elastic/elastic-agent-libs/filewatcher` Watches files and notifies if they have been modified.
 * `github.com/elastic/elastic-agent-libs/keystore` interface for keystores and file keystore implementation.
+* `github.com/elastic/elastic-agent-libs/kibana` Exposes the Kibana API
 * `github.com/elastic/elastic-agent-libs/loader` Helpers for loading a main elastic-agent config file.
 * `github.com/elastic/elastic-agent-libs/logp/cfgwarn` provides logging utilities for warning users about deprecated settings.
 * `github.com/elastic/elastic-agent-libs/logp` is the well known logger from libbeat.

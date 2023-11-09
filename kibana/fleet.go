@@ -29,18 +29,19 @@ import (
 )
 
 const (
-	fleetAgentPoliciesAPI     = "/api/fleet/agent_policies"
-	fleetAgentPolicyAPI       = "/api/fleet/agent_policies/%s"
-	fleetAgentsDeleteAPI      = "/api/fleet/agent_policies/delete"
-	fleetEnrollmentAPIKeysAPI = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
-	fleetAgentsAPI            = "/api/fleet/agents"
-	fleetAgentAPI             = "/api/fleet/agents/%s"
-	fleetUnEnrollAgentAPI     = "/api/fleet/agents/%s/unenroll"
-	fleetUpgradeAgentAPI      = "/api/fleet/agents/%s/upgrade"
-	fleetFleetServerHostsAPI  = "/api/fleet/fleet_server_hosts"
-	fleetFleetServerHostAPI   = "/api/fleet/fleet_server_hosts/%s"
-	fleetPackagePoliciesAPI   = "/api/fleet/package_policies"
-	fleetUninstallTokensAPI   = "/api/fleet/uninstall_tokens" //nolint:gosec // NOT the "Potential hardcoded credentials"
+	fleetAgentAPI                = "/api/fleet/agents/%s"
+	fleetAgentPoliciesAPI        = "/api/fleet/agent_policies"
+	fleetAgentPolicyAPI          = "/api/fleet/agent_policies/%s"
+	fleetAgentsAPI               = "/api/fleet/agents"
+	fleetAgentsDeleteAPI         = "/api/fleet/agent_policies/delete"
+	fleetEnrollmentAPIKeysAPI    = "/api/fleet/enrollment_api_keys" //nolint:gosec // no API key being leaked here
+	fleetFleetServerHostAPI      = "/api/fleet/fleet_server_hosts/%s"
+	fleetFleetServerHostsAPI     = "/api/fleet/fleet_server_hosts"
+	fleetPackagePoliciesAPI      = "/api/fleet/package_policies"
+	fleetUnEnrollAgentAPI        = "/api/fleet/agents/%s/unenroll"
+	fleetUninstallTokensAPI      = "/api/fleet/uninstall_tokens" //nolint:gosec // NOT the "Potential hardcoded credentials"
+	fleetUpgradeAgentAPI         = "/api/fleet/agents/%s/upgrade"
+	fleetAgentDownloadSourcesAPI = "/api/fleet/agent_download_sources"
 )
 
 //
@@ -138,6 +139,49 @@ func (client *Client) CreatePolicy(ctx context.Context, request AgentPolicy) (r 
 	var polResp policyResp
 	err = readJSONResponse(resp, &polResp)
 	return polResp.Item, err
+}
+
+type DownloadSource struct {
+	Name      string      `json:"name"`
+	Host      string      `json:"host"`
+	IsDefault bool        `json:"is_default"`
+	ProxyID   interface{} `json:"proxy_id"`
+}
+
+func (client *Client) CreateDownloadSource(ctx context.Context, source DownloadSource) error {
+	reqBody, err := json.Marshal(source)
+	if err != nil {
+		return fmt.Errorf("unable to marshal DownloadSource into JSON: %w", err)
+	}
+
+	resp, err := client.Connection.SendWithContext(
+		ctx,
+		http.MethodPost,
+		fleetAgentDownloadSourcesAPI,
+		nil,
+		nil,
+		bytes.NewReader(reqBody))
+	if err != nil {
+		return fmt.Errorf("error calling Agent Binary Download Sources API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		var respBody string
+		if bs, err := io.ReadAll(resp.Body); err != nil {
+			respBody = "could not read repose body"
+		} else {
+			respBody = string(bs)
+		}
+
+		client.log.Errorw(
+			"could not create download source, kibana returned "+resp.Status,
+			"http.response.body.content", respBody)
+		return fmt.Errorf("could not create download source, kibana returned %s. response body: %s: %w",
+			resp.Status, respBody, err)
+	}
+
+	return nil
 }
 
 // GetPolicy returns the requested ID
