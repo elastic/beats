@@ -173,13 +173,17 @@ func (rt *LoggingRoundTripper) TxID() string {
 		return ""
 	}
 	count := rt.txIDCounter.Load()
-	return rt.txBaseID + "-" + strconv.FormatUint(count, 10)
+	return rt.formatTxID(count)
 }
 
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
 	count := rt.txIDCounter.Inc()
+	return rt.formatTxID(count)
+}
+
+func (rt *LoggingRoundTripper) formatTxID(count uint64) string {
 	return rt.txBaseID + "-" + strconv.FormatUint(count, 10)
 }
 
