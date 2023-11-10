@@ -88,7 +88,7 @@ func initAzureTestServer() *httptest.Server {
 }
 
 func TestRetrieveAzureMetadata(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	server := initAzureTestServer()
 	defer server.Close()

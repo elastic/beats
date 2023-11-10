@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -44,7 +45,7 @@ func TestData(t *testing.T) {
 	go func() {
 		time.Sleep(100 * time.Millisecond)
 		file := filepath.Join(dir, "file.data")
-		os.WriteFile(file, []byte("hello world"), 0o600)
+		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}()
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
@@ -113,8 +114,8 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	os.WriteFile(createdFilepath, []byte("hello world"), 0o600)
-	os.WriteFile(updatedFilepath, []byte("hello world"), 0o600)
+	require.NoError(t, os.WriteFile(createdFilepath, []byte("hello world"), 0o600))
+	require.NoError(t, os.WriteFile(updatedFilepath, []byte("hello world"), 0o600))
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
@@ -169,7 +170,7 @@ func TestExcludedFiles(t *testing.T) {
 	go func() {
 		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
 			file := filepath.Join(dir, f)
-			os.WriteFile(file, []byte("hello world"), 0o600)
+			_ = os.WriteFile(file, []byte("hello world"), 0o600)
 		}
 	}()
 
@@ -223,10 +224,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 
 	for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
 		file := filepath.Join(dir, f)
-		err := os.WriteFile(file, []byte("hello world"), 0o600)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
@@ -287,12 +285,15 @@ func TestErrorReporting(t *testing.T) {
 	ms := mbtest.NewPushMetricSetV2(t, config)
 
 	done := make(chan struct{}, 1)
+	ready := make(chan struct{}, 1)
 	go func() {
 		for {
-			f.WriteString("can't read this\n")
-			f.Sync()
+			_, err := f.WriteString("can't read this\n")
+			require.NoError(t, err)
+			require.NoError(t, f.Sync())
 			select {
 			case <-done:
+				close(ready)
 				return
 			default:
 				time.Sleep(time.Second / 10)
@@ -302,6 +303,7 @@ func TestErrorReporting(t *testing.T) {
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 10, ms)
 	close(done)
+	<-ready
 
 	getField := func(ev *mb.Event, field string) interface{} {
 		v, _ := ev.MetricSetFields.GetValue(field)
@@ -316,6 +318,7 @@ func TestErrorReporting(t *testing.T) {
 
 	var event *mb.Event
 	for idx, ev := range events {
+		ev := ev
 		t.Log("event[", idx, "] = ", ev)
 		if match(&ev) {
 			event = &ev

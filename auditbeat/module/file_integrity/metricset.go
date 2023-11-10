@@ -41,7 +41,7 @@ const (
 	namespace = "."
 )
 
-var underTest = false
+var underTest bool //nolint:unused // Used in Darwin-only builds.
 
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,

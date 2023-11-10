@@ -265,15 +265,14 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		err := logp.DevelopmentSetup(logp.ToObserverOutput())
-		require.NoError(t, err)
+		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
-		err = os.WriteFile(filename, nil, 0777)
+		err := os.WriteFile(filename, nil, 0777)
 		require.NoError(t, err)
 
 		t.Run("issues a warning in logs", func(t *testing.T) {
@@ -373,8 +372,7 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		err = logp.DevelopmentSetup(logp.ToObserverOutput())
-		require.NoError(t, err)
+		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
 

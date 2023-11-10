@@ -265,7 +265,7 @@ func parseConfig(t testing.TB, yaml string) (Config, error) {
 }
 
 func commands(rules []auditRule) []string {
-	var cmds []string
+	var cmds []string //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, r := range rules {
 		cmds = append(cmds, r.flags)
 	}
