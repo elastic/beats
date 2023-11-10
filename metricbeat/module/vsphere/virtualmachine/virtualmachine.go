@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -29,6 +30,7 @@ import (
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"
+	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25"
@@ -47,6 +49,7 @@ func init() {
 type MetricSet struct {
 	*vsphere.MetricSet
 	GetCustomFields bool
+	MetricLevel     int
 }
 
 // New creates a new instance of the MetricSet.
@@ -58,8 +61,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config := struct {
 		GetCustomFields bool `config:"get_custom_fields"`
+		MetricLevel     int  `config:"metric_level"`
 	}{
 		GetCustomFields: false,
+		MetricLevel:     1,
 	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -115,99 +120,191 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 	}()
 
+	r, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"ResourcePool"}, true)
+	if err != nil {
+		return fmt.Errorf("error in CreateContainerView: %w", err)
+	}
+
+	defer func() {
+		if err := r.Destroy(ctx); err != nil {
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+		}
+	}()
+
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "resourcePool"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
+	// Create a map to easily look up VM names by ID
+	vmMap := make(map[string]mo.VirtualMachine)
 	for _, vm := range vmt {
-		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
-		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
-		event := mapstr.M{
-			"name": vm.Summary.Config.Name,
-			"os":   vm.Summary.Config.GuestFullName,
-			"cpu": mapstr.M{
-				"used": mapstr.M{
-					"mhz": usedCPU,
+		vmMap[vm.Reference().Value] = vm
+	}
+
+	var vmsToQuery []types.ManagedObjectReference
+
+	for _, vm := range vmt {
+		vmsToQuery = append(vmsToQuery, vm.Reference())
+	}
+
+	// Retrieve all resource pools in the cluster for later mapping
+	var rps []mo.ResourcePool
+	err = r.Retrieve(ctx, []string{"ResourcePool"}, []string{"summary"}, &rps)
+	if err != nil {
+		return fmt.Errorf("error in Retrieve: %w", err)
+	}
+
+	// Create a map to easily look up resource pools by name
+	rpMap := make(map[string]mo.ResourcePool)
+	for _, rp := range rps {
+		rpMap[rp.Name] = rp
+	}
+
+	// Create a Performance Manager instance
+	perfManager := performance.NewManager(c)
+
+	// gets a counterInfo object that describes all available counters for virtualMachines
+	counterInfo, err := perfManager.CounterInfo(ctx)
+	if err != nil {
+		log.Fatalf("Error retrieving counter info: %v", err)
+	}
+
+	// Create a map to easily look up counter names by ID
+	counterMap := make(map[int32]string)
+	for _, counter := range counterInfo {
+		counterMap[counter.Key] = counter.Name()
+	}
+
+	querySpec := types.PerfQuerySpec{
+		IntervalId: 20, // this likely needs to be made into a variable to support other-than-realtime metrics but it's not clear how to define that in the config and map to this and Level correctly
+		MaxSample:  1,
+	}
+
+	// Create a slice to hold our query specifications for each VM
+	var metricsToQuery []string
+
+	// Iterate over the counterInfo slice
+	for _, counter := range counterInfo {
+		// Check if the counter is collected at a 20-second interval
+		if counter.Level == int32(m.MetricLevel) {
+			// Add the counter to the metricsToQuery slice
+			metricsToQuery = append(metricsToQuery, counter.Name())
+
+		}
+	}
+
+	// Perform the query for all VMs at once
+	metricBase, err := perfManager.SampleByName(ctx, querySpec, metricsToQuery, vmsToQuery)
+	if err != nil {
+		fmt.Printf("Error retrieving metrics: %s\n", err)
+		return nil // this probably needs to be a different error
+	}
+
+	// assign metrics to the event output
+	for _, base := range metricBase {
+		if metric, ok := base.(*types.PerfEntityMetric); ok {
+			virtualMachine := vmMap[metric.Entity.Value]
+			// resourcePool := rpMap[virtualMachine.ResourcePool.Value] // not sure why but the Summary field isn't allowing me to get Name even though the docs say it's there
+			event := mapstr.M{
+				"name": virtualMachine.Summary.Config.Name,
+				"os":   virtualMachine.Summary.Config.GuestFullName,
+				"uuid": virtualMachine.Summary.Config.InstanceUuid,
+				"id":   virtualMachine.Reference().Value,
+				"resource_pool": mapstr.M{
+					"id": virtualMachine.ResourcePool.Value,
 				},
-			},
-			"memory": mapstr.M{
-				"used": mapstr.M{
-					"guest": mapstr.M{
-						"bytes": usedMemory,
-					},
-					"host": mapstr.M{
-						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
-					},
+				"cpu": mapstr.M{
+					"reserved": virtualMachine.Summary.Config.CpuReservation,
+					"cores":    virtualMachine.Summary.Config.NumCpu,
 				},
-			},
-		}
-
-		totalCPU := vm.Summary.Config.CpuReservation
-		if totalCPU > 0 {
-			freeCPU := totalCPU - usedCPU
-			// Avoid negative values if reported used CPU is slightly over total configured.
-			if freeCPU < 0 {
-				freeCPU = 0
+				"disks": mapstr.M{
+					"count": virtualMachine.Summary.Config.NumVirtualDisks,
+				},
+				"storage": mapstr.M{
+					"committed":  virtualMachine.Summary.Storage.Committed,
+					"uncommited": virtualMachine.Summary.Storage.Uncommitted,
+					"total":      virtualMachine.Summary.Storage.Committed + virtualMachine.Summary.Storage.Uncommitted,
+				},
+				"heartbeat_status": virtualMachine.GuestHeartbeatStatus,
+				"connection_state": virtualMachine.Summary.Runtime.ConnectionState,
+				"memory": mapstr.M{
+					"overhead":   virtualMachine.Summary.Runtime.MemoryOverhead,
+					"total_size": virtualMachine.Summary.Config.MemorySizeMB,
+					"reserved":   virtualMachine.Summary.Config.MemoryReservation,
+				},
+				"power_state":                   virtualMachine.Summary.Runtime.PowerState,
+				"snapshot_consolidation_needed": virtualMachine.Summary.Runtime.ConsolidationNeeded,
+				"vmx_path":                      virtualMachine.Summary.Config.VmPathName,
 			}
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", freeCPU)
-		}
-
-		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
-		if totalMemory > 0 {
-			freeMemory := totalMemory - usedMemory
-			// Avoid negative values if reported used memory is slightly over total configured.
-			if freeMemory < 0 {
-				freeMemory = 0
-			}
-			event.Put("memory.total.guest.bytes", totalMemory)
-			event.Put("memory.free.guest.bytes", freeMemory)
-		}
-
-		if host := vm.Summary.Runtime.Host; host != nil {
-			event["host.id"] = host.Value
-			hostSystem, err := getHostSystem(ctx, c, host.Reference())
-			if err == nil {
-				event["host.hostname"] = hostSystem.Summary.Config.Name
-			} else {
-				m.Logger().Debug(err.Error())
-			}
-		} else {
-			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
-				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
-				"from host/guest")
-		}
-
-		// Get custom fields (attributes) values if get_custom_fields is true.
-		if m.GetCustomFields && vm.Summary.CustomValue != nil {
-			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
-
-			if len(customFields) > 0 {
-				event["custom_fields"] = customFields
-			}
-		} else {
-			m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
-				"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
-				"information returned from host/guest")
-		}
-
-		if vm.Summary.Vm != nil {
-			networkNames, err := getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
-			if err != nil {
-				m.Logger().Debug(err.Error())
-			} else {
-				if len(networkNames) > 0 {
-					event["network_names"] = networkNames
+			for _, value := range metric.Value {
+				switch series := value.(type) {
+				case *types.PerfMetricIntSeries:
+					counter := counterMap[series.Id.CounterId]
+					event.Put(counter, series.Value)
+				case *types.PerfMetricSeriesCSV:
+					counter := counterMap[series.Id.CounterId]
+					event.Put(counter, series.Value)
+				default:
+					m.Logger().Debug("Metric is of an unknown type, skipping")
 				}
 			}
-		}
 
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-		})
+			// Get host information for VM
+			if host := virtualMachine.Summary.Runtime.Host; host != nil {
+				event["host"] = mapstr.M{
+					"id": host.Value,
+				}
+				hostSystem, err := getHostSystem(ctx, c, host.Reference())
+				if err == nil {
+					event.Put("host.hostname", hostSystem.Summary.Config.Name)
+				} else {
+					m.Logger().Debug(err.Error())
+				}
+			} else {
+				m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
+					"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
+					"from host/guest")
+			}
+
+			// Get custom fields (attributes) values if get_custom_fields is true.
+			if m.GetCustomFields && virtualMachine.Summary.CustomValue != nil {
+				customFields := getCustomFields(virtualMachine.Summary.CustomValue, customFieldsMap)
+
+				if len(customFields) > 0 {
+					event["custom_fields"] = customFields
+				}
+			} else {
+				m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
+					"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
+					"information returned from host/guest")
+			}
+
+			if virtualMachine.Summary.Vm != nil {
+				networkNames, err := getNetworkNames(ctx, c, virtualMachine.Summary.Vm.Reference())
+				if err != nil {
+					m.Logger().Debug(err.Error())
+				} else {
+					if len(networkNames) > 0 {
+						event["network_names"] = networkNames
+					}
+				}
+			}
+
+			if virtualMachine.Datastore != nil {
+				var datastoreIds []string
+				for _, datastore := range virtualMachine.Datastore {
+					datastoreIds = append(datastoreIds, datastore.Value)
+				}
+				event["datastore.id"] = datastoreIds
+			}
+
+			reporter.Event(mb.Event{
+				MetricSetFields: event,
+			})
+		}
 	}
 
 	return nil
