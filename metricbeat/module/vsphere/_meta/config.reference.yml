@@ -1,7 +1,9 @@
 - module: vsphere
   enabled: true
   metricsets: ["datastore", "host", "virtualmachine"]
-  period: 10s
+  # real-time stats are updated in vsphere every 20 seconds and are available at metric level 1 for vms and hosts:
+  # datastores are updated on the vsphere side every 5 minutes by default and shorter query times may compromise performance
+  period: 20s
   hosts: ["https://localhost/sdk"]
 
   username: "user"
@@ -10,3 +12,7 @@
   insecure: false
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
+  # Set a maximum query size when retrieving objects, this is typically 256 on vmvsphere 6.5 and later, default 256
+  # max_query_size: 256
+  # Set a maximum metric level to obtain, between 1 and 4, lower numbers are more granular, any number higher than one will hit the database rather than in-memory stats
+  # metric_level: 1
