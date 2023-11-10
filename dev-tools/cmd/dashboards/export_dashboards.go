@@ -138,7 +138,7 @@ func exportDashboardsFromYML(client *kibana.Client, ymlFile string) error {
 func exportSingleDashboard(client *kibana.Client, dashboard, folder string) error {
 	result, err := dashboards.Export(client, dashboard)
 	if err != nil {
-		return fmt.Errorf("failed to export the dashboard: %+v", err)
+		return fmt.Errorf("failed to export the dashboard: %w", err)
 	}
 	result = dashboards.DecodeExported(result)
 	return dashboards.SaveToFolder(result, folder, client.GetVersion())
