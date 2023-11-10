@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "User  Management Events - Description [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "# **User Management Events**\n\n#### This dashboard shows information about User Management Events collected by winlogbeat\n",
+                "openLinksInNewTab": false
+            },
+            "title": "User  Management Events - Description [Winlogbeat Security]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:05.336Z",
+    "id": "2dc6b820-b9e8-11e9-b6a2-c9b4015c4baf",
+    "managed": false,
+    "references": [],
+    "type": "visualization",
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:05.336Z",
+    "version": "WzIzOSwxXQ=="
+}

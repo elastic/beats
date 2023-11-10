@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var (
@@ -42,6 +43,7 @@ const (
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
+	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "", "Output NDJSON file, when exporting dashboards for Beats, please use -folder instead")
@@ -71,6 +73,9 @@ func main() {
 	}
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
+	if *insecure {
+		transport.TLS = &tlscommon.Config{VerificationMode: tlscommon.VerifyNone}
+	}
 
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol:  u.Scheme,
