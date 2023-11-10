@@ -50,6 +50,7 @@ type MetricSet struct {
 	*vsphere.MetricSet
 	GetCustomFields bool
 	MetricLevel     int
+	MaxQuerySize    int
 }
 
 // New creates a new instance of the MetricSet.
@@ -62,9 +63,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		GetCustomFields bool `config:"get_custom_fields"`
 		MetricLevel     int  `config:"metric_level"`
+		MaxQuerySize    int  `config:"max_query_size"`
 	}{
 		GetCustomFields: false,
 		MetricLevel:     1,
+		MaxQuerySize:    256,
 	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -73,6 +76,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		MetricSet:       ms,
 		GetCustomFields: config.GetCustomFields,
+		MetricLevel:     config.MetricLevel,
+		MaxQuerySize:    config.MaxQuerySize,
 	}, nil
 }
 
