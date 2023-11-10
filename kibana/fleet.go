@@ -169,7 +169,7 @@ func (client *Client) CreateDownloadSource(ctx context.Context, source DownloadS
 	if resp.StatusCode != http.StatusOK {
 		var respBody string
 		if bs, err := io.ReadAll(resp.Body); err != nil {
-			respBody = "could not read repose body"
+			respBody = "could not read response body"
 		} else {
 			respBody = string(bs)
 		}
