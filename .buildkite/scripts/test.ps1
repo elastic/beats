@@ -8,16 +8,6 @@ function fixCRLF {
     git reset --quiet --hard
 }
 
-function withGolang($version) {
-    Write-Host "-- Install golang --"
-    choco install -y golang --version $version
-    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
-    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    refreshenv
-    go version
-    go env
-}
-
 function withGoJUnitReport {
     Write-Host "-- Install go-junit-report --"
     go install github.com/jstemmer/go-junit-report/v2@latest
@@ -25,7 +15,6 @@ function withGoJUnitReport {
 
 Write-Host "--- Prepare enviroment"
 fixCRLF
-withGolang $env:GO_VERSION
 withGoJUnitReport
 
 Write-Host "--- Run test"
