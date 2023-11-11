@@ -288,7 +288,7 @@ The default method is `POST`. If `PUT` or `PATCH` are specified, requests using 
 [float]
 ==== `tracer.filename`
 
-It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations.
+It is possible to log HTTP requests to a local file-system for debugging configurations.
 This option is enabled by setting the `tracer.filename` value. Additional options are available to
 tune log rotation behavior.
 

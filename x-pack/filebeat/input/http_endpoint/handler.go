@@ -10,10 +10,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"time"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -50,13 +52,10 @@ type handler struct {
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if status, err := h.validator.validateRequest(r); err != nil {
-		sendAPIErrorResponse(w, r, h.log, status, err)
+	status, err := h.validator.validateRequest(r)
+	if err != nil {
+		h.sendAPIErrorResponse(w, r, h.log, status, err)
 		return
-	}
-
-	if h.reqLogger != nil {
-		h.logRequest(r)
 	}
 
 	start := time.Now()
@@ -64,21 +63,32 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.metrics.contentLength.Update(r.ContentLength)
 	body, status, err := getBodyReader(r)
 	if err != nil {
-		sendAPIErrorResponse(w, r, h.log, status, err)
+		h.sendAPIErrorResponse(w, r, h.log, status, err)
 		h.metrics.apiErrors.Add(1)
 		return
 	}
 	defer body.Close()
 
+	if h.reqLogger != nil {
+		// If we are logging, keep a copy of the body for the logger.
+		// This is stashed in the r.Body field. This is only safe
+		// because we are closing the original body in a defer and
+		// r.Body is not otherwise referenced by the non-logging logic
+		// after the call to getBodyReader above.
+		var buf bytes.Buffer
+		body = io.NopCloser(io.TeeReader(body, &buf))
+		r.Body = io.NopCloser(&buf)
+	}
+
 	objs, _, status, err := httpReadJSON(body)
 	if err != nil {
-		sendAPIErrorResponse(w, r, h.log, status, err)
+		h.sendAPIErrorResponse(w, r, h.log, status, err)
 		h.metrics.apiErrors.Add(1)
 		return
 	}
 
 	var headers map[string]interface{}
-	if len(h.includeHeaders) > 0 {
+	if len(h.includeHeaders) != 0 {
 		headers = getIncludedHeaders(r, h.includeHeaders)
 	}
 
@@ -97,14 +107,14 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			} else if !errors.Is(err, errNotCRC) {
 				h.metrics.apiErrors.Add(1)
-				sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
+				h.sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
 				return
 			}
 		}
 
 		if err = h.publishEvent(obj, headers); err != nil {
 			h.metrics.apiErrors.Add(1)
-			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			h.sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
 		h.metrics.eventsPublished.Add(1)
@@ -112,11 +122,36 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.sendResponse(w, respCode, respBody)
+	if h.reqLogger != nil {
+		h.logRequest(r, respCode, nil)
+	}
 	h.metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 	h.metrics.batchesPublished.Add(1)
 }
 
-func (h *handler) logRequest(r *http.Request) {
+func (h *handler) sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	var (
+		mw  io.Writer = w
+		buf bytes.Buffer
+	)
+	if h.reqLogger != nil {
+		mw = io.MultiWriter(mw, &buf)
+	}
+	enc := json.NewEncoder(mw)
+	enc.SetEscapeHTML(false)
+	err := enc.Encode(map[string]interface{}{"message": apiError.Error()})
+	if err != nil {
+		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
+	}
+	if h.reqLogger != nil {
+		h.logRequest(r, status, buf.Bytes())
+	}
+}
+
+func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
 	// Populate and preserve scheme and host if they are missing;
 	// they are required for httputil.DumpRequestOut.
 	var scheme, host string
@@ -128,23 +163,26 @@ func (h *handler) logRequest(r *http.Request) {
 		host = r.URL.Host
 		r.URL.Host = h.host
 	}
-	httplog.LogRequest(h.reqLogger, r)
+	extra := make([]zapcore.Field, 1, 4)
+	extra[0] = zap.Int("status", status)
+	addr, port, err := net.SplitHostPort(r.RemoteAddr)
+	if err == nil {
+		extra = append(extra,
+			zap.String("source.ip", addr),
+			zap.String("source.port", port),
+		)
+	}
+	if len(respBody) != 0 {
+		extra = append(extra,
+			zap.ByteString("http.response.body.content", respBody),
+		)
+	}
+	httplog.LogRequest(h.reqLogger, r, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
 	if host != "" {
 		r.URL.Host = host
-	}
-}
-
-func sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
-
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	if err := enc.Encode(map[string]interface{}{"message": apiError.Error()}); err != nil {
-		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
 	}
 }
 

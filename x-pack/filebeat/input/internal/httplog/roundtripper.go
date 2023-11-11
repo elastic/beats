@@ -146,13 +146,15 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 //	http.request.body.bytes
 //	http.request.mime_type
 //	event.original (the request without body from httputil.DumpRequestOut)
-func LogRequest(log *zap.Logger, req *http.Request) *http.Request {
-	req, _, _ = logRequest(log, req)
+//
+// Additional fields in extra will also be logged.
+func LogRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) *http.Request {
+	req, _, _ = logRequest(log, req, extra...)
 	return req
 }
 
-func logRequest(log *zap.Logger, req *http.Request) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
-	reqParts := []zapcore.Field{
+func logRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+	reqParts := append([]zapcore.Field{
 		zap.String("url.original", req.URL.String()),
 		zap.String("url.scheme", req.URL.Scheme),
 		zap.String("url.path", req.URL.Path),
@@ -161,7 +163,8 @@ func logRequest(log *zap.Logger, req *http.Request) (_ *http.Request, parts []za
 		zap.String("url.query", req.URL.RawQuery),
 		zap.String("http.request.method", req.Method),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
-	}
+	}, extra...)
+
 	var (
 		body []byte
 		err  error
