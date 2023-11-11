@@ -132,7 +132,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, err := newClient(ctx, cfg, log)
+	client, trace, err := newClient(ctx, cfg, log)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
 	if err != nil {
 		return err
 	}
@@ -227,6 +227,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			// Process a set of event requests.
+			if trace != nil {
+				log.Debugw("previous transaction", "transaction.id", trace.TxID())
+			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now()
@@ -240,6 +243,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				log.Errorw("failed evaluation", "error", err)
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
+			if trace != nil {
+				log.Debugw("final transaction", "transaction.id", trace.TxID())
+			}
 
 			// On exit, state is expected to be in the shape:
 			//
@@ -680,13 +686,13 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	return limit, true
 }
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
-		return nil, nil
+		return nil, nil, nil
 	}
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if cfg.Auth.Digest.isEnabled() {
@@ -702,6 +708,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		}
 	}
 
+	var trace *httplog.LoggingRoundTripper
 	if cfg.Resource.Tracer != nil {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
@@ -716,7 +723,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		)
 		traceLogger := zap.New(core)
 
-		c.Transport = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+		c.Transport = trace
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -736,12 +744,12 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	if cfg.Auth.OAuth2.isEnabled() {
 		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return authClient, nil
+		return authClient, trace, nil
 	}
 
-	return c, nil
+	return c, trace, nil
 }
 
 func wantClient(cfg config) bool {
@@ -877,7 +885,7 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -891,7 +899,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
-		lib.Debug(debug(log)),
+		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
 		lib.Regexp(patterns),
@@ -923,14 +931,18 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 	return prg, nil
 }
 
-func debug(log *logp.Logger) func(string, any) {
+func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, any) {
 	log = log.Named("cel_debug")
 	return func(tag string, value any) {
 		level := "DEBUG"
 		if _, ok := value.(error); ok {
 			level = "ERROR"
 		}
-		log.Debugw(level, "tag", tag, "value", value)
+		if trace == nil {
+			log.Debugw(level, "tag", tag, "value", value)
+		} else {
+			log.Debugw(level, "tag", tag, "value", value, "transaction.id", trace.TxID())
+		}
 	}
 }
 

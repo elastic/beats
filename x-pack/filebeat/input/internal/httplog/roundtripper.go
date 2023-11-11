@@ -167,10 +167,23 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	return resp, err
 }
 
+// TxID returns the current transaction.id value. If rt is nil, the empty string is returned.
+func (rt *LoggingRoundTripper) TxID() string {
+	if rt == nil {
+		return ""
+	}
+	count := rt.txIDCounter.Load()
+	return rt.formatTxID(count)
+}
+
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
 	count := rt.txIDCounter.Inc()
+	return rt.formatTxID(count)
+}
+
+func (rt *LoggingRoundTripper) formatTxID(count uint64) string {
 	return rt.txBaseID + "-" + strconv.FormatUint(count, 10)
 }
 
