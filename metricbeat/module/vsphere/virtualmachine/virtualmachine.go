@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/property"
@@ -51,6 +52,8 @@ type MetricSet struct {
 	GetCustomFields bool
 	MetricLevel     int
 	MaxQuerySize    int
+	ResourcePools   []string
+	DataCenters     []string
 }
 
 // New creates a new instance of the MetricSet.
@@ -61,13 +64,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	config := struct {
-		GetCustomFields bool `config:"get_custom_fields"`
-		MetricLevel     int  `config:"metric_level"`
-		MaxQuerySize    int  `config:"max_query_size"`
+		GetCustomFields bool     `config:"get_custom_fields"`
+		MetricLevel     int      `config:"metric_level"`
+		MaxQuerySize    int      `config:"max_query_size"`
+		ResourcePools   []string `config:"resource_pools"`
+		DataCenters     []string `config:"data_centers"`
 	}{
 		GetCustomFields: false,
 		MetricLevel:     1,
 		MaxQuerySize:    256,
+		ResourcePools:   nil,
+		DataCenters:     nil,
 	}
 
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -78,6 +85,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		GetCustomFields: config.GetCustomFields,
 		MetricLevel:     config.MetricLevel,
 		MaxQuerySize:    config.MaxQuerySize,
+		ResourcePools:   config.ResourcePools,
+		DataCenters:     config.DataCenters,
 	}, nil
 }
 
@@ -114,58 +123,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Create view of VirtualMachine objects
 	mgr := view.NewManager(c)
 
-	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
+	rpMap, err := m.getResourcePoolMap(ctx, c, mgr)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView: %w", err)
+		return fmt.Errorf("error getting Resource Pool Map: %w", err)
 	}
-
-	defer func() {
-		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
-		}
-	}()
-
-	r, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"ResourcePool"}, true)
-	if err != nil {
-		return fmt.Errorf("error in CreateContainerView: %w", err)
-	}
-
-	defer func() {
-		if err := r.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
-		}
-	}()
-
-	// Retrieve summary property for all machines
-	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "resourcePool"}, &vmt)
-	if err != nil {
-		return fmt.Errorf("error in Retrieve: %w", err)
-	}
-
-	// Create a map to easily look up VM names by ID
-	vmMap := make(map[string]mo.VirtualMachine)
-	for _, vm := range vmt {
-		vmMap[vm.Reference().Value] = vm
-	}
-
-	var vmsToQuery []types.ManagedObjectReference
-
-	for _, vm := range vmt {
-		vmsToQuery = append(vmsToQuery, vm.Reference())
-	}
-
-	// Retrieve all resource pools in the cluster for later mapping
-	var rps []mo.ResourcePool
-	err = r.Retrieve(ctx, []string{"ResourcePool"}, []string{"summary"}, &rps)
-	if err != nil {
-		return fmt.Errorf("error in Retrieve: %w", err)
-	}
-
-	// Create a map to easily look up resource pools by name
-	rpMap := make(map[string]mo.ResourcePool)
-	for _, rp := range rps {
-		rpMap[rp.Name] = rp
+	var rpList []string
+	for _, rp := range rpMap {
+		rpList = append(rpList, rp.ref.Value)
 	}
 
 	// Create a Performance Manager instance
@@ -201,7 +165,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 	}
 
-	vmChunks := splitIntoChunks(vmsToQuery, m.MaxQuerySize)
+	vmList, err := m.getVirtualMachineList(ctx, c, mgr, rpList)
+	if err != nil {
+		return fmt.Errorf("error getting Virtual Machine List: %w", err)
+	}
+
+	vmChunks := m.getVmChunks(vmList)
+	vmMap := getVmMap(vmList)
 
 	for _, chunk := range vmChunks {
 		// Perform the query for all VMs at once
@@ -214,8 +184,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		// assign metrics to the event output
 		for _, base := range metricBase {
 			if metric, ok := base.(*types.PerfEntityMetric); ok {
+
+				// build initial even tobject with static values
 				virtualMachine := vmMap[metric.Entity.Value]
-				// resourcePool := rpMap[virtualMachine.ResourcePool.Value] // not sure why but the Summary field isn't allowing me to get Name even though the docs say it's there
 				event := mapstr.M{
 					"name": virtualMachine.Summary.Config.Name,
 					"os":   virtualMachine.Summary.Config.GuestFullName,
@@ -247,6 +218,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 					"snapshot_consolidation_needed": virtualMachine.Summary.Runtime.ConsolidationNeeded,
 					"vmx_path":                      virtualMachine.Summary.Config.VmPathName,
 				}
+
+				// add mapped values
+				resourcePool := rpMap[virtualMachine.ResourcePool.Value]
+				event.Put("resource_pool.name", resourcePool.Name)
+				event.Put("resource_pool.path", resourcePool.InventoryPath)
+
 				for _, value := range metric.Value {
 					switch series := value.(type) {
 					case *types.PerfMetricIntSeries:
@@ -424,4 +401,169 @@ func splitIntoChunks(slice []types.ManagedObjectReference, n int) [][]types.Mana
 	}
 
 	return chunks
+}
+
+func getVmFilter(pools []types.ManagedObjectReference) property.Filter {
+	return property.Filter{"resourcePool": pools}
+}
+
+func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, mgr *view.Manager, includedPools []string) ([]mo.VirtualMachine, error) {
+
+	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
+	if err != nil {
+		return nil, fmt.Errorf("error in CreateContainerView: %w", err)
+	}
+
+	defer func() {
+		if err := v.Destroy(ctx); err != nil {
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+		}
+	}()
+
+	var vmt []mo.VirtualMachine
+
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "config", "resourcePool"}, &vmt)
+	if err != nil {
+		return nil, fmt.Errorf("error in Retrieve: %w", err)
+	}
+
+	// skip filtering the list if no pools are specified
+	if m.ResourcePools == nil && m.DataCenters == nil {
+		return vmt, nil
+	}
+
+	var vms []mo.VirtualMachine
+	for _, vm := range vmt {
+		if vm.ResourcePool != nil {
+			m.Logger().Debugf("vm %s has rpool %s", vm.Summary.Config.Name, vm.ResourcePool.Value)
+			if contains(includedPools, vm.ResourcePool.Value) {
+				m.Logger().Debugf("adding vm %s", vm.Summary.Config.Name)
+				vms = append(vms, vm)
+			}
+		} else {
+			m.Logger().Warnf("failed to get resource pool info for: %s as there is no rpool reference, skipping", vm.Summary.Config.Name)
+		}
+	}
+
+	return vms, nil
+
+}
+
+func (m *MetricSet) getVmChunks(vms []mo.VirtualMachine) [][]types.ManagedObjectReference {
+	var vmsToQuery []types.ManagedObjectReference
+
+	for _, vm := range vms {
+		vmsToQuery = append(vmsToQuery, vm.Reference())
+	}
+	vmChunks := splitIntoChunks(vmsToQuery, m.MaxQuerySize)
+	return vmChunks
+}
+
+func getVmMap(vms []mo.VirtualMachine) map[string]mo.VirtualMachine {
+	vmMap := make(map[string]mo.VirtualMachine)
+	for _, vm := range vms {
+		vmMap[vm.Reference().Value] = vm
+	}
+	return vmMap
+}
+
+type resourcePoolInfo struct {
+	InventoryPath string
+	Name          string
+	ref           types.ManagedObjectReference
+}
+
+func (m *MetricSet) getResourcePoolMap(ctx context.Context, c *vim25.Client, mgr *view.Manager) (map[string]resourcePoolInfo, error) {
+	// Create a single ContainerView for ResourcePool types
+	r, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"ResourcePool"}, true)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Destroy(ctx) // Simplified error handling, as the error is not critical
+
+	// Retrieve all resource pools in the cluster for later mapping
+	var rps []mo.ResourcePool
+	err = r.Retrieve(ctx, []string{"ResourcePool"}, []string{"summary"}, &rps)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a map to easily look up resource pools by reference
+	rpMap := make(map[string]resourcePoolInfo, len(rps))
+	for _, rp := range rps {
+		summary := rp.Summary.GetResourcePoolSummary()
+		rpInfo := resourcePoolInfo{
+			InventoryPath: "", // Placeholder, as we don't have the InventoryPath directly
+			Name:          summary.Name,
+		}
+		rpMap[rp.Reference().Value] = rpInfo
+	}
+
+	// Now, we need to fill in the InventoryPath for each resource pool
+	finder := find.NewFinder(c, false)
+	dcList, err := finder.DatacenterList(ctx, "*")
+	if err != nil {
+		return nil, err
+	}
+	for _, dc := range dcList {
+		if m.DataCenters != nil && !contains(m.DataCenters, dc.Name()) {
+			continue
+		}
+		finder.SetDatacenter(dc)
+		pools, err := finder.ResourcePoolList(ctx, "*")
+		if err != nil {
+			return nil, fmt.Errorf("unable to find resource pools for %s due to %w", dc.Name(), err)
+		}
+		for _, pool := range pools {
+			if m.ResourcePools != nil && !contains(m.ResourcePools, pool.InventoryPath) {
+				m.Logger().Debugf("skipping resource pool %s as it is not in the list of included resource pools", pool.InventoryPath)
+				continue
+			}
+			if rpInfo, exists := rpMap[pool.Reference().Value]; exists {
+				rpInfo.InventoryPath = pool.InventoryPath
+				rpInfo.ref = pool.Reference()
+				rpMap[pool.Reference().Value] = rpInfo // Update the map with the InventoryPath
+			}
+		}
+	}
+
+	m.Logger().Info("retrieved resource pool list")
+	return rpMap, nil
+}
+
+// this is currently unused since it's a very expensive call, but if we could cache it it would be nice to have
+func getVMInventoryPath(ctx context.Context, c *vim25.Client, vm mo.VirtualMachine) (string, error) {
+	// Create a property collector
+	pc := property.DefaultCollector(c)
+
+	// Traverse up the inventory tree to construct the full path
+	var pathElements []string
+	ref := vm.Reference()
+	for ref.Type != "Datacenter" {
+		var entity mo.ManagedEntity
+		err := pc.RetrieveOne(ctx, ref, []string{"name", "parent"}, &entity)
+		if err != nil {
+			return "", err
+		}
+		pathElements = append([]string{entity.Name}, pathElements...)
+		if entity.Parent == nil {
+			break
+		}
+		ref = *entity.Parent
+	}
+
+	// Join the path elements
+	inventoryPath := "/" + strings.Join(pathElements, "/")
+
+	return inventoryPath, nil
+}
+
+// contains checks if a slice contains a specific element.
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
