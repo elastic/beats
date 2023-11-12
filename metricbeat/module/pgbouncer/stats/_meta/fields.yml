@@ -1,0 +1,68 @@
+- name: stats
+  type: group
+  description: >
+    One document per server process, showing information related to the current
+    activity of that process, such as state and current query. Collected by
+    querying stats.
+  release: ga
+  fields:
+    - name: database
+      type: keyword
+      description: >
+        Name of the database this backend is connected to.
+    - name: total_query_count
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: total_received
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: total_sent
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: total_xact_time
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: total_query_time
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: total_wait_time
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: total_xact_count
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_xact_count
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_query_count
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_recv
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_sent
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_xact_time
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_query_time
+      type: long
+      description: >
+        OID of the database this backend is connected to.
+    - name: avg_wait_time
+      type: long
+      description: >
+        OID of the database this backend is connected to.
