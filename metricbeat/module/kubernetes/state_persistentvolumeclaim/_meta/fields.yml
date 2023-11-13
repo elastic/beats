@@ -22,7 +22,7 @@
     - name: storage_class
       type: keyword
       description: Storage class for the PVC.
-    - name: created.sec
-      type: double
-      description: Epoch seconds since the persistent volume claim was created
+    - name: created
+      type: date
+      description: PersistentVolumeClaim creation date
 

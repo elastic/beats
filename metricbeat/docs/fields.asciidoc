@@ -46374,12 +46374,12 @@ type: keyword
 
 --
 
-*`kubernetes.persistentvolumeclaim.created.sec`*::
+*`kubernetes.persistentvolumeclaim.created`*::
 +
 --
-Epoch seconds since the persistent volume claim was created
+PersistentVolumeClaim creation date
 
-type: double
+type: date
 
 --
 
