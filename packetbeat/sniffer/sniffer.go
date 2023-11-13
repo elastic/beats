@@ -90,19 +90,24 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		log:      logp.NewLogger("sniffer"),
 	}
 
 	for i, iface := range interfaces {
+		dec, ok := decoders[iface.Device]
+		if !ok {
+			// This should never happen.
+			return nil, fmt.Errorf("no decoder for %s", iface.Device)
+		}
 		child := sniffer{
 			state:         atomic.MakeInt32(snifferInactive),
 			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
 			id:            id,
 			idx:           i,
-			decoders:      decoders,
+			decoders:      dec,
 			log:           s.log,
 		}
 

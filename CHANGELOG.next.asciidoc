@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
+- Fix memqueue producer blocking indefinitely even after being cancelled {issue}22813[22813] {pull}37077[37077]
 
 *Auditbeat*
 
@@ -87,6 +88,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
 - Fix merging of array fields(processors, paths, parsers) in configurations generated from hints and default config. {issue}36838[36838] {pull}36857[36857]
 - Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
+- Do not error when Okta API returns no data. {pull}37092[37092]
+- Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
 
 *Heartbeat*
 
@@ -201,6 +204,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Use filestream input with file_identity.fingerprint as default for hints autodiscover. {issue}35984[35984] {pull}36950[36950]
 - Add network processor in addition to interface based direction resolution. {pull}37023[37023]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
+- Make CEL input log current transaction ID when request tracing is turned on. {pull}37065[37065]
+- Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
 
 *Auditbeat*
 
@@ -230,6 +235,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Packetbeat*
 
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
 
 *Packetbeat*
 
