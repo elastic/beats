@@ -43,10 +43,7 @@ func (r *pooledGzipReader) Read(b []byte) (int, error) {
 // After this call the reader should not be reused because it is returned to the pool.
 func (r *pooledGzipReader) Close() error {
 	err := r.Reader.Close()
-	_err := r.closer.Close()
-	if err == nil {
-		err = errors.Join(err, _err)
-	}
+	err = errors.Join(err, r.closer.Close())
 	gzipDecoderPool.Put(r.Reader)
 	r.Reader = nil
 	return err
