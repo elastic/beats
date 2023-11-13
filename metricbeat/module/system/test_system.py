@@ -422,6 +422,13 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             process = evt["system"]["process"]
             found_cmdline |= "cmdline" in process
+            if not found_cmdline:
+                try:
+                    print("ProcessName: ", evt['process']['pid'])
+                    print("ProcessName: ", evt['process']['name'])
+                    print("ProcessArgs: ", evt['process']['args'])
+                except Exception:
+                    print(">>>>>>>>>>>>>>>>>>>> did not find pid, name or args for process")
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
             process.pop("env", None)
