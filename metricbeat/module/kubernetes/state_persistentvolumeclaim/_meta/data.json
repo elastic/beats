@@ -9,6 +9,9 @@
         "namespace": "default",
         "persistentvolumeclaim": {
             "access_mode": "ReadWriteOnce",
+            "created": {
+                "sec": 1698751160
+            },
             "name": "task-pv-claim",
             "phase": "Bound",
             "request_storage": {

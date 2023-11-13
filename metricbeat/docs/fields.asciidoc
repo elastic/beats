@@ -46316,7 +46316,7 @@ type: keyword
 [float]
 === persistentvolumeclaim
 
-kubernetes persistent volume clame metrics from kube-state-metrics
+kubernetes persistent volume claim metrics from kube-state-metrics
 
 
 
@@ -46371,6 +46371,15 @@ type: keyword
 Storage class for the PVC.
 
 type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.created.sec`*::
++
+--
+Epoch seconds since the persistent volume claim was created
+
+type: double
 
 --
 

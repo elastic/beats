@@ -6,6 +6,9 @@
 		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
+            "created": {
+                "sec": 1691568402
+            },
 			"name": "task-pv-claim",
 			"phase": "Bound",
 			"request_storage": {
