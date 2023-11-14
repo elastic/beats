@@ -124,6 +124,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix dashboards under Kibana 8.x. {issue}37080[37080] {pull}37085[37085]
+
 
 *Elastic Logging Plugin*
 
@@ -288,6 +290,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
