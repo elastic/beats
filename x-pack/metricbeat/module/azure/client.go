@@ -181,18 +181,14 @@ func (client *Client) GetMetricValues(metrics []Metric, reporter mb.ReporterV2) 
 
 	// Same end time for all metrics in the same batch.
 	referenceTime := time.Now().UTC()
+	interval := client.Config.Period
+
+	// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
+	endTime := referenceTime.Add(interval * (-1))
+	startTime := endTime.Add(interval * (-1))
+	timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 	for _, metric := range metrics {
-		interval := client.Config.Period
-
-		// copy the reference time
-		endTime := referenceTime
-
-		// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-		endTime = endTime.Add(interval * (-1))
-		startTime := endTime.Add(interval * (-1))
-		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.
@@ -240,40 +236,42 @@ func (client *Client) GetMetricValues(metrics []Metric, reporter mb.ReporterV2) 
 			err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metric.ResourceSubId, metric.Namespace, err)
 			client.Log.Error(err)
 			reporter.Error(err)
-		} else {
 
-			// Update the metric registry with the latest timestamp and
-			// time grain for each metric.
-			//
-			// We track the time grain Azure used for this metric values from
-			// the API response.
-			client.MetricRegistry.Update(metric, MetricCollectionInfo{
-				timeGrain: timeGrain,
-				timestamp: referenceTime,
-			})
+			// Skip this metric and continue with the next one.
+			break
+		}
 
-			for i, currentMetric := range client.ResourceConfigurations.Metrics {
-				if matchMetrics(currentMetric, metric) {
-					// Map the metric values from the API response.
-					current := mapMetricValues(resp, currentMetric.Values)
-					client.ResourceConfigurations.Metrics[i].Values = current
+		// Update the metric registry with the latest timestamp and
+		// time grain for each metric.
+		//
+		// We track the time grain Azure used for this metric values from
+		// the API response.
+		client.MetricRegistry.Update(metric, MetricCollectionInfo{
+			timeGrain: timeGrain,
+			timestamp: referenceTime,
+		})
 
-					// Some predefined metricsets configuration do not have a time grain.
-					// Here is an example:
-					// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
-					//
-					// Predefined metricsets sometimes have long lists of metrics
-					// with no time grains. Or users can configure their own
-					// custom metricsets with no time grain.
-					//
-					// In this case, we track the time grain returned by the API. Azure
-					// provides a default time grain for each metric.
-					if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
-						client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
-					}
+		for i, currentMetric := range client.ResourceConfigurations.Metrics {
+			if matchMetrics(currentMetric, metric) {
+				// Map the metric values from the API response.
+				current := mapMetricValues(resp, currentMetric.Values)
+				client.ResourceConfigurations.Metrics[i].Values = current
 
-					result = append(result, client.ResourceConfigurations.Metrics[i])
+				// Some predefined metricsets configuration do not have a time grain.
+				// Here is an example:
+				// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
+				//
+				// Predefined metricsets sometimes have long lists of metrics
+				// with no time grains. Or users can configure their own
+				// custom metricsets with no time grain.
+				//
+				// In this case, we track the time grain returned by the API. Azure
+				// provides a default time grain for each metric.
+				if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
+					client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
 				}
+
+				result = append(result, client.ResourceConfigurations.Metrics[i])
 			}
 		}
 	}
