@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.11.0\...v8.11.1[View commits]
 
 *Affecting all Beats*
 
-- Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- Setting environmental variable ELASTIC_NETINFO:false will disable the netinfo.enabled option of add_host_metadata processor.
 
 
 [[release-notes-8.11.0]]
