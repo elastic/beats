@@ -47,7 +47,8 @@ func TestPacketGetUpdate(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	testTrack.Track(ctx)
+	err := testTrack.Track(ctx)
+	require.NoError(t, err)
 
 	testTrack.Update(40, applayer.TransportTCP, &common.ProcessTuple{Src: common.Process{PID: 11}})
 
@@ -174,7 +175,8 @@ func TestPacketUpdates(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 			defer cancel()
 
-			testTrack.Track(ctx)
+			err := testTrack.Track(ctx)
+			require.NoError(t, err)
 
 			for _, input := range testCase.inputs {
 
