@@ -15,28 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration_dev
+//go:build !linux
 
 package network
 
 import (
 	"context"
-	"testing"
-	"time"
+	"errors"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
-func TestNetworkTrack(t *testing.T) {
-	_ = logp.DevelopmentSetup(logp.WithLevel(logp.InfoLevel))
-	tracker, err := NewNetworkTracker()
-	require.NoError(t, err)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
-	defer cancel()
-
-	tracker.Track(ctx)
-
-	time.Sleep(time.Minute * 10)
+func StartPacketHandle(ctx context.Context, watcher *procs.ProcessesWatcher, procTracker *Tracker) error {
+	return errors.New("packet monitoring is only available on Linux")
 }
