@@ -43,7 +43,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 
 *Packetbeat*
 
@@ -61,8 +60,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 
-- Upgrade to Go 1.20.10. {pull}36846[36846]
-- Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 
 *Auditbeat*
 
@@ -109,6 +106,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
