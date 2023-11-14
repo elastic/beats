@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Upgrade to osquery 5.10.2. {pull}37115[37115]
 
 *Packetbeat*
 
