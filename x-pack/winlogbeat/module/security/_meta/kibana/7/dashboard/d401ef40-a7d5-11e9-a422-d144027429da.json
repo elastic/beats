@@ -262,11 +262,10 @@
         "title": "[Winlogbeat Security] Failed and Blocked Accounts",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:11.460Z",
     "id": "d401ef40-a7d5-11e9-a422-d144027429da",
-    "migrationVersion": {
-        "dashboard": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "c2ea73f0-a4bd-11e9-a422-d144027429da",
@@ -330,6 +329,7 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-11T13:18:53.287Z",
-    "version": "WzIxNzksMl0="
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2023-11-10T17:08:11.460Z",
+    "version": "WzMyMywxXQ=="
 }
