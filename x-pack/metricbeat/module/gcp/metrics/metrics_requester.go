@@ -79,6 +79,52 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
 
+	// Find the largest delay in the metrics to collect.
+	//
+	// Why do we need find the largest ingest delay in the metrics to collect?
+	// ======================================================================
+	//
+	// We need to share some context first.
+	//
+	// Context
+	// -------
+	//
+	// GCP metrics have different ingestion delays; some metrics have zero delay,
+	// while others have a non-zero delay of up to a few minutes.
+	//
+	// For example,
+	//  - `container/memory.limit.bytes` has no ingest delay.
+	//  - `container/memory/request_bytes` has two minutes ingest delay.
+	//
+	// Since the metricset collects metrics every 60 seconds, it ends up
+	// collecting `container/memory.limit.bytes` and `container/memory/request_bytes`
+	// in different iterations; it stores metrics values in different documents,
+	// even when they are related to the same timestamp.
+	//
+	// Problem
+	// -------
+	//
+	// When TSDB is enabled, two documents cannot have the same timestamp and dimensions.
+	// If they do, the second document is dropped.
+	//
+	// Unfortunately, this is exactly what happens when the metricset collects
+	// `container/memory.limit.bytes` and `container/memory/request_bytes` in different
+	// iterations.
+	//
+	// Solution
+	// --------
+	//
+	// We calculate the largest delay, and then we collect the metrics values only when
+	// they are all available.
+	//
+	largestDelay := 0 * time.Second
+	for _, meta := range metricsToCollect {
+		metricMeta := meta
+		if meta.ingestDelay > largestDelay {
+			largestDelay = metricMeta.ingestDelay
+		}
+	}
+
 	for mt, meta := range metricsToCollect {
 		wg.Add(1)
 
@@ -87,7 +133,7 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 			defer wg.Done()
 
 			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s", mt, metricMeta, aligner)
-			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
+			interval, aligner := getTimeIntervalAligner(largestDelay, metricMeta.samplePeriod, r.config.period, aligner)
 			ts := r.Metric(ctx, serviceName, mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
