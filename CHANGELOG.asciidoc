@@ -17,13 +17,13 @@ https://github.com/elastic/beats/compare/v7.17.14\...v7.17.15[View commits]
 
 *Affecting all Beats*
 
-- Upgrade elastic-agent-libs to v0.6.2 which include the following fixes: {pull}36979[36979]:
-  * Fix log file rotator purge
-  * Fix IP Validation for TLS clients
+- Upgrade elastic-agent-libs to v0.6.2 which includes the following fixes: {pull}36979[36979]:
+  * Fix log file rotator purge.
+  * Fix IP validation for TLS clients.
   * Rename the `key_passphrase_file` attribute to `key_passphrase_path` to be consistent with suggestions and naming conventions in Elastic Agent.
-  * Sends `PendingStop` and `Stopped` status to Windows service manager on external shutdown notification.
-- Upgrade to Go 1.20.10. {pull}36846[36846]
-- Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
+  * Send `PendingStop` and `Stopped` status to Windows service manager on external shutdown notification.
+- Upgrade Go version to 1.20.10. {pull}36846[36846]
+- Upgrade golang/x/net version to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 
 
 [[release-notes-7.17.14]]
