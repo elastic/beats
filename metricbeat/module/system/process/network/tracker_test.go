@@ -43,6 +43,7 @@ func TestPacketGetUpdate(t *testing.T) {
 		reqChan:    make(chan RequestCounters),
 		stopChan:   make(chan struct{}),
 		testmode:   true,
+		gctime:     time.Minute * 10,
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
