@@ -24,14 +24,15 @@ import (
 
 // Config stores the system/process config options
 type Config struct {
-	Procs           []string                 `config:"processes"`
-	Cgroups         *bool                    `config:"process.cgroups.enabled"`
-	EnvWhitelist    []string                 `config:"process.env.whitelist"`
-	CacheCmdLine    bool                     `config:"process.cmdline.cache.enabled"`
-	IncludeTop      process.IncludeTopConfig `config:"process.include_top_n"`
-	IncludeCPUTicks bool                     `config:"process.include_cpu_ticks"`
-	IncludePerCPU   bool                     `config:"process.include_per_cpu"`
-	CPUTicks        *bool                    `config:"cpu_ticks"` // Deprecated
+	Procs            []string                 `config:"processes"`
+	Cgroups          *bool                    `config:"process.cgroups.enabled"`
+	EnvWhitelist     []string                 `config:"process.env.whitelist"`
+	CacheCmdLine     bool                     `config:"process.cmdline.cache.enabled"`
+	IncludeTop       process.IncludeTopConfig `config:"process.include_top_n"`
+	IncludeCPUTicks  bool                     `config:"process.include_cpu_ticks"`
+	IncludePerCPU    bool                     `config:"process.include_per_cpu"`
+	CPUTicks         *bool                    `config:"cpu_ticks"` // Deprecated
+	TrackNetworkData bool                     `config:"process.track_network_data"`
 }
 
 // Validate checks for depricated config options
@@ -39,6 +40,7 @@ func (c Config) Validate() error {
 	if c.CPUTicks != nil {
 		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Use process.include_cpu_ticks instead")
 	}
+
 	return nil
 }
 
@@ -50,5 +52,6 @@ var defaultConfig = Config{
 		ByCPU:    0,
 		ByMemory: 0,
 	},
-	IncludePerCPU: true,
+	IncludePerCPU:    true,
+	TrackNetworkData: false,
 }

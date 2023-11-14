@@ -99,6 +99,9 @@ The default is 0.
 by memory. The processes are sorted by the `system.process.memory.rss.bytes`
 field. The default is 0.
 
+*`process.track_network_data`*:: If enabled, this will add counters of 
+sent and received network bytes associated with the process.
+
 [float]
 === Monitoring Hybrid Hierarchy Cgroups
 

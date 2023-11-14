@@ -111,6 +111,30 @@
           format: bytes
           description: >
             The shared memory the process uses.
+    - name: network
+      type: group
+      description: Network-specific metrics
+      fields:
+        - name: incoming
+          type: group
+          description: Incoming network counters
+          fields: 
+            - name: tcp
+              type: long
+              description: total bytes received over TCP
+            - name: udp
+              type: long
+              description: total bytes received over UDP
+        - name: outgoing
+          type: group
+          description: Outgoing network counters
+          fields:
+            - name: tcp
+              type: long
+              description: total bytes received over TCP
+            - name: udp
+              type: long
+              description: total bytes received over UDP
     - name: fd
       type: group
       description: >

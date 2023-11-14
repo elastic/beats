@@ -1,0 +1,242 @@
+package network
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+
+	psutil "github.com/shirou/gopsutil/process"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+// hook for testing
+var gcPidFetch = psutil.PidExistsWithContext
+
+// PacketData tracks all counters for a given port
+type PacketData struct {
+	Incoming PortsForProtocol
+	Outgoing PortsForProtocol
+}
+
+// ContainsMetrics returns true if the metrics have non-zero data
+func (pd PacketData) ContainsMetrics() bool {
+	return pd.Incoming.TCP > 0 || pd.Incoming.UDP > 0 || pd.Outgoing.TCP > 0 || pd.Outgoing.UDP > 0
+}
+
+// PortsForProtocol tracks counters for TCP/UDP connections
+type PortsForProtocol struct {
+	TCP uint64
+	UDP uint64
+}
+
+// CounterUpdateEvent is sent every time we get new packet data for a PID
+type CounterUpdateEvent struct {
+	pktLen        int
+	TransProtocol applayer.Transport
+	Proc          *common.ProcessTuple
+}
+
+// RequestCounters is a request for packet data
+type RequestCounters struct {
+	Pid  int
+	Resp chan PacketData
+}
+
+// Tracker tracks network packets and maps them to a PID
+type Tracker struct {
+	procData    map[int]PacketData
+	dataMut     sync.RWMutex
+	procWatcher *procs.ProcessesWatcher
+
+	log    *logp.Logger
+	gctime time.Duration
+
+	updateChan chan CounterUpdateEvent
+	reqChan    chan RequestCounters
+	stopChan   chan struct{}
+
+	// special test helpers
+	loopWaiter chan struct{}
+	testmode   bool
+}
+
+// NewNetworkTracker creates a new network tracker for the given config
+func NewNetworkTracker() (*Tracker, error) {
+	watcher := &procs.ProcessesWatcher{}
+	err := watcher.Init(procs.ProcsConfig{Enabled: true})
+	if err != nil {
+		return nil, fmt.Errorf("error initializing process watcher: %w", err)
+	}
+
+	tracker := &Tracker{
+		procData: map[int]PacketData{},
+		dataMut:  sync.RWMutex{},
+
+		updateChan: make(chan CounterUpdateEvent, 10),
+		reqChan:    make(chan RequestCounters, 10),
+		stopChan:   make(chan struct{}, 1),
+		gctime:     time.Minute * 10,
+		// right now, the packetbeat watcher won't work with alternate mountpoints,
+		// as support is missing from go-sysinfo. This means we can't support /hostfs settings
+		procWatcher: watcher,
+
+		log: logp.L(),
+	}
+
+	return tracker, nil
+}
+
+// Update the tracker with the given counts
+func (track *Tracker) Update(packetLen int, proto applayer.Transport, proc *common.ProcessTuple) {
+	track.updateChan <- CounterUpdateEvent{pktLen: packetLen, TransProtocol: proto, Proc: proc}
+}
+
+// Get data for a given PID
+func (track *Tracker) Get(pid int) PacketData {
+	req := RequestCounters{Pid: pid, Resp: make(chan PacketData)}
+	track.reqChan <- req
+	got := <-req.Resp
+	return got
+}
+
+// Stop the tracker
+func (track *Tracker) Stop() {
+	track.stopChan <- struct{}{}
+}
+
+// Track is a non-blocking operation that starts a packet sniffer, and the underlying
+// tracker that correlates packet data with pids
+func (track *Tracker) Track(ctx context.Context) error {
+	helperContext, cancel := context.WithCancel(ctx)
+	go func() {
+		if !track.testmode {
+			err := StartPacketHandle(helperContext, track.procWatcher, track)
+			if err != nil {
+				track.log.Errorf("error starting packet capture: %s", err)
+				ctx.Done()
+			}
+		}
+	}()
+
+	go func() {
+		track.garbageCollect(helperContext)
+	}()
+
+	go func() {
+		for {
+			select {
+			case update := <-track.updateChan:
+				track.updateInternalTracking(update)
+			case req := <-track.reqChan:
+				track.dataMut.RLock()
+				if proc, ok := track.procData[req.Pid]; ok {
+					req.Resp <- proc
+				} else {
+					req.Resp <- PacketData{}
+				}
+				track.dataMut.RUnlock()
+			case <-ctx.Done():
+				cancel()
+				return
+			case <-track.stopChan:
+				cancel()
+				return
+			}
+		}
+	}()
+
+	return nil
+}
+
+// As far as I can see, the only reliable way to do garbage collection
+// is to check each pid on a timer. Simply relying on a timestamp or counter could
+// result in false positives for PIDs that only occasionally create network traffic.
+// This method operates in its own thread, and will check the list of known PIDs on a timer.
+func (track *Tracker) garbageCollect(ctx context.Context) {
+	// the timer should be set to a fairly large number; if we garbage-collect more frequently there's
+	// a risk that we clean up a dead PID before its been reported.
+	ticker := time.NewTicker(track.gctime)
+	for {
+		select {
+		case <-ticker.C:
+			//copy total proc list so we don't hold the mutex for any longer than needed
+			track.dataMut.RLock()
+			keys := make([]int, 0, len(track.procData))
+			for k := range track.procData {
+				keys = append(keys, k)
+			}
+			track.dataMut.RUnlock()
+			keysToDelete := []int{}
+			for _, key := range keys {
+				found, _ := gcPidFetch(ctx, int32(key))
+				if !found {
+					keysToDelete = append(keysToDelete, key)
+				}
+			}
+			if len(keysToDelete) > 0 {
+				track.dataMut.Lock()
+				for _, key := range keysToDelete {
+					delete(track.procData, key)
+				}
+				track.dataMut.Unlock()
+				track.log.Infof("removed PIDs %v from network process tracker", keysToDelete)
+			}
+		case <-ctx.Done():
+			return
+		}
+
+		// used to coordinate testing
+		if track.loopWaiter != nil {
+			track.loopWaiter <- struct{}{}
+		}
+
+	}
+
+}
+
+func (track *Tracker) updateInternalTracking(update CounterUpdateEvent) {
+	track.dataMut.Lock()
+	defer track.dataMut.Unlock()
+	if update.Proc.Src.PID != 0 {
+		track.updateOutgoing(update.TransProtocol, update.Proc, update.pktLen)
+	}
+	if update.Proc.Dst.PID != 0 {
+		track.updateIncoming(update.TransProtocol, update.Proc, update.pktLen)
+	}
+}
+
+func (track *Tracker) updateOutgoing(proto applayer.Transport, proc *common.ProcessTuple, pktLen int) {
+	newPort := PacketData{}
+	if port, ok := track.procData[proc.Src.PID]; ok {
+		newPort = port
+	}
+
+	if proto == applayer.TransportTCP {
+		newPort.Outgoing.TCP = newPort.Outgoing.TCP + uint64(pktLen)
+	} else if proto == applayer.TransportUDP {
+		newPort.Outgoing.UDP = newPort.Outgoing.UDP + uint64(pktLen)
+	}
+
+	track.procData[proc.Src.PID] = newPort
+}
+
+func (track *Tracker) updateIncoming(proto applayer.Transport, proc *common.ProcessTuple, pktLen int) {
+	newPort := PacketData{}
+	if port, ok := track.procData[proc.Dst.PID]; ok {
+		newPort = port
+	}
+
+	if proto == applayer.TransportTCP {
+		newPort.Incoming.TCP = newPort.Incoming.TCP + uint64(pktLen)
+	} else if proto == applayer.TransportUDP {
+		newPort.Incoming.UDP = newPort.Incoming.UDP + uint64(pktLen)
+
+	}
+
+	track.procData[proc.Dst.PID] = newPort
+}

@@ -62293,6 +62293,60 @@ format: bytes
 --
 
 [float]
+=== network
+
+Network-specific metrics
+
+
+[float]
+=== incoming
+
+Incoming network counters
+
+
+*`system.process.network.incoming.tcp`*::
++
+--
+total bytes received over TCP
+
+type: long
+
+--
+
+*`system.process.network.incoming.udp`*::
++
+--
+total bytes received over UDP
+
+type: long
+
+--
+
+[float]
+=== outgoing
+
+Outgoing network counters
+
+
+*`system.process.network.outgoing.tcp`*::
++
+--
+total bytes received over TCP
+
+type: long
+
+--
+
+*`system.process.network.outgoing.udp`*::
++
+--
+total bytes received over UDP
+
+type: long
+
+--
+
+[float]
 === fd
 
 File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
