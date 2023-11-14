@@ -19,7 +19,7 @@ request.transforms:
       value: "MdatpPartner-Elastic-Filebeat/1.0.0"
   - set:
       target: "url.params.$filter"
-      value: 'lastUpdateTime gt [[formatDate .cursor.lastUpdateTime]]'
+      value: 'lastUpdateTime gt [[.cursor.lastUpdateTime]]'
       default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-55m")) "2006-01-02T15:04:05.9999999Z"]]'
 response.split:
   target: body.value
