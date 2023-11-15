@@ -93,7 +93,7 @@ func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
 			Events:         2, // Queue size
 			FlushMinEvents: 1, // make sure the queue won't buffer events
 			FlushTimeout:   time.Millisecond,
-		}, 0)
+		})
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
