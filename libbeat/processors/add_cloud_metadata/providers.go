@@ -65,6 +65,7 @@ var cloudMetaProviders = map[string]provider{
 	"nova-ssl":      openstackNovaSSLMetadataFetcher,
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
+	"huawei":        openstackNovaMetadataFetcher,
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
