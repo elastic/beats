@@ -7,29 +7,7 @@ package retry
 import (
 	"context"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
-
-// DoWithBackoff ignores retry config of delays and lets backoff decide how much time it needs.
-func DoWithBackoff(config *Config, b backoff.Backoff, fn func() error, fatalErrors ...error) error {
-	retryCount := getRetryCount(config)
-	var err error
-
-	for retryNo := 0; retryNo <= retryCount; retryNo++ {
-		err = fn()
-		if err == nil || isFatal(err, fatalErrors...) {
-			b.Reset()
-			return err
-		}
-
-		if retryNo < retryCount {
-			b.Wait()
-		}
-	}
-
-	return err
-}
 
 // Do runs provided function in a manner specified in retry configuration
 func Do(ctx context.Context, config *Config, fn func(ctx context.Context) error, fatalErrors ...error) error {
