@@ -19,7 +19,6 @@ package udp
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -33,6 +32,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/filebeat/input/internal/procnet"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
@@ -189,33 +189,10 @@ func newInputMetrics(id, device string, buflen uint64, poll time.Duration, log *
 	out.bufferLen.Set(buflen)
 
 	if poll > 0 && runtime.GOOS == "linux" {
-		host, port, err := net.SplitHostPort(device)
+		addr, addr6, err := procnet.Addrs(device, log)
 		if err != nil {
-			log.Warnf("failed to get address for %s: could not split host and port:", err)
+			log.Warn(err)
 			return out
-		}
-		ip, err := net.LookupIP(host)
-		if err != nil {
-			log.Warnf("failed to get address for %s: %v", device, err)
-			return out
-		}
-		p, err := strconv.ParseInt(port, 10, 16)
-		if err != nil {
-			log.Warnf("failed to get port for %s: %v", device, err)
-			return out
-		}
-		ph := strconv.FormatInt(p, 16)
-		addr := make([]string, 0, len(ip))
-		addr6 := make([]string, 0, len(ip))
-		for _, p := range ip {
-			switch len(p) {
-			case net.IPv4len:
-				addr = append(addr, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To4()), ph))
-			case net.IPv6len:
-				addr6 = append(addr6, fmt.Sprintf("%X:%s", binary.LittleEndian.Uint32(p.To16()), ph))
-			default:
-				log.Warnf("unexpected addr length %d for %s", len(p), p)
-			}
 		}
 		out.done = make(chan struct{})
 		go out.poll(addr, addr6, poll, log)
@@ -248,6 +225,23 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	if badAddr != nil {
 		log.Warnf("failed to parse IPv6 addrs for metric collection %q", badAddr)
 	}
+
+	// Do an initial check for access to the filesystem and of the
+	// value constructed by containsUnspecifiedAddr. This gives a
+	// base level for the rx_queue and drops values and ensures that
+	// if the constructed address values are malformed we panic early
+	// within the period of system testing.
+	rx, drops, err := procNetUDP("/proc/net/udp", addr, hasUnspecified, addrIsUnspecified)
+	if err != nil {
+		log.Warnf("failed to get initial udp stats from /proc: %v", err)
+	}
+	rx6, drops6, err := procNetUDP("/proc/net/udp6", addr6, hasUnspecified6, addrIsUnspecified6)
+	if err != nil {
+		log.Warnf("failed to get initial udp6 stats from /proc: %v", err)
+	}
+	m.rxQueue.Set(uint64(rx + rx6))
+	m.drops.Set(uint64(drops + drops6))
+
 	t := time.NewTicker(each)
 	for {
 		select {
@@ -257,7 +251,7 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 				log.Warnf("failed to get udp stats from /proc: %v", err)
 				continue
 			}
-			rx6, drops6, err := procNetUDP("/proc/net/udp6", addr, hasUnspecified6, addrIsUnspecified6)
+			rx6, drops6, err := procNetUDP("/proc/net/udp6", addr6, hasUnspecified6, addrIsUnspecified6)
 			if err != nil {
 				log.Warnf("failed to get udp6 stats from /proc: %v", err)
 				continue
@@ -301,6 +295,9 @@ func containsUnspecifiedAddr(addr []string) (yes bool, which []bool, bad []strin
 func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecified []bool) (rx, drops int64, err error) {
 	if len(addr) == 0 {
 		return 0, 0, nil
+	}
+	if len(addr) != len(addrIsUnspecified) {
+		return 0, 0, errors.New("mismatched address/unspecified lists: please report this")
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {

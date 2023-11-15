@@ -9,7 +9,6 @@
         "process"
       ],
       "code": "25",
-      "ingested": "2022-06-08T05:43:59.536869500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",

@@ -10,7 +10,7 @@ include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is a module for Zoom webhook logs. The module creates an HTTP listener that accepts incoming webhooks from Zoom.
 
-To configure Zoom to send webhooks to the filebeat module, please follow the https://marketplace.zoom.us/docs/guides/build/webhook-only-app[Zoom Documentation].
+To configure Zoom to send webhooks to the filebeat module, please follow the https://developers.zoom.us/docs/api/rest/webhook-only-app[Zoom Documentation].
 
 include::../include/gs-link.asciidoc[]
 
@@ -22,8 +22,10 @@ include::../include/config-option-intro.asciidoc[]
 [float]
 ==== `webhook` fileset settings
 
-When a webhook integration is created on Zoom, it will show a special token used to ensure that filebeat only handles HTTP requests from the correct source.
+When a webhook integration is created on Zoom, you can create a custom header to verify webhook events. See https://developers.zoom.us/docs/api/rest/webhook-reference/#custom-header[Custom Header] for more information about this process.
 This is configured with the `secret.header` and `secret.value` settings as shown below.
+
+On the other hand, Zoom also requires webhook validation for created or modified webhooks after October, 2022. This follows a challenge-response check (CRC) algorithm which is configured with the `crc.enabled` and `crc.secret` settings. Learn more about it at https://developers.zoom.us/docs/api/rest/webhook-reference/#validate-your-webhook-endpoint[Validate your webhook endpoint].
 
 Example config:
 
@@ -35,8 +37,10 @@ Example config:
     var.input: http_endpoint
     var.listen_address: 0.0.0.0
     var.listen_port: 8080
-    var.secret.header: Authorization
-    var.secret.value: ZOOMTOKEN
+    var.secret.header: x-my-custom-key
+    var.secret.value: my-custom-value
+    var.crc.enabled: true
+    var.crc.secret: ZOOMSECRETTOKEN
 ----
 
 include::../include/var-paths.asciidoc[]

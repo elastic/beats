@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !aix
-// +build !aix
 
 package kubernetes
 
@@ -39,14 +38,16 @@ import (
 )
 
 type pod struct {
-	uuid             uuid.UUID
-	config           *Config
-	metagen          metadata.MetaGen
-	logger           *logp.Logger
-	publishFunc      func([]bus.Event)
-	watcher          kubernetes.Watcher
-	nodeWatcher      kubernetes.Watcher
-	namespaceWatcher kubernetes.Watcher
+	uuid              uuid.UUID
+	config            *Config
+	metagen           metadata.MetaGen
+	logger            *logp.Logger
+	publishFunc       func([]bus.Event)
+	watcher           kubernetes.Watcher
+	nodeWatcher       kubernetes.Watcher
+	namespaceWatcher  kubernetes.Watcher
+	replicasetWatcher kubernetes.Watcher
+	jobWatcher        kubernetes.Watcher
 
 	// Mutex used by configuration updates not triggered by the main watcher,
 	// to avoid race conditions between cross updates and deletions.
@@ -57,6 +58,8 @@ type pod struct {
 // NewPodEventer creates an eventer that can discover and process pod objects
 func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
+
+	var replicaSetWatcher, jobWatcher kubernetes.Watcher
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -110,17 +113,41 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
-	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+
+	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+	// Deployment -> Replicaset -> Pod
+	// CronJob -> job -> Pod
+	if metaConf.Deployment {
+		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+		}
+	}
+	if metaConf.CronJob {
+		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+		}
+	}
+
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 	p := &pod{
-		config:           config,
-		uuid:             uuid,
-		publishFunc:      publish,
-		metagen:          metaGen,
-		logger:           logger,
-		watcher:          watcher,
-		nodeWatcher:      nodeWatcher,
-		namespaceWatcher: namespaceWatcher,
+		config:            config,
+		uuid:              uuid,
+		publishFunc:       publish,
+		metagen:           metaGen,
+		logger:            logger,
+		watcher:           watcher,
+		nodeWatcher:       nodeWatcher,
+		namespaceWatcher:  namespaceWatcher,
+		replicasetWatcher: replicaSetWatcher,
+		jobWatcher:        jobWatcher,
 	}
 
 	watcher.AddEventHandler(p)
@@ -245,6 +272,20 @@ func (p *pod) Start() error {
 		}
 	}
 
+	if p.replicasetWatcher != nil {
+		err := p.replicasetWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
+	if p.jobWatcher != nil {
+		err := p.jobWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
 	return p.watcher.Start()
 }
 
@@ -258,6 +299,14 @@ func (p *pod) Stop() {
 
 	if p.nodeWatcher != nil {
 		p.nodeWatcher.Stop()
+	}
+
+	if p.replicasetWatcher != nil {
+		p.replicasetWatcher.Stop()
+	}
+
+	if p.jobWatcher != nil {
+		p.jobWatcher.Stop()
 	}
 }
 

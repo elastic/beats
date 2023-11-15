@@ -34,6 +34,8 @@ Contains configuration for the FQDN reporting feature. When this feature is
 enabled, the fully-qualified domain name for the host is reported in the
 `host.name` field in events produced by {beatname_uc}.
 
+preview::[]
+
 For FQDN reporting to work as expected, the hostname of the current host must either:
 
 * Have a CNAME entry defined in DNS.
@@ -56,3 +58,4 @@ features:
 ===== `enabled`
 Set to `true` to enable the FQDN reporting feature of {beatname_uc}.
 Defaults to `false`.
+

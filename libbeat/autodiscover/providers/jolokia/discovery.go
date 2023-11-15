@@ -19,13 +19,13 @@ package jolokia
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -187,7 +187,7 @@ func matchInterfaceName(name, candidate string) bool {
 func getIPv4Addr(i net.Interface) (net.IP, error) {
 	addrs, err := i.Addrs()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get addresses for "+i.Name)
+		return nil, fmt.Errorf("failed to get addresses for "+i.Name+": %w", err)
 	}
 	for _, a := range addrs {
 		if ip, _, err := net.ParseCIDR(a.String()); err == nil && ip != nil {

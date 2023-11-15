@@ -12,11 +12,15 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"time"
+	"unicode"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
+	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -27,20 +31,30 @@ import (
 const jobErrString = "job with jobId %s encountered an error: %w"
 
 type job struct {
-	client       *azblob.BlobClient
-	blob         *azblob.BlobItemInternal
-	blobURL      string
-	hash         string
-	offset       int64
+	// client is an azure blob handle
+	client *blob.Client
+	// blob is an azure blob item handle
+	blob *azcontainer.BlobItem
+	// azure blob url for the resource
+	blobURL string
+	// object hash, used in setting event id
+	hash string
+	// flag to denote if object is gzip compressed or not
 	isCompressed bool
-	state        *state
-	src          *Source
-	publisher    cursor.Publisher
-	log          *logp.Logger
+	// flag to denote if object's root element is of an array type
+	isRootArray bool
+	// blob state
+	state *state
+	// container source struct used for storing container related data
+	src *Source
+	// publisher is used to publish a beat event to the output stream
+	publisher cursor.Publisher
+	// custom logger
+	log *logp.Logger
 }
 
 // newJob, returns an instance of a job, which is a unit of work that can be assigned to a go routine
-func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL string,
+func newJob(client *blob.Client, blob *azcontainer.BlobItem, blobURL string,
 	state *state, src *Source, publisher cursor.Publisher, log *logp.Logger,
 ) *job {
 	return &job{
@@ -56,7 +70,7 @@ func newJob(client *azblob.BlobClient, blob *azblob.BlobItemInternal, blobURL st
 }
 
 // azureObjectHash returns a short sha256 hash of the container name + blob name.
-func azureObjectHash(src *Source, blob *azblob.BlobItemInternal) string {
+func azureObjectHash(src *Source, blob *azcontainer.BlobItem) string {
 	h := sha256.New()
 	h.Write([]byte(src.ContainerName))
 	h.Write([]byte((*blob.Name)))
@@ -86,10 +100,13 @@ func (j *job) do(ctx context.Context, id string) {
 			Fields:    fields,
 		}
 		event.SetID(objectID(j.hash, 0))
-		j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
-		if err := j.publisher.Publish(event, j.state.checkpoint()); err != nil {
+		// locks while data is being saved to avoid concurrent map read/writes
+		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorf(jobErrString, id, err)
 		}
+		// unlocks after data is saved
+		done()
 	}
 }
 
@@ -102,18 +119,14 @@ func (j *job) timestamp() *time.Time {
 }
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
-	var err error
-	downloadOptions := &azblob.BlobDownloadOptions{}
-	if !j.isCompressed {
-		downloadOptions.Offset = &j.offset
-	}
-
-	get, err := j.client.Download(ctx, downloadOptions)
+	get, err := j.client.DownloadStream(ctx, &blob.DownloadStreamOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to download data from blob with error: %w", err)
 	}
-
-	reader := get.Body(&azblob.RetryReaderOptions{})
+	const maxRetries = 3
+	reader := get.NewRetryReader(ctx, &azblob.RetryReaderOptions{
+		MaxRetries: maxRetries,
+	})
 	defer func() {
 		err = reader.Close()
 		if err != nil {
@@ -121,13 +134,127 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 		}
 	}()
 
-	updatedReader, err := j.addGzipDecoderIfNeeded(reader)
-	err = j.readJsonAndPublish(ctx, updatedReader, id)
+	err = j.readJsonAndPublish(ctx, reader, id)
 	if err != nil {
 		return fmt.Errorf("failed to read data from blob with error: %w", err)
 	}
 
 	return err
+}
+
+func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
+	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
+	if err != nil {
+		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
+	}
+
+	// checks if the root element is an array or not
+	r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
+	if err != nil {
+		return fmt.Errorf("failed to evaluate json for blob: %s, with error: %w", *j.blob.Name, err)
+	}
+
+	dec := json.NewDecoder(r)
+	dec.UseNumber()
+	// If array is present at root then read json token and advance decoder
+	if j.isRootArray {
+		_, err := dec.Token()
+		if err != nil {
+			return fmt.Errorf("failed to read JSON token for object: %s, with error: %w", *j.blob.Name, err)
+		}
+	}
+
+	for dec.More() && ctx.Err() == nil {
+		var item json.RawMessage
+		offset := dec.InputOffset()
+		if err := dec.Decode(&item); err != nil {
+			return fmt.Errorf("failed to decode json: %w", err)
+		}
+		// if expand_event_list_from_field is set, then split the event list
+		if j.src.ExpandEventListFromField != "" {
+			if err := j.splitEventList(j.src.ExpandEventListFromField, item, offset, j.hash, id); err != nil {
+				return err
+			}
+			continue
+		}
+
+		data, err := item.MarshalJSON()
+		if err != nil {
+			return err
+		}
+		evt := j.createEvent(string(data), offset)
+
+		if !dec.More() {
+			// if this is the last object, then perform a complete state save
+			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+			if err := j.publisher.Publish(evt, cp); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+			done()
+		} else {
+			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			if err := j.publisher.Publish(evt, nil); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+		}
+	}
+	return nil
+}
+
+// splitEventList splits the event list into individual events and publishes them
+func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, objHash string, id string) error {
+	var jsonObject map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &jsonObject); err != nil {
+		return err
+	}
+
+	raw, found := jsonObject[key]
+	if !found {
+		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.UseNumber()
+
+	tok, err := dec.Token()
+	if err != nil {
+		return err
+	}
+	delim, ok := tok.(json.Delim)
+	if !ok || delim != '[' {
+		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+	}
+
+	for dec.More() {
+		arrayOffset := dec.InputOffset()
+
+		var item json.RawMessage
+		if err := dec.Decode(&item); err != nil {
+			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+		}
+
+		data, err := item.MarshalJSON()
+		if err != nil {
+			return err
+		}
+		evt := j.createEvent(string(data), offset+arrayOffset)
+
+		if !dec.More() {
+			// if this is the last object, then save checkpoint
+			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+			if err := j.publisher.Publish(evt, cp); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+			done()
+		} else {
+			// since we don't update the cursor checkpoint, lack of a lock here should be fine
+			if err := j.publisher.Publish(evt, nil); err != nil {
+				j.log.Errorf(jobErrString, id, err)
+			}
+		}
+	}
+
+	return nil
 }
 
 // addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
@@ -156,48 +283,38 @@ func (j *job) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	return gzip.NewReader(bufReader)
 }
 
-func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
-	dec := json.NewDecoder(r)
-	dec.UseNumber()
-	var offset int64
-	var relativeOffset int64
-	// uncompressed files use the client to directly set the offset, this
-	// in turn causes the offset to reset to 0 for the new stream, hence why
-	// we need to keep relative offsets to keep track of the actual offset
-	if !j.isCompressed {
-		relativeOffset = j.offset
-	}
-	for dec.More() && ctx.Err() == nil {
-		var item json.RawMessage
-		offset = dec.InputOffset()
-		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
+// evaluateJSON uses a bufio.NewReader & reader.Peek to evaluate if the
+// data stream contains a json array as the root element or not, without
+// advancing the reader. If the data stream contains an array as the root
+// element, the value of the boolean return type is set to true.
+func evaluateJSON(reader *bufio.Reader) (io.Reader, bool, error) {
+	eof := false
+	// readSize is the constant value in the incremental read operation, this value is arbitrary
+	// but works well for our use case
+	const readSize = 5
+	for i := 0; ; i++ {
+		b, err := reader.Peek((i + 1) * readSize)
+		if errors.Is(err, io.EOF) {
+			eof = true
 		}
-		// manually seek offset only if file is compressed
-		if j.isCompressed && offset < j.offset {
-			continue
+		startByte := i * readSize
+		for j := 0; j < len(b[startByte:]); j++ {
+			char := b[startByte+j : startByte+j+1]
+			switch {
+			case bytes.Equal(char, []byte("[")):
+				return reader, true, nil
+			case bytes.Equal(char, []byte("{")):
+				return reader, false, nil
+			case unicode.IsSpace(bytes.Runes(char)[0]):
+				continue
+			default:
+				return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
+			}
 		}
-
-		data, err := item.MarshalJSON()
-		if err != nil {
-			return err
-		}
-		evt := j.createEvent(string(data), offset+relativeOffset)
-		// updates the offset after reading the file
-		// this avoids duplicates for the last read when resuming operation
-		offset = dec.InputOffset()
-		if !dec.More() {
-			// if this is the last object, then peform a complete state save
-			j.state.save(*j.blob.Name, *j.blob.Properties.LastModified)
-		} else {
-			// partially saves read state using offset
-			j.state.savePartial(*j.blob.Name, offset+relativeOffset, j.blob.Properties.LastModified)
-		}
-		if err := j.publisher.Publish(evt, j.state.checkpoint()); err != nil {
-			j.log.Errorf(jobErrString, id, err)
+		if eof {
+			return nil, false, fmt.Errorf("unexpected error: JSON data is malformed")
 		}
 	}
-	return nil
 }
 
 func (j *job) createEvent(message string, offset int64) beat.Event {
@@ -217,8 +334,8 @@ func (j *job) createEvent(message string, offset int64) beat.Event {
 						"name": j.src.ContainerName,
 					},
 					"blob": mapstr.M{
-						"name":         j.blob.Name,
-						"content_type": j.blob.Properties.ContentType,
+						"name":         *j.blob.Name,
+						"content_type": *j.blob.Properties.ContentType,
 					},
 				},
 			},

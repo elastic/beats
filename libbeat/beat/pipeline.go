@@ -30,11 +30,14 @@ type Pipeline interface {
 	Connect() (Client, error)
 }
 
+// PipelineConnector wraps the Pipeline interface
 type PipelineConnector = Pipeline
 
 // Client holds a connection to the beats publisher pipeline
 type Client interface {
+	// Publish the event
 	Publish(Event)
+	// PublishAll events specified in the Event array
 	PublishAll([]Event)
 	Close() error
 }
@@ -125,6 +128,9 @@ type ProcessingConfig struct {
 	// is applied to events. If nil the Beat's default behavior prevails.
 	EventNormalization *bool
 
+	// Disables the addition of input.type
+	DisableType bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
@@ -136,7 +142,6 @@ type ClientListener interface {
 	Closed()  // Closed indicates the client being fully shutdown
 
 	Published()             // event has successfully entered the queue
-	FilteredOut(Event)      // event has been filtered out/dropped by processors
 	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 

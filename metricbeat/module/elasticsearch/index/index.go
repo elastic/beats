@@ -18,10 +18,9 @@
 package index
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -73,7 +72,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
+		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
 	if err := m.updateServicePath(*info.Version.Number); err != nil {

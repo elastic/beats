@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -257,6 +256,9 @@ func PythonIntegTest(ctx context.Context) error {
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
+		// Always create a fresh virtual environment when running tests in a container, until we get
+		// get the requirements installed as part of the container build.
+		args.ForceCreateVenv = true
 		// On Windows 32-bit converage is not enabled.
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"

@@ -5,7 +5,6 @@
 // See _meta/terraform/README.md for integration test usage instructions.
 
 //go:build integration && aws
-// +build integration,aws
 
 package awscloudwatch
 
@@ -133,8 +132,7 @@ func uploadLogMessage(t *testing.T, svc *cloudwatchlogs.Client, message string, 
 }
 
 func TestInputWithLogGroupNamePrefix(t *testing.T) {
-	err := logp.TestingSetup()
-	assert.Nil(t, err)
+	logp.TestingSetup()
 
 	// Terraform is used to set up S3 and SQS and must be executed manually.
 	tfConfig := getTerraformOutputs(t)

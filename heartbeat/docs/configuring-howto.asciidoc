@@ -70,3 +70,5 @@ include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 include::{libbeat-dir}/shared-feature-flags.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]
+
+include::./monitors/monitor-browser.asciidoc[]

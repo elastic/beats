@@ -3,8 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (!linux || !cgo) && !windows
-// +build !linux !cgo
-// +build !windows
 
 package pkg
 

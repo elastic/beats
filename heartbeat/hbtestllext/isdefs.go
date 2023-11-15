@@ -18,6 +18,8 @@
 package hbtestllext
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -61,6 +63,22 @@ var IsMonitorState = isdef.Is("isState", func(path llpath.Path, v interface{}) *
 	}
 	return llresult.ValidResult(path)
 })
+
+var IsMonitorStateInLocation = func(locName string) isdef.IsDef {
+	locPattern := fmt.Sprintf("^%s-[a-z0-9]+-0$", locName)
+	stateIdMatch := regexp.MustCompile(locPattern)
+	return isdef.Is("isState", func(path llpath.Path, v interface{}) *llresult.Results {
+		s, ok := v.(monitorstate.State)
+		if !ok {
+			return llresult.SimpleResult(path, false, "expected a monitorstate.State")
+		}
+
+		if !stateIdMatch.MatchString(s.ID) {
+			return llresult.SimpleResult(path, false, fmt.Sprintf("ID %s does not match regexp pattern /%s/", s.ID, locPattern))
+		}
+		return llresult.ValidResult(path)
+	})
+}
 
 var IsECSErr = func(expectedErr *ecserr.ECSErr) isdef.IsDef {
 	return isdef.Is("matches ECS ERR", func(path llpath.Path, v interface{}) *llresult.Results {

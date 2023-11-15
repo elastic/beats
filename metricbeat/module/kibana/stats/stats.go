@@ -19,8 +19,7 @@ package stats
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -48,8 +47,9 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP         *helper.HTTP
-	isUsageExcludable bool
+	statsHTTP                         *helper.HTTP
+	isUsageExcludable                 bool
+	lastRunningKibanaMessageTimestamp time.Time
 }
 
 // New create a new instance of the MetricSet
@@ -59,8 +59,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	statsHTTP, err := helper.NewHTTP(ms.BaseMetricSet)
+	if err != nil {
+		return nil, err
+	}
+
+	statsHTTP.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
 	return &MetricSet{
 		MetricSet: ms,
+		statsHTTP: statsHTTP,
 	}, nil
 }
 
@@ -68,40 +76,42 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
-	if err = m.init(); err != nil {
+	err, versionSupported := m.init()
+	if err != nil {
 		return err
+	}
+
+	if !versionSupported {
+		return nil
 	}
 
 	if err = m.fetchStats(r); err != nil {
-		return errors.Wrap(err, "error trying to get stats data from Kibana")
+		return fmt.Errorf("error trying to get stats data from Kibana: %w", err)
 	}
 
-	return
+	return nil
 }
 
-func (m *MetricSet) init() error {
-	statsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+func (m *MetricSet) init() (err error, versionSupported bool) {
+	kibanaVersion, err := kibana.GetVersion(m.statsHTTP, kibana.StatsPath)
 	if err != nil {
-		return err
-	}
-
-	statsHTTP.SetHeaderDefault(productorigin.Header, productorigin.Beats)
-
-	kibanaVersion, err := kibana.GetVersion(statsHTTP, kibana.StatsPath)
-	if err != nil {
-		return err
+		return err, false
 	}
 
 	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
 	if !isStatsAPIAvailable {
-		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
+		if time.Since(m.lastRunningKibanaMessageTimestamp) > 5*time.Minute {
+			m.lastRunningKibanaMessageTimestamp = time.Now()
+			const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+			m.Logger().Debugf(errorMsg, m.FullyQualifiedName(), kibana.ActionsAPIAvailableVersion, kibanaVersion)
+		}
+
+		return nil, false
 	}
 
-	m.statsHTTP = statsHTTP
 	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
 
-	return nil
+	return err, true
 }
 
 func (m *MetricSet) fetchStats(r mb.ReporterV2) error {

@@ -13,6 +13,8 @@ actions:
         - backport-skip
         - build-monitoring
         - Team:Beats-On-Call
+      description: |
+        Generated automatically with {{ requiredEnv "JOB_URL" }}
     scmid: default
 
 scms:

@@ -16,8 +16,6 @@ processors:
     target_field: '@timestamp'
 - remove:
     field: kibana.log.meta.@timestamp
-- remove:
-    field: message
 - rename:
     field: kibana.log.meta.message
     target_field: message

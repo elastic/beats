@@ -16,6 +16,5 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package input

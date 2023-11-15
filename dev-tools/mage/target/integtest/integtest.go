@@ -90,6 +90,10 @@ func PythonIntegTest(ctx context.Context) error {
 	}
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonTest(devtools.DefaultPythonTestIntegrationArgs())
+		args := devtools.DefaultPythonTestIntegrationArgs()
+		// Always create a fresh virtual environment when running tests in a container, until we get
+		// get the requirements installed as part of the container build.
+		args.ForceCreateVenv = true
+		return devtools.PythonTest(args)
 	})
 }

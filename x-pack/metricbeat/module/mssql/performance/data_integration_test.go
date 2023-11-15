@@ -5,11 +5,11 @@
 package performance
 
 import (
+	"errors"
 	"net/url"
 	"testing"
 
 	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"

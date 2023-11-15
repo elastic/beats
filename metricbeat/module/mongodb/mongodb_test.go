@@ -77,7 +77,7 @@ func TestParseMongoURL(t *testing.T) {
 		},
 		{
 			Name:     "with options",
-			URL:      "mongodb://localhost:40001?connect=direct&authSource=me",
+			URL:      "mongodb://localhost:40001/directConnection=true&authSource=me",
 			Username: "anotheruser",
 			Password: "anotherpass",
 
@@ -94,6 +94,16 @@ func TestParseMongoURL(t *testing.T) {
 			ExpectedAddr:     "localhost:40001,localhost:40002",
 			ExpectedUsername: "",
 			ExpectedPassword: "",
+		},
+		{
+			Name:     "with replicaSet option",
+			URL:      "mongodb://localhost:40001,localhost:40002/?replicaSet=dbrs",
+			Username: "anotheruser",
+			Password: "anotherpass",
+
+			ExpectedAddr:     "localhost:40001,localhost:40002",
+			ExpectedUsername: "anotheruser",
+			ExpectedPassword: "anotherpass",
 		},
 	}
 

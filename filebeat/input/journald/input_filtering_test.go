@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo && withjournald
-// +build linux,cgo,withjournald
 
 package journald
 
@@ -24,6 +23,7 @@ import (
 	"context"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -209,6 +209,97 @@ func TestInputIncludeMatches(t *testing.T) {
 			env.waitUntilEventCount(len(testCase.expectedMessages))
 
 			for idx, event := range env.pipeline.clients[0].GetEvents() {
+				if got, expected := event.Fields["message"], testCase.expectedMessages[idx]; got != expected {
+					t.Fatalf("expecting event message %q, got %q", expected, got)
+				}
+			}
+		})
+	}
+}
+
+// TestInputSeek test the output of various seek modes while reading
+// from input-multiline-parser.journal.
+func TestInputSeek(t *testing.T) {
+	// timeOfFirstEvent is the @timestamp on the "pam_unix" message.
+	var timeOfFirstEvent = time.Date(2021, time.November, 22, 17, 10, 4, 51729000, time.UTC)
+
+	var allMessages = []string{
+		"pam_unix(sudo:session): session closed for user root",
+		"Started Outputs some log lines.",
+		"1st line",
+		"2nd line",
+		"3rd line",
+		"4th line",
+		"5th line",
+		"6th line",
+	}
+
+	tests := map[string]struct {
+		config           mapstr.M
+		expectedMessages []string
+	}{
+		"seek head": {
+			config: map[string]any{
+				"seek": "head",
+			},
+			expectedMessages: allMessages,
+		},
+		"seek tail": {
+			config: map[string]any{
+				"seek": "tail",
+			},
+			expectedMessages: nil, // No messages are expected for seek=tail.
+		},
+		"seek cursor": {
+			config: map[string]any{
+				"seek": "cursor",
+			},
+			expectedMessages: allMessages,
+		},
+		"seek cursor with tail fallback": {
+			config: map[string]any{
+				"seek":                 "cursor",
+				"cursor_seek_fallback": "tail",
+			},
+			expectedMessages: nil, // No messages are expected because it will fall back to seek=tail.
+		},
+		"seek since": {
+			config: map[string]any{
+				"seek": "since",
+				// Query using one microsecond after the first event so that the first event
+				// is not returned. Note that journald uses microsecond precision for times.
+				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
+			},
+			expectedMessages: allMessages[1:],
+		},
+		"seek cursor with since fallback": {
+			config: map[string]any{
+				"seek":                 "cursor",
+				"cursor_seek_fallback": "since",
+				// Query using one microsecond after the first event so that the first event
+				// is not returned. Note that journald uses microsecond precision for times.
+				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
+			},
+			expectedMessages: allMessages[1:],
+		},
+	}
+
+	for name, testCase := range tests {
+		t.Run(name, func(t *testing.T) {
+			env := newInputTestingEnvironment(t)
+			conf := mapstr.M{
+				"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
+			}
+			conf.DeepUpdate(testCase.config)
+			inp := env.mustCreateInput(conf)
+
+			ctx, cancelInput := context.WithCancel(context.Background())
+			env.startInput(ctx, inp)
+			defer cancelInput()
+
+			env.waitUntilEventCount(len(testCase.expectedMessages))
+
+			for idx, event := range env.pipeline.GetAllEvents() {
 				if got, expected := event.Fields["message"], testCase.expectedMessages[idx]; got != expected {
 					t.Fatalf("expecting event message %q, got %q", expected, got)
 				}

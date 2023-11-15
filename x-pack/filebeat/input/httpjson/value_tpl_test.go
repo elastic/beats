@@ -19,6 +19,8 @@ import (
 )
 
 func TestValueTpl(t *testing.T) {
+	logp.TestingSetup()
+
 	cases := []struct {
 		name          string
 		value         string
@@ -355,6 +357,76 @@ func TestValueTpl(t *testing.T) {
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "4",
+		},
+		{
+			name:        "func min int",
+			value:       `[[min 4 1]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1",
+		},
+		{
+			name:        "func max int",
+			value:       `[[max 4 1]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "4",
+		},
+		{
+			name:        "func max float",
+			value:       `[[max 1.23 4.666]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "4.666",
+		},
+		{
+			name:        "func min float",
+			value:       `[[min 1.23 4.666]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1.23",
+		},
+		{
+			name:        "func min string",
+			value:       `[[min "a" "b"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "a",
+		},
+		{
+			name:        "func max string",
+			value:       `[[max "a" "b"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "b",
+		},
+		{
+			name:        "func min int64 unix seconds",
+			value:       `[[ min (now.Unix) 1689771139 ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1689771139",
+		},
+		{
+			name:        "func min int year",
+			value:       `[[ min (now.Year) 2020 ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020",
+		},
+		{
+			name:        "func max duration",
+			value:       `[[ max (parseDuration "59m") (parseDuration "1h") ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1h0m0s",
+		},
+		{
+			name:        "func min int ",
+			value:       `[[ min (now.Year) 2020 ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020",
 		},
 		{
 			name:        "func sha1 hmac Hex",
@@ -694,7 +766,7 @@ func TestValueTpl(t *testing.T) {
 				assert.NoError(t, defTpl.Unpack(tc.paramDefVal))
 			}
 
-			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, "", defTpl, logp.NewLogger(""))
+			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, tc.name, defTpl, logp.NewLogger(""))
 			assert.Equal(t, tc.expectedVal, got)
 			if tc.expectedError == "" {
 				assert.NoError(t, err)

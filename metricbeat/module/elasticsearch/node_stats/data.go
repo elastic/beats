@@ -368,6 +368,12 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 			continue
 		}
 
+		if transportAddress, hasTransportAddress := node["transport_address"]; hasTransportAddress {
+			if transportAddress, ok := transportAddress.(string); ok {
+				event.Host = transportAddress
+			}
+		}
+
 		roles := node["roles"]
 
 		event.ModuleFields = mapstr.M{

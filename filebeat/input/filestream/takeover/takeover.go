@@ -24,11 +24,11 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/filebeat/backup"
-	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -47,8 +47,8 @@ type filestreamMatchers map[string]func(source string) bool
 //
 // This mode is created for a smooth loginput->filestream migration experience, so the filestream
 // inputs would pick up ingesting files from the same point where a loginput stopped.
-func TakeOverLogInputStates(log *logp.Logger, store backend.Store, backuper backup.Backuper, cfg *cfg.Config) error {
-	filestreamMatchers, err := findFilestreams(log, cfg)
+func TakeOverLogInputStates(log *logp.Logger, store backend.Store, backuper backup.Backuper, inputsCfg []*conf.C) error {
+	filestreamMatchers, err := findFilestreams(log, inputsCfg)
 	if err != nil {
 		return fmt.Errorf("failed to read input configuration: %w", err)
 	}
@@ -141,10 +141,10 @@ func takeOverStates(log *logp.Logger, store backend.Store, matchers filestreamMa
 // findFilestreams finds filestream inputs that are marked as `take_over: true`
 // and creates a file matcher for each such filestream for the future use in state
 // processing
-func findFilestreams(log *logp.Logger, cfg *cfg.Config) (matchers filestreamMatchers, err error) {
+func findFilestreams(log *logp.Logger, inputs []*conf.C) (matchers filestreamMatchers, err error) {
 	matchers = make(filestreamMatchers)
 
-	for _, input := range cfg.Inputs {
+	for _, input := range inputs {
 		inputCfg := defaultInputConfig()
 		err := input.Unpack(&inputCfg)
 		if err != nil {

@@ -2,17 +2,20 @@
 name: bump-golang
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 20 * * 6'
+    - cron: "0 20 * * 6"
 
 permissions:
   contents: read
+
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 jobs:
   bump:
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v3
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
@@ -21,3 +24,14 @@ jobs:
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
           pipeline: ./.ci/bump-golang.yml
+          notifySlackChannel: "#ingest-notifications"
+          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
+
+      - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
+        with:
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
+          pipeline: ./.ci/bump-golang-7.17.yml
+          notifySlackChannel: "#ingest-notifications"
+          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"

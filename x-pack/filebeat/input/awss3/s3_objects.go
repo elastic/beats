@@ -15,7 +15,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"reflect"
 	"strings"
 	"time"
@@ -29,7 +28,6 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -47,7 +45,8 @@ type s3ObjectProcessorFactory struct {
 
 func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig, maxWorkers int) *s3ObjectProcessorFactory {
 	if metrics == nil {
-		metrics = newInputMetrics("", monitoring.NewRegistry(), maxWorkers)
+		// Metrics are optional. Initialize a stub.
+		metrics = newInputMetrics("", nil, 0)
 	}
 	if len(sel) == 0 {
 		sel = []fileSelectorConfig{
@@ -152,14 +151,38 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		contentType = p.readerConfig.ContentType
 	}
 
-	// Process object content stream.
-	switch {
-	case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
-		err = p.readJSON(reader)
-	default:
-		err = p.readFile(reader)
+	// try to create a decoder from the using the codec config
+	decoder, err := newDecoder(p.readerConfig.Decoding, reader)
+	if err != nil {
+		return err
 	}
+	if decoder != nil {
+		defer decoder.close()
 
+		var evtOffset int64
+		for decoder.next() {
+			data, err := decoder.decode()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+				break
+			}
+			evtOffset, err = p.readJSONSlice(bytes.NewReader(data), evtOffset)
+			if err != nil {
+				break
+			}
+		}
+	} else {
+		// This is the legacy path. It will be removed in future and clubbed together with the decoder.
+		// Process object content stream.
+		switch {
+		case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
+			err = p.readJSON(reader)
+		default:
+			err = p.readFile(reader)
+		}
+	}
 	if err != nil {
 		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
 			time.Since(start).Nanoseconds(), err)
@@ -233,15 +256,55 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	return nil
 }
 
-func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
-	var jsonObject map[string]json.RawMessage
-	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return err
+// readJSONSlice uses a json.RawMessage to process JSON slice data as individual JSON objects.
+// It accepts a reader and a starting offset, it returns an updated offset and an error if any.
+// It reads the opening token separately and then iterates over the slice, decoding each object and publishing it.
+func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, error) {
+	dec := json.NewDecoder(r)
+	dec.UseNumber()
+
+	// reads starting token separately since this is always a slice.
+	_, err := dec.Token()
+	if err != nil {
+		return -1, fmt.Errorf("failed to read JSON slice token for object key: %s, with error: %w", p.s3Obj.S3.Object.Key, err)
 	}
 
-	raw, found := jsonObject[key]
-	if !found {
-		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+	// we track each event offset separately since we are reading a slice.
+	for dec.More() && p.ctx.Err() == nil {
+		var item json.RawMessage
+		if err := dec.Decode(&item); err != nil {
+			return -1, fmt.Errorf("failed to decode json: %w", err)
+		}
+
+		if p.readerConfig.ExpandEventListFromField != "" {
+			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, evtOffset, p.s3ObjHash); err != nil {
+				return -1, err
+			}
+			continue
+		}
+
+		data, _ := item.MarshalJSON()
+		evt := p.createEvent(string(data), evtOffset)
+		p.publish(p.acker, &evt)
+		evtOffset++
+	}
+
+	return evtOffset, nil
+}
+
+func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
+	// .[] signifies the root object is an array, and it should be split.
+	if key != ".[]" {
+		var jsonObject map[string]json.RawMessage
+		if err := json.Unmarshal(raw, &jsonObject); err != nil {
+			return err
+		}
+
+		var found bool
+		raw, found = jsonObject[key]
+		if !found {
+			return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		}
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))
@@ -285,7 +348,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	var reader reader.Reader
-	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
+	reader, err = readfile.NewEncodeReader(io.NopCloser(r), readfile.Config{
 		Codec:        enc,
 		BufferSize:   int(p.readerConfig.BufferSize),
 		Terminator:   p.readerConfig.LineTerminator,

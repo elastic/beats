@@ -131,8 +131,17 @@ func (e *eventLogger) run(
 		}
 	}()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
+	channelNotFoundErrDetected := false
+
 runLoop:
 	for stop := false; !stop; {
+		select {
+		case <-done:
+			return
+		default:
+		}
+
 		err = api.Open(state)
 
 		switch {
@@ -141,13 +150,19 @@ runLoop:
 			time.Sleep(time.Second * 5)
 			continue
 		case !api.IsFile() && eventlog.IsChannelNotFound(err):
-			e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			if !channelNotFoundErrDetected {
+				e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			} else {
+				e.log.Debugw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			}
+			channelNotFoundErrDetected = true
 			time.Sleep(time.Second * 5)
 			continue
 		case err != nil:
 			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
+		channelNotFoundErrDetected = false
 
 		e.log.Debug("Opened successfully.")
 
@@ -162,15 +177,15 @@ runLoop:
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
 				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err, "channel", api.Channel())
-				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+				if resetErr := api.Reset(); resetErr != nil {
+					e.log.Warnw("Reset() error.", "error", err)
 				}
 				continue runLoop
 			}
 			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
 				e.log.Warnw("Read() encountered channel not found error for channel %q. Reopening handle...", "error", err, "channel", api.Channel())
-				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+				if resetErr := api.Reset(); resetErr != nil {
+					e.log.Warnw("Reset() error.", "error", err)
 				}
 				continue runLoop
 			}

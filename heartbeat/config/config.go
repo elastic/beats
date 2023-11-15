@@ -41,6 +41,7 @@ type LocationWithID struct {
 // Config defines the structure of heartbeat.yml.
 type Config struct {
 	RunOnce        bool                 `config:"run_once"`
+	PublishTimeout time.Duration        `config:"publish_timeout"`
 	Monitors       []*conf.C            `config:"monitors"`
 	ConfigMonitors *conf.C              `config:"config.monitors"`
 	Scheduler      Scheduler            `config:"scheduler"`

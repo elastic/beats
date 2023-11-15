@@ -19,12 +19,15 @@ package file_integrity
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
+	"os/user"
+	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -173,7 +176,7 @@ func TestDiffEvents(t *testing.T) {
 }
 
 func TestHashFile(t *testing.T) {
-	f, err := ioutil.TempFile("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -284,7 +287,7 @@ func TestHashFile(t *testing.T) {
 }
 
 func TestNewEventFromFileInfoHash(t *testing.T) {
-	f, err := ioutil.TempFile("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -357,7 +360,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 }
 
 func BenchmarkHashFile(b *testing.B) {
-	f, err := ioutil.TempFile("", "hash")
+	f, err := os.CreateTemp(b.TempDir(), "hash")
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -552,4 +555,50 @@ func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 		return false
 	}
 	return true
+}
+
+func TestACLText(t *testing.T) {
+	// The xattr package returns raw bytes, but command line tools such as getfattr
+	// return a base64-encoded format, so use that here to make test validation
+	// easier.
+	//
+	// Depending on the system we are running this test on, we may or may not
+	// have a username associated with the user's UID in the xattr string, so
+	// dynamically determine the username here.
+	tests := []struct {
+		encoded string
+		want    []string
+	}{
+		0: {
+			encoded: "0sAgAAAAEABgD/////AgAGAG8AAAAEAAQA/////xAABgD/////IAAEAP////8=",
+			want:    []string{"user::rw-", "user:" + userNameOrUID("111") + ":rw-", "group::r--", "mask::rw-", "other::r--"},
+		},
+		1: { // Encoded string from https://www.bityard.org/wiki/tech/os/linux/xattrs.
+			encoded: "0sAgAAAAEABgD/////AgAHAHwAAAAEAAQA/////xAABwD/////IAAEAP////8=",
+			want:    []string{"user::rw-", "user:" + userNameOrUID("124") + ":rwx", "group::r--", "mask::rwx", "other::r--"},
+		},
+	}
+	for i, test := range tests {
+		b, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(test.encoded, "0s"))
+		if err != nil {
+			t.Errorf("invalid test: unexpected base64 encoding error for test %d: %v", i, err)
+			continue
+		}
+		got, err := aclText(b)
+		if err != nil {
+			t.Errorf("unexpected error for test %d: %v", i, err)
+			continue
+		}
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("unexpected result for test %d:\ngot: %#v\nwant:%#v", i, got, test.want)
+		}
+	}
+}
+
+func userNameOrUID(uid string) string {
+	u, err := user.LookupId(uid)
+	if err != nil {
+		return uid
+	}
+	return u.Username
 }

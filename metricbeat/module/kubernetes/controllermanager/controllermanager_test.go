@@ -16,33 +16,39 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package controllermanager
 
 import (
 	"testing"
 
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
+var files = []string{
+	"./_meta/test/metrics.1.26",
+	"./_meta/test/metrics.1.27",
+	"./_meta/test/metrics.1.28",
+}
+
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "controllermanager",
-		ptest.TestCases{
-			{
-				MetricsFile:  "./_meta/test/metrics.1.25",
-				ExpectedFile: "./_meta/test/metrics.1.25.expected",
-			},
-			{
-				MetricsFile:  "./_meta/test/metrics.1.26",
-				ExpectedFile: "./_meta/test/metrics.1.26.expected",
-			},
-		},
-	)
+	var testCases ptest.TestCases
+	for _, file := range files {
+		testCases = append(testCases, ptest.TestCase{
+			MetricsFile:  file,
+			ExpectedFile: file + ".expected",
+		})
+	}
+	ptest.TestMetricSet(t, "kubernetes", "controllermanager", testCases)
 }
 
 func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "kubernetes", "controllermanager")
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestMetricsFamily(t, files, mapping)
 }

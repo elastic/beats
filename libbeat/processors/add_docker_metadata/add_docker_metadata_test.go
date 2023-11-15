@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build (linux || darwin || windows) && !integration
-// +build linux darwin windows
-// +build !integration
 
 package add_docker_metadata
 

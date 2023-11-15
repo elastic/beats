@@ -299,11 +299,30 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 			setup: func() {
 				// we change the default function to force a failure
-				findDefaultGoogleCredentials = func(context.Context, ...string) (*google.Credentials, error) {
+				findDefaultGoogleCredentials = func(context.Context, google.CredentialsParams) (*google.Credentials, error) {
 					return nil, errors.New("failed")
 				}
 			},
-			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentials },
+			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams },
+		},
+		{
+			name: "google must send scopes and delegated_account if ADC available",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.delegated_account": "delegated@account.com",
+					"scopes":                   []string{"foo"},
+				},
+			},
+			setup: func() {
+				findDefaultGoogleCredentials = func(_ context.Context, p google.CredentialsParams) (*google.Credentials, error) {
+					if len(p.Scopes) != 1 || p.Scopes[0] != "foo" || p.Subject != "delegated@account.com" {
+						return nil, errors.New("failed")
+					}
+					return &google.Credentials{}, nil
+				}
+			},
+			teardown: func() { findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams },
 		},
 		{
 			name:        "google must fail if credentials file not found",
@@ -430,6 +449,53 @@ func TestConfigOauth2Validation(t *testing.T) {
 					"provider":                 "google",
 					"google.jwt_file":          "./testdata/credentials.json",
 					"google.delegated_account": "delegated@account.com",
+				},
+			},
+		},
+		{
+			name: "google must work with delegated_account and ADC set up",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.delegated_account": "delegated@account.com",
+				},
+			},
+			setup: func() { os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./testdata/credentials.json") },
+		},
+		{
+			name:        "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
+			expectedErr: "okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":  "okta",
+					"client.id": "a_client_id",
+					"token_url": "localhost",
+					"scopes":    []string{"foo"},
+				},
+			},
+		},
+		{
+			name:        "okta oauth2 validation fails if jwk_json is not a valid JSON",
+			expectedErr: "the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":      "okta",
+					"client.id":     "a_client_id",
+					"token_url":     "localhost",
+					"scopes":        []string{"foo"},
+					"okta.jwk_json": `"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
+				},
+			},
+		},
+		{
+			name: "okta successful oauth2 validation",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"provider":      "okta",
+					"client.id":     "a_client_id",
+					"token_url":     "localhost",
+					"scopes":        []string{"foo"},
+					"okta.jwk_json": `{"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
 				},
 			},
 		},

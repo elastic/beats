@@ -34,7 +34,6 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
-	errw "github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -219,7 +218,7 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 		if ok {
 			minVersion, err := version.New(minESVersion["version"].(string))
 			if err != nil {
-				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
+				return vars, fmt.Errorf("Error parsing version %s: %w", minESVersion["version"].(string), err)
 			}
 
 			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
@@ -270,13 +269,13 @@ func ApplyTemplate(vars map[string]interface{}, templateString string, specialDe
 
 	tplFunctions, err := getTemplateFunctions(vars)
 	if err != nil {
-		return "", errw.Wrap(err, "error fetching template functions")
+		return "", fmt.Errorf("error fetching template functions: %w", err)
 	}
 	tpl = tpl.Funcs(tplFunctions)
 
 	tpl, err = tpl.Parse(templateString)
 	if err != nil {
-		return "", fmt.Errorf("Error parsing template %s: %v", templateString, err)
+		return "", fmt.Errorf("Error parsing template %s: %w", templateString, err)
 	}
 	buf := bytes.NewBufferString("")
 	err = tpl.Execute(buf, vars)
@@ -325,7 +324,7 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error) {
 	host, err := os.Hostname()
 	if err != nil || len(host) == 0 {
-		return nil, fmt.Errorf("Error getting the hostname: %v", err)
+		return nil, fmt.Errorf("Error getting the hostname: %w", err)
 	}
 	split := strings.SplitN(host, ".", 2)
 	hostname := split[0]
@@ -347,21 +346,21 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	path, err := ApplyTemplate(fs.vars, fs.manifest.Input, false)
 	if err != nil {
-		return nil, fmt.Errorf("Error expanding vars on the input path: %v", err)
+		return nil, fmt.Errorf("Error expanding vars on the input path: %w", err)
 	}
 	contents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
-		return nil, fmt.Errorf("Error reading input file %s: %v", path, err)
+		return nil, fmt.Errorf("Error reading input file %s: %w", path, err)
 	}
 
 	yaml, err := ApplyTemplate(fs.vars, string(contents), false)
 	if err != nil {
-		return nil, fmt.Errorf("Error interpreting the template of the input: %v", err)
+		return nil, fmt.Errorf("Error interpreting the template of the input: %w", err)
 	}
 
 	cfg, err := conf.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
-		return nil, fmt.Errorf("Error reading input config: %v", err)
+		return nil, fmt.Errorf("Error reading input config: %w", err)
 	}
 
 	cfg, err = mergePathDefaults(cfg)
@@ -373,11 +372,11 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	if len(fs.fcfg.Input) > 0 {
 		overrides, err := conf.NewConfigFrom(fs.fcfg.Input)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
+			return nil, fmt.Errorf("Error creating config from input overrides: %w", err)
 		}
 		cfg, err = conf.MergeConfigsWithOptions([]*conf.C{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldAppendValues("**.processors"))
 		if err != nil {
-			return nil, fmt.Errorf("Error applying config overrides: %v", err)
+			return nil, fmt.Errorf("Error applying config overrides: %w", err)
 		}
 	}
 
@@ -388,18 +387,18 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 			rootPipelineID = fs.pipelineIDs[0]
 		}
 		if err := cfg.SetString(pipelineField, -1, rootPipelineID); err != nil {
-			return nil, errw.Wrap(err, "error setting the fileset pipeline ID in config")
+			return nil, fmt.Errorf("error setting the fileset pipeline ID in config: %w", err)
 		}
 	}
 
 	// force our the module/fileset name
 	err = cfg.SetString("_module_name", -1, fs.mname)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %v", err)
+		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %w", err)
 	}
 	err = cfg.SetString("_fileset_name", -1, fs.name)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %v", err)
+		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %w", err)
 	}
 
 	common.PrintConfigDebugf(cfg, "Merged input config for fileset %s/%s", fs.mname, fs.name)
@@ -413,7 +412,7 @@ func (fs *Fileset) getPipelineIDs(info beat.Info) ([]string, error) {
 	for _, ingestPipeline := range fs.manifest.IngestPipeline {
 		path, err := ApplyTemplate(fs.vars, ingestPipeline, false)
 		if err != nil {
-			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %w", err)
 		}
 
 		pipelineIDs = append(pipelineIDs, FormatPipelineID(info.IndexPrefix, fs.mname, fs.name, path, info.Version))
@@ -432,32 +431,32 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 	for idx, ingestPipeline := range fs.manifest.IngestPipeline {
 		path, err := ApplyTemplate(fs.vars, ingestPipeline, false)
 		if err != nil {
-			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %w", err)
 		}
 
 		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 		if err != nil {
-			return nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
+			return nil, fmt.Errorf("Error reading pipeline file %s: %w", path, err)
 		}
 
 		encodedString, err := ApplyTemplate(vars, string(strContents), true)
 		if err != nil {
-			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
+			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %w", err)
 		}
 
 		var content map[string]interface{}
 		switch extension := strings.ToLower(filepath.Ext(path)); extension {
 		case ".json":
 			if err = json.Unmarshal([]byte(encodedString), &content); err != nil {
-				return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
+				return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %w", path, err)
 			}
 		case ".yaml", ".yml":
 			if err = yaml.Unmarshal([]byte(encodedString), &content); err != nil {
-				return nil, fmt.Errorf("Error YAML decoding the pipeline file: %s: %v", path, err)
+				return nil, fmt.Errorf("Error YAML decoding the pipeline file: %s: %w", path, err)
 			}
 			newContent, err := FixYAMLMaps(content)
 			if err != nil {
-				return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %v", path, err)
+				return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %w", path, err)
 			}
 			content = newContent.(map[string]interface{})
 		default:

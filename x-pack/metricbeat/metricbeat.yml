@@ -33,7 +33,7 @@ setup.template.settings:
 # all the transactions sent by a single shipper in the web interface.
 #name:
 
-# The tags of the shipper are included in their own field with each
+# The tags of the shipper are included in their field with each
 # transaction published.
 #tags: ["service-X", "web-tier"]
 
@@ -48,8 +48,8 @@ setup.template.settings:
 # options here or by using the `setup` command.
 #setup.dashboards.enabled: false
 
-# The URL from where to download the dashboards archive. By default this URL
-# has a value which is computed based on the Beat name and version. For released
+# The URL from where to download the dashboard archive. By default, this URL
+# has a value that is computed based on the Beat name and version. For released
 # versions, this URL points to the dashboard archive on the artifacts.elastic.co
 # website.
 #setup.dashboards.url:
@@ -134,7 +134,7 @@ processors:
 #logging.level: debug
 
 # At debug level, you can selectively enable logging only for some components.
-# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# To enable all selectors, use ["*"]. Examples of other selectors are "beat",
 # "publisher", "service".
 #logging.selectors: ["*"]
 
@@ -152,7 +152,7 @@ processors:
 #monitoring.cluster_uuid:
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well.
+# Elasticsearch outputs are accepted here as well.
 # Note that the settings should point to your Elasticsearch *monitoring* cluster.
 # Any setting that is not set is automatically inherited from the Elasticsearch
 # output configuration, so if you have the Elasticsearch output configured such

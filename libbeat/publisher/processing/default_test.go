@@ -480,6 +480,14 @@ func TestProcessingClose(t *testing.T) {
 	assert.True(t, factoryProcessor.closed)
 }
 
+func TestProcessingDiagnostics(t *testing.T) {
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	require.NoError(t, err)
+
+	p := factory.Processors()
+	assert.Empty(t, p)
+}
+
 func fromJSON(in string) mapstr.M {
 	var tmp mapstr.M
 	err := json.Unmarshal([]byte(in), &tmp)

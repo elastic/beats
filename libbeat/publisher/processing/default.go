@@ -261,9 +261,13 @@ func newBuilder(
 // Processors returns a string description of the processor config
 func (b *builder) Processors() []string {
 	procList := []string{}
-	for _, proc := range b.processors.list {
-		procList = append(procList, proc.String())
+
+	if b.processors != nil {
+		for _, proc := range b.processors.list {
+			procList = append(procList, proc.String())
+		}
 	}
+
 	return procList
 }
 

@@ -241,6 +241,71 @@ func TestDisabledMonitor(t *testing.T) {
 	}
 }
 
+func TestRunFrom(t *testing.T) {
+	tests := []struct {
+		name string
+		loc  *hbconfig.LocationWithID
+	}{
+		{
+			"no location",
+			nil,
+		},
+		{
+			"with id",
+			&hbconfig.LocationWithID{
+				ID: "test",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		confMap := map[string]interface{}{
+			"type":     "test",
+			"urls":     []string{"http://example.net"},
+			"schedule": "@every 1ms",
+			"name":     "test",
+		}
+		if tt.loc != nil {
+			geo, err := util.GeoConfigToMap(tt.loc.Geo)
+			require.NoError(t, err)
+			confMap["run_from"] = map[string]interface{}{
+				"id":  tt.loc.ID,
+				"geo": geo,
+			}
+		}
+
+		conf, err := config.NewConfigFrom(confMap)
+		require.NoError(t, err)
+
+		reg, _, _ := mockPluginsReg()
+		mockPipeline := &MockPipeline{}
+
+		f, sched, fClose := makeMockFactory(reg)
+		defer fClose()
+		defer sched.Stop()
+
+		makeTestMon := func() (*Monitor, error) {
+			mIface, err := f.Create(mockPipeline, conf)
+			if mIface == nil {
+				return nil, err
+			} else {
+				return mIface.(*Monitor), err
+			}
+		}
+
+		// Would fail if the previous newMonitor didn't free the monitor.id
+		m1, m1Err := makeTestMon()
+		require.NoError(t, m1Err)
+
+		if tt.loc == nil {
+			var emptyLoc *hbconfig.LocationWithID
+			require.Equal(t, emptyLoc, m1.stdFields.RunFrom)
+		} else {
+			require.Equal(t, tt.loc, m1.stdFields.RunFrom)
+		}
+	}
+}
+
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom")
@@ -260,8 +325,11 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 		}
 	}
 
+	c, err := mockPipeline.Connect()
+	require.NoError(t, err)
+
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil, nil)
+	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

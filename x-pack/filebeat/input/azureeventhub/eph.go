@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -79,7 +78,7 @@ func (a *azureInput) runWithEPH() error {
 			ok := a.processEvents(e, "")
 			if !ok {
 				onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
-				a.log.Debug(onEventErr.Error())
+				a.log.Error(onEventErr.Error())
 				a.Stop()
 			}
 			return onEventErr

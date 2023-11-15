@@ -5,11 +5,10 @@
 package o365audit
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -147,16 +146,16 @@ func (c *Config) Validate() (err error) {
 	}
 	if hasCert {
 		if err = c.CertificateConfig.Validate(); err != nil {
-			return errors.Wrap(err, "invalid certificate config")
+			return fmt.Errorf("invalid certificate config: %w", err)
 		}
 	}
 	c.API.Resource, err = forceURLScheme(c.API.Resource, "https")
 	if err != nil {
-		return errors.Wrapf(err, "resource '%s' is not a valid URL", c.API.Resource)
+		return fmt.Errorf("resource '%s' is not a valid URL: %w", c.API.Resource, err)
 	}
 	c.API.AuthenticationEndpoint, err = forceURLScheme(c.API.AuthenticationEndpoint, "https")
 	if err != nil {
-		return errors.Wrapf(err, "authentication_endpoint '%s' is not a valid URL", c.API.AuthenticationEndpoint)
+		return fmt.Errorf("authentication_endpoint '%s' is not a valid URL: %w", c.API.AuthenticationEndpoint, err)
 	}
 	return nil
 }

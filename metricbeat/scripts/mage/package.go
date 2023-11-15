@@ -26,7 +26,6 @@ import (
 	"strings"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -58,7 +57,7 @@ func CustomizePackaging() {
 			Modules: true,
 			Dep: func(spec devtools.PackageSpec) error {
 				if err := devtools.Copy(dirModulesDGenerated, spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
-					return errors.Wrap(err, "failed to copy modules.d dir")
+					return fmt.Errorf("failed to copy modules.d dir: %w", err)
 				}
 
 				return devtools.FindReplace(
@@ -73,7 +72,7 @@ func CustomizePackaging() {
 				err := devtools.Copy("metricbeat.reference.yml",
 					spec.MustExpand("{{.PackageDir}}/metricbeat.reference.yml"))
 				if err != nil {
-					return errors.Wrap(err, "failed to copy reference config")
+					return fmt.Errorf("failed to copy reference config: %w", err)
 				}
 
 				return devtools.FindReplace(
@@ -96,7 +95,7 @@ func CustomizePackaging() {
 			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 		}
 	}
@@ -171,7 +170,7 @@ func GenerateDirModulesD() error {
 
 	docBranch, err := devtools.BeatDocBranch()
 	if err != nil {
-		errors.Wrap(err, "failed to get doc branch")
+		return fmt.Errorf("failed to get doc branch: %w", err)
 	}
 
 	mode := 0644
@@ -297,21 +296,24 @@ func moduleConfigParts(f string) (moduleName string, configName string, ok bool)
 func copyWithHeader(header, src, dst string, mode os.FileMode) error {
 	dstFile, err := os.OpenFile(devtools.CreateDir(dst), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode&os.ModePerm)
 	if err != nil {
-		return errors.Wrap(err, "failed to open copy destination")
+		return fmt.Errorf("failed to open copy destination: %w", err)
 	}
 	defer dstFile.Close()
 
 	_, err = io.WriteString(dstFile, header+"\n\n")
 	if err != nil {
-		return errors.Wrap(err, "failed to write header")
+		return fmt.Errorf("failed to write header: %w", err)
 	}
 
 	srcFile, err := os.Open(src)
 	if err != nil {
-		return errors.Wrap(err, "failed to open copy source")
+		return fmt.Errorf("failed to open copy source: %w", err)
 	}
 	defer srcFile.Close()
 
 	_, err = io.Copy(dstFile, srcFile)
-	return errors.Wrap(err, "failed to copy file")
+	if err != nil {
+		return fmt.Errorf("failed to copy file: %w", err)
+	}
+	return nil
 }

@@ -22,11 +22,11 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -64,7 +64,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 
 	config, err := mysql.ParseDSN(host)
 	if err != nil {
-		return mb.HostData{}, errors.Wrapf(err, "error parsing mysql host")
+		return mb.HostData{}, fmt.Errorf("error parsing mysql host: %w", err)
 	}
 
 	if config.User == "" {
@@ -102,7 +102,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 func NewDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return nil, errors.Wrap(err, "sql open failed")
+		return nil, fmt.Errorf("sql open failed: %w", err)
 	}
 	return db, nil
 }

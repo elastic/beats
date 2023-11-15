@@ -93,14 +93,6 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		configurator = initialConfig().FromStatic
 	}
 
-	// Install Npcap if needed. This need to happen before any other
-	// work on Windows, including config checking, because that involves
-	// probing interfaces.
-	err := installNpcap(b)
-	if err != nil {
-		return nil, err
-	}
-
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
@@ -133,6 +125,18 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		}
 	}
 
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON()
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
+
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
 	}
@@ -154,7 +158,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	select {
 	case <-pb.done:
 	case err := <-factory.err:
-		close(pb.done)
+		pb.stopOnce.Do(func() { close(pb.done) })
 		return err
 	}
 	return nil
@@ -187,7 +191,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 			// to stop if the sniffer(s) exited without an error
 			// this would happen during a configuration reload
 			if err != nil {
-				close(pb.done)
+				pb.stopOnce.Do(func() { close(pb.done) })
 				return err
 			}
 		}

@@ -49,9 +49,8 @@ type IndexSelector interface {
 }
 
 // Group configures and combines multiple clients into load-balanced group of clients
-// being managed by the publisher pipeline. If QueueSettings is set then the
-// pipeline will use it to create the queue. QueueSettings must be one of
-// memqueue.Settings, diskqueue.Settings, proxyqueue.Settings.
+// being managed by the publisher pipeline.
+// If QueueFactory is set then the pipeline will use it to create the queue.
 // Currently it is only used to activate the proxy queue when using the Shipper
 // output, but it also provides a natural migration path for moving queue
 // configuration into the outputs.

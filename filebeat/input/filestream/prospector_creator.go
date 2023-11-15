@@ -24,6 +24,8 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -36,15 +38,24 @@ const (
 var experimentalWarning sync.Once
 
 func newProspector(config config) (loginp.Prospector, error) {
+	err := checkConfigCompatibility(config.FileWatcher, config.FileIdentity)
+	if err != nil {
+		return nil, err
+	}
+
 	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
 
-	identifier, err := newFileIdentifier(config.FileIdentity, getIdentifierSuffix(config))
+	identifier, err := newFileIdentifier(config.FileIdentity, config.Reader.Parsers.Suffix)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
+
+	logp.L().
+		With("filestream_id", config.ID).
+		Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
@@ -104,6 +115,22 @@ func newProspector(config config) (loginp.Prospector, error) {
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
 }
 
-func getIdentifierSuffix(config config) string {
-	return config.Reader.Parsers.Suffix
+func checkConfigCompatibility(fileWatcher, fileIdentifier *conf.Namespace) error {
+	var fwCfg struct {
+		Fingerprint struct {
+			Enabled bool `config:"enabled"`
+		} `config:"fingerprint"`
+	}
+
+	if fileWatcher != nil && fileIdentifier != nil && fileIdentifier.Name() == fingerprintName {
+		err := fileWatcher.Config().Unpack(&fwCfg)
+		if err != nil {
+			return fmt.Errorf("failed to parse file watcher configuration: %w", err)
+		}
+		if !fwCfg.Fingerprint.Enabled {
+			return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
+		}
+	}
+
+	return nil
 }

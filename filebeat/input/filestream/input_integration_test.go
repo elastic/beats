@@ -26,6 +26,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -636,7 +637,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
 
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
@@ -703,7 +704,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -715,10 +716,9 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 "fake-ID",
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "1ms",
-		"prospector.scanner.resend_on_touch": "true",
+		"id":                                "fake-ID",
+		"paths":                             []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval": "200ms",
 	})
 
 	testlines := []byte("first line\nsecond line\n")
@@ -742,7 +742,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
 
 	// all newly started client has to be cancelled so events can be processed
 	env.pipeline.cancelAllClients()
@@ -753,7 +753,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.mustWriteToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines))
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -913,7 +913,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0)
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
 
 	// recreate symlink
 	env.mustSymlink(testlogName, symlinkName)
@@ -921,12 +921,48 @@ func TestFilestreamTruncate(t *testing.T) {
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines))
+	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
 
 	env.requireRegistryEntryCount(1)
+}
+
+func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	logFiles := []struct {
+		path  string
+		lines []string
+	}{
+		{path: "log-a.log",
+			lines: []string{"1-aaaaaaaaaa", "2-aaaaaaaaaa"}},
+		{path: "log-b.log",
+			lines: []string{"1-bbbbbbbbbb", "2-bbbbbbbbbb"}},
+	}
+	for _, lf := range logFiles {
+		env.mustWriteToFile(
+			lf.path, []byte(strings.Join(lf.lines, "\n")+"\n"))
+	}
+
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                  "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded",
+		"harvester_limit":     1,
+		"close.reader.on_eof": true,
+		"paths": []string{
+			env.abspath(logFiles[0].path),
+			env.abspath(logFiles[1].path)},
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCountCtx(ctx, 4)
+
+	cancel()
+	env.waitUntilInputStops()
 }
 
 func TestGlobalIDCannotBeUsed(t *testing.T) {

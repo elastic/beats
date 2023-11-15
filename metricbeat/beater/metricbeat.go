@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -44,9 +45,9 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}   // Channel used to initiate shutdown.
-	stopOnce     sync.Once       // wraps the Stop() method
-	runners      []module.Runner // Active list of module runners.
+	done         chan struct{}    // Channel used to initiate shutdown.
+	stopOnce     sync.Once        // wraps the Stop() method
+	runners      []cfgfile.Runner // Active list of module runners.
 	config       Config
 	autodiscover *autodiscover.Autodiscover
 
@@ -153,6 +154,24 @@ func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, err
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
 		return metricbeat, nil
+	}
+
+	if b.API != nil {
+		if err := inputmon.AttachHandler(b.API.Router()); err != nil {
+			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
+	}
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON()
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
 	}
 
 	moduleOptions := append(

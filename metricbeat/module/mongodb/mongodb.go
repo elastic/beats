@@ -114,28 +114,11 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 
 	parse.SetURLUser(u, c.Username, c.Password)
 
-	clientOptions := options.Client()
-	clientOptions.Auth = &options.Credential{
-		AuthMechanism:           c.Credentials.AuthMechanism,
-		AuthMechanismProperties: c.Credentials.AuthMechanismProperties,
-		AuthSource:              c.Credentials.AuthSource,
-		PasswordSet:             c.Credentials.PasswordSet,
-		Username:                c.Username,
-		Password:                c.Password,
-	}
-	clientOptions.SetDirect(true)
-	clientOptions.ApplyURI(host)
-
-	// https://docs.mongodb.com/manual/reference/connection-string/
-	_, err = url.Parse(clientOptions.GetURI())
-	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
-	}
-
 	return parse.NewHostDataFromURL(u), nil
 }
 
-func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (*mongo.Client, error) {
+func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode readpref.Mode) (*mongo.Client, error) {
+
 	clientOptions := options.Client()
 
 	// options.Credentials must be nil for the driver to work properly if no auth is provided. Zero values breaks
@@ -154,7 +137,8 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 			clientOptions.Auth.AuthMechanismProperties = config.Credentials.AuthMechanismProperties
 		}
 	}
-	clientOptions.SetHosts(config.Hosts)
+
+	clientOptions.ApplyURI(uri)
 
 	if mode == 0 {
 		mode = readpref.NearestMode
@@ -165,7 +149,6 @@ func NewClient(config ModuleConfig, timeout time.Duration, mode readpref.Mode) (
 		return nil, err
 	}
 	clientOptions.SetReadPreference(readPreference)
-	clientOptions.SetDirect(true)
 	clientOptions.SetConnectTimeout(timeout)
 
 	if config.TLS.IsEnabled() {

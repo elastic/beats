@@ -15,8 +15,11 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
+
+const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
@@ -25,16 +28,24 @@ type config struct {
 
 	// Program is the CEL program to be run for each polling.
 	Program string `config:"program" validate:"required"`
+	// MaxExecutions is the maximum number of times a single
+	// periodic CEL execution loop may repeat due to a true
+	// "want_more" field. If it is nil a sensible default is
+	// used.
+	MaxExecutions *int `config:"max_executions"`
 	// Regexps is the set of regular expression to be made
 	// available to the program.
 	Regexps map[string]string `config:"regexp"`
+	// XSDs is the set of XSD type hint definitions to be
+	// made available for XML parsing.
+	XSDs map[string]string `config:"xsd"`
 	// State is the initial state to be provided to the
 	// program. If it has a cursor field, that field will
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
 	// Redact is the debug log state redaction configuration.
-	Redact redact `config:"redact"`
+	Redact *redact `config:"redact"`
 
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
@@ -55,8 +66,15 @@ type redact struct {
 }
 
 func (c config) Validate() error {
+	if c.Redact == nil {
+		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
+	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
+	}
+	if c.MaxExecutions != nil && *c.MaxExecutions <= 0 {
+		return fmt.Errorf("invalid maximum number of executions: %d <= 0", *c.MaxExecutions)
 	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
@@ -71,7 +89,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns)
+	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -79,6 +97,7 @@ func (c config) Validate() error {
 }
 
 func defaultConfig() config {
+	maxExecutions := defaultMaxExecutions
 	maxAttempts := 5
 	waitMin := time.Second
 	waitMax := time.Minute
@@ -86,7 +105,8 @@ func defaultConfig() config {
 	transport.Timeout = 30 * time.Second
 
 	return config{
-		Interval: time.Minute,
+		MaxExecutions: &maxExecutions,
+		Interval:      time.Minute,
 		Resource: &ResourceConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,

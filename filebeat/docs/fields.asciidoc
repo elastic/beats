@@ -86734,6 +86734,13 @@ kibana Module
 
 
 
+*`service.node.roles`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === kibana
 

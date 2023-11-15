@@ -34,10 +34,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-type redisOut struct {
-	beat beat.Info
-}
-
 const (
 	defaultWaitRetry    = 1 * time.Second
 	defaultMaxWaitRetry = 60 * time.Second
@@ -58,7 +54,9 @@ func makeRedis(
 ) (outputs.Group, error) {
 
 	if !cfg.HasField("index") {
-		cfg.SetString("index", -1, beat.Beat)
+		if err := cfg.SetString("index", -1, beat.Beat); err != nil {
+			return outputs.Fail(err)
+		}
 	}
 
 	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
@@ -77,13 +75,13 @@ func makeRedis(
 		}
 	}
 
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	rConfig := defaultConfig
+	if err := cfg.Unpack(&rConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
 	var dataType redisDataType
-	switch config.DataType {
+	switch rConfig.DataType {
 	case "", "list":
 		dataType = redisListType
 	case "channel":
@@ -102,7 +100,7 @@ func makeRedis(
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(rConfig.TLS)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -129,8 +127,8 @@ func makeRedis(
 		}
 
 		transp := transport.Config{
-			Timeout: config.Timeout,
-			Proxy:   &config.Proxy,
+			Timeout: rConfig.Timeout,
+			Proxy:   &rConfig.Proxy,
 			TLS:     tls,
 			Stats:   observer,
 		}
@@ -138,7 +136,7 @@ func makeRedis(
 		switch hostUrl.Scheme {
 		case redisScheme:
 			if hasScheme {
-				transp.TLS = nil // disable TLS if user explicitely set `redis` scheme
+				transp.TLS = nil // disable TLS if user explicitly set `redis` scheme
 			}
 		case tlsRedisScheme:
 			if transp.TLS == nil {
@@ -151,23 +149,23 @@ func makeRedis(
 			return outputs.Fail(err)
 		}
 
-		pass := config.Password
+		pass := rConfig.Password
 		hostPass, passSet := hostUrl.User.Password()
 		if passSet {
 			pass = hostPass
 		}
 
-		enc, err := codec.CreateEncoder(beat, config.Codec)
+		enc, err := codec.CreateEncoder(beat, rConfig.Codec)
 		if err != nil {
 			return outputs.Fail(err)
 		}
 
-		client := newClient(conn, observer, config.Timeout,
-			pass, config.Db, key, dataType, config.Index, enc)
-		clients[i] = newBackoffClient(client, config.Backoff.Init, config.Backoff.Max)
+		client := newClient(conn, observer, rConfig.Timeout,
+			pass, rConfig.Db, key, dataType, rConfig.Index, enc)
+		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 
-	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+	return outputs.SuccessNet(rConfig.Queue, rConfig.LoadBalance, rConfig.BulkMaxSize, rConfig.MaxRetries, clients)
 }
 
 func buildKeySelector(cfg *config.C) (outil.Selector, error) {

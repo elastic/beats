@@ -25,13 +25,7 @@ import (
 
 var (
 	metricsetName          = "cloudwatch"
-	metricNameIdx          = 0
-	namespaceIdx           = 1
-	statisticIdx           = 2
-	identifierNameIdx      = 3
-	identifierValueIdx     = 4
 	defaultStatistics      = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
-	labelSeparator         = "|"
 	dimensionSeparator     = ","
 	dimensionValueWildcard = "*"
 )
@@ -48,7 +42,7 @@ func init() {
 
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
-// mb.BaseMetricSet because it implements all of the required mb.MetricSet
+// mb.BaseMetricSet because it implements all the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
@@ -72,7 +66,7 @@ type Config struct {
 }
 
 type metricsWithStatistics struct {
-	cloudwatchMetric types.Metric
+	cloudwatchMetric aws.MetricWithID
 	statistic        []string
 }
 
@@ -148,7 +142,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Create events based on listMetricDetailTotal from configuration
 	if len(listMetricDetailTotal.metricsWithStats) != 0 {
 		for _, regionName := range m.MetricSet.RegionsList {
-			//m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
+			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			beatsConfig := m.MetricSet.AwsConfig.Copy()
 			beatsConfig.Region = regionName
 
@@ -165,6 +159,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
 
 			for _, event := range eventsWithIdentifier {
+				_ = event.RootFields.Delete(aws.CloudWatchPeriodName)
 				report.Event(event)
 			}
 		}
@@ -183,7 +178,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, svcCloudwatch)
+		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, svcCloudwatch)
 		if err != nil {
 			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
 		}
@@ -208,13 +203,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))
 
-			events, err := addMetadata(namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
+			events, err := addMetadata(m.logger, namespace, regionName, beatsConfig, config.AWSConfig.FIPSEnabled, eventsWithIdentifier)
 			if err != nil {
 				// TODO What to do if add metadata fails? I guess to continue, probably we have an 90% of reliable data
-				m.Logger().Warn("could not add metadata to events: %w", err)
+				m.Logger().Warnf("could not add metadata to events: %v", err)
 			}
 
 			for _, event := range events {
+				_ = event.RootFields.Delete(aws.CloudWatchPeriodName)
 				report.Event(event)
 			}
 		}
@@ -243,20 +239,20 @@ func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionNa
 }
 
 // filterListMetricsOutput compares config details with listMetricsOutput and filter out the ones don't match
-func filterListMetricsOutput(listMetricsOutput []types.Metric, namespace string, namespaceDetails []namespaceDetail) []metricsWithStatistics {
+func filterListMetricsOutput(listMetricsOutput []aws.MetricWithID, namespace string, namespaceDetails []namespaceDetail) []metricsWithStatistics {
 	var filteredMetricWithStatsTotal []metricsWithStatistics
 	for _, listMetric := range listMetricsOutput {
-		if *listMetric.Namespace == namespace {
+		if *listMetric.Metric.Namespace == namespace {
 			for _, configPerNamespace := range namespaceDetails {
 				if configPerNamespace.names != nil {
 					// Consider only the metrics that exist in the configuration
-					exists, _ := aws.StringInSlice(*listMetric.MetricName, configPerNamespace.names)
+					exists, _ := aws.StringInSlice(*listMetric.Metric.MetricName, configPerNamespace.names)
 					if !exists {
 						continue
 					}
 				}
 				if configPerNamespace.dimensions != nil {
-					if !compareAWSDimensions(listMetric.Dimensions, configPerNamespace.dimensions) {
+					if !compareAWSDimensions(listMetric.Metric.Dimensions, configPerNamespace.dimensions) {
 						continue
 					}
 				}
@@ -324,14 +320,19 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 			!configDimensionValueContainsWildcard(config.Dimensions) {
 			namespace := config.Namespace
 			for i := range config.MetricName {
+				metric := types.Metric{
+					Namespace:  &namespace,
+					MetricName: &config.MetricName[i],
+					Dimensions: cloudwatchDimensions,
+				}
+
 				metricsWithStats := metricsWithStatistics{
-					cloudwatchMetric: types.Metric{
-						Namespace:  &namespace,
-						MetricName: &config.MetricName[i],
-						Dimensions: cloudwatchDimensions,
+					cloudwatchMetric: aws.MetricWithID{
+						Metric: metric,
 					},
 					statistic: config.Statistic,
 				}
+
 				metricsWithStatsTotal = append(metricsWithStatsTotal, metricsWithStats)
 			}
 
@@ -367,37 +368,42 @@ func createMetricDataQueries(listMetricsTotal []metricsWithStatistics, dataGranu
 			dataGranularityInSec := int32(dataGranularity.Seconds())
 
 			id := "cw" + strconv.Itoa(i) + "stats" + strconv.Itoa(j)
-			metricDataQueries = append(metricDataQueries, types.MetricDataQuery{
+			metricDataQuery := types.MetricDataQuery{
 				Id: &id,
 				MetricStat: &types.MetricStat{
 					Period: &dataGranularityInSec,
 					Stat:   &stat,
-					Metric: &metric,
+					Metric: &metric.Metric,
 				},
 				Label: &label,
-			})
+			}
+			if listMetric.cloudwatchMetric.AccountID != "" {
+				metricDataQuery.AccountId = &metric.AccountID
+			}
+
+			metricDataQueries = append(metricDataQueries, metricDataQuery)
 		}
 	}
 	return metricDataQueries
 }
 
-func constructLabel(metric types.Metric, statistic string) string {
-	// label = metricName + namespace + statistic + dimKeys + dimValues
-	label := *metric.MetricName + labelSeparator + *metric.Namespace + labelSeparator + statistic
+func constructLabel(metric aws.MetricWithID, statistic string) string {
+	// label = accountID + accountLabel + metricName + namespace + statistic + periodLabel + dimKeys + dimValues
+	label := strings.Join([]string{metric.AccountID, aws.LabelConst.AccountLabel, *metric.Metric.MetricName, *metric.Metric.Namespace, statistic, aws.LabelConst.PeriodLabel}, aws.LabelConst.LabelSeparator)
 	dimNames := ""
 	dimValues := ""
-	for i, dim := range metric.Dimensions {
+	for i, dim := range metric.Metric.Dimensions {
 		dimNames += *dim.Name
 		dimValues += *dim.Value
-		if i != len(metric.Dimensions)-1 {
+		if i != len(metric.Metric.Dimensions)-1 {
 			dimNames += dimensionSeparator
 			dimValues += dimensionSeparator
 		}
 	}
 
 	if dimNames != "" && dimValues != "" {
-		label += labelSeparator + dimNames
-		label += labelSeparator + dimValues
+		label += aws.LabelConst.LabelSeparator + dimNames
+		label += aws.LabelConst.LabelSeparator + dimValues
 	}
 	return label
 }
@@ -419,12 +425,12 @@ func statisticLookup(stat string) (string, bool) {
 }
 
 func generateFieldName(namespace string, labels []string) string {
-	stat := labels[statisticIdx]
+	stat := labels[aws.LabelConst.StatisticIdx]
 	// Check if statistic method is one of Sum, SampleCount, Minimum, Maximum, Average
 	// With checkStatistics function, no need to check bool return value here
 	statMethod, _ := statisticLookup(stat)
 	// By default, replace dot "." using underscore "_" for metric names
-	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[metricNameIdx]) + "." + statMethod
+	return "aws." + stripNamespace(namespace) + ".metrics." + common.DeDot(labels[aws.LabelConst.MetricNameIdx]) + "." + statMethod
 }
 
 // stripNamespace converts Cloudwatch namespace into the root field we will use for metrics
@@ -435,15 +441,15 @@ func stripNamespace(namespace string) string {
 }
 
 func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.Event {
-	namespace := labels[namespaceIdx]
+	namespace := labels[aws.LabelConst.NamespaceIdx]
 	_, _ = event.RootFields.Put(generateFieldName(namespace, labels), metricValue)
 	_, _ = event.RootFields.Put("aws.cloudwatch.namespace", namespace)
-	if len(labels) == 3 {
+	if len(labels) != aws.LabelConst.LabelLengthTotal {
 		return event
 	}
 
-	dimNames := strings.Split(labels[identifierNameIdx], ",")
-	dimValues := strings.Split(labels[identifierValueIdx], ",")
+	dimNames := strings.Split(labels[aws.LabelConst.IdentifierNameIdx], ",")
+	dimValues := strings.Split(labels[aws.LabelConst.IdentifierValueIdx], ",")
 	for i := 0; i < len(dimNames); i++ {
 		_, _ = event.RootFields.Put("aws.dimensions."+dimNames[i], dimValues[i])
 	}
@@ -474,21 +480,25 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 			if len(metricDataResult.Values) == 0 {
 				continue
 			}
-			labels := strings.Split(*metricDataResult.Label, labelSeparator)
+			labels := strings.Split(*metricDataResult.Label, aws.LabelConst.LabelSeparator)
 			for valI, metricDataResultValue := range metricDataResult.Values {
-				if len(labels) != 5 {
-					// when there is no identifier value in label, use region+accountID+namespace+index instead
-					identifier := regionName + m.AccountID + labels[namespaceIdx] + fmt.Sprint("-", valI)
+				if len(labels) != aws.LabelConst.LabelLengthTotal {
+					// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
+					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.MonitoringAccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
-						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
+						if labels[aws.LabelConst.AccountIdIdx] != "" {
+							events[identifier] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+						} else {
+							events[identifier] = aws.InitEvent(regionName, m.MonitoringAccountName, m.MonitoringAccountID, metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+						}
 					}
 					events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
 					continue
 				}
 
-				identifierValue := labels[identifierValueIdx] + fmt.Sprint("-", valI)
+				identifierValue := labels[aws.LabelConst.IdentifierValueIdx] + fmt.Sprint("-", valI)
 				if _, ok := events[identifierValue]; !ok {
-					events[identifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, metricDataResult.Timestamps[valI])
+					events[identifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], metricDataResult.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 				}
 				events[identifierValue] = insertRootFields(events[identifierValue], metricDataResultValue, labels)
 			}
@@ -525,24 +535,28 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				continue
 			}
 
-			labels := strings.Split(*output.Label, labelSeparator)
+			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
 			for valI, metricDataResultValue := range output.Values {
-				if len(labels) != 5 {
+				if len(labels) != aws.LabelConst.LabelLengthTotal {
 					// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
 					if len(tagsFilter) != 0 {
 						continue
 					}
 
-					// when there is no identifier value in label, use region+accountID+namespace+index instead
-					identifier := regionName + m.AccountID + labels[namespaceIdx] + fmt.Sprint("-", valI)
+					// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
+					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.MonitoringAccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
 					if _, ok := events[identifier]; !ok {
-						events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
+						if labels[aws.LabelConst.AccountIdIdx] != "" {
+							events[identifier] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+						} else {
+							events[identifier] = aws.InitEvent(regionName, m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+						}
 					}
 					events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
 					continue
 				}
 
-				identifierValue := labels[identifierValueIdx]
+				identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
 				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
 
 				// add tags to event based on identifierValue
@@ -559,7 +573,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 						if len(tagsFilter) != 0 && resourceTagMap[subIdentifier] == nil {
 							continue
 						}
-						events[uniqueIdentifierValue] = aws.InitEvent(regionName, m.AccountName, m.AccountID, output.Timestamps[valI])
+						events[uniqueIdentifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
 					}
 					events[uniqueIdentifierValue] = insertRootFields(events[uniqueIdentifierValue], metricDataResultValue, labels)
 					insertTags(events, uniqueIdentifierValue, subIdentifier, resourceTagMap)

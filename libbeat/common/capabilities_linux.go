@@ -16,12 +16,12 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package common
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -51,12 +51,15 @@ func (c Capabilities) Check(set []string) bool {
 func GetCapabilities() (Capabilities, error) {
 	p, err := sysinfo.Self()
 	if err != nil {
-		return Capabilities{}, errors.Wrap(err, "failed to read self process information")
+		return Capabilities{}, fmt.Errorf("failed to read self process information: %w", err)
 	}
 
 	if c, ok := p.(types.Capabilities); ok {
 		capabilities, err := c.Capabilities()
-		return Capabilities(*capabilities), errors.Wrap(err, "failed to read process capabilities")
+		if err != nil {
+			return Capabilities{}, fmt.Errorf("failed to read process capabilities: %w", err)
+		}
+		return Capabilities(*capabilities), nil
 	}
 
 	return Capabilities{}, errors.New("capabilities not available")

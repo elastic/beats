@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -15,6 +14,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
@@ -40,9 +40,14 @@ func TestProcessEvents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	reg := monitoring.NewRegistry()
+	metrics := newInputMetrics("test", reg)
+	defer metrics.Close()
+
 	input := azureInput{
-		config: config,
-		outlet: out,
+		config:  config,
+		metrics: metrics,
+		outlet:  out,
 	}
 	var sn int64 = 12
 	now := time.Now()
@@ -74,7 +79,7 @@ func TestProcessEvents(t *testing.T) {
 	assert.Equal(t, message, single)
 }
 
-func TestParseMultipleMessages(t *testing.T) {
+func TestParseMultipleRecords(t *testing.T) {
 	// records object
 	msg := "{\"records\":[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
@@ -84,8 +89,17 @@ func TestParseMultipleMessages(t *testing.T) {
 		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 	}
-	input := azureInput{log: logp.NewLogger(fmt.Sprintf("%s test for input", inputName))}
-	messages := input.parseMultipleMessages([]byte(msg))
+
+	reg := monitoring.NewRegistry()
+	metrics := newInputMetrics("test", reg)
+	defer metrics.Close()
+
+	input := azureInput{
+		metrics: metrics,
+		log:     logp.NewLogger(fmt.Sprintf("%s test for input", inputName)),
+	}
+
+	messages := input.parseMultipleRecords([]byte(msg))
 	assert.NotNil(t, messages)
 	assert.Equal(t, len(messages), 3)
 	for _, ms := range messages {
@@ -96,7 +110,7 @@ func TestParseMultipleMessages(t *testing.T) {
 	msg1 := "[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
 		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]"
-	messages = input.parseMultipleMessages([]byte(msg1))
+	messages = input.parseMultipleRecords([]byte(msg1))
 	assert.NotNil(t, messages)
 	assert.Equal(t, len(messages), 3)
 	for _, ms := range messages {
@@ -105,7 +119,7 @@ func TestParseMultipleMessages(t *testing.T) {
 
 	// one event only
 	msg2 := "{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"
-	messages = input.parseMultipleMessages([]byte(msg2))
+	messages = input.parseMultipleRecords([]byte(msg2))
 	assert.NotNil(t, messages)
 	assert.Equal(t, len(messages), 1)
 	for _, ms := range messages {

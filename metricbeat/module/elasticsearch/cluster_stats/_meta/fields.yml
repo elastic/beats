@@ -17,6 +17,8 @@
           type: keyword
         - name: state_uuid
           type: keyword
+        - name: nodes
+          type: flattened
     - name: status
       type: keyword
       description: Cluster status (green, yellow, red).

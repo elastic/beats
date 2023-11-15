@@ -19,8 +19,7 @@ package node
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -151,7 +150,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var nodes []map[string]interface{}
 	err := json.Unmarshal(content, &nodes)
 	if err != nil {
-		return errors.Wrap(err, "error in Unmarshal")
+		return fmt.Errorf("error in Unmarshal: %w", err)
 	}
 
 	for _, node := range nodes {

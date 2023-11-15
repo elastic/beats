@@ -22,7 +22,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 
 	"github.com/mitchellh/hashstructure"
 
@@ -63,13 +62,15 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 	close        func() error
 
-	// pubClient accepts an ISyncClient as the lowest common denominator of client
-	// since async clients are a subset of sync clients
-	pubClient pipeline.ISyncClient
+	// pubClient accepts a generic beat.Client. Pipeline synchronicity is implemented
+	// at client wrapper-level
+	pubClient beat.Client
 
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
+
+	monitorStateTracker *monitorstate.Tracker
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -89,7 +90,7 @@ func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
 func newMonitor(
 	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pubClient pipeline.ISyncClient,
+	pubClient beat.Client,
 	taskAdder scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
@@ -106,7 +107,7 @@ func newMonitor(
 func newMonitorUnsafe(
 	config *conf.C,
 	registrar *plugin.PluginsReg,
-	pubClient pipeline.ISyncClient,
+	pubClient beat.Client,
 	addTask scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
@@ -125,15 +126,16 @@ func newMonitorUnsafe(
 	}
 
 	m := &Monitor{
-		stdFields:      standardFields,
-		pluginName:     pluginFactory.Name,
-		addTask:        addTask,
-		configuredJobs: []*configuredJob{},
-		pubClient:      pubClient,
-		internalsMtx:   sync.Mutex{},
-		config:         config,
-		stats:          pluginFactory.Stats,
-		state:          MON_INIT,
+		stdFields:           standardFields,
+		pluginName:          pluginFactory.Name,
+		addTask:             addTask,
+		configuredJobs:      []*configuredJob{},
+		pubClient:           pubClient,
+		internalsMtx:        sync.Mutex{},
+		config:              config,
+		stats:               pluginFactory.Stats,
+		state:               MON_INIT,
+		monitorStateTracker: monitorstate.NewTracker(stateLoader, false),
 	}
 
 	if m.stdFields.ID == "" {
@@ -179,7 +181,10 @@ func newMonitorUnsafe(
 		// We need to use the lightweight wrapping for error jobs
 		// since browser wrapping won't write summaries, but the fake job here is
 		// effectively a lightweight job
-		wrappedJobs = wrappers.WrapLightweight(p.Jobs, m.stdFields, monitorstate.NewTracker(stateLoader, false))
+		m.stdFields.BadConfig = true
+		// No need to retry bad configs
+		m.stdFields.MaxAttempts = 1
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	}
 
 	m.endpoints = p.Endpoints

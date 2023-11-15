@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
@@ -278,8 +277,7 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	// efficient and does not attempt to use local message files for rendering
 	// the event's message.
 	switch {
-	case c.Forwarded == nil && c.Name == "ForwardedEvents",
-		c.Forwarded != nil && *c.Forwarded:
+	case l.isForwarded():
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEventXML(event, l.renderBuf, out)
 		}
@@ -287,12 +285,17 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
-	}
-	l.message = func(event win.EvtHandle) (string, error) {
-		return win.Message(event, l.renderBuf, l.cache.get)
+		l.message = func(event win.EvtHandle) (string, error) {
+			return win.Message(event, l.renderBuf, l.cache.get)
+		}
 	}
 
 	return l, nil
+}
+
+func (l *winEventLog) isForwarded() bool {
+	c := l.config
+	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -333,7 +336,7 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
 	path := l.channelName
 
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
 		l.metrics.logError(err)
 		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
@@ -383,9 +386,12 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
-		// subscribe again from the beginning.
-		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
+		flags = win.EvtSubscribeStartAfterBookmark
+		if !l.isForwarded() {
+			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+			// subscribe again from the beginning.
+			flags |= win.EvtSubscribeStrict
+		}
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
@@ -425,6 +431,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 		return nil, err
 	}
 
+	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 	var records []Record
 	defer func() {
 		l.metrics.log(records)
@@ -463,7 +470,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 			l.metrics.logError(err)
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
-		if r.Message == "" {
+		if r.Message == "" && l.message != nil {
 			r.Message, err = l.message(h)
 			if err != nil {
 				l.metrics.logError(err)
@@ -571,6 +578,11 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
+}
+
+func (l *winEventLog) Reset() error {
+	debugf("%s Closing handle for reset", l.logPrefix)
+	return win.Close(l.subscription)
 }
 
 func (l *winEventLog) Close() error {

@@ -30347,6 +30347,13 @@ type: keyword
 
 --
 
+*`elasticsearch.cluster.stats.state.nodes`*::
++
+--
+type: flattened
+
+--
+
 *`elasticsearch.cluster.stats.status`*::
 +
 --
@@ -35353,6 +35360,60 @@ type: keyword
 +
 --
 Total billing amount.
+
+type: float
+
+--
+
+*`gcp.billing.sku_id`*::
++
+--
+The ID of the resource used by the service.
+
+type: keyword
+
+--
+
+*`gcp.billing.sku_description`*::
++
+--
+A description of the resource type used by the service. For example, a resource type for Cloud Storage is Standard Storage US.
+
+type: keyword
+
+--
+
+*`gcp.billing.service_id`*::
++
+--
+The ID of the service that the usage is associated with.
+
+type: keyword
+
+--
+
+*`gcp.billing.service_description`*::
++
+--
+The Google Cloud service that reported the Cloud Billing data.
+
+type: keyword
+
+--
+
+*`gcp.billing.tags`*::
++
+--
+A collection of key-value pairs that provide additional metadata.
+
+type: nested
+
+--
+
+*`gcp.billing.effective_price`*::
++
+--
+The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.
 
 type: float
 
@@ -45782,6 +45843,26 @@ type: boolean
 
 --
 
+
+*`kubernetes.deployment.status.available`*::
++
+--
+Deployment Available Condition status (true, false or unknown)
+
+
+type: keyword
+
+--
+
+*`kubernetes.deployment.status.progressing`*::
++
+--
+Deployment Progresing Condition status (true, false or unknown)
+
+type: keyword
+
+--
+
 [float]
 === replicas
 
@@ -46005,6 +46086,42 @@ Whether the job failed ("true", "false", or "unknown")
 
 
 type: keyword
+
+--
+
+[float]
+=== state_namespace
+
+Kubernetes namespace metrics.
+
+
+
+*`kubernetes.state_namespace.created.sec`*::
++
+--
+Unix creation timestamp.
+
+
+type: double
+
+--
+
+
+*`kubernetes.state_namespace.status.active`*::
++
+--
+Whether the namespace is active (true or false).
+
+type: boolean
+
+--
+
+*`kubernetes.state_namespace.status.terminating`*::
++
+--
+Whether the namespace is terminating (true or false).
+
+type: boolean
 
 --
 
@@ -61990,6 +62107,16 @@ alias to: process.parent.pid
 type: alias
 
 alias to: process.pgid
+
+--
+
+*`system.process.num_threads`*::
++
+--
+Number of threads in the process
+
+
+type: integer
 
 --
 

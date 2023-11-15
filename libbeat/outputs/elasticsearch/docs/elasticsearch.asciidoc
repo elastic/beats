@@ -105,7 +105,7 @@ The compression level must be in the range of `1` (best speed) to `9` (best comp
 
 Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
-The default value is `0`.
+The default value is `1`.
 
 ===== `escape_html`
 
@@ -124,10 +124,17 @@ The default value is `1`.
 
 ===== `loadbalance`
 
-If set to true and multiple {es} hosts are configured, the output plugin
-load balances published events onto all {es} hosts. If set to false,
-the output plugin sends all events to only one host (determined at random) and
-will switch to another host if the selected one becomes unresponsive.
+When `loadbalance: true` is set, {beatname_uc} connects to all configured
+hosts and sends data through all connections in parallel. If a connection
+fails, data is sent to the remaining hosts until it can be reestablished.
+Data will still be sent as long as {beatname_uc} can connect to at least
+one of its configured hosts.
+
+When `loadbalance: false` is set, {beatname_uc} sends data to a single host
+at a time. The target host is chosen at random from the list of configured
+hosts, and all data is sent to that target until the connection fails, when
+a new target is selected. Data will still be sent as long as {beatname_uc}
+can connect to at least one of its configured hosts.
 
 The default value is `true`.
 
@@ -654,10 +661,12 @@ endif::[]
 
 ===== `bulk_max_size`
 
-The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 50.
+The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 1600.
 
-Events can be collected into batches. {beatname_uc} will split batches larger than `bulk_max_size`
-into multiple batches.
+Events can be collected into batches. When using the memory queue with `queue.mem.flush.min_events`
+set to a value greater than `1`, the maximum batch is is the value of `queue.mem.flush.min_events`.
+{beatname_uc} will split batches read from the queue which are larger than `bulk_max_size` into
+multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in
@@ -681,6 +690,12 @@ default is `1s`.
 
 The maximum number of seconds to wait before attempting to connect to
 Elasticsearch after a network error. The default is `60s`.
+
+===== `idle_connection_timeout`
+
+The maximum amount of time an idle connection will remain idle before closing itself.
+Zero means no limit. The format is a Go language duration (example 60s is 60 seconds).
+The default is 3s.
 
 ===== `timeout`
 
@@ -743,3 +758,17 @@ output.elasticsearch:
   non_indexable_policy.dead_letter_index:
     index: "my-dead-letter-index"
 ------------------------------------------------------------------------------
+
+[[es-apis]]
+==== Elasticsearch APIs
+{beatname_uc} will use the `_bulk` API from {es}, the events are sent
+in the order they arrive to the publishing pipeline, a single `_bulk`
+request may contain events from different inputs/modules. Temporary
+failures are re-tried.
+
+The status code for each event is checked and handled as:
+
+* `< 300`: The event is counted as `events.acked`
+* `409` (Conflict): The event is counted as `events.duplicates`
+* `429` (Too Many Requests): The event is counted as `events.toomany`
+* `> 399 and < 500`: The `non_indexable_policy` is applied.

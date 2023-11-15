@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows && !integration
-// +build !windows,!integration
 
 package file
 

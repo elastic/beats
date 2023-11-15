@@ -10,7 +10,6 @@
         "registry"
       ],
       "code": "13",
-      "ingested": "2022-06-08T05:43:59.481703200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -83,7 +82,6 @@
         "registry"
       ],
       "code": "13",
-      "ingested": "2022-06-08T05:43:59.481743400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -156,7 +154,6 @@
         "registry"
       ],
       "code": "13",
-      "ingested": "2022-06-08T05:43:59.481754200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -229,7 +226,6 @@
         "registry"
       ],
       "code": "13",
-      "ingested": "2022-06-08T05:43:59.481765Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -302,7 +298,6 @@
         "registry"
       ],
       "code": "13",
-      "ingested": "2022-06-08T05:43:59.481866400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",

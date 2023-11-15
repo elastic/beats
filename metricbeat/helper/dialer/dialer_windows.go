@@ -16,16 +16,14 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package dialer
 
 import (
+	"errors"
 	"net"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	winio "github.com/Microsoft/go-winio"
 

@@ -9,12 +9,12 @@
         "proxy": {
             "client": {
                 "request": {
-                    "count": 25
+                    "count": 1
                 }
             },
-            "code": "200",
+            "code": "201",
             "host": "kind-control-plane:6443",
-            "method": "GET"
+            "method": "POST"
         }
     },
     "metricset": {

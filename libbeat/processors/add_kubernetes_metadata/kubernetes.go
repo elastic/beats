@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package add_kubernetes_metadata
 
@@ -46,6 +45,10 @@ const (
 type kubernetesAnnotator struct {
 	log                 *logp.Logger
 	watcher             kubernetes.Watcher
+	nsWatcher           kubernetes.Watcher
+	nodeWatcher         kubernetes.Watcher
+	rsWatcher           kubernetes.Watcher
+	jobWatcher          kubernetes.Watcher
 	indexers            *Indexers
 	matchers            *Matchers
 	cache               *cache
@@ -142,6 +145,8 @@ func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig,
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
+		var replicaSetWatcher, jobWatcher kubernetes.Watcher
+
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -209,12 +214,38 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
+
+		// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+		// Deployment -> Replicaset -> Pod
+		// CronJob -> job -> Pod
+		if metaConf.Deployment {
+			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+			}
+			k.rsWatcher = replicaSetWatcher
+		}
+		if metaConf.CronJob {
+			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+				SyncTimeout: config.SyncPeriod,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+			}
+			k.jobWatcher = jobWatcher
+		}
+
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
-		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
 		k.kubernetesAvailable = true
+		k.nodeWatcher = nodeWatcher
+		k.nsWatcher = namespaceWatcher
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
@@ -236,15 +267,27 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
 		// be populated before trying to generate metadata for Pods.
-		if nodeWatcher != nil {
-			if err := nodeWatcher.Start(); err != nil {
+		if k.nodeWatcher != nil {
+			if err := k.nodeWatcher.Start(); err != nil {
 				k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
 				return
 			}
 		}
-		if namespaceWatcher != nil {
-			if err := namespaceWatcher.Start(); err != nil {
+		if k.nsWatcher != nil {
+			if err := k.nsWatcher.Start(); err != nil {
 				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+				return
+			}
+		}
+		if k.rsWatcher != nil {
+			if err := k.rsWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start replicaSet watcher: %v", err)
+				return
+			}
+		}
+		if k.jobWatcher != nil {
+			if err := k.jobWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start job watcher: %v", err)
 				return
 			}
 		}
@@ -306,6 +349,18 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 func (k *kubernetesAnnotator) Close() error {
 	if k.watcher != nil {
 		k.watcher.Stop()
+	}
+	if k.nodeWatcher != nil {
+		k.nodeWatcher.Stop()
+	}
+	if k.nsWatcher != nil {
+		k.nsWatcher.Stop()
+	}
+	if k.rsWatcher != nil {
+		k.rsWatcher.Stop()
+	}
+	if k.jobWatcher != nil {
+		k.jobWatcher.Stop()
 	}
 	if k.cache != nil {
 		k.cache.stop()

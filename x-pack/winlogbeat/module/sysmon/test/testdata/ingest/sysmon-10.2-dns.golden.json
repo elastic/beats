@@ -34,7 +34,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773701Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -136,7 +135,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773734900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -239,7 +237,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773751300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -346,7 +343,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773860300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -449,7 +445,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773878300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -539,8 +534,9 @@
       ],
       "question": {
         "name": "confiant-integrations.global.ssl.fastly.net",
-        "registered_domain": "confiant-integrations.global.ssl.fastly.net",
-        "top_level_domain": "global.ssl.fastly.net"
+        "registered_domain": "global.ssl.fastly.net",
+        "subdomain": "confiant-integrations",
+        "top_level_domain": "ssl.fastly.net"
       },
       "resolved_ip": [
         "151.101.1.194",
@@ -557,7 +553,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773931300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -656,7 +651,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773947600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -762,7 +756,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.773963700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -857,7 +850,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774007200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -965,7 +957,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774062200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1109,7 +1100,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774078900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1215,7 +1205,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774112400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1316,7 +1305,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774166300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1423,7 +1411,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774267400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1518,7 +1505,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774283800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1624,7 +1610,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774312Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1727,7 +1712,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774330300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1829,7 +1813,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774385800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1958,7 +1941,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774419200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2053,8 +2035,9 @@
       ],
       "question": {
         "name": "clarium.freetls.fastly.net",
-        "registered_domain": "clarium.freetls.fastly.net",
-        "top_level_domain": "freetls.fastly.net"
+        "registered_domain": "freetls.fastly.net",
+        "subdomain": "clarium",
+        "top_level_domain": "fastly.net"
       },
       "resolved_ip": [
         "151.101.194.79",
@@ -2071,7 +2054,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774434800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2226,7 +2208,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774450Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2378,7 +2359,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774489600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2533,7 +2513,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774523Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2654,7 +2633,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774562600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2805,7 +2783,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774578600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2966,7 +2943,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774592900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3074,7 +3050,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774604100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3216,7 +3191,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774616600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3326,7 +3300,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774629200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3469,7 +3442,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774645300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3575,7 +3547,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774658100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3672,7 +3643,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774732100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3808,7 +3778,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774764Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -3941,7 +3910,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774798100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4044,7 +4012,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774809600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4176,7 +4143,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774843200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4330,7 +4296,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774880100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4488,7 +4453,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774892300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4595,7 +4559,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774905800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4742,7 +4705,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774932Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4893,7 +4855,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774942600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -4999,7 +4960,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774956100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5092,7 +5052,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774966100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5201,7 +5160,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.774991400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5341,7 +5299,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775006900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5490,7 +5447,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775021800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5604,7 +5560,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775036700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5754,7 +5709,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775051600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5870,7 +5824,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775066300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -5998,7 +5951,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775081Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6105,7 +6057,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775096200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6203,7 +6154,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775111500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6287,7 +6237,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775148400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6367,7 +6316,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775184200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6505,7 +6453,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775246500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6620,7 +6567,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775264600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6719,7 +6665,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775280100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6861,7 +6806,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775295Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -6976,7 +6920,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775309500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7120,7 +7063,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775324500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7226,7 +7168,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775338700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7338,7 +7279,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775353200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7453,7 +7393,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775367700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7554,7 +7493,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775383700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7696,7 +7634,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775398800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -7852,7 +7789,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775413200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8010,7 +7946,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775427900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8162,7 +8097,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775442300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8277,7 +8211,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775456800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8391,7 +8324,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775472Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8491,7 +8423,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775486500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8633,7 +8564,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775501200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8794,7 +8724,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775515700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -8946,7 +8875,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775530400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9056,7 +8984,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775570Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9204,7 +9131,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775583800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9315,7 +9241,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775615300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9463,7 +9388,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775648500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9615,7 +9539,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775770600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9744,7 +9667,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775788300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -9897,7 +9819,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775820400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10029,7 +9950,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775851100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10127,7 +10047,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775888700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10268,7 +10187,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775899100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10389,7 +10307,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775953700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10484,7 +10401,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.775968900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10625,7 +10541,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776019500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10777,7 +10692,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776052500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -10908,7 +10822,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776093500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11055,7 +10968,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776107700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11195,7 +11107,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776118400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11333,7 +11244,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776133300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11492,7 +11402,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776144300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11646,7 +11555,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776158800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11791,7 +11699,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776170Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -11941,7 +11848,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776180100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12092,7 +11998,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776194800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12202,7 +12107,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776209300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12343,7 +12247,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776223400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12453,7 +12356,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776242400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12566,7 +12468,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776257400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12671,7 +12572,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776271800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12774,7 +12674,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776286200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12876,7 +12775,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776300500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -12979,7 +12877,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776314800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13077,7 +12974,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776329Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13183,7 +13079,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776343200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13286,7 +13181,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776357400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13392,7 +13286,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776371400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13495,7 +13388,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776385700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13597,7 +13489,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776400100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13699,7 +13590,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776414600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13848,7 +13738,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776428700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -13970,7 +13859,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776443200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14076,7 +13964,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776457400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14220,7 +14107,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776471400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14322,7 +14208,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776485800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14422,7 +14307,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776500100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14570,7 +14454,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776514300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14677,7 +14560,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776528600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14778,7 +14660,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776542700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -14924,7 +14805,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776556700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15085,7 +14965,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776570600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15197,7 +15076,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776586800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15345,7 +15223,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776601200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15503,7 +15380,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776616500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15656,7 +15532,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776672300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15803,7 +15678,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776839200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -15959,7 +15833,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776888800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -16321,7 +16194,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -16534,7 +16406,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776929800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -16644,7 +16515,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776944Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -16749,7 +16619,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776960900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -16835,7 +16704,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776975700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -16932,7 +16800,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.776990100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17081,7 +16948,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777004300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17239,7 +17105,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777018400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17350,7 +17215,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777032700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17493,7 +17357,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777046600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17644,7 +17507,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777060700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17794,7 +17656,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777079700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -17933,7 +17794,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777088100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18041,7 +17901,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777094600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18143,7 +18002,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777102400Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18286,7 +18144,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777108200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18408,7 +18265,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777117700Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18560,7 +18416,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777144300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18667,7 +18522,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777156200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18768,7 +18622,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777163100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18866,7 +18719,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.777205500Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -18950,7 +18802,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.778350300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -19027,7 +18878,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.778386300Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -19104,7 +18954,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.778398900Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -19205,7 +19054,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.778411100Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -19304,7 +19152,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.778423200Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -19435,7 +19282,6 @@
         "network"
       ],
       "code": "22",
-      "ingested": "2022-06-08T05:43:58.778435Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",

@@ -22,6 +22,7 @@ package compat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -72,8 +73,15 @@ func RunnerFactory(
 func (f *factory) CheckConfig(cfg *conf.C) error {
 	_, err := f.loader.Configure(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("runner factory could not check config: %w", err)
 	}
+
+	if err = f.loader.Delete(cfg); err != nil {
+		return fmt.Errorf(
+			"runner factory failed to delete an input after config check: %w",
+			err)
+	}
+
 	return nil
 }
 
@@ -120,7 +128,7 @@ func (r *runner) Start() {
 			},
 			r.connector,
 		)
-		if err != nil {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
@@ -146,7 +154,12 @@ func configID(config *conf.C) (string, error) {
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",
+			h, err)
+	}
+
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return "", fmt.Errorf("can not compute id from configuration: %w", err)

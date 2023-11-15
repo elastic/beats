@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package udp
 
@@ -104,14 +103,14 @@ type TestStruct struct {
 
 // Helper method for creating mocks and the Udp instance under test.
 func testSetup(t *testing.T) *TestStruct {
-	_ = logp.TestingSetup(logp.WithSelectors("udp"))
+	logp.TestingSetup(logp.WithSelectors("udp"))
 
 	protocols := &TestProtocols{}
 	protocols.udp = make(map[protos.Protocol]protos.UDPPlugin)
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
-	udp, err := NewUDP(protocols, "test", "test")
+	udp, err := NewUDP(protocols, "test", "test", 0)
 	if err != nil {
 		t.Error("Error creating UDP handler: ", err)
 	}

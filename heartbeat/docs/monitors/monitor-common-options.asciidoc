@@ -189,9 +189,7 @@ processors in your config.
 ==== `data_stream`
 
 Contains options pertaining to data stream naming, following the conventions followed by {fleet-guide}/data-streams.html[Fleet Data Streams]. By default Heartbeat will
-write to a datastream named `heartbeat-VERSION` except in the case of `browser` monitors, which will
-always follow the Fleet convention of `type-dataset-namespace`, where the type is always synthetics
-unless overriden.
+write to a datastream named `heartbeat-VERSION`.
 
 
 ```yaml

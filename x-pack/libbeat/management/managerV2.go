@@ -6,6 +6,7 @@ package management
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -15,9 +16,13 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	gproto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -29,6 +34,25 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
+
+var errStoppingOnOutputChange = errors.New("stopping Beat on output change")
+
+// diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
+// since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
+type diagnosticHandler struct {
+	log    *logp.Logger
+	client *client.Unit
+}
+
+func (handler diagnosticHandler) Register(name string, description string, filename string, contentType string, callback func() []byte) {
+	handler.log.Infof("registering callback with %s", name)
+	// paranoid checking
+	if handler.client != nil {
+		handler.client.RegisterDiagnosticHook(name, description, filename, contentType, callback)
+	} else {
+		handler.log.Warnf("client handler for diag callback %s is nil", name)
+	}
+}
 
 // unitKey is used to identify a unique unit in a map
 // the `ID` of a unit in itself is not unique without its type, only `Type` + `ID` is unique
@@ -49,9 +73,10 @@ type BeatV2Manager struct {
 	errCanceller context.CancelFunc
 
 	// track individual units given to us by the V2 API
-	mx      sync.Mutex
-	units   map[unitKey]*client.Unit
-	actions []client.Action
+	mx          sync.Mutex
+	units       map[unitKey]*client.Unit
+	actions     []client.Action
+	forceReload bool
 
 	// status is reported as a whole for every unit sent to this component
 	// hopefully this can be improved in the future to be separated per unit
@@ -84,6 +109,13 @@ type BeatV2Manager struct {
 	lastBeatOutputCfg   *reload.ConfigWithMeta
 	lastBeatInputCfgs   []*reload.ConfigWithMeta
 	lastBeatFeaturesCfg *conf.C
+
+	// changeDebounce is the debounce time for a configuration change
+	changeDebounce time.Duration
+	// forceReloadDebounce is the time the manager will wait before
+	// trying to reload the configuration after an input not finished error
+	// happens
+	forceReloadDebounce time.Duration
 }
 
 // ================================
@@ -93,6 +125,20 @@ type BeatV2Manager struct {
 // WithStopOnEmptyUnits enables stopping the beat when agent sends no units.
 func WithStopOnEmptyUnits(m *BeatV2Manager) {
 	m.stopOnEmptyUnits = true
+}
+
+// WithChangeDebounce sets the changeDeboung value
+func WithChangeDebounce(d time.Duration) func(b *BeatV2Manager) {
+	return func(b *BeatV2Manager) {
+		b.changeDebounce = d
+	}
+}
+
+// WithForceReloadDebounce sets the forceReloadDebounce value
+func WithForceReloadDebounce(d time.Duration) func(b *BeatV2Manager) {
+	return func(b *BeatV2Manager) {
+		b.forceReloadDebounce = d
+	}
 }
 
 // ================================
@@ -109,22 +155,38 @@ func init() {
 // This is registered as the manager factory in init() so that calls to
 // lbmanagement.NewManager will be forwarded here.
 func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+	logger := logp.NewLogger(lbmanagement.DebugK).Named("V2-manager")
 	c := DefaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, fmt.Errorf("parsing fleet management settings: %w", err)
 		}
 	}
-	agentClient, _, err := client.NewV2FromReader(os.Stdin, client.VersionInfo{
-		Name:    "beat-v2-client",
-		Version: version.GetDefaultVersion(),
-		Meta: map[string]string{
-			"commit":     version.Commit(),
-			"build_time": version.BuildTime().String(),
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error reading control config from agent: %w", err)
+
+	var agentClient client.V2
+	var err error
+	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
+		// Insecure for testing Elastic-Agent-Client initialisation
+		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
+		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
+			"", // Insecure connection for test, no token needed
+			client.VersionInfo{
+				Name:    "beat-v2-client-for-testing",
+				Version: version.GetDefaultVersion(),
+			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else {
+		// Normal Elastic-Agent-Client initialisation
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
+			Name:    "beat-v2-client",
+			Version: version.GetDefaultVersion(),
+			Meta: map[string]string{
+				"commit":     version.Commit(),
+				"build_time": version.BuildTime().String(),
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error reading control config from agent: %w", err)
+		}
 	}
 
 	// officially running under the elastic-agent; we set the publisher pipeline
@@ -150,6 +212,12 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		status:             lbmanagement.Running,
 		message:            "Healthy",
 		stopChan:           make(chan struct{}, 1),
+		changeDebounce:     time.Second,
+		// forceReloadDebounce is greater than changeDebounce because it is only
+		// used when an input has not reached its finished state, this means some events
+		// still need to be acked by the acker, hence the longer we wait the more likely
+		// for the input to have reached its finished state.
+		forceReloadDebounce: time.Second * 10,
 	}
 
 	if config.Enabled {
@@ -288,8 +356,11 @@ func (cm *BeatV2Manager) SetPayload(payload map[string]interface{}) {
 
 // updateStatuses updates the status for all units to match the status of the entire manager.
 //
-// This is done because beats at the moment cannot manage different status per unit, something
+// This is done because beats at the moment cannot fully manage different status per unit, something
 // that is new in the V2 control protocol but not supported in beats itself.
+//
+// Errors while starting/reloading inputs are already reported by unit, but
+// the shutdown process is still not being handled by unit.
 func (cm *BeatV2Manager) updateStatuses() {
 	status := getUnitState(cm.status)
 	message := cm.message
@@ -372,21 +443,23 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case err := <-cm.client.Errors():
-			cm.logger.Errorf("elastic-agent-client error: %s", err)
+			// Don't print the context canceled errors that happen normally during shutdown, restart, etc
+			if !errors.Is(context.Canceled, err) {
+				cm.logger.Errorf("elastic-agent-client error: %s", err)
+			}
+
 		}
 	}
 }
 
 func (cm *BeatV2Manager) unitListen() {
-	const changeDebounce = 100 * time.Millisecond
-
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	// timer is used to provide debounce on unit changes
 	// this allows multiple changes to come in and only a single reload be performed
-	t := time.NewTimer(changeDebounce)
+	t := time.NewTimer(cm.changeDebounce)
 	t.Stop() // starts stopped, until a change occurs
 
 	cm.logger.Debug("Listening for agent unit changes")
@@ -411,7 +484,8 @@ func (cm *BeatV2Manager) unitListen() {
 			return
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
-				"BeatV2Manager.unitListen UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
+				change.Unit.ID(),
 				change.Type, int64(change.Triggers), change.Type, change.Triggers)
 
 			switch change.Type {
@@ -420,11 +494,11 @@ func (cm *BeatV2Manager) unitListen() {
 			case client.UnitChangedAdded:
 				cm.addUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
-				t.Reset(changeDebounce)
+				t.Reset(cm.changeDebounce)
 			case client.UnitChangedModified:
 				cm.modifyUnit(change.Unit)
 				// reset can be called here because `<-t.C` is handled in the same select
-				t.Reset(changeDebounce)
+				t.Reset(cm.changeDebounce)
 			case client.UnitChangedRemoved:
 				cm.deleteUnit(change.Unit)
 			}
@@ -439,6 +513,10 @@ func (cm *BeatV2Manager) unitListen() {
 			}
 			cm.mx.Unlock()
 			cm.reload(units)
+			if cm.forceReload {
+				// Restart the debounce timer so we try to reload the inputs.
+				t.Reset(cm.forceReloadDebounce)
+			}
 		}
 	}
 }
@@ -471,7 +549,18 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	var outputUnit *client.Unit
 	var inputUnits []*client.Unit
 	var stoppingUnits []*client.Unit
-	var errs multierror.Errors
+	healthyInputs := map[string]*client.Unit{}
+	unitErrors := map[string][]error{}
+
+	// as the very last action, set the state of the failed units
+	defer func() {
+		for _, unit := range units {
+			errs := unitErrors[unit.ID()]
+			if len(errs) != 0 {
+				unit.UpdateState(client.UnitStateFailed, errors.Join(errs...).Error(), nil)
+			}
+		}
+	}()
 
 	for _, unit := range units {
 		expected := unit.Expected()
@@ -484,11 +573,11 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 			// unit is expected to update its feature flags
 			featuresCfg, err := features.NewConfigFromProto(expected.Features)
 			if err != nil {
-				errs = append(errs, err)
+				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
 			}
 
 			if err := features.UpdateFromConfig(featuresCfg); err != nil {
-				errs = append(errs, err)
+				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
 			}
 
 			cm.lastBeatFeaturesCfg = featuresCfg
@@ -510,6 +599,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 			outputUnit = unit
 		} else if unit.Type() == client.UnitTypeInput {
 			inputUnits = append(inputUnits, unit)
+			healthyInputs[unit.ID()] = unit
 		} else {
 			cm.logger.Errorf("unit %s as an unknown type %+v", unit.ID(), unit.Type())
 		}
@@ -521,8 +611,33 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	publisher.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
-	if err := cm.reloadOutput(outputUnit); err != nil {
-		errs = append(errs, err)
+	restartBeat, err := cm.reloadOutput(outputUnit)
+	// The manager has already signalled the Beat to stop,
+	// there is nothing else to do. Trying to reload inputs
+	// will only lead to invalid state updates and possible
+	// race conditions.
+	if restartBeat {
+		return
+	}
+	if err != nil {
+		// Output creation failed, there is no point in going any further
+		// because there is no output to read events.
+		//
+		// Trying to start inputs will eventually lead them to deadlock
+		// waiting for the output. Log input will deadlock when starting,
+		// effectively blocking this manager.
+		cm.logger.Errorw("could not start output", "error", err)
+
+		msg := fmt.Sprintf("could not start output: %s", err)
+		if err := outputUnit.UpdateState(client.UnitStateFailed, msg, nil); err != nil {
+			cm.logger.Errorw("setting output state", "error", err)
+		}
+
+		return
+	}
+
+	if err := outputUnit.UpdateState(client.UnitStateHealthy, "Healthy", nil); err != nil {
+		cm.logger.Errorw("setting output state", "error", err)
 	}
 
 	// compute the input configuration
@@ -530,7 +645,16 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
 	if err := cm.reloadInputs(inputUnits); err != nil {
-		errs = append(errs, err)
+		merror := &multierror.MultiError{}
+		if errors.As(err, &merror) {
+			for _, err := range merror.Errors {
+				unitErr := cfgfile.UnitError{}
+				if errors.As(err, &unitErr) {
+					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
+					delete(healthyInputs, unitErr.UnitID)
+				}
+			}
+		}
 	}
 
 	// report the stopping units as stopped
@@ -538,60 +662,58 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 		_ = unit.UpdateState(client.UnitStateStopped, "Stopped", nil)
 	}
 
-	// any error during reload changes the whole state of the beat to failed
-	if len(errs) > 0 {
-		cm.status = lbmanagement.Failed
-		cm.message = fmt.Sprintf("%s", errs)
-	}
-
-	// now update the statuses of all units
-	cm.mx.Lock()
-	status := getUnitState(cm.status)
-	message := cm.message
-	payload := cm.payload
-	cm.mx.Unlock()
-	for _, unit := range units {
+	// now update the statuses of all units that contain only healthy
+	// inputs. If there isn't an error with the inputs, we set the unit as
+	// healthy because there is no way to know more information about its inputs.
+	for _, unit := range healthyInputs {
 		expected := unit.Expected()
 		if expected.State == client.UnitStateStopped {
 			// unit is expected to be stopping (don't adjust the state as the state is now managed by the
 			// `reload` method and will be marked stopped in that code path)
 			continue
 		}
-		err := unit.UpdateState(status, message, payload)
+
+		err := unit.UpdateState(client.UnitStateHealthy, "Healthy", nil)
 		if err != nil {
 			cm.logger.Errorf("Failed to update unit %s status: %s", unit.ID(), err)
 		}
 	}
 }
 
-func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
+// reloadOutput reload outputs, it returns a bool and an error.
+// The bool, if set, indicates that the output reload requires an restart,
+// in that case the error is always `nil`.
+//
+// In any other case, the bool is always false and the error will be non nil
+// if any error has occurred.
+func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) (bool, error) {
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 	output := cm.registry.GetReloadableOutput()
 	if output == nil {
-		return fmt.Errorf("failed to find beat reloadable type 'output'")
+		return false, fmt.Errorf("failed to find beat reloadable type 'output'")
 	}
 
 	if unit == nil {
 		// output is being stopped
 		err := output.Reload(nil)
 		if err != nil {
-			return fmt.Errorf("failed to reload output: %w", err)
+			return false, fmt.Errorf("failed to reload output: %w", err)
 		}
 		cm.lastOutputCfg = nil
 		cm.lastBeatOutputCfg = nil
-		return nil
+		return false, nil
 	}
 
 	expected := unit.Expected()
 	if expected.Config == nil {
 		// should not happen; hard stop
-		return fmt.Errorf("output unit has no config")
+		return false, fmt.Errorf("output unit has no config")
 	}
 
 	if cm.lastOutputCfg != nil && gproto.Equal(cm.lastOutputCfg, expected.Config) {
 		// configuration for the output did not change; do nothing
 		cm.logger.Debug("Skipped reloading output; configuration didn't change")
-		return nil
+		return false, nil
 	}
 
 	cm.logger.Debugf("Got output unit config '%s'", expected.Config.GetId())
@@ -600,21 +722,25 @@ func (cm *BeatV2Manager) reloadOutput(unit *client.Unit) error {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(client.UnitStateStopping, "Restarting", nil)
 		cm.Stop()
-		return nil
+		return true, nil
 	}
 
 	reloadConfig, err := groupByOutputs(expected.Config)
 	if err != nil {
-		return fmt.Errorf("failed to generate config for output: %w", err)
+		return false, fmt.Errorf("failed to generate config for output: %w", err)
 	}
+
+	// Set those variables regardless of the outcome of output.Reload
+	// this ensures that if we're on a failed output state and a new
+	// output configuration is sent, the Beat will gracefully exit
+	cm.lastOutputCfg = expected.Config
+	cm.lastBeatOutputCfg = reloadConfig
 
 	err = output.Reload(reloadConfig)
 	if err != nil {
-		return fmt.Errorf("failed to reload output: %w", err)
+		return false, fmt.Errorf("failed to reload output: %w", err)
 	}
-	cm.lastOutputCfg = expected.Config
-	cm.lastBeatOutputCfg = reloadConfig
-	return nil
+	return false, nil
 }
 
 func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
@@ -638,19 +764,72 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*client.Unit) error {
 		if err != nil {
 			return fmt.Errorf("failed to generate configuration for unit %s: %w", unit.ID(), err)
 		}
+		// add diag callbacks for unit
+		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
+		for _, in := range inputCfg {
+			in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
+			in.InputUnitID = unit.ID()
+		}
 		inputCfgs[unit.ID()] = expected.Config
 		inputBeatCfgs = append(inputBeatCfgs, inputCfg...)
 	}
 
-	if !didChange(cm.lastInputCfgs, inputCfgs) {
+	if !didChange(cm.lastInputCfgs, inputCfgs) && !cm.forceReload {
 		cm.logger.Debug("Skipped reloading input units; configuration didn't change")
 		return nil
 	}
 
-	err := obj.Reload(inputBeatCfgs)
-	if err != nil {
-		return fmt.Errorf("failed to reloading inputs: %w", err)
+	if cm.forceReload {
+		cm.logger.Info("Reloading Beats inputs because forceReload is true. " +
+			"Set log level to debug to get more information about which " +
+			"inputs are causing this.")
 	}
+
+	if err := obj.Reload(inputBeatCfgs); err != nil {
+		merror := &multierror.MultiError{}
+		realErrors := multierror.Errors{}
+
+		// At the moment this logic is tightly bound to the current RunnerList
+		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
+		// filebeat/input/log/input.go.
+		// If they change the way they report errors, this will break.
+		// TODO (Tiago): update all layers to use the most recent features from
+		// the standard library errors package.
+		if errors.As(err, &merror) {
+			for _, err := range merror.Errors {
+				causeErr := errors.Unwrap(err)
+				// A Log input is only marked as finished when all events it
+				// produced are acked by the acker so when we see this error,
+				// we just retry until the new input can be started.
+				// This is the same logic used by the standalone configuration file
+				// reloader implemented on libbeat/cfgfile/reload.go
+				inputNotFinishedErr := &common.ErrInputNotFinished{}
+				if ok := errors.As(causeErr, &inputNotFinishedErr); ok {
+					cm.logger.Debugf("file '%s' is not finished, will retry starting the input soon", inputNotFinishedErr.File)
+					cm.forceReload = true
+					cm.logger.Debug("ForceReload set to TRUE")
+					continue
+				}
+
+				// This is an error that cannot be ignored, so we report it
+				realErrors = append(realErrors, err)
+			}
+		}
+
+		if len(realErrors) != 0 {
+			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
+		}
+	} else {
+		// If there was no error reloading input and forceReload was
+		// true, then set it to false. This prevents unnecessary logging
+		// and makes it clear this was the moment when the input reload
+		// finally worked.
+		if cm.forceReload {
+			cm.forceReload = false
+			cm.logger.Debug("ForceReload set to FALSE")
+		}
+	}
+
 	cm.lastInputCfgs = inputCfgs
 	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil

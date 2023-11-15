@@ -156,7 +156,7 @@ func TestParseRFC3164(t *testing.T) {
 				hostname: "test-host",
 				msg:      "this is the message",
 			},
-			wantErr: `validation error at position 5: parsing time "24-08-2003T05:14:15-07:00" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "8-2003T05:14:15-07:00" as "2006"`,
+			wantErr: `validation error at position 5: parsing time "24-08-2003T05:14:15-07:00" as "2006-01-02T15:04:05.999999999Z07:00": cannot parse "24-08-2003T05:14:15-07:00" as "2006"`,
 		},
 		"err-eof": {
 			in: "<13>Oct 11 22:14:15 test-",

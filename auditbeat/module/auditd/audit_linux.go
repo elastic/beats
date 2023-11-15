@@ -979,8 +979,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		if c.SocketType == "" {
 			return "", fmt.Errorf("failed to create audit client: %w", err)
 		}
-		// Ignore errors if a socket type has been specified. It will fail during
-		// further setup and its necessary for unit tests to pass
+		// Ignore errors if a socket type has been specified.
 		return c.SocketType, nil
 	}
 	defer client.Close()

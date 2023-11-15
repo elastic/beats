@@ -6,8 +6,7 @@ package performance
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -17,19 +16,19 @@ func (m *MetricSet) extract(ctx context.Context, extractor performanceExtractMet
 	out = &extractedData{}
 
 	if out.bufferCacheHitRatios, err = extractor.bufferCacheHitRatio(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting buffer cache hit ratio")
+		return nil, fmt.Errorf("error getting buffer cache hit ratio: %w", err)
 	}
 
 	if out.libraryData, err = extractor.libraryCache(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting libraryCache data")
+		return nil, fmt.Errorf("error getting libraryCache data: %w", err)
 	}
 
 	if out.cursorsByUsernameAndMachine, err = extractor.cursorsByUsernameAndMachine(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting cursors by username and machine")
+		return nil, fmt.Errorf("error getting cursors by username and machine: %w", err)
 	}
 
 	if out.totalCursors, err = extractor.totalCursors(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting total cursors")
+		return nil, fmt.Errorf("error getting total cursors: %w", err)
 	}
 
 	return
@@ -40,7 +39,7 @@ func (m *MetricSet) extract(ctx context.Context, extractor performanceExtractMet
 func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
 	extractedMetricsData, err := m.extract(ctx, m.extractor)
 	if err != nil {
-		return nil, errors.Wrap(err, "error extracting data")
+		return nil, fmt.Errorf("error extracting data: %w", err)
 	}
 
 	return m.transform(extractedMetricsData), nil

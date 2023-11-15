@@ -7,18 +7,29 @@ package http_endpoint
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"reflect"
 	"sync"
+	"time"
+
+	"github.com/rcrowley/go-metrics"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -85,8 +96,10 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 }
 
 func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
-	err := servers.serve(ctx, e, publisher)
-	if err != nil && err != http.ErrServerClosed {
+	metrics := newInputMetrics(ctx.ID)
+	defer metrics.Close()
+	err := servers.serve(ctx, e, publisher, metrics)
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
@@ -107,16 +120,23 @@ type pool struct {
 // cancelled or the context of another end-point sharing the same address
 // has had its context cancelled. If an end-point is re-registered with
 // the same address and mux pattern, serve will return an error.
-func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) error {
+func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, metrics *inputMetrics) error {
 	log := ctx.Logger.With("address", e.addr)
 	pattern := e.config.URL
 
-	var err error
+	u, err := url.Parse(pattern)
+	if err != nil {
+		return err
+	}
+	metrics.route.Set(u.Path)
+	metrics.isTLS.Set(e.tlsConfig != nil)
+
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
 	if ok {
 		err = checkTLSConsistency(e.addr, s.tls, e.config.TLS)
 		if err != nil {
+			p.mu.Unlock()
 			return err
 		}
 
@@ -129,7 +149,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(e.config, pub, log))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, pub, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -137,8 +157,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle(pattern, newHandler(e.config, pub, log))
-	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
+	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	s = &server{
 		idOf: map[string]string{pattern: ctx.ID},
 		tls:  e.config.TLS,
@@ -146,6 +165,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
+	mux.Handle(pattern, newHandler(s.ctx, e.config, pub, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
@@ -153,14 +173,47 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher) e
 		log.Infof("Starting HTTPS server on %s with %s end point", srv.Addr, pattern)
 		// The certificate is already loaded so we do not need
 		// to pass the cert file and key file parameters.
-		err = s.srv.ListenAndServeTLS("", "")
+		err = listenAndServeTLS(s.srv, "", "", metrics)
 	} else {
 		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
-		err = s.srv.ListenAndServe()
+		err = listenAndServe(s.srv, metrics)
 	}
+	p.mu.Lock()
+	delete(p.servers, e.addr)
+	p.mu.Unlock()
 	s.setErr(err)
 	s.cancel()
 	return err
+}
+
+func listenAndServeTLS(srv *http.Server, certFile, keyFile string, metrics *inputMetrics) error {
+	addr := srv.Addr
+	if addr == "" {
+		addr = ":https"
+	}
+
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	metrics.bindAddr.Set(ln.Addr().String())
+
+	defer ln.Close()
+
+	return srv.ServeTLS(ln, certFile, keyFile)
+}
+
+func listenAndServe(srv *http.Server, metrics *inputMetrics) error {
+	addr := srv.Addr
+	if addr == "" {
+		addr = ":http"
+	}
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	metrics.bindAddr.Set(ln.Addr().String())
+	return srv.Serve(ln)
 }
 
 func checkTLSConsistency(addr string, old, new *tlscommon.ServerConfig) error {
@@ -234,30 +287,95 @@ func (s *server) getErr() error {
 	return s.err
 }
 
-func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.Handler {
-	validator := &apiValidator{
-		basicAuth:    c.BasicAuth,
-		username:     c.Username,
-		password:     c.Password,
-		method:       http.MethodPost,
-		contentType:  c.ContentType,
-		secretHeader: c.SecretHeader,
-		secretValue:  c.SecretValue,
-		hmacHeader:   c.HMACHeader,
-		hmacKey:      c.HMACKey,
-		hmacType:     c.HMACType,
-		hmacPrefix:   c.HMACPrefix,
-	}
-
-	handler := &httpHandler{
-		log:                   log,
-		publisher:             pub,
+func newHandler(ctx context.Context, c config, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
+	h := &handler{
+		log:       log,
+		publisher: pub,
+		metrics:   metrics,
+		validator: apiValidator{
+			basicAuth:    c.BasicAuth,
+			username:     c.Username,
+			password:     c.Password,
+			method:       c.Method,
+			contentType:  c.ContentType,
+			secretHeader: c.SecretHeader,
+			secretValue:  c.SecretValue,
+			hmacHeader:   c.HMACHeader,
+			hmacKey:      c.HMACKey,
+			hmacType:     c.HMACType,
+			hmacPrefix:   c.HMACPrefix,
+		},
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
 		responseBody:          c.ResponseBody,
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
+		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
+	if c.Tracer != nil {
+		w := zapcore.AddSync(c.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			c.Tracer.Close()
+		}()
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		h.reqLogger = zap.New(core)
+		h.host = c.ListenAddress + ":" + c.ListenPort
+		if c.TLS != nil && c.TLS.IsEnabled() {
+			h.scheme = "https"
+		} else {
+			h.scheme = "http"
+		}
+	}
+	return h
+}
 
-	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
+// inputMetrics handles the input's metric reporting.
+type inputMetrics struct {
+	unregister func()
+
+	bindAddr            *monitoring.String // bind address of input
+	route               *monitoring.String // request route
+	isTLS               *monitoring.Bool   // whether the input is listening on a TLS connection
+	apiErrors           *monitoring.Uint   // number of API errors
+	batchesReceived     *monitoring.Uint   // number of event arrays received
+	batchesPublished    *monitoring.Uint   // number of event arrays published
+	eventsPublished     *monitoring.Uint   // number of events published
+	contentLength       metrics.Sample     // histogram of request content lengths.
+	batchSize           metrics.Sample     // histogram of the received batch sizes.
+	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of handler start to time of ACK for non-empty batches).
+}
+
+func newInputMetrics(id string) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+	out := &inputMetrics{
+		unregister:          unreg,
+		bindAddr:            monitoring.NewString(reg, "bind_address"),
+		route:               monitoring.NewString(reg, "route"),
+		isTLS:               monitoring.NewBool(reg, "is_tls_connection"),
+		apiErrors:           monitoring.NewUint(reg, "api_errors_total"),
+		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
+		batchesPublished:    monitoring.NewUint(reg, "batches_published_total"),
+		eventsPublished:     monitoring.NewUint(reg, "events_published_total"),
+		contentLength:       metrics.NewUniformSample(1024),
+		batchSize:           metrics.NewUniformSample(1024),
+		batchProcessingTime: metrics.NewUniformSample(1024),
+	}
+	_ = adapter.NewGoMetrics(reg, "size", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.contentLength))
+	_ = adapter.NewGoMetrics(reg, "batch_size", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.batchSize))
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
+
+	return out
+}
+
+func (m *inputMetrics) Close() {
+	m.unregister()
 }

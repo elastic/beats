@@ -18,9 +18,9 @@
 package socket_summary
 
 import (
+	"fmt"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -155,7 +155,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	conns, err := connections("inet")
 
 	if err != nil {
-		return errors.Wrap(err, "error getting connections")
+		return fmt.Errorf("error getting connections: %w", err)
 	}
 
 	stats := calculateConnStats(conns)

@@ -37,7 +37,7 @@ const (
 	copiedFileIdx                  = 0
 )
 
-var numericSuffixRegexp = regexp.MustCompile("\\d*$")
+var numericSuffixRegexp = regexp.MustCompile(`\d*$`)
 
 // sorter is required for ordering rotated log files
 // The slice is ordered so the newest rotated file comes first.
@@ -278,7 +278,10 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated", event.NewPath)
 
-		updater.ResetCursor(src, state{Offset: 0})
+		err := updater.ResetCursor(src, state{Offset: 0})
+		if err != nil {
+			log.Errorf("failed to reset file cursor: %w", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -299,15 +302,12 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		p.fileProspector.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unkown return value %v", event.Op)
+		log.Error("Unknown return value %v", event.Op)
 	}
 }
 
 func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
-	if p.rotatedSuffix.MatchString(event.NewPath) {
-		return true
-	}
-	return false
+	return p.rotatedSuffix.MatchString(event.NewPath)
 }
 
 func (p *copyTruncateFileProspector) onRotatedFile(
@@ -329,7 +329,9 @@ func (p *copyTruncateFileProspector) onRotatedFile(
 			hg.Start(ctx, src)
 			return
 		}
-		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		descCopy := fe.Descriptor
+		descCopy.Info = fi
+		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Descriptor: descCopy})
 		p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 		p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 		hg.Start(ctx, src)

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows || aix
-// +build darwin freebsd linux windows aix
 
 package process_summary
 
