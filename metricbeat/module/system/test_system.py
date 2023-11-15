@@ -421,14 +421,10 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         for evt in output:
             process = evt["system"]["process"]
+            # Not all process will have 'cmdline' due to permission issues,
+            # especially on Windows. Therefore we ensure at least some of
+            # them will have it.
             found_cmdline |= "cmdline" in process
-            if not found_cmdline:
-                try:
-                    print("ProcessName: ", evt['process']['pid'])
-                    print("ProcessName: ", evt['process']['name'])
-                    print("ProcessArgs: ", evt['process']['args'])
-                except Exception:
-                    print(">>>>>>>>>>>>>>>>>>>> did not find pid, name or args for process")
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
             process.pop("env", None)
@@ -441,9 +437,10 @@ class Test(metricbeat.BaseTest):
             process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
-
-            self.assertTrue(
-                found_cmdline, "cmdline not found in any process events")
+        # After iterating over all process, make sure at least one of them had
+        # the 'cmdline' set.
+        self.assertTrue(
+            found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
