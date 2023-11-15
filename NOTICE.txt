@@ -21198,11 +21198,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/osquery/osquery-go
-Version: v0.0.0-20230707154813-2e4891a0f444
+Version: v0.0.0-20231108163517-e3cde127e724
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/osquery/osquery-go@v0.0.0-20230707154813-2e4891a0f444/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/osquery/osquery-go@v0.0.0-20231108163517-e3cde127e724/LICENSE:
 
 MIT License
 
