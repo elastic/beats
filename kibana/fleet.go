@@ -148,10 +148,21 @@ type DownloadSource struct {
 	ProxyID   interface{} `json:"proxy_id"`
 }
 
-func (client *Client) CreateDownloadSource(ctx context.Context, source DownloadSource) error {
+type DownloadSourceResponse struct {
+	Item struct {
+		ID        string `json:"id"`
+		Name      string `json:"name"`
+		Host      string `json:"host"`
+		IsDefault bool   `json:"is_default"`
+		ProxyID   string `json:"proxy_id"`
+	} `json:"item"`
+}
+
+func (client *Client) CreateDownloadSource(ctx context.Context, source DownloadSource) (DownloadSourceResponse, error) {
 	reqBody, err := json.Marshal(source)
 	if err != nil {
-		return fmt.Errorf("unable to marshal DownloadSource into JSON: %w", err)
+		return DownloadSourceResponse{},
+			fmt.Errorf("unable to marshal DownloadSource into JSON: %w", err)
 	}
 
 	resp, err := client.Connection.SendWithContext(
@@ -162,7 +173,8 @@ func (client *Client) CreateDownloadSource(ctx context.Context, source DownloadS
 		nil,
 		bytes.NewReader(reqBody))
 	if err != nil {
-		return fmt.Errorf("error calling Agent Binary Download Sources API: %w", err)
+		return DownloadSourceResponse{},
+			fmt.Errorf("error calling Agent Binary Download Sources API: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -177,11 +189,18 @@ func (client *Client) CreateDownloadSource(ctx context.Context, source DownloadS
 		client.log.Errorw(
 			"could not create download source, kibana returned "+resp.Status,
 			"http.response.body.content", respBody)
-		return fmt.Errorf("could not create download source, kibana returned %s. response body: %s: %w",
-			resp.Status, respBody, err)
+		return DownloadSourceResponse{},
+			fmt.Errorf("could not create download source, kibana returned %s. response body: %s: %w",
+				resp.Status, respBody, err)
 	}
 
-	return nil
+	body := DownloadSourceResponse{}
+	if err = json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		return DownloadSourceResponse{},
+			fmt.Errorf("failed parsing download source response: %w", err)
+	}
+
+	return body, nil
 }
 
 // GetPolicy returns the requested ID
