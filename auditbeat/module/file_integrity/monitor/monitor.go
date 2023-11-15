@@ -45,7 +45,7 @@ func New(recursive bool, IsExcludedPath func(path string) bool) (Watcher, error)
 	// Use our simulated recursive watches unless the fsnotify implementation
 	// supports OS-provided recursive watches
 	if recursive && watcher.SetRecursive() != nil {
-		return newRecursiveWatcher(watcher, IsExcludedPath), nil
+		return newRecursiveWatcher(watcher, IsExcludedPath), nil //nolint:nilerr // Ignore SetRecursive() errors.
 	}
 	return (*nonRecursiveWatcher)(watcher), nil
 }

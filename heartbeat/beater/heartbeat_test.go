@@ -15,49 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build windows
-
-package wineventlog
+package beater
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func TestPublisherMetadataStore(t *testing.T) {
-	logp.TestingSetup()
+func TestMakeESClient(t *testing.T) {
+	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {
+		origTimeout := 90
+		origCfg, _ := conf.NewConfigFrom(map[interface{}]interface{}{
+			"hosts":    []string{"http://localhost:9200"},
+			"username": "anyuser",
+			"password": "anypwd",
+			"timeout":  origTimeout,
+		})
+		anyAttempt := 1
+		anyDuration := 1 * time.Second
 
-	s, err := NewPublisherMetadataStore(
-		NilHandle,
-		"Microsoft-Windows-Security-Auditing",
-		logp.NewLogger("metadata"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer s.Close()
+		_, _ = makeESClient(origCfg, anyAttempt, anyDuration)
 
-	assert.NotEmpty(t, s.Events)
-	assert.Empty(t, s.EventFingerprints)
-
-	t.Run("event_metadata_from_handle", func(t *testing.T) {
-		log := openLog(t, security4752File)
-		defer log.Close()
-
-		h := mustNextHandle(t, log)
-		defer h.Close()
-
-		em, err := newEventMetadataFromEventHandle(s.Metadata, h)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		assert.EqualValues(t, 4752, em.EventID)
-		assert.EqualValues(t, 0, em.Version)
-		assert.Empty(t, em.MsgStatic)
-		assert.NotNil(t, em.MsgTemplate)
-		assert.NotEmpty(t, em.EventData)
+		timeout, err := origCfg.Int("timeout", -1)
+		require.NoError(t, err)
+		assert.EqualValues(t, origTimeout, timeout)
 	})
 }
