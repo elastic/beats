@@ -2,9 +2,8 @@ package easyops
 
 import (
 	"fmt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"strings"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type couMetricBuilder struct {
@@ -22,14 +21,14 @@ func newCouMetricBuilder(field string, originMetric []string, groupKeys []string
 	}
 }
 
-func (builder *couMetricBuilder) Build(events []common.MapStr) []common.MapStr {
-	var result []common.MapStr
+func (builder *couMetricBuilder) Build(events []mapstr.M) []mapstr.M {
+	var result []mapstr.M
 	eventMap := GroupEventsByKeys(events, builder.groupKeys)
 	for _, es := range eventMap {
 		if len(es) == 0 {
 			continue
 		}
-		rs := common.MapStr{}
+		rs := mapstr.M{}
 		for _, groupKey := range builder.groupKeys {
 			// GetValue success in GroupEventsByKeys
 			val, _ := es[0].GetValue(groupKey)
@@ -45,7 +44,7 @@ func (builder *couMetricBuilder) Build(events []common.MapStr) []common.MapStr {
 	return result
 }
 
-func (builder *couMetricBuilder) count(events []common.MapStr, originMetric []string, defaultValues map[string]interface{}) map[string]float64 {
+func (builder *couMetricBuilder) count(events []mapstr.M, originMetric []string, defaultValues map[string]interface{}) map[string]float64 {
 	counters := map[string]float64{}
 	for field, defaultValue := range defaultValues {
 		if value, ok := defaultValue.(float64); ok {

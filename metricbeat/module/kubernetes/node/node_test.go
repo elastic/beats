@@ -55,12 +55,6 @@ func (s *NodeTestSuite) ReadTestFile(testFile string) []byte {
 	return body
 }
 
-//=======
-//	events, err := eventMapping(body, &prometheus.MetricsMapping{})
-//	assert.NoError(t, err, "error mapping "+testFile)
-//	assert.Equal(t, len(events), 1)
-//>>>>>>> 99ddfa11c9 (chore(): new k8s node metrics refs MONITOR-4095)
-
 func (s *NodeTestSuite) TestEventMapping() {
 	body := s.ReadTestFile(testFile)
 	events, err := eventMapping(body, s.Logger, &prometheus.MetricsMapping{})

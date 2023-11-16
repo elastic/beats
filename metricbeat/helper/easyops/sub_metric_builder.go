@@ -1,6 +1,6 @@
 package easyops
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
 type subMetricBuilder struct {
 	baseBuilderFields
@@ -17,14 +17,14 @@ func newSubMetricBuilder(field string, originMetric []string, groupKeys []string
 	}
 }
 
-func (builder *subMetricBuilder) Build(events []common.MapStr) []common.MapStr {
-	var result []common.MapStr
+func (builder *subMetricBuilder) Build(events []mapstr.M) []mapstr.M {
+	var result []mapstr.M
 	eventMap := GroupEventsByKeys(events, builder.groupKeys)
 	for _, es := range eventMap {
 		if len(es) == 0 {
 			continue
 		}
-		rs := common.MapStr{}
+		rs := mapstr.M{}
 		for _, groupKey := range builder.groupKeys {
 			// GetValue success in GroupEventsByKeys
 			val, _ := es[0].GetValue(groupKey)
@@ -36,7 +36,7 @@ func (builder *subMetricBuilder) Build(events []common.MapStr) []common.MapStr {
 	return result
 }
 
-func (builder *subMetricBuilder) sub(events []common.MapStr, originMetric []string) interface{} {
+func (builder *subMetricBuilder) sub(events []mapstr.M, originMetric []string) interface{} {
 	var floatResult float64 = 0
 	for index, metric := range originMetric {
 		for _, event := range events {
