@@ -23,8 +23,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgv1"
@@ -70,24 +68,13 @@ const (
 	memoryStat  = "memory"
 )
 
-// nolint: deadcode,structcheck,unused // needed by other platforms
+//nolint: deadcode,structcheck,unused // needed by other platforms
 type mount struct {
 	subsystem  string // Subsystem name (e.g. cpuacct).
 	mountpoint string // Mountpoint of the subsystem (e.g. /cgroup/cpuacct).
 	path       string // Relative path to the cgroup (e.g. /docker/<id>).
 	id         string // ID of the cgroup.
 	fullPath   string // Absolute path to the cgroup. It's the mountpoint joined with the path.
-}
-
-// pathListWithTime combines PathList with a timestamp.
-type pathListWithTime struct {
-	added    time.Time
-	pathList PathList
-}
-
-type pathCache struct {
-	sync.RWMutex
-	cache map[string]pathListWithTime
 }
 
 // Reader reads cgroup metrics and limits.
@@ -98,9 +85,6 @@ type Reader struct {
 	ignoreRootCgroups        bool // Ignore a cgroup when its path is "/".
 	cgroupsHierarchyOverride string
 	cgroupMountpoints        Mountpoints // Mountpoints for each subsystem (e.g. cpu, cpuacct, memory, blkio).
-
-	// Cache to map known v2 cgroup controllerPaths to pathListWithTime.
-	v2ControllerPathCache pathCache
 }
 
 // ReaderOptions holds options for NewReaderOptions.
@@ -151,7 +135,6 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 		ignoreRootCgroups:        opts.IgnoreRootCgroups,
 		cgroupsHierarchyOverride: opts.CgroupsHierarchyOverride,
 		cgroupMountpoints:        mountpoints,
-		v2ControllerPathCache:    pathCache{cache: make(map[string]pathListWithTime)},
 	}, nil
 }
 

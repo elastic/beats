@@ -25,7 +25,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -68,7 +67,7 @@ type PathList struct {
 
 // Flatten combines the V1 and V2 cgroups in cases where we don't need a map with keys
 func (pl PathList) Flatten() []ControllerPath {
-	list := make([]ControllerPath, 0, len(pl.V1)+len(pl.V2))
+	list := []ControllerPath{}
 	for _, v1 := range pl.V1 {
 		list = append(list, v1)
 	}
@@ -256,7 +255,6 @@ func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 		if r.cgroupsHierarchyOverride != "" {
 			path = r.cgroupsHierarchyOverride
 		}
-
 		// cgroup V2
 		// cgroup v2 controllers will always start with this string
 		if strings.Contains(line, "0::/") {
@@ -277,23 +275,6 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 				controllerPath = r.rootfsMountpoint.ResolveHostFS(filepath.Join("/sys/fs/cgroup/unified", path))
 			}
 
-			// Check if there is an entry for controllerPath already cached.
-			r.v2ControllerPathCache.Lock()
-			cacheEntry, ok := r.v2ControllerPathCache.cache[controllerPath]
-			if ok {
-				// If the cached entry for controllerPath is not older than 5 minutes,
-				// return the cached entry.
-				if time.Since(cacheEntry.added) < 5*time.Minute {
-					cPaths.V2 = cacheEntry.pathList.V2
-					r.v2ControllerPathCache.Unlock()
-					continue
-				}
-			}
-			// Consider the existing entry for controllerPath invalid, as it is
-			// older than 5 minutes.
-			delete(r.v2ControllerPathCache.cache, controllerPath)
-			r.v2ControllerPathCache.Unlock()
-
 			cgpaths, err := os.ReadDir(controllerPath)
 			if err != nil {
 				return cPaths, fmt.Errorf("error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s': %w", r.cgroupMountpoints.V2Loc, line, err)
@@ -306,12 +287,6 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 					cPaths.V2[controllerName] = ControllerPath{ControllerPath: path, FullPath: controllerPath, IsV2: true}
 				}
 			}
-			r.v2ControllerPathCache.Lock()
-			r.v2ControllerPathCache.cache[controllerPath] = pathListWithTime{
-				added:    time.Now(),
-				pathList: cPaths,
-			}
-			r.v2ControllerPathCache.Unlock()
 			// cgroup v1
 		} else {
 			subsystems := strings.Split(fields[1], ",")
