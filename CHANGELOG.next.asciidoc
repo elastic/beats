@@ -69,6 +69,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
+- Do not error when Okta API returns no data. {pull}37092[37092]
+- Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
 
 *Heartbeat*
 
@@ -106,7 +108,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
-Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- Upgrade to Go 1.20.11. {pull}37123[37123]
 
 *Auditbeat*
 
@@ -198,6 +200,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
