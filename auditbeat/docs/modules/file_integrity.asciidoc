@@ -28,8 +28,13 @@ to only send events for new or modified files.
 
 The operating system features that power this feature are as follows.
 
-* Linux - `inotify` is used, and therefore the kernel must have inotify support.
+* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`.
+By default, `fsnotify` is used, and therefore the kernel must have inotify support.
 Inotify was initially merged into the 2.6.13 Linux kernel.
+The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels.
+FSNotify doesn't have the ability to associate user data to file events.
+The preferred backend can be selected by specifying the `backend` config option.
+Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
 coalesces multiple changes to a file into a single event. {beatname_uc} translates
 this coalesced changes into a meaningful sequence of actions. However,
@@ -143,6 +148,9 @@ usually only involve reading a small number of bytes.
 of this directories are watched. If `recursive` is set to `true`, the
 `file_integrity` module will watch for changes on this directories and all
 their subdirectories.
+
+*`backend`*:: (*Linux only*) Select the backend which will be used to
+source events. Valid values: `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
 
 include::{docdir}/auditbeat-options.asciidoc[]
 

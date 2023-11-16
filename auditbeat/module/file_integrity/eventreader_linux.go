@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux && !freebsd && !openbsd && !netbsd && !windows && !darwin
+//go:build linux
 
 package file_integrity
 
@@ -26,5 +26,35 @@ import (
 )
 
 func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	return errors.New("file auditing metricset is not implemented on this system")
+	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
+		// Auto and unset defaults to fsnotify
+		l := logger.Named("fsnotify")
+		l.Info("selected backend: fsnotify")
+		return &fsNotifyReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+		}, nil
+	}
+
+	if c.Backend == BackendEBPF {
+		l := logger.Named("ebpf")
+		l.Info("selected backend: ebpf")
+
+		paths := make(map[string]struct{})
+		for _, p := range c.Paths {
+			paths[p] = struct{}{}
+		}
+
+		return &ebpfReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+			paths:   paths,
+			eventC:  make(chan Event),
+		}, nil
+	}
+
+	// unimplemented
+	return nil, errors.ErrUnsupported
 }

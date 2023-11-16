@@ -14,11 +14,15 @@ services:
       - KIBANA_PORT=5601
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
+      - /sys:/sys
     command: make
     privileged: true
     pid: host
     cap_add:
       - AUDIT_CONTROL
+      - BPF
+      - PERFMON
+      - SYS_RESOURCE
 
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
