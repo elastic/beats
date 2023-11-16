@@ -9,8 +9,6 @@ import (
 	"errors"
 	"testing"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
 func TestRetry(t *testing.T) {
@@ -72,60 +70,6 @@ func TestRetry(t *testing.T) {
 	}
 }
 
-func TestRetryWithBackoff(t *testing.T) {
-	type testCase struct {
-		Fn                 func() error
-		ExpectedExecutions int
-		IsErrExpected      bool
-		Enabled            bool
-	}
-
-	errFatal := errors.New("fatal")
-	executions := 0
-
-	testCases := map[string]testCase{
-		"not-failing":        testCase{Fn: func() error { executions++; return nil }, ExpectedExecutions: 1, Enabled: true},
-		"failing":            testCase{Fn: func() error { executions++; return errors.New("fail") }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true},
-		"fatal-by-enum":      testCase{Fn: func() error { executions++; return errFatal }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: true},
-		"fatal-by-iface":     testCase{Fn: func() error { executions++; return ErrFatal{} }, ExpectedExecutions: 1, IsErrExpected: true, Enabled: true},
-		"not-fatal-by-iface": testCase{Fn: func() error { executions++; return ErrNotFatal{} }, ExpectedExecutions: 4, IsErrExpected: true, Enabled: true},
-	}
-
-	config := &Config{
-		RetriesCount: 3,
-		Delay:        5000,
-	}
-	maxDelay := time.Duration(config.Delay) * time.Millisecond
-
-	done := make(chan struct{})
-	maxWaitTime := 200 * time.Millisecond
-	minWaitTime := 50 * time.Millisecond
-	backoff := backoff.NewEqualJitterBackoff(done, minWaitTime, maxWaitTime)
-
-	for n, tc := range testCases {
-		testFn := tc.Fn
-		executions = 0
-		config.Enabled = tc.Enabled
-
-		startTime := time.Now()
-		err := DoWithBackoff(config, backoff, testFn, errFatal)
-
-		executionTime := time.Since(startTime)
-		minExecTime := getBackoffMinTime(minWaitTime, maxWaitTime, tc.ExpectedExecutions)
-		if tc.ExpectedExecutions > 1 && (executionTime < minExecTime || executionTime > maxDelay) {
-			t.Fatalf("[%s]: expecting execution time between %d-%d ns, got: %v", n, minExecTime, maxDelay, executionTime)
-		}
-
-		if (err == nil) == tc.IsErrExpected {
-			t.Fatalf("[%s]: expecting error, got: %v", n, err)
-		}
-
-		if executions != tc.ExpectedExecutions {
-			t.Fatalf("[%s]: expecting %d executions, got: %d", n, tc.ExpectedExecutions, executions)
-		}
-	}
-}
-
 type ErrFatal struct{ error }
 
 func (ErrFatal) Fatal() bool {
@@ -167,17 +111,4 @@ func getMinExecutionTime(delayDuration time.Duration, executions int64, exponent
 		execTime = 0
 	}
 	return time.Duration(execTime)
-}
-
-func getBackoffMinTime(delay time.Duration, maxWaitTime time.Duration, executions int) time.Duration {
-	var duration time.Duration
-	for i := 1; i < executions; i++ {
-		duration += delay
-		delay *= 2
-		if delay > maxWaitTime {
-			delay = maxWaitTime
-		}
-	}
-
-	return duration
 }
