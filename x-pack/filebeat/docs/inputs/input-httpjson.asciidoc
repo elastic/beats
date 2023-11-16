@@ -142,7 +142,7 @@ Appends a value to an array. If the field does not exist, the first entry will c
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
-- `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. The default is `string`.
+- `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
