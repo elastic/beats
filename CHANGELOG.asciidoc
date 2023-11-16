@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v8.10.4\...v8.11.0[View commits]
 *Filebeat*
 
 - Switch types of `log.file.device`, `log.file.inode`, `log.file.idxhi`, `log.file.idxlo` and `log.file.vol` fields to strings to better align with ECS and integrations. {pull}36697[36697]
+- Improve documentation for `httpjson` input. {pull}37073[37073] 
 
 *Metricbeat*
 
