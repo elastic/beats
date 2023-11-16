@@ -758,7 +758,7 @@ If set to true, the fields from the parent document (at the same level as `targe
 [float]
 ==== `response.split[].delimiter`
 
-Required if using the split type of `string`.  This is the substring used to split the string.  For example, if `delimiter` is "\n" and the string was "line 1\nline 2", then the split would result in "line 1" and "line 2".
+Required if using the split type of `string`.  This is the substring used to split the string.  For example, if `delimiter` is "\n" and the string is "line 1\nline 2", then the split will result in "line 1" and "line 2".
 
 [float]
 ==== `response.split[].key_field`
