@@ -23,10 +23,13 @@ import (
 	"math"
 	"math/rand"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"gotest.tools/assert"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
@@ -72,6 +75,78 @@ func TestProduceConsumer(t *testing.T) {
 
 	t.Run("direct", testWith(makeTestQueue(bufferSize, 0, 0)))
 	t.Run("flush", testWith(makeTestQueue(bufferSize, batchSize/2, 100*time.Millisecond)))
+}
+
+// TestProducerDoesNotBlockWhenCancelled ensures the producer Publish
+// does not block indefinitely.
+//
+// Once we get a producer `p` from the queue we want to ensure
+// that if p.Publish is called and blocks it will unblock once
+// p.Cancel is called.
+//
+// For this test we start a queue with size 2 and try to add more
+// than 2 events to it, p.Publish will block, once we call p.Cancel,
+// we ensure the 3rd event was not successfully published.
+func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
+	q := NewQueue(nil, nil,
+		Settings{
+			Events:         2, // Queue size
+			FlushMinEvents: 1, // make sure the queue won't buffer events
+			FlushTimeout:   time.Millisecond,
+		})
+
+	p := q.Producer(queue.ProducerConfig{
+		// We do not read from the queue, so the callbacks are never called
+		ACK:          func(count int) {},
+		OnDrop:       func(e interface{}) {},
+		DropOnCancel: false,
+	})
+
+	success := atomic.Bool{}
+	publishCount := atomic.Int32{}
+	go func() {
+		// Publish 2 events, this will make the queue full, but
+		// both will be accepted
+		for i := 0; i < 2; i++ {
+			id, ok := p.Publish(fmt.Sprintf("Event %d", i))
+			if !ok {
+				t.Errorf("failed to publish to the queue, event ID: %v", id)
+				return
+			}
+			publishCount.Add(1)
+		}
+		_, ok := p.Publish("Event 3")
+		if ok {
+			t.Errorf("publishing the 3rd event must fail")
+			return
+		}
+
+		// Flag the test as successful
+		success.Store(true)
+	}()
+
+	// Allow the producer to run and the queue to do its thing.
+	// Two events should be accepted and the third call to p.Publish
+	// must block
+	// time.Sleep(100 * time.Millisecond)
+
+	// Ensure we published two events
+	require.Eventually(
+		t,
+		func() bool { return publishCount.Load() == 2 },
+		200*time.Millisecond,
+		time.Millisecond,
+		"the first two events were not successfully published")
+
+	// Cancel the producer, this should unblock its Publish method
+	p.Cancel()
+
+	require.Eventually(
+		t,
+		success.Load,
+		200*time.Millisecond,
+		1*time.Millisecond,
+		"test not flagged as successful, p.Publish likely blocked indefinitely")
 }
 
 func TestQueueMetricsDirect(t *testing.T) {
