@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 
 	"github.com/aws/smithy-go"
 
@@ -25,10 +26,11 @@ type opEnsureBucket struct {
 	log        *logp.Logger
 	svc        *s3.Client
 	bucketName string
+	region     string
 }
 
 func newOpEnsureBucket(log *logp.Logger, cfg aws.Config, bucketName string) *opEnsureBucket {
-	return &opEnsureBucket{log: log, svc: s3.NewFromConfig(cfg), bucketName: bucketName}
+	return &opEnsureBucket{log: log, svc: s3.NewFromConfig(cfg), bucketName: bucketName, region: cfg.Region}
 }
 
 func (o *opEnsureBucket) Execute(_ executor.Context) error {
@@ -45,7 +47,7 @@ func (o *opEnsureBucket) Execute(_ executor.Context) error {
 	if errors.As(err, &apiError) {
 		if apiError.ErrorCode() == notFound {
 			// bucket do not exist let's create it.
-			input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName)}
+			input := &s3.CreateBucketInput{Bucket: aws.String(o.bucketName), CreateBucketConfiguration: &types.CreateBucketConfiguration{LocationConstraint: types.BucketLocationConstraint(o.region)}}
 			resp, err := o.svc.CreateBucket(context.TODO(), input)
 			if err != nil {
 				o.log.Debugf("Could not create bucket, resp: %v", resp)

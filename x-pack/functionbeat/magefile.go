@@ -60,7 +60,12 @@ func Build() error {
 
 		inputFiles := filepath.Join("provider", provider.Name, "main.go")
 		params.InputFiles = []string{inputFiles}
-		params.Name = devtools.BeatName + "-" + provider.Name
+		// Ref: https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/
+		if provider.Name == "aws" {
+			params.Name = "bootstrap"
+		} else {
+			params.Name = devtools.BeatName + "-" + provider.Name
+		}
 		params.OutputDir = filepath.Join("provider", provider.Name)
 		params.CGO = false
 		params.Env = make(map[string]string)
@@ -182,7 +187,7 @@ func BuildPkgForFunctions() error {
 	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
-		filepath.Join("provider", "aws", "functionbeat-aws"): filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "aws", "bootstrap"): filepath.Join("pkg", "bootstrap"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{
@@ -219,7 +224,11 @@ func BuildSystemTestBinary() error {
 			continue
 		}
 
-		params.Name = filepath.Join("provider", provider.Name, devtools.BeatName+"-"+provider.Name)
+		if provider.Name == "aws" {
+			params.Name = filepath.Join("provider", provider.Name, "bootstrap")
+		} else {
+			params.Name = filepath.Join("provider", provider.Name, devtools.BeatName+"-"+provider.Name)
+		}
 		inputFiles := make([]string, 0)
 		for _, inputFileName := range []string{"main.go", "main_test.go"} {
 			inputFiles = append(inputFiles, filepath.Join("provider", provider.Name, inputFileName))

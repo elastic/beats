@@ -28,8 +28,8 @@ import (
 
 const (
 	// AWS lambda currently support go 1.x as a runtime.
-	runtime     = "go1.x"
-	handlerName = "functionbeat-aws"
+	runtime     = "provided.al2"
+	handlerName = "bootstrap"
 )
 
 // AWSLambdaFunction add 'dependsOn' as a serializable parameters,  goformation doesn't currently
@@ -218,6 +218,7 @@ func NewCLI(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}
+	config.Region = "eu-west-1"
 	if config.Region != "" {
 		awsCfg.Region = config.Region
 	}

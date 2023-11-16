@@ -326,6 +326,6 @@ func checksum(data []byte) string {
 
 func zipResources() []bundle.Resource {
 	return []bundle.Resource{
-		&bundle.LocalFile{Path: "pkg/functionbeat-aws", FileMode: 0755},
+		&bundle.LocalFile{Path: "pkg/bootstrap", FileMode: 0755},
 	}
 }

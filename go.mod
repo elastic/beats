@@ -26,7 +26,7 @@ require (
 	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/aws/aws-lambda-go v1.13.3
+	github.com/aws/aws-lambda-go v1.41.0
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/config v1.17.7
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.20
