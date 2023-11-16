@@ -1,9 +1,8 @@
 package easyops
 
 import (
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"math"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type divMetricBuilder struct {
@@ -21,14 +20,14 @@ func newDivMetricBuilder(field string, originMetric []string, groupKeys []string
 	}
 }
 
-func (builder *divMetricBuilder) Build(events []common.MapStr) []common.MapStr {
-	var result []common.MapStr
+func (builder *divMetricBuilder) Build(events []mapstr.M) []mapstr.M {
+	var result []mapstr.M
 	eventMap := GroupEventsByKeys(events, builder.groupKeys)
 	for _, es := range eventMap {
 		if len(es) == 0 {
 			continue
 		}
-		rs := common.MapStr{}
+		rs := mapstr.M{}
 		for _, groupKey := range builder.groupKeys {
 			// GetValue success in GroupEventsByKeys
 			val, _ := es[0].GetValue(groupKey)
@@ -40,7 +39,7 @@ func (builder *divMetricBuilder) Build(events []common.MapStr) []common.MapStr {
 	return result
 }
 
-func (builder *divMetricBuilder) div(events []common.MapStr, originMetric []string) interface{} {
+func (builder *divMetricBuilder) div(events []mapstr.M, originMetric []string) interface{} {
 	var floatResult float64 = 0
 MetricLoop:
 	for index, metric := range originMetric {

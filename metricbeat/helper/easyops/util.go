@@ -2,12 +2,11 @@ package easyops
 
 import (
 	"fmt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"strings"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func GenerateGroupValue(event common.MapStr, groupKeys []string) (string, error) {
+func GenerateGroupValue(event mapstr.M, groupKeys []string) (string, error) {
 	groupValues := make([]string, 0, len(groupKeys))
 	for _, groupKey := range groupKeys {
 		value, err := event.GetValue(groupKey)
@@ -19,8 +18,8 @@ func GenerateGroupValue(event common.MapStr, groupKeys []string) (string, error)
 	return strings.Join(groupValues, ";"), nil
 }
 
-func GroupEventsByKeys(events []common.MapStr, groupKeys []string) map[string][]common.MapStr {
-	result := map[string][]common.MapStr{}
+func GroupEventsByKeys(events []mapstr.M, groupKeys []string) map[string][]mapstr.M {
+	result := map[string][]mapstr.M{}
 	for _, event := range events {
 		group, err := GenerateGroupValue(event, groupKeys)
 		if err == nil {

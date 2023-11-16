@@ -1,8 +1,6 @@
 package easyops
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common"
-)
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
 type AggregateType uint8
 
@@ -22,7 +20,7 @@ type AggregateMetricMap struct {
 }
 
 type AggregateMetricBuilder interface {
-	Build(events []common.MapStr) []common.MapStr
+	Build(events []mapstr.M) []mapstr.M
 }
 
 type baseBuilderFields struct {
