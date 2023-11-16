@@ -143,7 +143,7 @@ Appends a value to an array. If the field does not exist, the first entry will c
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. The default is `string`.
-- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. The default is `false`.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
 ==== `delete`
@@ -174,8 +174,8 @@ Sets a value.
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
-- `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. The default is `string`.
-- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. The default is `false`.
+- `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. Default is `string`.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [[value-templates]]
 ==== Value templates
@@ -476,7 +476,7 @@ filebeat.inputs:
 [float]
 ==== `request.keep_alive.disable`
 
-This specifies whether to disable keep-alive for HTTP end-points. Default: `true`.
+This specifies whether to disable keep-alives for HTTP end-points. Default: `true`.
 
 [float]
 ==== `request.keep_alive.max_idle_connections`
@@ -540,7 +540,7 @@ If the `remaining` header is missing from the Response, no rate-limiting will oc
 [float]
 ==== `request.rate_limit.reset`
 
-The value of the response specifies the epoch time when the rate limit will reset.
+The value of the response that specifies the epoch time when the rate limit will reset.
 It is defined with a Go template value. Can read state from: [`.last_response.header`]
 
 [[request-transforms-headers]]
@@ -1037,7 +1037,7 @@ This will output:
 ]
 ----
 
-- We have a response with a key whose value is a string.  We want the string to be split on a delimiter and a document for each sub strings.
+- We have a response with string value keys.  We want the string to be split on a delimiter and a document for each substring.
 
 +
 ["source","json",subs="attributes"]
@@ -1224,7 +1224,7 @@ request_url using file_name as 'file_1': \https://example.com/services/data/v1.0
 request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
 
 +
-Collect and make events from responses in any format supported by httpjson for all calls.
+Collect and make events from the response in any format supported by httpjson for all calls.
 
 +
 [[chain-step-replace_with]]
@@ -1233,7 +1233,7 @@ Collect and make events from responses in any format supported by httpjson for a
 
 The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value.
 The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables
-like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`], etc. The `replace_with` clause can be used in combination with the `replace` clause
+like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause
 thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
@@ -1476,7 +1476,7 @@ response_json using id as '2':
 ----
 
 +
-Collect and make events from responses in any format supported by httpjson for all calls.
+Collect and make events from the response in any format supported by httpjson for all calls.
 
 NOTE: httpjson chain will only create and ingest events from the last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
 
