@@ -76,10 +76,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 }
 
 func TestGetFilterForMetric(t *testing.T) {
-	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
-		t.Fatalf("cannot initialise logger on development mode: %+v", err)
-	}
-
+	logp.DevelopmentSetup(logp.ToObserverOutput())
 	var logger = logp.NewLogger("TestGetFilterForMetric")
 
 	cases := []struct {

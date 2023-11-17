@@ -22,7 +22,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"os/user"
@@ -177,7 +176,7 @@ func TestDiffEvents(t *testing.T) {
 }
 
 func TestHashFile(t *testing.T) {
-	f, err := ioutil.TempFile("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -288,7 +287,7 @@ func TestHashFile(t *testing.T) {
 }
 
 func TestNewEventFromFileInfoHash(t *testing.T) {
-	f, err := ioutil.TempFile("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -361,7 +360,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 }
 
 func BenchmarkHashFile(b *testing.B) {
-	f, err := ioutil.TempFile("", "hash")
+	f, err := os.CreateTemp(b.TempDir(), "hash")
 	if err != nil {
 		b.Fatal(err)
 	}

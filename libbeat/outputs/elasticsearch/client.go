@@ -102,6 +102,7 @@ func NewClient(
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
 		Transport:        s.Transport,
+		IdleConnTimeout:  s.IdleConnTimeout,
 	})
 	if err != nil {
 		return nil, err

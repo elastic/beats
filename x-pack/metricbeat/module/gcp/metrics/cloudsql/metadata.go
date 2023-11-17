@@ -6,7 +6,6 @@ package cloudsql
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -156,24 +155,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	}
 
 	return cloudsqlMetadata, nil
-}
-
-func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInputData) (string, error) {
-	metadata, err := s.Metadata(ctx, in.TimeSeries)
-	if err != nil {
-		return "", err
-	}
-
-	metadata.ECS.Update(metadata.Labels)
-	if in.Timestamp != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Timestamp)
-	} else if in.Point != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
-	} else {
-		return "", errors.New("no timestamp information found")
-	}
-
-	return metadata.ECS.String(), nil
 }
 
 func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {

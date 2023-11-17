@@ -443,34 +443,84 @@ certificate_authorities:
 [[server-certificate]]
 ==== `certificate: "/etc/server/cert.pem"`
 
-For server authentication, the path to the SSL authentication certificate must
-be specified for TLS. If the certificate is not specified, startup will fail.
+The end-entity (leaf) certificate that the server uses to identify itself.
+If the certificate is signed by a certificate authority (CA), then it should
+include intermediate CA certificates, sorted from leaf to root.
+For servers, a `certificate` and <<server-key,`key`>> must be specified.
 
-When this option is configured, the <<server-key,`key`>> option is also required.
-The certificate option support embedding of the certificate:
+The certificate option supports embedding of the PEM certificate content. This
+example contains the leaf certificate followed by issuer's certificate.
 
 [source,yaml]
 ----
 certificate: |
-    -----BEGIN CERTIFICATE-----
-    MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF
-    ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2
-    MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB
-    BQADggEPADCCAQoCggEBANce58Y/JykI58iyOXpxGfw0/gMvF0hUQAcUrSMxEO6n
-    fZRA49b4OV4SwWmA3395uL2eB2NB8y8qdQ9muXUdPBWE4l9rMZ6gmfu90N5B5uEl
-    94NcfBfYOKi1fJQ9i7WKhTjlRkMCgBkWPkUokvBZFRt8RtF7zI77BSEorHGQCk9t
-    /D7BS0GJyfVEhftbWcFEAG3VRcoMhF7kUzYwp+qESoriFRYLeDWv68ZOvG7eoWnP
-    PsvZStEVEimjvK5NSESEQa9xWyJOmlOKXhkdymtcUd/nXnx6UTCFgnkgzSdTWV41
-    CI6B6aJ9svCTI2QuoIq2HxX/ix7OvW1huVmcyHVxyUECAwEAAaNTMFEwHQYDVR0O
-    BBYEFPwN1OceFGm9v6ux8G+DZ3TUDYxqMB8GA1UdIwQYMBaAFPwN1OceFGm9v6ux
-    8G+DZ3TUDYxqMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG5D
-    874A4YI7YUwOVsVAdbWtgp1d0zKcPRR+r2OdSbTAV5/gcS3jgBJ3i1BN34JuDVFw
-    3DeJSYT3nxy2Y56lLnxDeF8CUTUtVQx3CuGkRg1ouGAHpO/6OqOhwLLorEmxi7tA
-    H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu
-    8F4QOgTAWyh8EZIwaKCliFRSynDpv3JTUwtfZkxo6K6nce1RhCWFAsMvDZL8Dgc0
-    yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk
-    sxSmbIUfc2SGJGCJD4I=
-    -----END CERTIFICATE-----
+  -----BEGIN CERTIFICATE-----
+  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
+  puoJ9UYvfIcHUGPdZGU=
+  -----END CERTIFICATE-----
+  -----BEGIN CERTIFICATE-----
+  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
+  RQQmEyTn1hn/eA==
+  -----END CERTIFICATE-----
 ----
 
 [float]
@@ -478,7 +528,7 @@ certificate: |
 ==== `key: "/etc/server/cert.key"`
 
 The server certificate key used for authentication is required.
-The key option support embedding of the private key:
+The key option supports embedding of the private key:
 
 [source,yaml]
 ----
