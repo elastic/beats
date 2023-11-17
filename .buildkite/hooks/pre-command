@@ -5,3 +5,10 @@ set -euo pipefail
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "elastic-agent-autodiscover" ]]; then
   export GO_VERSION=$(cat .go-version)
 fi
+
+# addtional preparation for macos step
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "elastic-agent-autodiscover" && "$BUILDKITE_STEP_KEY" == "mac-test" ]]; then
+    echo "--- prepare env"
+    source .buildkite/scripts/common.sh
+    with_go ${GO_VERSION} ${SETUP_GVM_VERSION}
+fi

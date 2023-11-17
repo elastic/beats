@@ -36,6 +36,7 @@ spec:
     spec:
       repository: elastic/elastic-agent-autodiscover
       pipeline_file: ".buildkite/pipeline.yml"
+      maximum_timeout_in_minutes: 60
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
