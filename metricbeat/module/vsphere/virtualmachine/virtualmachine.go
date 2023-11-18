@@ -252,9 +252,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 					m.Logger().Debug(err.Error())
 				}
 			} else {
-				m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
-					"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
-					"from host/guest")
+				m.Logger().Debug(`'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error
+					from vsphere library, an error trying to reach host/guest or incomplete information returned
+					from host/guest`)
 			}
 
 			// Get custom fields (attributes) values if get_custom_fields is true.
