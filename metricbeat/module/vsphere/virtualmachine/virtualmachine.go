@@ -37,6 +37,7 @@ import (
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
+	"golang.org/x/exp/slices"
 )
 
 func init() {
@@ -127,7 +128,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("error getting Resource Pool Map: %w", err)
 	}
-	var rpList []string
+	var rpList = make([]string, 0, len(rpMap))
 	for _, rp := range rpMap {
 		rpList = append(rpList, rp.ref.Value)
 	}
@@ -142,13 +143,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	// Create a map to easily look up counter names by ID
-	counterMap := make(map[int32]string)
+	counterMap := make(map[int32]string, len(counterInfo))
 	for _, counter := range counterInfo {
 		counterMap[counter.Key] = counter.Name()
 	}
 
 	querySpec := types.PerfQuerySpec{
-		IntervalId: 20, // this likely needs to be made into a variable to support other-than-realtime metrics but it's not clear how to define that in the config and map to this and Level correctly
+		IntervalId: 20, // NOTE: This likely needs to be made into a variable to support other-than-realtime metrics but it's not clear how to define that in the config and map to this and Level correctly
 		MaxSample:  1,
 	}
 
@@ -177,119 +178,118 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		// Perform the query for all VMs at once
 		metricBase, err := perfManager.SampleByName(ctx, querySpec, metricsToQuery, chunk)
 		if err != nil {
-			fmt.Printf("Error retrieving metrics: %s\n", err)
-			return nil // this probably needs to be a different error
+			return fmt.Errorf("Error retrieving metrics: %s\n", err)
 		}
 
-		// assign metrics to the event output
+		// Assign metrics to the event output
 		for _, base := range metricBase {
-			if metric, ok := base.(*types.PerfEntityMetric); ok {
-
-				// build initial even tobject with static values
-				virtualMachine := vmMap[metric.Entity.Value]
-				event := mapstr.M{
-					"name": virtualMachine.Summary.Config.Name,
-					"os":   virtualMachine.Summary.Config.GuestFullName,
-					"uuid": virtualMachine.Summary.Config.InstanceUuid,
-					"id":   virtualMachine.Reference().Value,
-					"resource_pool": mapstr.M{
-						"id": virtualMachine.ResourcePool.Value,
-					},
-					"cpu": mapstr.M{
-						"reserved": virtualMachine.Summary.Config.CpuReservation,
-						"cores":    virtualMachine.Summary.Config.NumCpu,
-					},
-					"disks": mapstr.M{
-						"count": virtualMachine.Summary.Config.NumVirtualDisks,
-					},
-					"storage": mapstr.M{
-						"committed":  virtualMachine.Summary.Storage.Committed,
-						"uncommited": virtualMachine.Summary.Storage.Uncommitted,
-						"total":      virtualMachine.Summary.Storage.Committed + virtualMachine.Summary.Storage.Uncommitted,
-					},
-					"heartbeat_status": virtualMachine.GuestHeartbeatStatus,
-					"connection_state": virtualMachine.Summary.Runtime.ConnectionState,
-					"memory": mapstr.M{
-						"overhead":   virtualMachine.Summary.Runtime.MemoryOverhead,
-						"total_size": virtualMachine.Summary.Config.MemorySizeMB,
-						"reserved":   virtualMachine.Summary.Config.MemoryReservation,
-					},
-					"power_state":                   virtualMachine.Summary.Runtime.PowerState,
-					"snapshot_consolidation_needed": virtualMachine.Summary.Runtime.ConsolidationNeeded,
-					"vmx_path":                      virtualMachine.Summary.Config.VmPathName,
-				}
-
-				// add mapped values
-				resourcePool := rpMap[virtualMachine.ResourcePool.Value]
-				event.Put("resource_pool.name", resourcePool.Name)
-				event.Put("resource_pool.path", resourcePool.InventoryPath)
-
-				for _, value := range metric.Value {
-					switch series := value.(type) {
-					case *types.PerfMetricIntSeries:
-						counter := counterMap[series.Id.CounterId]
-						event.Put(counter, series.Value)
-					case *types.PerfMetricSeriesCSV:
-						counter := counterMap[series.Id.CounterId]
-						event.Put(counter, series.Value)
-					default:
-						m.Logger().Debug("Metric is of an unknown type, skipping")
-					}
-				}
-
-				// Get host information for VM
-				if host := virtualMachine.Summary.Runtime.Host; host != nil {
-					event["host"] = mapstr.M{
-						"id": host.Value,
-					}
-					hostSystem, err := getHostSystem(ctx, c, host.Reference())
-					if err == nil {
-						event.Put("host.hostname", hostSystem.Summary.Config.Name)
-					} else {
-						m.Logger().Debug(err.Error())
-					}
-				} else {
-					m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
-						"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
-						"from host/guest")
-				}
-
-				// Get custom fields (attributes) values if get_custom_fields is true.
-				if m.GetCustomFields && virtualMachine.Summary.CustomValue != nil {
-					customFields := getCustomFields(virtualMachine.Summary.CustomValue, customFieldsMap)
-
-					if len(customFields) > 0 {
-						event["custom_fields"] = customFields
-					}
-				} else {
-					m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
-						"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
-						"information returned from host/guest")
-				}
-
-				if virtualMachine.Summary.Vm != nil {
-					networkNames, err := getNetworkNames(ctx, c, virtualMachine.Summary.Vm.Reference())
-					if err != nil {
-						m.Logger().Debug(err.Error())
-					} else {
-						if len(networkNames) > 0 {
-							event["network_names"] = networkNames
-						}
-					}
-				}
-
-				if virtualMachine.Datastore != nil {
-					var datastoreIds []string
-					for _, datastore := range virtualMachine.Datastore {
-						datastoreIds = append(datastoreIds, datastore.Value)
-					}
-					event["datastore.id"] = datastoreIds
-				}
-
-				reporter.Event(mb.Event{
-					MetricSetFields: event,
-				})
+			metric, ok := base.(*types.PerfEntityMetric)
+			if !ok {
+				continue
 			}
+
+			// Build initial event object with static values
+			virtualMachine := vmMap[metric.Entity.Value]
+			event := mapstr.M{
+				"name": virtualMachine.Summary.Config.Name,
+				"os":   virtualMachine.Summary.Config.GuestFullName,
+				"uuid": virtualMachine.Summary.Config.InstanceUuid,
+				"id":   virtualMachine.Reference().Value,
+				"resource_pool": mapstr.M{
+					"id": virtualMachine.ResourcePool.Value,
+				},
+				"cpu": mapstr.M{
+					"reserved": virtualMachine.Summary.Config.CpuReservation,
+					"cores":    virtualMachine.Summary.Config.NumCpu,
+				},
+				"disks": mapstr.M{
+					"count": virtualMachine.Summary.Config.NumVirtualDisks,
+				},
+				"storage": mapstr.M{
+					"committed":  virtualMachine.Summary.Storage.Committed,
+					"uncommited": virtualMachine.Summary.Storage.Uncommitted,
+					"total":      virtualMachine.Summary.Storage.Committed + virtualMachine.Summary.Storage.Uncommitted,
+				},
+				"heartbeat_status": virtualMachine.GuestHeartbeatStatus,
+				"connection_state": virtualMachine.Summary.Runtime.ConnectionState,
+				"memory": mapstr.M{
+					"overhead":   virtualMachine.Summary.Runtime.MemoryOverhead,
+					"total_size": virtualMachine.Summary.Config.MemorySizeMB,
+					"reserved":   virtualMachine.Summary.Config.MemoryReservation,
+				},
+				"power_state":                   virtualMachine.Summary.Runtime.PowerState,
+				"snapshot_consolidation_needed": virtualMachine.Summary.Runtime.ConsolidationNeeded,
+				"vmx_path":                      virtualMachine.Summary.Config.VmPathName,
+			}
+
+			// add mapped values
+			resourcePool := rpMap[virtualMachine.ResourcePool.Value]
+			event.Put("resource_pool.name", resourcePool.Name)
+			event.Put("resource_pool.path", resourcePool.InventoryPath)
+
+			for _, value := range metric.Value {
+				switch series := value.(type) {
+				case *types.PerfMetricIntSeries:
+					counter := counterMap[series.Id.CounterId]
+					event.Put(counter, series.Value)
+				case *types.PerfMetricSeriesCSV:
+					counter := counterMap[series.Id.CounterId]
+					event.Put(counter, series.Value)
+				default:
+					m.Logger().Debug("metric is of an unknown type, skipping")
+				}
+			}
+
+			// Get host information for VM
+			if host := virtualMachine.Summary.Runtime.Host; host != nil {
+				event["host"] = mapstr.M{
+					"id": host.Value,
+				}
+				hostSystem, err := getHostSystem(ctx, c, host.Reference())
+				if err == nil {
+					event.Put("host.hostname", hostSystem.Summary.Config.Name)
+				} else {
+					m.Logger().Debug(err.Error())
+				}
+			} else {
+				m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
+					"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
+					"from host/guest")
+			}
+
+			// Get custom fields (attributes) values if get_custom_fields is true.
+			if m.GetCustomFields && virtualMachine.Summary.CustomValue != nil {
+				customFields := getCustomFields(virtualMachine.Summary.CustomValue, customFieldsMap)
+
+				if len(customFields) > 0 {
+					event["custom_fields"] = customFields
+				}
+			} else {
+				m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
+					"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
+					"information returned from host/guest")
+			}
+
+			if virtualMachine.Summary.Vm != nil {
+				networkNames, err := getNetworkNames(ctx, c, virtualMachine.Summary.Vm.Reference())
+				if err != nil {
+					m.Logger().Debug(err.Error())
+				} else {
+					if len(networkNames) > 0 {
+						event["network_names"] = networkNames
+					}
+				}
+			}
+
+			if virtualMachine.Datastore != nil {
+				var datastoreIds = make([]string, 0, len(virtualMachine.Datastore))
+				for _, datastore := range virtualMachine.Datastore {
+					datastoreIds = append(datastoreIds, datastore.Value)
+				}
+				event["datastore.id"] = datastoreIds
+			}
+
+			reporter.Event(mb.Event{MetricSetFields: event})
 		}
 	}
 
@@ -408,7 +408,6 @@ func getVmFilter(pools []types.ManagedObjectReference) property.Filter {
 }
 
 func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, mgr *view.Manager, includedPools []string) ([]mo.VirtualMachine, error) {
-
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
 		return nil, fmt.Errorf("error in CreateContainerView: %w", err)
@@ -416,7 +415,7 @@ func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, 
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+			m.Logger().Debugf("error trying to destroy view from vshphere: %s", err)
 		}
 	}()
 
@@ -427,7 +426,7 @@ func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, 
 		return nil, fmt.Errorf("error in Retrieve: %w", err)
 	}
 
-	// skip filtering the list if no pools are specified
+	// Skip filtering the list if no pools are specified
 	if m.ResourcePools == nil && m.DataCenters == nil {
 		return vmt, nil
 	}
@@ -436,7 +435,7 @@ func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, 
 	for _, vm := range vmt {
 		if vm.ResourcePool != nil {
 			m.Logger().Debugf("vm %s has rpool %s", vm.Summary.Config.Name, vm.ResourcePool.Value)
-			if contains(includedPools, vm.ResourcePool.Value) {
+			if slices.Contains(includedPools, vm.ResourcePool.Value) {
 				m.Logger().Debugf("adding vm %s", vm.Summary.Config.Name)
 				vms = append(vms, vm)
 			}
@@ -450,7 +449,7 @@ func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, 
 }
 
 func (m *MetricSet) getVmChunks(vms []mo.VirtualMachine) [][]types.ManagedObjectReference {
-	var vmsToQuery []types.ManagedObjectReference
+	var vmsToQuery = make([]types.ManagedObjectReference, 0, len(vms))
 
 	for _, vm := range vms {
 		vmsToQuery = append(vmsToQuery, vm.Reference())
@@ -506,7 +505,7 @@ func (m *MetricSet) getResourcePoolMap(ctx context.Context, c *vim25.Client, mgr
 		return nil, err
 	}
 	for _, dc := range dcList {
-		if m.DataCenters != nil && !contains(m.DataCenters, dc.Name()) {
+		if m.DataCenters != nil && !slices.Contains(m.DataCenters, dc.Name()) {
 			continue
 		}
 		finder.SetDatacenter(dc)
@@ -515,7 +514,7 @@ func (m *MetricSet) getResourcePoolMap(ctx context.Context, c *vim25.Client, mgr
 			return nil, fmt.Errorf("unable to find resource pools for %s due to %w", dc.Name(), err)
 		}
 		for _, pool := range pools {
-			if m.ResourcePools != nil && !contains(m.ResourcePools, pool.InventoryPath) {
+			if m.ResourcePools != nil && !slices.Contains(m.ResourcePools, pool.InventoryPath) {
 				m.Logger().Debugf("skipping resource pool %s as it is not in the list of included resource pools", pool.InventoryPath)
 				continue
 			}
@@ -531,7 +530,7 @@ func (m *MetricSet) getResourcePoolMap(ctx context.Context, c *vim25.Client, mgr
 	return rpMap, nil
 }
 
-// this is currently unused since it's a very expensive call, but if we could cache it it would be nice to have
+// getVMInventoryPath is currently unused since it's a very expensive call, but if we could cache it it would be nice to have
 func getVMInventoryPath(ctx context.Context, c *vim25.Client, vm mo.VirtualMachine) (string, error) {
 	// Create a property collector
 	pc := property.DefaultCollector(c)
@@ -556,14 +555,4 @@ func getVMInventoryPath(ctx context.Context, c *vim25.Client, vm mo.VirtualMachi
 	inventoryPath := "/" + strings.Join(pathElements, "/")
 
 	return inventoryPath, nil
-}
-
-// contains checks if a slice contains a specific element.
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
