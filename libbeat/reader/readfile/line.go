@@ -46,6 +46,7 @@ type LineReader struct {
 	decoder    transform.Transformer
 
 	skippedByteCount int // number of bytes skipped, when the line is too long
+	batchMode        bool
 }
 
 // New creates a new reader object
@@ -67,6 +68,7 @@ func NewLineReader(input io.Reader, config Config) (*LineReader, error) {
 		decoder:    config.Codec.NewDecoder(),
 		inBuffer:   streambuf.New(nil),
 		outBuffer:  streambuf.New(nil),
+		batchMode:  config.BatchMode,
 	}, nil
 }
 
@@ -161,11 +163,18 @@ func (r *LineReader) Next() ([]byte, int, error) {
 	return bytes, sz, nil
 }
 
+func (r *LineReader) findInBufferIndex(from int, seq []byte) int {
+	if r.batchMode {
+		return r.inBuffer.LastIndexFrom(from, seq)
+	}
+	return r.inBuffer.IndexFrom(from, seq)
+}
+
 // Reads from the buffer until a new line character is detected
 // Returns an error otherwise
 func (r *LineReader) advance() error {
 	// Initial check if buffer has already a newLine character
-	idx := r.inBuffer.IndexFrom(r.inOffset, r.nl)
+	idx := r.findInBufferIndex(r.inOffset, r.nl)
 
 	// fill inBuffer until '\n' sequence has been found in input buffer
 	for idx == -1 {
@@ -192,7 +201,7 @@ func (r *LineReader) advance() error {
 		}
 
 		// Check if buffer has newLine character
-		idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
+		idx = r.findInBufferIndex(r.inOffset, r.nl)
 
 		// If max bytes limit per line is set, then drop the lines that are longer
 		if r.maxBytes != 0 {
@@ -204,7 +213,7 @@ func (r *LineReader) advance() error {
 				err = r.inBuffer.Advance(skipped)
 				r.inBuffer.Reset()
 				r.inOffset = 0
-				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
+				idx = r.findInBufferIndex(r.inOffset, r.nl)
 			}
 
 			// If newLine is not found and the incoming data buffer exceeded max bytes limit, then skip until the next newLine
@@ -216,7 +225,7 @@ func (r *LineReader) advance() error {
 					return err
 				}
 				logp.Warn("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, skipped)
-				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
+				idx = r.findInBufferIndex(r.inOffset, r.nl)
 			}
 		}
 	}

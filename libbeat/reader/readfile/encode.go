@@ -38,6 +38,7 @@ type Config struct {
 	Codec      encoding.Encoding
 	BufferSize int
 	MaxBytes   int
+	BatchMode  bool
 }
 
 // New creates a new Encode reader from input reader by applying

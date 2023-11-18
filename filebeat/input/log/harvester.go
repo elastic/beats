@@ -30,10 +30,12 @@
 package log
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	file_helper "github.com/elastic/beats/libbeat/common/file"
 	"io"
+	"strings"
 	"sync"
 	"time"
 
@@ -310,10 +312,19 @@ func (h *Harvester) Run() error {
 					data.Event.Timestamp = ts
 				}
 			} else if &text != nil {
-				if fields == nil {
-					fields = common.MapStr{}
+				if h.config.IsLudicrousModeActivated() {
+					texts := make([]string, 0, strings.Count(text, "\n")+1)
+					scanner := bufio.NewScanner(strings.NewReader(text))
+					for scanner.Scan() {
+						texts = append(texts, scanner.Text())
+					}
+					data.Event.Texts = texts
+				} else {
+					if fields == nil {
+						fields = common.MapStr{}
+					}
+					fields["data"] = text
 				}
-				fields["data"] = text
 			}
 
 			data.Event.Fields = fields

@@ -70,6 +70,7 @@ var (
 			CloseEOF:      false,
 			CloseTimeout:  0,
 		},
+		LudicrousMode: true,
 	}
 )
 
@@ -114,6 +115,9 @@ type config struct {
 		ForceCRI bool   `config:"force_cri_logs"`
 		CRIFlags bool   `config:"cri_flags"`
 	} `config:"docker-json"`
+
+	// ludicrous mode, the collection speed of the single-line-log can reach 100+MB/s !!!
+	LudicrousMode bool `config:"ludicrous_mode"`
 }
 
 type LogConfig struct {
@@ -231,4 +235,9 @@ func (c *config) normalizeGlobPatterns() error {
 	}
 	c.Paths = paths
 	return nil
+}
+
+func (c *config) IsLudicrousModeActivated() bool {
+	inSingleLineScene := c.DockerJSON == nil && c.JSON == nil && c.Multiline == nil
+	return c.LudicrousMode && inSingleLineScene
 }

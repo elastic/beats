@@ -398,6 +398,21 @@ func (b *Buffer) IndexFrom(from int, seq []byte) int {
 	return idx + from + b.mark
 }
 
+// LastIndexFrom returns offset of seq in unprocessed buffer start at from.
+// Returns -1 if seq can not be found.
+func (b *Buffer) LastIndexFrom(from int, seq []byte) int {
+	if b.err != nil {
+		return -1
+	}
+
+	idx := bytes.LastIndex(b.data[b.mark+from:], seq)
+	if idx < 0 {
+		return -1
+	}
+
+	return idx + from + b.mark
+}
+
 // IndexByte returns offset of byte in unprocessed buffer.
 // Returns -1 if byte not in buffer.
 func (b *Buffer) IndexByte(byte byte) int {

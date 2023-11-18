@@ -33,6 +33,7 @@ const FlagField = "log.flags"
 // Output can optionally publish a subset of Meta, or ignore Meta.
 type Event struct {
 	Timestamp time.Time
+	Texts     []string
 	Meta      common.MapStr
 	Fields    common.MapStr
 	Private   interface{} // for beats private use
