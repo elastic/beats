@@ -78,3 +78,10 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 func (e *Event) Delete(key string) error {
 	return e.Fields.Delete(key)
 }
+
+func (e *Event) Count() int {
+	if e.Texts == nil {
+		return 1
+	}
+	return len(e.Texts)
+}

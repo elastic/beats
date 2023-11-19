@@ -30,7 +30,6 @@
 package log
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	file_helper "github.com/elastic/beats/libbeat/common/file"
@@ -313,12 +312,8 @@ func (h *Harvester) Run() error {
 				}
 			} else if &text != nil {
 				if h.config.IsLudicrousModeActivated() {
-					texts := make([]string, 0, strings.Count(text, "\n")+1)
-					scanner := bufio.NewScanner(strings.NewReader(text))
-					for scanner.Scan() {
-						texts = append(texts, scanner.Text())
-					}
-					data.Event.Texts = texts
+					normalizedText := strings.ReplaceAll(text, "\r\n", "\n")
+					data.Event.Texts = strings.Split(normalizedText, "\n")
 				} else {
 					if fields == nil {
 						fields = common.MapStr{}
