@@ -4,60 +4,195 @@
     virtualmachine
   release: ga
   fields:
-    - name: host.id
+    - name: vmtools_version
       type: keyword
-      description: >
-        Host id
+      description: "Version of the VM Tools installed on the virtual machine."
+    - name: memory.reserved
+      type: long
+      description: "Amount of memory reserved for the virtual machine."
+    - name: memory.overhead
+      type: long
+      description: "Memory overhead for the virtual machine."
+    - name: memory.total_size
+      type: long
+      description: "Total size of memory allocated to the virtual machine."
+    - name: os_family
+      type: keyword
+      description: "Family of the operating system running on the virtual machine."
+    - name: disks
+      type: nested
+      description: "List of disks attached to the virtual machine."
+      fields:
+        - name: path
+          type: keyword
+          description: "File system path of the disk."
+        - name: free_space
+          type: long
+          description: "Free space available on the disk."
+        - name: capacity
+          type: long
+          description: "Total capacity of the disk."
+    - name: vmx_path
+      type: keyword
+      description: "Path to the VMX configuration file."
+    - name: datastore.totalReadLatency.average
+      type: long
+      description: "Average total read latency for the datastore."
+    - name: datastore.totalWriteLatency.average
+      type: long
+      description: "Average total write latency for the datastore."
+    - name: datastore.numberReadAveraged.average
+      type: long
+      description: "Average number of reads for the datastore."
+    - name: datastore.numberWriteAveraged.average
+      type: long
+      description: "Average number of writes for the datastore."
+    - name: primary_ip
+      type: ip
+      description: "Primary IP address of the virtual machine."
+    - name: storage.committed
+      type: long
+      description: "Amount of storage committed to the virtual machine."
+    - name: storage.total
+      type: long
+      description: "Total storage allocated to the virtual machine."
+    - name: storage.uncommited
+      type: long
+      description: "Amount of uncommitted storage for the virtual machine."
+    - name: networks
+      type: nested
+      description: "List of network interfaces for the virtual machine."
+      fields:
+        - name: connected
+          type: boolean
+          description: "Whether the network interface is connected."
+        - name: mac_address
+          type: keyword
+          description: "MAC address of the network interface."
+        - name: ip_config
+          type: nested
+          description: "IP configuration for the network interface."
+          fields:
+            - name: ip_address
+              type: ip
+              description: "IP address assigned to the network interface."
+            - name: prefix_length
+              type: integer
+              description: "Network prefix length for the IP address."
+        - name: network
+          type: keyword
+          description: "Network name the interface is connected to."
+    - name: resource_pool.path
+      type: keyword
+      description: "Resource pool path."
+    - name: resource_pool.name
+      type: keyword
+      description: "Resource pool name."
+    - name: resource_pool.id
+      type: keyword
+      description: "Resource pool identifier."
+    - name: sys.uptime.latest
+      type: long
+      description: "Latest uptime reading for the virtual machine."
+    - name: connection_state
+      type: keyword
+      description: "Connection state of the virtual machine."
+    - name: uuid
+      type: keyword
+      description: "UUID of the virtual machine."
+    - name: hardware_version
+      type: keyword
+      description: "Hardware version of the virtual machine."
+    - name: mem.consumed.average
+      type: long
+      description: "Average memory consumed by the virtual machine."
+    - name: mem.swapinRate.average
+      type: long
+      description: "Average swap-in rate for the virtual machine."
+    - name: mem.overhead.average
+      type: long
+      description: "Average memory overhead for the virtual machine."
+    - name: mem.usage.average
+      type: long
+      description: "Average memory usage for the virtual machine."
+    - name: mem.vmmemctl.average
+      type: long
+      description: "Average memory control activity for the virtual machine."
+    - name: mem.swapoutRate.average
+      type: long
+      description: "Average swap-out rate for the virtual machine."
+    - name: virtualDisk.totalWriteLatency.average
+      type: long
+      description: "Average total write latency for the virtual disks."
+    - name: virtualDisk.totalReadLatency.average
+      type: long
+      description: "Average total read latency for the virtual disks."
+    - name: virtualDisk.numberReadAveraged.average
+      type: long
+      description: "Average number of reads for the virtual disks."
+    - name: virtualDisk.numberWriteAveraged.average
+      type: long
+      description: "Average number of writes for the virtual disks."
     - name: host.hostname
       type: keyword
-      description: >
-        Host name of the host
-    - name: name
+      description: "Hostname of the host machine."
+    - name: host.id
       type: keyword
-      description: >
-        Virtual Machine name
+      description: "Identifier of the host machine."
+    - name: host.version
+      type: keyword
+      description: "Version of the host machine."
+    - name: id
+      type: keyword
+      description: "Identifier of the virtual machine."
+    - name: net.usage.average
+      type: long
+      description: "Average network usage for the virtual machine."
+    - name: guest_state
+      type: keyword
+      description: "Guest state of the virtual machine."
     - name: os
       type: keyword
-      description: >
-        Virtual Machine Operating System name
-    - name: cpu.used.mhz
+      description: "Operating system running on the virtual machine."
+    - name: cpu.cores
+      type: integer
+      description: "Number of CPU cores allocated to the virtual machine."
+    - name: cpu.reserved
       type: long
-      description: >
-        Used CPU in Mhz
-    - name: cpu.total.mhz
+      description: "Amount of CPU resources reserved for the virtual machine."
+    - name: cpu.ready.percentage
+      type: float
+      description: "Percentage of time the CPU is ready to run on the virtual machine."
+    - name: cpu.ready.summation
       type: long
-      description: >
-        Total CPU in Mhz
-    - name: cpu.free.mhz
+      description: "Summation of CPU ready time for the virtual machine."
+    - name: cpu.usage.average
       type: long
-      description: >
-        Available CPU in Mhz
-    - name: memory.used.guest.bytes
+      description: "Average CPU usage for the virtual machine."
+    - name: cpu.usagemhz.average
       type: long
-      description: >
-        Used Memory of Guest in bytes
-      format: bytes
-    - name: memory.used.host.bytes
-      type: long
-      description: >
-        Used Memory of Host in bytes
-      format: bytes
-    - name: memory.total.guest.bytes
-      type: long
-      description: >
-        Total Memory of Guest in bytes
-      format: bytes
-    - name: memory.free.guest.bytes
-      type: long
-      description: >
-        Free Memory of Guest in bytes
-      format: bytes
-    - name: custom_fields
-      type: object
-      object_type: keyword
-      description: >
-        Custom fields
-    - name: network_names
+      description: "Average CPU usage in MHz for the virtual machine."
+    - name: power_state
       type: keyword
-      description: >
-        Network names
+      description: "Power state of the virtual machine."
+    - name: disk.maxTotalLatency.latest
+      type: long
+      description: "Latest maximum total latency for the disks."
+    - name: disk.usage.average
+      type: long
+      description: "Average disk usage for the virtual machine."
+    - name: disk.numberReadAveraged.average
+      type: long
+      description: "Average number of disk reads for the virtual machine."
+    - name: disk.numberWriteAveraged.average
+      type: long
+      description: "Average number of disk writes for the virtual machine."
+    - name: name
+      type: keyword
+      description: "Name of the virtual machine."
+    - name: heartbeat_status
+      type: keyword
+      description: "Heartbeat status of the virtual machine."
+    - name: snapshot_consolidation_needed
+      type: boolean
+      description: "Whether snapshot consolidation is needed for the virtual machine."

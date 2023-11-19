@@ -55,6 +55,9 @@ type MetricSet struct {
 	MaxQuerySize    int
 	ResourcePools   []string
 	DataCenters     []string
+	RpMap           map[string]resourcePoolInfo
+	HostMap         map[string]hostInfo
+	DsMap           map[string]DatastoreInfo
 }
 
 // New creates a new instance of the MetricSet.
@@ -88,6 +91,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		MaxQuerySize:    config.MaxQuerySize,
 		ResourcePools:   config.ResourcePools,
 		DataCenters:     config.DataCenters,
+		RpMap:           make(map[string]resourcePoolInfo),
+		HostMap:         make(map[string]hostInfo),
+		DsMap:           make(map[string]DatastoreInfo),
 	}, nil
 }
 
@@ -124,12 +130,33 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Create view of VirtualMachine objects
 	mgr := view.NewManager(c)
 
-	rpMap, err := m.getResourcePoolMap(ctx, c, mgr)
-	if err != nil {
-		return fmt.Errorf("error getting Resource Pool Map: %w", err)
+	// if perform initial population of the host, resource pool, network, and datastore maps
+	if len(m.RpMap) == 0 {
+		m.RpMap, err = m.getResourcePoolMap(ctx, c, mgr)
+		if err != nil {
+			return fmt.Errorf("error getting Resource Pool Map: %w", err)
+		}
 	}
-	var rpList = make([]string, 0, len(rpMap))
-	for _, rp := range rpMap {
+	if len(m.HostMap) == 0 {
+		m.HostMap, err = m.getHostMap(ctx, c, mgr)
+		if err != nil {
+			return fmt.Errorf("error getting Host Map: %w", err)
+		}
+	}
+	if len(m.DsMap) == 0 {
+		m.DsMap, err = m.getDatastoreMap(ctx, c, mgr)
+		if err != nil {
+			return fmt.Errorf("error getting Datastore Map: %w", err)
+		}
+	}
+
+	// create bool variables that can be set to true if refreshes are needed
+	var rpRefreshRequired bool
+	var hostRefreshRequired bool
+	var dsRefreshRequired bool
+
+	var rpList = make([]string, 0, len(m.RpMap))
+	for _, rp := range m.RpMap {
 		rpList = append(rpList, rp.ref.Value)
 	}
 
@@ -191,10 +218,15 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			// Build initial event object with static values
 			virtualMachine := vmMap[metric.Entity.Value]
 			event := mapstr.M{
-				"name": virtualMachine.Summary.Config.Name,
-				"os":   virtualMachine.Summary.Config.GuestFullName,
-				"uuid": virtualMachine.Summary.Config.InstanceUuid,
-				"id":   virtualMachine.Reference().Value,
+				"name":             virtualMachine.Summary.Config.Name,
+				"os":               virtualMachine.Summary.Config.GuestFullName,
+				"os_family":        virtualMachine.Guest.GuestFamily,
+				"guest_state":      virtualMachine.Guest.GuestState,
+				"hardware_version": virtualMachine.Guest.HwVersion,
+				"vmtools_version":  virtualMachine.Guest.ToolsVersion,
+				"uuid":             virtualMachine.Summary.Config.InstanceUuid,
+				"id":               virtualMachine.Reference().Value,
+				"primary_ip":       virtualMachine.Guest.IpAddress,
 				"resource_pool": mapstr.M{
 					"id": virtualMachine.ResourcePool.Value,
 				},
@@ -222,10 +254,73 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				"vmx_path":                      virtualMachine.Summary.Config.VmPathName,
 			}
 
-			// add mapped values
-			resourcePool := rpMap[virtualMachine.ResourcePool.Value]
-			event.Put("resource_pool.name", resourcePool.Name)
-			event.Put("resource_pool.path", resourcePool.InventoryPath)
+			// Add resource pool name and path if available, if not, set the rpRefreshRequired var to true
+			resourcePool, ok := m.RpMap[virtualMachine.ResourcePool.Value]
+			if !ok {
+				rpRefreshRequired = true
+				m.Logger().Debugf("resource pool with id %s not found, will refresh pool information at end of current run", virtualMachine.ResourcePool.Value)
+			} else {
+				event.Put("resource_pool.name", resourcePool.Name)
+				event.Put("resource_pool.path", resourcePool.InventoryPath)
+			}
+
+			if virtualMachine.Datastore != nil {
+				var datastores []DatastoreInfo
+				for _, ds := range virtualMachine.Datastore {
+					datastore, ok := m.DsMap[ds.Value]
+					if !ok {
+						dsRefreshRequired = true
+						m.Logger().Debugf("datastore with id %s not found, will refresh datastore information at the end of the run")
+					} else {
+						datastores = append(datastores, datastore)
+						event.Put("datastores", datastores)
+					}
+				}
+			}
+
+			// Get host information for VM
+			vmhost, ok := m.HostMap[virtualMachine.Summary.Runtime.Host.Value]
+			if !ok {
+				hostRefreshRequired = true
+			} else {
+				event.Put("host.id", vmhost.Ref.Value)
+				event.Put("host.hostname", vmhost.Hostname)
+				event.Put("host.version", vmhost.Version)
+			}
+
+			var networks []NetworkInfo
+			for _, netInfo := range virtualMachine.Guest.Net {
+				network := NetworkInfo{
+					Network:    netInfo.Network,
+					MacAddress: netInfo.MacAddress,
+					Connected:  netInfo.Connected,
+					// DNSAddresses: netInfo.DnsConfig.IpAddress,
+				}
+				if netInfo.DnsConfig != nil {
+					network.DNSAddresses = netInfo.DnsConfig.IpAddress
+				}
+				if netInfo.IpConfig != nil {
+					for _, ipConfig := range netInfo.IpConfig.IpAddress {
+						network.IPConfig = append(network.IPConfig, IPConfig{
+							IPAddress:    ipConfig.IpAddress,
+							PrefixLength: int(ipConfig.PrefixLength),
+						})
+					}
+				}
+				networks = append(networks, network)
+			}
+			event.Put("networks", networks)
+
+			var disks []DiskInfo
+			for _, diskInfo := range virtualMachine.Guest.Disk {
+				disk := DiskInfo{
+					Capacity:  diskInfo.Capacity,
+					Path:      diskInfo.DiskPath,
+					FreeSpace: diskInfo.FreeSpace,
+				}
+				disks = append(disks, disk)
+			}
+			event.Put("disks", disks)
 
 			for _, value := range metric.Value {
 				switch series := value.(type) {
@@ -238,23 +333,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				default:
 					m.Logger().Debug("metric is of an unknown type, skipping")
 				}
-			}
-
-			// Get host information for VM
-			if host := virtualMachine.Summary.Runtime.Host; host != nil {
-				event["host"] = mapstr.M{
-					"id": host.Value,
-				}
-				hostSystem, err := getHostSystem(ctx, c, host.Reference())
-				if err == nil {
-					event.Put("host.hostname", hostSystem.Summary.Config.Name)
-				} else {
-					m.Logger().Debug(err.Error())
-				}
-			} else {
-				m.Logger().Debug(`'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error
-					from vsphere library, an error trying to reach host/guest or incomplete information returned
-					from host/guest`)
 			}
 
 			// Get custom fields (attributes) values if get_custom_fields is true.
@@ -270,30 +348,57 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 					"information returned from host/guest")
 			}
 
-			if virtualMachine.Summary.Vm != nil {
-				networkNames, err := getNetworkNames(ctx, c, virtualMachine.Summary.Vm.Reference())
-				if err != nil {
-					m.Logger().Debug(err.Error())
-				} else {
-					if len(networkNames) > 0 {
-						event["network_names"] = networkNames
-					}
-				}
-			}
-
-			if virtualMachine.Datastore != nil {
-				var datastoreIds = make([]string, 0, len(virtualMachine.Datastore))
-				for _, datastore := range virtualMachine.Datastore {
-					datastoreIds = append(datastoreIds, datastore.Value)
-				}
-				event["datastore.id"] = datastoreIds
-			}
-
 			reporter.Event(mb.Event{MetricSetFields: event})
 		}
 	}
 
+	if rpRefreshRequired {
+		m.RpMap, err = m.getResourcePoolMap(ctx, c, mgr)
+		if err != nil {
+			return fmt.Errorf("error getting Resource Pool Map: %w", err)
+		}
+	}
+
+	if hostRefreshRequired {
+		m.HostMap, err = m.getHostMap(ctx, c, mgr)
+		if err != nil {
+			return fmt.Errorf("error getting Host Map: %w", err)
+		}
+	}
+
+	if dsRefreshRequired {
+		m.DsMap, err = m.getDatastoreMap(ctx, c, mgr)
+		if err != nil {
+			return fmt.Errorf("error getting datastore map %w", err)
+		}
+	}
+
 	return nil
+}
+
+// Defines the stucts that map IP information together
+type NetworkInfo struct {
+	Network      string     `json:"network"`
+	MacAddress   string     `json:"mac_address"`
+	Connected    bool       `json:"connected"`
+	IPConfig     []IPConfig `json:"ip_config"`
+	DNSAddresses []string   `json:"dns_addresses,omitempty"` // Optional field
+}
+
+type IPConfig struct {
+	IPAddress    string `json:"ip_address"`
+	PrefixLength int    `json:"prefix_length"`
+}
+
+type DNSConfig struct {
+	DNSAddresses []string `json:"dns_addresses"`
+	DNSDomain    string   `json:"dns_domain,omitempty"` // Optional field
+}
+
+type DiskInfo struct {
+	Capacity  int64  `json:"capacity"`
+	Path      string `json:"path"`
+	FreeSpace int64  `json:"free_space"`
 }
 
 func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap map[int32]string) mapstr.M {
@@ -375,17 +480,6 @@ func setCustomFieldsMap(ctx context.Context, client *vim25.Client) (map[int32]st
 	return customFieldsMap, nil
 }
 
-func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) (*mo.HostSystem, error) {
-	pc := property.DefaultCollector(c)
-
-	var hs mo.HostSystem
-	err := pc.RetrieveOne(ctx, ref, []string{"summary"}, &hs)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %v", err)
-	}
-	return &hs, nil
-}
-
 func splitIntoChunks(slice []types.ManagedObjectReference, n int) [][]types.ManagedObjectReference {
 	var chunks [][]types.ManagedObjectReference
 
@@ -403,10 +497,6 @@ func splitIntoChunks(slice []types.ManagedObjectReference, n int) [][]types.Mana
 	return chunks
 }
 
-func getVmFilter(pools []types.ManagedObjectReference) property.Filter {
-	return property.Filter{"resourcePool": pools}
-}
-
 func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, mgr *view.Manager, includedPools []string) ([]mo.VirtualMachine, error) {
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
@@ -421,7 +511,7 @@ func (m *MetricSet) getVirtualMachineList(ctx context.Context, c *vim25.Client, 
 
 	var vmt []mo.VirtualMachine
 
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "config", "resourcePool"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "config", "resourcePool", "guest"}, &vmt)
 	if err != nil {
 		return nil, fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -528,6 +618,73 @@ func (m *MetricSet) getResourcePoolMap(ctx context.Context, c *vim25.Client, mgr
 
 	m.Logger().Info("retrieved resource pool list")
 	return rpMap, nil
+}
+
+type hostInfo struct {
+	Ref      types.ManagedObjectReference
+	Hostname string
+	Version  string
+}
+
+func (m *MetricSet) getHostMap(ctx context.Context, c *vim25.Client, mgr *view.Manager) (map[string]hostInfo, error) {
+	// Create a single ContainerView for Host types
+	r, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"HostSystem"}, true)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Destroy(ctx) // Simplified error handling, as the error is not critical
+
+	var hosts []mo.HostSystem
+	err = r.Retrieve(ctx, []string{"HostSystem"}, []string{"summary"}, &hosts)
+	if err != nil {
+		return nil, err
+	}
+
+	hostMap := make(map[string]hostInfo, len(hosts))
+	for _, host := range hosts {
+		summary := host.Summary
+		info := hostInfo{
+			Ref:      host.Reference(),
+			Hostname: summary.Config.Name,
+			Version:  summary.Config.Product.Version,
+		}
+		hostMap[host.Reference().Value] = info
+	}
+
+	m.Logger().Info("retrieved host list")
+	return hostMap, nil
+}
+
+type DatastoreInfo struct {
+	Name string `json:"name"`
+	Id   string `json:"id"`
+	Type string `json:"type"`
+}
+
+func (m *MetricSet) getDatastoreMap(ctx context.Context, c *vim25.Client, mgr *view.Manager) (map[string]DatastoreInfo, error) {
+	r, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Datastore"}, true)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Destroy(ctx) // Simplified error handling, as the error is not critical
+
+	var datastores []mo.Datastore
+	err = r.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &datastores)
+	if err != nil {
+		return nil, err
+	}
+
+	datastoreMap := make(map[string]DatastoreInfo, len(datastores))
+	for _, datastore := range datastores {
+		info := DatastoreInfo{
+			Id:   datastore.Reference().Value,
+			Name: datastore.Summary.Name,
+			Type: datastore.Summary.Type,
+		}
+		datastoreMap[datastore.Reference().Value] = info
+	}
+	m.Logger().Info("retrieved datastore list")
+	return datastoreMap, nil
 }
 
 // getVMInventoryPath is currently unused since it's a very expensive call, but if we could cache it it would be nice to have
