@@ -79,9 +79,30 @@ func (e *Event) Delete(key string) error {
 	return e.Fields.Delete(key)
 }
 
+func (e *Event) HasTexts() bool {
+	return len(e.Texts) > 0
+}
+
 func (e *Event) Count() int {
-	if e.Texts == nil {
+	if !e.HasTexts() {
 		return 1
 	}
 	return len(e.Texts)
+}
+
+func (e *Event) GetTexts() []string {
+	if e.HasTexts() {
+		// 如果 texts 字段有值，直接返回
+		return e.Texts
+	}
+	if e.Fields == nil {
+		return nil
+	}
+	if _, ok := e.Fields["data"]; ok {
+		if text, valid := e.Fields["data"].(string); valid {
+			// 如果 data 字段有值，且为字符串，则返回单个字符串的切片
+			return []string{text}
+		}
+	}
+	return nil
 }
