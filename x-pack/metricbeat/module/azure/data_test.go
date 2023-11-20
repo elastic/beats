@@ -10,24 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//func TestReturnAllDimensions(t *testing.T) {
-//	dimensionList := []Dimension{
-//		{
-//			Value: "vm1",
-//			Name:  "VMName",
-//		},
-//		{
-//			Value: "*",
-//			Name:  "SlotID",
-//		},
-//	}
-//	result, dims := returnAllDimensions(dimensionList)
-//	assert.True(t, result)
-//	assert.Equal(t, len(dims), 1)
-//	assert.Equal(t, dims[0].Name, "SlotID")
-//	assert.Equal(t, dims[0].Value, "*")
-//}
-
 func TestGetDimensionValue(t *testing.T) {
 	dimensionList := []Dimension{
 		{
