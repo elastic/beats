@@ -22,17 +22,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
-
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type IMDSClient interface {
@@ -57,15 +55,15 @@ var ec2MetadataFetcher = provider{
 
 	Local: true,
 
-	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
-		ec2Schema := func(m map[string]interface{}) mapstr.M {
+	Create: func(_ string, c *common.Config) (metadataFetcher, error) {
+		ec2Schema := func(m map[string]interface{}) common.MapStr {
 			m["service"] = mapstr.M{
 				"name": "EC2",
 			}
-			return mapstr.M{"cloud": m}
+			return common.MapStr{"cloud": m}
 		}
 
-		fetcher, err := newGenericMetadataFetcher(config, "aws", ec2Schema, fetchRawProviderMetadata)
+		fetcher, err := newGenericMetadataFetcher("aws", ec2Schema, fetchRawProviderMetadata)
 		return fetcher, err
 	},
 }

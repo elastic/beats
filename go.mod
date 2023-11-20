@@ -31,7 +31,7 @@ require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.13.3
 	github.com/aws/aws-sdk-go v1.19.48
-	github.com/aws/aws-sdk-go-v2 v0.24.0
+	github.com/aws/aws-sdk-go-v2 v1.16.6
 	github.com/awslabs/goformation/v4 v4.1.0
 	github.com/awslabs/kinesis-aggregation/go v0.0.0-20200810181507-d352038274c0
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
@@ -221,6 +221,17 @@ require (
 	github.com/apache/arrow/go/v12 v12.0.0 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.15.12 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.7 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.7 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.13 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.7 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.14 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.7 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.10 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.8 // indirect
+	github.com/aws/smithy-go v1.12.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/containerd/containerd v1.5.13 // indirect
