@@ -4,7 +4,7 @@
 
 //go:build windows
 
-package etw_input
+package etw
 
 import (
 	"fmt"
@@ -21,17 +21,39 @@ var validTraceLevel = map[string]bool{
 }
 
 type config struct {
-	Logfile         string `config:"file"`
-	ProviderGUID    string `config:"provider.guid"`
-	ProviderName    string `config:"provider.name"`
-	SessionName     string `config:"session_name"` // Tag for the new session
-	TraceLevel      string `config:"trace_level"`
+	// Logfile is the path to an .etl file to read from.
+	Logfile string `config:"file"`
+	// ProviderGUID is the GUID of an ETW provider.
+	// Run 'logman query providers' to list the available providers.
+	ProviderGUID string `config:"provider.guid"`
+	// ProviderName is the name of an ETW provider.
+	// Run 'logman query providers' to list the available providers.
+	ProviderName string `config:"provider.name"`
+	// SessionName is the name used to create a new session for the
+	// defined provider. If missing, its default value is the provider ID
+	// prefixed by 'Elastic-'
+	SessionName string `config:"session_name"`
+	// TraceLevel filters all provider events with a level value
+	// that is less than or equal to this level.
+	// Allowed values are critical, error, warning, informational, and verbose.
+	TraceLevel string `config:"trace_level"`
+	// MatchAnyKeyword is an 8-byte bitmask that enables the filtering of
+	// events from specific provider subcomponents. The provider will write
+	// a particular event if the event's keyword bits match any of the bits
+	// in this bitmask.
+	// See https://learn.microsoft.com/en-us/message-analyzer/system-etw-provider-event-keyword-level-settings for more details.
+	// Use logman query providers "<provider.name>" to list the available keywords.
 	MatchAnyKeyword uint64 `config:"match_any_keyword"`
+	// An 8-byte bitmask that enables the filtering of events from
+	// specific provider subcomponents. The provider will write a particular
+	// event if the event's keyword bits match all of the bits in this bitmask.
+	// See https://learn.microsoft.com/en-us/message-analyzer/system-etw-provider-event-keyword-level-settings for more details.
 	MatchAllKeyword uint64 `config:"match_all_keyword"`
-	Session         string `config:"session"`
+	// Session is the name of an existing session to read from.
+	// Run 'logman query -ets' to list existing sessions.
+	Session string `config:"session"`
 }
 
-// Create a conversion function to convert config to etw.Config
 func convertConfig(cfg config) etw.Config {
 	return etw.Config{
 		Logfile:         cfg.Logfile,
@@ -47,19 +69,12 @@ func convertConfig(cfg config) etw.Config {
 
 func defaultConfig() config {
 	return config{
-		Logfile:         "",
-		ProviderName:    "",
-		ProviderGUID:    "",
-		SessionName:     "",
 		TraceLevel:      "verbose",
 		MatchAnyKeyword: 0xffffffffffffffff,
-		MatchAllKeyword: 0,
-		Session:         "",
 	}
 }
 
-// Config validation
-func (c *config) validate() error {
+func (c *config) Validate() error {
 	if c.ProviderName == "" && c.ProviderGUID == "" && c.Logfile == "" && c.Session == "" {
 		return fmt.Errorf("provider, existing logfile or running session must be set")
 	}
