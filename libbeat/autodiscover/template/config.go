@@ -154,7 +154,7 @@ func ApplyConfigTemplate(event bus.Event, configs []*conf.C, options ...ucfg.Opt
 		var unpacked map[string]interface{}
 		err = c.Unpack(&unpacked, opts...)
 		if err != nil {
-			logp.Debug("autodiscover", "Configuration template cannot be resolved: %v", err)
+			logp.Warn("autodiscover: Configuration template cannot be resolved: %v", err)
 			continue
 		}
 		// Repack again:

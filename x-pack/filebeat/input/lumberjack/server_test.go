@@ -69,7 +69,7 @@ func TestServer(t *testing.T) {
 }
 
 func testSendReceive(t testing.TB, c config, numberOfEvents int, clientTLSConfig *tls.Config) {
-	require.NoError(t, logp.TestingSetup())
+	logp.TestingSetup()
 	log := logp.NewLogger(inputName).With("test_name", t.Name())
 
 	ctx, shutdown := context.WithTimeout(context.Background(), testTimeout)

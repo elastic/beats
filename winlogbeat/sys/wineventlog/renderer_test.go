@@ -40,7 +40,7 @@ import (
 )
 
 func TestRenderer(t *testing.T) {
-	logp.TestingSetup() //nolint:errcheck // Bad linter! Never returns a non-nil error when called without options.
+	logp.TestingSetup()
 
 	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
 		log := openLog(t, sysmon9File)

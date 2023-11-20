@@ -67,6 +67,7 @@
                 "enableHover": false,
                 "invertColors": false,
                 "legendPosition": "right",
+                "legendSize": "auto",
                 "percentageMode": false,
                 "setColorRange": false,
                 "times": [],
@@ -93,11 +94,10 @@
             "type": "heatmap"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:03.260Z",
     "id": "e20c02d0-9b48-11ea-87e4-49f31ec44891",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
@@ -106,6 +106,7 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:18:56.323Z",
-    "version": "WzIyNDYsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:03.260Z",
+    "version": "WzIyMiwxXQ=="
 }

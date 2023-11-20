@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"runtime"
@@ -27,20 +26,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewMetadata(t *testing.T) {
-	f, err := ioutil.TempFile("", "metadata")
+	f, err := os.CreateTemp(t.TempDir(), "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(f.Name())
 
 	_, err = f.WriteString("metadata test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Sync()
+	require.NoError(t, f.Sync())
 	f.Close()
 
 	info, err := os.Lstat(f.Name())
@@ -96,17 +95,16 @@ func TestNewMetadata(t *testing.T) {
 }
 
 func TestSetUIDSetGIDBits(t *testing.T) {
-	f, err := ioutil.TempFile("", "setuid")
+	f, err := os.CreateTemp(t.TempDir(), "setuid")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(f.Name())
 
 	_, err = f.WriteString("metadata test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Sync()
+	require.NoError(t, f.Sync())
 	f.Close()
 
 	info, err := os.Lstat(f.Name())
