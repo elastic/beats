@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"sort"
@@ -73,7 +72,7 @@ var (
 )
 
 func TestImmutable(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -108,7 +107,7 @@ func TestImmutable(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -141,7 +140,7 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Create a mock netlink client that provides the expected responses.
 	mock := NewMock().
@@ -260,7 +259,7 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -290,7 +289,7 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -350,7 +349,7 @@ func TestBuildMetricbeatEvent(t *testing.T) {
 }
 
 func buildSampleEvent(t testing.TB, lines []string, filename string) {
-	var msgs []*auparse.AuditMessage
+	var msgs []*auparse.AuditMessage //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, txt := range lines {
 		m, err := auparse.ParseLogLine(txt)
 		if err != nil {
@@ -366,7 +365,7 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 		t.Fatal(err)
 	}
 
-	if err := ioutil.WriteFile(filename, output, 0o644); err != nil {
+	if err := os.WriteFile(filename, output, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

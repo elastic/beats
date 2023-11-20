@@ -143,7 +143,17 @@ func (st *openState) Close() {
 func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return <-req.resp, true
+		// If the output is blocked and the queue is full, `req` is written
+		// to `st.events`, however the queue never writes back to `req.resp`,
+		// which effectively blocks for ever. So we also need to select on the
+		// done channel to ensure we don't miss the shutdown signal.
+		select {
+		case resp := <-req.resp:
+			return resp, true
+		case <-st.done:
+			st.events = nil
+			return 0, false
+		}
 	case <-st.done:
 		st.events = nil
 		return 0, false

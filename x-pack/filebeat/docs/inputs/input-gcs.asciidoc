@@ -9,8 +9,6 @@
 <titleabbrev>Google Cloud Storage</titleabbrev>
 ++++
 
-Beta [Input]
-
 Use the `google cloud storage input` to read content from files stored in buckets which reside on your Google Cloud.
 The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
 perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases
@@ -405,4 +403,4 @@ In this configuration even though we have specified `max_workers = 10`, `poll = 
 will override these values with their own respective values which are defined as part of their sub attibutes.
 
 
-NOTE: Since this is an experimental (beta) input, any feedback is welcome, which will help us optimise and make it better going forward. 
+NOTE: Any feedback is welcome which will help us further optimize this input. Please feel free to open a github issue for any bugs or feature requests.

@@ -52,7 +52,7 @@ func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTa
 }
 
 func TestMain(m *testing.M) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	code := m.Run()
 	os.Exit(code)
 }
