@@ -7,12 +7,12 @@
 package etw
 
 type Config struct {
-	Logfile         string
-	ProviderGUID    string
-	ProviderName    string
-	SessionName     string // Tag for the new session
-	TraceLevel      string
-	MatchAnyKeyword uint64
-	MatchAllKeyword uint64
-	Session         string
+	Logfile         string // Path to the logfile
+	ProviderGUID    string // GUID of the ETW provider
+	ProviderName    string // Name of the ETW provider
+	SessionName     string // Name for new ETW session
+	TraceLevel      string // Level of tracing (e.g., "verbose")
+	MatchAnyKeyword uint64 // Filter for any matching keywords (bitmask)
+	MatchAllKeyword uint64 // Filter for all matching keywords (bitmask)
+	Session         string // Existing session to attach
 }

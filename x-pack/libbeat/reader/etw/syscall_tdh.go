@@ -26,19 +26,21 @@ var (
 const ANYSIZE_ARRAY = 1 << 25
 const DEFAULT_PROPERTY_BUFFER_SIZE = 256
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_enumeration_info
 type ProviderEnumerationInfo struct {
 	NumberOfProviders      uint32
 	Reserved               uint32
 	TraceProviderInfoArray [ANYSIZE_ARRAY]TraceProviderInfo
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-trace_provider_info
 type TraceProviderInfo struct {
 	ProviderGuid       GUID
 	SchemaSource       uint32
 	ProviderNameOffset uint32
 }
 
-// Event structs
+// https://learn.microsoft.com/en-us/windows/win32/api/evntcons/ns-evntcons-event_record
 type EventRecord struct {
 	EventHeader       EventHeader
 	BufferContext     EtwBufferContext
@@ -49,12 +51,14 @@ type EventRecord struct {
 	UserContext       uintptr
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/relogger/ns-relogger-event_header
 const (
 	EVENT_HEADER_FLAG_STRING_ONLY   = 0x0004
 	EVENT_HEADER_FLAG_32_BIT_HEADER = 0x0020
 	EVENT_HEADER_FLAG_64_BIT_HEADER = 0x0040
 )
 
+// https://learn.microsoft.com/en-us/windows/win32/api/relogger/ns-relogger-event_header
 type EventHeader struct {
 	Size            uint16
 	HeaderType      uint16
@@ -76,6 +80,7 @@ func (e *EventRecord) PointerSize() uint32 {
 	return 8
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntprov/ns-evntprov-event_descriptor
 type EventDescriptor struct {
 	Id      uint16
 	Version uint8
@@ -86,11 +91,13 @@ type EventDescriptor struct {
 	Keyword uint64
 }
 
+// https://learn.microsoft.com/en-us/windows/desktop/api/relogger/ns-relogger-etw_buffer_context
 type EtwBufferContext struct {
 	Union    uint16
 	LoggerId uint16
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntcons/ns-evntcons-event_header_extended_data_item
 type EventHeaderExtendedDataItem struct {
 	Reserved1      uint16
 	ExtType        uint16
@@ -99,12 +106,14 @@ type EventHeaderExtendedDataItem struct {
 	DataPtr        uint64
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-tdh_context
 type TdhContext struct {
 	ParameterValue uint32
 	ParameterType  int32
 	ParameterSize  uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-trace_event_info
 type TraceEventInfo struct {
 	ProviderGUID                GUID
 	EventGUID                   GUID
@@ -128,6 +137,7 @@ type TraceEventInfo struct {
 	EventPropertyInfoArray      [ANYSIZE_ARRAY]EventPropertyInfo
 }
 
+// https://learn.microsoft.com/en-us/windows/desktop/api/tdh/ns-tdh-event_property_info
 type EventPropertyInfo struct {
 	Flags      PropertyFlags
 	NameOffset uint32
@@ -179,14 +189,14 @@ type TemplateFlags int32
 
 type PropertyFlags int32
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ne-tdh-property_flags
 const (
-	PropertyStruct           = PropertyFlags(0x1)
-	PropertyParamLength      = PropertyFlags(0x2)
-	PropertyParamCount       = PropertyFlags(0x4)
-	PropertyWBEMXmlFragment  = PropertyFlags(0x8)
-	PropertyParamFixedLength = PropertyFlags(0x10)
+	PropertyStruct      = PropertyFlags(0x1)
+	PropertyParamLength = PropertyFlags(0x2)
+	PropertyParamCount  = PropertyFlags(0x4)
 )
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-event_map_info
 type EventMapInfo struct {
 	NameOffset    uint32
 	Flag          MapFlags
@@ -197,17 +207,20 @@ type EventMapInfo struct {
 
 type MapFlags int32
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-event_map_entry
 type EventMapEntry struct {
 	OutputOffset uint32
 	Union        uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/desktop/api/tdh/ns-tdh-property_data_descriptor
 type PropertyDataDescriptor struct {
 	PropertyName unsafe.Pointer
 	ArrayIndex   uint32
 	Reserved     uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviders
 func _TdhEnumerateProviders(
 	pBuffer *ProviderEnumerationInfo,
 	pBufferSize *uint32) error {
@@ -220,6 +233,7 @@ func _TdhEnumerateProviders(
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgeteventinformation
 func _TdhGetEventInformation(pEvent *EventRecord,
 	tdhContextCount uint32,
 	pTdhContext *TdhContext,
@@ -237,6 +251,7 @@ func _TdhGetEventInformation(pEvent *EventRecord,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhformatproperty
 func _TdhFormatProperty(
 	eventInfo *TraceEventInfo,
 	mapInfo *EventMapInfo,
@@ -267,6 +282,7 @@ func _TdhFormatProperty(
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgetproperty
 func _TdhGetProperty(pEvent *EventRecord,
 	tdhContextCount uint32,
 	pTdhContext *TdhContext,
@@ -288,6 +304,7 @@ func _TdhGetProperty(pEvent *EventRecord,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhgeteventmapinformation
 func _TdhGetEventMapInformation(pEvent *EventRecord,
 	pMapName *uint16,
 	pBuffer *EventMapInfo,

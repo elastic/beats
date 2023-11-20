@@ -30,8 +30,9 @@ type Session struct {
 	BufferCallback uintptr // Pointer to BufferCallback which processes retrieved metadata about the ETW buffers
 }
 
-// Sets the session name used for identify the created session
+// setSessionName determines the session name based on the provided configuration.
 func setSessionName(conf Config) string {
+	// Iterate through potential session name values, returning the first non-empty one.
 	for _, value := range []string{conf.Logfile, conf.Session, conf.SessionName} {
 		if value != "" {
 			return value
@@ -45,18 +46,22 @@ func setSessionName(conf Config) string {
 	return fmt.Sprintf("Elastic-%s", conf.ProviderGUID)
 }
 
+// setSessionGUID determines the session GUID based on the provided configuration.
 func setSessionGUID(conf Config) (GUID, error) {
 	var guid GUID
 	var err error
+
+	// If ProviderGUID is not set in the configuration, attempt to resolve it using the provider name.
 	if conf.ProviderGUID == "" {
 		guid, err = GUIDFromProviderName(conf.ProviderName)
 		if err != nil {
-			return GUID{}, fmt.Errorf("error resolving GUID from %s: %v", conf.ProviderName, err)
+			return GUID{}, fmt.Errorf("error resolving GUID: %w", err)
 		}
 	} else {
+		// If ProviderGUID is set, parse it into a GUID structure.
 		winGUID, err := windows.GUIDFromString(conf.ProviderGUID)
 		if err != nil {
-			return GUID{}, fmt.Errorf("error parsing Windows GUID: %v", err)
+			return GUID{}, fmt.Errorf("error parsing Windows GUID: %w", err)
 		}
 		guid = convertWindowsGUID(winGUID)
 	}
@@ -64,6 +69,7 @@ func setSessionGUID(conf Config) (GUID, error) {
 	return guid, nil
 }
 
+// convertWindowsGUID converts a Windows GUID structure to a custom GUID structure.
 func convertWindowsGUID(windowsGUID windows.GUID) GUID {
 	return GUID{
 		Data1: windowsGUID.Data1,
@@ -90,56 +96,65 @@ func getTraceLevel(level string) uint8 {
 	}
 }
 
-// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more options when creating sessions
-func NewSessionProperties(sessionName string) *EventTraceProperties {
+// newSessionProperties initializes and returns a pointer to EventTraceProperties
+// with the necessary settings for starting an ETW session.
+// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties
+func newSessionProperties(sessionName string) *EventTraceProperties {
+	// Calculate buffer size for session properties.
 	sessionNameSize := (len(sessionName) + 1) * 2
 	bufSize := sessionNameSize + int(unsafe.Sizeof(EventTraceProperties{}))
 
+	// Allocate buffer and cast to EventTraceProperties.
 	propertiesBuf := make([]byte, bufSize)
 	sessionProperties := (*EventTraceProperties)(unsafe.Pointer(&propertiesBuf[0]))
 
-	// Mandatory fields for SessionProperties struct
+	// Initialize mandatory fields of the EventTraceProperties struct.
 	// Filled based on https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
 	sessionProperties.Wnode.BufferSize = uint32(bufSize)
-	sessionProperties.Wnode.Guid = GUID{}     // Not needed to create GUID if other than private or kernel session
-	sessionProperties.Wnode.ClientContext = 1 // Clock resolution for timestamp (defaults to QPC)
+	sessionProperties.Wnode.Guid = GUID{}     // GUID not required for non-private/kernel sessions
+	sessionProperties.Wnode.ClientContext = 1 // Use Query Performance Counter for time resolution
 	sessionProperties.Wnode.Flags = WNODE_FLAG_TRACED_GUID
-	sessionProperties.LogFileMode = EVENT_TRACE_REAL_TIME_MODE // See https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants
-	sessionProperties.LogFileNameOffset = 0                    // Can be specified to log to a file as well as to a real-time session
-	sessionProperties.BufferSize = 64                          // This is a default value, may be part of the configuration
-	sessionProperties.LoggerNameOffset = uint32(unsafe.Sizeof(EventTraceProperties{}))
+	// Set logging mode to real-time
+	// See https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants
+	sessionProperties.LogFileMode = EVENT_TRACE_REAL_TIME_MODE
+	sessionProperties.LogFileNameOffset = 0                                            // Can be specified to log to a file as well as to a real-time session
+	sessionProperties.BufferSize = 64                                                  // Default buffer size, can be configurable
+	sessionProperties.LoggerNameOffset = uint32(unsafe.Sizeof(EventTraceProperties{})) // Offset to the logger name
 
 	return sessionProperties
 }
 
-// Initialise a session
+// NewSession initializes and returns a new ETW Session based on the provided configuration.
 func NewSession(conf Config) (Session, error) {
 	var session Session
 	var err error
 	session.Name = setSessionName(conf)
 	session.Realtime = true
 
+	// If a current session is configured, set up the session properties and return.
 	if conf.Session != "" {
-		// Whether reading from an existing session, there is no need to initialise parameters below
+		session.Properties = newSessionProperties(session.Name)
 		return session, nil
 	} else if conf.Logfile != "" {
-		// Same when reading from a logfile
+		// If a logfile is specified, set up for non-realtime session.
 		session.Realtime = false
 		return session, nil
 	}
 
-	session.NewSession = true
+	session.NewSession = true // Indicate this is a new session
 
 	session.GUID, err = setSessionGUID(conf)
 	if err != nil {
-		return Session{}, fmt.Errorf("error resolving GUID from %s: %v", conf.ProviderName, err)
+		return Session{}, err
 	}
 
-	session.Properties = NewSessionProperties(session.Name)
+	// Initialize additional session properties.
+	session.Properties = newSessionProperties(session.Name)
 	session.TraceLevel = getTraceLevel(conf.TraceLevel)
 	session.MatchAnyKeyword = conf.MatchAnyKeyword
 	session.MatchAllKeyword = conf.MatchAllKeyword
 
+	// Set default callbacks if not already specified.
 	if session.Callback == 0 {
 		session.Callback = syscall.NewCallback(DefaultCallback)
 	}

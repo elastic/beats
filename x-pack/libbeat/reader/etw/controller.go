@@ -19,31 +19,69 @@ func isValidHandler(handler uint64) bool {
 	return true
 }
 
-// Create a real-time session
-func (s *Session) CreateRealtimeSession() error {
-	sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
+// GetHandler queries the status of an existing ETW session to get its handler and properties.
+func (s *Session) GetHandler() error {
+	// Convert the session name to UTF16 for Windows API compatibility.
+	sessionNamePtr, err := syscall.UTF16PtrFromString(s.Name)
 	if err != nil {
-		return fmt.Errorf("failed to convert session name '%s'", s.Name)
+		return fmt.Errorf("failed to convert session name")
 	}
 
+	// Query the current state of the ETW session.
+	if err = _ControlTrace(
+		0,
+		sessionNamePtr,
+		s.Properties,
+		EVENT_TRACE_CONTROL_QUERY,
+	); err != nil {
+		// Handle specific errors related to the query operation.
+		if err == ERROR_BAD_LENGTH {
+			return fmt.Errorf("bad length when querying handler: %w", err)
+		} else if err == ERROR_INVALID_PARAMETER {
+			return fmt.Errorf("invalid parameters when querying handler: %w", err)
+		} else if err == ERROR_WMI_INSTANCE_NOT_FOUND {
+			return fmt.Errorf("session is not running")
+		}
+		return fmt.Errorf("failed to get handler: %w", err)
+	}
+
+	// Get the session handler from the properties struct.
+	s.Handler = uintptr(s.Properties.Wnode.Union1)
+
+	return nil
+}
+
+// CreateRealtimeSession initializes and starts a new real-time ETW session.
+func (s *Session) CreateRealtimeSession() error {
+	// Convert the session name to UTF16 format for Windows API compatibility.
+	sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
+	if err != nil {
+		return fmt.Errorf("failed to convert session name")
+	}
+
+	// Start the ETW trace session.
 	err = _StartTrace(
 		&s.Handler,
 		sessionPtr,
 		s.Properties,
 	)
 	if err != nil {
+		// Handle specific errors related to starting the trace session.
 		if err == ERROR_ALREADY_EXISTS {
-			return fmt.Errorf("session already exists for '%s'", s.Name)
+			return fmt.Errorf("session already exists: %w", err)
 		} else if err == ERROR_INVALID_PARAMETER {
-			return fmt.Errorf("invalid parameters for '%s'", s.Name)
+			return fmt.Errorf("invalid parameters when starting session trace: %w", err)
 		}
-		return fmt.Errorf("failed to start trace (unknown reason) for '%s'", s.Name)
+		return fmt.Errorf("failed to start trace: %w", err)
 	}
 
+	// Set additional parameters for trace enabling.
+	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters#members
 	params := EnableTraceParameters{
 		Version: 2, // ENABLE_TRACE_PARAMETERS_VERSION_2
 	}
 
+	// Enable the trace session with extended options.
 	if err := _EnableTraceEx2(
 		s.Handler,
 		(*GUID)(unsafe.Pointer(&s.GUID)),
@@ -51,27 +89,35 @@ func (s *Session) CreateRealtimeSession() error {
 		s.TraceLevel,
 		s.MatchAnyKeyword,
 		s.MatchAllKeyword,
-		0,       // Timeout set to zero to enable the trace asynchronously
-		&params, // More filters that may be initialized (ENABLE_TRACE_PARAMETERS)
+		0,       // Asynchronous enablement with zero timeout
+		&params, // Additional parameters
 	); err != nil {
-		// Todo: Catch specific error cases
-		return fmt.Errorf("failed to enable trace for '%s'", s.Name)
+		// Handle specific errors related to enabling the trace session.
+		if err == ERROR_INVALID_PARAMETER {
+			return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
+		} else if err == ERROR_TIMEOUT {
+			return fmt.Errorf("timeout value expired before the enable callback completed: %w", err)
+		} else if err == ERROR_NO_SYSTEM_RESOURCES {
+			return fmt.Errorf("exceeded the number of trace sessions that can enable the provider: %w", err)
+		}
+		return fmt.Errorf("failed to enable trace: %w", err)
 	}
+
 	return nil
 }
 
-// Closes handles and session if created
+// StopSession closes the ETW session and associated handles if they were created.
 func (s *Session) StopSession() error {
 	if s.Realtime {
 		if isValidHandler(s.TraceHandler) {
+			// Attempt to close the trace and handle potential errors.
 			if err := _CloseTrace(s.TraceHandler); err != nil && err != ERROR_CTX_CLOSE_PENDING {
-				return fmt.Errorf("failed to close trace for session '%s'", s.Name)
+				return fmt.Errorf("failed to close trace: %w", err)
 			}
 		}
 
 		if s.NewSession {
-			// Here we could also have to call _EnableTraceEx2 to disable provider if started
-			// If calling _ControlTrace without disabling the providers, ETW should disable all the providers for that session automatically
+			// If we created the session, send a control command to stop it.
 			return _ControlTrace(
 				s.Handler,
 				nil,
@@ -80,5 +126,6 @@ func (s *Session) StopSession() error {
 			)
 		}
 	}
+
 	return nil
 }

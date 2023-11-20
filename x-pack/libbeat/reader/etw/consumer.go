@@ -11,36 +11,48 @@ import (
 	"syscall"
 )
 
+// StartConsumer initializes and starts the ETW event tracing session.
 func (s *Session) StartConsumer() error {
 	var elf EventTraceLogfile
 	var err error
 
+	// Configure EventTraceLogfile based on the session type (realtime or not).
 	if !s.Realtime {
 		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_RAW_TIMESTAMP
 		logfilePtr, err := syscall.UTF16PtrFromString(s.Name)
 		if err != nil {
-			return fmt.Errorf("failed to convert logfile name '%s'", s.Name)
+			return fmt.Errorf("failed to convert logfile name")
 		}
 		elf.LogFileName = logfilePtr
 	} else {
 		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_RAW_TIMESTAMP | PROCESS_TRACE_MODE_REAL_TIME
 		sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
 		if err != nil {
-			return fmt.Errorf("failed to convert session '%s'", s.Name)
+			return fmt.Errorf("failed to convert session name")
 		}
 		elf.LoggerName = sessionPtr
 	}
 
+	// Set callbacks and context for the session.
 	elf.BufferCallback = s.BufferCallback
 	elf.Callback = s.Callback
 	elf.Context = 0
 
+	// Open an ETW trace processing handle for consuming events
+	// from an ETW real-time trace session or an ETW log file.
 	s.TraceHandler, err = _OpenTrace(&elf)
 	if err != nil {
-		return fmt.Errorf("failed to open trace for session %s", s.Name)
+		// Handle specific errors for trace opening.
+		if err == ERROR_BAD_PATHNAME {
+			return fmt.Errorf("invalid log source when opening trace: %w", err)
+		} else if err == ERROR_ACCESS_DENIED {
+			return fmt.Errorf("access denied when opening trace: %w", err)
+		}
+		return fmt.Errorf("failed to open trace: %w", err)
 	}
+	// Process the trace. This function blocks until processing ends.
 	if err := _ProcessTrace(&s.TraceHandler, 1, nil, nil); err != nil {
-		return fmt.Errorf("failed to process trace for session '%s'", s.Name)
+		return fmt.Errorf("failed to process trace: %w", err)
 	}
 
 	return nil

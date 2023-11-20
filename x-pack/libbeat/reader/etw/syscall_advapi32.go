@@ -27,6 +27,7 @@ var (
 	closeTrace   = advapi32.NewProc("CloseTrace")
 )
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace
 type EventTrace struct {
 	Header           EventTraceHeader
 	InstanceId       uint32
@@ -37,6 +38,7 @@ type EventTrace struct {
 	UnionCtx         uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_header
 type EventTraceHeader struct {
 	Size      uint16
 	Union1    uint16
@@ -48,6 +50,7 @@ type EventTraceHeader struct {
 	Union4    uint64
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties
 type EventTraceProperties struct {
 	Wnode               WnodeHeader
 	BufferSize          uint32
@@ -69,6 +72,7 @@ type EventTraceProperties struct {
 	LoggerNameOffset    uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
 type WnodeHeader struct {
 	BufferSize    uint32
 	ProviderId    uint32
@@ -80,6 +84,7 @@ type WnodeHeader struct {
 }
 
 // Used to enable a provider via EnableTraceEx2
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-enable_trace_parameters
 type EnableTraceParameters struct {
 	Version          uint32
 	EnableProperty   uint32
@@ -91,12 +96,14 @@ type EnableTraceParameters struct {
 
 // Defines the filter data that a session passes
 // to the provider's enable callback function
+// https://learn.microsoft.com/en-us/windows/win32/api/evntprov/ns-evntprov-event_filter_descriptor
 type EventFilterDescriptor struct {
 	Ptr  uint64
 	Size uint32
 	Type uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_logfilew
 type EventTraceLogfile struct {
 	LogFileName    *uint16 // Logfile
 	LoggerName     *uint16 // Real-time session
@@ -105,15 +112,20 @@ type EventTraceLogfile struct {
 	LogFileMode    uint32
 	CurrentEvent   EventTrace
 	LogfileHeader  TraceLogfileHeader
-	BufferCallback uintptr // Optional: receives buffer-related statistics after delivered all the events
+	BufferCallback uintptr
 	BufferSize     uint32
 	Filled         uint32
 	EventsLost     uint32
-	Callback       uintptr // Receive events (EventRecordCallback (TDH) or EventCallback) Tip: New code should use EventRecordCallback instead of EventCallback. The EventRecordCallback receives an EVENT_RECORD which contains more complete event information, can be used with decoding APIs such as TdhGetEventInformation, and has a context pointer that can be used by your callback. It is used since we set PROCESS_TRACE_MODE_EVENT_RECORD.
-	IsKernelTrace  uint32
-	Context        uintptr
+	// Receive events (EventRecordCallback (TDH) or EventCallback)
+	// Tip: New code should use EventRecordCallback instead of EventCallback.
+	// The EventRecordCallback receives an EVENT_RECORD which contains
+	// more complete event information
+	Callback      uintptr
+	IsKernelTrace uint32
+	Context       uintptr
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-trace_logfile_header
 type TraceLogfileHeader struct {
 	BufferSize         uint32
 	VersionUnion       uint32
@@ -135,6 +147,7 @@ type TraceLogfileHeader struct {
 	BuffersLost        uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/ns-timezoneapi-time_zone_information
 type TimeZoneInformation struct {
 	Bias         int32
 	StandardName [32]uint16
@@ -145,11 +158,13 @@ type TimeZoneInformation struct {
 	DaylighBias  int32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime
 type FileTime struct {
 	dwLowDateTime  uint32
 	dwHighDateTime uint32
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-systemtime
 type SystemTime struct {
 	Year         uint16
 	Month        uint16
@@ -161,8 +176,8 @@ type SystemTime struct {
 	Milliseconds uint16
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletrace
 const (
-	// Information levels
 	TRACE_LEVEL_NONE        = 0
 	TRACE_LEVEL_CRITICAL    = 1
 	TRACE_LEVEL_FATAL       = 1
@@ -170,18 +185,16 @@ const (
 	TRACE_LEVEL_WARNING     = 3
 	TRACE_LEVEL_INFORMATION = 4
 	TRACE_LEVEL_VERBOSE     = 5
-	TRACE_LEVEL_RESERVED6   = 6
-	TRACE_LEVEL_RESERVED7   = 7
-	TRACE_LEVEL_RESERVED8   = 8
-	TRACE_LEVEL_RESERVED9   = 9
 )
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntprov/nc-evntprov-penablecallback
 const (
 	EVENT_CONTROL_CODE_DISABLE_PROVIDER = 0
 	EVENT_CONTROL_CODE_ENABLE_PROVIDER  = 1
 	EVENT_CONTROL_CODE_CAPTURE_STATE    = 2
 )
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-controltracea
 const (
 	EVENT_TRACE_CONTROL_QUERY  = 0
 	EVENT_TRACE_CONTROL_STOP   = 1
@@ -189,6 +202,7 @@ const (
 	EVENT_TRACE_CONTROL_FLUSH  = 3
 )
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_logfilea
 const (
 	PROCESS_TRACE_MODE_REAL_TIME     = 0x00000100
 	PROCESS_TRACE_MODE_RAW_TIMESTAMP = 0x00001000
@@ -199,11 +213,17 @@ const INVALID_PROCESSTRACE_HANDLE = 0xFFFFFFFFFFFFFFFF
 
 // https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes
 const (
+	ERROR_ACCESS_DENIED          syscall.Errno = 5
 	ERROR_INVALID_HANDLE         syscall.Errno = 6
+	ERROR_BAD_LENGTH             syscall.Errno = 24
 	ERROR_INVALID_PARAMETER      syscall.Errno = 87
 	ERROR_INSUFFICIENT_BUFFER    syscall.Errno = 122
+	ERROR_BAD_PATHNAME           syscall.Errno = 161
 	ERROR_ALREADY_EXISTS         syscall.Errno = 183
 	ERROR_NOT_FOUND              syscall.Errno = 1168
+	ERROR_NO_SYSTEM_RESOURCES    syscall.Errno = 1450
+	ERROR_TIMEOUT                syscall.Errno = 1460
+	ERROR_WMI_INSTANCE_NOT_FOUND syscall.Errno = 4201
 	ERROR_CTX_CLOSE_PENDING      syscall.Errno = 7007
 	ERROR_EVT_INVALID_EVENT_DATA syscall.Errno = 15005
 )
@@ -223,8 +243,9 @@ type GUID struct {
 	Data4 [8]byte
 }
 
-// Function definitions
+// Wrappers
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-starttracew
 func _StartTrace(traceHandle *uintptr,
 	instanceName *uint16,
 	properties *EventTraceProperties) error {
@@ -238,6 +259,7 @@ func _StartTrace(traceHandle *uintptr,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletrace
 func _EnableTrace(enable uint32,
 	enableFlag uint32,
 	enableLevel uint32,
@@ -255,6 +277,7 @@ func _EnableTrace(enable uint32,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex
 func _EnableTraceEx(providerId *GUID,
 	sourceId *GUID,
 	traceHandle uintptr,
@@ -280,6 +303,7 @@ func _EnableTraceEx(providerId *GUID,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2
 func _EnableTraceEx2(traceHandle uintptr,
 	providerId *GUID,
 	isEnabled uint32,
@@ -303,6 +327,7 @@ func _EnableTraceEx2(traceHandle uintptr,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-controltracew
 func _ControlTrace(traceHandle uintptr,
 	instanceName *uint16,
 	properties *EventTraceProperties,
@@ -318,6 +343,7 @@ func _ControlTrace(traceHandle uintptr,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-opentracew
 func _OpenTrace(logfile *EventTraceLogfile) (uint64, error) {
 	r0, _, err := openTraceW.Call(
 		uintptr(unsafe.Pointer(logfile)))
@@ -327,6 +353,7 @@ func _OpenTrace(logfile *EventTraceLogfile) (uint64, error) {
 	return uint64(r0), err
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-processtrace
 func _ProcessTrace(handleArray *uint64,
 	handleCount uint32,
 	startTime *FileTime,
@@ -342,6 +369,7 @@ func _ProcessTrace(handleArray *uint64,
 	return syscall.Errno(r0)
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-closetrace
 func _CloseTrace(traceHandle uint64) error {
 	r0, _, _ := closeTrace.Call(
 		uintptr(traceHandle))
