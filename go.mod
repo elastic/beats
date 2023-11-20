@@ -391,7 +391,7 @@ require (
 )
 
 replace (
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.0.1-0.20231120154032-00a8b5505629
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.0.1-0.20231120162017-2c5e6af954e2
 
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
 	github.com/Microsoft/hcsshim => github.com/Microsoft/hcsshim v0.9.8
