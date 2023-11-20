@@ -18,19 +18,10 @@
 package add_cloud_metadata
 
 import (
+	"context"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net"
 	"net/http"
 
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -42,81 +33,22 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
->>>>>>> d66a0001ac ([add_cloud_metadata] Remove logger for AWS/EC2 (#36829))
 )
 
-const (
-	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
-	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
-	ec2InstanceIMDSv2TokenTTLHeader   = "X-aws-ec2-metadata-token-ttl-seconds"
-	ec2InstanceIMDSv2TokenTTLValue    = "21600"
-	ec2InstanceIMDSv2TokenURI         = "/latest/api/token"
-)
+type IMDSClient interface {
+	GetInstanceIdentityDocument(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+}
 
-// fetches IMDSv2 token, returns empty one on errors
-func getIMDSv2Token(c *common.Config) string {
-	logger := logp.NewLogger("add_cloud_metadata")
+var NewIMDSClient func(cfg awssdk.Config) IMDSClient = func(cfg awssdk.Config) IMDSClient {
+	return imds.NewFromConfig(cfg)
+}
 
-	config := defaultConfig()
-	if err := c.Unpack(&config); err != nil {
-		logger.Warnf("error when load config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
+type EC2Client interface {
+	DescribeTags(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error)
+}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		logger.Warnf("error when load TLS config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	client := http.Client{
-		Timeout: config.Timeout,
-		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			DialContext: (&net.Dialer{
-				Timeout:   config.Timeout,
-				KeepAlive: 0,
-			}).DialContext,
-			TLSClientConfig: tlsConfig.ToConfig(),
-		},
-	}
-
-	tokenReq, err := http.NewRequest("PUT", fmt.Sprintf("http://%s%s", metadataHost, ec2InstanceIMDSv2TokenURI), nil)
-	if err != nil {
-		logger.Warnf("error when make token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	tokenReq.Header.Add(ec2InstanceIMDSv2TokenTTLHeader, ec2InstanceIMDSv2TokenTTLValue)
-	rsp, err := client.Do(tokenReq)
-	if rsp == nil {
-		logger.Warnf("read token request for getting IMDSv2 token returns empty: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	defer func(body io.ReadCloser) {
-		if body != nil {
-			body.Close()
-		}
-	}(rsp.Body)
-
-	if err != nil {
-		logger.Warnf("error when read token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	if rsp.StatusCode != http.StatusOK {
-		logger.Warnf("error when check request status for getting IMDSv2 token: http request status %d. No token in the metadata request will be used.", rsp.StatusCode)
-		return ""
-	}
-
-	all, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		logger.Warnf("error when reading token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
-		return ""
-	}
-
-	return string(all)
+var NewEC2Client func(cfg awssdk.Config) EC2Client = func(cfg awssdk.Config) EC2Client {
+	return ec2.NewFromConfig(cfg)
 }
 
 // AWS EC2 Metadata Service
@@ -125,35 +57,18 @@ var ec2MetadataFetcher = provider{
 
 	Local: true,
 
-	Create: func(_ string, config *common.Config) (metadataFetcher, error) {
-		ec2Schema := func(m map[string]interface{}) common.MapStr {
-			m["serviceName"] = "EC2"
-			out, _ := s.Schema{
-				"instance":          s.Object{"id": c.Str("instanceId")},
-				"machine":           s.Object{"type": c.Str("instanceType")},
-				"region":            c.Str("region"),
-				"availability_zone": c.Str("availabilityZone"),
-				"service": s.Object{
-					"name": c.Str("serviceName"),
-				},
-				"account": s.Object{"id": c.Str("accountId")},
-				"image":   s.Object{"id": c.Str("imageId")},
-			}.Apply(m)
-			return common.MapStr{"cloud": out}
+	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
+		ec2Schema := func(m map[string]interface{}) mapstr.M {
+			m["service"] = mapstr.M{
+				"name": "EC2",
+			}
+			return mapstr.M{"cloud": m}
 		}
 
-		headers := make(map[string]string, 1)
-		token := getIMDSv2Token(config)
-		if len(token) > 0 {
-			headers[ec2InstanceIMDSv2TokenValueHeader] = token
-		}
-
-		fetcher, err := newMetadataFetcher(config, "aws", headers, metadataHost, ec2Schema, ec2InstanceIdentityURI)
+		fetcher, err := newGenericMetadataFetcher(config, "aws", ec2Schema, fetchRawProviderMetadata)
 		return fetcher, err
 	},
 }
-<<<<<<< HEAD
-=======
 
 // fetchRaw queries raw metadata from a hosting provider's metadata service.
 func fetchRawProviderMetadata(
@@ -231,4 +146,3 @@ func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string,
 	}
 	return "", nil
 }
->>>>>>> d66a0001ac ([add_cloud_metadata] Remove logger for AWS/EC2 (#36829))
