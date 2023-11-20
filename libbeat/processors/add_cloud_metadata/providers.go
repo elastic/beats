@@ -100,7 +100,7 @@ func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataF
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
-	// Iterate over all providers and create an unique meta-data fetcher per provider type.
+	// Iterate over all providers and create a unique meta-data fetcher per provider type.
 	// Some providers might appear twice in the set of providers to support aliases on provider names.
 	// For example aws and ec2 both use the same provider.
 	// The loop tracks already seen providers in the `visited` set, to ensure that we do not create
@@ -122,7 +122,7 @@ func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataF
 }
 
 // fetchMetadata attempts to fetch metadata in parallel from each of the
-// hosting providers supported by this processor. It wait for the results to
+// hosting providers supported by this processor. It will wait for the results to
 // be returned or for a timeout to occur then returns the first result that
 // completed in time.
 func (p *addCloudMetadata) fetchMetadata() *result {
@@ -168,6 +168,8 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 			// Bail out on first success.
 			if result.err == nil && result.metadata != nil {
 				return &result
+			} else if result.err != nil {
+				p.logger.Errorf("add_cloud_metadata: received error %v", result.err)
 			}
 		case <-ctx.Done():
 			p.logger.Debugf("add_cloud_metadata: timed-out waiting for all responses")
