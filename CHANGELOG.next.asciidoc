@@ -210,6 +210,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add network processor in addition to interface based direction resolution. {pull}37023[37023]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
 - Make CEL input log current transaction ID when request tracing is turned on. {pull}37065[37065]
+- Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
 - Made GCS input GA and updated docs accordingly. {pull}37127[37127]
 
