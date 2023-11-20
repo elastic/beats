@@ -17,7 +17,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
   - `queue.mem.flush.timeout` is changing from `1s` to `10s`.
   - `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
   - `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
-
 - add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
 platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
 know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
