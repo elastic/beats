@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
 - The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
+- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
 
 *Osquerybeat*
 
