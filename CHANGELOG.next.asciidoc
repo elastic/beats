@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 - Do not error when Okta API returns no data. {pull}37092[37092]
 - Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
+- Make CEL input now global evaluate to a time in UTC. {pull}37159[37159]
 
 *Heartbeat*
 
