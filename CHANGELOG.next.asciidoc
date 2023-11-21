@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Upgrade to osquery 5.10.2. {pull}37115[37115]
 
 *Packetbeat*
 
@@ -91,6 +92,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Do not error when Okta API returns no data. {pull}37092[37092]
 - Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
+- Make CEL input now global evaluate to a time in UTC. {pull}37159[37159]
 
 *Heartbeat*
 
@@ -115,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
 - The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
+- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
 
 *Osquerybeat*
 
@@ -123,6 +126,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
+
+- Fix dashboards under Kibana 8.x. {issue}37080[37080] {pull}37085[37085]
 
 
 *Elastic Logging Plugin*
@@ -147,6 +152,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- Upgrade to Go 1.20.11. {pull}37123[37123]
 
 *Auditbeat*
 
@@ -206,7 +212,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add network processor in addition to interface based direction resolution. {pull}37023[37023]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
 - Make CEL input log current transaction ID when request tracing is turned on. {pull}37065[37065]
+- Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
+- Made GCS input GA and updated docs accordingly. {pull}37127[37127]
 
 *Auditbeat*
 
@@ -288,6 +296,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
