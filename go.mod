@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/Microsoft/go-winio v0.5.2
+	github.com/docker/go-units v0.5.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-ucfg v0.8.5
 	github.com/fatih/color v1.13.0

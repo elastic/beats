@@ -26,6 +26,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/upgrade/details"
 )
 
 const (
@@ -329,11 +331,11 @@ type AgentUpgradeDetails struct {
 	State         string `json:"state"`
 	ActionID      string `json:"action_id"`
 	Metadata      struct {
-		ScheduledAt     *time.Time `json:"scheduled_at"`
-		DownloadPercent float64    `json:"download_percent"`
-		DownloadRate    float64    `json:"download_rate"`
-		FailedState     string     `json:"failed_state"`
-		ErrorMsg        string     `json:"error_msg"`
+		ScheduledAt     *time.Time           `json:"scheduled_at"`
+		DownloadPercent float64              `json:"download_percent"`
+		DownloadRate    details.DownloadRate `json:"download_rate"`
+		FailedState     string               `json:"failed_state"`
+		ErrorMsg        string               `json:"error_msg"`
 	} `json:"metadata"`
 }
 
