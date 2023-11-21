@@ -19,7 +19,7 @@ const DefaultTimeGrain = "PT5M"
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
+func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {
@@ -29,9 +29,10 @@ func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue,
 					continue
 				}
 				// remove metric values that are not part of the timeline selected
-				if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
-					continue
-				}
+				// We don't need this filtering anymore, since we modify the timespan directly
+				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
+				//	continue
+				//}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
