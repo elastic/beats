@@ -228,7 +228,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// Process a set of event requests.
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
-			start := i.now()
+			start := i.now().In(time.UTC)
 			state, err = evalWith(ctx, prg, state, start)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
