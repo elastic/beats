@@ -13026,11 +13026,19 @@ these terms.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
+<<<<<<< HEAD
 Version: v0.7.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.7.0/LICENSE.txt:
+=======
+Version: v0.8.2
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.8.2/LICENSE.txt:
+>>>>>>> 15857a8596 (upgrade elastic-agent-system-metrics to v0.8.2 (#37171))
 
                                  Apache License
                            Version 2.0, January 2004
