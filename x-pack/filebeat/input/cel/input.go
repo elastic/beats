@@ -839,7 +839,7 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
 		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
-		return resp, nil
+		return resp, err
 	}
 }
 
