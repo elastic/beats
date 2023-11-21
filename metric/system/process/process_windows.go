@@ -80,26 +80,39 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 }
 
 func FetchNumThreads(pid int) (int, error) {
-	pHandle, err := syscall.OpenProcess(
+	targetProcessHandle, err := syscall.OpenProcess(
 		xsyswindows.PROCESS_QUERY_INFORMATION,
 		false,
 		uint32(pid))
 	if err != nil {
 		return 0, fmt.Errorf("OpenProcess failed for PID %d: %w", pid, err)
 	}
-	defer syscall.CloseHandle(pHandle)
+	defer syscall.CloseHandle(targetProcessHandle)
+
+	currentProcessHandle, err := syscall.GetCurrentProcess()
+	if err != nil {
+		return 0, fmt.Errorf("GetCurrentProcess failed: %w", err)
+	}
+	// The pseudo handle need not be closed when it is no longer
+	// needed, calling CloseHandle has no effect.  Adding here to
+	// remind us to close any handles we open.
+	defer syscall.CloseHandle(currentProcessHandle)
 
 	var snapshotHandle syscall.Handle
-	err = PssCaptureSnapshot(pHandle, PSSCaptureThreads, 0, &snapshotHandle)
+	err = PssCaptureSnapshot(targetProcessHandle, PSSCaptureThreads, 0, &snapshotHandle)
 	if err != nil {
 		return 0, fmt.Errorf("PssCaptureSnapshot failed: %w", err)
 	}
 
 	info := PssThreadInformation{}
 	buffSize := unsafe.Sizeof(info)
-	err = PssQuerySnapshot(snapshotHandle, PssQueryThreadInformation, &info, uint32(buffSize))
-	if err != nil {
-		return 0, fmt.Errorf("PssQuerySnapshot failed: %w", err)
+	queryErr := PssQuerySnapshot(snapshotHandle, PssQueryThreadInformation, &info, uint32(buffSize))
+	freeErr := PssFreeSnapshot(currentProcessHandle, snapshotHandle)
+	if queryErr != nil || freeErr != nil {
+		//Join discards any nil errors
+		return 0, errors.Join(
+			fmt.Errorf("PssQuerySnapshot failed: %w", queryErr),
+			fmt.Errorf("PssFreeSnapshot failed: %w", freeErr))
 	}
 
 	return int(info.ThreadsCaptured), nil

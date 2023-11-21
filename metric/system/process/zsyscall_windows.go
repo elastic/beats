@@ -59,6 +59,7 @@ var (
 
 	procPssCaptureSnapshot = modkernel32.NewProc("PssCaptureSnapshot")
 	procPssQuerySnapshot   = modkernel32.NewProc("PssQuerySnapshot")
+	procPssFreeSnapshot    = modkernel32.NewProc("PssFreeSnapshot")
 )
 
 func PssCaptureSnapshot(processHandle syscall.Handle, captureFlags PSSCaptureFlags, threadContextFlags uint32, snapshotHandle *syscall.Handle) (err error) {
@@ -71,6 +72,14 @@ func PssCaptureSnapshot(processHandle syscall.Handle, captureFlags PSSCaptureFla
 
 func PssQuerySnapshot(snapshotHandle syscall.Handle, informationClass uint32, buffer *PssThreadInformation, bufferLength uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procPssQuerySnapshot.Addr(), 4, uintptr(snapshotHandle), uintptr(informationClass), uintptr(unsafe.Pointer(buffer)), uintptr(bufferLength), 0, 0)
+	if r1 != 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func PssFreeSnapshot(processHandle syscall.Handle, snapshotHandle syscall.Handle) (err error) {
+	r1, _, e1 := syscall.Syscall6(procPssFreeSnapshot.Addr(), 2, uintptr(processHandle), uintptr(snapshotHandle), 0, 0, 0, 0)
 	if r1 != 0 {
 		err = errnoErr(e1)
 	}

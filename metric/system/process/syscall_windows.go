@@ -21,6 +21,7 @@ package process
 //  - https://learn.microsoft.com/en-us/previous-versions/windows/desktop/proc_snap/overview-of-process-snapshotting
 // PssCaptureSnapshot docs in https://learn.microsoft.com/en-us/windows/win32/api/processsnapshot/nf-processsnapshot-psscapturesnapshot
 // PssQuerySnapshot docs in https://learn.microsoft.com/en-us/windows/win32/api/processsnapshot/nf-processsnapshot-pssquerysnapshot
+// PssFreeSnapshot docs in https://learn.microsoft.com/en-us/windows/win32/api/processsnapshot/nf-processsnapshot-pssfreesnapshot
 
 // Use golang.org/x/sys/windows/mkwinsyscall instead of adriansr/mksyscall
 // below once https://github.com/golang/go/issues/42373 is fixed.
@@ -29,6 +30,7 @@ package process
 
 //sys PssCaptureSnapshot(processHandle syscall.Handle, captureFlags PSSCaptureFlags, threadContextFlags uint32, snapshotHandle *syscall.Handle) (err error) [failretval!=0] = kernel32.PssCaptureSnapshot
 //sys PssQuerySnapshot(snapshotHandle syscall.Handle, informationClass uint32, buffer *PssThreadInformation, bufferLength uint32) (err error) [failretval!=0] = kernel32.PssQuerySnapshot
+//sys PssFreeSnapshot(processHandle syscall.Handle, snapshotHandle syscall.Handle) (err error) [failretval!=0] = kernel32.PssFreeSnapshot
 
 // The following constants are PssQueryInformationClass as defined on
 // https://learn.microsoft.com/en-us/windows/win32/api/processsnapshot/ne-processsnapshot-pss_query_information_class
