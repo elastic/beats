@@ -213,6 +213,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
 - Made GCS input GA and updated docs accordingly. {pull}37127[37127]
+- Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
 
 *Auditbeat*
 
