@@ -30,6 +30,8 @@ func TestInput(t *testing.T) {
 		baseConfig  map[string]interface{}
 		handler     http.HandlerFunc
 		expected    []string
+
+		skipReason string
 	}{
 		{
 			name:        "Test simple GET request",
@@ -246,6 +248,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
+			skipReason: "flakey test - see https://github.com/elastic/beats/issues/34929",
+
 			name: "Test first event",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				registerPaginationTransforms()
@@ -407,6 +411,10 @@ func TestInput(t *testing.T) {
 	for _, testCase := range testCases {
 		tc := testCase
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.skipReason != "" {
+				t.Skipf("skip: %s", tc.skipReason)
+			}
+
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
 			cfg := common.MustNewConfigFrom(tc.baseConfig)
