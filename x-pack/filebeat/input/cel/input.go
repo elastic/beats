@@ -835,7 +835,8 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
 // but return the last retry attempt's response and a nil error so that the CEL code
-// can evaluate the response status itself.
+// can evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
+// is returned unaltered.
 func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
 		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
