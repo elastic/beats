@@ -309,11 +309,10 @@
         "title": "[Winlogbeat powershell] Overview",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:10.446Z",
     "id": "c77e06c0-9e7c-11ea-af6f-cfdb1ee1d6c8",
-    "migrationVersion": {
-        "dashboard": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "9ec52c30-9e91-11ea-af6f-cfdb1ee1d6c8",
@@ -407,6 +406,7 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-11T13:18:51.383Z",
-    "version": "WzIxNTQsMl0="
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2023-11-10T17:08:10.446Z",
+    "version": "WzMxMSwxXQ=="
 }
