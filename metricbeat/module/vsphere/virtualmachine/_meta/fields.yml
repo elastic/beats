@@ -56,7 +56,7 @@
     - name: storage.total
       type: long
       description: "Total storage allocated to the virtual machine."
-    - name: storage.uncommited
+    - name: storage.uncommitted
       type: long
       description: "Amount of uncommitted storage for the virtual machine."
     - name: networks
