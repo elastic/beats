@@ -150,7 +150,8 @@ Before starting {beatname_uc}, modify the user credentials in
 +{beatname_lc}.yml+ and specify a user who is
 <<privileges-to-publish-events,authorized to publish events>>.
 
-By default, the `winlogbeat` service runs as `Local System` account. If you want to run `winlogbeat` service as a local user account which is not an Administrator, follow the below steps. By following these steps, your local user account will be granted `Log on as a service` security policy and made part of group `Event Log Readers` to the event log. (You can skip these steps if you want to continue running Winlogbeat as an Administrator.)
+By default, the `winlogbeat` service runs as `Local System` account. If you want to run `winlogbeat` service as a local user account which is not an Administrator, follow the below steps. By following these steps, your local user account will be granted `Log on as a service` security policy and made part of group `Event Log Readers` to read the event log. (You can skip these steps if you want to continue running Winlogbeat as an Administrator.)
+
 . Open the Services Management console in Windows, if not already open by running this command:
 [source,shell]
 ----------------------------------------------------------------------
@@ -166,7 +167,8 @@ PS C:\Program Files\Winlogbeat> services.msc
 . Under `Users`, right-click on your local account user and open `Properties`.
 . Select `Member of` tab and click on `Add..`
 . Find and select the group named `Event Log Readers` and click `Apply`. This should allow your local account user to read the event log.
-NOTE: A force apply maybe required to apply the policy selected from `Local Group Policy Editor`. Run `gpupdate /force` from Powershell if you are facing issue starting up the `winlogbeat service` in next step.
+
+NOTE: A force apply maybe required to apply the policy selected from `Local Group Policy Editor`. Run `gpupdate /force` from Powershell if you are having trouble starting up the `winlogbeat` service in next step.
 
 To start the {beatname_uc} service, run:
 
