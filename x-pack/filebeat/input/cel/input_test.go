@@ -683,6 +683,37 @@ var inputTests = []struct {
 			{"hello": "world"},
 		},
 	},
+	{
+		name:   "retry_failure_no_success",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"resource": map[string]interface{}{
+				"retry": map[string]interface{}{
+					"max_attempts": 2,
+				},
+			},
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [
+			bytes(resp.Body).decode_json(),
+			{"status": resp.StatusCode},
+		],
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusGatewayTimeout)
+			//nolint:errcheck // No point checking errors in test server.
+			w.Write([]byte(`{"error":"we were too slow"}`))
+		},
+		want: []map[string]interface{}{
+			{"error": "we were too slow"},
+			{"status": float64(504)}, // Float because of JSON.
+		},
+	},
 
 	{
 		name:   "POST_request",
