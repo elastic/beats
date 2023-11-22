@@ -270,7 +270,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 					datastore, ok := m.DsMap[ds.Value]
 					if !ok {
 						dsRefreshRequired = true
-						m.Logger().Debugf("datastore with id %s not found, will refresh datastore information at the end of the run")
+						m.Logger().Debugf("datastore with id %s not found, will refresh datastore information at the end of the run", ds.Value)
 					} else {
 						datastores = append(datastores, datastore)
 						event.Put("datastores", datastores)
