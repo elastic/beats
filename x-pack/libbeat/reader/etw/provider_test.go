@@ -63,7 +63,8 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 	EnumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
 		// Empty list of providers
 		*pBuffer = ProviderEnumerationInfo{
-			NumberOfProviders: 0,
+			NumberOfProviders:      0,
+			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{},
 		}
 		return nil
 	}
