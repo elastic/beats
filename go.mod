@@ -125,7 +125,7 @@ require (
 	github.com/mitchellh/hashstructure v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/osquery/osquery-go v0.0.0-20230707154813-2e4891a0f444
+	github.com/osquery/osquery-go v0.0.0-20231108163517-e3cde127e724
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
@@ -204,7 +204,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.6.4
 	github.com/elastic/elastic-agent-libs v0.6.2
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.7.0
+	github.com/elastic/elastic-agent-system-metrics v0.8.2
 	github.com/elastic/go-elasticsearch/v8 v8.10.0
 	github.com/elastic/mito v1.6.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640

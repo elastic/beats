@@ -232,7 +232,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
-			start := i.now()
+			start := i.now().In(time.UTC)
 			state, err = evalWith(ctx, prg, state, start)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
@@ -730,14 +730,16 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
 	if cfg.Resource.Retry.getMaxAttempts() > 1 {
+		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
 		c = (&retryablehttp.Client{
 			HTTPClient:   c,
 			Logger:       newRetryLog(log),
 			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
 			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
-			RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
+			RetryMax:     maxAttempts,
 			CheckRetry:   retryablehttp.DefaultRetryPolicy,
 			Backoff:      retryablehttp.DefaultBackoff,
+			ErrorHandler: retryErrorHandler(maxAttempts, log),
 		}).StandardClient()
 	}
 
@@ -828,6 +830,17 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 		}
 
 		return nil
+	}
+}
+
+// retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
+// but return the last retry attempt's response and a nil error so that the CEL code
+// can evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
+// is returned unaltered.
+func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
+	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
+		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		return resp, err
 	}
 }
 
