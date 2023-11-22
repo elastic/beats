@@ -1,49 +1,141 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "event": {
-        "dataset": "vsphere.virtualmachine",
-        "duration": 115000,
-        "module": "vsphere"
-    },
-    "metricset": {
-        "name": "virtualmachine",
-        "period": 10000
-    },
-    "service": {
-        "address": "127.0.0.1:39149",
-        "type": "vsphere"
-    },
+    "@timestamp": "2023-11-22T05:40:25.501Z",
     "vsphere": {
         "virtualmachine": {
-            "cpu": {
-                "used": {
-                    "mhz": 0
-                }
-            },
-            "host.hostname": "localhost.localdomain",
-            "host.id": "ha-host",
+            "vmtools_version": "11296",
             "memory": {
-                "free": {
-                    "guest": {
-                        "bytes": 33554432
-                    }
+                "reserved": 0,
+                "overhead": 0,
+                "total_size": 4096
+            },
+            "disks": [
+                {
+                    "path": "/",
+                    "free_space": 67461361664,
+                    "capacity": 75424264192
                 },
-                "total": {
-                    "guest": {
-                        "bytes": 33554432
-                    }
-                },
-                "used": {
-                    "guest": {
-                        "bytes": 0
-                    },
-                    "host": {
-                        "bytes": 0
-                    }
+                {
+                    "path": "/boot",
+                    "free_space": 95321088,
+                    "capacity": 125783040
+                }
+            ],
+            "os_family": "linuxGuest",
+            "vmx_path": "[vsanDatastore] 32487a25-fd93-1c2b-461f-a1236c829671/server01.vmx",
+            "primary_ip": "10.10.10.11",
+            "storage": {
+                "uncommitted": 149183004672,
+                "total": 177070931968,
+                "committed": 27887927296
+            },
+            "sys": {
+                "uptime": {
+                    "latest": 37443616
                 }
             },
-            "name": "ha-host_VM0",
-            "os": "otherGuest"
+            "resource_pool": {
+                "path": "/Datacenter1/host/LAB/Resources",
+                "name": "Resources",
+                "id": "resgroup-8"
+            },
+            "connection_state": "connected",
+            "networks": [
+                {
+                    "connected": true,
+                    "mac_address": "00:50:56:3E:1A:7B",
+                    "ip_config": [
+                        {
+                            "ip_address": "10.10.10.11",
+                            "prefix_length": 24
+                        }
+                    ],
+                    "network": "VM Network"
+                }
+            ],
+            "hardware_version": "vmx-11",
+            "uuid": "500a13ad-8ff1-e5d0-ed98-aab6396a25d3",
+            "mem": {
+                "consumed": {
+                    "average": 3719396
+                },
+                "swapinRate": {
+                    "average": 0
+                },
+                "overhead": {
+                    "average": 45164
+                },
+                "usage": {
+                    "average": 99
+                },
+                "vmmemctl": {
+                    "average": 0
+                },
+                "swapoutRate": {
+                    "average": 0
+                }
+            },
+            "virtualDisk": {
+                "totalReadLatency": {
+                    "average": 0
+                },
+                "totalWriteLatency": {
+                    "average": 0
+                },
+                "numberReadAveraged": {
+                    "average": 0
+                },
+                "numberWriteAveraged": {
+                    "average": 0
+                }
+            },
+            "host": {
+                "hostname": "vmhost-12.local",
+                "id": "host-12",
+                "version": "7.0.3"
+            },
+            "id": "vm-3894",
+            "net": {
+                "usage": {
+                    "average": 0
+                }
+            },
+            "guest_state": "running",
+            "os": "Other 3.x or later Linux (64-bit)",
+            "cpu": {
+                "cores": 2,
+                "reserved": 0,
+                "ready": {
+                    "summation": 6
+                },
+                "usage": {
+                    "average": 45
+                },
+                "usagemhz": {
+                    "average": 11
+                }
+            },
+            "power_state": "poweredOn",
+            "disk": {
+                "maxTotalLatency": {
+                    "latest": 0
+                }
+            },
+            "name": "server01",
+            "heartbeat_status": "",
+            "snapshot_consolidation_needed": false
         }
+    },
+    "service": {
+        "address": "https://127.0.0.1:39149/sdk",
+        "type": "vsphere"
+    },
+    "metricset": {
+        "period": 20000,
+        "name": "virtualmachine"
+    },
+    "event": {
+        "duration": 44152074083,
+        "module": "vsphere",
+        "dataset": "vsphere.virtualmachine"
     }
 }
