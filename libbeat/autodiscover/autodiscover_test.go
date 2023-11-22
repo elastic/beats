@@ -733,9 +733,7 @@ func printDebugLogsOnFailure(t *testing.T) {
 	// Use the following line to have the logs being printed
 	// in real time.
 	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
-	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
-		t.Fatalf("error setting up dev logging: %s", err)
-	}
+	logp.DevelopmentSetup(logp.ToObserverOutput())
 
 	t.Cleanup(func() {
 		if t.Failed() {

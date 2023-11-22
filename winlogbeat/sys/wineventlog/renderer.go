@@ -53,12 +53,12 @@ type Renderer struct {
 
 // NewRenderer returns a new Renderer.
 func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
-	systemContext, err := _EvtCreateRenderContext(0, 0, EvtRenderContextSystem)
+	systemContext, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for system context: %w", err)
 	}
 
-	userContext, err := _EvtCreateRenderContext(0, 0, EvtRenderContextUser)
+	userContext, err := _EvtCreateRenderContext(0, nil, EvtRenderContextUser)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for user context: %w", err)
 	}

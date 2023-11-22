@@ -61,7 +61,7 @@ type KibanaLoader struct {
 // NewKibanaLoader creates a new loader to load Kibana files
 func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
 	if cfg == nil || !cfg.Enabled() {
-		return nil, fmt.Errorf("Kibana is not configured or enabled")
+		return nil, fmt.Errorf("kibana is not configured or enabled")
 	}
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatname)
@@ -127,7 +127,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs multierror.Errors

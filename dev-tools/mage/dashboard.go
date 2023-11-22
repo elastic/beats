@@ -55,6 +55,9 @@ func ExportDashboard() error {
 	if kibanaURL := EnvOr("KIBANA_URL", ""); kibanaURL != "" {
 		args = append(args, "-kibana", kibanaURL)
 	}
+	if kibanaInsecure, _ := strconv.ParseBool(os.Getenv("KIBANA_INSECURE")); kibanaInsecure {
+		args = append(args, "-insecure")
+	}
 
 	return dashboardCmd(args...)
 }
@@ -65,6 +68,7 @@ func ExportDashboard() error {
 //
 // Optional environment variables:
 // - KIBANA_URL: URL of Kibana
+// - KIBANA_INSECURE: Disable TLS verification.
 // - KIBANA_ALWAYS: Connect to Kibana without checking ES version. Default true.
 // - ES_URL: URL of Elasticsearch (only used with KIBANA_ALWAYS=false).
 func ImportDashboards(buildDep, dashboardDep interface{}) error {
@@ -82,6 +86,9 @@ func ImportDashboards(buildDep, dashboardDep interface{}) error {
 	var args []string
 	if kibanaURL := EnvOr("KIBANA_URL", ""); kibanaURL != "" {
 		args = append(args, "-E", "setup.kibana.host="+kibanaURL)
+	}
+	if kibanaInsecure, _ := strconv.ParseBool(os.Getenv("KIBANA_INSECURE")); kibanaInsecure {
+		args = append(args, "-E", "setup.kibana.ssl.verification_mode=none")
 	}
 	if esURL := EnvOr("ES_URL", ""); !kibanaAlways && esURL != "" {
 		args = append(args, "-E", "setup.elasticsearch.host="+esURL)

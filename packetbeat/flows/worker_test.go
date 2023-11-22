@@ -37,7 +37,7 @@ import (
 var dataFlag = flag.Bool("data", false, "Write updated data.json files")
 
 func TestCreateEvent(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	// Build biflow event.
 	start := time.Unix(1542292881, 0)

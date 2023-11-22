@@ -17,10 +17,10 @@
             },
             "memory": {
                 "allocatable": {
-                    "bytes": 16259682304
+                    "bytes": 12027240448
                 },
                 "capacity": {
-                    "bytes": 16259682304
+                    "bytes": 12027240448
                 }
             },
             "name": "kind-control-plane",

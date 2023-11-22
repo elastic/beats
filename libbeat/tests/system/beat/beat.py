@@ -717,6 +717,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(
                     __file__) + "../../../../_meta/fields.common.yml")
+
             with open(path, encoding="utf-8") as f2:
                 content = f2.read()
 
@@ -788,7 +789,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def assert_fields_are_documented(self, evt):
         """
         Assert that all keys present in evt are documented in fields.yml.
-        This reads from the global fields.yml, means `make collect` has to be run before the check.
+        This reads from the global fields.yml, means `mage fields` has to be run before the check.
         """
         expected_fields, dict_fields, aliases = self.load_fields()
         flat = self.flatten_object(evt, dict_fields)

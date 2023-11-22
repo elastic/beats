@@ -13,8 +13,8 @@ tags:
 
 # Build args passed to Dockerfile ARGs
 args:
-  BASE_IMAGE: "redhat/ubi/ubi8"
-  BASE_TAG: "8.7"
+  BASE_IMAGE: "redhat/ubi/ubi9"
+  BASE_TAG: "9.3"
   ELASTIC_STACK: "{{ beat_version }}"
   ELASTIC_PRODUCT: "auditbeat"
 

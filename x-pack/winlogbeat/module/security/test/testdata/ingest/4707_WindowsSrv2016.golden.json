@@ -10,7 +10,6 @@
         "configuration"
       ],
       "code": "4707",
-      "ingested": "2022-06-08T06:21:07.915673700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

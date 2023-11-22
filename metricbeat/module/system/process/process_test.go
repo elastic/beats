@@ -33,6 +33,7 @@ import (
 
 func TestFetch(t *testing.T) {
 	logp.DevelopmentSetup()
+
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
@@ -44,6 +45,7 @@ func TestFetch(t *testing.T) {
 	assert.Empty(t, errs)
 	assert.NotEmpty(t, events)
 
+	t.Logf("fetched %d events, showing events[0]:", len(events))
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "process").Fields.StringToPrint())
 }

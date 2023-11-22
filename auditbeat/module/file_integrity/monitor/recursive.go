@@ -144,20 +144,19 @@ func (watcher *recursiveWatcher) deliver(ev fsnotify.Event) {
 	}
 }
 
-func (watcher *recursiveWatcher) forwardEvents() error {
+func (watcher *recursiveWatcher) forwardEvents() {
 	defer watcher.close()
 
 	for {
 		select {
 		case <-watcher.done:
-			return nil
-
+			return
 		case path := <-watcher.addC:
 			watcher.addErrC <- watcher.addRecursive(path)
 
 		case event, ok := <-watcher.inner.Events:
 			if !ok {
-				return nil
+				return
 			}
 			if event.Name == "" {
 				continue

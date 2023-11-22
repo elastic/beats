@@ -182,20 +182,33 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 			}
 			msID := id.String()
 			metrics := monitoring.NewRegistry()
-			monitoring.NewString(metrics, "module").Set(m.Name())
-			monitoring.NewString(metrics, "metricset").Set(name)
+			monitoring.NewString(metrics, "input").Set(m.Name() + "/" + name)
 			if host != "" {
 				monitoring.NewString(metrics, "host").Set(host)
 			}
-			monitoring.NewString(metrics, "id").Set(msID)
+			monitoring.NewString(metrics, "ephemeral_id").Set(msID)
+			if configuredID := m.Config().ID; configuredID != "" {
+				// If a module ID was configured, then use that as the ID within metrics.
+				// Note that the "ephemeral_id" is what is used as the monitoring registry
+				// key. This module ID is not unique to the MetricSet instance when multiple
+				// hosts are monitored or if multiple different MetricSet types were enabled
+				// under the same module instance.
+				monitoring.NewString(metrics, "id").Set(configuredID)
+			} else {
+				monitoring.NewString(metrics, "id").Set(msID)
+			}
 
+			logger := logp.NewLogger(m.Name() + "." + name)
+			if m.Config().ID != "" {
+				logger = logger.With("id", m.Config().ID)
+			}
 			metricsets = append(metricsets, BaseMetricSet{
 				id:      msID,
 				name:    name,
 				module:  m,
 				host:    host,
 				metrics: metrics,
-				logger:  logp.NewLogger(m.Name() + "." + name),
+				logger:  logger,
 			})
 		}
 	}

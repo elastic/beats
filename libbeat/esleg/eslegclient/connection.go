@@ -423,6 +423,7 @@ func (conn *Connection) getVersion() error {
 	}
 
 	if versionData.Version.BuildFlavor == "serverless" {
+		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
 		conn.isServerless = true
 	} else if versionData.Version.BuildFlavor == "default" {
 		conn.isServerless = false

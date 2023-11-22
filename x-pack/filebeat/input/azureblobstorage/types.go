@@ -13,11 +13,14 @@ import (
 
 // Source, it is the cursor source
 type Source struct {
-	ContainerName string
-	AccountName   string
-	MaxWorkers    int
-	Poll          bool
-	PollInterval  time.Duration
+	ContainerName            string
+	AccountName              string
+	MaxWorkers               int
+	Poll                     bool
+	PollInterval             time.Duration
+	TimeStampEpoch           *int64
+	FileSelectors            []fileSelectorConfig
+	ExpandEventListFromField string
 }
 
 func (s *Source) Name() string {

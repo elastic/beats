@@ -96,7 +96,7 @@ func (t *valueTpl) Unpack(in string) error {
 func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
-			log.Debugf("template execution: falling back to default value")
+			log.Debugw("template execution: falling back to default value", "target", targetName)
 			return defaultVal.Execute(emptyTransformContext(), transformable{}, targetName, nil, log)
 		}
 		return "", err
@@ -107,7 +107,7 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 			val, err = fallback(errExecutingTemplate)
 		}
 		if err != nil {
-			log.Debugf("template execution failed: %v", err)
+			log.Debugw("template execution failed", "target", targetName, "error", err)
 		}
 		tryDebugTemplateValue(targetName, val, log)
 	}()
@@ -142,7 +142,7 @@ func tryDebugTemplateValue(target, val string, log *logp.Logger) {
 	case "Authorization", "Proxy-Authorization":
 		// ignore filtered headers
 	default:
-		log.Debugf("template execution: evaluated template %q", val)
+		log.Debugw("evaluated template", "target", target, "value", val)
 	}
 }
 

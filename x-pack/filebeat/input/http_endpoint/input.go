@@ -17,6 +17,9 @@ import (
 	"time"
 
 	"github.com/rcrowley/go-metrics"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
@@ -146,7 +149,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(e.config, pub, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, pub, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -154,7 +157,6 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle(pattern, newHandler(e.config, pub, log, metrics))
 	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	s = &server{
 		idOf: map[string]string{pattern: ctx.ID},
@@ -163,6 +165,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
+	mux.Handle(pattern, newHandler(s.ctx, e.config, pub, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
@@ -284,25 +287,24 @@ func (s *server) getErr() error {
 	return s.err
 }
 
-func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
-	validator := &apiValidator{
-		basicAuth:    c.BasicAuth,
-		username:     c.Username,
-		password:     c.Password,
-		method:       http.MethodPost,
-		contentType:  c.ContentType,
-		secretHeader: c.SecretHeader,
-		secretValue:  c.SecretValue,
-		hmacHeader:   c.HMACHeader,
-		hmacKey:      c.HMACKey,
-		hmacType:     c.HMACType,
-		hmacPrefix:   c.HMACPrefix,
-	}
-
-	handler := &httpHandler{
-		log:                   log,
-		publisher:             pub,
-		metrics:               metrics,
+func newHandler(ctx context.Context, c config, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
+	h := &handler{
+		log:       log,
+		publisher: pub,
+		metrics:   metrics,
+		validator: apiValidator{
+			basicAuth:    c.BasicAuth,
+			username:     c.Username,
+			password:     c.Password,
+			method:       c.Method,
+			contentType:  c.ContentType,
+			secretHeader: c.SecretHeader,
+			secretValue:  c.SecretValue,
+			hmacHeader:   c.HMACHeader,
+			hmacKey:      c.HMACKey,
+			hmacType:     c.HMACType,
+			hmacPrefix:   c.HMACPrefix,
+		},
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
 		responseBody:          c.ResponseBody,
@@ -310,8 +312,27 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *in
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
-
-	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
+	if c.Tracer != nil {
+		w := zapcore.AddSync(c.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			c.Tracer.Close()
+		}()
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		h.reqLogger = zap.New(core)
+		h.host = c.ListenAddress + ":" + c.ListenPort
+		if c.TLS != nil && c.TLS.IsEnabled() {
+			h.scheme = "https"
+		} else {
+			h.scheme = "http"
+		}
+	}
+	return h
 }
 
 // inputMetrics handles the input's metric reporting.
