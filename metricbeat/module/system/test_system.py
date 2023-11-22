@@ -112,7 +112,7 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "num_threads"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
@@ -420,6 +420,9 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         for evt in output:
             process = evt["system"]["process"]
+            # Not all process will have 'cmdline' due to permission issues,
+            # especially on Windows. Therefore we ensure at least some of
+            # them will have it.
             found_cmdline |= "cmdline" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
@@ -430,11 +433,13 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("fd", None)
             process.pop("cmdline", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
-
-            self.assertTrue(
-                found_cmdline, "cmdline not found in any process events")
+        # After iterating over all process, make sure at least one of them had
+        # the 'cmdline' set.
+        self.assertTrue(
+            found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
@@ -486,6 +491,7 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("cmdline", None)
             process.pop("fd", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 
