@@ -133,3 +133,21 @@ func TestParseProcStat(t *testing.T) {
 
 	assert.Equal(t, want, got, "")
 }
+
+func TestParseIO(t *testing.T) {
+	path := resolve.NewTestResolver("testdata/")
+	data, err := getIOData(path, 42)
+	require.NoError(t, err)
+
+	good := ProcIOInfo{
+		ReadChar:            opt.UintWith(10418),
+		WriteChar:           opt.UintWith(8),
+		ReadSyscalls:        opt.UintWith(14),
+		WriteSyscalls:       opt.UintWith(1),
+		ReadBytes:           opt.UintWith(5243),
+		WriteBytes:          opt.UintWith(128),
+		CancelledWriteBytes: opt.UintWith(4),
+	}
+
+	require.Equal(t, good, data)
+}

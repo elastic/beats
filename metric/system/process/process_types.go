@@ -49,6 +49,7 @@ type ProcState struct {
 	CPU     ProcCPUInfo                       `struct:"cpu,omitempty"`
 	FD      ProcFDInfo                        `struct:"fd,omitempty"`
 	Network *sysinfotypes.NetworkCountersInfo `struct:"-,omitempty"`
+	IO      ProcIOInfo                        `struct:"io,omitempty"`
 
 	// cgroups
 	Cgroup cgroup.CGStats `struct:"cgroup,omitempty"`
@@ -77,6 +78,24 @@ type CPUTotal struct {
 	Ticks opt.Uint   `struct:"ticks,omitempty"`
 	Pct   opt.Float  `struct:"pct,omitempty"`
 	Norm  opt.PctOpt `struct:"norm,omitempty"`
+}
+
+// ProcIOInfo is the struct for I/O counters from /proc/[pid]/io
+type ProcIOInfo struct {
+	// ReadChar is bytes read from the system, as passed from read() and similar syscalls
+	ReadChar opt.Uint `struct:"read_char,omitempty"`
+	// WriteChar is bytes written to the system, as passed to various syscalls
+	WriteChar opt.Uint `struct:"write_char,omitempty"`
+	//ReadSyscalls counts the number of read operations
+	ReadSyscalls opt.Uint `struct:"read_ops,omitempty"`
+	//WriteSyscalls counts the number of write operations
+	WriteSyscalls opt.Uint `struct:"write_ops,omitempty"`
+	// ReadBytes is the count of bytes that were actually fetched from the storage layer
+	ReadBytes opt.Uint `struct:"read_bytes,omitempty"`
+	// WriteBytes is the count of bytes that were actually written to the storage layer
+	WriteBytes opt.Uint `struct:"write_bytes,omitempty"`
+	// the number of bytes which this process caused to not happen, by truncating pagecache
+	CancelledWriteBytes opt.Uint `struct:"cancelled_write_bytes,omitempty"`
 }
 
 // ProcMemInfo is the struct for cpu.memory metrics

@@ -123,6 +123,12 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 	if err != nil {
 		return state, fmt.Errorf("error creating username for pid %d: %w", pid, err)
 	}
+
+	state.IO, err = getIOData(hostfs, pid)
+	if err != nil {
+		return state, fmt.Errorf("error fetching IO metrics for pid %d: %w", pid, err)
+	}
+
 	return state, nil
 }
 
@@ -298,6 +304,44 @@ func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 	share, _ := strconv.ParseUint(fields[2], 10, 64)
 	state.Share = opt.UintWith(share << 12)
 
+	return state, nil
+}
+
+func getIOData(hostfs resolve.Resolver, pid int) (ProcIOInfo, error) {
+	state := ProcIOInfo{}
+	path := hostfs.Join("proc", strconv.Itoa(pid), "io")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return state, fmt.Errorf("error fetching IO metrics: %w", err)
+	}
+
+	for _, metric := range strings.Split(string(data), "\n") {
+		raw := strings.Split(metric, ": ")
+		if len(raw) < 2 {
+			continue
+		}
+		value, err := strconv.ParseUint(raw[1], 10, 64)
+		if err != nil {
+			return state, fmt.Errorf("error converting counters '%s' in io stat file: %w", raw, err)
+		}
+
+		switch raw[0] {
+		case "rchar":
+			state.ReadChar = opt.UintWith(value)
+		case "wchar":
+			state.WriteChar = opt.UintWith(value)
+		case "syscr":
+			state.ReadSyscalls = opt.UintWith(value)
+		case "syscw":
+			state.WriteSyscalls = opt.UintWith(value)
+		case "read_bytes":
+			state.ReadBytes = opt.UintWith(value)
+		case "write_bytes":
+			state.WriteBytes = opt.UintWith(value)
+		case "cancelled_write_bytes":
+			state.CancelledWriteBytes = opt.UintWith(value)
+		}
+	}
 	return state, nil
 }
 
