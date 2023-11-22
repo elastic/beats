@@ -67,25 +67,30 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Service{}, err)
 	}
 
+	metaConf := config.AddResourceMetadata
+
 	var namespaceMeta metadata.MetaGen
+	var options kubernetes.WatchOptions
 	var namespaceWatcher kubernetes.Watcher
+	if metaConf.Namespace.Enabled() {
+		options = kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Namespace:   config.Namespace,
+		}
+		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, options, nil)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
+		}
 
-	metaConf := metadata.GetDefaultResourceMetadataConfig()
-	namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
-	}, nil)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
+		namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+
 	}
-
-	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
 
 	p := &service{
 		config:           config,
 		uuid:             uuid,
 		publish:          publish,
-		metagen:          metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, client),
+		metagen:          namespaceMeta,
 		namespaceWatcher: namespaceWatcher,
 		logger:           logger,
 		watcher:          watcher,
