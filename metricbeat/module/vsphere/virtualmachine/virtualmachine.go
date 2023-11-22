@@ -238,9 +238,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 					"count": virtualMachine.Summary.Config.NumVirtualDisks,
 				},
 				"storage": mapstr.M{
-					"committed":  virtualMachine.Summary.Storage.Committed,
-					"uncommited": virtualMachine.Summary.Storage.Uncommitted,
-					"total":      virtualMachine.Summary.Storage.Committed + virtualMachine.Summary.Storage.Uncommitted,
+					"committed":   virtualMachine.Summary.Storage.Committed,
+					"uncommitted": virtualMachine.Summary.Storage.Uncommitted,
+					"total":       virtualMachine.Summary.Storage.Committed + virtualMachine.Summary.Storage.Uncommitted,
 				},
 				"heartbeat_status": virtualMachine.GuestHeartbeatStatus,
 				"connection_state": virtualMachine.Summary.Runtime.ConnectionState,
@@ -326,10 +326,10 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				switch series := value.(type) {
 				case *types.PerfMetricIntSeries:
 					counter := counterMap[series.Id.CounterId]
-					event.Put(counter, series.Value)
+					event.Put(counter, series.Value[0])
 				case *types.PerfMetricSeriesCSV:
 					counter := counterMap[series.Id.CounterId]
-					event.Put(counter, series.Value)
+					event.Put(counter, series.Value[0])
 				default:
 					m.Logger().Debug("metric is of an unknown type, skipping")
 				}
