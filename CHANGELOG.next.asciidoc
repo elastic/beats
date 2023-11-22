@@ -218,6 +218,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
 - Made GCS input GA and updated docs accordingly. {pull}37127[37127]
 - Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
+- Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
 
 *Auditbeat*
 

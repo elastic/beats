@@ -140,7 +140,7 @@ The field should be an array, but in the case of an error condition in the CEL p
 
 <3> If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The {mito_docs}/lib#Limit[Limit], and {mito_docs}/lib#OktaRateLimit[Okta Rate Limit policy] and {mito_docs}/lib#DraftRateLimit[Draft Rate Limit policy] documentation show how to construct this field.
 
-<4> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
+<4> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
 
 The `status_code`, `header` and `rate_limit` values may be omitted if the program is not interacting with an HTTP API end-point and so will not be needed to contribute to program control.
 
