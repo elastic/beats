@@ -163,7 +163,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Create a Performance Manager instance
 	perfManager := performance.NewManager(c)
 
-	// gets a counterInfo object that describes all available counters for virtualMachines
+	// Gets a counterInfo object that describes all available counters for virtualMachines
 	counterInfo, err := perfManager.CounterInfo(ctx)
 	if err != nil {
 		log.Fatalf("Error retrieving counter info: %v", err)
@@ -205,7 +205,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		// Perform the query for all VMs at once
 		metricBase, err := perfManager.SampleByName(ctx, querySpec, metricsToQuery, chunk)
 		if err != nil {
-			return fmt.Errorf("Error retrieving metrics: %s\n", err)
+			return fmt.Errorf("error retrieving metrics: %s\n", err)
 		}
 
 		// Assign metrics to the event output
