@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
 
 *Filebeat*
 
