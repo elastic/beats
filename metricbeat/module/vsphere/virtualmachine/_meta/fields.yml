@@ -160,9 +160,6 @@
     - name: cpu.reserved
       type: long
       description: "Amount of CPU resources reserved for the virtual machine."
-    - name: cpu.ready.percentage
-      type: float
-      description: "Percentage of time the CPU is ready to run on the virtual machine."
     - name: cpu.ready.summation
       type: long
       description: "Summation of CPU ready time for the virtual machine."
