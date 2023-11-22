@@ -130,7 +130,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Create view of VirtualMachine objects
 	mgr := view.NewManager(c)
 
-	// if perform initial population of the host, resource pool, network, and datastore maps
+	// If first run perform initial population of the host, resource pool, network, and datastore maps
 	if len(m.RpMap) == 0 {
 		m.RpMap, err = m.getResourcePoolMap(ctx, c, mgr)
 		if err != nil {
