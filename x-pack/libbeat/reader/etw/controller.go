@@ -28,7 +28,7 @@ func (s *Session) GetHandler() error {
 	}
 
 	// Query the current state of the ETW session.
-	if err = _ControlTrace(
+	if err = ControlTraceFunc(
 		0,
 		sessionNamePtr,
 		s.Properties,
@@ -60,7 +60,7 @@ func (s *Session) CreateRealtimeSession() error {
 	}
 
 	// Start the ETW trace session.
-	err = _StartTrace(
+	err = StartTraceFunc(
 		&s.Handler,
 		sessionPtr,
 		s.Properties,
@@ -82,7 +82,7 @@ func (s *Session) CreateRealtimeSession() error {
 	}
 
 	// Enable the trace session with extended options.
-	if err := _EnableTraceEx2(
+	if err := EnableTraceFunc(
 		s.Handler,
 		(*GUID)(unsafe.Pointer(&s.GUID)),
 		EVENT_CONTROL_CODE_ENABLE_PROVIDER,
@@ -111,14 +111,14 @@ func (s *Session) StopSession() error {
 	if s.Realtime {
 		if isValidHandler(s.TraceHandler) {
 			// Attempt to close the trace and handle potential errors.
-			if err := _CloseTrace(s.TraceHandler); err != nil && err != ERROR_CTX_CLOSE_PENDING {
+			if err := CloseTraceFunc(s.TraceHandler); err != nil && err != ERROR_CTX_CLOSE_PENDING {
 				return fmt.Errorf("failed to close trace: %w", err)
 			}
 		}
 
 		if s.NewSession {
 			// If we created the session, send a control command to stop it.
-			return _ControlTrace(
+			return ControlTraceFunc(
 				s.Handler,
 				nil,
 				s.Properties,

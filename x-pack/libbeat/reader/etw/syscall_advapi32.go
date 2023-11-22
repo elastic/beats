@@ -17,8 +17,8 @@ var (
 	advapi32 = windows.NewLazySystemDLL("advapi32.dll")
 	// Controller
 	startTraceW    = advapi32.NewProc("StartTraceW")
-	enableTrace    = advapi32.NewProc("EnableTrace")    // Classic providers
-	enableTraceEx  = advapi32.NewProc("EnableTraceEx")  // Manifest-based providers
+	enableTrace    = advapi32.NewProc("EnableTrace")    // Classic providers (not used for now)
+	enableTraceEx  = advapi32.NewProc("EnableTraceEx")  // Manifest-based providers (not used for now)
 	enableTraceEx2 = advapi32.NewProc("EnableTraceEx2") // Manifest-based providers and filtering
 	controlTraceW  = advapi32.NewProc("ControlTraceW")
 	// Consumer
@@ -242,6 +242,17 @@ type GUID struct {
 	Data3 uint16
 	Data4 [8]byte
 }
+
+// For testing purposes we create a variable to store the function to call
+// When running tests, these variables point to a mock function
+var (
+	StartTraceFunc   = _StartTrace
+	EnableTraceFunc  = _EnableTraceEx2
+	ControlTraceFunc = _ControlTrace
+	OpenTraceFunc    = _OpenTrace
+	ProcessTraceFunc = _ProcessTrace
+	CloseTraceFunc   = _CloseTrace
+)
 
 // Wrappers
 

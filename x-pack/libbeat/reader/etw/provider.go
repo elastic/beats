@@ -50,7 +50,7 @@ func GUIDFromProviderName(providerName string) (GUID, error) {
 	for {
 		tmp := make([]byte, size)
 		buf = (*ProviderEnumerationInfo)(unsafe.Pointer(&tmp[0]))
-		if err := _TdhEnumerateProviders(buf, &size); err != ERROR_INSUFFICIENT_BUFFER {
+		if err := EnumerateProvidersFunc(buf, &size); err != ERROR_INSUFFICIENT_BUFFER {
 			break
 		}
 	}

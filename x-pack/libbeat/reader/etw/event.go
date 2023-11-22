@@ -13,7 +13,7 @@ import (
 	"unsafe"
 )
 
-// TODO: DefaultBufferCallback receives stats from the buffer
+// DefaultBufferCallback receives stats from the buffer
 func DefaultBufferCallback(etl *EventTraceLogfile) uintptr {
 	// fmt.Printf("Buffers read: %d\n", etl.BuffersRead)
 	// fmt.Printf("Buffer size: %d\n", etl.BufferSize)
@@ -23,6 +23,8 @@ func DefaultBufferCallback(etl *EventTraceLogfile) uintptr {
 
 	// return True (1) to continue the processing
 	// return False (0) to stop processing events
+
+	// TODO: Push these buffer stats to the publish queue or logfile?
 	return 1
 }
 

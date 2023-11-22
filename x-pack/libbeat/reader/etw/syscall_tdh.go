@@ -220,6 +220,9 @@ type PropertyDataDescriptor struct {
 	Reserved     uint32
 }
 
+// Interface to replace the pointer to the function in unit tests
+var EnumerateProvidersFunc = _TdhEnumerateProviders
+
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviders
 func _TdhEnumerateProviders(
 	pBuffer *ProviderEnumerationInfo,

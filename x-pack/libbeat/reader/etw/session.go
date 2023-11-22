@@ -14,6 +14,13 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+// For testing purposes we create a variable to store the function to call
+// When running tests, these variables point to a mock function
+var (
+	GUIDFromProviderNameFunc = GUIDFromProviderName
+	SetSessionGUIDFunc       = setSessionGUID
+)
+
 type Session struct {
 	Name            string // Identifier of the session
 	GUID            GUID
@@ -53,7 +60,7 @@ func setSessionGUID(conf Config) (GUID, error) {
 
 	// If ProviderGUID is not set in the configuration, attempt to resolve it using the provider name.
 	if conf.ProviderGUID == "" {
-		guid, err = GUIDFromProviderName(conf.ProviderName)
+		guid, err = GUIDFromProviderNameFunc(conf.ProviderName)
 		if err != nil {
 			return GUID{}, fmt.Errorf("error resolving GUID: %w", err)
 		}
@@ -131,6 +138,12 @@ func NewSession(conf Config) (Session, error) {
 	session.Name = setSessionName(conf)
 	session.Realtime = true
 
+	// Set default callbacks if not already specified.
+	if session.Callback == 0 {
+		session.Callback = syscall.NewCallback(DefaultCallback)
+	}
+	session.BufferCallback = syscall.NewCallback(DefaultBufferCallback)
+
 	// If a current session is configured, set up the session properties and return.
 	if conf.Session != "" {
 		session.Properties = newSessionProperties(session.Name)
@@ -153,12 +166,6 @@ func NewSession(conf Config) (Session, error) {
 	session.TraceLevel = getTraceLevel(conf.TraceLevel)
 	session.MatchAnyKeyword = conf.MatchAnyKeyword
 	session.MatchAllKeyword = conf.MatchAllKeyword
-
-	// Set default callbacks if not already specified.
-	if session.Callback == 0 {
-		session.Callback = syscall.NewCallback(DefaultCallback)
-	}
-	session.BufferCallback = syscall.NewCallback(DefaultBufferCallback)
 
 	return session, nil
 }
