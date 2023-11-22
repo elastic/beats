@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
 - The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
+- Fix too-frequent API calls made to vCenter for host and network information lookups in the vSphere module. {pull}37137[37137]
 
 *Osquerybeat*
 
@@ -223,6 +224,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
+- Add support for all metrics and multiple additional configration items returned by a vCenter server for the virtualmachine metric set in the vSphere module. {pull}37137[37137]
 
 
 *Osquerybeat*
