@@ -99,7 +99,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	metaConf := config.AddResourceMetadata
 
 	var options kubernetes.WatchOptions
-	if metaConf.Node.Enabled() {
+	if metaConf.Node.Enabled() || config.Hints.Enabled() {
 		options = kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Node:        config.Node,
@@ -109,7 +109,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 		}
 	}
-	if metaConf.Namespace.Enabled() {
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		options = kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Namespace:   config.Namespace,
@@ -162,12 +162,12 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 
 	watcher.AddEventHandler(p)
 
-	if nodeWatcher != nil && config.Hints.Enabled() {
+	if nodeWatcher != nil {
 		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
 		nodeWatcher.AddEventHandler(updater)
 	}
 
-	if namespaceWatcher != nil && config.Hints.Enabled() {
+	if namespaceWatcher != nil {
 		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
 		namespaceWatcher.AddEventHandler(updater)
 	}

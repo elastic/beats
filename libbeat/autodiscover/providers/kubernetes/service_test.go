@@ -432,6 +432,90 @@ func TestEmitEvent_Service(t *testing.T) {
 	}
 }
 
+func TestServiceEventer_NamespaceWatcher(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		cfg         mapstr.M
+		expectedNil bool
+		name        string
+		msg         string
+	}{
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: true,
+			name:        "add_resource_metadata.namespace disabled and hints disabled.",
+			msg:         "Namespace watcher should be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+				},
+				"hints.enabled": true,
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace disabled and hints enabled.",
+			msg:         "Namespace watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": true,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace enabled and hints disabled.",
+			msg:         "Namespace watcher should not be nil.",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			config := conf.MustNewConfigFrom(&test.cfg)
+
+			eventer, err := NewServiceEventer(uuid, config, client, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			namespaceWatcher := eventer.(*service).namespaceWatcher
+
+			if test.expectedNil {
+				assert.Equalf(t, nil, namespaceWatcher, test.msg)
+			} else {
+				assert.NotEqualf(t, nil, namespaceWatcher, test.msg)
+			}
+		})
+	}
+}
+
 func NewMockServiceEventerManager(svc *service) EventManager {
 	em := &eventerManager{}
 	em.eventer = svc

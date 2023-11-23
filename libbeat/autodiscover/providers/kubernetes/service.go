@@ -72,7 +72,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	var namespaceMeta metadata.MetaGen
 	var options kubernetes.WatchOptions
 	var namespaceWatcher kubernetes.Watcher
-	if metaConf.Namespace.Enabled() {
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		options = kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Namespace:   config.Namespace,
