@@ -90,7 +90,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 		config:           config,
 		uuid:             uuid,
 		publish:          publish,
-		metagen:          namespaceMeta,
+		metagen:          metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, client),
 		namespaceWatcher: namespaceWatcher,
 		logger:           logger,
 		watcher:          watcher,
