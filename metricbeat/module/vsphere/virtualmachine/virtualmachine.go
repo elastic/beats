@@ -151,9 +151,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	// create bool variables that can be set to true if refreshes are needed
-	var rpRefreshRequired bool
-	var hostRefreshRequired bool
-	var dsRefreshRequired bool
+	var rpRefreshRequired, hostRefreshRequired, dsRefreshRequired bool
 
 	var rpList = make([]string, 0, len(m.RpMap))
 	for _, rp := range m.RpMap {
