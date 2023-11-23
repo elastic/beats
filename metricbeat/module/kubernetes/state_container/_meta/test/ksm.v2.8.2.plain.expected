@@ -76,6 +76,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time":1691568404,
 				"restarts": 0
 			}
 		},
@@ -164,6 +165,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time": 1691566355,
 				"restarts": 0
 			}
 		},
@@ -208,6 +210,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time":1691566351,
 				"restarts": 0
 			}
 		},
@@ -247,6 +250,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time": 1691568404,
 				"restarts": 0
 			}
 		},
@@ -335,6 +339,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time": 1691566345,
 				"restarts": 0
 			}
 		},
@@ -414,6 +419,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time":1691568412,
 				"restarts": 0
 			}
 		},
@@ -466,6 +472,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time": 1691566360,
 				"restarts": 0
 			}
 		},
@@ -561,6 +568,7 @@
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"last_ready_time": 1691566357,
 				"restarts": 0
 			}
 		},

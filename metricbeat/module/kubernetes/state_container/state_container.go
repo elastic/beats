@@ -60,6 +60,7 @@ var (
 			)),
 
 			"kube_pod_container_status_ready":                  p.BooleanMetric("status.ready"),
+			"kube_pod_status_container_ready_time":             p.Metric("status.last_ready_time"),
 			"kube_pod_container_status_restarts_total":         p.Metric("status.restarts"),
 			"kube_pod_container_status_running":                p.KeywordMetric("status.phase", "running"),
 			"kube_pod_container_status_terminated":             p.KeywordMetric("status.phase", "terminated"),

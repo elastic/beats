@@ -45576,6 +45576,7 @@ kubernetes container metrics
 --
 Container id
 
+
 type: keyword
 
 --
@@ -45598,6 +45599,16 @@ Container ready status
 
 
 type: boolean
+
+--
+
+*`kubernetes.container.status.last_ready_time`*::
++
+--
+Time when the container of the pod entered Ready state
+
+
+type: date
 
 --
 

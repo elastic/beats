@@ -6,7 +6,7 @@
   fields:
     - name: id
       type: keyword
-      description:
+      description: >
         Container id
     - name: status
       type: group
@@ -14,11 +14,15 @@
         - name: phase
           type: keyword
           description: >
-                Container phase (running, waiting, terminated)
+            Container phase (running, waiting, terminated)
         - name: ready
           type: boolean
           description: >
             Container ready status
+        - name: last_ready_time
+          type: date
+          description: >
+            Time when the container of the pod entered Ready state
         - name: restarts
           type: integer
           description: >
