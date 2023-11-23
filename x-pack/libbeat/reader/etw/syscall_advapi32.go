@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"errors"
 	"syscall"
 	"unsafe"
 
@@ -278,7 +279,7 @@ func _EnableTraceEx2(traceHandle uintptr,
 	enableProperty uint32,
 	enableParameters *EnableTraceParameters) error {
 	r0, _, _ := enableTraceEx2.Call(
-		uintptr(traceHandle),
+		traceHandle,
 		uintptr(unsafe.Pointer(providerId)),
 		uintptr(isEnabled),
 		uintptr(level),
@@ -298,7 +299,7 @@ func _ControlTrace(traceHandle uintptr,
 	properties *EventTraceProperties,
 	controlCode uint32) error {
 	r0, _, _ := controlTraceW.Call(
-		uintptr(traceHandle),
+		traceHandle,
 		uintptr(unsafe.Pointer(instanceName)),
 		uintptr(unsafe.Pointer(properties)),
 		uintptr(controlCode))
@@ -312,7 +313,8 @@ func _ControlTrace(traceHandle uintptr,
 func _OpenTrace(logfile *EventTraceLogfile) (uint64, error) {
 	r0, _, err := openTraceW.Call(
 		uintptr(unsafe.Pointer(logfile)))
-	if err.(syscall.Errno) == 0 {
+	var errno syscall.Errno
+	if errors.As(err, &errno) && errno == 0 {
 		return uint64(r0), nil
 	}
 	return uint64(r0), err

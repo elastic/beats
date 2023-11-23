@@ -14,13 +14,12 @@ import (
 )
 
 var (
-	tdh                                  = windows.NewLazySystemDLL("tdh.dll")
-	tdhEnumerateProviders                = tdh.NewProc("TdhEnumerateProviders")
-	tdhEnumerateProviderFieldInformation = tdh.NewProc("TdhEnumerateProviderFieldInformation")
-	tdhGetEventInformation               = tdh.NewProc("TdhGetEventInformation")
-	tdhGetEventMapInformation            = tdh.NewProc("TdhGetEventMapInformation")
-	tdhFormatProperty                    = tdh.NewProc("TdhFormatProperty")
-	tdhGetProperty                       = tdh.NewProc("TdhGetProperty")
+	tdh                       = windows.NewLazySystemDLL("tdh.dll")
+	tdhEnumerateProviders     = tdh.NewProc("TdhEnumerateProviders")
+	tdhGetEventInformation    = tdh.NewProc("TdhGetEventInformation")
+	tdhGetEventMapInformation = tdh.NewProc("TdhGetEventMapInformation")
+	tdhFormatProperty         = tdh.NewProc("TdhFormatProperty")
+	tdhGetProperty            = tdh.NewProc("TdhGetProperty")
 )
 
 const ANYSIZE_ARRAY = 1 << 25
@@ -220,7 +219,7 @@ type PropertyDataDescriptor struct {
 	Reserved     uint32
 }
 
-// Interface to replace the pointer to the function in unit tests
+// EnumerateProvidersFunc is used to replace the pointer to the function in unit tests
 var EnumerateProvidersFunc = _TdhEnumerateProviders
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviders

@@ -7,7 +7,6 @@
 package etw
 
 import (
-	"encoding/binary"
 	"syscall"
 	"testing"
 	"unsafe"
@@ -61,6 +60,14 @@ func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 	mockProviderName := "NonExistentProvider"
 
 	EnumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
+		// Check if the buffer size is sufficient
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{})) + uint32(unsafe.Sizeof(TraceProviderInfo{}))*0 // As there are no providers
+		if *pBufferSize < requiredSize {
+			// Set the size required and return the error
+			*pBufferSize = requiredSize
+			return ERROR_INSUFFICIENT_BUFFER
+		}
+
 		// Empty list of providers
 		*pBuffer = ProviderEnumerationInfo{
 			NumberOfProviders:      0,
@@ -85,12 +92,14 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 	mockGUID := GUID{Data1: 1234, Data2: 5678}
 
 	EnumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
-		// Create and populate a buffer for the provider name
-		utf16Name, _ := syscall.UTF16FromString(realProviderName)
-		nameBuffer := make([]byte, len(utf16Name)*2)
-		for i, v := range utf16Name {
-			binary.LittleEndian.PutUint16(nameBuffer[i*2:], v)
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{})) + uint32(unsafe.Sizeof(TraceProviderInfo{}))*1 // Size for one provider
+		if *pBufferSize < requiredSize {
+			*pBufferSize = requiredSize
+			return ERROR_INSUFFICIENT_BUFFER
 		}
+
+		// Create and populate a buffer for the provider name
+		utf16Ptr, _ := syscall.UTF16PtrFromString(realProviderName)
 
 		// Create and populate the ProviderEnumerationInfo
 		*pBuffer = ProviderEnumerationInfo{
@@ -98,7 +107,7 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{
 				{
 					ProviderGuid:       mockGUID,
-					ProviderNameOffset: uint32(uintptr(unsafe.Pointer(&nameBuffer[0]))),
+					ProviderNameOffset: uint32(uintptr(unsafe.Pointer(utf16Ptr))),
 				},
 			},
 		}
@@ -120,12 +129,14 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 	mockGUID := GUID{Data1: 1234, Data2: 5678}
 
 	EnumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
-		// Create and populate a buffer for the provider name
-		utf16Name, _ := syscall.UTF16FromString(mockProviderName)
-		nameBuffer := make([]byte, len(utf16Name)*2)
-		for i, v := range utf16Name {
-			binary.LittleEndian.PutUint16(nameBuffer[i*2:], v)
+		requiredSize := uint32(unsafe.Sizeof(ProviderEnumerationInfo{})) + uint32(unsafe.Sizeof(TraceProviderInfo{}))*1 // Size for one provider
+		if *pBufferSize < requiredSize {
+			*pBufferSize = requiredSize
+			return ERROR_INSUFFICIENT_BUFFER
 		}
+
+		// Create and populate a buffer for the provider name
+		utf16Ptr, _ := syscall.UTF16PtrFromString(mockProviderName)
 
 		// Create and populate the ProviderEnumerationInfo
 		*pBuffer = ProviderEnumerationInfo{
@@ -133,7 +144,7 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{
 				{
 					ProviderGuid:       mockGUID,
-					ProviderNameOffset: uint32(uintptr(unsafe.Pointer(&nameBuffer[0]))),
+					ProviderNameOffset: uint32(uintptr(unsafe.Pointer(utf16Ptr))),
 				},
 			},
 		}
