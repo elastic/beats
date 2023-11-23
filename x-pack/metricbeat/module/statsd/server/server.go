@@ -197,7 +197,9 @@ func (m *MetricSet) ServerStart() {
 	if m.serverStarted {
 		return
 	}
-	m.server.Start()
+	if err := m.server.Start(); err != nil {
+		m.Logger().Errorw("could not start statsd server for module: "+m.Module().Name(), "error", err)
+	}
 	m.serverStarted = true
 }
 

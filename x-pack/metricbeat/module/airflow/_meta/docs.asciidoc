@@ -1,5 +1,5 @@
 This module collects metrics from
-https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html[Airflow metrics] running a
+https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html[Airflow metrics]. It runs a
 statsd server where airflow will send metrics to. The default metricset is `statsd`.
 
 [float]
@@ -10,9 +10,13 @@ The Airflow module is tested with Airflow 2.1.0. It should work with version
 
 [float]
 === Usage
-The Airflow module requires <<metricbeat-module-statsd,Statsd>> to receive Statsd metrics. Refer to the link for instructions about how to use Statsd.
+The Airflow module requires <<metricbeat-module-statsd,Statsd>> to
+receive statsd metrics. Refer to the link for instructions about how
+to use statsd.
 
-Add the following lines to your Airflow configuration file e.g. `airflow.cfg` ensuring `statsd_prefix` is left empty and replace `%METRICBEAT_HOST%` with the address metricbeat is running:
+Add the following lines to your Airflow configuration file
+e.g. `airflow.cfg` ensuring `statsd_prefix` is left empty and replace
+`%METRICBEAT_HOST%` with the address where metricbeat is running:
 
 ```
 [metrics]
