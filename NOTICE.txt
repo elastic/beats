@@ -15600,11 +15600,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.6.0
+Version: v1.7.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.7.0/LICENSE:
 
 
                                  Apache License
@@ -17587,11 +17587,11 @@ Contents of probable licence file $GOMODCACHE/github.com/gomodule/redigo@v1.8.3/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/cel-go
-Version: v0.15.3
+Version: v0.17.7
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/cel-go@v0.15.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/cel-go@v0.17.7/LICENSE:
 
 
                                  Apache License

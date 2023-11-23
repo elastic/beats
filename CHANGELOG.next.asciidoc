@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
 
 *Filebeat*
 
@@ -217,6 +218,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
 - Made GCS input GA and updated docs accordingly. {pull}37127[37127]
 - Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
+- Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
+- Update CEL extensions library to v1.7.0. {pull}37172[37172]
 
 *Auditbeat*
 
