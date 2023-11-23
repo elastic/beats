@@ -64,8 +64,8 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 	bbuf := bytes.NewBuffer(buf)
 
-	procMap := make(ProcsMap, 0)
-	var plist []ProcState
+	procMap := make(ProcsMap, num)
+	plist := make([]ProcState, 0, num)
 
 	for i := 0; i < num; i++ {
 		if err := binary.Read(bbuf, binary.LittleEndian, &pid); err != nil {
@@ -193,7 +193,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 	}
 
 	// read CLI args
-	var argv []string
+	argv := make([]string, 0, argc)
 	for i := 0; i < int(argc); i++ {
 		arg, err := bbuf.ReadBytes(0)
 		if err == io.EOF {

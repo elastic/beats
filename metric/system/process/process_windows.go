@@ -38,8 +38,8 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		return nil, nil, fmt.Errorf("EnumProcesses failed: %w", err)
 	}
 
-	procMap := make(ProcsMap, 0)
-	var plist []ProcState
+	procMap := make(ProcsMap, len(pids))
+	plist := make([]ProcState, 0, len(pids))
 	// This is probably the only implementation that doesn't benefit from our
 	// little fillPid callback system. We'll need to iterate over everything
 	// manually.

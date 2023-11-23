@@ -115,8 +115,8 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	}
 
 	// Format the list to the MapStr type used by the outputs
-	var procs []mapstr.M
-	var rootEvents []mapstr.M
+	procs := make([]mapstr.M, 0, len(plist))
+	rootEvents := make([]mapstr.M, 0, len(plist))
 
 	for _, process := range plist {
 		process := process

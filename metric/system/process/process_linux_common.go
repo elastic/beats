@@ -58,8 +58,8 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		return nil, nil, fmt.Errorf("error reading directory names: %w", err)
 	}
 
-	procMap := make(ProcsMap)
-	var plist []ProcState
+	procMap := make(ProcsMap, len(names))
+	plist := make([]ProcState, 0, len(names))
 
 	// Iterate over the directory, fetch just enough info so we can filter based on user input.
 	logger := logp.L()

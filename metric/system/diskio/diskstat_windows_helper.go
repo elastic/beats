@@ -59,7 +59,7 @@ func ioCounters(names ...string) (map[string]disk.IOCountersStat, error) {
 	if err != nil || len(logicalDisks) == 0 {
 		return nil, err
 	}
-	ret := make(map[string]disk.IOCountersStat)
+	ret := make(map[string]disk.IOCountersStat, len(logicalDisks))
 	for _, drive := range logicalDisks {
 		// not get _Total or Harddrive
 		if len(drive.Name) > 3 {
@@ -158,7 +158,7 @@ func getLogicalDriveStrings() ([]logicalDrive, error) {
 		}
 		return nil, err
 	}
-	var logicalDrives []logicalDrive
+	logicalDrives := make([]logicalDrive, 0, len(lpBuffer))
 	for _, v := range lpBuffer {
 		if v >= 65 && v <= 90 {
 			s := string(v)
