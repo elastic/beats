@@ -18,7 +18,7 @@ import (
 func TestUTF16PtrToString(t *testing.T) {
 	// Create a UTF-16 string
 	sampleText := "This is a string test!"
-	utf16Str := syscall.StringToUTF16(sampleText)
+	utf16Str, _ := syscall.UTF16FromString(sampleText)
 
 	// Convert to *uint16
 	ptr := &utf16Str[0]
@@ -31,7 +31,7 @@ func TestUTF16PtrToString(t *testing.T) {
 func TestUTF16AtOffsetToString(t *testing.T) {
 	// Create a UTF-16 string
 	sampleText := "This is a string test!"
-	utf16Str := syscall.StringToUTF16(sampleText)
+	utf16Str, _ := syscall.UTF16FromString(sampleText)
 
 	// Convert it to uintptr (simulate as if it's part of a larger struct)
 	ptr := uintptr(unsafe.Pointer(&utf16Str[0]))
@@ -42,7 +42,7 @@ func TestUTF16AtOffsetToString(t *testing.T) {
 
 	// Test with offset (skip the first character)
 	offset := unsafe.Sizeof(utf16Str[0]) // Size of one UTF-16 character
-	resultWithOffset := UTF16AtOffsetToString(ptr, uintptr(offset))
+	resultWithOffset := UTF16AtOffsetToString(ptr, offset)
 	assert.Equal(t, sampleText[1:], resultWithOffset, "The converted string with offset should skip the first character")
 }
 

@@ -17,8 +17,6 @@ var (
 	advapi32 = windows.NewLazySystemDLL("advapi32.dll")
 	// Controller
 	startTraceW    = advapi32.NewProc("StartTraceW")
-	enableTrace    = advapi32.NewProc("EnableTrace")    // Classic providers (not used for now)
-	enableTraceEx  = advapi32.NewProc("EnableTraceEx")  // Manifest-based providers (not used for now)
 	enableTraceEx2 = advapi32.NewProc("EnableTraceEx2") // Manifest-based providers and filtering
 	controlTraceW  = advapi32.NewProc("ControlTraceW")
 	// Consumer
@@ -264,50 +262,6 @@ func _StartTrace(traceHandle *uintptr,
 		uintptr(unsafe.Pointer(traceHandle)),
 		uintptr(unsafe.Pointer(instanceName)),
 		uintptr(unsafe.Pointer(properties)))
-	if r0 == 0 {
-		return nil
-	}
-	return syscall.Errno(r0)
-}
-
-// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletrace
-func _EnableTrace(enable uint32,
-	enableFlag uint32,
-	enableLevel uint32,
-	controlGuid *GUID,
-	traceHandle uintptr) error {
-	r0, _, _ := enableTrace.Call(
-		uintptr(enable),
-		uintptr(enableFlag),
-		uintptr(enableLevel),
-		uintptr(unsafe.Pointer(controlGuid)),
-		uintptr(traceHandle))
-	if r0 == 0 {
-		return nil
-	}
-	return syscall.Errno(r0)
-}
-
-// https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex
-func _EnableTraceEx(providerId *GUID,
-	sourceId *GUID,
-	traceHandle uintptr,
-	controlCode uint32,
-	level uint8,
-	matchAnyKeyword uint64,
-	matchAllKeyword uint64,
-	timeout uint32,
-	enableFilterDesc *EventFilterDescriptor) error {
-	r0, _, _ := enableTraceEx.Call(
-		uintptr(unsafe.Pointer(providerId)),
-		uintptr(unsafe.Pointer(sourceId)),
-		uintptr(traceHandle),
-		uintptr(controlCode),
-		uintptr(level),
-		uintptr(matchAnyKeyword),
-		uintptr(matchAllKeyword),
-		uintptr(timeout),
-		uintptr(unsafe.Pointer(enableFilterDesc)))
 	if r0 == 0 {
 		return nil
 	}

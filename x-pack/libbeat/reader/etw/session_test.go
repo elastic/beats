@@ -145,8 +145,6 @@ func TestNewSessionProperties(t *testing.T) {
 	}
 }
 
-var mockSetSessionGUID = setSessionGUID
-
 func TestNewSession_ProviderName(t *testing.T) {
 	// Backup original function
 	originalSetSessionGUID := SetSessionGUIDFunc
