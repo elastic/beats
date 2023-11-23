@@ -74,9 +74,10 @@ var (
 			"pod":       p.KeyLabel("name"),
 			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 
-			"node":    p.Label(mb.ModuleDataKey + ".node.name"),
-			"pod_ip":  p.Label("ip"),
-			"host_ip": p.Label("host_ip"),
+			"node":            p.Label(mb.ModuleDataKey + ".node.name"),
+			"pod_ip":          p.Label("ip"),
+			"host_ip":         p.Label("host_ip"),
+			"created_by_kind": p.Label("created_by_kind"),
 		},
 	}
 )
