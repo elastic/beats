@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"errors"
 	"fmt"
 	"syscall"
 )
@@ -43,9 +44,9 @@ func (s *Session) StartConsumer() error {
 	s.TraceHandler, err = OpenTraceFunc(&elf)
 	if err != nil {
 		// Handle specific errors for trace opening.
-		if err == ERROR_BAD_PATHNAME {
+		if errors.Is(err, ERROR_BAD_PATHNAME) {
 			return fmt.Errorf("invalid log source when opening trace: %w", err)
-		} else if err == ERROR_ACCESS_DENIED {
+		} else if errors.Is(err, ERROR_ACCESS_DENIED) {
 			return fmt.Errorf("access denied when opening trace: %w", err)
 		}
 		return fmt.Errorf("failed to open trace: %w", err)

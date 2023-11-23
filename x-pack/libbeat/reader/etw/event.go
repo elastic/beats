@@ -8,7 +8,9 @@ package etw
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"unicode/utf16"
 	"unsafe"
 )
@@ -52,9 +54,7 @@ func DefaultCallback(er *EventRecord) {
 	if err != nil {
 		return
 	}
-	fmt.Println(string(jsonData))
-
-	return
+	log.Println(string(jsonData))
 }
 
 // propertyParser is used for parsing properties from raw EVENT_RECORD structures.
@@ -115,7 +115,7 @@ func newPropertyParser(er *EventRecord) (*propertyParser, error) {
 func getEventInformation(er *EventRecord) (info *TraceEventInfo, err error) {
 	// Initially call TdhGetEventInformation to get the required buffer size.
 	var bufSize uint32
-	if err = _TdhGetEventInformation(er, 0, nil, nil, &bufSize); err == ERROR_INSUFFICIENT_BUFFER {
+	if err = _TdhGetEventInformation(er, 0, nil, nil, &bufSize); errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
 		// Allocate enough memory for TRACE_EVENT_INFO based on the required size.
 		buff := make([]byte, bufSize)
 		info = ((*TraceEventInfo)(unsafe.Pointer(&buff[0])))
@@ -315,17 +315,14 @@ retryLoop:
 			&userDataConsumed,
 		)
 
-		switch err {
-		case nil:
+		if err == nil {
 			// If formatting is successful, break out of the loop.
 			break retryLoop
-
-		case ERROR_INSUFFICIENT_BUFFER:
+		} else if errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
 			// Increase the buffer size if it's insufficient.
 			formattedData = make([]byte, formattedDataSize)
 			continue
-
-		case ERROR_EVT_INVALID_EVENT_DATA:
+		} else if errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA) {
 			// Handle invalid event data error.
 			// Discarding MapInfo allows us to access
 			// at least the non-interpreted data.
@@ -333,9 +330,8 @@ retryLoop:
 				mapInfo = nil
 				continue
 			}
-			fallthrough // Unknown error
-
-		default:
+			return "", fmt.Errorf("TdhFormatProperty failed: %w", err) // Handle unknown error
+		} else {
 			return "", fmt.Errorf("TdhFormatProperty failed: %w", err)
 		}
 	}
@@ -359,12 +355,11 @@ func (p *propertyParser) getMapInfo(propertyInfo EventPropertyInfo) (*EventMapIn
 		nil,
 		&mapSize,
 	)
-	switch err {
-	case ERROR_NOT_FOUND:
+	if errors.Is(err, ERROR_NOT_FOUND) {
 		return nil, nil // No mapping information available. This is not an error.
-	case ERROR_INSUFFICIENT_BUFFER:
+	} else if errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
 		// Resize the buffer and try again.
-	default:
+	} else {
 		return nil, fmt.Errorf("TdhGetEventMapInformation failed to get size: %w", err)
 	}
 

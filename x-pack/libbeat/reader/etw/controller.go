@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"errors"
 	"fmt"
 	"syscall"
 	"unsafe"
@@ -35,11 +36,11 @@ func (s *Session) GetHandler() error {
 		EVENT_TRACE_CONTROL_QUERY,
 	); err != nil {
 		// Handle specific errors related to the query operation.
-		if err == ERROR_BAD_LENGTH {
+		if errors.Is(err, ERROR_BAD_LENGTH) {
 			return fmt.Errorf("bad length when querying handler: %w", err)
-		} else if err == ERROR_INVALID_PARAMETER {
+		} else if errors.Is(err, ERROR_INVALID_PARAMETER) {
 			return fmt.Errorf("invalid parameters when querying handler: %w", err)
-		} else if err == ERROR_WMI_INSTANCE_NOT_FOUND {
+		} else if errors.Is(err, ERROR_WMI_INSTANCE_NOT_FOUND) {
 			return fmt.Errorf("session is not running")
 		}
 		return fmt.Errorf("failed to get handler: %w", err)
@@ -67,9 +68,9 @@ func (s *Session) CreateRealtimeSession() error {
 	)
 	if err != nil {
 		// Handle specific errors related to starting the trace session.
-		if err == ERROR_ALREADY_EXISTS {
+		if errors.Is(err, ERROR_ALREADY_EXISTS) {
 			return fmt.Errorf("session already exists: %w", err)
-		} else if err == ERROR_INVALID_PARAMETER {
+		} else if errors.Is(err, ERROR_INVALID_PARAMETER) {
 			return fmt.Errorf("invalid parameters when starting session trace: %w", err)
 		}
 		return fmt.Errorf("failed to start trace: %w", err)
@@ -93,11 +94,11 @@ func (s *Session) CreateRealtimeSession() error {
 		&params, // Additional parameters
 	); err != nil {
 		// Handle specific errors related to enabling the trace session.
-		if err == ERROR_INVALID_PARAMETER {
+		if errors.Is(err, ERROR_INVALID_PARAMETER) {
 			return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
-		} else if err == ERROR_TIMEOUT {
+		} else if errors.Is(err, ERROR_TIMEOUT) {
 			return fmt.Errorf("timeout value expired before the enable callback completed: %w", err)
-		} else if err == ERROR_NO_SYSTEM_RESOURCES {
+		} else if errors.Is(err, ERROR_NO_SYSTEM_RESOURCES) {
 			return fmt.Errorf("exceeded the number of trace sessions that can enable the provider: %w", err)
 		}
 		return fmt.Errorf("failed to enable trace: %w", err)
@@ -111,7 +112,7 @@ func (s *Session) StopSession() error {
 	if s.Realtime {
 		if isValidHandler(s.TraceHandler) {
 			// Attempt to close the trace and handle potential errors.
-			if err := CloseTraceFunc(s.TraceHandler); err != nil && err != ERROR_CTX_CLOSE_PENDING {
+			if err := CloseTraceFunc(s.TraceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
 				return fmt.Errorf("failed to close trace: %w", err)
 			}
 		}

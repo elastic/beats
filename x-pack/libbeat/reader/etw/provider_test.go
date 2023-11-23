@@ -46,13 +46,13 @@ func TestUTF16AtOffsetToString(t *testing.T) {
 	assert.Equal(t, sampleText[1:], resultWithOffset, "The converted string with offset should skip the first character")
 }
 
-func TestGUIDFromProviderName_EmptyProvider(t *testing.T) {
+func TestGUIDFromProviderName_EmptyName(t *testing.T) {
 	guid, err := GUIDFromProviderName("")
 	assert.EqualError(t, err, "empty provider name")
 	assert.Equal(t, GUID{}, guid, "GUID should be empty for an empty provider name")
 }
 
-func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
+func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 	// Backup and defer restoration of the original function
 	originalFunc := EnumerateProvidersFunc
 	defer func() { EnumerateProvidersFunc = originalFunc }()
@@ -70,6 +70,42 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 	}
 
 	guid, err := GUIDFromProviderName(mockProviderName)
+	assert.EqualError(t, err, "no providers found")
+	assert.Equal(t, GUID{}, guid, "GUID should be empty when the provider is not found")
+}
+
+func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
+	// Backup and defer restoration of the original function
+	originalFunc := EnumerateProvidersFunc
+	defer func() { EnumerateProvidersFunc = originalFunc }()
+
+	// Define a mock provider name and GUID for testing.
+	mockProviderName := "NonExistentProvider"
+	realProviderName := "ExistentProvider"
+	mockGUID := GUID{Data1: 1234, Data2: 5678}
+
+	EnumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
+		// Create and populate a buffer for the provider name
+		utf16Name, _ := syscall.UTF16FromString(realProviderName)
+		nameBuffer := make([]byte, len(utf16Name)*2)
+		for i, v := range utf16Name {
+			binary.LittleEndian.PutUint16(nameBuffer[i*2:], v)
+		}
+
+		// Create and populate the ProviderEnumerationInfo
+		*pBuffer = ProviderEnumerationInfo{
+			NumberOfProviders: 1,
+			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{
+				{
+					ProviderGuid:       mockGUID,
+					ProviderNameOffset: uint32(uintptr(unsafe.Pointer(&nameBuffer[0]))),
+				},
+			},
+		}
+		return nil
+	}
+
+	guid, err := GUIDFromProviderName(mockProviderName)
 	assert.EqualError(t, err, "unable to find GUID from provider name")
 	assert.Equal(t, GUID{}, guid, "GUID should be empty when the provider is not found")
 }
@@ -81,13 +117,11 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 
 	// Define a mock provider name and GUID for testing.
 	mockProviderName := "MockProvider"
-	mockGUID := GUID{Data1: 1234, Data2: 5678} // Example GUID
-
-	// Setup the mock TdhAPI
+	mockGUID := GUID{Data1: 1234, Data2: 5678}
 
 	EnumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
 		// Create and populate a buffer for the provider name
-		utf16Name := syscall.StringToUTF16(mockProviderName)
+		utf16Name, _ := syscall.UTF16FromString(mockProviderName)
 		nameBuffer := make([]byte, len(utf16Name)*2)
 		for i, v := range utf16Name {
 			binary.LittleEndian.PutUint16(nameBuffer[i*2:], v)

@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"errors"
 	"fmt"
 	"syscall"
 	"unsafe"
@@ -50,9 +51,13 @@ func GUIDFromProviderName(providerName string) (GUID, error) {
 	for {
 		tmp := make([]byte, size)
 		buf = (*ProviderEnumerationInfo)(unsafe.Pointer(&tmp[0]))
-		if err := EnumerateProvidersFunc(buf, &size); err != ERROR_INSUFFICIENT_BUFFER {
+		if err := EnumerateProvidersFunc(buf, &size); !errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
 			break
 		}
+	}
+
+	if buf.NumberOfProviders == 0 {
+		return GUID{}, fmt.Errorf("no providers found")
 	}
 
 	// Iterate through the list of providers to find a match by name.
