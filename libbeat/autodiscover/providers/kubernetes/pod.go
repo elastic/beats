@@ -103,7 +103,6 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		options = kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Node:        config.Node,
-			Namespace:   config.Namespace,
 		}
 		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
 		if err != nil {
@@ -113,6 +112,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	if metaConf.Namespace.Enabled() {
 		options = kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
+			Namespace:   config.Namespace,
 		}
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, options, nil)
 		if err != nil {
