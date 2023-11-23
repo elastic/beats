@@ -22,7 +22,7 @@ var (
 	tdhGetProperty            = tdh.NewProc("TdhGetProperty")
 )
 
-const ANYSIZE_ARRAY = 1 << 25
+const ANYSIZE_ARRAY = 1 << 16
 const DEFAULT_PROPERTY_BUFFER_SIZE = 256
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_enumeration_info
