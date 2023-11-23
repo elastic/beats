@@ -943,6 +943,408 @@ This will output:
 ]
 ----
 
+<<<<<<< HEAD
+=======
+[[chain]]
+[float]
+=== `chain`
+
+A chain is a list of requests to be made after the first one.
+
+[float]
+==== `chain[].step`
+
+Contains basic request and response configuration for chained calls.
+
+[float]
+==== `chain[].step.request`
+
+See <<request-parameters,request parameters>>. Required.
+
+Example:
+
+First call: \https://example.com/services/data/v1.0/
+
+Second call: \https://example.com/services/data/v1.0/1/export_ids
+
+Third call: \https://example.com/services/data/v1.0/export_ids/file_1/info
+
+[float]
+==== `chain[].step.response.split`
+
+See <<response-split,response split parameter>>.
+
++
+[[chain-step-replace]]
+[float]
+==== `chain[].step.replace`
+
+A link:https://goessner.net/articles/JsonPath/index.html#e2[JSONPath] string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
+
+Example:
+
+- First call: \https://example.com/services/data/v1.0/
++
+<<response-json1,response>>
+
+- Second call: \https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
++
+<<response-json2,response>>
+
+- Third call: \https://example.com/services/data/v1.0/export_ids/`$.file_name`/info
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+        request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+        request.method: GET
+        replace: $.records[:].id
+    # third call
+    - step:
+        request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+        request.method: GET
+        replace: $.file_name
+----
+
+Example:
+
+- First call to collect record ids
+
++
+request_url: \https://example.com/services/data/v1.0/records
+
++
+response_json:
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "records": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+
+- Second call to collect `file_name` using collected ids from first call.
+
++
+request_url using id as '1': \https://example.com/services/data/v1.0/1/export_ids
+
++
+response_json using id as '1':
+
++
+[[response-json2]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1"
+}
+----
+
++
+request_url using id as '2': \https://example.com/services/data/v1.0/2/export_ids
+
++
+response_json using id as '2':
+
++
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2"
+}
+----
+
+- Third call to collect `files` using collected `file_name` from second call.
+
++
+request_url using file_name as 'file_1': \https://example.com/services/data/v1.0/export_ids/file_1/info
+
++
+request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
++
+[[chain-step-replace_with]]
+[float]
+==== `chain[].step.replace_with`
+
+The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value.
+The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables
+like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause
+thus providing a lot of flexibility in the logic of chain requests.
+
+Example:
+
+- First call: \https://example.com/services/data/v1.0/exports
++
+<<response-json1-replace_with,response>>
+
+- Second call: \https://example.com/services/data/v1.0/$.exportId/files
++
+<<response-json2-replace_with,response>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - step:
+        request.url: https://example.com/services/data/v1.0/$.exportId/files
+        request.method: GET
+        replace_with: '$.exportId,.first_response.body.exportId'
+----
+
+Example:
+
+- First call to fetch exportId
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId" : "2212"
+}
+----
+
+- Second call to fetch `file ids` using exportId from first call.
+
++
+request_url using exportId as '2212': \https://example.com/services/data/v1.0/2212/files
+
++
+response_json using exportId as '2212':
+
++
+[[response-json2-replace_with]]
+["source","json",subs="attributes"]
+----
+{
+    "files": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+
+**Some useful points to remember:- **
+
+    1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a
+    **single '.' (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal
+    processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one '.' (dot) as prefix) or
+    `replace_with:'$.exportId,first_response.body.exportId'` (no '.' dot as prefix)
+
+   2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with:
+    '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from
+    the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be
+    extrated becomes `"" (an empty string)`, which has no definition within any context variable.
+
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+
+[float]
+==== `chain[].while`
+
+Contains basic request and response configuration for chained while calls. Chained while calls will keep making the requests for a given number of times until a condition is met
+or the maximum number of attempts gets exhausted. While chain has an attribute `until` which holds the expression to be evaluated. Ideally the `until` field should always be used
+together with the attributes `request.retry.max_attempts` and `request.retry.wait_min` which specifies the maximum number of attempts to evaluate `until` before giving up and the
+maximum wait time in between such requests. If `request.retry.max_attempts` is not specified, it will only try to evaluate the expression once and give up if it fails. If
+`request.retry.wait_min` is not specified the default wait time will always be `0` as in successive calls will be made immediately.
+
+[float]
+==== `chain[].while.request`
+
+See  <<request-parameters,request parameters>> .
+
+Example:
+
+First call: \http://example.com/services/data/v1.0/exports
+
+Second call: \http://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+
+Third call: \http://example.com/services/data/v1.0/export_ids/1/info
+
+[float]
+==== `chain[].while.response.split`
+
+See  <<response-split,response split parameter>> .
+
+[float]
+==== `chain[].while.replace`
+
+See  <<chain-step-replace, chain[].step.replace>> .
+
+Example:
+
+- First call: \http://example.com/services/data/v1.0/exports
++
+<<response-json1-while,response>>
+
+- Second call: \http://example.com/services/data/v1.0/`$.exportId`/export_ids/status
++
+<<response-json2-while,response>>
+
+- Third call: \http://example.com/services/data/v1.0/export_ids/`$.files[:].id`/info
++
+<<response-json3-while,response 1>>, <<response-json4-while,response 2>>
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  id: my-httpjson-id
+  request.url: http://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - while:
+        request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/status
+        request.method: GET
+        replace: $.exportId
+        until: '[[ eq .last_response.body.status "completed" ]]'
+        request.retry.max_attempts: 5
+        request.retry.wait_min: 5s
+    # third call
+    - step:
+        request.url: http://example.com/services/data/v1.0/export_ids/$.files[:].id/info
+        request.method: GET
+        replace: $.files[:].id
+----
+
+Example:
+
+- First call to collect export ids
+
++
+request_url: \https://example.com/services/data/v1.0/exports
+
++
+response_json:
+
++
+[[response-json1-while]]
+["source","json",subs="attributes"]
+----
+{
+    "exportId": "9ef0e6a5"
+}
+----
+
+- Second call to collect `file_ids` using collected id from first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts gets exhausted.
+
++
+request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
+
++
+response_json using id as '9ef0e6a5':
+
++
+[[response-json2-while]]
+["source","json",subs="attributes"]
+----
+{
+    "status": "completed",
+    "files": [
+      {
+        "id": 1
+      },
+      {
+        "id": 2
+      },
+      {
+        "id": 3
+      }
+    ]
+}
+----
+
+- Third call to collect `files` using collected `file_id` from second call.
+
++
+request_url using file_id as '1': \https://example.com/services/data/v1.0/export_ids/1/info
+
++
+request_url using file_id as '2': \https://example.com/services/data/v1.0/export_ids/2/info
+
++
+response_json using id as '1':
+
++
+[[response-json3-while]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1",
+    "file_data": "some data"
+}
+----
+
++
+response_json using id as '2':
+
++
+[[response-json4-while]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2",
+    "file_data": "some data"
+}
+----
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+
+[float]
+==== `chain[].while.replace_with`
+
+See  <<chain-step-replace_with, chain[].step.replace_with>> .
+
+>>>>>>> 0b22871685 (Fix incorrect indentation in YAML examples (#37185))
 [[cursor]]
 [float]
 ==== `cursor`
