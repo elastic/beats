@@ -85,7 +85,7 @@ var configList = []ConfigItem{
 		Key:  "beats_revision",
 		Help: "Enter the github.com/elastic/beats revision",
 		Default: func(cfg map[string]string) string {
-			return "master"
+			return "main"
 		},
 	},
 }

@@ -64,6 +64,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Fix type mismatch in libbeat/metric/system/cgroup/cgv2 when building on mips platforms. {pull}34658[34658]
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 - Skip flakey test in HTTPJSON input {issue}34929[34929] {issue}37146[37146] {pull}37162[37162]
+- Fix Beat Generator {pull}37195[37195]
 
 ==== Added
 
