@@ -158,6 +158,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return event.Error
 	}
 	_, _ = event.RootFields.Put("service.address", serviceAddress)
+	event.Host = fmt.Sprintf("%v", serviceAddress)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
