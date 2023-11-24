@@ -674,7 +674,14 @@ func (h *FileHarvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(
+			r,
+			h.config.DockerJSON.Stream,
+			h.config.DockerJSON.Partial,
+			h.config.DockerJSON.ForceCRI,
+			h.config.DockerJSON.CRIFlags,
+			h.config.IsLudicrousModeActivated(),
+		)
 	}
 
 	if h.config.JSON != nil {

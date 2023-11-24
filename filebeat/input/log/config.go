@@ -238,6 +238,6 @@ func (c *config) normalizeGlobPatterns() error {
 }
 
 func (c *config) IsLudicrousModeActivated() bool {
-	inSingleLineScene := c.DockerJSON == nil && c.JSON == nil && c.Multiline == nil
+	inSingleLineScene := c.JSON == nil && c.Multiline == nil
 	return c.LudicrousMode && inSingleLineScene
 }
