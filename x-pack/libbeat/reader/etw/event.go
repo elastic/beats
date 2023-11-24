@@ -32,9 +32,9 @@ func DefaultBufferCallback(etl *EventTraceLogfile) uintptr {
 
 // DefaultCallback is a default handler for processing ETW events.
 // By default this callback is replaced by the one defined in the Filebeat input
-func DefaultCallback(er *EventRecord) {
+func DefaultCallback(er *EventRecord) uintptr {
 	if er == nil {
-		return
+		return 1
 	}
 
 	// Initialize a map to hold event data.
@@ -46,15 +46,17 @@ func DefaultCallback(er *EventRecord) {
 		event["EventProperties"] = data
 	} else {
 		// If properties cannot be retrieved, exit the callback.
-		return
+		return 1
 	}
 
 	// Marshal the event data to JSON and output it.
 	jsonData, err := json.Marshal(event)
 	if err != nil {
-		return
+		return 1
 	}
 	log.Println(string(jsonData))
+
+	return 0
 }
 
 // propertyParser is used for parsing properties from raw EVENT_RECORD structures.

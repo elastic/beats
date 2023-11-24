@@ -156,7 +156,7 @@ func NewSession(conf Config) (Session, error) {
 
 	session.NewSession = true // Indicate this is a new session
 
-	session.GUID, err = setSessionGUID(conf)
+	session.GUID, err = SetSessionGUIDFunc(conf)
 	if err != nil {
 		return Session{}, err
 	}

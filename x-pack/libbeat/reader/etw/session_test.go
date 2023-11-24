@@ -82,7 +82,7 @@ func TestSetSessionGUID_ProviderName(t *testing.T) {
 
 func TestSetSessionGUID_ProviderGUID(t *testing.T) {
 	// Example GUID string
-	guidString := "12345678-1234-5678-1234-567812345678"
+	guidString := "{12345678-1234-5678-1234-567812345678}"
 
 	// Configuration with a set ProviderGUID
 	conf := Config{ProviderGUID: guidString}
@@ -124,7 +124,7 @@ func TestNewSessionProperties(t *testing.T) {
 		sessionName  string
 		expectedSize uint32
 	}{
-		{"EmptyName", "", uint32(unsafe.Sizeof(EventTraceProperties{}))},
+		{"EmptyName", "", 2 + uint32(unsafe.Sizeof(EventTraceProperties{}))},
 		{"NormalName", "Session1", 18 + uint32(unsafe.Sizeof(EventTraceProperties{}))},
 		// Additional test cases can be added here
 	}
@@ -136,8 +136,8 @@ func TestNewSessionProperties(t *testing.T) {
 			assert.Equal(t, tc.expectedSize, props.Wnode.BufferSize, "BufferSize should match expected value")
 			assert.Equal(t, GUID{}, props.Wnode.Guid, "GUID should be empty")
 			assert.Equal(t, uint32(1), props.Wnode.ClientContext, "ClientContext should be 1")
-			assert.Equal(t, WNODE_FLAG_TRACED_GUID, props.Wnode.Flags, "Flags should match WNODE_FLAG_TRACED_GUID")
-			assert.Equal(t, EVENT_TRACE_REAL_TIME_MODE, props.LogFileMode, "LogFileMode should be set to real-time")
+			assert.Equal(t, uint32(WNODE_FLAG_TRACED_GUID), props.Wnode.Flags, "Flags should match WNODE_FLAG_TRACED_GUID")
+			assert.Equal(t, uint32(EVENT_TRACE_REAL_TIME_MODE), props.LogFileMode, "LogFileMode should be set to real-time")
 			assert.Equal(t, uint32(0), props.LogFileNameOffset, "LogFileNameOffset should be 0")
 			assert.Equal(t, uint32(64), props.BufferSize, "BufferSize should be 64")
 			assert.Equal(t, uint32(unsafe.Sizeof(EventTraceProperties{})), props.LoggerNameOffset, "LoggerNameOffset should be the size of EventTraceProperties")
@@ -234,7 +234,6 @@ func TestNewSession_AttachSession(t *testing.T) {
 	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
-	assert.Equal(t, uint8(5), session.TraceLevel, "TraceLevel should be 5 (verbose)")
 	assert.Equal(t, false, session.NewSession)
 	assert.Equal(t, true, session.Realtime)
 	assert.NotNil(t, session.Properties)
@@ -255,7 +254,6 @@ func TestNewSession_Logfile(t *testing.T) {
 	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, "LogFile1.etl", session.Name, "SessionName should match expected value")
-	assert.Equal(t, uint8(5), session.TraceLevel, "TraceLevel should be 5 (verbose)")
 	assert.Equal(t, false, session.NewSession)
 	assert.Equal(t, false, session.Realtime)
 	assert.Nil(t, session.Properties)

@@ -105,16 +105,15 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 			return ERROR_INSUFFICIENT_BUFFER
 		}
 
-		// Allocate buffer
-		buffer := make([]byte, requiredSize)
-
 		// Calculate the offset for the provider name
 		// It's placed after ProviderEnumerationInfo and TraceProviderInfo
 		nameOffset := unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{})
 
-		// Manually encode UTF-16 into the byte buffer at the correct offset
+		// Convert pBuffer to a byte slice starting at the calculated offset for the name
+		byteBuffer := (*[1 << 30]byte)(unsafe.Pointer(pBuffer))[:]
+		// Copy the UTF-16 encoded name into the buffer
 		for i, char := range utf16ProviderName {
-			binary.LittleEndian.PutUint16(buffer[nameOffset+(uintptr(i)*2):], char)
+			binary.LittleEndian.PutUint16(byteBuffer[nameOffset+(uintptr(i)*2):], char)
 		}
 
 		// Create and populate the ProviderEnumerationInfo struct
@@ -157,16 +156,15 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 			return ERROR_INSUFFICIENT_BUFFER
 		}
 
-		// Allocate buffer
-		buffer := make([]byte, requiredSize)
-
 		// Calculate the offset for the provider name
 		// It's placed after ProviderEnumerationInfo and TraceProviderInfo
 		nameOffset := unsafe.Sizeof(ProviderEnumerationInfo{}) + unsafe.Sizeof(TraceProviderInfo{})
 
-		// Manually encode UTF-16 into the byte buffer at the correct offset
+		// Convert pBuffer to a byte slice starting at the calculated offset for the name
+		byteBuffer := (*[1 << 30]byte)(unsafe.Pointer(pBuffer))[:]
+		// Copy the UTF-16 encoded name into the buffer
 		for i, char := range utf16ProviderName {
-			binary.LittleEndian.PutUint16(buffer[nameOffset+(uintptr(i)*2):], char)
+			binary.LittleEndian.PutUint16(byteBuffer[nameOffset+(uintptr(i)*2):], char)
 		}
 
 		// Create and populate the ProviderEnumerationInfo struct
