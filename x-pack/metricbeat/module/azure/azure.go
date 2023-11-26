@@ -88,11 +88,17 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	// Same end time for all metrics in the same batch.
+	// Set the reference time for the current fetch.
+	//
+	// The reference time is used to calculate time intervals
+	// and compare with collection info in the metric
+	// registry to decide whether to collect metrics or not,
+	// depending on metric time grain (check `MetricRegistry`
+	// for more information).
+	//
+	// We truncate the reference time to the second to avoid
+	// comparison issues due to milliseconds.
 	referenceTime := time.Now().UTC().Truncate(time.Second)
-
-	// truncate the reference time to the nearest 1 second
-	//referenceTime = referenceTime.Truncate(time.Second)
 
 	// Initialize cloud resources and monitor metrics
 	// information.
