@@ -69,7 +69,6 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 		if collection.timestamp.After(timeGrainStartTime) {
 			m.logger.Debugw(
 				"MetricRegistry: Metric does not need an update",
-				//"key", key,
 				"needs_update", false,
 				"reference_time", referenceTime,
 				"now", now,
@@ -84,7 +83,6 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 		// it means that the metricset needs to collect the metric values again.
 		m.logger.Debugw(
 			"MetricRegistry: Metric needs an update",
-			//"key", key,
 			"needs_update", true,
 			"reference_time", referenceTime,
 			"now", now,
@@ -101,7 +99,6 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 	// In this case, we need to collect the metric.
 	m.logger.Debugw(
 		"MetricRegistry: Metric needs an update",
-		//"key", key,
 		"needs_update", true,
 		"reference_time", referenceTime,
 		"now", now,
