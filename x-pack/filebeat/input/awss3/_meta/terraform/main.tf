@@ -16,6 +16,11 @@ provider "aws" {
       branch       = var.BRANCH
       build        = var.BUILD_ID
       created_date = var.CREATED_DATE
+      division     = "engineering"
+      org          = "ingest"
+      team         = "filebeat"
+      project      = "beats"
+      ephemeral    = "true"
     }
   }
 }
