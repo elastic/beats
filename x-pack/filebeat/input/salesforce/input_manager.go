@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -42,10 +41,7 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
-
-	var sources []cursor.Source
-	sources = append(sources, &source{cfg: config})
-
+	sources := []inputcursor.Source{&source{cfg: config}}
 	return sources, &salesforceInput{config: config}, nil
 }
 
@@ -68,7 +64,5 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 }
 
 func defaultConfig() config {
-	return config{
-		Interval: time.Hour,
-	}
+	return config{Interval: time.Hour}
 }

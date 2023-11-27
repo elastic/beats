@@ -5,6 +5,7 @@
 package salesforce
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -13,43 +14,25 @@ type config struct {
 	Interval time.Duration `config:"interval" validate:"required"`
 	Auth     *authConfig   `config:"auth"`
 	Url      string        `config:"url" validate:"required"`
-	Soql     *SoqlConfig   `config:"soql"`
+	Version  int           `config:"version" validate:"required"`
 	Query    *QueryConfig  `config:"query"`
 }
 
 func (c *config) Validate() error {
-	if c.Url == "" {
-		return fmt.Errorf("no instance url was configured or detected")
+	switch {
+	case c.Url == "":
+		return errors.New("no instance url was configured or detected")
+	case c.Interval == 0:
+		return fmt.Errorf("please provide a valid interval %d", c.Interval)
+	case c.Version <= 0:
+		return fmt.Errorf("please provide a valid version")
 	}
+
 	return nil
 }
 
 type QueryConfig struct {
+	SOQL    string    `config:"soql"` // NOTE(SS): Only for testing purpose
 	Default *valueTpl `config:"default"`
 	Value   *valueTpl `config:"value"`
-}
-
-type SoqlConfig struct {
-	Query  string          `config:"query"`
-	Object string          `config:"object"`
-	Fields []string        `config:"fields"`
-	Where  WhereTypeConfig `config:"where"`
-	Order  OrderConfig     `config:"order"`
-}
-
-type WhereTypeConfig struct {
-	Or  []WhereConfig `config:"or"`
-	And []WhereConfig `config:"and"`
-}
-
-type WhereConfig struct {
-	Op     string        `config:"op"`
-	Values []interface{} `config:"values"`
-	Field  string        `config:"field"`
-}
-
-type OrderConfig struct {
-	By        string `config:"by"`
-	Ascending bool   `config:"asc"`
-	NullFirst bool   `config:"null_first"`
 }

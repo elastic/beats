@@ -29,7 +29,7 @@ type oAuth2Config struct {
 	User         string `config:"user"`
 }
 
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
+// isEnabled returns true if the `enable` field is set to true in the yaml.
 func (o *oAuth2Config) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
@@ -44,7 +44,7 @@ func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, _ *http.Clien
 	return creds.Client(ctx)
 }
 
-// Client wraps the given http.Client and returns a new one that will use the oauth authentication.
+// client wraps the given http.Client and returns a new one that will use the oauth authentication.
 func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
@@ -57,14 +57,14 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 				AuthStyle: oauth2.AuthStyleAutoDetect,
 			},
 		}
+
 		token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
 		if err != nil {
 			return nil, fmt.Errorf("oauth2 client: error loading credentials using user and password: %w", err)
 		}
 		return conf.Client(ctx, token), nil
-	} else {
-		return o.clientCredentialsGrant(ctx, client), nil
 	}
+	return o.clientCredentialsGrant(ctx, client), nil
 }
 
 // maybeString returns the string pointed to by p or "" if p in nil.
@@ -84,7 +84,8 @@ func (o *oAuth2Config) Validate() error {
 	if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
 		return errors.New("both token_url and client credentials must be provided")
 	}
-	if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
+
+	if o.Password == "" || o.User == "" {
 		return errors.New("both user and password credentials must be provided")
 	}
 

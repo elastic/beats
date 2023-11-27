@@ -4,16 +4,14 @@
 
 package salesforce
 
-import (
-	"time"
-)
+import "time"
 
 type state struct {
 	StartTime time.Time `struct:"start_timestamp"`
 	LogTime   string    `struct:"timestamp"`
 }
 
-// setCheckpoint sets checkpoint from source to current state instance
+// setCheckpoint sets checkpoint from source to current state instance.
 func (s *state) setCheckpoint(chkpt string) {
 	s.LogTime = chkpt
 }
