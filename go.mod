@@ -277,6 +277,7 @@ require (
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
+	github.com/g8rswimmer/go-sfdc v2.0.1+incompatible // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

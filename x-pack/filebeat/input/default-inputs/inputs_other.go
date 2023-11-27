@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/salesforce"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/shipper"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -38,6 +39,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		awss3.Plugin(store),
 		awscloudwatch.Plugin(),
 		lumberjack.Plugin(),
+		salesforce.Plugin(log, store),
 		shipper.Plugin(log, store),
 	}
 }
