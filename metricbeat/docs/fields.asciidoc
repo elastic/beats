@@ -62299,12 +62299,12 @@ Network-specific metrics
 
 
 [float]
-=== incoming
+=== inbound
 
 Incoming network counters
 
 
-*`system.process.network.incoming.tcp`*::
+*`system.process.network.inbound.tcp`*::
 +
 --
 total bytes received over TCP
@@ -62313,7 +62313,7 @@ type: long
 
 --
 
-*`system.process.network.incoming.udp`*::
+*`system.process.network.inbound.udp`*::
 +
 --
 total bytes received over UDP
@@ -62323,12 +62323,12 @@ type: long
 --
 
 [float]
-=== outgoing
+=== outbound
 
 Outgoing network counters
 
 
-*`system.process.network.outgoing.tcp`*::
+*`system.process.network.outbound.tcp`*::
 +
 --
 total bytes received over TCP
@@ -62337,7 +62337,7 @@ type: long
 
 --
 
-*`system.process.network.outgoing.udp`*::
+*`system.process.network.outbound.udp`*::
 +
 --
 total bytes received over UDP

@@ -115,7 +115,7 @@
       type: group
       description: Network-specific metrics
       fields:
-        - name: incoming
+        - name: inbound
           type: group
           description: Incoming network counters
           fields: 
@@ -125,7 +125,7 @@
             - name: udp
               type: long
               description: total bytes received over UDP
-        - name: outgoing
+        - name: outbound
           type: group
           description: Outgoing network counters
           fields:

@@ -133,11 +133,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				netData := m.networkMonitoring.Get(int(pid))
 				if netData.ContainsMetrics() {
 					procs[evtI].Put("network.usage", mapstr.M{
-						"incoming": mapstr.M{
+						"inbound": mapstr.M{
 							"tcp": netData.Incoming.TCP,
 							"udp": netData.Incoming.UDP,
 						},
-						"outgoing": mapstr.M{
+						"outbound": mapstr.M{
 							"tcp": netData.Outgoing.TCP,
 							"udp": netData.Outgoing.UDP,
 						},
@@ -155,6 +155,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 
+	return nil
+}
+
+func (m *MetricSet) Close() error {
+	m.networkMonitoring.Stop()
 	return nil
 }
 
