@@ -73,7 +73,7 @@ func TestGarbageCollect(t *testing.T) {
 		log:        logp.L(),
 	}
 
-	gcPidFetch = func(ctx context.Context, pid int32) (bool, error) {
+	testTrack.gcPIDFetch = func(ctx context.Context, pid int32) (bool, error) {
 		if pid == 10 || pid == 1245 {
 			return true, nil
 		}
@@ -94,7 +94,7 @@ func TestGarbageCollect(t *testing.T) {
 	testTrack.dataMut.Lock()
 	require.Equal(t, map[int]PacketData{10: {}, 1245: {}}, testTrack.procData)
 	// remove a pid, test again
-	gcPidFetch = func(ctx context.Context, pid int32) (bool, error) {
+	testTrack.gcPIDFetch = func(ctx context.Context, pid int32) (bool, error) {
 		if pid == 10 {
 			return true, nil
 		}

@@ -33,15 +33,10 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
-// StartPacketHandle starts the packet capture process
+// RunPacketHandle starts the packet capture process
 // As of now, this uses AF_PACKET, which is linux-only. However, unlike pcap, we're not
 // importing libpcap, which would introduce another runtime dependency into metricbeat.
-func StartPacketHandle(ctx context.Context, watcher *procs.ProcessesWatcher, procTracker *Tracker) error {
-	afHandle, err := afpacket.NewTPacket(afpacket.SocketRaw)
-	if err != nil {
-		return fmt.Errorf("error creating afpacket interface: %w", err)
-	}
-
+func RunPacketHandle(ctx context.Context, afHandle *afpacket.TPacket, watcher *procs.ProcessesWatcher, procTracker *Tracker) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -52,7 +47,7 @@ func StartPacketHandle(ctx context.Context, watcher *procs.ProcessesWatcher, pro
 
 		packet, ci, perr := afHandle.ZeroCopyReadPacketData()
 		if perr != nil {
-			return fmt.Errorf("error reading packet data: %w", err)
+			return fmt.Errorf("error reading packet data: %w", perr)
 		}
 
 		parsed := gopacket.NewPacket(packet, layers.LinkTypeEthernet, gopacket.NoCopy)

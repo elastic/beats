@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/gopacket/afpacket"
 	psutil "github.com/shirou/gopsutil/process"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -34,9 +35,6 @@ import (
 // give the update/request channels a bit of a buffer,
 // in cases where we're getting flooding with events and don't want to block.
 const channelBaseSize = 10
-
-// hook for testing
-var gcPidFetch = psutil.PidExistsWithContext
 
 // PacketData tracks all counters for a given port
 type PacketData struct {
@@ -84,6 +82,8 @@ type Tracker struct {
 	// special test helpers
 	loopWaiter chan struct{}
 	testmode   bool
+	// used for the garbage collection subprocess, wrapped for aid of testing
+	gcPIDFetch func(ctx context.Context, pid int32) (bool, error)
 }
 
 // NewNetworkTracker creates a new network tracker for the given config
@@ -108,6 +108,7 @@ func NewNetworkTracker() (*Tracker, error) {
 		// right now, the packetbeat watcher won't work with alternate mountpoints,
 		// as support is missing from go-sysinfo. This means we can't support /hostfs settings
 		procWatcher: watcher,
+		gcPIDFetch:  psutil.PidExistsWithContext,
 
 		log: logp.L(),
 	}
@@ -136,13 +137,22 @@ func (track *Tracker) Stop() {
 // Track is a non-blocking operation that starts a packet sniffer, and the underlying
 // tracker that correlates packet data with pids
 func (track *Tracker) Track(ctx context.Context) error {
-	helperContext, cancel := context.WithCancel(ctx)
+	var afHandle *afpacket.TPacket
+	var err error
+	if !track.testmode {
+		afHandle, err = afpacket.NewTPacket(afpacket.SocketRaw)
+		if err != nil {
+			return fmt.Errorf("error creating afpacket interface: %w", err)
+		}
+	}
+
+	helperContext, helperCancel := context.WithCancel(ctx)
 	go func() {
 		if !track.testmode {
-			err := StartPacketHandle(helperContext, track.procWatcher, track)
+			err := RunPacketHandle(helperContext, afHandle, track.procWatcher, track)
 			if err != nil {
 				track.log.Errorf("error starting packet capture: %s", err)
-				ctx.Done()
+				helperCancel()
 			}
 		}
 	}()
@@ -168,10 +178,12 @@ func (track *Tracker) Track(ctx context.Context) error {
 				}
 
 			case <-ctx.Done():
-				cancel()
+				helperCancel()
+				return
+			case <-helperContext.Done():
 				return
 			case <-track.stopChan:
-				cancel()
+				helperCancel()
 				return
 			}
 		}
@@ -200,7 +212,7 @@ func (track *Tracker) garbageCollect(ctx context.Context) {
 			track.dataMut.RUnlock()
 			keysToDelete := []int{}
 			for _, key := range keys {
-				found, _ := gcPidFetch(ctx, int32(key))
+				found, _ := track.gcPIDFetch(ctx, int32(key))
 				if !found {
 					keysToDelete = append(keysToDelete, key)
 				}
@@ -217,7 +229,7 @@ func (track *Tracker) garbageCollect(ctx context.Context) {
 			return
 		}
 
-		// used to coordinate testing
+		// used to coordinate testing, not used in prod
 		if track.loopWaiter != nil {
 			track.loopWaiter <- struct{}{}
 		}
