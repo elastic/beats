@@ -5,6 +5,7 @@
 package app_insights
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -122,29 +123,19 @@ func TestGroupMetrics(t *testing.T) {
 		groupedByDimensions := groupMetricsByDimension(metrics)
 		assert.Len(t, groupedByDimensions, 2)
 
-		dimensionsGroup1, ok := groupedByDimensions["request_url_host"]
+		k1 := fmt.Sprintf("%d_%d_%s", timestamp1.Unix(), timestamp1.Unix(), "request_url_host")
+
+		dimensionsGroup1, ok := groupedByDimensions[k1]
 		assert.True(t, ok)
-		assert.Len(t, dimensionsGroup1, 2) // 2 metrics
+		assert.Len(t, dimensionsGroup1, 2)
 		assert.ElementsMatch(t, dimensionsGroup1, expectedGroup1)
 
-		dimensionsGroup2, ok := groupedByDimensions["request_url_hostlocalhost"]
+		k2 := fmt.Sprintf("%d_%d_%s", timestamp3.Unix(), timestamp3.Unix(), "request_url_hostlocalhost")
+
+		dimensionsGroup2, ok := groupedByDimensions[k2]
 		assert.True(t, ok)
-		assert.Len(t, dimensionsGroup2, 1) // 1 metric
+		assert.Len(t, dimensionsGroup2, 1)
 		assert.ElementsMatch(t, dimensionsGroup2, expectedGroup2)
-
-		groupedByTime1 := groupMetricsByTime(dimensionsGroup1)
-		assert.Len(t, groupedByTime1, 1) // same timestamps, 1 group
-		timeGroup1, ok := groupedByTime1[newMetricTimeKey(timestamp1.Time.Truncate(time.Second), timestamp1.Time.Truncate(time.Second))]
-		assert.True(t, ok)
-		assert.Len(t, timeGroup1, 2) // 2 metrics
-		assert.ElementsMatch(t, timeGroup1, expectedGroup1)
-
-		groupedByTime2 := groupMetricsByTime(dimensionsGroup2)
-		assert.Len(t, groupedByTime2, 1) // same timestamps, 1 group
-		timeGroup1, ok = groupedByTime2[newMetricTimeKey(timestamp1.Time.Truncate(time.Second), timestamp1.Time.Truncate(time.Second))]
-		assert.True(t, ok)
-		assert.Len(t, timeGroup1, 1) // 1 metric
-		assert.ElementsMatch(t, timeGroup1, expectedGroup2)
 	})
 
 	t.Run("two dimensions groups with different timestamps", func(t *testing.T) {
@@ -165,47 +156,11 @@ func TestGroupMetrics(t *testing.T) {
 				Start: timestamp1,
 				End:   timestamp1,
 			},
-			{
-				SegmentName: map[string]string{
-					"request_url_host": "",
-				},
-				Value: map[string]interface{}{
-					"sessions_count.unique": 44,
-				},
-				Start: timestamp2,
-				End:   timestamp2,
-			},
 		}
 
 		expectedDimensionsGroup2 := []MetricValue{
 			{
 				SegmentName: map[string]string{
-					"request_url_host": "localhost",
-				},
-				Value: map[string]interface{}{
-					"sessions_count.unique": 44,
-				},
-				Start: timestamp3,
-				End:   timestamp3,
-			},
-		}
-
-		expectedTimeGroup1 := []MetricValue{
-			{
-				SegmentName: map[string]string{
-					"request_url_host": "",
-				},
-				Value: map[string]interface{}{
-					"users_count.unique": 44,
-				},
-				Start: timestamp1,
-				End:   timestamp1,
-			},
-		}
-
-		expectedTimeGroup2 := []MetricValue{
-			{
-				SegmentName: map[string]string{
 					"request_url_host": "",
 				},
 				Value: map[string]interface{}{
@@ -216,7 +171,7 @@ func TestGroupMetrics(t *testing.T) {
 			},
 		}
 
-		expectedTimeGroup3 := []MetricValue{
+		expectedDimensionsGroup3 := []MetricValue{
 			{
 				SegmentName: map[string]string{
 					"request_url_host": "localhost",
@@ -230,43 +185,33 @@ func TestGroupMetrics(t *testing.T) {
 		}
 
 		groupedByDimensions := groupMetricsByDimension(metrics)
-		assert.Len(t, groupedByDimensions, 2)
+		assert.Len(t, groupedByDimensions, 3)
 
-		dimensionsGroup1, ok := groupedByDimensions["request_url_host"]
+		k1 := fmt.Sprintf("%d_%d_%s", timestamp1.Unix(), timestamp1.Unix(), "request_url_host")
+
+		dimensionsGroup1, ok := groupedByDimensions[k1]
 		assert.True(t, ok)
-		assert.Len(t, dimensionsGroup1, 2) // 2 metrics
+		assert.Len(t, dimensionsGroup1, 1)
 		assert.ElementsMatch(t, dimensionsGroup1, expectedDimensionsGroup1)
 
-		dimensionsGroup2, ok := groupedByDimensions["request_url_hostlocalhost"]
+		k2 := fmt.Sprintf("%d_%d_%s", timestamp2.Unix(), timestamp2.Unix(), "request_url_host")
+
+		dimensionsGroup2, ok := groupedByDimensions[k2]
 		assert.True(t, ok)
-		assert.Len(t, dimensionsGroup2, 1) // 1 metric
+		assert.Len(t, dimensionsGroup2, 1)
 		assert.ElementsMatch(t, dimensionsGroup2, expectedDimensionsGroup2)
 
-		groupedByTime1 := groupMetricsByTime(dimensionsGroup1)
-		assert.Len(t, groupedByTime1, 2) // different timestamps, 2 group
+		k3 := fmt.Sprintf("%d_%d_%s", timestamp3.Unix(), timestamp3.Unix(), "request_url_hostlocalhost")
 
-		timeGroup1, ok := groupedByTime1[newMetricTimeKey(timestamp1.Time.Truncate(time.Second), timestamp1.Time.Truncate(time.Second))]
+		dimensionsGroup3, ok := groupedByDimensions[k3]
 		assert.True(t, ok)
-		assert.Len(t, timeGroup1, 1) // 1 metric
-		assert.ElementsMatch(t, timeGroup1, expectedTimeGroup1)
-
-		timeGroup2, ok := groupedByTime1[newMetricTimeKey(timestamp2.Time.Truncate(time.Second), timestamp2.Time.Truncate(time.Second))]
-		assert.True(t, ok)
-		assert.Len(t, timeGroup1, 1) // 1 metric
-		assert.ElementsMatch(t, timeGroup2, expectedTimeGroup2)
-
-		groupedByTime2 := groupMetricsByTime(dimensionsGroup2)
-		assert.Len(t, groupedByTime2, 1) // different timestamps, 2 group
-
-		timeGroup1, ok = groupedByTime2[newMetricTimeKey(timestamp3.Time.Truncate(time.Second), timestamp3.Time.Truncate(time.Second))]
-		assert.True(t, ok)
-		assert.Len(t, timeGroup1, 1) // 1 metric
-		assert.ElementsMatch(t, timeGroup1, expectedTimeGroup3)
+		assert.Len(t, dimensionsGroup3, 1)
+		assert.ElementsMatch(t, dimensionsGroup3, expectedDimensionsGroup3)
 	})
 }
 
 func TestEventMapping(t *testing.T) {
-	startDate := date.Time{}
+	startDate := date.Time{Time: time.Now()}
 	id := "123"
 	var info = insights.MetricsResultInfo{
 		AdditionalProperties: map[string]interface{}{
@@ -294,9 +239,9 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, len(events), 1)
 	for _, event := range events {
 		val1, _ := event.MetricSetFields.GetValue("start_date")
-		assert.Equal(t, val1, &startDate)
+		assert.Equal(t, val1, startDate.Time)
 		val2, _ := event.MetricSetFields.GetValue("end_date")
-		assert.Equal(t, val2, &startDate)
+		assert.Equal(t, val2, startDate.Time)
 		val3, _ := event.ModuleFields.GetValue("metrics.requests_count")
 		assert.Equal(t, val3, mapstr.M{"sum": 12})
 		val5, _ := event.ModuleFields.GetValue("metrics.requests_failed")
