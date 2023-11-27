@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
 
 *Filebeat*
 
@@ -91,6 +92,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 - Do not error when Okta API returns no data. {pull}37092[37092]
 - Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
+- Make CEL input now global evaluate to a time in UTC. {pull}37159[37159]
 
 *Heartbeat*
 
@@ -116,6 +118,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
 - The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
 - Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
+- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
+- Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
 
 *Osquerybeat*
 
@@ -210,7 +214,12 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add network processor in addition to interface based direction resolution. {pull}37023[37023]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
 - Make CEL input log current transaction ID when request tracing is turned on. {pull}37065[37065]
+- Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
+- Made GCS input GA and updated docs accordingly. {pull}37127[37127]
+- Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
+- Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
+- Update CEL extensions library to v1.7.0. {pull}37172[37172]
 
 *Auditbeat*
 

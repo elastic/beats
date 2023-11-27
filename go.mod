@@ -204,12 +204,12 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.6.4
 	github.com/elastic/elastic-agent-libs v0.6.2
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.8.1
+	github.com/elastic/elastic-agent-system-metrics v0.8.2
 	github.com/elastic/go-elasticsearch/v8 v8.10.0
-	github.com/elastic/mito v1.6.0
+	github.com/elastic/mito v1.7.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
-	github.com/google/cel-go v0.15.3
+	github.com/google/cel-go v0.17.7
 	github.com/googleapis/gax-go/v2 v2.11.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
