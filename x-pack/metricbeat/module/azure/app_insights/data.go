@@ -132,123 +132,133 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 	if metricValues.Value == nil {
 		return events
 	}
-	groupedAddProp := make(map[string][]MetricValue)
+
 	mValues := mapMetricValues(metricValues)
-
-	for _, mv := range mValues {
-		if len(mv.Segments) == 0 {
-			groupedAddProp[mv.Interval] = append(groupedAddProp[mv.Interval], mv)
-		}
-	}
-
-	for _, val := range groupedAddProp {
-		event := createNoSegEvent(val, applicationId, namespace)
-		if len(event.MetricSetFields) > 0 {
-			events = append(events, event)
-		}
-	}
 
 	groupedByDimensions := groupMetricsByDimension(mValues)
 
 	for _, group := range groupedByDimensions {
-		groupedByTime := groupMetricsByTime(group)
+		event := createGroupEvent(group, newMetricTimeKey(group[0].Start.Time, group[0].End.Time), applicationId, namespace)
 
-		for ts, group := range groupedByTime {
-			events = append(
-				events,
-				createGroupEvent(group, ts, applicationId, namespace),
-			)
+		// Only add events that have metric values.
+		if len(event.MetricSetFields) > 0 {
+			events = append(events, event)
 		}
 	}
 	return events
 }
 
-// groupMetricsByTime groups metrics by their start and end times truncated to the second.
-func groupMetricsByTime(metrics []MetricValue) map[metricTimeKey][]MetricValue {
-	result := make(map[metricTimeKey][]MetricValue, len(metrics)/2)
-
-	for _, metric := range metrics {
-		// The start and end times are truncated to the nearest second.
-		// This is done to ensure that metrics that fall within the same
-		// second are grouped together, even if their actual time are
-		// slightly different.
-		timeKey := newMetricTimeKey(
-			metric.Start.Time.Truncate(time.Second),
-			metric.End.Time.Truncate(time.Second),
-		)
-		result[timeKey] = append(result[timeKey], metric)
-	}
-
-	return result
-}
-
 // groupMetricsByDimension groups the given metrics by their dimension keys.
 func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
-	var (
-		keys                 = make(map[string][]MetricValue)
-		firstStart, firstEnd *date.Time
-		helper               func(metrics []MetricValue)
-	)
+	keys := make(map[string][]MetricValue)
 
-	helper = func(metrics []MetricValue) {
-		for _, metric := range metrics {
-			dimensionKey := getSortedKeys(metric.SegmentName)
+	var stack []MetricValue
+	stack = append(stack, metrics...)
 
-			if metric.Start != nil && !metric.Start.IsZero() {
-				firstStart = metric.Start
-			}
+	// Initialize default start and end times using the first metric's times
+	// The reason we need to use first metric's start and end times is because
+	// the start and end times of the child segments are not always set.
+	firstStart := metrics[0].Start
+	firstEnd := metrics[0].End
 
-			if metric.End != nil && !metric.End.IsZero() {
-				firstEnd = metric.End
-			}
+	// Iterate until all metrics are processed
+	for len(stack) > 0 {
+		// Retrieve and remove the last metric from the stack
+		metric := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
 
-			if len(metric.Segments) > 0 {
-				for _, segment := range metric.Segments {
-					segmentKey := getSortedKeys(segment.SegmentName)
-					if segmentKey != "" {
-						combinedKey := dimensionKey + segmentKey
+		// Update default times if the current metric has valid start and end times
+		if metric.End != nil && !metric.End.IsZero() {
+			firstEnd = metric.End
+		}
+		if metric.Start != nil && !metric.Start.IsZero() {
+			firstStart = metric.Start
+		}
 
-						newMetric := MetricValue{
-							SegmentName: segment.SegmentName,
-							Value:       segment.Value,
-							Segments:    segment.Segments,
-							Interval:    segment.Interval,
-							Start:       firstStart,
-							End:         firstEnd,
-						}
+		// Generate a sorted key from the segment names to ensure consistent dimension keys
+		sortedSegmentsKey := getSortedKeys(metric.SegmentName)
 
-						keys[combinedKey] = append(keys[combinedKey], newMetric)
+		// Construct a dimension key using the default times and sorted segment names
+		dimensionKey := createDimensionKey(firstStart.Unix(), firstEnd.Unix(), sortedSegmentsKey)
+
+		// If the metric has child segments, process them
+		// This is usually the case for segments that don't have actual metric values
+		if len(metric.Segments) > 0 {
+			for _, segment := range metric.Segments {
+				// Generate a sorted key from the segment names
+				segmentKey := getSortedKeys(segment.SegmentName)
+				if segmentKey != "" {
+					// Combine the dimension key with the segment key
+					combinedKey := dimensionKey + segmentKey
+
+					// Create a new metric with the combined key and add it to the map
+					newMetric := MetricValue{
+						SegmentName: segment.SegmentName,
+						Value:       segment.Value,
+						Segments:    segment.Segments,
+						Interval:    segment.Interval,
+						Start:       firstStart,
+						End:         firstEnd,
 					}
-				}
 
-				for _, segment := range metric.Segments {
-					helper(segment.Segments)
+					keys[combinedKey] = append(keys[combinedKey], newMetric)
 				}
-			} else if dimensionKey != "" {
-				m := metric
-				m.Start, m.End = firstStart, firstEnd
-				keys[dimensionKey] = append(keys[dimensionKey], m)
+				// Add the child segments to the stack for processing
+				stack = append(stack, segment.Segments...)
+			}
+		} else {
+			// If the metric has no child segments, add it to the map using the dimension key
+			// This is usually the case for segments that have actual metric values
+			if dimensionKey != "" {
+				metric.Start, metric.End = firstStart, firstEnd
+				keys[dimensionKey] = append(keys[dimensionKey], metric)
 			}
 		}
 	}
 
-	helper(metrics)
-
 	return keys
 }
 
-// getSortedKeys returns a string of sorted keys.
+// getSortedKeys is a function that returns a string of sorted keys.
 // The keys are sorted in alphabetical order.
+//
+// By sorting the keys, we ensure that we always get the same string for the same map,
+// regardless of the order in which the keys were originally added.
+//
+// For example, consider the following two maps:
+// map1: map[string]string{"request_url_host": "", "request_url_path": "/home"}
+// map2: map[string]string{"request_url_path": "/home", "request_url_host": ""}
+// Even though they represent the same data, if we were to join their keys without sorting,
+// we would get different results: "request_url_hostrequest_url_path" for map1 and
+// "request_url_pathrequest_url_host" for map2.
+//
+// By sorting the keys, we ensure that we always get "request_url_hostrequest_url_path",
+// regardless of the order in which the keys were added to the map.
 func getSortedKeys(m map[string]string) string {
 	keys := make([]string, 0, len(m))
 	for k, v := range m {
 		keys = append(keys, k+v)
 	}
 	sort.Strings(keys)
+
 	return strings.Join(keys, "")
 }
 
+// createDimensionKey is used to generate a unique key for a specific dimension.
+// The dimension key is a combination of the start time, end time, and sorted segments.
+//
+// startTime: The start time of the metric in Unix timestamp format.
+// endTime: The end time of the metric in Unix timestamp format.
+// sortedSegments: A string representing sorted segments (metric names).
+//
+// For example: 1617225600_1617232800_request_url_hostlocalhost
+func createDimensionKey(startTime, endTime int64, sortedSegments string) string {
+	return fmt.Sprintf("%d_%d_%s", startTime, endTime, sortedSegments)
+}
+
 func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, applicationId, namespace string) mb.Event {
+	// If the metric time is zero then we don't have a valid event.
+	// This should never happen, it's a safety check.
 	if metricTime.Start.IsZero() || metricTime.End.IsZero() {
 		return mb.Event{}
 	}
@@ -261,6 +271,7 @@ func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, appli
 		}
 	}
 
+	// If we don't have any metrics then we don't have a valid event.
 	if len(metricList) == 0 {
 		return mb.Event{}
 	}
@@ -298,43 +309,6 @@ func createGroupEvent(metricValue []MetricValue, metricTime metricTimeKey, appli
 	}
 
 	return event
-}
-
-func createEvent(start *date.Time, end *date.Time, applicationId string, namespace string, metricList mapstr.M) mb.Event {
-	event := mb.Event{
-		ModuleFields: mapstr.M{
-			"application_id": applicationId,
-		},
-		MetricSetFields: mapstr.M{
-			"start_date": start,
-			"end_date":   end,
-		},
-		Timestamp: end.Time,
-	}
-	event.RootFields = mapstr.M{}
-	event.RootFields.Put("cloud.provider", "azure")
-	if namespace == "" {
-		event.ModuleFields.Put("metrics", metricList)
-	} else {
-		for key, metric := range metricList {
-			event.MetricSetFields.Put(key, metric)
-		}
-	}
-	return event
-}
-
-func createNoSegEvent(values []MetricValue, applicationId string, namespace string) mb.Event {
-	metricList := mapstr.M{}
-	for _, value := range values {
-		for key, metric := range value.Value {
-			metricList.Put(key, metric)
-		}
-	}
-	if len(metricList) == 0 {
-		return mb.Event{}
-	}
-	return createEvent(values[0].Start, values[0].End, applicationId, namespace, metricList)
-
 }
 
 func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interface{} {
