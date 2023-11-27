@@ -12,12 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -280,10 +278,10 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 	}
 
 	interval := &monitoringpb.TimeInterval{
-		StartTime: &timestamp.Timestamp{
+		StartTime: &timestamppb.Timestamp{
 			Seconds: startTime.Unix(),
 		},
-		EndTime: &timestamp.Timestamp{
+		EndTime: &timestamppb.Timestamp{
 			Seconds: endTime.Unix(),
 		},
 	}
