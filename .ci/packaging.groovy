@@ -331,7 +331,7 @@ def linuxPlatforms() {
 def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
-    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi9' : 'beats' ]
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi' : 'beats' ]
     def completeVariant = ['-complete' : 'beats']
     // Cloud is not public available, therefore it should use the beats-ci namespace.
     def cloudVariant = ['-cloud' : 'beats-ci']
