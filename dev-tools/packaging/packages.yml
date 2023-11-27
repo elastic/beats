@@ -178,12 +178,12 @@ shared:
 
   - &docker_ubi_spec
     extra_vars:
-      image_name: '{{.BeatName}}-ubi9'
+      image_name: '{{.BeatName}}-ubi'
       from: 'docker.elastic.co/ubi9/ubi-minimal'
 
   - &docker_arm_ubi_spec
     extra_vars:
-      image_name: '{{.BeatName}}-ubi9'
+      image_name: '{{.BeatName}}-ubi'
       from: 'registry.access.redhat.com/ubi9/ubi-minimal:9.3'
 
   - &elastic_docker_spec

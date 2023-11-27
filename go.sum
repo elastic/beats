@@ -696,8 +696,8 @@ github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a h1:8WfL/X6fK11
 github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.2 h1:Dg80n8cr90OZ7x+bAax/QjoW/XqTI11RmA79ZwIm9/4=
 github.com/elastic/gosigar v0.14.2/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
-github.com/elastic/mito v1.6.0 h1:0Gf0qovzgBCKfGoPKdqdGKBjS9L3mRREWNqb7zG2WYg=
-github.com/elastic/mito v1.6.0/go.mod h1:J0LW+SbpiAoiBUBEBrbH8epwNDFhWWgEWyR/9DpY04c=
+github.com/elastic/mito v1.7.0 h1:cb4/z7Pt1Sonw92ucUMPcfbzX8MC+b6Hvf4ZMBJWg74=
+github.com/elastic/mito v1.7.0/go.mod h1:nh7WSVimSs4d0N9Zakw+ZNOZL0wKl+jmQLT49JLxRQs=
 github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3 h1:ChPwRVv1RR4a0cxoGjKcyWjTEpxYfm5gydMIzo32cAw=
 github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3/go.mod h1:RAy2GVV4sTWVlNMavv3xhLsk18rxhfhDnombTe6EF5c=
 github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3 h1:FzA0/n4iMt8ojGDGRoiFPSHFvvdVIvxOxyLtiFnrLBM=
@@ -1019,8 +1019,8 @@ github.com/gomodule/redigo v1.8.3/go.mod h1:P9dn9mFrCBvWhGE1wpxx6fgq7BAeLBk+UUUz
 github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/btree v1.0.1/go.mod h1:xXMiIv4Fb/0kKde4SpL7qlzvu5cMJDRkFDxJfI9uaxA=
-github.com/google/cel-go v0.15.3 h1:W1wIeGuEs81+lBVU+cQRg1hkRT58Q6bNxvM5yn008S8=
-github.com/google/cel-go v0.15.3/go.mod h1:YzWEoI07MC/a/wj9in8GeVatqfypkldgBlwXh9bCwqY=
+github.com/google/cel-go v0.17.7 h1:6ebJFzu1xO2n7TLtN+UBqShGBhlD85bhvglh5DpcfqQ=
+github.com/google/cel-go v0.17.7/go.mod h1:HXZKzB0LXqer5lHHgfWAnlYwJaQBDKMjxjulNQzhwhY=
 github.com/google/flatbuffers v1.11.0/go.mod h1:1AeVuKshWv4vARoZatz6mlQ0JxURH0Kv5+zNeJKJCa8=
 github.com/google/flatbuffers v1.12.0/go.mod h1:1AeVuKshWv4vARoZatz6mlQ0JxURH0Kv5+zNeJKJCa8=
 github.com/google/flatbuffers v2.0.8+incompatible/go.mod h1:1AeVuKshWv4vARoZatz6mlQ0JxURH0Kv5+zNeJKJCa8=
