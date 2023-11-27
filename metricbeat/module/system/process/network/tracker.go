@@ -31,6 +31,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// give the update/request channels a bit of a buffer,
+// in cases where we're getting flooding with events and don't want to block.
+const channelBaseSize = 10
+
 // hook for testing
 var gcPidFetch = psutil.PidExistsWithContext
 
@@ -94,10 +98,13 @@ func NewNetworkTracker() (*Tracker, error) {
 		procData: map[int]PacketData{},
 		dataMut:  sync.RWMutex{},
 
-		updateChan: make(chan CounterUpdateEvent, 10),
-		reqChan:    make(chan RequestCounters, 10),
+		updateChan: make(chan CounterUpdateEvent, channelBaseSize),
+		reqChan:    make(chan RequestCounters, channelBaseSize),
 		stopChan:   make(chan struct{}, 1),
-		gctime:     time.Minute * 10,
+		// we don't want a garbage collection sweep that's too frequent,
+		// as we might delete a short-lived process before system/process has even had a chance to report it
+		// perhaps this should be `period`*2?
+		gctime: time.Minute * 10,
 		// right now, the packetbeat watcher won't work with alternate mountpoints,
 		// as support is missing from go-sysinfo. This means we can't support /hostfs settings
 		procWatcher: watcher,
@@ -151,12 +158,15 @@ func (track *Tracker) Track(ctx context.Context) error {
 				track.updateInternalTracking(update)
 			case req := <-track.reqChan:
 				track.dataMut.RLock()
-				if proc, ok := track.procData[req.Pid]; ok {
+				proc, ok := track.procData[req.Pid]
+				track.dataMut.RUnlock()
+
+				if ok {
 					req.Resp <- proc
 				} else {
 					req.Resp <- PacketData{}
 				}
-				track.dataMut.RUnlock()
+
 			case <-ctx.Done():
 				cancel()
 				return
