@@ -331,10 +331,14 @@ def linuxPlatforms() {
 def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+<<<<<<< HEAD
     def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi9' : 'beats' ]
     def completeVariant = ['-complete' : 'beats']
     // Cloud is not public available, therefore it should use the beats-ci namespace.
     def cloudVariant = ['-cloud' : 'beats-ci']
+=======
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi' : 'beats' ]
+>>>>>>> 296183ca0d (ironbank: rename ubi9 to ubi image (#37153))
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
       tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
