@@ -163,7 +163,6 @@ func createMemoryFields(stats *Stats) mapstr.M {
 			},
 			"usage": mapstr.M{
 				"total": stats.memoryStats.Usage,
-				"pct":   stats.memoryStats.UsageP,
 				"max":   stats.memoryStats.MaxUsage,
 			},
 		}

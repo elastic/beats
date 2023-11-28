@@ -251,11 +251,6 @@
               format: bytes
               description: >
                 Max memory usage.
-            - name: pct
-              type: scaled_float
-              format: percent
-              description: >
-                Memory usage percentage.
             - name: total
               type: long
               format: bytes
