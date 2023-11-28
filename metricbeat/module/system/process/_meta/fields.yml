@@ -113,7 +113,7 @@
             The shared memory the process uses.
     - name: io
       type: group
-      description: Disk I/O Metrics, as forwarded from /proc/[PID]/IO. Available on Linux only.
+      description: Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
       fields:
         - name: cancelled_write_bytes
           type: long
@@ -126,7 +126,7 @@
           description: The number of bytes written to the storage layer.
         - name: read_char
           type: long
-          description: The number of bytes read fromo read(2) and similar syscalls.
+          description: The number of bytes read from read(2) and similar syscalls.
         - name: write_char
           type: long
           description: The number of bytes sent to syscalls for writing.

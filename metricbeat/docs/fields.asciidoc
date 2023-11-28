@@ -62311,7 +62311,7 @@ format: bytes
 [float]
 === io
 
-Disk I/O Metrics, as forwarded from /proc/[PID]/IO. Available on Linux only.
+Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
 
 
 *`system.process.io.cancelled_write_bytes`*::
@@ -62344,7 +62344,7 @@ type: long
 *`system.process.io.read_char`*::
 +
 --
-The number of bytes read fromo read(2) and similar syscalls.
+The number of bytes read from read(2) and similar syscalls.
 
 type: long
 
