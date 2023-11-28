@@ -5501,18 +5501,6 @@ format: bytes
 
 --
 
-*`awsfargate.task_stats.memory.usage.pct`*::
-+
---
-Memory usage percentage.
-
-
-type: scaled_float
-
-format: percent
-
---
-
 *`awsfargate.task_stats.memory.usage.total`*::
 +
 --
