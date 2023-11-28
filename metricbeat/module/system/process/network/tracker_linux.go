@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+
 package network
 
 import (
@@ -35,56 +37,6 @@ import (
 // give the update/request channels a bit of a buffer,
 // in cases where we're getting flooding with events and don't want to block.
 const channelBaseSize = 10
-
-// PacketData tracks all counters for a given port
-type PacketData struct {
-	Incoming PortsForProtocol
-	Outgoing PortsForProtocol
-}
-
-// ContainsMetrics returns true if the metrics have non-zero data
-func (pd PacketData) ContainsMetrics() bool {
-	return pd.Incoming.TCP > 0 || pd.Incoming.UDP > 0 || pd.Outgoing.TCP > 0 || pd.Outgoing.UDP > 0
-}
-
-// PortsForProtocol tracks counters for TCP/UDP connections
-type PortsForProtocol struct {
-	TCP uint64
-	UDP uint64
-}
-
-// CounterUpdateEvent is sent every time we get new packet data for a PID
-type CounterUpdateEvent struct {
-	pktLen        int
-	TransProtocol applayer.Transport
-	Proc          *common.ProcessTuple
-}
-
-// RequestCounters is a request for packet data
-type RequestCounters struct {
-	Pid  int
-	Resp chan PacketData
-}
-
-// Tracker tracks network packets and maps them to a PID
-type Tracker struct {
-	procData    map[int]PacketData
-	dataMut     sync.RWMutex
-	procWatcher *procs.ProcessesWatcher
-
-	log    *logp.Logger
-	gctime time.Duration
-
-	updateChan chan CounterUpdateEvent
-	reqChan    chan RequestCounters
-	stopChan   chan struct{}
-
-	// special test helpers
-	loopWaiter chan struct{}
-	testmode   bool
-	// used for the garbage collection subprocess, wrapped for aid of testing
-	gcPIDFetch func(ctx context.Context, pid int32) (bool, error)
-}
 
 // NewNetworkTracker creates a new network tracker for the given config
 func NewNetworkTracker() (*Tracker, error) {
