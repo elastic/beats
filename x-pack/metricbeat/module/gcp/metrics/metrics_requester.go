@@ -15,6 +15,7 @@ import (
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -254,7 +255,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
-func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
+func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *durationpb.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
 	var startTime, endTime, currentTime time.Time
 	var needsAggregation bool
 	currentTime = time.Now().UTC()

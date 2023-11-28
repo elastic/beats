@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
+	"google.golang.org/protobuf/runtime/protoimpl"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
@@ -393,7 +394,7 @@ func generateKinesisAggregateRecord(numRecords int, valid bool) []byte {
 	}
 
 	aggRec.PartitionKeyTable = partKeyTable
-	data, _ := proto.Marshal(aggRec)
+	data, _ := proto.Marshal(protoimpl.X.ProtoMessageV2Of(aggRec))
 	md5Hash := md5.Sum(data)
 	aggRecBytes = append(aggRecBytes, data...)
 	aggRecBytes = append(aggRecBytes, md5Hash[:]...)

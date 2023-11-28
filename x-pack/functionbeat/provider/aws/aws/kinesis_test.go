@@ -16,6 +16,7 @@ import (
 	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto" //nolint:staticcheck // SA1019 dependency uses deprecated package
+	"google.golang.org/protobuf/runtime/protoimpl"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -133,14 +134,14 @@ func generateAggregatedKinesisEvent(validRec bool) events.KinesisEvent {
 	partKeyTable = append(partKeyTable, "0")
 
 	aggRec.PartitionKeyTable = partKeyTable
-	data, _ := proto.Marshal(aggRec)
+	data, _ := proto.Marshal(protoimpl.X.ProtoMessageV2Of(aggRec))
 	md5Hash := md5.Sum(data)
 	aggRecBytes = append(aggRecBytes, data...)
 	aggRecBytes = append(aggRecBytes, md5Hash[:]...)
 
 	return events.KinesisEvent{
 		Records: []events.KinesisEventRecord{
-			events.KinesisEventRecord{
+			{
 				AwsRegion:      "east-1",
 				EventID:        "1234",
 				EventName:      "connect",
