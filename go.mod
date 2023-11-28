@@ -151,7 +151,7 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.11.0
 	go.uber.org/multierr v1.11.0
-	go.uber.org/zap v1.25.0
+	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.14.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.10.0
@@ -202,9 +202,9 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/elastic-agent-autodiscover v0.6.4
-	github.com/elastic/elastic-agent-libs v0.6.2
+	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.8.2
+	github.com/elastic/elastic-agent-system-metrics v0.9.0
 	github.com/elastic/go-elasticsearch/v8 v8.10.0
 	github.com/elastic/mito v1.7.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
