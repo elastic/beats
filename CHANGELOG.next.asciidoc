@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Auditbeat*
 
 - Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
+- Fix guess trigger for system/socket creds on newer kernels. {issue}36905[36905] {pull}37136[37136]
 
 *Filebeat*
 
