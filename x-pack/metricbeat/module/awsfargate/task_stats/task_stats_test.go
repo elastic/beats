@@ -6,7 +6,7 @@ package task_stats
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -49,9 +49,8 @@ var (
         "DesiredStatus": "RUNNING",
         "KnownStatus": "ACTIVATING",
 		"Limits": {
-			"CPU": 1,
-			"Memory": 7168
-		  },
+		  "Memory": 7168
+		},
 		"Containers": [{
 			"DockerId": "query-metadata-1",
 			"Name": "query-metadata",
@@ -63,16 +62,15 @@ var (
 				"com.amazonaws.ecs.task-definition-family": "query-metadata",
 				"com.amazonaws.ecs.task-definition-version": "7"},
 			"Limits": {
-				"CPU": 2,
 				"Memory": 3328
 			}
-			}]
-		}`
+		}]
+	}`
 )
 
 func TestGetTaskStats(t *testing.T) {
 	taskStatsResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+		Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
 	}
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
@@ -82,7 +80,7 @@ func TestGetTaskStats(t *testing.T) {
 
 func TestGetTask(t *testing.T) {
 	taskResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskRespJson))),
+		Body: io.NopCloser(bytes.NewReader([]byte(taskRespJson))),
 	}
 
 	taskOutput, err := getTask(taskResp)
@@ -106,14 +104,14 @@ func TestGetTask(t *testing.T) {
 
 func TestGetStatsList(t *testing.T) {
 	taskStatsResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+		Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
 	}
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	assert.NoError(t, err)
 
 	taskResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskRespJson))),
+		Body: io.NopCloser(bytes.NewReader([]byte(taskRespJson))),
 	}
 
 	taskOutput, err := getTask(taskResp)
@@ -125,7 +123,7 @@ func TestGetStatsList(t *testing.T) {
 
 func TestGetCPUStats(t *testing.T) {
 	taskStatsResp := &http.Response{
-		Body: ioutil.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
+		Body: io.NopCloser(bytes.NewReader([]byte(taskStatsJson))),
 	}
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
