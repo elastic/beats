@@ -228,7 +228,6 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	var result []Metric
 
 	// Same end time for all metrics in the same batch.
-	//referenceTime := time.Now().UTC()
 	interval := client.Config.Period
 
 	// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
