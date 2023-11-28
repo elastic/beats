@@ -7,11 +7,6 @@ package salesforce
 import "time"
 
 type state struct {
-	StartTime time.Time `struct:"start_timestamp"`
-	LogTime   string    `struct:"timestamp"`
-}
-
-// setCheckpoint sets checkpoint from source to current state instance.
-func (s *state) setCheckpoint(chkpt string) {
-	s.LogTime = chkpt
+	StartTime   time.Time `struct:"start_timestamp"`
+	LogDateTime string    `struct:"timestamp"`
 }
