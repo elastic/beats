@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
+- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
 
 *Osquerybeat*
 
