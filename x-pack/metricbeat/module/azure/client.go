@@ -62,7 +62,7 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 		timeGrainStartTime := referenceTime.Add(-timeGrainDuration)
 
 		// If the last collection time is after the start time of the time grain,
-		// it means that we already have a value for the give time grain.
+		// it means that we already have a value for the given time grain.
 		//
 		// In this case, the metricset does not need to collect the metric
 		// values again.
