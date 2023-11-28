@@ -20,7 +20,6 @@
 package network
 
 import (
-	"context"
 	"errors"
 )
 
@@ -30,7 +29,7 @@ func NewNetworkTracker() (*Tracker, error) {
 }
 
 // Track is a bare tracker implementation
-func (track *Tracker) Track(ctx context.Context) error { return nil }
+func (track *Tracker) Track() error { return nil }
 
 // Stop is a bare stop implementation
 func (track *Tracker) Stop() {}

@@ -20,7 +20,6 @@
 package process
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"runtime"
@@ -103,7 +102,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error creating network tracker: %w", err)
 		}
-		err = m.networkMonitoring.Track(context.Background())
+		err = m.networkMonitoring.Track()
 		if err != nil {
 			return nil, fmt.Errorf("error starting network tracker: %w", err)
 		}
@@ -126,11 +125,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	for evtI := range procs {
 		if m.networkMonitoring != nil {
-			pid, err := extractPid(roots[evtI])
+			pid, err := extractPID(roots[evtI])
 			if err != nil {
 				m.Logger().Debugf("error fetching pid for network data: %s", err)
 			} else {
-				netData := m.networkMonitoring.Get(int(pid))
+				netData := m.networkMonitoring.Get(pid)
 				if netData.ContainsMetrics() {
 					procs[evtI].Put("network.usage", mapstr.M{
 						"inbound": mapstr.M{
@@ -163,14 +162,14 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func extractPid(rootMap mapstr.M) (uint64, error) {
+func extractPID(rootMap mapstr.M) (int, error) {
 	rawPid, err := rootMap.GetValue("process.pid")
 	if err != nil {
 		return 0, fmt.Errorf("error fetching root event PID for pid: %w", err)
 	}
 
 	if unwrappedPid, ok := rawPid.(int); ok {
-		return uint64(unwrappedPid), nil
+		return unwrappedPid, nil
 	}
 	return 0, fmt.Errorf("could not unpack PID from root event, got %T", rawPid)
 

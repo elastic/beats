@@ -33,14 +33,14 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
-// RunPacketHandle starts the packet capture process
+// runPacketHandle starts the packet capture process
 // As of now, this uses AF_PACKET, which is linux-only. However, unlike pcap, we're not
 // importing libpcap, which would introduce another runtime dependency into metricbeat.
-func RunPacketHandle(ctx context.Context, afHandle *afpacket.TPacket, watcher *procs.ProcessesWatcher, procTracker *Tracker) error {
+func runPacketHandle(ctx context.Context, afHandle *afpacket.TPacket, watcher *procs.ProcessesWatcher, procTracker *Tracker) error {
+	defer afHandle.Close()
 	for {
 		select {
 		case <-ctx.Done():
-			afHandle.Close()
 			return nil
 		default:
 		}

@@ -50,8 +50,8 @@ func NewNetworkTracker() (*Tracker, error) {
 		procData: map[int]PacketData{},
 		dataMut:  sync.RWMutex{},
 
-		updateChan: make(chan CounterUpdateEvent, channelBaseSize),
-		reqChan:    make(chan RequestCounters, channelBaseSize),
+		updateChan: make(chan counterUpdateEvent, channelBaseSize),
+		reqChan:    make(chan requestCounters, channelBaseSize),
 		stopChan:   make(chan struct{}, 1),
 		// we don't want a garbage collection sweep that's too frequent,
 		// as we might delete a short-lived process before system/process has even had a chance to report it
@@ -70,12 +70,12 @@ func NewNetworkTracker() (*Tracker, error) {
 
 // Update the tracker with the given counts
 func (track *Tracker) Update(packetLen int, proto applayer.Transport, proc *common.ProcessTuple) {
-	track.updateChan <- CounterUpdateEvent{pktLen: packetLen, TransProtocol: proto, Proc: proc}
+	track.updateChan <- counterUpdateEvent{pktLen: packetLen, TransProtocol: proto, Proc: proc}
 }
 
 // Get data for a given PID
 func (track *Tracker) Get(pid int) PacketData {
-	req := RequestCounters{Pid: pid, Resp: make(chan PacketData)}
+	req := requestCounters{PID: pid, Resp: make(chan PacketData)}
 	track.reqChan <- req
 	got := <-req.Resp
 	return got
@@ -88,7 +88,7 @@ func (track *Tracker) Stop() {
 
 // Track is a non-blocking operation that starts a packet sniffer, and the underlying
 // tracker that correlates packet data with pids
-func (track *Tracker) Track(ctx context.Context) error {
+func (track *Tracker) Track() error {
 	var afHandle *afpacket.TPacket
 	var err error
 	if !track.testmode {
@@ -98,10 +98,10 @@ func (track *Tracker) Track(ctx context.Context) error {
 		}
 	}
 
-	helperContext, helperCancel := context.WithCancel(ctx)
+	helperContext, helperCancel := context.WithCancel(context.Background())
 	go func() {
 		if !track.testmode {
-			err := RunPacketHandle(helperContext, afHandle, track.procWatcher, track)
+			err := runPacketHandle(helperContext, afHandle, track.procWatcher, track)
 			if err != nil {
 				track.log.Errorf("error starting packet capture: %s", err)
 				helperCancel()
@@ -120,7 +120,7 @@ func (track *Tracker) Track(ctx context.Context) error {
 				track.updateInternalTracking(update)
 			case req := <-track.reqChan:
 				track.dataMut.RLock()
-				proc, ok := track.procData[req.Pid]
+				proc, ok := track.procData[req.PID]
 				track.dataMut.RUnlock()
 
 				if ok {
@@ -128,10 +128,6 @@ func (track *Tracker) Track(ctx context.Context) error {
 				} else {
 					req.Resp <- PacketData{}
 				}
-
-			case <-ctx.Done():
-				helperCancel()
-				return
 			case <-helperContext.Done():
 				return
 			case <-track.stopChan:
@@ -175,7 +171,7 @@ func (track *Tracker) garbageCollect(ctx context.Context) {
 					delete(track.procData, key)
 				}
 				track.dataMut.Unlock()
-				track.log.Infof("removed PIDs %v from network process tracker", keysToDelete)
+				track.log.Debugf("removed PIDs %v from network process tracker", keysToDelete)
 			}
 		case <-ctx.Done():
 			return
@@ -190,7 +186,7 @@ func (track *Tracker) garbageCollect(ctx context.Context) {
 
 }
 
-func (track *Tracker) updateInternalTracking(update CounterUpdateEvent) {
+func (track *Tracker) updateInternalTracking(update counterUpdateEvent) {
 	track.dataMut.Lock()
 	defer track.dataMut.Unlock()
 	if update.Proc.Src.PID != 0 {

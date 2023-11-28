@@ -32,23 +32,21 @@ import (
 
 type testCase struct {
 	name     string
-	inputs   []CounterUpdateEvent
+	inputs   []counterUpdateEvent
 	expected map[int]PacketData
 }
 
 func TestPacketGetUpdate(t *testing.T) {
 	testTrack := &Tracker{
 		procData:   make(map[int]PacketData),
-		updateChan: make(chan CounterUpdateEvent, 10),
-		reqChan:    make(chan RequestCounters),
+		updateChan: make(chan counterUpdateEvent, 10),
+		reqChan:    make(chan requestCounters),
 		stopChan:   make(chan struct{}),
 		testmode:   true,
 		gctime:     time.Minute * 10,
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
 
-	err := testTrack.Track(ctx)
+	err := testTrack.Track()
 	require.NoError(t, err)
 
 	testTrack.Update(40, applayer.TransportTCP, &common.ProcessTuple{Src: common.Process{PID: 11}})
@@ -63,8 +61,8 @@ func TestGarbageCollect(t *testing.T) {
 	_ = logp.DevelopmentSetup()
 	testTrack := &Tracker{
 		procData:   make(map[int]PacketData),
-		updateChan: make(chan CounterUpdateEvent, 10),
-		reqChan:    make(chan RequestCounters),
+		updateChan: make(chan counterUpdateEvent, 10),
+		reqChan:    make(chan requestCounters),
 		stopChan:   make(chan struct{}, 1),
 		testmode:   true,
 		gctime:     time.Millisecond,
@@ -116,7 +114,7 @@ func TestPacketUpdates(t *testing.T) {
 	cases := []testCase{
 		{
 			name: "base-case",
-			inputs: []CounterUpdateEvent{
+			inputs: []counterUpdateEvent{
 				{
 					pktLen:        40,
 					TransProtocol: applayer.TransportTCP,
@@ -124,12 +122,12 @@ func TestPacketUpdates(t *testing.T) {
 				},
 			},
 			expected: map[int]PacketData{
-				11: {Outgoing: PortsForProtocol{TCP: 40}},
+				11: {Outgoing: ProtocolCounters{TCP: 40}},
 			},
 		},
 		{
 			name: "multiple-proto",
-			inputs: []CounterUpdateEvent{
+			inputs: []counterUpdateEvent{
 				{
 					pktLen:        40,
 					TransProtocol: applayer.TransportTCP,
@@ -157,9 +155,9 @@ func TestPacketUpdates(t *testing.T) {
 				},
 			},
 			expected: map[int]PacketData{
-				11: {Outgoing: PortsForProtocol{TCP: 81}, Incoming: PortsForProtocol{TCP: 70}},
-				13: {Outgoing: PortsForProtocol{UDP: 44}},
-				23: {Outgoing: PortsForProtocol{TCP: 10}},
+				11: {Outgoing: ProtocolCounters{TCP: 81}, Incoming: ProtocolCounters{TCP: 70}},
+				13: {Outgoing: ProtocolCounters{UDP: 44}},
+				23: {Outgoing: ProtocolCounters{TCP: 10}},
 			},
 		},
 	}
@@ -168,16 +166,14 @@ func TestPacketUpdates(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			testTrack := &Tracker{
 				procData:   make(map[int]PacketData),
-				updateChan: make(chan CounterUpdateEvent),
-				reqChan:    make(chan RequestCounters, 10),
+				updateChan: make(chan counterUpdateEvent),
+				reqChan:    make(chan requestCounters, 10),
 				stopChan:   make(chan struct{}),
 				testmode:   true,
 				gctime:     time.Minute,
 			}
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-			defer cancel()
 
-			err := testTrack.Track(ctx)
+			err := testTrack.Track()
 			require.NoError(t, err)
 
 			for _, input := range testCase.inputs {

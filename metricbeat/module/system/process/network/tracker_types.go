@@ -30,31 +30,31 @@ import (
 
 // PacketData tracks all counters for a given port
 type PacketData struct {
-	Incoming PortsForProtocol
-	Outgoing PortsForProtocol
+	Incoming ProtocolCounters
+	Outgoing ProtocolCounters
 }
 
 // ContainsMetrics returns true if the metrics have non-zero data
 func (pd PacketData) ContainsMetrics() bool {
-	return pd.Incoming.TCP > 0 || pd.Incoming.UDP > 0 || pd.Outgoing.TCP > 0 || pd.Outgoing.UDP > 0
+	return pd != PacketData{}
 }
 
-// PortsForProtocol tracks counters for TCP/UDP connections
-type PortsForProtocol struct {
+// ProtocolCounters tracks counters for TCP/UDP connections
+type ProtocolCounters struct {
 	TCP uint64
 	UDP uint64
 }
 
-// CounterUpdateEvent is sent every time we get new packet data for a PID
-type CounterUpdateEvent struct {
+// counterUpdateEvent is sent every time we get new packet data for a PID
+type counterUpdateEvent struct {
 	pktLen        int
 	TransProtocol applayer.Transport
 	Proc          *common.ProcessTuple
 }
 
-// RequestCounters is a request for packet data
-type RequestCounters struct {
-	Pid  int
+// requestCounters is a request for packet data
+type requestCounters struct {
+	PID  int
 	Resp chan PacketData
 }
 
@@ -67,8 +67,8 @@ type Tracker struct {
 	log    *logp.Logger
 	gctime time.Duration
 
-	updateChan chan CounterUpdateEvent
-	reqChan    chan RequestCounters
+	updateChan chan counterUpdateEvent
+	reqChan    chan requestCounters
 	stopChan   chan struct{}
 
 	// special test helpers
