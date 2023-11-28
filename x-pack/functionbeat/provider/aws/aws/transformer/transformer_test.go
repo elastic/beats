@@ -20,7 +20,7 @@ import (
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
 	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/protobuf/proto" //nolint:staticcheck // SA1019 dependency uses deprecated package
+	"google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -34,7 +34,7 @@ func TestCloudwatch(t *testing.T) {
 		SubscriptionFilters: []string{"MyFilter"},
 		MessageType:         "DATA_MESSAGE",
 		LogEvents: []events.CloudwatchLogsLogEvent{
-			events.CloudwatchLogsLogEvent{
+			{
 				ID:        "1234567890123456789",
 				Timestamp: 1566908691193,
 				Message:   "my interesting message",
