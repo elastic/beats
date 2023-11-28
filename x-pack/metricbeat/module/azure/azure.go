@@ -96,8 +96,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// depending on metric time grain (check `MetricRegistry`
 	// for more information).
 	//
-	// We truncate the reference time to the second to avoid
-	// comparison issues due to milliseconds.
+	// We truncate the reference time to the second to avoid millisecond
+	// variations in the collection period causing skipped collections.
 	referenceTime := time.Now().UTC().Truncate(time.Second)
 
 	// Initialize cloud resources and monitor metrics
