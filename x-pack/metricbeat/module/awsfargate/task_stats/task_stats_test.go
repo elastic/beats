@@ -48,6 +48,10 @@ var (
 		"Revision": "7",
         "DesiredStatus": "RUNNING",
         "KnownStatus": "ACTIVATING",
+		"Limits": {
+			"CPU": 1,
+			"Memory": 7168
+		  },
 		"Containers": [{
 			"DockerId": "query-metadata-1",
 			"Name": "query-metadata",
@@ -57,7 +61,11 @@ var (
 				"com.amazonaws.ecs.container-name": "query-metadata",
 				"com.amazonaws.ecs.task-arn": "arn:aws:ecs:us-west-2:111122223333:task/default/febee046097849aba589d4435207c04a",
 				"com.amazonaws.ecs.task-definition-family": "query-metadata",
-				"com.amazonaws.ecs.task-definition-version": "7"}
+				"com.amazonaws.ecs.task-definition-version": "7"},
+			"Limits": {
+				"CPU": 2,
+				"Memory": 3328
+			}
 			}]
 		}`
 )
@@ -87,11 +95,13 @@ func TestGetTask(t *testing.T) {
 	assert.Equal(t, "RUNNING", taskOutput.DesiredStatus)
 	assert.Equal(t, "ACTIVATING", taskOutput.KnownStatus)
 
+	assert.Equal(t, uint64(7168), taskOutput.Limit.Memory)
 	assert.Equal(t, 1, len(taskOutput.Containers))
 	assert.Equal(t, "query-metadata-1", taskOutput.Containers[0].DockerId)
 	assert.Equal(t, "query-metadata", taskOutput.Containers[0].Name)
 	assert.Equal(t, "mreferre/eksutils", taskOutput.Containers[0].Image)
 	assert.Equal(t, 5, len(taskOutput.Containers[0].Labels))
+	assert.Equal(t, uint64(3328), taskOutput.Containers[0].Limits.Memory)
 }
 
 func TestGetStatsList(t *testing.T) {

@@ -79,7 +79,13 @@ type TaskMetadata struct {
 	Revision      string       `json:"Revision"`
 	DesiredStatus string       `json:"DesiredStatus"`
 	KnownStatus   string       `json:"KnownStatus"`
+	Limit         Limits       `json:"Limits"`
 	Containers    []*container `json:"Containers"`
+}
+
+// Limits is a struct that represents the memory limit from ${ECS_CONTAINER_METADATA_URI_V4}/task
+type Limits struct {
+	Memory uint64 `json:"Memory"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
