@@ -151,7 +151,6 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 			}
 
 			var events []mapstr.M
-			//nolint:errcheck // All the errors returned here are from mapstr.M queries and may be ignored.
 			for i, p := range k.Processed {
 				err = wintest.ErrorMessage(p)
 				if err != nil {
@@ -272,7 +271,7 @@ func normalize(t testing.TB, m mapstr.M) mapstr.M {
 
 func filterEvent(m mapstr.M, ignores []string) mapstr.M {
 	for _, f := range ignores {
-		m.Delete(f) //nolint:errcheck // Deleting a thing that doesn't exist is ok.
+		m.Delete(f)
 	}
 	return m
 }
@@ -289,7 +288,7 @@ func lowercaseGUIDs(m mapstr.M) mapstr.M {
 			continue
 		}
 		if uppercaseGUIDRegex.MatchString(str) {
-			m.Put(k, strings.ToLower(str)) //nolint:errcheck // Can't fail because k has been obtained from m.
+			m.Put(k, strings.ToLower(str))
 		}
 	}
 	return m
