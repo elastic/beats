@@ -23987,11 +23987,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/v2@v2.4.4/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/ecszap
-Version: v1.0.1
+Version: v1.0.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.2/LICENSE:
 
 
                                  Apache License
