@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pmezard/go-difflib/difflib"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -215,14 +215,8 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 	expJSON, _ := json.MarshalIndent(expected, "", "  ")
 	actJSON, _ := json.MarshalIndent(actual, "", "  ")
 
-	diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-		A:        difflib.SplitLines(string(expJSON)),
-		B:        difflib.SplitLines(string(actJSON)),
-		FromFile: "Expected",
-		ToFile:   "Actual",
-		Context:  1,
-	})
-	t.Errorf("Expected and actual are different:\n%s", diff)
+	t.Errorf("Expected and actual are different:\n%s",
+		cmp.Diff(string(expJSON), string(actJSON)))
 	return false
 }
 
