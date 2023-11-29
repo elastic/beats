@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
 - Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
 - Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
+- Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
 
 *Osquerybeat*
 
