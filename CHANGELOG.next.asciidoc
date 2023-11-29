@@ -230,6 +230,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Libbeat*
 
+- Added support for ETW reader. {pull}36914[36914]
+
 *Heartbeat*
 - Added status to monitor run log report.
 - Capture and log the individual connection metrics for all the lightweight monitors
