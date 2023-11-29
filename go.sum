@@ -1361,7 +1361,6 @@ github.com/linuxkit/virtsock v0.0.0-20201010232012-f8cee7dfc7a3/go.mod h1:3r6x7q
 github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 h1:6E+4a0GO5zZEnZ81pIr0yLvtUWk2if982qA3F3QD6H4=
 github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0/go.mod h1:zJYVVT2jmtg6P3p1VtQj7WsuWi/y4VnjVBn7F8KPB3I=
 github.com/lyft/protoc-gen-validate v0.0.13/go.mod h1:XbGvPuh87YZc5TdIa2/I4pLk0QoUACkjt2znoq26NVQ=
-github.com/magefile/mage v1.9.0/go.mod h1:z5UZb/iS3GoOSn0JgWuiw7dxlurVYTu+/jHXqQg881A=
 github.com/magefile/mage v1.15.0 h1:BvGheCMAsG3bWUDbZ8AyXXpCNwU9u5CB6sM+HNb9HYg=
 github.com/magefile/mage v1.15.0/go.mod h1:z5UZb/iS3GoOSn0JgWuiw7dxlurVYTu+/jHXqQg881A=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
@@ -1913,8 +1912,8 @@ go.elastic.co/apm/module/apmhttp/v2 v2.4.4 h1:BcJDLFztZByHiJRXXvAHY7bue9+vhzMLn2
 go.elastic.co/apm/module/apmhttp/v2 v2.4.4/go.mod h1:694qsHWRPVkfYqQ224ZSeRx9Dt2FS/xF1igNBGkHi6o=
 go.elastic.co/apm/v2 v2.4.4 h1:KGbmUEtLNQ6sCFGpqTMhfRjqDOKP8IliO+efErKY5lU=
 go.elastic.co/apm/v2 v2.4.4/go.mod h1:+CiBUdrrAGnGCL9TNx7tQz3BrfYV23L8Ljvotoc87so=
-go.elastic.co/ecszap v1.0.1 h1:mBxqEJAEXBlpi5+scXdzL7LTFGogbuxipJC0KTZicyA=
-go.elastic.co/ecszap v1.0.1/go.mod h1:SVjazT+QgNeHSGOCUHvRgN+ZRj5FkB7IXQQsncdF57A=
+go.elastic.co/ecszap v1.0.2 h1:iW5OGx8IiokiUzx/shD4AJCPFMC9uUtr7ycaiEIU++I=
+go.elastic.co/ecszap v1.0.2/go.mod h1:dJkSlK3BTiwG/qXhCwe50Mz/jwu854vSip8sIeQhNZg=
 go.elastic.co/fastjson v1.1.0 h1:3MrGBWWVIxe/xvsbpghtkFoPciPhOCmjsR/HfwEeQR4=
 go.elastic.co/fastjson v1.1.0/go.mod h1:boNGISWMjQsUPy/t6yqt2/1Wx4YNPSe+mZjlyw9vKKI=
 go.elastic.co/go-licence-detector v0.6.0 h1:QJ+cUIHC0JpxEKgp5Bj0pabEiOOt9H1O9CCcUNe6yRQ=
@@ -1984,7 +1983,7 @@ go.uber.org/zap v1.10.0/go.mod h1:vwi/ZaCAaUcBkycHslxD9B2zi4UTXhF60s6SWpuDF0Q=
 go.uber.org/zap v1.13.0/go.mod h1:zwrFLgMcdUuIBviXEYEH1YKNaOBnKXsx2IPda5bBwHM=
 go.uber.org/zap v1.14.0/go.mod h1:zwrFLgMcdUuIBviXEYEH1YKNaOBnKXsx2IPda5bBwHM=
 go.uber.org/zap v1.14.1/go.mod h1:Mb2vm2krFEG5DV0W9qcHBYFtp/Wku1cvYaqPsS/WYfc=
-go.uber.org/zap v1.21.0/go.mod h1:wjWOCqI0f2ZZrJF/UufIOkiC8ii6tm1iqIsLo76RfJw=
+go.uber.org/zap v1.24.0/go.mod h1:2kMP+WWQ8aoFoedH3T2sq6iJ2yDWpHbP0f6MQbS9Gkg=
 go.uber.org/zap v1.25.0 h1:4Hvk6GtkucQ790dqmj7l1eEnRdKm3k3ZUrUMS2d5+5c=
 go.uber.org/zap v1.25.0/go.mod h1:JIAUzQIH94IC4fOJQm7gMmBJP5k7wQfdcnYdPoEXJYk=
 golang.org/x/crypto v0.0.0-20171113213409-9f005a07e0d3/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
