@@ -114,7 +114,7 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		Version:     cfg.Version,
 	}
 
-	query := querier{Query: cfg.Query.SOQL}
+	query := querier{Query: buf.String()}
 
 	err = periodically(ctx, cfg.Interval, func() error {
 		cursor.StartTime = time.Now()
@@ -169,7 +169,12 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 						Fields:    mapstr.M{"event": mapstr.M{"original": val}},
 					}
 
-					cursor.LogDateTime = val["TIMESTAMP_DERIVED"].(string)
+					if timstamp, ok := val["TIMESTAMP_DERIVED"].(string); ok {
+						cursor.LogDateTime = timstamp
+					} else {
+						cursor.LogDateTime = time.Now().Format(time.RFC3339)
+					}
+
 					err = pub.Publish(event, cursor)
 					if err != nil {
 						return err
