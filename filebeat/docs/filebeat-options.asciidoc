@@ -91,6 +91,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-udp>>
 * <<{beatname_lc}-input-gcs>>
+* <<{beatname_lc}-input-etw>>
 
 include::multiline.asciidoc[]
 
@@ -145,3 +146,5 @@ include::inputs/input-udp.asciidoc[]
 include::inputs/input-unix.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-gcs.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-etw.asciidoc[]
