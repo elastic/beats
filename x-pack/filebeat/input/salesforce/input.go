@@ -24,6 +24,7 @@ import (
 	"github.com/g8rswimmer/go-sfdc/credentials"
 	"github.com/g8rswimmer/go-sfdc/session"
 	"github.com/g8rswimmer/go-sfdc/soql"
+	"golang.org/x/exp/slices"
 )
 
 const inputName = "salesforce"
@@ -233,6 +234,9 @@ func decodeAsCSV(p []byte) ([]map[string]interface{}, error) {
 		}
 		return nil, err
 	}
+
+	// As buffer reuse is enabled, copying header is important.
+	header = slices.Clone(header)
 
 	var results []map[string]interface{}
 
