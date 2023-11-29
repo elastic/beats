@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -166,17 +165,12 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 				}
 
 				for _, val := range recs {
-					jsonStrEvent, err := json.Marshal(val)
-					if err != nil {
-						return err
-					}
-
 					event := beat.Event{
 						Timestamp: time.Now(),
-						Fields:    mapstr.M{"event": mapstr.M{"original": jsonStrEvent}},
+						Fields:    mapstr.M{"event": mapstr.M{"original": val}},
 					}
 
-					if timstamp, ok := val["TIMESTAMP_DERIVED"].(string); ok {
+					if timstamp, ok := val["TIMESTAMP_DERIVED"]; ok {
 						cursor.LogDateTime = timstamp
 					} else {
 						cursor.LogDateTime = time.Now().Format(time.RFC3339)
@@ -217,7 +211,7 @@ type textContextError struct {
 }
 
 // decodeAsCSV decodes p as a headed CSV document into dst.
-func decodeAsCSV(p []byte) ([]map[string]interface{}, error) {
+func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	r := csv.NewReader(bytes.NewReader(p))
 	r.ReuseRecord = true // to control sharing of backing array for performance
 
@@ -238,14 +232,14 @@ func decodeAsCSV(p []byte) ([]map[string]interface{}, error) {
 	// As buffer reuse is enabled, copying header is important.
 	header = slices.Clone(header)
 
-	var results []map[string]interface{}
+	var results []map[string]string
 
 	event, err := r.Read()
 	for ; err == nil; event, err = r.Read() {
 		if err != nil {
 			continue
 		}
-		o := make(map[string]interface{}, len(header))
+		o := make(map[string]string, len(header))
 		for i, h := range header {
 			o[h] = event[i]
 		}
