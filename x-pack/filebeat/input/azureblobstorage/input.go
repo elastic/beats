@@ -23,6 +23,12 @@ type azurebsInput struct {
 	serviceURL string
 }
 
+// defines the valid range for Unix timestamps for 64 bit integers
+var (
+	minTimestamp = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+	maxTimestamp = time.Date(3000, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+)
+
 const (
 	inputName string = "azure-blob-storage"
 )
@@ -30,7 +36,7 @@ const (
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Azure Blob Storage logs",
 		Doc:        "Collect logs from Azure Blob Storage Service",
@@ -53,12 +59,18 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	var sources []cursor.Source
 	for _, c := range config.Containers {
 		container := tryOverrideOrDefault(config, c)
+		if container.TimeStampEpoch != nil && !isValidUnixTimestamp(*container.TimeStampEpoch) {
+			return nil, nil, fmt.Errorf("invalid timestamp epoch: %d", *container.TimeStampEpoch)
+		}
 		sources = append(sources, &Source{
-			AccountName:   config.AccountName,
-			ContainerName: c.Name,
-			MaxWorkers:    *container.MaxWorkers,
-			Poll:          *container.Poll,
-			PollInterval:  *container.PollInterval,
+			AccountName:              config.AccountName,
+			ContainerName:            c.Name,
+			MaxWorkers:               *container.MaxWorkers,
+			Poll:                     *container.Poll,
+			PollInterval:             *container.PollInterval,
+			TimeStampEpoch:           container.TimeStampEpoch,
+			ExpandEventListFromField: container.ExpandEventListFromField,
+			FileSelectors:            container.FileSelectors,
 		})
 	}
 
@@ -85,7 +97,6 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.MaxWorkers = &maxWorkers
 	}
-
 	if c.Poll == nil {
 		var poll bool
 		if cfg.Poll != nil {
@@ -93,7 +104,6 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.Poll = &poll
 	}
-
 	if c.PollInterval == nil {
 		interval := time.Second * 300
 		if cfg.PollInterval != nil {
@@ -101,7 +111,22 @@ func tryOverrideOrDefault(cfg config, c container) container {
 		}
 		c.PollInterval = &interval
 	}
+	if c.TimeStampEpoch == nil {
+		c.TimeStampEpoch = cfg.TimeStampEpoch
+	}
+	if c.ExpandEventListFromField == "" {
+		c.ExpandEventListFromField = cfg.ExpandEventListFromField
+	}
+	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
+		c.FileSelectors = cfg.FileSelectors
+	}
 	return c
+}
+
+// isValidUnixTimestamp checks if the timestamp is a valid Unix timestamp
+func isValidUnixTimestamp(timestamp int64) bool {
+	// checks if the timestamp is within the valid range
+	return minTimestamp <= timestamp && timestamp <= maxTimestamp
 }
 
 func (input *azurebsInput) Name() string {

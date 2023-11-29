@@ -52,3 +52,21 @@ func defaultConf() conf {
 		UpdateInterval: defaultUpdateInterval,
 	}
 }
+
+func (c *conf) wantUsers() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users":
+		return true
+	default:
+		return false
+	}
+}
+
+func (c *conf) wantDevices() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "devices":
+		return true
+	default:
+		return false
+	}
+}

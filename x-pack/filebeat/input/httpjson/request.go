@@ -385,7 +385,7 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 		lastResponse:  &response{body: dataMap},
 	}
 
-	val, err := expression.Execute(paramCtx, tr, "", nil, log)
+	val, err := expression.Execute(paramCtx, tr, "response_evaluation", nil, log)
 	if err != nil {
 		return false, fmt.Errorf("error while evaluating expression: %w", err)
 	}
