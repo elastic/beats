@@ -14083,11 +14083,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-lookslike
-Version: v0.3.0
+Version: v1.0.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-lookslike@v0.3.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-lookslike@v1.0.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
