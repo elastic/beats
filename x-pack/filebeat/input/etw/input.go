@@ -74,6 +74,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	e.log.Info("Starting " + inputName + " input")
 
 	var wg sync.WaitGroup
+	var once sync.Once
 
 	// Handle realtime session creation or attachment.
 	if e.etwSession.Realtime {
@@ -81,22 +82,22 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 			// Attach to an existing session.
 			err = e.etwSession.GetHandler()
 			if err != nil {
-				return fmt.Errorf("unable to retrieve handler for session '%s': %w", e.etwSession.Name, err)
+				return fmt.Errorf("unable to retrieve handler: %w", err)
 			}
-			e.log.Debug("attached to existing session '%s'", e.etwSession.Name)
+			e.log.Debug("attached to existing session")
 		} else {
 			// Create a new realtime session.
 			err = e.etwSession.CreateRealtimeSession()
 			if err != nil {
-				return fmt.Errorf("realtime session '%s' could not be created: %w", e.etwSession.Name, err)
+				return fmt.Errorf("realtime session could not be created: %w", err)
 			}
-			e.log.Debug("created session '%s'", e.etwSession.Name)
+			e.log.Debug("created session")
 		}
 	}
 	// Defer the cleanup and closing of resources.
 	defer func() {
 		wg.Wait() // Ensure all goroutines have finished before closing.
-		e.close()
+		once.Do(e.Close)
 		e.log.Info(inputName + " input stopped")
 	}()
 
@@ -140,18 +141,24 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		defer wg.Done()
 		e.log.Debug("starting to listen ETW events")
 		if err = e.etwSession.StartConsumer(); err != nil {
-			e.log.Warnf("events could not be read from '%s': %w", e.etwSession.Name, err)
+			e.log.Warnf("events could not be read from session: %w", err)
 		}
-		e.log.Debug("stopped to read ETW events from '%s'", e.etwSession.Name)
+		e.log.Debug("stopped to read ETW events from session")
+	}()
+
+	// We ensure resources are closed when receiving a cancelation signal
+	go func() {
+		<-ctx.Cancelation.Done()
+		once.Do(e.Close)
 	}()
 
 	return nil
 }
 
 // close stops the ETW session and logs the outcome.
-func (e *etwInput) close() {
+func (e *etwInput) Close() {
 	if err := e.etwSession.StopSession(); err != nil {
-		e.log.Error("failed to shutdown ETW session '%s'", e.etwSession.Name)
+		e.log.Error("failed to shutdown ETW session")
 	}
-	e.log.Info("successfully shutdown for '%s'", e.etwSession.Name)
+	e.log.Info("successfully shutdown")
 }
