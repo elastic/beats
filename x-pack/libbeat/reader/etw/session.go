@@ -118,8 +118,11 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 	// Initialize mandatory fields of the EventTraceProperties struct.
 	// Filled based on https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
 	sessionProperties.Wnode.BufferSize = uint32(bufSize)
-	sessionProperties.Wnode.Guid = GUID{}     // GUID not required for non-private/kernel sessions
-	sessionProperties.Wnode.ClientContext = 1 // Use Query Performance Counter for time resolution
+	sessionProperties.Wnode.Guid = GUID{} // GUID not required for non-private/kernel sessions
+	// ClientContext is used for timestamp resolution
+	// Not used unless adding PROCESS_TRACE_MODE_RAW_TIMESTAMP flag to EVENT_TRACE_LOGFILE struct
+	// See https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
+	sessionProperties.Wnode.ClientContext = 1
 	sessionProperties.Wnode.Flags = WNODE_FLAG_TRACED_GUID
 	// Set logging mode to real-time
 	// See https://learn.microsoft.com/en-us/windows/win32/etw/logging-mode-constants

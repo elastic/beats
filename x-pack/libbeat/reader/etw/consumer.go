@@ -19,14 +19,14 @@ func (s *Session) StartConsumer() error {
 
 	// Configure EventTraceLogfile based on the session type (realtime or not).
 	if !s.Realtime {
-		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_RAW_TIMESTAMP
+		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD
 		logfilePtr, err := syscall.UTF16PtrFromString(s.Name)
 		if err != nil {
 			return fmt.Errorf("failed to convert logfile name")
 		}
 		elf.LogFileName = logfilePtr
 	} else {
-		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_RAW_TIMESTAMP | PROCESS_TRACE_MODE_REAL_TIME
+		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_REAL_TIME
 		sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
 		if err != nil {
 			return fmt.Errorf("failed to convert session name")
