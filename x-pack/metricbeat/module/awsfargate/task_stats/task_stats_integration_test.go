@@ -31,9 +31,11 @@ func TestFetch(t *testing.T) {
 
 	taskStatsResp, err := buildResponse("./_meta/testdata/task_stats.json")
 	assert.NoError(t, err)
+	defer taskStatsResp.Body.Close()
 
 	byteTaskResp, err := buildResponse("./_meta/testdata/task.json")
 	assert.NoError(t, err)
+	defer byteTaskResp.Body.Close()
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	assert.NoError(t, err)
@@ -69,9 +71,11 @@ func TestData(t *testing.T) {
 
 	taskStatsResp, err := buildResponse("./_meta/testdata/task_stats.json")
 	assert.NoError(t, err)
+	defer taskStatsResp.Body.Close()
 
 	byteTaskResp, err := buildResponse("./_meta/testdata/task.json")
 	assert.NoError(t, err)
+	defer byteTaskResp.Body.Close()
 
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	assert.NoError(t, err)

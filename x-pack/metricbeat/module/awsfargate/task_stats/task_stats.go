@@ -137,6 +137,8 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	defer taskStatsResp.Body.Close()
+
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	if err != nil {
 		return nil, fmt.Errorf("getTaskStats failed: %w", err)
@@ -151,6 +153,8 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	defer taskResp.Body.Close()
+
 	taskOutput, err := getTask(taskResp)
 	if err != nil {
 		return nil, fmt.Errorf("getTask failed: %w", err)
