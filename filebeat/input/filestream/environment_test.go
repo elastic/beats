@@ -66,9 +66,7 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
-		t.Fatalf("error setting up dev logging: %s", err)
-	}
+	logp.DevelopmentSetup(logp.ToObserverOutput())
 
 	t.Cleanup(func() {
 		if t.Failed() {

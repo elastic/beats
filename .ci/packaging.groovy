@@ -332,7 +332,7 @@ def linuxPlatforms() {
 def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
-    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi' : 'beats' ]
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
       tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {

@@ -22,13 +22,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -80,7 +81,6 @@ func fetchRawProviderMetadata(
 	// LoadDefaultConfig loads the EC2 role credentials
 	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
 	if err != nil {
-		logger.Warnf("error loading AWS default configuration: %s.", err)
 		result.err = fmt.Errorf("failed loading AWS default configuration: %w", err)
 		return
 	}
@@ -88,7 +88,6 @@ func fetchRawProviderMetadata(
 
 	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
-		logger.Warnf("error fetching EC2 Identity Document: %s.", err)
 		result.err = fmt.Errorf("failed fetching EC2 Identity Document: %w", err)
 		return
 	}
@@ -96,13 +95,19 @@ func fetchRawProviderMetadata(
 	// AWS Region must be set to be able to get EC2 Tags
 	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
 	awsConfig.Region = awsRegion
+	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
 
 	clusterName, err := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
 	if err != nil {
 		logger.Warnf("error fetching cluster name metadata: %s.", err)
-	}
+	} else if clusterName != "" {
+		// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
+		// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
+		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
 
-	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
+		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
+		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
+	}
 
 	_, _ = result.metadata.Put("instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
 	_, _ = result.metadata.Put("machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
@@ -111,14 +116,6 @@ func fetchRawProviderMetadata(
 	_, _ = result.metadata.Put("account.id", accountID)
 	_, _ = result.metadata.Put("image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
 
-	// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
-	// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
-	if clusterName != "" {
-		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
-
-		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
-		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
-	}
 }
 
 func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string, error) {

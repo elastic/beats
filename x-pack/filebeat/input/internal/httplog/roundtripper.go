@@ -86,7 +86,75 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		}
 	}
 
-	reqParts := []zapcore.Field{
+	req, respParts, errorsMessages := logRequest(log, req)
+
+	resp, err := rt.transport.RoundTrip(req)
+	if err != nil {
+		log.Debug("HTTP response error", zap.NamedError("error.message", err))
+		return resp, err
+	}
+	if resp == nil {
+		log.Debug("HTTP response error", noResponse)
+		return resp, err
+	}
+	respParts = append(respParts,
+		zap.Int("http.response.status_code", resp.StatusCode),
+	)
+	errorsMessages = errorsMessages[:0]
+	var body []byte
+	resp.Body, body, err = copyBody(resp.Body)
+	if err != nil {
+		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
+	} else {
+		respParts = append(respParts,
+			zap.ByteString("http.response.body.content", body),
+			zap.Int("http.response.body.bytes", len(body)),
+			zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
+		)
+	}
+	message, err := httputil.DumpResponse(resp, false)
+	if err != nil {
+		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
+	} else {
+		respParts = append(respParts, zap.ByteString("event.original", message))
+	}
+	switch len(errorsMessages) {
+	case 0:
+	case 1:
+		respParts = append(respParts, zap.String("error.message", errorsMessages[0]))
+	default:
+		respParts = append(respParts, zap.Strings("error.message", errorsMessages))
+	}
+	log.Debug("HTTP response", respParts...)
+
+	return resp, err
+}
+
+// LogRequest logs an HTTP request to the provided logger.
+//
+// Fields logged:
+//
+//	url.original
+//	url.scheme
+//	url.path
+//	url.domain
+//	url.port
+//	url.query
+//	http.request
+//	user_agent.original
+//	http.request.body.content
+//	http.request.body.bytes
+//	http.request.mime_type
+//	event.original (the request without body from httputil.DumpRequestOut)
+//
+// Additional fields in extra will also be logged.
+func LogRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) *http.Request {
+	req, _, _ = logRequest(log, req, extra...)
+	return req
+}
+
+func logRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+	reqParts := append([]zapcore.Field{
 		zap.String("url.original", req.URL.String()),
 		zap.String("url.scheme", req.URL.Scheme),
 		zap.String("url.path", req.URL.Path),
@@ -95,11 +163,11 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.String("url.query", req.URL.RawQuery),
 		zap.String("http.request.method", req.Method),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
-	}
+	}, extra...)
+
 	var (
-		body           []byte
-		err            error
-		errorsMessages []string
+		body []byte
+		err  error
 	)
 	req.Body, body, err = copyBody(req.Body)
 	if err != nil {
@@ -126,51 +194,26 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	}
 	log.Debug("HTTP request", reqParts...)
 
-	resp, err := rt.transport.RoundTrip(req)
-	if err != nil {
-		log.Debug("HTTP response error", zap.NamedError("error.message", err))
-		return resp, err
-	}
-	if resp == nil {
-		log.Debug("HTTP response error", noResponse)
-		return resp, err
-	}
-	respParts := append(reqParts[:0],
-		zap.Int("http.response.status_code", resp.StatusCode),
-	)
-	errorsMessages = errorsMessages[:0]
-	resp.Body, body, err = copyBody(resp.Body)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
-	} else {
-		respParts = append(respParts,
-			zap.ByteString("http.response.body.content", body),
-			zap.Int("http.response.body.bytes", len(body)),
-			zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
-		)
-	}
-	message, err = httputil.DumpResponse(resp, false)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
-	} else {
-		respParts = append(respParts, zap.ByteString("event.original", message))
-	}
-	switch len(errorsMessages) {
-	case 0:
-	case 1:
-		respParts = append(respParts, zap.String("error.message", errorsMessages[0]))
-	default:
-		respParts = append(respParts, zap.Strings("error.message", errorsMessages))
-	}
-	log.Debug("HTTP response", respParts...)
+	return req, reqParts[:0], errorsMessages
+}
 
-	return resp, err
+// TxID returns the current transaction.id value. If rt is nil, the empty string is returned.
+func (rt *LoggingRoundTripper) TxID() string {
+	if rt == nil {
+		return ""
+	}
+	count := rt.txIDCounter.Load()
+	return rt.formatTxID(count)
 }
 
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
 	count := rt.txIDCounter.Inc()
+	return rt.formatTxID(count)
+}
+
+func (rt *LoggingRoundTripper) formatTxID(count uint64) string {
 	return rt.txBaseID + "-" + strconv.FormatUint(count, 10)
 }
 
