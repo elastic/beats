@@ -29,7 +29,7 @@ import (
 )
 
 func getFiles(folder string) ([]string, error) {
-	var files []string
+	var files []string //nolint:prealloc
 	entries, err := os.ReadDir(folder)
 	if err != nil {
 		return nil, err
