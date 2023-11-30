@@ -55,6 +55,17 @@ func makeES(
 	if err := cfg.Unpack(&esConfig); err != nil {
 		return outputs.Fail(err)
 	}
+	// If a preset is specified, unpack its contents to overwrite the baseline
+	// config, but log a warning if we override anything explicitly specified
+	// in cfg.
+	overriddenFields, err := applyPreset(esConfig.Preset, &esConfig, cfg)
+	if err != nil {
+		return outputs.Fail(err)
+	}
+	for _, field := range overriddenFields {
+		log.Warnf("setting '%v' is ignored because of config preset '%v'",
+			field, esConfig.Preset)
+	}
 
 	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)
 	if err != nil {

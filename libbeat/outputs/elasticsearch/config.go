@@ -43,9 +43,10 @@ type elasticsearchConfig struct {
 	Backoff            Backoff           `config:"backoff"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
+	Queue              config.Namespace  `config:"queue"`
+	Preset             preset            `config:"preset"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
-	Queue     config.Namespace                 `config:"queue"`
 }
 
 type Backoff struct {
