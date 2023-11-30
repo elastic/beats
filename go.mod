@@ -197,6 +197,29 @@ require (
 )
 
 require (
+<<<<<<< HEAD
+=======
+	cloud.google.com/go v0.110.4
+	cloud.google.com/go/compute v1.21.0
+	cloud.google.com/go/redis v1.13.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.2
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
+	github.com/Azure/go-autorest/autorest/adal v0.9.14
+	github.com/apache/arrow/go/v12 v12.0.1
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.17
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.33
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
+	github.com/aws/smithy-go v1.13.5
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/elastic-agent-autodiscover v0.6.4
+>>>>>>> 9de3307fab ([Azure] [Billing] Switch to Consumption API 1.1.0 with patches (#37158))
 	github.com/elastic/elastic-agent-libs v0.6.2
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98
@@ -210,6 +233,10 @@ require (
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
+<<<<<<< HEAD
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.0 // indirect
+>>>>>>> 9de3307fab ([Azure] [Billing] Switch to Consumption API 1.1.0 with patches (#37158))
 	github.com/Azure/go-amqp v0.16.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.3.1 // indirect
@@ -306,7 +333,12 @@ require (
 )
 
 replace (
+<<<<<<< HEAD
 	github.com/Azure/azure-sdk-for-go => github.com/elastic/azure-sdk-for-go v59.0.0-elastic-1+incompatible
+=======
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
+
+>>>>>>> 9de3307fab ([Azure] [Billing] Switch to Consumption API 1.1.0 with patches (#37158))
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
