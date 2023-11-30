@@ -20,20 +20,12 @@ var (
 	errExecuteTemplate     = errors.New("template execution failed")
 )
 
-func tryDebugTemplateValue(target, val string, log *logp.Logger) {
-	switch target {
-	case "":
-		// ignore filtered headers
-	default:
-		log.Debugw("evaluated template", "target", target, "value", val)
-	}
-}
-
-func (t *valueTpl) Execute(data, cursor any, target string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+func (t *valueTpl) Execute(data any, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
-			log.Debugf("template execution: falling back to default value for target %s. Error: %s", target, err)
-			return defaultVal.Execute(mapstr.M{}, mapstr.M{}, target, nil, log)
+			log.Debugf("template execution error: %s", err)
+			log.Info("fallback to default template")
+			return defaultVal.Execute(mapstr.M{}, nil, log)
 		}
 		return "", err
 	}
@@ -43,14 +35,14 @@ func (t *valueTpl) Execute(data, cursor any, target string, defaultVal *valueTpl
 			val, err = fallback(errExecuteTemplate)
 		}
 		if err != nil {
-			log.Debugw("template execution failed", "target", target, "error", err)
+			log.Debugf("template execution failed %s", err)
 		}
-		tryDebugTemplateValue(target, val, log)
 	}()
 
 	buf := new(strings.Builder)
 
-	if err := t.Template.Execute(buf, data); err != nil {
+	err = t.Template.Execute(buf, data)
+	if err != nil {
 		return fallback(err)
 	}
 

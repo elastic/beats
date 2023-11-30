@@ -89,16 +89,23 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	var qr string
+	ctxTmpl := mapstr.M{
+		"var":    nil,
+		"cursor": nil,
+	}
+
 	if cursor.LogDateTime != "" {
-		qr, err = cfg.Query.Value.Execute(mapstr.M{}, cursor, "target", nil, log)
+		ctxTmpl["cursor"] = mapstr.M{"logdate": cursor.LogDateTime}
+		qr, err = cfg.Query.Value.Execute(ctxTmpl, nil, log)
 		if err != nil {
 			return err
 		}
 	} else {
-		q := "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-		defaultTmpl := &valueTpl{template.Must(template.New("defaultQuery").Parse(q))}
-		data := mapstr.M{"var": mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}}
-		qr, err = cfg.Query.Default.Execute(data, cursor, "target", defaultTmpl, log)
+		defaultQuery := "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
+		defaultTmpl := &valueTpl{template.Must(template.New("default").Parse(defaultQuery))}
+
+		ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}
+		qr, err = cfg.Query.Default.Execute(ctxTmpl, defaultTmpl, log)
 		if err != nil {
 			return err
 		}
@@ -122,6 +129,8 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		Client:      http.DefaultClient,
 		Version:     cfg.Version,
 	}
+
+	log.Infof("salesforce query: %s", qr)
 
 	query := querier{Query: qr}
 
