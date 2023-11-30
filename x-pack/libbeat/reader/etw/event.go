@@ -17,16 +17,15 @@ import (
 
 // DefaultBufferCallback receives stats from the buffer
 func DefaultBufferCallback(etl *EventTraceLogfile) uintptr {
-	// fmt.Printf("Buffers read: %d\n", etl.BuffersRead)
-	// fmt.Printf("Buffer size: %d\n", etl.BufferSize)
-	// fmt.Printf("Buffers written: %d\n", etl.LogfileHeader.BuffersWritten)
-	// fmt.Printf("Buffers written: %d\n", etl.LogfileHeader.BuffersWritten)
-	// fmt.Printf("Event losts: %d\n", etl.EventsLost)
+	// Not reading data from this callback so far.
+	// It retrieves very specific data about internal buffers
+	// that could be pushed to the publish queue or logfile.
+	// Requires further discussion.
+
+	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-etw_buffer_callback_information
 
 	// return True (1) to continue the processing
 	// return False (0) to stop processing events
-
-	// TODO: Push these buffer stats to the publish queue or logfile?
 	return 1
 }
 
@@ -38,12 +37,14 @@ func DefaultCallback(er *EventRecord) uintptr {
 	}
 
 	// Initialize a map to hold event data.
-	event := make(map[string]interface{})
-	event["Header"] = er.EventHeader // Store the event header.
+	var event map[string]interface{}
 
 	// Retrieve and store additional event properties, if available.
 	if data, err := GetEventProperties(er); err == nil {
-		event["EventProperties"] = data
+		event = map[string]interface{}{
+			"Header":          er.EventHeader,
+			"EventProperties": data,
+		}
 	} else {
 		// If properties cannot be retrieved, exit the callback.
 		return 1
@@ -317,14 +318,15 @@ retryLoop:
 			&userDataConsumed,
 		)
 
-		if err == nil {
+		switch {
+		case err == nil:
 			// If formatting is successful, break out of the loop.
 			break retryLoop
-		} else if errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
+		case errors.Is(err, ERROR_INSUFFICIENT_BUFFER):
 			// Increase the buffer size if it's insufficient.
 			formattedData = make([]byte, formattedDataSize)
 			continue
-		} else if errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA) {
+		case errors.Is(err, ERROR_EVT_INVALID_EVENT_DATA):
 			// Handle invalid event data error.
 			// Discarding MapInfo allows us to access
 			// at least the non-interpreted data.
@@ -333,7 +335,7 @@ retryLoop:
 				continue
 			}
 			return "", fmt.Errorf("TdhFormatProperty failed: %w", err) // Handle unknown error
-		} else {
+		default:
 			return "", fmt.Errorf("TdhFormatProperty failed: %w", err)
 		}
 	}
@@ -351,29 +353,21 @@ func (p *propertyParser) getMapInfo(propertyInfo EventPropertyInfo) (*EventMapIn
 	mapName := (*uint16)(unsafe.Add(unsafe.Pointer(p.info), propertyInfo.MapNameOffset()))
 
 	// First call to get the required size of the map info.
-	err := _TdhGetEventMapInformation(
-		p.er,
-		mapName,
-		nil,
-		&mapSize,
-	)
-	if errors.Is(err, ERROR_NOT_FOUND) {
-		return nil, nil // No mapping information available. This is not an error.
-	} else if errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
+	err := _TdhGetEventMapInformation(p.er, mapName, nil, &mapSize)
+	switch {
+	case errors.Is(err, ERROR_NOT_FOUND):
+		// No mapping information available. This is not an error.
+		return nil, nil
+	case errors.Is(err, ERROR_INSUFFICIENT_BUFFER):
 		// Resize the buffer and try again.
-	} else {
+	default:
 		return nil, fmt.Errorf("TdhGetEventMapInformation failed to get size: %w", err)
 	}
 
 	// Allocate buffer and retrieve the actual map information.
 	buff := make([]byte, int(mapSize))
 	mapInfo := ((*EventMapInfo)(unsafe.Pointer(&buff[0])))
-	err = _TdhGetEventMapInformation(
-		p.er,
-		mapName,
-		mapInfo,
-		&mapSize,
-	)
+	err = _TdhGetEventMapInformation(p.er, mapName, mapInfo, &mapSize)
 	if err != nil {
 		return nil, fmt.Errorf("TdhGetEventMapInformation failed: %w", err)
 	}

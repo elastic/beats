@@ -97,6 +97,5 @@ func GUIDToString(guid GUID) string {
 // IsGUIDValid checks if GUID contains valid data
 // (any of the fields in the GUID are non-zero)
 func IsGUIDValid(guid GUID) bool {
-	return guid.Data1 != 0 || guid.Data2 != 0 || guid.Data3 != 0 ||
-		guid.Data4 != [8]byte{}
+	return guid.Data1 != 0 || guid.Data2 != 0 || guid.Data3 != 0 || guid.Data4 != [8]byte{}
 }

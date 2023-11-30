@@ -42,13 +42,16 @@ func (s *Session) StartConsumer() error {
 	// Open an ETW trace processing handle for consuming events
 	// from an ETW real-time trace session or an ETW log file.
 	s.TraceHandler, err = OpenTraceFunc(&elf)
-	if err != nil {
-		// Handle specific errors for trace opening.
-		if errors.Is(err, ERROR_BAD_PATHNAME) {
-			return fmt.Errorf("invalid log source when opening trace: %w", err)
-		} else if errors.Is(err, ERROR_ACCESS_DENIED) {
-			return fmt.Errorf("access denied when opening trace: %w", err)
-		}
+
+	switch {
+	case err == nil:
+
+	// Handle specific errors for trace opening.
+	case errors.Is(err, ERROR_BAD_PATHNAME):
+		return fmt.Errorf("invalid log source when opening trace: %w", err)
+	case errors.Is(err, ERROR_ACCESS_DENIED):
+		return fmt.Errorf("access denied when opening trace: %w", err)
+	default:
 		return fmt.Errorf("failed to open trace: %w", err)
 	}
 	// Process the trace. This function blocks until processing ends.

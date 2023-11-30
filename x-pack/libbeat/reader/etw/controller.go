@@ -14,10 +14,7 @@ import (
 )
 
 func isValidHandler(handler uint64) bool {
-	if handler == 0 || handler == INVALID_PROCESSTRACE_HANDLE {
-		return false
-	}
-	return true
+	return handler != 0 && handler != INVALID_PROCESSTRACE_HANDLE
 }
 
 // GetHandler queries the status of an existing ETW session to get its handler and properties.
@@ -29,20 +26,18 @@ func (s *Session) GetHandler() error {
 	}
 
 	// Query the current state of the ETW session.
-	if err = ControlTraceFunc(
-		0,
-		sessionNamePtr,
-		s.Properties,
-		EVENT_TRACE_CONTROL_QUERY,
-	); err != nil {
-		// Handle specific errors related to the query operation.
-		if errors.Is(err, ERROR_BAD_LENGTH) {
-			return fmt.Errorf("bad length when querying handler: %w", err)
-		} else if errors.Is(err, ERROR_INVALID_PARAMETER) {
-			return fmt.Errorf("invalid parameters when querying handler: %w", err)
-		} else if errors.Is(err, ERROR_WMI_INSTANCE_NOT_FOUND) {
-			return fmt.Errorf("session is not running")
-		}
+	err = ControlTraceFunc(0, sessionNamePtr, s.Properties, EVENT_TRACE_CONTROL_QUERY)
+	switch {
+	case err == nil:
+
+	// Handle specific errors related to the query operation.
+	case errors.Is(err, ERROR_BAD_LENGTH):
+		return fmt.Errorf("bad length when querying handler: %w", err)
+	case errors.Is(err, ERROR_INVALID_PARAMETER):
+		return fmt.Errorf("invalid parameters when querying handler: %w", err)
+	case errors.Is(err, ERROR_WMI_INSTANCE_NOT_FOUND):
+		return fmt.Errorf("session is not running")
+	default:
 		return fmt.Errorf("failed to get handler: %w", err)
 	}
 
@@ -61,18 +56,16 @@ func (s *Session) CreateRealtimeSession() error {
 	}
 
 	// Start the ETW trace session.
-	err = StartTraceFunc(
-		&s.Handler,
-		sessionPtr,
-		s.Properties,
-	)
-	if err != nil {
-		// Handle specific errors related to starting the trace session.
-		if errors.Is(err, ERROR_ALREADY_EXISTS) {
-			return fmt.Errorf("session already exists: %w", err)
-		} else if errors.Is(err, ERROR_INVALID_PARAMETER) {
-			return fmt.Errorf("invalid parameters when starting session trace: %w", err)
-		}
+	err = StartTraceFunc(&s.Handler, sessionPtr, s.Properties)
+	switch {
+	case err == nil:
+
+	// Handle specific errors related to starting the trace session.
+	case errors.Is(err, ERROR_ALREADY_EXISTS):
+		return fmt.Errorf("session already exists: %w", err)
+	case errors.Is(err, ERROR_INVALID_PARAMETER):
+		return fmt.Errorf("invalid parameters when starting session trace: %w", err)
+	default:
 		return fmt.Errorf("failed to start trace: %w", err)
 	}
 
@@ -82,25 +75,22 @@ func (s *Session) CreateRealtimeSession() error {
 		Version: 2, // ENABLE_TRACE_PARAMETERS_VERSION_2
 	}
 
+	// Zero timeout means asynchronous enablement
+	const timeout = 0
+
 	// Enable the trace session with extended options.
-	if err := EnableTraceFunc(
-		s.Handler,
-		(*GUID)(unsafe.Pointer(&s.GUID)),
-		EVENT_CONTROL_CODE_ENABLE_PROVIDER,
-		s.TraceLevel,
-		s.MatchAnyKeyword,
-		s.MatchAllKeyword,
-		0,       // Asynchronous enablement with zero timeout
-		&params, // Additional parameters
-	); err != nil {
-		// Handle specific errors related to enabling the trace session.
-		if errors.Is(err, ERROR_INVALID_PARAMETER) {
-			return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
-		} else if errors.Is(err, ERROR_TIMEOUT) {
-			return fmt.Errorf("timeout value expired before the enable callback completed: %w", err)
-		} else if errors.Is(err, ERROR_NO_SYSTEM_RESOURCES) {
-			return fmt.Errorf("exceeded the number of trace sessions that can enable the provider: %w", err)
-		}
+	err = EnableTraceFunc(s.Handler, (*GUID)(unsafe.Pointer(&s.GUID)), EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.TraceLevel, s.MatchAnyKeyword, s.MatchAllKeyword, timeout, &params)
+	switch {
+	case err == nil:
+
+	// Handle specific errors related to enabling the trace session.
+	case errors.Is(err, ERROR_INVALID_PARAMETER):
+		return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
+	case errors.Is(err, ERROR_TIMEOUT):
+		return fmt.Errorf("timeout value expired before the enable callback completed: %w", err)
+	case errors.Is(err, ERROR_NO_SYSTEM_RESOURCES):
+		return fmt.Errorf("exceeded the number of trace sessions that can enable the provider: %w", err)
+	default:
 		return fmt.Errorf("failed to enable trace: %w", err)
 	}
 
