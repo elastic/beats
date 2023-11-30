@@ -32,7 +32,6 @@ func (c *config) Validate() error {
 }
 
 type QueryConfig struct {
-	SOQL    string    `config:"soql"` // NOTE(SS): Only for testing purpose
 	Default *valueTpl `config:"default"`
 	Value   *valueTpl `config:"value"`
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -87,7 +88,7 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
-	buf := new(bytes.Buffer)
+	buf := new(strings.Builder)
 	if cursor.LogDateTime != "" {
 		err := cfg.Query.Value.Execute(buf, cursor)
 		if err != nil {
@@ -173,7 +174,11 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 					event := beat.Event{
 						Timestamp: time.Now(),
-						Fields:    mapstr.M{"event": mapstr.M{"original": string(jsonStrEvent)}},
+						Fields: mapstr.M{
+							"event": mapstr.M{
+								"message": string(jsonStrEvent),
+							},
+						},
 					}
 
 					if timstamp, ok := val["TIMESTAMP_DERIVED"]; ok {
