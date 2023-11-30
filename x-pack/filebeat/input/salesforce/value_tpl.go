@@ -1,13 +1,64 @@
 package salesforce
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"text/template"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type valueTpl struct {
 	*template.Template
+}
+
+var (
+	errEmptyTemplateResult = errors.New("template result is empty")
+	errExecuteTemplate     = errors.New("template execution failed")
+)
+
+func tryDebugTemplateValue(target, val string, log *logp.Logger) {
+	switch target {
+	case "":
+		// ignore filtered headers
+	default:
+		log.Debugw("evaluated template", "target", target, "value", val)
+	}
+}
+
+func (t *valueTpl) Execute(data, cursor any, target string, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+	fallback := func(err error) (string, error) {
+		if defaultVal != nil {
+			log.Debugf("template execution: falling back to default value for target %s. Error: %s", target, err)
+			return defaultVal.Execute(mapstr.M{}, mapstr.M{}, target, nil, log)
+		}
+		return "", err
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			val, err = fallback(errExecuteTemplate)
+		}
+		if err != nil {
+			log.Debugw("template execution failed", "target", target, "error", err)
+		}
+		tryDebugTemplateValue(target, val, log)
+	}()
+
+	buf := new(strings.Builder)
+
+	if err := t.Template.Execute(buf, data); err != nil {
+		return fallback(err)
+	}
+
+	val = buf.String()
+	if val == "" {
+		return fallback(errEmptyTemplateResult)
+	}
+	return val, nil
 }
 
 func (t *valueTpl) Unpack(in string) error {

@@ -11,11 +11,12 @@ import (
 )
 
 type config struct {
-	Interval time.Duration `config:"interval" validate:"required"`
-	Auth     *authConfig   `config:"auth"`
-	Url      string        `config:"url" validate:"required"`
-	Version  int           `config:"version" validate:"required"`
-	Query    *QueryConfig  `config:"query"`
+	Interval        time.Duration `config:"interval" validate:"required"`
+	Auth            *authConfig   `config:"auth"`
+	Url             string        `config:"url" validate:"required"`
+	Version         int           `config:"version" validate:"required"`
+	Query           *QueryConfig  `config:"query"`
+	InitialInterval time.Duration `config:"initial_interval"`
 }
 
 func (c *config) Validate() error {

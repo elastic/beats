@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"sync"
+	"text/template"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -82,20 +82,26 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 	return s.run(env, src.(*source), st, pub)
 }
 
-func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub inputcursor.Publisher) error {
+func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub inputcursor.Publisher) (err error) {
 	cfg := src.cfg
-	// log := env.Logger.With("input_url", cfg.Url)
+	log := env.Logger.With("input_url", cfg.Url)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
-	buf := new(strings.Builder)
+	var qr string
 	if cursor.LogDateTime != "" {
-		err := cfg.Query.Value.Execute(buf, cursor)
+		qr, err = cfg.Query.Value.Execute(mapstr.M{}, cursor, "target", nil, log)
 		if err != nil {
 			return err
 		}
 	} else {
-		buf.WriteString(cfg.Query.Default.Root.String())
+		q := "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
+		defaultTmpl := &valueTpl{template.Must(template.New("defaultQuery").Parse(q))}
+		data := mapstr.M{"var": mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}}
+		qr, err = cfg.Query.Default.Execute(data, cursor, "target", defaultTmpl, log)
+		if err != nil {
+			return err
+		}
 	}
 
 	passCreds := credentials.PasswordCredentials{
@@ -117,7 +123,7 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		Version:     cfg.Version,
 	}
 
-	query := querier{Query: buf.String()}
+	query := querier{Query: qr}
 
 	err = periodically(ctx, cfg.Interval, func() error {
 		cursor.StartTime = time.Now()
