@@ -86,6 +86,8 @@ func convertWindowsGUID(windowsGUID windows.GUID) GUID {
 	}
 }
 
+// getTraceLevel converts a string representation of a trace level
+// to its corresponding uint8 constant value
 func getTraceLevel(level string) uint8 {
 	switch level {
 	case "critical":
