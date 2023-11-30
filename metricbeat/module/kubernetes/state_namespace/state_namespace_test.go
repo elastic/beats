@@ -22,12 +22,13 @@ package state_namespace
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/stretchr/testify/require"
 )
 
 var filesFolder = "../_meta/test/KSM"

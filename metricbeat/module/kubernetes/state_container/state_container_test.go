@@ -22,10 +22,11 @@ package state_container
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/stretchr/testify/require"
 )
 
 var filesFolder = "../_meta/test/KSM"

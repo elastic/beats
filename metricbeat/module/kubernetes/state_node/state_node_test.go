@@ -22,8 +22,9 @@ package state_node
 import (
 	"testing"
 
-	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/stretchr/testify/require"
+
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 

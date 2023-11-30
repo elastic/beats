@@ -22,8 +22,9 @@ package state_cronjob
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/stretchr/testify/require"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"

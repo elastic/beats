@@ -22,9 +22,10 @@ package state_persistentvolume
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )
