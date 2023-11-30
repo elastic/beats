@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
  - Fix CmdLine generation and caching for system.process
+ - Fix process metrics collection when both cgroup V1 and V2 controllers exist
 
 ## [0.7.0]
 

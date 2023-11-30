@@ -36,6 +36,7 @@ import (
 
 const dockerTestData = "testdata/docker.zip"
 const ubuntuTestData = "testdata/ubuntu1804.zip"
+const amazonLinux2TestData = "testdata/amzn2.zip"
 
 func TestMain(m *testing.M) {
 	err := extractTestData(dockerTestData)
@@ -44,6 +45,11 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	err = extractTestData(ubuntuTestData)
+	if err != nil {
+		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
+		os.Exit(1)
+	}
+	err = extractTestData(amazonLinux2TestData)
 	if err != nil {
 		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
 		os.Exit(1)
@@ -194,6 +200,31 @@ func TestProcessCgroupPaths(t *testing.T) {
 	assert.Equal(t, path, paths.V1["net_prio"].ControllerPath)
 	assert.Equal(t, path, paths.V1["perf_event"].ControllerPath)
 	assert.Len(t, paths.Flatten(), 10)
+}
+
+func TestProcessCgroupHybridPaths(t *testing.T) {
+	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), false)
+	if err != nil {
+		t.Fatalf("error in NewReader: %s", err)
+	}
+	paths, err := reader.ProcessCgroupPaths(493239)
+	if err != nil {
+		t.Fatalf("error in ProcessCgroupPaths: %s", err)
+	}
+
+	path := "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod7a96c459_d529_44ae_9f99_90d3798d6426.slice/cri-containerd-1d3d308a7d48a27814a68bf33a44acf4441c9c02463ca0bc1cdfdc8c0b4a8496.scope"
+	assert.Equal(t, path, paths.V1["blkio"].ControllerPath)
+	assert.Equal(t, path, paths.V1["cpu"].ControllerPath)
+	assert.Equal(t, path, paths.V1["cpuacct"].ControllerPath)
+	assert.Equal(t, path, paths.V1["cpuset"].ControllerPath)
+	assert.Equal(t, path, paths.V1["devices"].ControllerPath)
+	assert.Equal(t, path, paths.V1["freezer"].ControllerPath)
+	assert.Equal(t, path, paths.V1["memory"].ControllerPath)
+	assert.Equal(t, path, paths.V1["net_cls"].ControllerPath)
+	assert.Equal(t, path, paths.V1["net_prio"].ControllerPath)
+	assert.Equal(t, path, paths.V1["perf_event"].ControllerPath)
+	assert.Equal(t, path, paths.V1["hugetlb"].ControllerPath)
+	assert.Len(t, paths.Flatten(), 13)
 }
 
 func TestProcessCgroupPathsV2(t *testing.T) {

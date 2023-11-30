@@ -32,6 +32,9 @@ const (
 	path = "/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 	id   = "b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 
+	idHybrid   = "cri-containerd-1d3d308a7d48a27814a68bf33a44acf4441c9c02463ca0bc1cdfdc8c0b4a8496.scope"
+	pathHybrid = "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod7a96c459_d529_44ae_9f99_90d3798d6426.slice/cri-containerd-1d3d308a7d48a27814a68bf33a44acf4441c9c02463ca0bc1cdfdc8c0b4a8496.scope"
+
 	pathv2 = "/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
 	idv2   = "docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
 )
@@ -77,6 +80,35 @@ func TestReaderGetStatsV1(t *testing.T) {
 	require.Equal(t, path, stats.CPUAccounting.Path)
 	require.Equal(t, path, stats.Memory.Path)
 
+}
+
+// testcase for the situation where both cgroup v1 and v2 controllers exist but
+// /sys/fs/cgroup/unified is not mounted
+func TestReaderGetStatsV1MalformedHybrid(t *testing.T) {
+	reader, err := NewReader(resolve.NewTestResolver("testdata/amzn2"), true)
+	require.NoError(t, err, "error in NewReader")
+
+	stats, err := reader.GetV1StatsForProcess(493239)
+	require.NoError(t, err, "error in GetV1StatsForProcess")
+
+	require.NotNil(t, stats, "no cgroup stats found")
+
+	require.Equal(t, idHybrid, stats.ID)
+	require.Equal(t, idHybrid, stats.BlockIO.ID)
+	require.Equal(t, idHybrid, stats.CPU.ID)
+	require.Equal(t, idHybrid, stats.CPUAccounting.ID)
+	require.Equal(t, idHybrid, stats.Memory.ID)
+
+	require.NotZero(t, stats.CPU.CFS.PeriodMicros.Us)
+	require.NotZero(t, stats.CPUAccounting.Total.NS)
+	require.NotZero(t, stats.Memory.Mem.Usage.Bytes)
+	require.NotZero(t, stats.BlockIO.Total.Bytes)
+
+	require.Equal(t, pathHybrid, stats.Path)
+	require.Equal(t, pathHybrid, stats.BlockIO.Path)
+	require.Equal(t, pathHybrid, stats.CPU.Path)
+	require.Equal(t, pathHybrid, stats.CPUAccounting.Path)
+	require.Equal(t, pathHybrid, stats.Memory.Path)
 }
 
 func TestReaderGetStatsV2(t *testing.T) {

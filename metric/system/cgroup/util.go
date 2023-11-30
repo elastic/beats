@@ -237,6 +237,11 @@ func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 	}
 	defer cgroup.Close()
 
+	version, err := r.CgroupsVersion(pid)
+	if err != nil {
+		return PathList{}, fmt.Errorf("error finding cgroup version for pid %d: %w", pid, err)
+	}
+
 	cPaths := PathList{V1: map[string]ControllerPath{}, V2: map[string]ControllerPath{}}
 	sc := bufio.NewScanner(cgroup)
 	for sc.Scan() {
@@ -257,13 +262,21 @@ func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 		}
 		// cgroup V2
 		// cgroup v2 controllers will always start with this string
-		if strings.Contains(line, "0::/") {
+		if strings.HasPrefix(line, "0::/") {
 			// if you're running inside a container
 			// that's operating with a hybrid cgroups config,
 			// the containerized process won't see the V2 mount
 			// inside /proc/self/mountinfo if docker is using cgroups V1
 			// For this very annoying edge case, revert to the hostfs flag
 			// If it's not set, warn the user that they've hit this.
+
+			// we skip reading paths in case there are cgroups V1 controllers, we are at the cgroup V2 root and the cgroup V2 mount is not available
+			// instead of returning an error because we don't want to break V1 metric collection for misconfigured hybrid systems that have only
+			// a cgroup V2 root but don't have any other controllers. This case happens when cgroup V2 FS is mounted at a special location but not used
+			if version == CgroupsV1 && line == "0::/" && r.cgroupMountpoints.V2Loc == "" {
+				continue
+			}
+
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
 			if r.cgroupMountpoints.V2Loc == "" && !r.rootfsMountpoint.IsSet() {
 				logp.L().Debugf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
