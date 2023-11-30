@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -165,9 +166,14 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 				}
 
 				for _, val := range recs {
+					jsonStrEvent, err := json.Marshal(val)
+					if err != nil {
+						return err
+					}
+
 					event := beat.Event{
 						Timestamp: time.Now(),
-						Fields:    mapstr.M{"event": mapstr.M{"original": val}},
+						Fields:    mapstr.M{"event": mapstr.M{"original": string(jsonStrEvent)}},
 					}
 
 					if timstamp, ok := val["TIMESTAMP_DERIVED"]; ok {
