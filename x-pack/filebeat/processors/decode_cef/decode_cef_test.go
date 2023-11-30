@@ -226,7 +226,7 @@ func readCEFSamples(t testing.TB, source string) []mapstr.M {
 		t.Fatal(err)
 	}
 
-	var samples []mapstr.M //nolint:prealloc
+	var samples []mapstr.M //nolint:prealloc // size is unknown and it's a test
 	s := bufio.NewScanner(f)
 	for s.Scan() {
 		data := s.Bytes()
