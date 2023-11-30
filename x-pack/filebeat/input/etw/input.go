@@ -111,10 +111,13 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		e.log.Debugf("received event %d with length %d", er.EventHeader.EventDescriptor.Id, er.UserDataLength)
 
 		event := make(map[string]interface{})
-		event["Header"] = er.EventHeader
 
 		if data, err := etw.GetEventProperties(er); err == nil {
-			event["EventProperties"] = data
+			event = map[string]interface{}{
+				"Header":          er.EventHeader,
+				"EventProperties": data,
+				"Metadata":        fillEventMetadata(er, e.etwSession, e.config),
+			}
 		} else {
 			e.log.Errorf("failed to read event properties: %w", err)
 			return 1
@@ -123,8 +126,9 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"header": event["Header"],
-				"winlog": event["EventProperties"],
+				"metadata": event["Metadata"],
+				"header":   event["Header"],
+				"winlog":   event["EventProperties"],
 			},
 		}
 		publisher.Publish(evt)
@@ -153,6 +157,53 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}()
 
 	return nil
+}
+
+// fillEventMetadata constructs a metadata map for an event record.
+func fillEventMetadata(er *etw.EventRecord, session etw.Session, cfg config) map[string]interface{} {
+	// Mapping from Level to Severity
+	levelToSeverity := map[uint8]string{
+		1: "critical",
+		2: "error",
+		3: "warning",
+		4: "information",
+		5: "verbose",
+	}
+
+	metadata := make(map[string]interface{})
+
+	// Get the severity level, with a default value if not found
+	severity, ok := levelToSeverity[er.EventHeader.EventDescriptor.Level]
+	if !ok {
+		severity = "unknown" // Default severity level
+	}
+	metadata["Severity"] = severity
+
+	// Include provider name and GUID in metadata if available
+	if cfg.ProviderName != "" {
+		metadata["ProviderName"] = cfg.ProviderName
+	}
+	if cfg.ProviderGUID != "" {
+		metadata["ProviderGUID"] = cfg.ProviderGUID
+	} else if etw.IsGUIDValid(session.GUID) {
+		metadata["ProviderGUID"] = etw.GUIDToString(session.GUID)
+	}
+
+	// Include logfile path if available
+	if cfg.Logfile != "" {
+		metadata["Logfile"] = cfg.Logfile
+	}
+
+	// Include session name if available
+	if cfg.Session != "" {
+		metadata["Session"] = cfg.Session
+	} else if cfg.SessionName != "" {
+		metadata["Session"] = cfg.SessionName
+	} else if cfg.ProviderGUID != "" || cfg.ProviderName != "" {
+		metadata["Session"] = session.Name
+	}
+
+	return metadata
 }
 
 // close stops the ETW session and logs the outcome.

@@ -130,7 +130,7 @@ func Test_validateConfig(t *testing.T) {
 				}
 			} else {
 				if err != nil {
-					t.Fatalf("Configuration validation failed. no error expected but got '%w'", err)
+					t.Fatalf("Configuration validation failed. no error expected but got '%v'", err)
 				}
 			}
 		})
