@@ -19,6 +19,8 @@ package ktest
 
 import (
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -26,10 +28,29 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )
 
-// GetTestCases Build test cases from the files and returns them
-func GetTestCases(files []string) ptest.TestCases {
+func getFiles(folder string) ([]string, error) {
+	var files []string
+	entries, err := os.ReadDir(folder)
+	if err != nil {
+		return nil, err
+	}
+	for _, e := range entries {
+		files = append(files, filepath.Join(folder, e.Name()))
+	}
+	return files, nil
+}
+
+// GetTestCases Build test cases based on the files from folder, and the expected files in the expectedFolder
+func GetTestCases(folder string, expectedFolder string) (ptest.TestCases, error) {
+	var files []string
 	var cases ptest.TestCases
-	for i := 0; i < len(files); i++ {
+
+	files, err := getFiles(folder)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
 		cases = append(cases,
 			struct {
 				MetricsFile  string
@@ -39,22 +60,54 @@ func GetTestCases(files []string) ptest.TestCases {
 				// Example:
 				//	Metricsfile: ../_meta/test/ksm.v2.4.2
 				//	ExpectedFile: ./_meta/test/ksm.v2.4.2.expected
-				MetricsFile:  files[i],
-				ExpectedFile: files[i][1:] + ".expected",
+				MetricsFile:  file,
+				ExpectedFile: filepath.Join(expectedFolder, filepath.Base(file)+".expected"),
 			},
 		)
 	}
-	return cases
+	return cases, nil
 }
 
-// TestMetricsFamily
+// TestMetricsFamilyFromFiles
 // This function reads the metric files and checks if the resource fetched metrics exist in it.
 // It only checks the family metric, because if the metric doesn't have any data, we don't have a way
 // to know the labels from the file.
 // The test fails if the metric does not exist in any of the files.
 // A warning is printed if the metric is not present in all of them.
 // Nothing happens, otherwise.
-func TestMetricsFamily(t *testing.T, files []string, mapping *p.MetricsMapping) {
+func TestMetricsFamilyFromFiles(t *testing.T, files []string, mapping *p.MetricsMapping) {
+	metricsFiles := map[string][]string{}
+	for i := 0; i < len(files); i++ {
+		content, err := ioutil.ReadFile(files[i])
+		if err != nil {
+			t.Fatalf("Unknown file %s.", files[i])
+		}
+		text := string(content)
+		for metric := range mapping.Metrics {
+			// A space is needed to check if the metric exists, since there are metrics that can follow this logic:
+			// some_metric and some_metric_total
+			if !strings.Contains(text, "# TYPE "+metric+" ") {
+				metricsFiles[metric] = append(metricsFiles[metric], files[i])
+			}
+		}
+	}
+	for metric, filesList := range metricsFiles {
+		if len(filesList) != len(files) {
+			t.Logf("Warning: metric %s is not present in all files.", metric)
+		} else {
+			t.Errorf("Unknown metric: %s", metric)
+		}
+	}
+
+}
+
+// TestMetricsFamilyFromFolder is the same as TestMetricsFamilyFromFiles, but for folder
+func TestMetricsFamilyFromFolder(t *testing.T, folder string, mapping *p.MetricsMapping) {
+	files, err := getFiles(folder)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
 	metricsFiles := map[string][]string{}
 	for i := 0; i < len(files); i++ {
 		content, err := ioutil.ReadFile(files[i])
