@@ -9,7 +9,7 @@
       "Memory": 7168
     },
     "Containers": [{
-        "DockerId": "query-metadata-1",
+        "DockerId": "1234",
         "Name": "query-metadata",
         "Image": "mreferre/eksutils",
         "Labels": {

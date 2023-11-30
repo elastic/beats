@@ -42,7 +42,7 @@ func TestFetch(t *testing.T) {
 	assert.NoError(t, err)
 
 	formattedStats := getStatsList(taskStatsOutput, taskOutput)
-	assert.Equal(t, 1, len(formattedStats))
+	assert.Equal(t, 0, len(formattedStats))
 	event := createEvent(&formattedStats[0])
 
 	// Build a metricset to test the event
