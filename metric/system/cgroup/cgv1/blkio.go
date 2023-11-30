@@ -35,10 +35,12 @@ import (
 //
 // https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt
 type BlockIOSubsystem struct {
-	ID    string   `json:"id,omitempty"`                   // ID of the cgroup.
-	Path  string   `json:"path,omitempty"`                 // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-	Total TotalIOs `json:"total,omitempty" struct:"total"` // Throttle limits for upper IO rates and metrics.
-	//CFQ      CFQScheduler   `json:"cfq,omitempty"`      // Completely fair queue scheduler limits and metrics.
+	ID     string   `json:"id,omitempty"`                     // ID of the cgroup.
+	Path   string   `json:"path,omitempty"`                   // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+	Total  TotalIOs `json:"total,omitempty" struct:"total"`   // Throttle limits for upper IO rates and metrics.
+	Reads  TotalIOs `json:"reads,omitempty" struct:"reads"`   // Throttle limits for upper IO rates and metrics.
+	Writes TotalIOs `json:"writes,omitempty" struct:"writes"` // Throttle limits for upper IO rates and metrics.
+	//CFQ      CFQScheduler   `json:"cfq,omitempty"`          // Completely fair queue scheduler limits and metrics.
 }
 
 // TotalIOs wraps the totals for blkio
@@ -196,6 +198,10 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 	for _, dev := range devices {
 		blkio.Total.Bytes += dev.Bytes.Read + dev.Bytes.Write
 		blkio.Total.Ios += dev.IOs.Read + dev.IOs.Write
+		blkio.Reads.Bytes += dev.Bytes.Read
+		blkio.Reads.Ios += dev.IOs.Read
+		blkio.Writes.Bytes += dev.Bytes.Write
+		blkio.Writes.Ios += dev.IOs.Write
 	}
 	return nil
 }

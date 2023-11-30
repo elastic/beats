@@ -58,8 +58,12 @@ func TestBlkioThrottle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, uint64(46), blkio.Total.Ios)
-	assert.Equal(t, uint64(1648128), blkio.Total.Bytes)
+	assert.Equal(t, uint64(48), blkio.Total.Ios)
+	assert.Equal(t, uint64(1651200), blkio.Total.Bytes)
+	assert.Equal(t, uint64(46), blkio.Reads.Ios)
+	assert.Equal(t, uint64(1648128), blkio.Reads.Bytes)
+	assert.Equal(t, uint64(2), blkio.Writes.Ios)
+	assert.Equal(t, uint64(3072), blkio.Writes.Bytes)
 
 }
 

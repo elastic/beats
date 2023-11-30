@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Add metrics from `/proc/[pid]/io`
+- Add metrics for disk reads and writes per cgroup
 
 ### Changed
 
