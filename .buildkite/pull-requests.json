@@ -30,7 +30,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ ]
+            "always_require_ci_on_changed": [ "^metricbeat/.*", "^Jenkinsfile", "^\\.ci/scripts/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         }
     ]
 }
