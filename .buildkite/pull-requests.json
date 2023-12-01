@@ -15,6 +15,22 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": [ ]
+        },
+        {
+            "enabled": true,
+            "pipelineSlug": "beats",
+            "allow_org_users": true,
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
+            "set_commit_status": true,
+            "build_on_commit": true,
+            "build_on_comment": true,
+            "trigger_comment_regex": "^/test metricbeat$",
+            "always_trigger_comment_regex": "^/test metricbeat$",
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": [ ]
         }
     ]
 }
