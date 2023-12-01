@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -40,7 +41,7 @@ var configMaps = map[preset]*config.C{
 	presetCustom: config.MustNewConfigFrom(map[string]interface{}{}),
 	presetBalanced: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              1600,
-		"workers":                    1,
+		"worker":                     1,
 		"queue.mem.events":           3200,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    10 * time.Second,
@@ -49,7 +50,7 @@ var configMaps = map[preset]*config.C{
 	}),
 	presetThroughput: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              1600,
-		"workers":                    4,
+		"worker":                     4,
 		"queue.mem.events":           12800,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    5 * time.Second,
@@ -58,7 +59,7 @@ var configMaps = map[preset]*config.C{
 	}),
 	presetScale: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              1600,
-		"workers":                    1,
+		"worker":                     1,
 		"queue.mem.events":           3200,
 		"queue.mem.flush.min_events": 1600,
 		"queue.mem.flush.timeout":    20 * time.Second,
@@ -67,7 +68,7 @@ var configMaps = map[preset]*config.C{
 	}),
 	presetLatency: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              50,
-		"workers":                    1,
+		"worker":                     1,
 		"queue.mem.events":           4100,
 		"queue.mem.flush.min_events": 2050,
 		"queue.mem.flush.timeout":    1 * time.Second,
@@ -97,39 +98,62 @@ func (p *preset) Validate() error {
 // Apply the configuration for c's "preset" field, returning a list of fields
 // in the provided user config that were overwritten.
 func applyPreset(
-	preset preset, target *elasticsearchConfig, userConfig *config.C,
+	target *elasticsearchConfig, userConfig *config.C,
 ) ([]string, error) {
-	// Find the preset and unpack it
 	presetConfig := configMaps[target.Preset]
 	if presetConfig == nil {
 		// This should never happen because the Preset field is validated
 		// when it's first unpacked, but let's be cautious.
 		return nil, fmt.Errorf("unknown preset value %v", target.Preset)
 	}
+
+	// Check for any user-provided fields that overlap with the preset.
+	// Queue parameters have special handling since they must be applied
+	// as a group so all queue parameters conflict with each other.
+	userKeys := userConfig.FlattenedKeys()
+	presetKeys := presetConfig.FlattenedKeys()
+	presetConfiguresQueue := listContainsPrefix(presetKeys, "queue.")
+	queueConflict := false
+	overridden := []string{}
+	for _, key := range userKeys {
+		if strings.HasPrefix(key, "queue.") && presetConfiguresQueue {
+			overridden = append(overridden, key)
+			queueConflict = true
+		} else if listContainsStr(presetKeys, key) {
+			overridden = append(overridden, key)
+		}
+	}
+	if queueConflict {
+		// If both the preset and the user config have queue parameters,
+		// we need to explicitly clear the elasticsearchConfig's queue
+		// field before applying the preset, since config.Unpack gives
+		// an error when unpacking namespace types twice even if the
+		// names match.
+		target.Queue = config.Namespace{}
+	}
+
+	// Apply the preset to the ES config
 	err := presetConfig.Unpack(target)
 	if err != nil {
 		return nil, err
 	}
 
-	// Check for any user-provided fields that overlap with the preset.
-	// This will need refinement if we start supporting other queue
-	// types, since e.g. "queue.mem.events" and "queue.disk.events"
-	// don't have explicitly conflicting field names.
-	overridden := []string{}
-	userKeys := userConfig.FlattenedKeys()
-	presetKeys := presetConfig.FlattenedKeys()
-	for _, key := range userKeys {
-		if containsStr(presetKeys, key) {
-			overridden = append(overridden, key)
-		}
-	}
 	return overridden, nil
 }
 
-// TODO: Replace this with slices.Contains ones we hit Go 1.21.
-func containsStr(list []string, str string) bool {
+// TODO: Replace this with slices.Contains once we hit Go 1.21.
+func listContainsStr(list []string, str string) bool {
 	for _, s := range list {
 		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
+func listContainsPrefix(list []string, prefix string) bool {
+	for _, s := range list {
+		if strings.HasPrefix(s, prefix) {
 			return true
 		}
 	}

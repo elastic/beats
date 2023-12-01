@@ -60,7 +60,7 @@ func makeES(
 	// in cfg.
 	if esConfig.Preset != "" {
 		log.Infof("Applying performance preset '%v'", esConfig.Preset)
-		overriddenFields, err := applyPreset(esConfig.Preset, &esConfig, cfg)
+		overriddenFields, err := applyPreset(&esConfig, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
