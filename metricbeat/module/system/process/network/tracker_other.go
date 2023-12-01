@@ -33,3 +33,7 @@ func (track *Tracker) Track() error { return nil }
 
 // Stop is a bare stop implementation
 func (track *Tracker) Stop() {}
+
+func (track *Tracker) Get(pid int) PacketData {
+	return PacketData{}
+}
