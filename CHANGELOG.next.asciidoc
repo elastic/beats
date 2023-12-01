@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
   - `queue.mem.flush.timeout` is changing from `1s` to `10s`.
   - `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
   - `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
-
+- Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
 *Auditbeat*
 
@@ -245,7 +245,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
-
+- Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 
 *Osquerybeat*
 
