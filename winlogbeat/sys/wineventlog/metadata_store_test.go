@@ -28,7 +28,7 @@ import (
 )
 
 func TestPublisherMetadataStore(t *testing.T) {
-	logp.TestingSetup() //nolint:errcheck // Not needed.
+	logp.TestingSetup()
 
 	s, err := NewPublisherMetadataStore(
 		NilHandle,

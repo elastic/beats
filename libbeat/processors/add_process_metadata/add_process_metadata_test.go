@@ -28,7 +28,6 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -39,7 +38,7 @@ import (
 )
 
 func TestAddProcessMetadata(t *testing.T) {
-	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+	logp.TestingSetup(logp.WithSelectors(processorName))
 
 	startTime := time.Now()
 	testProcs := testProvider{
@@ -817,7 +816,7 @@ func TestAddProcessMetadata(t *testing.T) {
 }
 
 func TestUsingCache(t *testing.T) {
-	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+	logp.TestingSetup(logp.WithSelectors(processorName))
 
 	selfPID := os.Getpid()
 
@@ -926,7 +925,7 @@ func TestUsingCache(t *testing.T) {
 }
 
 func TestSelf(t *testing.T) {
-	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+	logp.TestingSetup(logp.WithSelectors(processorName))
 
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
@@ -960,7 +959,7 @@ func TestSelf(t *testing.T) {
 }
 
 func TestBadProcess(t *testing.T) {
-	require.NoError(t, logp.TestingSetup(logp.WithSelectors(processorName)))
+	logp.TestingSetup(logp.WithSelectors(processorName))
 
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},

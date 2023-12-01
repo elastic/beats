@@ -21,7 +21,7 @@ package auditd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -166,10 +166,7 @@ audit_rules: |
 			makeRuleFlags(0, 2),
 		}, "\n")
 
-		dir1, err := ioutil.TempDir("", "rules1")
-		if err != nil {
-			t.Fatal(err)
-		}
+		dir1 := t.TempDir()
 
 		for _, file := range []struct {
 			order int
@@ -189,15 +186,12 @@ audit_rules: |
 				makeRuleFlags(1+file.order, 2),
 				makeRuleFlags(1+file.order, 3),
 			}, "\n"))
-			if err = ioutil.WriteFile(path, content, fileMode); err != nil {
+			if err := os.WriteFile(path, content, fileMode); err != nil {
 				t.Fatal(err)
 			}
 		}
 
-		dir2, err := ioutil.TempDir("", "rules0")
-		if err != nil {
-			t.Fatal(err)
-		}
+		dir2 := t.TempDir()
 
 		for _, file := range []struct {
 			order int
@@ -215,7 +209,7 @@ audit_rules: |
 				makeRuleFlags(10+file.order, 2),
 				makeRuleFlags(10+file.order, 3),
 			}, "\n"))
-			if err = ioutil.WriteFile(path, content, fileMode); err != nil {
+			if err := os.WriteFile(path, content, fileMode); err != nil {
 				t.Fatal(err)
 			}
 		}
@@ -225,7 +219,7 @@ audit_rules: |
 			fmt.Sprintf("%s/*.conf", dir2),
 		}
 
-		if err = config.Validate(); err != nil {
+		if err := config.Validate(); err != nil {
 			t.Fatal(err)
 		}
 
@@ -271,7 +265,7 @@ func parseConfig(t testing.TB, yaml string) (Config, error) {
 }
 
 func commands(rules []auditRule) []string {
-	var cmds []string
+	var cmds []string //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, r := range rules {
 		cmds = append(cmds, r.flags)
 	}

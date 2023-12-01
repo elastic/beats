@@ -28,7 +28,7 @@ import (
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
-	require.NoError(t, logp.TestingSetup())
+	logp.TestingSetup()
 
 	msg := newSQSMessage(newS3Event("log.json"))
 
@@ -237,7 +237,7 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
-	require.NoError(t, logp.TestingSetup())
+	logp.TestingSetup()
 
 	p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, nil, nil, time.Minute, 5, nil, nil, 5)
 
