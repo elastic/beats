@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
   - `queue.mem.flush.timeout` is changing from `1s` to `10s`.
   - `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
   - `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
-
+- Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
 *Auditbeat*
 
