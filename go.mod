@@ -222,7 +222,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.4
-	go.elastic.co/apm/v2 v2.4.4
+	go.elastic.co/apm/v2 v2.4.7
 	go.mongodb.org/mongo-driver v1.5.1
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
