@@ -43277,6 +43277,26 @@ Kubernetes API server metrics
 
 
 
+*`kubernetes.apiserver.major.version`*::
++
+--
+API Server major version.
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.minor.version`*::
++
+--
+API Server minor version.
+
+
+type: keyword
+
+--
+
 *`kubernetes.apiserver.request.resource`*::
 +
 --
@@ -46318,6 +46338,16 @@ Node pod capacity
 
 
 type: long
+
+--
+
+*`kubernetes.node.kubelet.version`*::
++
+--
+Kubelet version.
+
+
+type: keyword
 
 --
 
