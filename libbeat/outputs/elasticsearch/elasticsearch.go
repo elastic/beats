@@ -52,22 +52,24 @@ func makeES(
 	}
 
 	esConfig := defaultConfig
-	if err := cfg.Unpack(&esConfig); err != nil {
-		return outputs.Fail(err)
-	}
-	// If a preset is specified, unpack its contents to overwrite the baseline
-	// config, but log a warning if we override anything explicitly specified
-	// in cfg.
-	if esConfig.Preset != "" {
-		log.Infof("Applying performance preset '%v'", esConfig.Preset)
-		overriddenFields, err := applyPreset(&esConfig, cfg)
+	preset, err := cfg.String("preset", -1)
+	if err == nil && preset != "" {
+		// Performance preset is present, apply it and log any fields that
+		// were overridden
+		overriddenFields, err := applyPreset(preset, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
 		for _, field := range overriddenFields {
 			log.Warnf("Setting '%v' is ignored because of performance preset '%v'",
-				field, esConfig.Preset)
+				field, preset)
 		}
+	}
+
+	// Unpack the full config, including any performance preset overrides,
+	// into the config struct.
+	if err := cfg.Unpack(&esConfig); err != nil {
+		return outputs.Fail(err)
 	}
 
 	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)

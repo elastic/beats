@@ -25,18 +25,16 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-type preset string
-
 const (
-	presetNone       preset = ""
-	presetCustom     preset = "custom"
-	presetBalanced   preset = "balanced"
-	presetThroughput preset = "throughput"
-	presetScale      preset = "scale"
-	presetLatency    preset = "latency"
+	presetNone       = ""
+	presetCustom     = "custom"
+	presetBalanced   = "balanced"
+	presetThroughput = "throughput"
+	presetScale      = "scale"
+	presetLatency    = "latency"
 )
 
-var configMaps = map[preset]*config.C{
+var presetConfigs = map[string]*config.C{
 	presetNone:   config.MustNewConfigFrom(map[string]interface{}{}),
 	presetCustom: config.MustNewConfigFrom(map[string]interface{}{}),
 	presetBalanced: config.MustNewConfigFrom(map[string]interface{}{
@@ -77,34 +75,13 @@ var configMaps = map[preset]*config.C{
 	}),
 }
 
-// Make sure unpacked preset names are valid
-func (p *preset) Unpack(s string) error {
-	value := preset(s)
-	if err := value.Validate(); err != nil {
-		return err
-	}
-	*p = value
-	return nil
-}
-
-// Return an error if the preset name is unknown
-func (p *preset) Validate() error {
-	if configMaps[*p] == nil {
-		return fmt.Errorf("unknown preset name '%v'", p)
-	}
-	return nil
-}
-
-// Apply the configuration for c's "preset" field, returning a list of fields
-// in the provided user config that were overwritten.
-func applyPreset(
-	target *elasticsearchConfig, userConfig *config.C,
-) ([]string, error) {
-	presetConfig := configMaps[target.Preset]
+// Given a user config, check its preset field and apply any corresponding
+// config overrides.
+// Returns a list of the user fields that were overwritten.
+func applyPreset(preset string, userConfig *config.C) ([]string, error) {
+	presetConfig := presetConfigs[preset]
 	if presetConfig == nil {
-		// This should never happen because the Preset field is validated
-		// when it's first unpacked, but let's be cautious.
-		return nil, fmt.Errorf("unknown preset value %v", target.Preset)
+		return nil, fmt.Errorf("unknown preset value %v", preset)
 	}
 
 	// Check for any user-provided fields that overlap with the preset.
@@ -113,31 +90,23 @@ func applyPreset(
 	userKeys := userConfig.FlattenedKeys()
 	presetKeys := presetConfig.FlattenedKeys()
 	presetConfiguresQueue := listContainsPrefix(presetKeys, "queue.")
-	queueConflict := false
 	overridden := []string{}
 	for _, key := range userKeys {
 		if strings.HasPrefix(key, "queue.") && presetConfiguresQueue {
 			overridden = append(overridden, key)
-			queueConflict = true
 		} else if listContainsStr(presetKeys, key) {
 			overridden = append(overridden, key)
 		}
 	}
-	if queueConflict {
-		// If both the preset and the user config have queue parameters,
-		// we need to explicitly clear the elasticsearchConfig's queue
-		// field before applying the preset, since config.Unpack gives
-		// an error when unpacking namespace types twice even if the
-		// names match.
-		target.Queue = config.Namespace{}
+	// Remove the queue parameters if needed, then merge the preset
+	// config on top of the user config.
+	if presetConfiguresQueue {
+		_, _ = userConfig.Remove("queue", -1)
 	}
-
-	// Apply the preset to the ES config
-	err := presetConfig.Unpack(target)
+	err := userConfig.Merge(presetConfig)
 	if err != nil {
 		return nil, err
 	}
-
 	return overridden, nil
 }
 

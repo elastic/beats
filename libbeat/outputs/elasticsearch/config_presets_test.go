@@ -4,64 +4,42 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestValidate(t *testing.T) {
-	noPresetCfg := config.MustNewConfigFrom(map[string]interface{}{})
-	validPresetCfg := config.MustNewConfigFrom(map[string]interface{}{
-		"preset": "balanced",
-	})
-	invalidPresetCfg := config.MustNewConfigFrom(map[string]interface{}{
-		"preset": "asdf",
-	})
-
-	cfg := elasticsearchConfig{}
-	err := noPresetCfg.Unpack(&cfg)
-	require.NoError(t, err, "Config with no specified preset should unpack successfully")
-
-	err = validPresetCfg.Unpack(&cfg)
-	require.NoError(t, err, "Config with valid preset should unpack successfully")
-
-	err = invalidPresetCfg.Unpack(&cfg)
-	require.Error(t, err, "Config with invalid preset should not unpack successfully")
-}
-
 func TestApplyPresetNoConflicts(t *testing.T) {
+	const testHost = "http://elastic-host:9200"
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"preset": presetThroughput,
+		"hosts": []string{testHost},
+
 		// Set some parameters that aren't affected by performance presets
 		"max_retries": 5,
-		"username":    "elastic",
-		"password":    "password",
 		"loadbalance": true,
 	})
-	esConfig := elasticsearchConfig{}
-	err := cfg.Unpack(&esConfig)
-	require.NoError(t, err, "Valid config tree must unpack successfully")
-
-	// Apply the preset and make sure:
-	// - the resulting config contains the original and preset values
-	// - no conflicts are reported
-	conflicts, err := applyPreset(&esConfig, cfg)
+	// Apply the preset and make sure no conflicts are reported.
+	conflicts, err := applyPreset(presetThroughput, cfg)
 	require.NoError(t, err, "Valid preset must apply successfully")
 	assert.Equal(t, 0, len(conflicts), "applyPreset should report no conflicts from non-preset fields")
 
+	// Unpack the final config into elasticsearchConfig and verify that both user
+	// and preset fields are set correctly.
+	esConfig := elasticsearchConfig{}
+	err = cfg.Unpack(&esConfig)
+	require.NoError(t, err, "Config should unpack successfully")
+
+	// Check basic user params
 	assert.Equal(t, 5, esConfig.MaxRetries, "Non-preset fields should be unchanged by applyPreset")
-	assert.Equal(t, "elastic", esConfig.Username, "Non-preset fields should be unchanged by applyPreset")
-	assert.Equal(t, "password", esConfig.Password, "Non-preset fields should be unchanged by applyPreset")
 	assert.Equal(t, true, esConfig.LoadBalance, "Non-preset fields should be unchanged by applyPreset")
 
+	// Check basic preset params
 	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by applyPreset")
 	assert.Equal(t, 1, esConfig.CompressionLevel, "Preset fields should be set by applyPreset")
 	assert.Equal(t, 15*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by applyPreset")
-	// TODO: rework applyPreset to operate directly on config structs before
-	// the first unpack, so we can properly set (and test) the worker count.
-	//assert.Equal(t, 4, esConfig.workers, "Preset fields should be set by applyPreset")
 
-	// Queue params are more awkward to test
+	// Check preset queue params
 	var memQueueConfig struct {
 		Events         int           `config:"events"`
 		FlushMinEvents int           `config:"flush.min_events"`
@@ -74,58 +52,132 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 	assert.Equal(t, 12800, memQueueConfig.Events, "Queue fields should match preset definition")
 	assert.Equal(t, 1600, memQueueConfig.FlushMinEvents, "Queue fields should match preset definition")
 	assert.Equal(t, 5*time.Second, memQueueConfig.FlushTimeout, "Queue fields should match preset definition")
+
+	// Check calculated hosts, which should contain one copy of the user config
+	// hosts for each configured worker (which for presetThroughput is 4).
+	hosts, err := outputs.ReadHostList(cfg)
+	require.NoError(t, err, "ReadHostList should succeed")
+	assert.Equal(t, 4, len(hosts), "'throughput' preset should create 4 workers per host")
+	for _, host := range hosts {
+		assert.Equal(t, testHost, host, "Computed hosts should match user config")
+	}
 }
 
 func TestApplyPresetWithConflicts(t *testing.T) {
+	const testHost = "http://elastic-host:9200"
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"preset": presetThroughput,
+		"hosts": []string{testHost},
+
 		// Set parameters contained in the performance presets, with
 		// arbitrary numbers that do not match the preset values so we can
 		// make sure everything is overridden.
 		"bulk_max_size":              100,
-		"workers":                    10,
+		"worker":                     10,
 		"queue.mem.events":           1000,
 		"queue.mem.flush.min_events": 100,
 		"queue.mem.flush.timeout":    100 * time.Second,
 		"compression_level":          5,
 		"idle_connection_timeout":    100 * time.Second,
 	})
+	// Apply the preset and ensure all preset fields are reported as conflicts
+	conflicts, err := applyPreset(presetBalanced, cfg)
+	require.NoError(t, err, "Valid preset must apply successfully")
+	expectedConflicts := []string{
+		"bulk_max_size",
+		"worker",
+		"queue.mem.events",
+		"queue.mem.flush.min_events",
+		"queue.mem.flush.timeout",
+		"compression_level",
+		"idle_connection_timeout",
+	}
+	assert.ElementsMatch(t, expectedConflicts, conflicts, "All preset fields should be reported as overridden")
+
+	// Unpack the final config into elasticsearchConfig and verify that user
+	// fields were overridden
 	esConfig := elasticsearchConfig{}
-	err := cfg.Unpack(&esConfig)
+	err = cfg.Unpack(&esConfig)
 	require.NoError(t, err, "Valid config tree must unpack successfully")
 
-	// Apply the preset and make sure:
-	// - the resulting config overrides all initial config values
-	// - conflicts are reported on all fields
-	conflicts, err := applyPreset(&esConfig, cfg)
-	require.NoError(t, err, "Valid preset must apply successfully")
-	assert.Equal(t, 7, len(conflicts), "Number of conflicts should equal number of overridden fields")
-	// TODO: add the remaining equality checks
+	// Check basic preset params
+	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 1, esConfig.CompressionLevel, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 3*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by applyPreset")
+
+	// Check preset queue params
+	var memQueueConfig struct {
+		Events         int           `config:"events"`
+		FlushMinEvents int           `config:"flush.min_events"`
+		FlushTimeout   time.Duration `config:"flush.timeout"`
+	}
+	require.Equal(t, "mem", esConfig.Queue.Name(), "applyPreset should configure the memory queue")
+	err = esConfig.Queue.Config().Unpack(&memQueueConfig)
+	assert.NoError(t, err, "applyPreset should set valid memory queue config")
+
+	assert.Equal(t, 3200, memQueueConfig.Events, "Queue fields should match preset definition")
+	assert.Equal(t, 1600, memQueueConfig.FlushMinEvents, "Queue fields should match preset definition")
+	assert.Equal(t, 10*time.Second, memQueueConfig.FlushTimeout, "Queue fields should match preset definition")
+
+	// Check calculated hosts, which should contain one copy of the user config
+	// hosts for each configured worker (which for presetBalanced is 1).
+	hosts, err := outputs.ReadHostList(cfg)
+	require.NoError(t, err, "ReadHostList should succeed")
+	require.Equal(t, 1, len(hosts), "'balanced' preset should create 1 worker per host")
+	assert.Equal(t, testHost, hosts[0])
 }
 
 func TestApplyPresetCustom(t *testing.T) {
+	const testHost = "http://elastic-host:9200"
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
-		"preset": presetCustom,
+		"hosts": []string{testHost},
+
 		// Set parameters contained in the performance presets, with
 		// arbitrary numbers that do not match the preset values so we can
 		// make sure nothing is overridden.
 		"bulk_max_size":              100,
-		"workers":                    10,
+		"worker":                     2,
 		"queue.mem.events":           1000,
 		"queue.mem.flush.min_events": 100,
 		"queue.mem.flush.timeout":    100 * time.Second,
 		"compression_level":          5,
 		"idle_connection_timeout":    100 * time.Second,
 	})
-	esConfig := elasticsearchConfig{}
-	err := cfg.Unpack(&esConfig)
-	require.NoError(t, err, "Valid config tree must unpack successfully")
-
-	// Apply the preset and make sure:
-	// - the resulting config overrides all initial config values
-	// - conflicts are reported on all fields
-	conflicts, err := applyPreset(&esConfig, cfg)
+	// Apply the preset and make sure no conflicts are reported.
+	conflicts, err := applyPreset(presetCustom, cfg)
 	require.NoError(t, err, "Custom preset must apply successfully")
-	assert.Equal(t, 0, len(conflicts), "Custom preset should always report no conflicts")
-	// TODO: add the remaining equality checks
+	assert.Equal(t, 0, len(conflicts), "applyPreset should report no conflicts when preset is 'custom'")
+
+	// Unpack the final config into elasticsearchConfig and verify that both user
+	// and preset fields are set correctly.
+	esConfig := elasticsearchConfig{}
+	err = cfg.Unpack(&esConfig)
+	require.NoError(t, err, "Config should unpack successfully")
+
+	// Check basic user params
+	assert.Equal(t, 100, esConfig.BulkMaxSize, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 5, esConfig.CompressionLevel, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 100*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by applyPreset")
+
+	// Check user queue params
+	var memQueueConfig struct {
+		Events         int           `config:"events"`
+		FlushMinEvents int           `config:"flush.min_events"`
+		FlushTimeout   time.Duration `config:"flush.timeout"`
+	}
+	require.Equal(t, "mem", esConfig.Queue.Name(), "applyPreset with custom preset should preserve user queue settings")
+	err = esConfig.Queue.Config().Unpack(&memQueueConfig)
+	assert.NoError(t, err, "Queue settings should unpack successfully")
+
+	assert.Equal(t, 1000, memQueueConfig.Events, "Queue fields should match preset definition")
+	assert.Equal(t, 100, memQueueConfig.FlushMinEvents, "Queue fields should match preset definition")
+	assert.Equal(t, 100*time.Second, memQueueConfig.FlushTimeout, "Queue fields should match preset definition")
+
+	// Check calculated hosts, which should contain one copy of the user config
+	// hosts for each configured worker (which in this case means 2).
+	hosts, err := outputs.ReadHostList(cfg)
+	require.NoError(t, err, "ReadHostList should succeed")
+	assert.Equal(t, 2, len(hosts), "'custom' preset should leave worker count unchanged")
+	for _, host := range hosts {
+		assert.Equal(t, testHost, host, "Computed hosts should match user config")
+	}
 }

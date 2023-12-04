@@ -44,7 +44,6 @@ type elasticsearchConfig struct {
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	Queue              config.Namespace  `config:"queue"`
-	Preset             preset            `config:"preset"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
