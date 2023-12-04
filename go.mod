@@ -94,15 +94,9 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
-<<<<<<< HEAD
-	github.com/google/flatbuffers v2.0.8+incompatible
-	github.com/google/go-cmp v0.5.9
-	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
-=======
 	github.com/google/flatbuffers v23.3.3+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
->>>>>>> e62be5dcf7 (Replace EOL `github.com/pmezard/go-difflib` by `github.com/google/go-cmp` (#37228))
 	github.com/google/uuid v1.3.0
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.3
@@ -140,12 +134,8 @@ require (
 	github.com/otiai10/copy v1.2.0
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
-<<<<<<< HEAD
-	github.com/pmezard/go-difflib v1.0.0
-	github.com/prometheus/client_golang v1.7.1 // indirect
-=======
 	github.com/pmezard/go-difflib v1.0.0 // indirect
->>>>>>> e62be5dcf7 (Replace EOL `github.com/pmezard/go-difflib` by `github.com/google/go-cmp` (#37228))
+	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.10.0
 	github.com/prometheus/procfs v0.7.3

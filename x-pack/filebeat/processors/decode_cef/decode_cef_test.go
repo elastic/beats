@@ -201,11 +201,7 @@ func readCEFSamples(t testing.TB, source string) []common.MapStr {
 		t.Fatal(err)
 	}
 
-<<<<<<< HEAD
-	var samples []common.MapStr
-=======
-	var samples []mapstr.M //nolint:prealloc // size is unknown and it's a test
->>>>>>> e62be5dcf7 (Replace EOL `github.com/pmezard/go-difflib` by `github.com/google/go-cmp` (#37228))
+	var samples []common.MapStr //nolint:prealloc // size is unknown and it's a test
 	s := bufio.NewScanner(f)
 	for s.Scan() {
 		data := s.Bytes()
