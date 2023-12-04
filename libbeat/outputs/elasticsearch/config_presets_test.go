@@ -38,7 +38,7 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 		"loadbalance": true,
 	})
 	// Apply the preset and make sure no conflicts are reported.
-	conflicts, err := applyPreset(presetThroughput, cfg)
+	conflicts, _, err := applyPreset(presetThroughput, cfg)
 	require.NoError(t, err, "Valid preset must apply successfully")
 	assert.Equal(t, 0, len(conflicts), "applyPreset should report no conflicts from non-preset fields")
 
@@ -98,7 +98,7 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 		"idle_connection_timeout":    100 * time.Second,
 	})
 	// Apply the preset and ensure all preset fields are reported as conflicts
-	conflicts, err := applyPreset(presetBalanced, cfg)
+	conflicts, _, err := applyPreset(presetBalanced, cfg)
 	require.NoError(t, err, "Valid preset must apply successfully")
 	expectedConflicts := []string{
 		"bulk_max_size",
@@ -161,7 +161,7 @@ func TestApplyPresetCustom(t *testing.T) {
 		"idle_connection_timeout":    100 * time.Second,
 	})
 	// Apply the preset and make sure no conflicts are reported.
-	conflicts, err := applyPreset(presetCustom, cfg)
+	conflicts, _, err := applyPreset(presetCustom, cfg)
 	require.NoError(t, err, "Custom preset must apply successfully")
 	assert.Equal(t, 0, len(conflicts), "applyPreset should report no conflicts when preset is 'custom'")
 

@@ -77,11 +77,12 @@ var presetConfigs = map[string]*config.C{
 
 // Given a user config, check its preset field and apply any corresponding
 // config overrides.
-// Returns a list of the user fields that were overwritten.
-func applyPreset(preset string, userConfig *config.C) ([]string, error) {
+// Returns a list of the user fields that were overwritten, and the full
+// preset config that was applied.
+func applyPreset(preset string, userConfig *config.C) ([]string, *config.C, error) {
 	presetConfig := presetConfigs[preset]
 	if presetConfig == nil {
-		return nil, fmt.Errorf("unknown preset value %v", preset)
+		return nil, nil, fmt.Errorf("unknown preset value %v", preset)
 	}
 
 	// Check for any user-provided fields that overlap with the preset.
@@ -105,9 +106,9 @@ func applyPreset(preset string, userConfig *config.C) ([]string, error) {
 	}
 	err := userConfig.Merge(presetConfig)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return overridden, nil
+	return overridden, presetConfig, nil
 }
 
 // TODO: Replace this with slices.Contains once we hit Go 1.21.

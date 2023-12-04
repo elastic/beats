@@ -56,13 +56,14 @@ func makeES(
 	if err == nil && preset != "" {
 		// Performance preset is present, apply it and log any fields that
 		// were overridden
-		overriddenFields, err := applyPreset(preset, cfg)
+		overriddenFields, presetConfig, err := applyPreset(preset, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
+		log.Infof("Applying performance preset '%v': %v",
+			preset, config.DebugString(presetConfig, false))
 		for _, field := range overriddenFields {
-			log.Warnf("Setting '%v' is ignored because of performance preset '%v'",
-				field, preset)
+			log.Warnf("Performance preset '%v' overrides user setting for field '%v'", preset, field)
 		}
 	}
 
