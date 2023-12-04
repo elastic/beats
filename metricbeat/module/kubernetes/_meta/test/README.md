@@ -1,6 +1,7 @@
 # Kube State Metrics metrics files
 
 Each KSM metrics file used for the tests of each `state_*` metricset can be found inside `KSM` directory.
+Each `state_*` metricset directory will have corresponding `_meta/test` subfolder with expected files
 
 Each file has the name format `ksm.v<version>.plain`. The `<version>` should be compatible with the Kubernetes versions we support. Check the compatibility in the official repository [here](https://github.com/kubernetes/kube-state-metrics#compatibility-matrix).
 
