@@ -13448,11 +13448,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-concert@v0.2
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-elasticsearch/v8
-Version: v8.10.0
+Version: v8.11.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-elasticsearch/v8@v8.10.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-elasticsearch/v8@v8.11.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
