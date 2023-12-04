@@ -60,6 +60,31 @@ func TestToMap(t *testing.T) {
 			},
 		},
 		{
+			"root fields with invalid URL",
+			mapstr.M{
+				"type":            JourneyStart,
+				"package_version": "1.2.3",
+				"root_fields": map[string]interface{}{
+					"synthetics": map[string]interface{}{
+						"nested": "v1",
+					},
+					"truly_at_root": "v2",
+				},
+				"url": "https://{example}.com",
+			},
+			mapstr.M{
+				"synthetics": mapstr.M{
+					"type":            JourneyStart,
+					"package_version": "1.2.3",
+					"nested":          "v1",
+				},
+				"url": mapstr.M{
+					"full": "https://{example}.com",
+				},
+				"truly_at_root": "v2",
+			},
+		},
+		{
 			"root fields, step metadata",
 			mapstr.M{
 				"type":            StepStart,
