@@ -17,7 +17,7 @@ path: "../_meta/test"
 
 When you update the KSM directory files, remember to run `go test -data` to generate the expected files. To check against the expected files already present, you can just run `go test .` inside each state metricset directory.
 
-> **TIP**: To run tests and generate the expected files for all state metricsets you can run `go test ./state... --data`.
+> **TIP**: To run tests and generate the expected files for all state metricsets you can run `go test ./state... --data`. Navigate to `/elastic/beats/metricbeat/module/kubernetes/` to run this command
 
 > **_NOTE:_**  The expected files inside these two folders are not deleted when running the tests. Remember to delete them if they are from an old version.
 
