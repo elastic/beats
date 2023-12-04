@@ -6,6 +6,7 @@ package process
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
@@ -101,12 +103,14 @@ type MetricSet struct {
 
 // Process represents information about a process.
 type Process struct {
-	Info     types.ProcessInfo
-	UserInfo *types.UserInfo
-	User     *user.User
-	Group    *user.Group
-	Hashes   map[hasher.HashType]hasher.Digest
-	Error    error
+	Info           types.ProcessInfo
+	UserInfo       *types.UserInfo
+	User           *user.User
+	Group          *user.Group
+	CapEffective   []string
+	CapPermitted   []string
+	Hashes         map[hasher.HashType]hasher.Digest
+	Error          error
 }
 
 // Hash creates a hash for Process.
@@ -376,6 +380,13 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		event.RootFields.Put("user.group.name", process.Group.Name)
 	}
 
+	if len(process.CapEffective) > 0 {
+		event.RootFields.Put("process.thread.capabilities.effective", process.CapEffective)
+	}
+	if len(process.CapPermitted) > 0 {
+		event.RootFields.Put("process.thread.capabilities.permitted", process.CapPermitted)
+	}
+
 	if process.Hashes != nil {
 		for hashType, digest := range process.Hashes {
 			fieldName := "process.hash." + string(hashType)
@@ -488,6 +499,14 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			process.UserInfo = &userInfo
 		}
 
+		process.CapEffective, err = capabilities.FromPid(capabilities.Effective, pInfo.PID)
+		if err != nil && !errors.Is(err, capabilities.ErrUnsupported) && process.Error == nil {
+			process.Error = err
+		}
+		process.CapPermitted, err = capabilities.FromPid(capabilities.Permitted, pInfo.PID)
+		if err != nil && !errors.Is(err, capabilities.ErrUnsupported) && process.Error == nil {
+			process.Error = err
+		}
 		// Exclude Linux kernel processes, they are not very interesting.
 		if runtime.GOOS == "linux" && userInfo.UID == "0" && process.Info.Exe == "" {
 			continue
