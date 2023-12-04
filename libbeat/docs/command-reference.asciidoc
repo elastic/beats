@@ -744,6 +744,10 @@ and inputs, and runs each input until the harvesters are closed. If you set the
 `--once` flag, you should also set `close_eof` so the harvester is closed when
 the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
++
+The `--once` option is not currently supported with the
+{filebeat-ref}/filebeat-input-filestream.html[`filestream`] input type.
+
 endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::
