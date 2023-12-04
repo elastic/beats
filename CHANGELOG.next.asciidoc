@@ -78,22 +78,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
-- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-- Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
-- Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
 
 *Functionbeat*
 
 
 *Winlogbeat*
 
-
+- Document minimum permissions required for running winlogbeat with local user account. {issue}15773[15773] {pull}37176[37176]
 
 *Elastic Log Driver*
 
