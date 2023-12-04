@@ -33,7 +33,9 @@ func Test_validateConfig(t *testing.T) {
 		{
 			name: "minimal config",
 			config: config{
-				ProviderName: "Microsoft-Windows-DNSServer",
+				ProviderName:    "Microsoft-Windows-DNSServer",
+				TraceLevel:      "verbose",
+				MatchAnyKeyword: 0xffffffffffffffff,
 			},
 		},
 		{
@@ -130,7 +132,7 @@ func Test_validateConfig(t *testing.T) {
 				}
 			} else {
 				if err != nil {
-					t.Fatalf("Configuration validation failed. no error expected but got '%v'", err)
+					t.Fatalf("Configuration validation failed. No error expected but got '%v'", err)
 				}
 			}
 		})
