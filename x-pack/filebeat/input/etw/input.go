@@ -110,7 +110,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 		e.log.Debugf("received event %d with length %d", er.EventHeader.EventDescriptor.Id, er.UserDataLength)
 
-		event := make(map[string]interface{})
+		var event map[string]interface{}
 
 		if data, err := etw.GetEventProperties(er); err == nil {
 			event = map[string]interface{}{
