@@ -166,6 +166,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 - Add `ignore_errors` option to audit module. {issue}15768[15768] {pull}36851[36851]
 - Fix copy arguments for strict aligned architectures. {pull}36976[36976]
+- Add process capabilities to the process module. {issue}36404[36404] {pull}37303[37303]
 
 *Filebeat*
 

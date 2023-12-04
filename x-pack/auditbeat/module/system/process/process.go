@@ -101,12 +101,13 @@ type MetricSet struct {
 
 // Process represents information about a process.
 type Process struct {
-	Info     types.ProcessInfo
-	UserInfo *types.UserInfo
-	User     *user.User
-	Group    *user.Group
-	Hashes   map[hasher.HashType]hasher.Digest
-	Error    error
+	Info           types.ProcessInfo
+	UserInfo       *types.UserInfo
+	User           *user.User
+	Group          *user.Group
+	CapabilityInfo *types.CapabilityInfo
+	Hashes         map[hasher.HashType]hasher.Digest
+	Error          error
 }
 
 // Hash creates a hash for Process.
@@ -353,6 +354,17 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		},
 	}
 
+	if process.CapabilityInfo != nil {
+		if len(process.CapabilityInfo.Effective) > 0 {
+			event.RootFields.Put("process.thread.capabilities.effective",
+				process.CapabilityInfo.Effective)
+		}
+		if len(process.CapabilityInfo.Permitted) > 0 {
+			event.RootFields.Put("process.thread.capabilities.permitted",
+				process.CapabilityInfo.Permitted)
+		}
+	}
+
 	if process.UserInfo != nil {
 		putIfNotEmpty(&event.RootFields, "user.id", process.UserInfo.UID)
 		putIfNotEmpty(&event.RootFields, "user.group.id", process.UserInfo.GID)
@@ -488,6 +500,13 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			process.UserInfo = &userInfo
 		}
 
+		if capIface, ok := sysinfoProc.(types.Capabilities); ok {
+			process.CapabilityInfo, err = capIface.Capabilities()
+			if err != nil && process.Error == nil {
+				process.Error = fmt.Errorf("failed to load capabilities for PID %d: %w",
+					sysinfoProc.PID(), err)
+			}
+		}
 		// Exclude Linux kernel processes, they are not very interesting.
 		if runtime.GOOS == "linux" && userInfo.UID == "0" && process.Info.Exe == "" {
 			continue
