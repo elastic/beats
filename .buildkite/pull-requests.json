@@ -18,7 +18,7 @@
         },
         {
             "enabled": true,
-            "pipelineSlug": "beats",
+            "pipelineSlug": "beats-metricbeat",
             "allow_org_users": true,
             "allowed_repo_permissions": ["admin", "write"],
             "allowed_list": [ ],
@@ -30,7 +30,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^metricbeat/.*", "^Jenkinsfile", "^\\.ci/scripts/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
+            "always_require_ci_on_changed": [ "^metricbeat/.*", ".buildkite/metricbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         }
     ]
 }
