@@ -42,7 +42,6 @@ func getFiles(folder string) ([]string, error) {
 
 // GetTestCases Build test cases based on the files from folder, and the expected files in the expectedFolder
 func GetTestCases(folder string, expectedFolder string) (ptest.TestCases, error) {
-	var files []string
 	var cases ptest.TestCases
 
 	files, err := getFiles(folder)
@@ -56,11 +55,8 @@ func GetTestCases(folder string, expectedFolder string) (ptest.TestCases, error)
 				MetricsFile  string
 				ExpectedFile string
 			}{
-				// the metrics file is inside the parent directory, while the expected file is in the current directory
-				// Example:
-				//	Metricsfile: ../_meta/test/ksm.v2.4.2
-				//	ExpectedFile: ./_meta/test/ksm.v2.4.2.expected
-				MetricsFile:  file,
+				MetricsFile: file,
+				// the expected file will have the path <expectedFolder>/filename.expected
 				ExpectedFile: filepath.Join(expectedFolder, filepath.Base(file)+".expected"),
 			},
 		)
@@ -108,27 +104,5 @@ func TestMetricsFamilyFromFolder(t *testing.T, folder string, mapping *p.Metrics
 		t.Fatalf(err.Error())
 	}
 
-	metricsFiles := map[string][]string{}
-	for i := 0; i < len(files); i++ {
-		content, err := ioutil.ReadFile(files[i])
-		if err != nil {
-			t.Fatalf("Unknown file %s.", files[i])
-		}
-		text := string(content)
-		for metric := range mapping.Metrics {
-			// A space is needed to check if the metric exists, since there are metrics that can follow this logic:
-			// some_metric and some_metric_total
-			if !strings.Contains(text, "# TYPE "+metric+" ") {
-				metricsFiles[metric] = append(metricsFiles[metric], files[i])
-			}
-		}
-	}
-	for metric, filesList := range metricsFiles {
-		if len(filesList) != len(files) {
-			t.Logf("Warning: metric %s is not present in all files.", metric)
-		} else {
-			t.Errorf("Unknown metric: %s", metric)
-		}
-	}
-
+	TestMetricsFamilyFromFiles(t, files, mapping)
 }
