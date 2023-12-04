@@ -656,6 +656,8 @@ func (h *FileHarvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
+	logp.Info("NewLogFileReader: %s, LudicrousMode: %s", h.state.Source, h.config.IsLudicrousModeActivated())
+
 	// Configure MaxBytes limit for EncodeReader as multiplied by 4
 	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
 	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.

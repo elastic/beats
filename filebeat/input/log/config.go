@@ -70,7 +70,7 @@ var (
 			CloseEOF:      false,
 			CloseTimeout:  0,
 		},
-		LudicrousMode: true,
+		LudicrousMode: false,
 	}
 )
 
