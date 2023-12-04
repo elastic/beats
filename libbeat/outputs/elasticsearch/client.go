@@ -447,8 +447,8 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 					}
 				} else { // drop
 					stats.nonIndexable++
-					client.log.Warnf("Cannot index event (status=%v): dropping event!", status)
-					client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event! Enable debug logs to view the event and cause.", data[i], status, msg)
+					client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 					continue
 				}
 			}
