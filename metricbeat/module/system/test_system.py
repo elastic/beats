@@ -113,7 +113,7 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # is not available on all OSes and requires root to read for all processes.
 # num_threads may not be readable for some privileged process on Windows,
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "io"]
 
 
 class Test(metricbeat.BaseTest):
