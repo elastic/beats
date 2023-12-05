@@ -87,8 +87,9 @@ func createRootFields(stats *Stats, regionName string) mapstr.M {
 			"image": mapstr.M{
 				"name": stats.Container.Image,
 			},
-			"name":   stats.Container.Name,
-			"labels": stats.Container.Labels,
+			"name":              stats.Container.Name,
+			"labels":            stats.Container.Labels,
+			"memory_hard_limit": stats.Container.Limits.Memory,
 		},
 	}
 
