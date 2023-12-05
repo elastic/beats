@@ -30,6 +30,11 @@ var doMetadataFetcher = provider{
 
 	Local: true,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		doSchema := func(m map[string]interface{}) mapstr.M {
 			m["serviceName"] = "Droplets"

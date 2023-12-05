@@ -45,6 +45,11 @@ var huaweiMetadataFetcher = provider{
 
 	Local: true,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		metadataHost := "169.254.169.254"
 		huaweiCloudMetadataJSONURI := "/openstack/latest/meta_data.json"

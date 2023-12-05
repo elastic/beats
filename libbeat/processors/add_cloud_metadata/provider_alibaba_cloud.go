@@ -29,6 +29,11 @@ var alibabaCloudMetadataFetcher = provider{
 
 	Local: false,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		ecsMetadataHost := "100.100.100.200"
 		ecsMetadataInstanceIDURI := "/latest/meta-data/instance-id"

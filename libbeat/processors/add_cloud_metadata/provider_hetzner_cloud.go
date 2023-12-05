@@ -34,6 +34,10 @@ const (
 var hetznerMetadataFetcher = provider{
 	Name:  "hetzner-cloud",
 	Local: true,
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		hetznerSchema := func(m map[string]interface{}) mapstr.M {
 			m["service"] = mapstr.M{

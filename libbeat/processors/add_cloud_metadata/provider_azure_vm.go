@@ -30,6 +30,11 @@ var azureVMMetadataFetcher = provider{
 
 	Local: true,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		azMetadataURI := "/metadata/instance/compute?api-version=2021-02-01"
 		azHeaders := map[string]string{"Metadata": "true"}

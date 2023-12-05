@@ -39,8 +39,12 @@ var openstackNovaMetadataFetcher = provider{
 }
 
 var openstackNovaSSLMetadataFetcher = provider{
-	Name:   "openstack-nova-ssl",
-	Local:  true,
+	Name:  "openstack-nova-ssl",
+	Local: true,
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
 	Create: buildOpenstackNovaCreate("https"),
 }
 

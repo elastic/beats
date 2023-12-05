@@ -24,6 +24,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -34,6 +36,9 @@ type provider struct {
 
 	// Local Set to true if local IP is accessed only
 	Local bool
+
+	// ServiceExists returns true if the provider has a metadata service available
+	ServiceExists func() bool
 
 	// Create returns an actual metadataFetcher
 	Create func(string, *conf.C) (metadataFetcher, error)
@@ -97,7 +102,7 @@ func filterMetaProviders(filter func(string) bool, fetchers map[string]provider)
 	return out
 }
 
-func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher, error) {
+func setupFetchers(providers map[string]provider, c *conf.C, logger *logp.Logger) ([]metadataFetcher, error) {
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
@@ -112,6 +117,11 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 		}
 		visited[ff.Name] = true
 
+		if !ff.ServiceExists() {
+			logger.Warnf("could not find metadata service for provider [%s]; skipping fetcher creation", name)
+			continue
+		}
+
 		fetcher, err := ff.Create(name, c)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize the %v fetcher: %w", name, err)
@@ -119,6 +129,11 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 
 		mf = append(mf, fetcher)
 	}
+
+	logger.Infof(
+		"[%d] out of a possible [%d] metadata fetchers for [%d] providers created",
+		len(mf), len(visited), len(providers),
+	)
 	return mf, nil
 }
 

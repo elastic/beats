@@ -47,6 +47,11 @@ var gceMetadataFetcher = provider{
 
 	Local: true,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(provider string, config *conf.C) (metadataFetcher, error) {
 		gceMetadataURI := "/computeMetadata/v1/?recursive=true&alt=json"
 		gceHeaders := map[string]string{"Metadata-Flavor": "Google"}
