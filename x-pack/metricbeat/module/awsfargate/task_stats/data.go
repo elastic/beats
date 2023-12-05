@@ -59,7 +59,7 @@ func createEvent(stats *Stats) mb.Event {
 
 	memoryHardLimit := stats.Container.Limits.Memory
 	if memoryHardLimit != 0 {
-		_, _ = e.MetricSetFields.Put("memory_hard_limit", taskKnownStatus)
+		_, _ = e.MetricSetFields.Put("memory_hard_limit", memoryHardLimit)
 	}
 
 	_, _ = e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
