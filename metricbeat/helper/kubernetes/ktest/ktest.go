@@ -28,13 +28,13 @@ import (
 )
 
 func getFiles(folder string) ([]string, error) {
-	var files []string
 	entries, err := os.ReadDir(folder)
+	files := make([]string, len(entries))
 	if err != nil {
 		return nil, err
 	}
-	for _, e := range entries {
-		files = append(files, filepath.Join(folder, e.Name()))
+	for i, e := range entries {
+		files[i] = filepath.Join(folder, e.Name())
 	}
 	return files, nil
 }
