@@ -88,8 +88,13 @@ func applyPreset(preset string, userConfig *config.C) ([]string, *config.C, erro
 	// Check for any user-provided fields that overlap with the preset.
 	// Queue parameters have special handling since they must be applied
 	// as a group so all queue parameters conflict with each other.
-	userKeys := userConfig.FlattenedKeys()
+	// User config keys must be fetch from a special helper since they
+	// unpredictably contain an implicit prefix, see flattenedKeysForConfig.
 	presetKeys := presetConfig.FlattenedKeys()
+	userKeys, err := flattenedKeysForConfig(userConfig)
+	if err != nil {
+		return nil, nil, err
+	}
 	presetConfiguresQueue := listContainsPrefix(presetKeys, "queue.")
 	overridden := []string{}
 	for _, key := range userKeys {
@@ -104,7 +109,7 @@ func applyPreset(preset string, userConfig *config.C) ([]string, *config.C, erro
 	if presetConfiguresQueue {
 		_, _ = userConfig.Remove("queue", -1)
 	}
-	err := userConfig.Merge(presetConfig)
+	err = userConfig.Merge(presetConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -128,4 +133,34 @@ func listContainsPrefix(list []string, prefix string) bool {
 		}
 	}
 	return false
+}
+
+// Configs passed to the Elasticsearch output are often (but not always)
+// created via a config.Namespace, where the top-level namespace
+// "elasticsearch" has all the output's config fields underneath. This
+// usually doesn't matter, since we're just given the config object for
+// the top-level keys underneath "elasticsearch". However, when collecting
+// the full flattened key list for a config via FlattenedKeys(), a config
+// object that was created via config.Namespace still "remembers" and
+// includes the top-level "elasticsearch" key even though it is omitted
+// when otherwise modifying or unpacking keys.
+// Since we need the actual effective flattened key within the elasticsearch
+// namespace, and we don't want it to behave differently depending on how
+// our config object was originally generated, we use this workaround:
+// unpack the config into a bare map, then repack it into a config object.
+// This way it "forgets" about the namespace metadata since it is not
+// included when unpacking into map for.
+// It would be nice to not have to do this (perhaps config.Namespace.Unpack
+// should strip the extra prefix somehow when it extracts the config subtree?)
+func flattenedKeysForConfig(cfg *config.C) ([]string, error) {
+	rawMap := make(map[string]interface{})
+	err := cfg.Unpack(rawMap)
+	if err != nil {
+		return nil, err
+	}
+	strippedCfg, err := config.NewConfigFrom(rawMap)
+	if err != nil {
+		return nil, err
+	}
+	return strippedCfg.FlattenedKeys(), nil
 }
