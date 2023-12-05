@@ -57,6 +57,11 @@ func createEvent(stats *Stats) mb.Event {
 		_, _ = e.MetricSetFields.Put("task_known_status", taskKnownStatus)
 	}
 
+	memoryHardLimit := stats.Container.Limits.Memory
+	if memoryHardLimit != 0 {
+		_, _ = e.MetricSetFields.Put("memory_hard_limit", taskKnownStatus)
+	}
+
 	_, _ = e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
 	return e
 }
@@ -87,9 +92,8 @@ func createRootFields(stats *Stats, regionName string) mapstr.M {
 			"image": mapstr.M{
 				"name": stats.Container.Image,
 			},
-			"name":              stats.Container.Name,
-			"labels":            stats.Container.Labels,
-			"memory_hard_limit": stats.Container.Limits.Memory,
+			"name":   stats.Container.Name,
+			"labels": stats.Container.Labels,
 		},
 	}
 

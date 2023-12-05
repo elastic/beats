@@ -22,6 +22,10 @@
       type: keyword
       description: >
         The known status for the task from Amazon ECS.
+    - name: hard_memory_limit
+      type: scaled_float
+      description: >
+        The Hard Memory Limit for the task from Amazon ECS.
     - name: cpu
       type: group
       description: Runtime CPU metrics.
