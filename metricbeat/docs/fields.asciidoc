@@ -4986,6 +4986,16 @@ type: keyword
 
 --
 
+*`awsfargate.task_stats.hard_memory_limit`*::
++
+--
+The Hard Memory Limit for the task from Amazon ECS.
+
+
+type: scaled_float
+
+--
+
 [float]
 === cpu
 
