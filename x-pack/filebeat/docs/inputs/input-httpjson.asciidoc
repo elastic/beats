@@ -1145,14 +1145,14 @@ filebeat.inputs:
   chain:
     # second call
     - step:
-      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
-      request.method: GET
-      replace: $.records[:].id
+        request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+        request.method: GET
+        replace: $.records[:].id
     # third call
     - step:
-      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
-      request.method: GET
-      replace: $.file_name
+        request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+        request.method: GET
+        replace: $.file_name
 ----
 
 Example:
@@ -1257,9 +1257,9 @@ filebeat.inputs:
   chain:
     # second call
     - step:
-      request.url: https://example.com/services/data/v1.0/$.exportId/files
-      request.method: GET
-      replace_with: '$.exportId,.first_response.body.exportId'
+        request.url: https://example.com/services/data/v1.0/$.exportId/files
+        request.method: GET
+        replace_with: '$.exportId,.first_response.body.exportId'
 ----
 
 Example:

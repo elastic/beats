@@ -6,10 +6,10 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "default",
+        "namespace": "kube-public",
         "state_namespace": {
             "created": {
-                "sec": 1691566338
+                "sec": 1698675678
             },
             "status": {
                 "active": true,

@@ -12,11 +12,11 @@
         },
         "pod": {
             "host_ip": "172.18.0.2",
-            "ip": "10.244.0.22",
-            "name": "hello-28192809-jbn5z",
+            "ip": "10.244.0.6",
+            "name": "web-0",
             "status": {
-                "phase": "succeeded",
-                "ready": "false",
+                "phase": "running",
+                "ready": "true",
                 "scheduled": "true"
             }
         }

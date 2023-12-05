@@ -54,7 +54,7 @@ func hetznerMetadataHandler() http.HandlerFunc {
 }
 
 func TestRetrieveHetznerMetadata(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	server := httptest.NewServer(hetznerMetadataHandler())
 	defer server.Close()

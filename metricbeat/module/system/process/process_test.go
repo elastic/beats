@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
@@ -33,8 +32,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	err := logp.DevelopmentSetup()
-	require.NoError(t, err, "could not set the logger to DevelopmentSetup")
+	logp.DevelopmentSetup()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
