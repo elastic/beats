@@ -19,7 +19,7 @@ services:
       - "script.context.template.cache_max_size=2000"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.11.1
+    image: docker.elastic.co/sscs/logstash-cgr:20231205-pr-7
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 300
