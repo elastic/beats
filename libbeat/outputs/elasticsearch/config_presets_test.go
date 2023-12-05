@@ -199,3 +199,32 @@ func TestApplyPresetCustom(t *testing.T) {
 		assert.Equal(t, testHost, host, "Computed hosts should match user config")
 	}
 }
+
+func TestFlattenedKeysRemovesNamespace(t *testing.T) {
+	// A test exhibiting the namespace corner case that breaks the baseline
+	// behavior of FlattenedKeys, and ensuring that flattenedKeysForConfig
+	// fixes it.
+	rawCfg := config.MustNewConfigFrom(map[string]interface{}{
+		"namespace.testkey": "testvalue",
+	})
+	ns := config.Namespace{}
+	err := ns.Unpack(rawCfg)
+	require.NoError(t, err, "Namespace unpack should succeed")
+
+	// Extract the sub-config from the Namespace object.
+	cfg := ns.Config()
+
+	// FlattenedKeys on the config object parsed via a Namespace will still
+	// include the namespace in the reported keys
+	nsFlattenedKeys := cfg.FlattenedKeys()
+	assert.ElementsMatch(t, []string{"namespace.testkey"}, nsFlattenedKeys,
+		"Expected keys from FlattenedKeys to include original namespace")
+
+	// flattenedKeysForConfig should strip the namespace prefix so we can
+	// reliably compare output config fields no matter how they were
+	// originally created.
+	cfgFlattenedKeys, err := flattenedKeysForConfig(cfg)
+	require.NoError(t, err, "flattenedKeysForConfig should succeed")
+	assert.ElementsMatch(t, []string{"testkey"}, cfgFlattenedKeys,
+		"Expected flattenedKeysForConfig to remove original namespace")
+}
