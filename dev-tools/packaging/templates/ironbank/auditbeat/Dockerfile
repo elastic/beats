@@ -47,6 +47,10 @@ COPY LICENSE /licenses/elastic-${ELASTIC_PRODUCT}
 # Add a dumb init process
 COPY tinit /tinit
 RUN chmod +x /tinit
+# Help with supporting the override in the ECK entrypoint
+# https://github.com/elastic/cloud-on-k8s/blob/272fd0f2b344b1f86f04decb561eceab8a5a3254/pkg/controller/agent/pod.go#L455
+# TODO: eventually /tinit will be replaced by /usr/bin/tini
+RUN ln -s /tinit /usr/bin/tini
 
 # Bring in product from the initial stage.
 COPY --from=builder --chown=1000:0 /usr/share/${ELASTIC_PRODUCT} /usr/share/${ELASTIC_PRODUCT}
@@ -74,6 +78,7 @@ RUN groupadd --gid 1000 ${ELASTIC_PRODUCT} && useradd --uid 1000 --gid 1000 --gr
 USER ${ELASTIC_PRODUCT}
 ENV ELASTIC_PRODUCT=${ELASTIC_PRODUCT}
 
+# TODO: eventually /tinit will be replaced by /usr/bin/tini
 ENTRYPOINT ["/tinit", "--", "/usr/share/auditbeat/auditbeat", "-E", "http.enabled=true", "-E", "http.host=unix:///usr/share/auditbeat/data/auditbeat.sock"]
 CMD ["-environment", "container"]
 
