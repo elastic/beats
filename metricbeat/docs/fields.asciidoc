@@ -4986,7 +4986,7 @@ type: keyword
 
 --
 
-*`awsfargate.task_stats.hard_memory_limit`*::
+*`awsfargate.task_stats.memory_hard_limit`*::
 +
 --
 The Hard Memory Limit for the task from Amazon ECS.
