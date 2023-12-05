@@ -83,7 +83,7 @@ type TaskMetadata struct {
 	Containers    []*container `json:"Containers"`
 }
 
-// Limits is a struct that represents the memory limit from ${ECS_CONTAINER_METADATA_URI_V4}/task
+// Limits is a struct that represents the memory limit from ${ECS_CONTAINER_METADATA_URI_V4}/task, which is the Hard Memory Limit set in AWS ECS
 type Limits struct {
 	Memory uint64 `json:"Memory"`
 }
