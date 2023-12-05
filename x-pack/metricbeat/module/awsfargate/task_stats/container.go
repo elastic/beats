@@ -15,7 +15,7 @@ type container struct {
 	Name     string
 	Image    string
 	Labels   map[string]string
-	Limits   Limits `json:"Limits"`
+	Limits   Limits
 }
 
 func getContainerMetadata(c *container) *container {
