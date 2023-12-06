@@ -18,6 +18,7 @@
 package logp
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -27,8 +28,6 @@ import (
 	"strings"
 	"sync/atomic"
 	"unsafe"
-
-	"github.com/hashicorp/go-multierror"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -325,22 +324,22 @@ func (m multiCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *za
 
 // Write writes the entry to each core.
 func (m multiCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	var errs error
+	var errs []error
 	for _, core := range m.cores {
 		if err := core.Write(entry, fields); err != nil {
-			errs = multierror.Append(errs, err)
+			errs = append(errs, err)
 		}
 	}
-	return errs
+	return errors.Join(errs...)
 }
 
 // Sync syncs each core.
 func (m multiCore) Sync() error {
-	var errs error
+	var errs []error
 	for _, core := range m.cores {
 		if err := core.Sync(); err != nil {
-			errs = multierror.Append(errs, err)
+			errs = append(errs, err)
 		}
 	}
-	return errs
+	return errors.Join(errs...)
 }

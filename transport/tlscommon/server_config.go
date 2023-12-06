@@ -19,9 +19,8 @@ package tlscommon
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -46,7 +45,7 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 		return nil, nil
 	}
 
-	fail := multierror.Errors{}
+	var fail []error
 	logFail := func(es ...error) {
 		for _, e := range es {
 			if e != nil {
@@ -72,8 +71,8 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 	logFail(errs...)
 
 	// fail, if any error occurred when loading certificate files
-	if err = fail.Err(); err != nil {
-		return nil, err
+	if len(fail) != 0 {
+		return nil, errors.Join(fail...)
 	}
 
 	certs := make([]tls.Certificate, 0)

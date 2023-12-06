@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -32,8 +33,6 @@ import (
 	"net/url"
 	"path"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -84,15 +83,15 @@ func extractError(result []byte) error {
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
 		return fmt.Errorf("error extracting JSON for error response: %w", err)
 	}
-	var errs multierror.Errors
+	var errs []error
 	if kibanaResult.Message != "" {
 		for _, err := range kibanaResult.Attributes.Objects {
 			errs = append(errs, fmt.Errorf("id: %s, message: %s", err.ID, err.Error.Message))
 		}
-		if errs == nil {
+		if len(errs) == 0 {
 			return fmt.Errorf("%s", kibanaResult.Message)
 		}
-		return fmt.Errorf("%s: %w", kibanaResult.Message, errs.Err())
+		return fmt.Errorf("%s: %w", kibanaResult.Message, errors.Join(errs...))
 
 	}
 	return nil
@@ -118,11 +117,11 @@ func extractMessage(result []byte) error {
 	}
 
 	if !kibanaResult.Success {
-		var errs multierror.Errors
+		var errs []error
 		for _, err := range kibanaResult.Errors {
 			errs = append(errs, fmt.Errorf("error: %s, asset ID=%s; asset type=%s; references=%+v", err.Error.Type, err.ID, err.Type, err.Error.References))
 		}
-		return errs.Err()
+		return errors.Join(errs...)
 	}
 
 	return nil

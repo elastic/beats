@@ -9,8 +9,6 @@ require (
 	github.com/elastic/go-ucfg v0.8.5
 	github.com/fatih/color v1.13.0
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/hashicorp/go-multierror v1.1.1
-	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-colorable v0.1.12
 	github.com/mitchellh/hashstructure v1.1.0
@@ -37,9 +35,9 @@ require (
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/google/licenseclassifier v0.0.0-20200402202327-879cb1424de0 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jcchavezs/porto v0.1.0 // indirect
+	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
 	github.com/karrick/godirwalk v1.15.6 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
