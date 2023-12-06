@@ -14,33 +14,6 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 - Defaults are changing for some options in the queue and Elasticsearch output, to improve typical performance based on current benchmark data. All changes can be overridden by setting them explicitly in the beat configuration. {pull}36990[36990] The changes are:
 - Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -68,128 +41,15 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 - Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Fix dashboards under Kibana 8.x. {issue}37080[37080] {pull}37085[37085]
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
 *Affecting all Beats*
 
 - Upgrade to Go 1.20.11. {pull}37123[37123]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-*Libbeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.11.1]]
