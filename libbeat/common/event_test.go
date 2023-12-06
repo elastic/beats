@@ -136,7 +136,8 @@ func TestConvertNestedMapStr(t *testing.T) {
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
-		g.Convert(test.Input)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
 		assert.Equal(t, test.Output, test.Input, "Test case %d", i)
 	}
 }
@@ -195,7 +196,8 @@ func TestConvertNestedStruct(t *testing.T) {
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
-		g.Convert(test.Input)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
 		assert.EqualValues(t, test.Output, test.Input, "Test case %v", i)
 	}
 }
@@ -241,7 +243,8 @@ func TestConvertWithNullEmission(t *testing.T) {
 
 	g := NewGenericEventConverter(true)
 	for i, test := range tests {
-		g.Convert(test.Input)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
 		assert.EqualValues(t, test.Output, test.Input, "Test case %v", i)
 	}
 }
@@ -426,7 +429,8 @@ func TestNormalizeTime(t *testing.T) {
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": NetString("hola")})
+		errs := g.Convert(mapstr.M{"key": NetString("hola")})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -434,7 +438,8 @@ func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
+		errs := g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -442,7 +447,8 @@ func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		errs := g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -450,7 +456,8 @@ func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
+		errs := g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -459,7 +466,8 @@ func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	type myString string
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
+		errs := g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -468,7 +476,8 @@ func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	val := "foo"
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": &val})
+		errs := g.Convert(mapstr.M{"key": &val})
+		assert.Empty(b, errs)
 	}
 }
 func TestDeDotJSON(t *testing.T) {
