@@ -33,8 +33,9 @@ func TestConvertNestedMapStr(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
-		Input  mapstr.M
-		Output mapstr.M
+		Input       mapstr.M
+		Output      mapstr.M
+		ShouldError bool
 	}
 
 	type String string
@@ -102,7 +103,8 @@ func TestConvertNestedMapStr(t *testing.T) {
 				"key2": uintptr(88),
 				"key3": func() { t.Log("hello") },
 			},
-			Output: mapstr.M{},
+			Output:      mapstr.M{},
+			ShouldError: true,
 		},
 		{
 			Input: mapstr.M{
@@ -129,15 +131,21 @@ func TestConvertNestedMapStr(t *testing.T) {
 			},
 		},
 		{
-			mapstr.M{"k": map[string]int{"hits": 1}},
-			mapstr.M{"k": mapstr.M{"hits": float64(1)}},
+			Input: mapstr.M{
+				"k": map[string]int{"hits": 1},
+			},
+			Output: mapstr.M{
+				"k": mapstr.M{"hits": float64(1)},
+			},
 		},
 	}
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
 		errs := g.Convert(test.Input)
-		assert.Empty(t, errs)
+		if !test.ShouldError {
+			assert.Empty(t, errs)
+		}
 		assert.Equal(t, test.Output, test.Input, "Test case %d", i)
 	}
 }
