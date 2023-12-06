@@ -40,7 +40,7 @@ import (
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
 // `expEventCount` is an expected amount of produced events
-func runFilestreamBenchmark(t require.TestingT, testID string, cfg string, expEventCount int) {
+func runFilestreamBenchmark(t testing.TB, testID string, cfg string, expEventCount int) {
 	logger := logp.L()
 	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
 	require.NoError(t, err)
@@ -69,18 +69,18 @@ func runFilestreamBenchmark(t require.TestingT, testID string, cfg string, expEv
 	<-done // for more stable results we should wait until the full shutdown
 }
 
-func generateFile(b *testing.B, lineCount int) string {
-	b.Helper()
-	dir := b.TempDir()
+func generateFile(t testing.TB, lineCount int) string {
+	t.Helper()
+	dir := t.TempDir()
 	file, err := os.CreateTemp(dir, "lines.log")
-	require.NoError(b, err)
+	require.NoError(t, err)
 
 	for i := 0; i < lineCount; i++ {
 		fmt.Fprintf(file, "rather mediocre log line message - %d\n", i)
 	}
 	filename := file.Name()
 	err = file.Close()
-	require.NoError(b, err)
+	require.NoError(t, err)
 	return filename
 }
 
@@ -117,7 +117,7 @@ paths:
 	})
 }
 
-func createTestStore(t require.TestingT) loginp.StateStore {
+func createTestStore(t testing.TB) loginp.StateStore {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
 
