@@ -53,13 +53,14 @@ func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
 //
 // Nil values in maps are dropped during the conversion. Any unsupported types
 // that are found in the mapstr.M are dropped and warnings are logged.
-func (e *GenericEventConverter) Convert(m mapstr.M) {
+func (e *GenericEventConverter) Convert(m mapstr.M) []error {
 	keys := make([]string, 0, 10)
 	errs := e.normalizeMap(m, keys...)
 	if len(errs) > 0 {
 		e.log.Warnf("Unsuccessful conversion to generic event: %v errors: %v, "+
 			"event=%#v", len(errs), errs, m)
 	}
+	return errs
 }
 
 // normalizeMap normalizes each element contained in the given map. If an error
