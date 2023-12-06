@@ -40,14 +40,14 @@ import (
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
 // `expEventCount` is an expected amount of produced events
-func runFilestreamBenchmark(b *testing.B, testID string, cfg string, expEventCount int) {
+func runFilestreamBenchmark(t require.TestingT, testID string, cfg string, expEventCount int) {
 	logger := logp.L()
 	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
-	require.NoError(b, err)
+	require.NoError(t, err)
 
-	p := Plugin(logger, createTestStore(b))
+	p := Plugin(logger, createTestStore(t))
 	input, err := p.Manager.Create(c)
-	require.NoError(b, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	context := v2.Context{
@@ -60,7 +60,7 @@ func runFilestreamBenchmark(b *testing.B, testID string, cfg string, expEventCou
 	done := make(chan struct{})
 	go func() {
 		err := input.Run(context, connector)
-		assert.NoError(b, err)
+		assert.NoError(t, err)
 		done <- struct{}{}
 	}()
 
@@ -117,7 +117,7 @@ paths:
 	})
 }
 
-func createTestStore(t *testing.B) loginp.StateStore {
+func createTestStore(t require.TestingT) loginp.StateStore {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
 
