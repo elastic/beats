@@ -29,19 +29,16 @@ import (
 
 func getFiles(folder string) ([]string, error) {
 	entries, err := os.ReadDir(folder)
-	files := make([]string, len(entries))
+	files := make([]string, 0)
 	if err != nil {
 		return nil, err
 	}
-	fileIndex := 0
 	for _, e := range entries {
 		// this file is only needed for testdata folder
 		if e.Name() != "docs.plain" {
-			files[fileIndex] = filepath.Join(folder, e.Name())
-			fileIndex++
+			files = append(files, filepath.Join(folder, e.Name()))
 		}
 	}
-	files = files[:fileIndex]
 	return files, nil
 }
 
