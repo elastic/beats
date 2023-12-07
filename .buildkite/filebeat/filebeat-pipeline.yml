@@ -4,20 +4,60 @@ env:
   SETUP_GVM_VERSION: "v0.5.1"
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
+  DEBIAN_FRONTEND: "noninteractive"
 
 steps:
-  - group: ":linux: Testing on Linux"
-    key: "staging"
-#    if: build.pull_request.labels includes \"filebeat\"
+  - group: "Mandatory Testing"
+    key: "mandatory-tests"
+    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
-      - label: ":linux: Test Filebeat: ARM"
-        command: echo "THIS IS MSG ${GITHUB_PR_TRIGGER_COMMENT}"
+      - label: ":ubuntu: Unit Tests"
+        command:
+          - "sudo apt-get update"
+          - "sudo apt-get install -y libsystemd-dev"
+          - "sudo apt install -y python3-pip"
+          - "sudo apt-get install -y python3-venv"
+          - ".buildkite/filebeat/scripts/unit-tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+      - label: ":ubuntu: Integration Tests"
+        command:
+          - "sudo apt-get update"
+          - "sudo apt-get install -y libsystemd-dev"
+          - ".buildkite/filebeat/scripts/integration-tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+      - label: ":ubuntu: Python Integration Tests"
+        command:
+          - "sudo apt-get update"
+          - "sudo apt-get install -y libsystemd-dev"
+          - ".buildkite/filebeat/scripts/integration-pytests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+#      - label: ":windows: Unit Tests / {{matrix.platform}}"
+#        command: ".buildkite/filebeat/scripts/win-tests.ps1"
+#        agents:
+#          provider: "gcp"
+#          imagePrefix: {{matrix.platform}}
+#        matrix:
+#          setup:
+#            platform:
+#              -  "family/core-windows-2022"
+#              -  "family/core-windows-2016"
+
+
+#    steps:
+#      - label: ":linux: Test Filebeat: ARM"
+#        command: echo "THIS IS MSG ${GITHUB_PR_TRIGGER_COMMENT}"
 #        if: build.pull_request.labels includes \"arm\"
 #        notify:
 #          - github_commit_status:
 #              context: "Test Filebeat/ARM"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
+#        agents:
+#          provider: "aws"
+#          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+#          instanceType: "t4g.large"
