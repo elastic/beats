@@ -213,7 +213,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `hexDecode`: decodes the hexadecimal string. Any hexadecimal string will be converted to its bytes representation. Example `[[hexDecode "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96"]]`; Expected Output: `"\xb0\xa9*\b\xa9\xb4\x88:\xa3\xaa-\tW\xbe\x12\xa6x\xcb۳-\xc5\xdb\t\xfeh#\x9a\t\x87/\x96"`
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex-encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `join`: Joins a list using the specified separator. Example: `[[join .body.arr ","]]`
+- `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
 - `max`: returns the maximum of two values.
 - `min`: returns the minimum of two values.
 - `mul`: multiplies two integers.
