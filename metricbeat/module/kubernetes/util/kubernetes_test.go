@@ -20,33 +20,384 @@ package util
 import (
 	"fmt"
 	"testing"
+	"time"
 
-	k8s "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	k8s "k8s.io/client-go/kubernetes"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/tools/cache"
 
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var (
-	logger = logp.NewLogger("kubernetes")
-)
+func TestWatchOptions(t *testing.T) {
+	log := logp.NewLogger("test")
 
-func TestBuildMetadataEnricher(t *testing.T) {
-	watcher := mockWatcher{}
-	nodeWatcher := mockWatcher{}
-	namespaceWatcher := mockWatcher{}
-	rsWatcher := mockWatcher{}
-	jobWatcher := mockWatcher{}
+	client := k8sfake.NewSimpleClientset()
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+	}
+
+	options, err := getWatchOptions(config, false, client, log)
+	require.NoError(t, err)
+	require.Equal(t, options.SyncTimeout, config.SyncPeriod)
+	require.Equal(t, options.Namespace, config.Namespace)
+	require.NotEqual(t, options.Node, config.Node)
+
+	options, err = getWatchOptions(config, true, client, log)
+	require.NoError(t, err)
+	require.Equal(t, options.SyncTimeout, config.SyncPeriod)
+	require.Equal(t, options.Namespace, config.Namespace)
+	require.Equal(t, options.Node, config.Node)
+}
+
+func TestStartWatcher(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	client := k8sfake.NewSimpleClientset()
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+	}
+	log := logp.NewLogger("test")
+
+	options, err := getWatchOptions(config, false, client, log)
+	require.NoError(t, err)
+
+	created, err := startWatcher(NamespaceResource, &kubernetes.Node{}, *options, client)
+	require.True(t, created)
+	require.NoError(t, err)
+
+	resourceWatchers.lock.Lock()
+	require.Equal(t, 1, len(resourceWatchers.watchersMap))
+	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource])
+	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
+	resourceWatchers.lock.Unlock()
+
+	created, err = startWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client)
+	require.False(t, created)
+	require.NoError(t, err)
+
+	resourceWatchers.lock.Lock()
+	require.Equal(t, 1, len(resourceWatchers.watchersMap))
+	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource])
+	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
+	resourceWatchers.lock.Unlock()
+
+	created, err = startWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client)
+	require.True(t, created)
+	require.NoError(t, err)
+
+	resourceWatchers.lock.Lock()
+	require.Equal(t, 2, len(resourceWatchers.watchersMap))
+	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource])
+	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource])
+	resourceWatchers.lock.Unlock()
+}
+
+func TestAddToWhichAreUsing(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	client := k8sfake.NewSimpleClientset()
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+	}
+	log := logp.NewLogger("test")
+
+	options, err := getWatchOptions(config, false, client, log)
+	require.NoError(t, err)
+
+	// Create the new entry with watcher and nil string array first
+	created, err := startWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client)
+	require.True(t, created)
+	require.NoError(t, err)
+
+	resourceWatchers.lock.Lock()
+	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].watcher)
+	require.Nil(t, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	resourceWatchers.lock.Unlock()
+
+	addToWhichAreUsing(DeploymentResource, DeploymentResource)
+	resourceWatchers.lock.Lock()
+	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	require.Equal(t, []string{DeploymentResource}, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	resourceWatchers.lock.Unlock()
+
+	addToWhichAreUsing(DeploymentResource, PodResource)
+	resourceWatchers.lock.Lock()
+	require.Equal(t, []string{DeploymentResource, PodResource}, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	resourceWatchers.lock.Unlock()
+}
+
+func TestRemoveToWhichAreUsing(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	client := k8sfake.NewSimpleClientset()
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+	}
+	log := logp.NewLogger("test")
+
+	options, err := getWatchOptions(config, false, client, log)
+	require.NoError(t, err)
+
+	// Create the new entry with watcher and nil string array first
+	created, err := startWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client)
+	require.True(t, created)
+	require.NoError(t, err)
+
+	addToWhichAreUsing(DeploymentResource, DeploymentResource)
+	addToWhichAreUsing(DeploymentResource, PodResource)
+
+	resourceWatchers.lock.Lock()
+	defer resourceWatchers.lock.Unlock()
+
+	removed, size := removeToWhichAreUsing(DeploymentResource, DeploymentResource)
+	require.True(t, removed)
+	require.Equal(t, 1, size)
+
+	removed, size = removeToWhichAreUsing(DeploymentResource, DeploymentResource)
+	require.False(t, removed)
+	require.Equal(t, 1, size)
+
+	removed, size = removeToWhichAreUsing(DeploymentResource, PodResource)
+	require.True(t, removed)
+	require.Equal(t, 0, size)
+}
+
+func TestStartAllWatchers(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	client := k8sfake.NewSimpleClientset()
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: true,
+		},
+	}
+	log := logp.NewLogger("test")
+
+	// Start watchers based on a resource that does not exist should cause an error
+	err := startAllWatchers(client, "does-not-exist", false, config, log)
+	require.Error(t, err)
+	resourceWatchers.lock.Lock()
+	require.Equal(t, 0, len(resourceWatchers.watchersMap))
+	resourceWatchers.lock.Unlock()
+
+	// Start watcher for a resource that requires other resources, should start all the watchers
+	extras := getExtraWatchers(PodResource, config)
+	err = startAllWatchers(client, PodResource, false, config, log)
+	require.NoError(t, err)
+
+	// Check that all the required watchers are in the map
+	resourceWatchers.lock.Lock()
+	// we add 1 to the expected result to represent the resource itself
+	require.Equal(t, len(extras)+1, len(resourceWatchers.watchersMap))
+	for _, extra := range extras {
+		require.NotNil(t, resourceWatchers.watchersMap[extra])
+	}
+	resourceWatchers.lock.Unlock()
+}
+
+func TestCreateMetaGen(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	commonMetaConfig := metadata.Config{}
+	commonConfig, err := conf.NewConfigFrom(&commonMetaConfig)
+	require.NoError(t, err)
+
+	log := logp.NewLogger("test")
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: true,
+		},
+	}
+	client := k8sfake.NewSimpleClientset()
+
+	_, err = createMetadataGen(client, commonConfig, config, DeploymentResource)
+	// At this point, no watchers were created
+	require.Error(t, err)
+
+	// Create the watchers necessary for the metadata generator
+	err = startAllWatchers(client, DeploymentResource, false, config, log)
+	require.NoError(t, err)
+
+	// Create the generators, this time without error
+	_, err = createMetadataGen(client, commonConfig, config, DeploymentResource)
+	require.NoError(t, err)
+}
+
+func TestCreateMetaGenSpecific(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	commonMetaConfig := metadata.Config{}
+	commonConfig, err := conf.NewConfigFrom(&commonMetaConfig)
+	require.NoError(t, err)
+
+	log := logp.NewLogger("test")
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: true,
+		},
+	}
+	client := k8sfake.NewSimpleClientset()
+
+	// For pod:
+
+	_, err = createMetadataGenSpecific(client, commonConfig, config, PodResource)
+	// At this point, no watchers were created
+	require.Error(t, err)
+
+	// Create the pod resource + the extras
+	err = startAllWatchers(client, PodResource, false, config, log)
+	require.NoError(t, err)
+
+	_, err = createMetadataGenSpecific(client, commonConfig, config, PodResource)
+	// At this point, no watchers were created
+	require.NoError(t, err)
+
+	// For service:
+	_, err = createMetadataGenSpecific(client, commonConfig, config, ServiceResource)
+	// At this point, no watchers were created
+	require.Error(t, err)
+
+	// Create the service resource + the extras
+	err = startAllWatchers(client, ServiceResource, false, config, log)
+	require.NoError(t, err)
+
+	_, err = createMetadataGenSpecific(client, commonConfig, config, ServiceResource)
+	// At this point, no watchers were created
+	require.NoError(t, err)
+}
+
+func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap[NamespaceResource] = &watcherData{
+		watcher:       &mockWatcher{},
+		started:       true,
+		whichAreUsing: []string{NamespaceResource, DeploymentResource},
+	}
+	resourceWatchers.watchersMap[DeploymentResource] = &watcherData{
+		watcher:       &mockWatcher{},
+		started:       true,
+		whichAreUsing: []string{DeploymentResource},
+	}
+	resourceWatchers.lock.Unlock()
+
+	funcs := mockFuncs{}
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+		},
+	}
+
+	enricherNamespace := buildMetadataEnricher(NamespaceResource, config, funcs.update, funcs.delete, funcs.index)
+	resourceWatchers.lock.Lock()
+	watcher := resourceWatchers.watchersMap[NamespaceResource]
+	// it was initialized with starting = true
+	require.True(t, watcher.started)
+	resourceWatchers.lock.Unlock()
+
+	// starting should not affect this result
+	enricherNamespace.Start()
+	resourceWatchers.lock.Lock()
+	watcher = resourceWatchers.watchersMap[NamespaceResource]
+	require.True(t, watcher.started)
+	resourceWatchers.lock.Unlock()
+
+	// Stopping should not stop the watcher because it is still being used by DeploymentResource
+	enricherNamespace.Stop()
+	resourceWatchers.lock.Lock()
+	watcher = resourceWatchers.watchersMap[NamespaceResource]
+	require.True(t, watcher.started)
+	require.Equal(t, []string{DeploymentResource}, watcher.whichAreUsing)
+	resourceWatchers.lock.Unlock()
+
+	// Stopping the deployment watcher should stop now both watchers
+	enricherDeployment := buildMetadataEnricher(DeploymentResource, config, funcs.update, funcs.delete, funcs.index)
+	enricherDeployment.Stop()
+
+	resourceWatchers.lock.Lock()
+	watcher = resourceWatchers.watchersMap[NamespaceResource]
+
+	require.False(t, watcher.started)
+	require.Equal(t, []string{}, watcher.whichAreUsing)
+
+	watcher = resourceWatchers.watchersMap[DeploymentResource]
+	require.False(t, watcher.started)
+	require.Equal(t, []string{}, watcher.whichAreUsing)
+
+	resourceWatchers.lock.Unlock()
+
+}
+
+func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
+	// make sure the watchers map is empty for the test
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap = make(map[string]*watcherData)
+	resourceWatchers.lock.Unlock()
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap[PodResource] = &watcherData{
+		watcher:       &mockWatcher{},
+		started:       false,
+		whichAreUsing: []string{PodResource},
+	}
+	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
 	resource := &v1.Pod{
@@ -60,15 +411,36 @@ func TestBuildMetadataEnricher(t *testing.T) {
 		},
 	}
 
-	enricher := buildMetadataEnricher(&watcher, &nodeWatcher, &namespaceWatcher, &rsWatcher, &jobWatcher, funcs.update, funcs.delete, funcs.index)
-	assert.NotNil(t, watcher.handler)
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+		},
+	}
+
+	enricher := buildMetadataEnricher(PodResource, config, funcs.update, funcs.delete, funcs.index)
+	resourceWatchers.lock.Lock()
+	wData := resourceWatchers.watchersMap[PodResource]
+	mockW := wData.watcher.(*mockWatcher)
+	require.NotNil(t, mockW.handler)
+	resourceWatchers.lock.Unlock()
 
 	enricher.Start()
-	assert.True(t, watcher.started)
+	resourceWatchers.lock.Lock()
+	watcher := resourceWatchers.watchersMap[PodResource]
+	require.True(t, watcher.started)
+	resourceWatchers.lock.Unlock()
 
-	// Emit an event
-	watcher.handler.OnAdd(resource)
-	assert.Equal(t, resource, funcs.updated)
+	resourceWatchers.lock.Lock()
+	wData = resourceWatchers.watchersMap[PodResource]
+	mockW = wData.watcher.(*mockWatcher)
+	mockW.handler.OnAdd(resource)
+	resourceWatchers.lock.Unlock()
+
+	require.Equal(t, resource, funcs.updated)
 
 	// Test enricher
 	events := []mapstr.M{
@@ -77,7 +449,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	}
 	enricher.Enrich(events)
 
-	assert.Equal(t, []mapstr.M{
+	require.Equal(t, []mapstr.M{
 		{"name": "unknown"},
 		{
 			"name":    "enrich",
@@ -94,7 +466,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	enricher.isPod = true
 	enricher.Enrich(events)
 
-	assert.Equal(t, []mapstr.M{
+	require.Equal(t, []mapstr.M{
 		{"name": "unknown"},
 		{
 			"name":    "enrich",
@@ -105,8 +477,13 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	}, events)
 
 	// Emit delete event
-	watcher.handler.OnDelete(resource)
-	assert.Equal(t, resource, funcs.deleted)
+	resourceWatchers.lock.Lock()
+	wData = resourceWatchers.watchersMap[PodResource]
+	mockW = wData.watcher.(*mockWatcher)
+	mockW.handler.OnDelete(resource)
+	resourceWatchers.lock.Unlock()
+
+	require.Equal(t, resource, funcs.deleted)
 
 	events = []mapstr.M{
 		{"name": "unknown"},
@@ -114,10 +491,16 @@ func TestBuildMetadataEnricher(t *testing.T) {
 	}
 	enricher.Enrich(events)
 
-	assert.Equal(t, []mapstr.M{
+	require.Equal(t, []mapstr.M{
 		{"name": "unknown"},
 		{"name": "enrich"},
 	}, events)
+
+	enricher.Stop()
+	resourceWatchers.lock.Lock()
+	watcher = resourceWatchers.watchersMap[PodResource]
+	require.False(t, watcher.started)
+	resourceWatchers.lock.Unlock()
 }
 
 type mockFuncs struct {
@@ -137,6 +520,7 @@ func (f *mockFuncs) update(m map[string]mapstr.M, obj kubernetes.Resource) {
 			},
 		},
 	}
+	logger := logp.NewLogger("kubernetes")
 	for k, v := range accessor.GetLabels() {
 		kubernetes2.ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
 	}
@@ -157,11 +541,9 @@ func (f *mockFuncs) index(m mapstr.M) string {
 
 type mockWatcher struct {
 	handler kubernetes.ResourceEventHandler
-	started bool
 }
 
 func (m *mockWatcher) Start() error {
-	m.started = true
 	return nil
 }
 
