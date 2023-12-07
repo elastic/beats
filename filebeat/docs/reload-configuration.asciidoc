@@ -41,15 +41,15 @@ Example external configuration file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-- type: log
+- type: filestream
   paths:
     - /var/log/mysql.log
-  scan_frequency: 10s
+  prospector.scanner.check_interval: 10s
 
-- type: log
+- type: filestream
   paths:
     - /var/log/apache.log
-  scan_frequency: 5s
+  prospector.scanner.check_interval: 5s
 ------------------------------------------------------------------------------
 
 
