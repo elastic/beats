@@ -30,9 +30,9 @@ import (
 )
 
 var files = []string{
-	"./_meta/test/metrics.1.25",
 	"./_meta/test/metrics.1.26",
 	"./_meta/test/metrics.1.27",
+	"./_meta/test/metrics.1.28",
 }
 
 func TestEventMapping(t *testing.T) {
@@ -51,5 +51,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestMetricsFamily(t, files, mapping)
+	k.TestMetricsFamilyFromFiles(t, files, mapping)
 }

@@ -18,69 +18,95 @@
 package summarizer
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
-
-	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// Summarizer produces summary events (with summary.* and other asssociated fields).
+// It accumulates state as it processes the whole event field in order to produce
+// this summary.
 type Summarizer struct {
 	rootJob        jobs.Job
 	contsRemaining uint16
 	mtx            *sync.Mutex
-	jobSummary     *JobSummary
-	checkGroup     string
-	stateTracker   *monitorstate.Tracker
 	sf             stdfields.StdMonitorFields
+	mst            *monitorstate.Tracker
 	retryDelay     time.Duration
+	plugins        []SummarizerPlugin
+	startedAt      time.Time
 }
 
-type JobSummary struct {
-	Attempt      uint16                   `json:"attempt"`
-	MaxAttempts  uint16                   `json:"max_attempts"`
-	FinalAttempt bool                     `json:"final_attempt"`
-	Up           uint16                   `json:"up"`
-	Down         uint16                   `json:"down"`
-	Status       monitorstate.StateStatus `json:"status"`
-	RetryGroup   string                   `json:"retry_group"`
+func (s Summarizer) beforeEachEvent(event *beat.Event) {
+	for _, plugin := range s.plugins {
+		plugin.BeforeEachEvent(event)
+	}
+}
+
+// EachEventActions is a set of options using bitmasks to inform execution after the EachEvent callback
+type EachEventActions uint8
+
+// DropErrEvent if will remove the error from the job return.
+const DropErrEvent = 1
+
+// BeforeSummaryActions is a set of options using bitmasks to inform execution after the BeforeSummary callback
+type BeforeSummaryActions uint8
+
+// RetryBeforeSummary will retry the job once complete.
+const RetryBeforeSummary = 1
+
+// SummarizerPlugin encapsulates functionality for the Summarizer that's easily expressed
+// in one location. Prior to this code was strewn about a bit more and following it was
+// a bit trickier.
+type SummarizerPlugin interface {
+	// BeforeEachEvent is called on each event, and allows for the mutation of events
+	// before monitor execution
+	BeforeEachEvent(event *beat.Event)
+	// EachEvent is called on each event, and allows for the mutation of events
+	EachEvent(event *beat.Event, err error) EachEventActions
+	// BeforeSummary is run on the final (summary) event for each monitor.
+	BeforeSummary(event *beat.Event) BeforeSummaryActions
+	// BeforeRetry is called before the first EachEvent in the event of a retry
+	// can be used for resetting state between retries
+	BeforeRetry()
 }
 
 func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitorstate.Tracker) *Summarizer {
-	uu, err := uuid.NewV1()
-	if err != nil {
-		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
-	}
-	return &Summarizer{
+	s := &Summarizer{
 		rootJob:        rootJob,
 		contsRemaining: 1,
 		mtx:            &sync.Mutex{},
-		jobSummary:     NewJobSummary(1, sf.MaxAttempts, uu.String()),
-		checkGroup:     uu.String(),
-		stateTracker:   mst,
+		mst:            mst,
 		sf:             sf,
-		// private property, but can be overridden in tests to speed them up
-		retryDelay: time.Second,
+		retryDelay:     time.Second,
+		startedAt:      time.Now(),
 	}
+	s.setupPlugins()
+	return s
 }
 
-func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSummary {
-	if maxAttempts < 1 {
-		maxAttempts = 1
-	}
-
-	return &JobSummary{
-		MaxAttempts: maxAttempts,
-		Attempt:     attempt,
-		RetryGroup:  retryGroup,
+func (s *Summarizer) setupPlugins() {
+	// ssp must appear before Err plugin since
+	// it intercepts errors
+	if s.sf.Type == "browser" {
+		s.plugins = []SummarizerPlugin{
+			DropBrowserExtraEvents{},
+			&BrowserDurationPlugin{},
+			&BrowserURLPlugin{},
+			NewBrowserStateStatusplugin(s.mst, s.sf),
+			NewBrowserErrPlugin(),
+		}
+	} else {
+		s.plugins = []SummarizerPlugin{
+			&LightweightDurationPlugin{},
+			NewLightweightStateStatusPlugin(s.mst, s.sf),
+			NewLightweightErrPlugin(),
+		}
 	}
 }
 
@@ -89,56 +115,41 @@ func NewJobSummary(attempt uint16, maxAttempts uint16, retryGroup string) *JobSu
 // This adds the state and summary top level fields.
 func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		conts, jobErr := j(event)
 
-		_, _ = event.PutValue("monitor.check_group", fmt.Sprintf("%s-%d", s.checkGroup, s.jobSummary.Attempt))
+		// call BeforeEachEvent for each plugin before running job
+		s.beforeEachEvent(event)
+
+		conts, eventErr := j(event)
 
 		s.mtx.Lock()
 		defer s.mtx.Unlock()
-
-		js := s.jobSummary
 
 		s.contsRemaining-- // we just ran one cont, discount it
 		// these many still need to be processed
 		s.contsRemaining += uint16(len(conts))
 
-		monitorStatus, err := event.GetValue("monitor.status")
-		if err == nil && !eventext.IsEventCancelled(event) { // if this event contains a status...
-			mss := monitorstate.StateStatus(monitorStatus.(string))
-
-			if mss == monitorstate.StatusUp {
-				js.Up++
-			} else {
-				js.Down++
+		for _, plugin := range s.plugins {
+			actions := plugin.EachEvent(event, eventErr)
+			if actions&DropErrEvent != 0 {
+				eventErr = nil
 			}
 		}
 
 		if s.contsRemaining == 0 {
-			if js.Down > 0 {
-				js.Status = monitorstate.StatusDown
-			} else {
-				js.Status = monitorstate.StatusUp
+			var retry bool
+			for _, plugin := range s.plugins {
+				actions := plugin.BeforeSummary(event)
+				if actions&RetryBeforeSummary != 0 {
+					retry = true
+				}
+
 			}
 
-			// Get the last status of this monitor, we use this later to
-			// determine if a retry is needed
-			lastStatus := s.stateTracker.GetCurrentStatus(s.sf)
-
-			// FinalAttempt is true if no retries will occur
-			js.FinalAttempt = js.Status != monitorstate.StatusDown || js.Attempt >= js.MaxAttempts
-
-			ms := s.stateTracker.RecordStatus(s.sf, js.Status, js.FinalAttempt)
-
-			eventext.MergeEventFields(event, mapstr.M{
-				"summary": js,
-				"state":   ms,
-			})
-
-			logp.L().Debugf("attempt info: %v == %v && %d < %d", js.Status, lastStatus, js.Attempt, js.MaxAttempts)
-			if !js.FinalAttempt {
-				// Reset the job summary for the next attempt
-				// We preserve `s` across attempts
-				s.jobSummary = NewJobSummary(js.Attempt+1, js.MaxAttempts, js.RetryGroup)
+			if !retry {
+				// on final run emits a metric for the service when summary events are complete
+				logger.LogRun(event)
+			} else {
+				// Bump the job summary for the next attempt
 				s.contsRemaining = 1
 
 				// Delay retries by 1s for two reasons:
@@ -146,13 +157,15 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				//    that it's hard to tell the sequence in which jobs executed apart in our
 				//    kibana queries
 				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
-				delayedRootJob := jobs.Wrap(s.rootJob, func(j jobs.Job) jobs.Job {
-					return func(event *beat.Event) ([]jobs.Job, error) {
-						time.Sleep(s.retryDelay)
-						return j(event)
+				delayedRootJob := func(event *beat.Event) ([]jobs.Job, error) {
+					time.Sleep(s.retryDelay)
+					for _, p := range s.plugins {
+						p.BeforeRetry()
 					}
-				})
-				conts = []jobs.Job{delayedRootJob}
+					return s.Wrap(s.rootJob)(event)
+				}
+
+				return []jobs.Job{delayedRootJob}, eventErr
 			}
 		}
 
@@ -162,6 +175,6 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 			conts[i] = s.Wrap(cont)
 		}
 
-		return conts, jobErr
+		return conts, eventErr
 	}
 }

@@ -1248,6 +1248,8 @@ var testCases = []struct {
 }
 
 func TestInput(t *testing.T) {
+	logp.TestingSetup()
+
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 			if test.skipReason != "" {

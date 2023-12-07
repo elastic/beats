@@ -6,16 +6,16 @@ processors:
       value: '{{_ingest.timestamp}}'
   - pipeline:
       name: '{< IngestPipeline "security" >}'
-      if: ctx?.winlog?.channel == 'Security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx?.winlog?.provider_name)
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx.winlog?.provider_name)
   - pipeline:
       name: '{< IngestPipeline "sysmon" >}'
-      if: ctx?.winlog?.channel == 'Microsoft-Windows-Sysmon/Operational'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'microsoft-windows-sysmon/operational'
   - pipeline:
       name: '{< IngestPipeline "powershell" >}'
-      if: ctx?.winlog?.channel == 'Windows PowerShell'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'windows powershell'
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
-      if: ctx?.winlog?.channel == 'Microsoft-Windows-PowerShell/Operational'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'microsoft-windows-powershell/operational'
   - set:
       field: host.os.type
       value: windows

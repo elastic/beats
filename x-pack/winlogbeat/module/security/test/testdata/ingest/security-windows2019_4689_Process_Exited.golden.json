@@ -10,7 +10,6 @@
         "process"
       ],
       "code": "4689",
-      "ingested": "2022-06-08T06:21:08.450696200Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -83,7 +82,6 @@
         "process"
       ],
       "code": "4689",
-      "ingested": "2022-06-08T06:21:08.450710900Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -156,7 +154,6 @@
         "process"
       ],
       "code": "4689",
-      "ingested": "2022-06-08T06:21:08.450714900Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
