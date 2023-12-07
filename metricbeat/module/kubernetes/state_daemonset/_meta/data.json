@@ -12,6 +12,7 @@
                 "available": 1,
                 "desired": 1,
                 "ready": 1,
+                "scheduled": 1,
                 "unavailable": 0
             }
         },
