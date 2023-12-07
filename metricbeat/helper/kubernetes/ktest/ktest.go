@@ -29,12 +29,15 @@ import (
 
 func getFiles(folder string) ([]string, error) {
 	entries, err := os.ReadDir(folder)
-	files := make([]string, len(entries))
+	files := make([]string, 0)
 	if err != nil {
 		return nil, err
 	}
-	for i, e := range entries {
-		files[i] = filepath.Join(folder, e.Name())
+	for _, e := range entries {
+		// this file is only needed for testdata folder
+		if e.Name() != "docs.plain" {
+			files = append(files, filepath.Join(folder, e.Name()))
+		}
 	}
 	return files, nil
 }
@@ -72,17 +75,17 @@ func GetTestCases(folder string, expectedFolder string) (ptest.TestCases, error)
 // Nothing happens, otherwise.
 func TestMetricsFamilyFromFiles(t *testing.T, files []string, mapping *p.MetricsMapping) {
 	metricsFiles := map[string][]string{}
-	for i := 0; i < len(files); i++ {
-		content, err := os.ReadFile(files[i])
+	for _, file := range files {
+		content, err := os.ReadFile(file)
 		if err != nil {
-			t.Fatalf("Unknown file %s.", files[i])
+			t.Fatalf("Unknown file %s.", file)
 		}
 		text := string(content)
 		for metric := range mapping.Metrics {
 			// A space is needed to check if the metric exists, since there are metrics that can follow this logic:
 			// some_metric and some_metric_total
 			if !strings.Contains(text, "# TYPE "+metric+" ") {
-				metricsFiles[metric] = append(metricsFiles[metric], files[i])
+				metricsFiles[metric] = append(metricsFiles[metric], file)
 			}
 		}
 	}
@@ -102,6 +105,5 @@ func TestMetricsFamilyFromFolder(t *testing.T, folder string, mapping *p.Metrics
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-
 	TestMetricsFamilyFromFiles(t, files, mapping)
 }
