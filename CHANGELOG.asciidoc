@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 ==== Breaking changes
 
 *Affecting all Beats*
-- Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
 - Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
 ==== Bugfixes
