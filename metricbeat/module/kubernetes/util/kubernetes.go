@@ -467,7 +467,7 @@ func NewResourceMetadataEnricher(
 
 	updateFunc := func(m map[string]mapstr.M, r kubernetes.Resource) {
 		accessor, _ := meta.Accessor(r)
-		id := join(accessor.GetNamespace(), accessor.GetName()) //nolint:all
+		id := join(accessor.GetNamespace(), accessor.GetName())
 
 		switch r := r.(type) {
 		case *kubernetes.Pod:
@@ -660,60 +660,6 @@ func NewContainerMetadataEnricher(
 	enricher := buildMetadataEnricher(PodResource, config, updateFunc, deleteFunc, indexFunc)
 
 	return enricher
-}
-
-func getResourceMetadataWatchers(
-	config *kubernetesConfig,
-	resource kubernetes.Resource,
-	client k8sclient.Interface, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
-
-	var err error
-
-	options := kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
-	}
-
-	log := logp.NewLogger(selector)
-
-	// Watch objects in the node only
-	if nodeScope {
-		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Node,
-			Client:      client,
-			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
-			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
-		}
-		options.Node, err = kubernetes.DiscoverKubernetesNode(log, nd)
-		if err != nil {
-			logp.Err("Couldn't discover kubernetes node: %s", err)
-			return nil, nil, nil
-		}
-	}
-
-	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Node)
-
-	watcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher", client, resource, options, nil)
-	if err != nil {
-		logp.Err("Error initializing Kubernetes watcher: %s", err)
-		return nil, nil, nil
-	}
-
-	nodeWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_node", client, &kubernetes.Node{}, options, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Node{}, err)
-		return watcher, nil, nil
-	}
-
-	namespaceWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-		return watcher, nodeWatcher, nil
-	}
-
-	return watcher, nodeWatcher, namespaceWatcher
 }
 
 func GetValidatedConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
