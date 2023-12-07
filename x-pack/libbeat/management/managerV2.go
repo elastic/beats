@@ -173,7 +173,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 			client.VersionInfo{
 				Name:    "beat-v2-client-for-testing",
 				Version: version.GetDefaultVersion(),
-			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
 		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
