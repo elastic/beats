@@ -64,6 +64,19 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	return ports, nil
 }
 
+// GetSingleLocalPortToPIDMapping
+func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.Transport, address net.IP, port uint16) (int, bool, error) {
+	maps, err := proc.GetLocalPortToPIDMapping(transport)
+	if err != nil {
+		return 0, false, err
+	}
+	pid, found := maps[endpoint{address: address.String(), port: port}]
+	if !found {
+		return 0, false, nil
+	}
+	return pid, true, nil
+}
+
 type extractor interface {
 	// Extract extracts useful information from the pointed-to structure
 	Extract(unsafe.Pointer)

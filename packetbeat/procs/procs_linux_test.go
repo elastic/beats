@@ -20,13 +20,38 @@
 package procs
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/stretchr/testify/require"
 )
+
+func TestGetSingleLocalPort(t *testing.T) {
+	logp.TestingSetup()
+
+	pathPrefix := "./testdata"
+	procFake := []testProcFile{
+		{path: "/proc/766/fd/15", isLink: true, contents: "socket:[10150504]"},
+	}
+	err := createFakeDirectoryStructure(pathPrefix, procFake)
+	defer func() {
+		os.RemoveAll("testdata/proc/766")
+	}()
+	require.NoError(t, err)
+
+	proc := &ProcessesWatcher{hostfs: pathPrefix}
+	proc.Init(ProcsConfig{Enabled: true})
+	ip, port, err := hexToIPPort([]byte("2501A8C0:0016"), false)
+	require.NoError(t, err)
+
+	pid, found, err := proc.GetSingleLocalPortToPIDMapping(applayer.TransportTCP, ip, port)
+	require.True(t, found)
+	require.NoError(t, err)
+	require.Equal(t, 766, pid)
+}
 
 func TestFindSocketsOfPid(t *testing.T) {
 	logp.TestingSetup()
@@ -44,7 +69,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("", "find-sockets")
+	pathPrefix, err := os.MkdirTemp("", "find-sockets")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -116,7 +141,7 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 		}
 
 		if !file.isLink {
-			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
+			err = os.WriteFile(filepath.Join(prefix, file.path),
 				[]byte(file.contents), 0o644)
 			if err != nil {
 				return err

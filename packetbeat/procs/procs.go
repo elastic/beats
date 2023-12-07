@@ -51,6 +51,9 @@ type ProcessesWatcher struct {
 
 	// watcher is the OS-dependent engine for the ProcessWatcher.
 	watcher processWatcher
+
+	// alternate hostfs root. Provides an alternate filesystem root for linux /proc/ traversal. Also useful for testing
+	hostfs string
 }
 
 // endpoint is a network address/port number complex.
@@ -95,6 +98,9 @@ type processWatcher interface {
 	// GetLocalIPs returns the list of local addresses. If the returned error
 	// is non-nil, the IP slice is nil.
 	GetLocalIPs() ([]net.IP, error)
+
+	// GetSingleLocalPortToPIDMapping returns a single PID for a given IP:port combination
+	GetSingleLocalPortToPIDMapping(transport applayer.Transport, address net.IP, port uint16) (int, bool, error)
 }
 
 // init sets up the necessary data structures for the ProcessWatcher.
@@ -196,14 +202,15 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 		return p.proc
 	}
 
-	proc.updateMap(transport)
+	//proc.updateMap(transport)
+	foundProc := proc.UpdateMapForEndpoint(address, port, transport)
 
-	p, exists = lookupMapping(address, port, procMap)
-	if exists {
-		return p.proc
-	}
+	// p, exists = lookupMapping(address, port, procMap)
+	// if exists {
+	// 	return p.proc
+	// }
 
-	return nil
+	return foundProc
 }
 
 func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMapping) (p portProcMapping, found bool) {
@@ -242,6 +249,25 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	for e, pid := range endpoints {
 		proc.updateMappingEntry(transport, e, pid)
 	}
+}
+
+func (proc *ProcessesWatcher) UpdateMapForEndpoint(address net.IP, port uint16, transport applayer.Transport) *process {
+	pid, found, err := proc.watcher.GetSingleLocalPortToPIDMapping(transport, address, port)
+	if err != nil {
+		logp.Err("error fetching details for connection %s:%d: %w", address, port, err)
+	}
+	if !found {
+		return nil
+	}
+
+	foundProc := proc.getProcessInfo(pid)
+	if foundProc == nil {
+		return nil
+	}
+	proc.expireProcessCache()
+
+	proc.updateMappingEntry(transport, endpoint{address: address.String(), port: port}, pid)
+	return foundProc
 }
 
 func (proc *ProcessesWatcher) expireProcessCache() {
