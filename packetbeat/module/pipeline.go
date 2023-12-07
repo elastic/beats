@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -112,8 +113,9 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 	if err != nil {
 		return pipeline{}, err
 	}
+	ds, _, _ := strings.Cut(filename, string(os.PathSeparator))
 	p = pipeline{
-		id:       fileset.FormatPipelineID(info.IndexPrefix, "", "", filename, info.Version),
+		id:       fileset.FormatPipelineID(info.IndexPrefix, "", "", ds, info.Version),
 		contents: updatedContent,
 	}
 	return p, nil
