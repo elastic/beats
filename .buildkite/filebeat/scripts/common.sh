@@ -4,6 +4,12 @@ set -euo pipefail
 
 WORKSPACE="$(pwd)"
 BIN="${WORKSPACE}/bin"
+HW_TYPE="$(uname -m)"
+PLATFORM_TYPE="$(uname)"
+
+if [[ -z "${GOLANG_VERSION-""}" ]]; then
+    export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
+fi
 
 add_bin_path() {
     echo "Adding PATH to the environment variables..."
@@ -12,7 +18,7 @@ add_bin_path() {
 }
 
 with_go() {
-    local go_version="${1}"
+    local go_version="${GOLANG_VERSION}"
     echo "Setting up the Go environment..."
     create_bin
     check_platform_architecture
