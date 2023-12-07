@@ -11,34 +11,33 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 
 *Affecting all Beats*
 - Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
-- Defaults are changing for some options in the queue and Elasticsearch output, to improve typical performance based on current benchmark data. All changes can be overridden by setting them explicitly in the beat configuration. {pull}36990[36990] The changes are:
 - Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
 ==== Bugfixes
 
 *Affecting all Beats*
-- Fix memqueue producer blocking indefinitely even after being cancelled {issue}22813[22813] {pull}37077[37077]
+- Fix memqueue producer blocking indefinitely even after being cancelled. {issue}22813[22813] {pull}37077[37077]
 
 *Auditbeat*
 
 - Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
-- Fix guess trigger for system/socket creds on newer kernels. {issue}36905[36905] {pull}37136[37136]
+- Fix guess trigger for system/socket credentials on newer kernels. {issue}36905[36905] {pull}37136[37136]
 
 *Filebeat*
 
 - Do not error when Okta API returns no data. {pull}37092[37092]
 - Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
-- Make CEL input now global evaluate to a time in UTC. {pull}37159[37159]
+- Make CEL input `now` global evaluate to a time in UTC. {pull}37159[37159]
 
 *Heartbeat*
 
-- Fix mapping errors with invalid urls. {pull}37255[37255]
+- Fix mapping errors with invalid URLs. {pull}37255[37255]
 
 *Metricbeat*
 
 - Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
-- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
-- Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
+- Enhance Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility. {pull}36823[36823]
+- Fix unintended skip in metric collection on Azure Monitor. {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 
 *Winlogbeat*
