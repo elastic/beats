@@ -210,7 +210,7 @@ func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.
 		}
 		options.Node, err = kubernetes.DiscoverKubernetesNode(log, nd)
 		if err != nil {
-			return nil, fmt.Errorf("couldn't discover kubernetes node: %s", err)
+			return nil, fmt.Errorf("couldn't discover kubernetes node: %w", err)
 		}
 	}
 	return &options, err
@@ -302,7 +302,7 @@ func startAllWatchers(
 	// If it fails, we return an error, so we can stop the extra watchers from starting.
 	created, err := startWatcher(resourceName, res, *options, client)
 	if err != nil {
-		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %s", resourceName, resourceName, err)
+		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, resourceName, err)
 	} else if created {
 		log.Debugf("Started watcher %s successfully, created by %s.", resourceName, resourceName)
 	}
