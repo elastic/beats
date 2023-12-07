@@ -8911,6 +8911,13 @@ type: long
 
 --
 
+*`beat.stats.libbeat.pipeline.queue.max_events`*::
++
+--
+type: long
+
+--
+
 
 *`beat.stats.libbeat.pipeline.events.active`*::
 +

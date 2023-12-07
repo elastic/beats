@@ -1742,11 +1742,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azcore
-Version: v1.4.0
+Version: v1.9.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.4.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.9.0/LICENSE.txt:
 
 MIT License
 
@@ -1804,11 +1804,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
-Version: v1.0.1-0.20230529151645-4546c1b1f847
+Version: v1.1.0-elastic
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption@v1.0.1-0.20230529151645-4546c1b1f847/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption@v1.1.0-elastic/LICENSE.txt:
 
 MIT License
 
@@ -1834,11 +1834,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement
-Version: v1.0.0
+Version: v1.1.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement@v1.0.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement@v1.1.0/LICENSE.txt:
 
 MIT License
 
@@ -13026,11 +13026,11 @@ these terms.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.7.0
+Version: v0.8.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.7.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.8.2/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -29025,11 +29025,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-pipeline-g
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/internal
-Version: v1.2.0
+Version: v1.5.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/internal@v1.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/internal@v1.5.0/LICENSE.txt:
 
 MIT License
 
