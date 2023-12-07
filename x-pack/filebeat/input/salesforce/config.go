@@ -17,6 +17,12 @@ type config struct {
 	Version         int           `config:"version" validate:"required"`
 	Query           *QueryConfig  `config:"query"`
 	InitialInterval time.Duration `config:"initial_interval"`
+	From            string        `config:"from"`
+	Cursor          *cursorConfig `config:"cursor"`
+}
+
+type cursorConfig struct {
+	Field string `config:"field"`
 }
 
 func (c *config) Validate() error {

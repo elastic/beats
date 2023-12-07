@@ -5,14 +5,12 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"sync"
-	"text/template"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -28,21 +26,21 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const inputName = "salesforce"
+const (
+	inputName       = "salesforce"
+	timestampFormat = "2006-01-02T15:04:05.999Z"
+)
 
 type salesforceInput struct {
 	config
 
-	time func() time.Time
+	ctx context.Context
 
-	log      *logp.Logger
-	outlet   channel.Outleter // Output of received messages.
-	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
+	publisher  inputcursor.Publisher
+	cursor     *state
+	sfdcConfig *sfdc.Configuration
 
-	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc // Used to signal that the worker should stop.
-	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup     // Waits on worker goroutine.
+	log *logp.Logger
 }
 
 // // The Filebeat user-agent is provided to the program as useragent.
@@ -54,14 +52,6 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 		Stability: feature.Stable,
 		Manager:   NewInputManager(log, store),
 	}
-}
-
-// now is time.Now with a modifiable time source.
-func (s *salesforceInput) now() time.Time {
-	if s.time == nil {
-		return time.Now()
-	}
-	return s.time()
 }
 
 func (s *salesforceInput) Name() string { return inputName }
@@ -86,31 +76,179 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Url)
 
-	ctx := ctxtool.FromCanceller(env.Cancelation)
+	s.ctx = ctxtool.FromCanceller(env.Cancelation)
+	s.publisher = pub
+	s.cursor = cursor
+	s.log = log
 
-	var qr string
-	ctxTmpl := mapstr.M{
-		"var":    nil,
-		"cursor": nil,
+	s.sfdcConfig, err = getSFDCConfig(&cfg)
+	if err != nil {
+		return err
 	}
 
-	if cursor.LogDateTime != "" {
-		ctxTmpl["cursor"] = mapstr.M{"logdate": cursor.LogDateTime}
-		qr, err = cfg.Query.Value.Execute(ctxTmpl, nil, log)
-		if err != nil {
-			return err
-		}
-	} else {
-		defaultQuery := "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-		defaultTmpl := &valueTpl{template.Must(template.New("default").Parse(defaultQuery))}
+	cursor.StartTime = time.Now()
 
-		ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}
-		qr, err = cfg.Query.Default.Execute(ctxTmpl, defaultTmpl, log)
-		if err != nil {
-			return err
-		}
+	switch cfg.From {
+	case "EventLogFile":
+		return periodically(s.ctx, cfg.Interval, s.runEventLogFile)
+	case "Object":
+		return periodically(s.ctx, cfg.Interval, s.runObject)
 	}
 
+	return errors.New("invalid from: " + cfg.From + ", supported values: EventLogFile, Object")
+}
+
+func (s *salesforceInput) runObject() error {
+	qr, err := ParseCursor(&s.config, s.cursor, s.log)
+	if err != nil {
+		return err
+	}
+	query := &querier{Query: qr}
+
+	s.log.Infof("salesforce query: %s", qr)
+
+	// Open creates a session using the configuration.
+	session, err := session.Open(*s.sfdcConfig)
+	if err != nil {
+		return err
+	}
+
+	// Create a new SOQL resource using the session.
+	soqlr, err := soql.NewResource(session)
+	if err != nil {
+		return fmt.Errorf("error setting up salesforce SOQL resource: %w", err)
+	}
+
+	res, err := soqlr.Query(query, false)
+	if err != nil {
+		return err
+	}
+
+	totalEvents := 0
+	for res.Done() {
+		for _, rec := range res.Records() {
+			val := rec.Record().Fields()
+			jsonStrEvent, err := json.Marshal(val)
+			if err != nil {
+				return err
+			}
+
+			if timstamp, ok := val[s.config.Cursor.Field].(string); ok {
+				s.cursor.LogDateTime = timstamp
+			} else {
+				s.cursor.LogDateTime = time.Now().Format(timestampFormat)
+			}
+
+			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
+			if err != nil {
+				return err
+			}
+			totalEvents++
+		}
+
+		if res.MoreRecords() {
+			res, err = res.Next()
+			if err != nil {
+				return err
+			}
+		} else {
+			break
+		}
+	}
+	s.log.Debugf("total events: %d", totalEvents)
+
+	return nil
+}
+
+func (s *salesforceInput) runEventLogFile() error {
+	qr, err := ParseCursor(&s.config, s.cursor, s.log)
+	if err != nil {
+		return err
+	}
+	query := &querier{Query: qr}
+
+	s.log.Infof("salesforce query: %s", qr)
+
+	// Open creates a session using the configuration.
+	session, err := session.Open(*s.sfdcConfig)
+	if err != nil {
+		return err
+	}
+
+	// Create a new SOQL resource using the session.
+	soqlr, err := soql.NewResource(session)
+	if err != nil {
+		return fmt.Errorf("error setting up salesforce SOQL resource: %w", err)
+	}
+
+	res, err := soqlr.Query(query, false)
+	if err != nil {
+		return err
+	}
+
+	totalEvents := 0
+	for res.Done() {
+		for _, rec := range res.Records() {
+			req, err := http.NewRequestWithContext(s.ctx, "GET", s.sfdcConfig.Credentials.URL()+rec.Record().Fields()["LogFile"].(string), nil)
+			if err != nil {
+				return err
+			}
+
+			session.AuthorizationHeader(req)
+			req.Header.Add("X-PrettyPrint", "1")
+
+			resp, err := s.sfdcConfig.Client.Do(req)
+			if err != nil {
+				return err
+			}
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				resp.Body.Close()
+				return err
+			}
+			resp.Body.Close()
+
+			recs, err := decodeAsCSV(body)
+			if err != nil {
+				return err
+			}
+
+			if timstamp, ok := rec.Record().Fields()[s.config.Cursor.Field].(string); ok {
+				s.cursor.LogDateTime = timstamp
+			} else {
+				s.cursor.LogDateTime = time.Now().Format(timestampFormat)
+			}
+
+			for _, val := range recs {
+				jsonStrEvent, err := json.Marshal(val)
+				if err != nil {
+					return err
+				}
+
+				err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
+				if err != nil {
+					return err
+				}
+				totalEvents++
+			}
+		}
+
+		if res.MoreRecords() {
+			res, err = res.Next()
+			if err != nil {
+				return err
+			}
+		} else {
+			break
+		}
+	}
+	s.log.Debugf("total events: %d", totalEvents)
+
+	return nil
+}
+
+func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	passCreds := credentials.PasswordCredentials{
 		URL:          cfg.Url,
 		Username:     cfg.Auth.OAuth2.User,
@@ -121,106 +259,27 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	creds, err := credentials.NewPasswordCredentials(passCreds)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	config := sfdc.Configuration{
+	return &sfdc.Configuration{
 		Credentials: creds,
 		Client:      http.DefaultClient,
 		Version:     cfg.Version,
+	}, nil
+}
+
+func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte) error {
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields: mapstr.M{
+			"event": mapstr.M{
+				"message": string(jsonStrEvent),
+			},
+		},
 	}
 
-	log.Infof("salesforce query: %s", qr)
-
-	query := querier{Query: qr}
-
-	err = periodically(ctx, cfg.Interval, func() error {
-		cursor.StartTime = time.Now()
-
-		// Open creates a session using the configuration.
-		session, err := session.Open(config)
-		if err != nil {
-			return err
-		}
-
-		// Create a new SOQL resource using the session.
-		soqlr, err := soql.NewResource(session)
-		if err != nil {
-			return fmt.Errorf("error setting up salesforce SOQL resource: %w", err)
-		}
-
-		res, err := soqlr.Query(query, false)
-		if err != nil {
-			return err
-		}
-
-		for res.Done() {
-			for _, rec := range res.Records() {
-				req, err := http.NewRequestWithContext(ctx, "GET", creds.URL()+rec.Record().Fields()["LogFile"].(string), nil)
-				if err != nil {
-					return err
-				}
-
-				session.AuthorizationHeader(req)
-				req.Header.Add("X-PrettyPrint", "1")
-
-				resp, err := config.Client.Do(req)
-				if err != nil {
-					return err
-				}
-
-				body, err := io.ReadAll(resp.Body)
-				if err != nil {
-					resp.Body.Close()
-					return err
-				}
-				resp.Body.Close()
-
-				recs, err := decodeAsCSV(body)
-				if err != nil {
-					return err
-				}
-
-				for _, val := range recs {
-					jsonStrEvent, err := json.Marshal(val)
-					if err != nil {
-						return err
-					}
-
-					event := beat.Event{
-						Timestamp: time.Now(),
-						Fields: mapstr.M{
-							"event": mapstr.M{
-								"message": string(jsonStrEvent),
-							},
-						},
-					}
-
-					if timstamp, ok := val["TIMESTAMP_DERIVED"]; ok {
-						cursor.LogDateTime = timstamp
-					} else {
-						cursor.LogDateTime = time.Now().Format(time.RFC3339)
-					}
-
-					err = pub.Publish(event, cursor)
-					if err != nil {
-						return err
-					}
-				}
-			}
-
-			if res.MoreRecords() {
-				res, err = res.Next()
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		return nil
-	})
-
-	return err
+	return pub.Publish(event, cursor)
 }
 
 func periodically(ctx context.Context, each time.Duration, fn func() error) error {
