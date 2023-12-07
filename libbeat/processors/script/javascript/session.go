@@ -209,10 +209,6 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 		if r := recover(); r != nil {
 			s.log.Errorw("The javascript processor caused an unexpected panic "+
 				"while processing an event. Recovering, but please report this.",
-<<<<<<< HEAD
-				"event", common.MapStr{"original": b.Fields.String()},
-=======
->>>>>>> 3a504dd1e1 (Remove event fields from error log. (#37330))
 				"panic", r,
 				zap.Stack("stack"))
 			if !s.evt.IsCancelled() {
