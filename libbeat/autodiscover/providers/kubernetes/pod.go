@@ -153,7 +153,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	watcher.AddEventHandler(p)
 
 	if nodeWatcher != nil && (config.Hints.Enabled() || metaConf.Node.Enabled()) {
-		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
+		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), p.nodeWatcher.Store(), &p.crossUpdate)
 		nodeWatcher.AddEventHandler(updater)
 	}
 

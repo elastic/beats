@@ -2040,8 +2040,15 @@ func TestNodePodUpdater(t *testing.T) {
 		}
 	}
 
+	node := &kubernetes.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "foo",
+		},
+	}
+
 	cases := map[string]struct {
 		pods     []interface{}
+		nodes    []interface{}
 		expected []interface{}
 	}{
 		"no pods": {},
@@ -2050,6 +2057,7 @@ func TestNodePodUpdater(t *testing.T) {
 				pod("onepod", "foo"),
 				pod("onepod", "bar"),
 			},
+			nodes: []interface{}{node},
 			expected: []interface{}{
 				pod("onepod", "foo"),
 			},
@@ -2059,6 +2067,7 @@ func TestNodePodUpdater(t *testing.T) {
 				pod("onepod", "bar"),
 				pod("otherpod", "bar"),
 			},
+			nodes: []interface{}{node},
 		},
 	}
 
@@ -2066,13 +2075,17 @@ func TestNodePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+			storenode := &mockNodeStore{objects: c.nodes}
+			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, storenode, &sync.Mutex{})
 
-			node := &kubernetes.Node{
+			//We simulate an update on the node with the addition of on label
+			node = &kubernetes.Node{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foo",
-				},
-			}
+					Labels: map[string]string{
+						"beta.kubernetes.io/arch": "arm64",
+					},
+				}}
 			updater.OnUpdate(node)
 
 			assert.EqualValues(t, c.expected, handler.objects)
@@ -2093,6 +2106,14 @@ type mockUpdaterStore struct {
 }
 
 func (s *mockUpdaterStore) List() []interface{} {
+	return s.objects
+}
+
+type mockNodeStore struct {
+	objects []interface{}
+}
+
+func (s *mockNodeStore) List() []interface{} {
 	return s.objects
 }
 
