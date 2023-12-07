@@ -45885,6 +45885,16 @@ type: long
 
 --
 
+*`kubernetes.daemonset.replicas.scheduled`*::
++
+--
+The number of replicas scheduled per DaemonSet
+
+
+type: long
+
+--
+
 *`kubernetes.daemonset.replicas.unavailable`*::
 +
 --

@@ -7,11 +7,12 @@
         },
         "kubernetes": {
             "daemonset": {
-                "name": "kube-proxy",
+                "name": "fluentd-elasticsearch",
                 "replicas": {
                     "available": 1,
                     "desired": 1,
                     "ready": 1,
+                    "scheduled": 1,
                     "unavailable": 0
                 }
             },
@@ -39,6 +40,7 @@
                     "available": 1,
                     "desired": 1,
                     "ready": 1,
+                    "scheduled": 1,
                     "unavailable": 0
                 }
             },
@@ -61,11 +63,12 @@
         },
         "kubernetes": {
             "daemonset": {
-                "name": "fluentd-elasticsearch",
+                "name": "kube-proxy",
                 "replicas": {
                     "available": 1,
                     "desired": 1,
                     "ready": 1,
+                    "scheduled": 1,
                     "unavailable": 0
                 }
             },
