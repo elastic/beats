@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Fix memqueue producer blocking indefinitely even after being cancelled {issue}22813[22813] {pull}37077[37077]
+- Support Elastic Agent control protocol chunking support {pull}37343[37343]
 
 *Auditbeat*
 
