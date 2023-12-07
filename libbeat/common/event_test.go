@@ -218,7 +218,6 @@ func TestConvertWithNullEmission(t *testing.T) {
 		Output mapstr.M
 	}
 
-	type String string
 	type TestStruct struct {
 		A interface{}
 	}
