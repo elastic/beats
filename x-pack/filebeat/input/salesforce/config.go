@@ -13,7 +13,7 @@ import (
 type config struct {
 	Interval        time.Duration `config:"interval" validate:"required"`
 	Auth            *authConfig   `config:"auth"`
-	Url             string        `config:"url" validate:"required"`
+	URL             string        `config:"url" validate:"required"`
 	Version         int           `config:"version" validate:"required"`
 	Query           *QueryConfig  `config:"query"`
 	InitialInterval time.Duration `config:"initial_interval"`
@@ -27,7 +27,7 @@ type cursorConfig struct {
 
 func (c *config) Validate() error {
 	switch {
-	case c.Url == "":
+	case c.URL == "":
 		return errors.New("no instance url was configured or detected")
 	case c.Interval == 0:
 		return fmt.Errorf("please provide a valid interval %d", c.Interval)

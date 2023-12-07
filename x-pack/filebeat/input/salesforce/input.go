@@ -11,6 +11,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/g8rswimmer/go-sfdc"
+	"github.com/g8rswimmer/go-sfdc/credentials"
+	"github.com/g8rswimmer/go-sfdc/session"
+	"github.com/g8rswimmer/go-sfdc/soql"
+	"golang.org/x/exp/slices"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -19,28 +25,20 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
-	"github.com/g8rswimmer/go-sfdc"
-	"github.com/g8rswimmer/go-sfdc/credentials"
-	"github.com/g8rswimmer/go-sfdc/session"
-	"github.com/g8rswimmer/go-sfdc/soql"
-	"golang.org/x/exp/slices"
 )
 
 const (
-	inputName       = "salesforce"
-	timestampFormat = "2006-01-02T15:04:05.999Z"
+	inputName         = "salesforce"
+	formatRFC3339Like = "2006-01-02T15:04:05.999Z"
 )
 
 type salesforceInput struct {
 	config
-
-	ctx context.Context
-
+	ctx        context.Context
 	publisher  inputcursor.Publisher
 	cursor     *state
 	sfdcConfig *sfdc.Configuration
-
-	log *logp.Logger
+	log        *logp.Logger
 }
 
 // // The Filebeat user-agent is provided to the program as useragent.
@@ -56,7 +54,7 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 
 func (s *salesforceInput) Name() string { return inputName }
 
-func (s *salesforceInput) Test(src inputcursor.Source, _ v2.TestContext) error {
+func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 	return nil
 }
 
@@ -74,7 +72,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 
 func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub inputcursor.Publisher) (err error) {
 	cfg := src.cfg
-	log := env.Logger.With("input_url", cfg.Url)
+	log := env.Logger.With("input_url", cfg.URL)
 
 	s.ctx = ctxtool.FromCanceller(env.Cancelation)
 	s.publisher = pub
@@ -103,6 +101,7 @@ func (s *salesforceInput) runObject() error {
 	if err != nil {
 		return err
 	}
+
 	query := &querier{Query: qr}
 
 	s.log.Infof("salesforce query: %s", qr)
@@ -128,6 +127,7 @@ func (s *salesforceInput) runObject() error {
 	for res.Done() {
 		for _, rec := range res.Records() {
 			val := rec.Record().Fields()
+
 			jsonStrEvent, err := json.Marshal(val)
 			if err != nil {
 				return err
@@ -136,7 +136,7 @@ func (s *salesforceInput) runObject() error {
 			if timstamp, ok := val[s.config.Cursor.Field].(string); ok {
 				s.cursor.LogDateTime = timstamp
 			} else {
-				s.cursor.LogDateTime = time.Now().Format(timestampFormat)
+				s.cursor.LogDateTime = time.Now().Format(formatRFC3339Like)
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
@@ -165,6 +165,7 @@ func (s *salesforceInput) runEventLogFile() error {
 	if err != nil {
 		return err
 	}
+
 	query := &querier{Query: qr}
 
 	s.log.Infof("salesforce query: %s", qr)
@@ -217,7 +218,7 @@ func (s *salesforceInput) runEventLogFile() error {
 			if timstamp, ok := rec.Record().Fields()[s.config.Cursor.Field].(string); ok {
 				s.cursor.LogDateTime = timstamp
 			} else {
-				s.cursor.LogDateTime = time.Now().Format(timestampFormat)
+				s.cursor.LogDateTime = time.Now().Format(formatRFC3339Like)
 			}
 
 			for _, val := range recs {
@@ -250,7 +251,7 @@ func (s *salesforceInput) runEventLogFile() error {
 
 func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	passCreds := credentials.PasswordCredentials{
-		URL:          cfg.Url,
+		URL:          cfg.URL,
 		Username:     cfg.Auth.OAuth2.User,
 		Password:     cfg.Auth.OAuth2.Password,
 		ClientID:     cfg.Auth.OAuth2.ClientID,
@@ -283,8 +284,7 @@ func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte)
 }
 
 func periodically(ctx context.Context, each time.Duration, fn func() error) error {
-	err := fn()
-	if err != nil {
+	if err := fn(); err != nil {
 		return err
 	}
 	return timed.Periodic(ctx, each, fn)

@@ -28,14 +28,14 @@ func ParseCursor(cfg *config, cursor *state, log *logp.Logger) (qr string, err e
 		if err != nil {
 			return "", err
 		}
-	} else {
-		defaultTmpl := cfg.Query.Default
+		return qr, nil
+	}
 
-		ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}
-		qr, err = cfg.Query.Default.Execute(ctxTmpl, defaultTmpl, log)
-		if err != nil {
-			return "", err
-		}
+	defaultTmpl := cfg.Query.Default
+	ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}
+	qr, err = cfg.Query.Default.Execute(ctxTmpl, defaultTmpl, log)
+	if err != nil {
+		return "", err
 	}
 
 	return qr, nil

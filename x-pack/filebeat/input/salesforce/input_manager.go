@@ -47,7 +47,7 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 
 type source struct{ cfg config }
 
-func (s *source) Name() string { return s.cfg.Url }
+func (s *source) Name() string { return s.cfg.URL }
 
 // Init initializes both wrapped input managers.
 func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {

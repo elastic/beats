@@ -94,6 +94,7 @@ func parseRFC3339Timestamp(s string) string {
 func formatUnixTimeAsRFC3339(sec int64) string {
 	return time.Unix(sec, 0).Format(time.RFC3339)
 }
+
 func formatUnixTimeMilliAsRFC3339(ms int64) string {
 	return time.Unix(0, ms*1e6).Format(time.RFC3339)
 }
@@ -116,6 +117,7 @@ func formatCurrentTimeWithDurationOffset(duration string) string {
 
 	// Consume [-+]?
 	var neg bool
+
 	c := duration[0]
 	if c == '-' || c == '+' {
 		neg = c == '-'
