@@ -101,9 +101,9 @@ func (p *group) Close() error {
 }
 
 func (p *group) String() string {
-	var s []string
-	for _, p := range p.list {
-		s = append(s, p.String())
+	s := make([]string, len(p.list))
+	for i, p := range p.list {
+		s[i] = p.String()
 	}
 
 	str := strings.Join(s, ", ")

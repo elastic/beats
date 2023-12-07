@@ -177,9 +177,9 @@ func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (procs Processors) String() string {
-	var s []string
-	for _, p := range procs.List {
-		s = append(s, p.String())
+	s := make([]string, len(procs.List))
+	for i, p := range procs.List {
+		s[i] = p.String()
 	}
 	return strings.Join(s, ", ")
 }
