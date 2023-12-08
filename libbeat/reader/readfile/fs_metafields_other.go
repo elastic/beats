@@ -21,7 +21,6 @@ package readfile
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -33,8 +32,8 @@ const (
 	inodeKey    = "log.file.inode"
 )
 
-func setFileSystemMetadata(fi os.FileInfo, fields mapstr.M) error {
-	osstate := file.GetOSState(fi)
+func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
+	osstate := fi.GetOSState()
 	_, err := fields.Put(deviceIDKey, strconv.FormatUint(osstate.Device, 10))
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", deviceIDKey, err)
