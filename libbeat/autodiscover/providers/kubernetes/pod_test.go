@@ -1988,6 +1988,11 @@ func TestNamespacePodUpdater(t *testing.T) {
 		}
 	}
 
+	namespace := &kubernetes.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "foo",
+		}}
+
 	cases := map[string]struct {
 		pods     []interface{}
 		expected []interface{}
@@ -2014,14 +2019,19 @@ func TestNamespacePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+			storenamespace := &mockNamespaceStore{objects: namespace, exist: true, err: nil}
+			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, storenamespace, &sync.Mutex{})
 
-			namespace := &kubernetes.Namespace{
+			//We simulate an update on the namespace with the addition of one label
+			namespace1 := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foo",
-				},
-			}
-			updater.OnUpdate(namespace)
+					Labels: map[string]string{
+						"beta.kubernetes.io/arch": "arm64",
+					},
+				}}
+
+			updater.OnUpdate(namespace1)
 
 			assert.EqualValues(t, c.expected, handler.objects)
 		})
@@ -2076,7 +2086,7 @@ func TestNodePodUpdater(t *testing.T) {
 			storenode := &mockNodeStore{objects: node, exist: true, err: nil}
 			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, storenode, &sync.Mutex{})
 
-			//We simulate an update on the node with the addition of on label
+			//We simulate an update on the node with the addition of one label
 			node1 := &kubernetes.Node{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foo",
@@ -2105,6 +2115,16 @@ type mockUpdaterStore struct {
 
 func (s *mockUpdaterStore) List() []interface{} {
 	return s.objects
+}
+
+type mockNamespaceStore struct {
+	objects interface{}
+	exist   bool
+	err     error
+}
+
+func (s *mockNamespaceStore) GetByKey(string) (interface{}, bool, error) {
+	return s.objects, s.exist, s.err
 }
 
 type mockNodeStore struct {
