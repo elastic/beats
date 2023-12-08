@@ -5,9 +5,10 @@
 package azure
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
 	"strings"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewMetricRegistry instantiates a new metric registry.
