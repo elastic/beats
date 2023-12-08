@@ -158,7 +158,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 }
 
 func (m *MetricSet) Close() error {
-	m.networkMonitoring.Stop()
+	if m.networkMonitoring != nil {
+		m.networkMonitoring.Stop()
+	}
 	return nil
 }
 
