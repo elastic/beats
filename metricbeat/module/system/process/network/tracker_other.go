@@ -21,6 +21,9 @@ package network
 
 import (
 	"errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
 // NewNetworkTracker returns an error on unsupported systems
@@ -34,6 +37,11 @@ func (track *Tracker) Track() error { return nil }
 // Stop is a bare stop implementation
 func (track *Tracker) Stop() {}
 
+// Get is a bare get implementation
 func (track *Tracker) Get(pid int) PacketData {
 	return PacketData{}
+}
+
+// Update is a bare update implementation
+func (track *Tracker) Update(packetLen int, proto applayer.Transport, proc *common.ProcessTuple) {
 }

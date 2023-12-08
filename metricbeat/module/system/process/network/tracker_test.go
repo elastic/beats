@@ -15,12 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
-
 package network
 
 import (
 	"context"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -39,6 +38,9 @@ type testCase struct {
 }
 
 func TestPacketGetUpdate(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skipf("network features are linux-only")
+	}
 	testTrack := &Tracker{
 		procData:   make(map[int]PacketData),
 		updateChan: make(chan counterUpdateEvent, 10),
@@ -60,6 +62,9 @@ func TestPacketGetUpdate(t *testing.T) {
 }
 
 func TestGarbageCollect(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skipf("network features are linux-only")
+	}
 	_ = logp.DevelopmentSetup()
 	testTrack := &Tracker{
 		procData:   make(map[int]PacketData),
@@ -113,6 +118,9 @@ func TestGarbageCollect(t *testing.T) {
 }
 
 func TestPacketUpdates(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skipf("network features are linux-only")
+	}
 	cases := []testCase{
 		{
 			name: "base-case",
