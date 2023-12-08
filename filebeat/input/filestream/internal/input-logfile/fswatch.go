@@ -18,11 +18,9 @@
 package input_logfile
 
 import (
-	"os"
-
 	"github.com/elastic/go-concert/unison"
 
-	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const (
@@ -63,7 +61,7 @@ type FileDescriptor struct {
 	// the filename from the `Info`.
 	Filename string
 	// Info is the result of file stat
-	Info os.FileInfo
+	Info file.ExtendedFileInfo
 	// Fingerprint is a computed hash of the file header
 	Fingerprint string
 }
@@ -75,7 +73,7 @@ func (fd FileDescriptor) FileID() string {
 	if fd.Fingerprint != "" {
 		return fd.Fingerprint
 	}
-	return file_helper.GetOSState(fd.Info).String()
+	return fd.Info.GetOSState().String()
 }
 
 // SameFile returns true if descriptors point to the same file.
