@@ -204,7 +204,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.6.5
 	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.9.0
+	github.com/elastic/elastic-agent-system-metrics v0.9.1
 	github.com/elastic/go-elasticsearch/v8 v8.11.1
 	github.com/elastic/mito v1.7.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
@@ -220,7 +220,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.7
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.7
 	go.elastic.co/apm/v2 v2.4.7
 	go.mongodb.org/mongo-driver v1.5.1
