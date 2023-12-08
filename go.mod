@@ -76,9 +76,9 @@ require (
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
-	github.com/elastic/go-seccomp-bpf v1.3.0
+	github.com/elastic/go-seccomp-bpf v1.4.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.11.1
+	github.com/elastic/go-sysinfo v1.11.2
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
@@ -204,7 +204,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.6.5
 	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.9.0
+	github.com/elastic/elastic-agent-system-metrics v0.9.1
 	github.com/elastic/go-elasticsearch/v8 v8.11.1
 	github.com/elastic/mito v1.7.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
@@ -220,8 +220,8 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.4
-	go.elastic.co/apm/module/apmhttp/v2 v2.4.4
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.7
+	go.elastic.co/apm/module/apmhttp/v2 v2.4.7
 	go.elastic.co/apm/v2 v2.4.7
 	go.mongodb.org/mongo-driver v1.5.1
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98
