@@ -36,58 +36,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.
-// `testID` must be unique for each test run
-// `cfg` must be a valid YAML string containing valid filestream configuration
-// `expEventCount` is an expected amount of produced events
-func runFilestreamBenchmark(t testing.TB, testID string, cfg string, expEventCount int) {
-	logger := logp.L()
-	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
-	require.NoError(t, err)
-
-	p := Plugin(logger, createTestStore(t))
-	input, err := p.Manager.Create(c)
-	require.NoError(t, err)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	context := v2.Context{
-		Logger:      logger,
-		ID:          testID,
-		Cancelation: ctx,
-	}
-
-	connector, eventsDone := newTestPipeline(expEventCount)
-	done := make(chan struct{})
-	go func() {
-		err := input.Run(context, connector)
-		assert.NoError(t, err)
-		done <- struct{}{}
-	}()
-
-	<-eventsDone
-	cancel()
-	<-done // for more stable results we should wait until the full shutdown
-}
-
-func generateFile(t testing.TB, lineCount int) string {
-	t.Helper()
-	dir := t.TempDir()
-	file, err := os.CreateTemp(dir, "lines.log")
-	require.NoError(t, err)
-
-	for i := 0; i < lineCount; i++ {
-		fmt.Fprintf(file, "rather mediocre log line message - %d\n", i)
-	}
-	filename := file.Name()
-	err = file.Close()
-	require.NoError(t, err)
-	return filename
-}
-
 func BenchmarkFilestream(b *testing.B) {
 	logp.TestingSetup(logp.ToDiscardOutput())
 	lineCount := 10000
 	filename := generateFile(b, lineCount)
+
+	b.ResetTimer()
 
 	b.Run("filestream default throughput", func(b *testing.B) {
 		cfg := `
@@ -117,6 +71,76 @@ paths:
 	})
 }
 
+// runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.
+// `testID` must be unique for each test run
+// `cfg` must be a valid YAML string containing valid filestream configuration
+// `expEventCount` is an expected amount of produced events
+func runFilestreamBenchmark(b *testing.B, testID string, cfg string, expEventCount int) {
+	// we don't include initialization in the benchmark time
+	b.StopTimer()
+	runner := createFilestreamTestRunner(b, testID, cfg, expEventCount)
+	// this is where the benchmark actually starts
+	b.StartTimer()
+	events := runner(b)
+	require.Len(b, events, expEventCount)
+}
+
+// createFilestreamTestRunner can be used for both benchmarks and regular tests to run a filestream input
+// with the given configuration and event limit.
+// `testID` must be unique for each test run
+// `cfg` must be a valid YAML string containing valid filestream configuration
+// `eventLimit` is an amount of produced events after which the filestream will shutdown
+//
+// returns a runner function that returns produced events.
+func createFilestreamTestRunner(b testing.TB, testID string, cfg string, eventLimit int) func(t testing.TB) []beat.Event {
+	logger := logp.L()
+	c, err := conf.NewConfigWithYAML([]byte(cfg), cfg)
+	require.NoError(b, err)
+
+	p := Plugin(logger, createTestStore(b))
+	input, err := p.Manager.Create(c)
+	require.NoError(b, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	context := v2.Context{
+		Logger:      logger,
+		ID:          testID,
+		Cancelation: ctx,
+	}
+
+	events := make([]beat.Event, 0, eventLimit)
+	connector, eventsDone := newTestPipeline(eventLimit, &events)
+	done := make(chan struct{})
+
+	return func(t testing.TB) []beat.Event {
+		go func() {
+			err := input.Run(context, connector)
+			assert.NoError(b, err)
+			close(done)
+		}()
+
+		<-eventsDone
+		cancel()
+		<-done // for more stable results we should wait until the full shutdown
+		return events
+	}
+}
+
+func generateFile(t testing.TB, lineCount int) string {
+	t.Helper()
+	dir := t.TempDir()
+	file, err := os.CreateTemp(dir, "lines.log")
+	require.NoError(t, err)
+
+	for i := 0; i < lineCount; i++ {
+		fmt.Fprintf(file, "rather mediocre log line message - %d\n", i)
+	}
+	filename := file.Name()
+	err = file.Close()
+	require.NoError(t, err)
+	return filename
+}
+
 func createTestStore(t testing.TB) loginp.StateStore {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
@@ -137,14 +161,15 @@ func (s *testStore) CleanupInterval() time.Duration {
 	return time.Second
 }
 
-func newTestPipeline(eventLimit int) (pc beat.PipelineConnector, done <-chan struct{}) {
+func newTestPipeline(eventLimit int, out *[]beat.Event) (pc beat.PipelineConnector, done <-chan struct{}) {
 	ch := make(chan struct{})
-	return &testPipeline{limit: eventLimit, done: ch}, ch
+	return &testPipeline{limit: eventLimit, done: ch, out: out}, ch
 }
 
 type testPipeline struct {
 	done  chan struct{}
 	limit int
+	out   *[]beat.Event
 }
 
 func (p *testPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
@@ -160,8 +185,12 @@ type testClient struct {
 
 func (c *testClient) Publish(event beat.Event) {
 	c.testPipeline.limit--
+	if c.testPipeline.limit < 0 {
+		return
+	}
+	*c.testPipeline.out = append(*c.testPipeline.out, event)
 	if c.testPipeline.limit == 0 {
-		c.testPipeline.done <- struct{}{}
+		close(c.testPipeline.done)
 	}
 }
 
