@@ -128,28 +128,16 @@ func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.
 	var err error
 	// fetch list of current sockets
 	if address.To4() != nil {
-		logp.Debug("procs", "getLocalPortsToPIDs()")
 		socketList, err = socketsFromProc(filepath.Join(proc.hostfs, sourceFiles.ipv4), false)
-		if err != nil {
-			logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
-			return 0, false, err
-		}
 	} else {
 		socketList, err = socketsFromProc(filepath.Join(proc.hostfs, sourceFiles.ipv6), true)
-		// Ignore the error when /proc/net/tcp6 doesn't exists (ipv6 disabled).
-		if err != nil {
-			if os.IsNotExist(err) {
-				warnIPv6Once.Do(func() {
-					logp.Warn("No IPv6 socket info reported by the kernel. Process monitor won't enrich IPv6 events")
-				})
-			} else {
-				logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
-				return 0, false, err
-			}
-		}
+	}
+	if err != nil {
+		logp.Err("GetLocalPortToPIDMapping: error parsing: %s", err)
+		return 0, false, err
 	}
 
-	// if no current socket that matchest our request is found in /proc/net, bail early, as it won't show up in in /proc/[pid]/fd
+	// if no current socket that matches our request is found in /proc/net, bail early, as it won't show up in in /proc/[pid]/fd
 	var foundInode uint64
 	for _, sock := range socketList {
 		if (address.Equal(sock.dstIP) && port == sock.dstPort) || (address.Equal(sock.srcIP)) && port == sock.srcPort {
@@ -174,9 +162,9 @@ func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.
 	}
 
 	// 'creative' optimization
-	// if we're asked to get an unknown process, there's a chance it's actually a new PID, so traverse the list backwards,
-	// from high PID to low PID
-	// all the symlink resolve operations can actually take up a non-trivial amount of CPU time
+	// if we're asked to get an unknown process, there's a good chance it's actually a new PID, so traverse the list backwards,
+	// from high PID to low PID,
+	// as all the symlink resolve operations can actually take up a non-trivial amount of CPU time
 	for i := len(names) - 1; i >= 0; i-- {
 		if names[i][0] < '0' || names[i][0] > '9' {
 			continue
@@ -187,9 +175,7 @@ func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.
 		}
 		inodes, err := findSocketsOfPid(proc.hostfs, pid)
 		if err != nil {
-			if os.IsNotExist(err) {
-				logp.Info("FindSocketsOfPid: %s", err)
-			} else {
+			if !os.IsNotExist(err) {
 				logp.Err("FindSocketsOfPid: %s", err)
 			}
 			continue
