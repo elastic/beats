@@ -9,15 +9,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
-- Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
-- Defaults are changing for some options in the queue and Elasticsearch output, to improve typical performance based on current benchmark data. All changes can be overridden by setting them explicitly in the beat configuration. {pull}36990[36990] The changes are:
-  - `queue.mem.events` is changing from `4096` to `3200`.
-  - `queue.mem.flush.min_events` is changing from `2048` to `1600`.
-  - `queue.mem.flush.timeout` is changing from `1s` to `10s`.
-  - `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
-  - `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
-- Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
+- `queue.mem.events` is changing from `4096` to `3200`.
+- `queue.mem.flush.min_events` is changing from `2048` to `1600`.
+- `queue.mem.flush.timeout` is changing from `1s` to `10s`.
+- `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
+- `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
 - Improve Beat `test output` command to honor proxy_url setting for output.logstash and output.elasticsearch. {issue}24751[24751] {pull}36715[36715]
 
 *Auditbeat*
@@ -63,12 +59,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
-- Fix memqueue producer blocking indefinitely even after being cancelled {issue}22813[22813] {pull}37077[37077]
 
 *Auditbeat*
 
-- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
-- Fix guess trigger for system/socket creds on newer kernels. {issue}36905[36905] {pull}37136[37136]
 
 *Filebeat*
 
@@ -99,7 +92,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
-- Fix mapping errors with invalid urls. {pull}37255[37255]
 
 *Metricbeat*
 
@@ -125,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
 - Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
+- Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
 
 *Osquerybeat*
 
@@ -134,7 +127,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix dashboards under Kibana 8.x. {issue}37080[37080] {pull}37085[37085]
 
 
 *Elastic Logging Plugin*
@@ -160,6 +152,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 - Upgrade to Go 1.20.11. {pull}37123[37123]
+- The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 
 *Auditbeat*
 
@@ -309,6 +302,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
