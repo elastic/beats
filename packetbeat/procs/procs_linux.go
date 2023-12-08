@@ -114,7 +114,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	return ports, nil
 }
 
-// GetSingleLocalPortToPIDMapping fetches a PID that corrisponds to a given address:port combination.
+// GetSingleLocalPortToPIDMapping fetches a PID that corresponds to a given address:port combination.
 // It returns the pid, a bool indicating if a matching PID was found, and an error.
 // Because we're only searching for a single PID, this employs a number of optimizations that are not present in GetLocalPortToPIDMapping,
 // and should be preferred if we only care about locating a single PID.

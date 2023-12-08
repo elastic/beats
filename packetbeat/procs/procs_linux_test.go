@@ -24,9 +24,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGetSingleLocalPort(t *testing.T) {
@@ -43,7 +44,8 @@ func TestGetSingleLocalPort(t *testing.T) {
 	require.NoError(t, err)
 
 	proc := &ProcessesWatcher{hostfs: pathPrefix}
-	proc.Init(ProcsConfig{Enabled: true})
+	err = proc.Init(ProcsConfig{Enabled: true})
+	require.NoError(t, err)
 	ip, port, err := hexToIPPort([]byte("2501A8C0:0016"), false)
 	require.NoError(t, err)
 
