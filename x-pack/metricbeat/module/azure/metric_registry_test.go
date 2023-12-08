@@ -93,20 +93,26 @@ func TestNewMetricRegistry(t *testing.T) {
 
 	//
 	// These tests document the limits of the time.Round function used
-	// to round the reference time.
+	// to round the reference time to the nearest second.
 	//
 
 	t.Run("Round outer limits", func(t *testing.T) {
 		referenceTime1, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:32.500Z")
 		referenceTime2, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:33.499Z")
 
-		assert.Equal(t, referenceTime1.Round(time.Second), referenceTime2.Round(time.Second))
+		expected, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:33.000Z")
+
+		assert.Equal(t, expected, referenceTime1.Round(time.Second))
+		assert.Equal(t, expected, referenceTime2.Round(time.Second))
 	})
 
 	t.Run("Round inner limits", func(t *testing.T) {
 		referenceTime1, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:32.999Z")
 		referenceTime2, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:33.001Z")
 
-		assert.Equal(t, referenceTime1.Round(time.Second), referenceTime2.Round(time.Second))
+		expected, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:33.000Z")
+
+		assert.Equal(t, expected, referenceTime1.Round(time.Second))
+		assert.Equal(t, expected, referenceTime2.Round(time.Second))
 	})
 }
