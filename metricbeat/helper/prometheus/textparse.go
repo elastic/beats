@@ -18,6 +18,8 @@
 package prometheus
 
 import (
+	"errors"
+	"io"
 	"math"
 	"mime"
 	"net/http"
@@ -496,8 +498,15 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		)
 		if et, err = parser.Next(); err != nil {
 			// TODO: log here
-			// if errors.Is(err, io.EOF) {}
-			break
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			// NOTE: ignore any errors that are not EOF. This is to avoid breaking the parsing.
+			// if acceptHeader in the prometheus client is `Accept: text/plain; version=0.0.4` (like it is now)
+			// any `info` metrics are not supported, and then there will be ignored here.
+			// if acceptHeader in the prometheus client `Accept: application/openmetrics-text; version=0.0.1`
+			// any `info` metrics are supported, and then there will be parsed here.
+			continue
 		}
 		switch et {
 		case textparse.EntryType:
