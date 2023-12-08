@@ -113,7 +113,7 @@ func getNetTable(fn GetExtendedTableFn, order bool, family uint32, tableClass ui
 			ptr = make([]byte, size)
 			addr = uintptr(unsafe.Pointer(&ptr[0]))
 		} else {
-			return nil, fmt.Errorf("getNetTable failed: code=%v err=%w", code, err)
+			return nil, fmt.Errorf("getNetTable failed: code=%w err=%w", code, err)
 		}
 	}
 }

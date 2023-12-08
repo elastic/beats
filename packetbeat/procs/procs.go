@@ -111,6 +111,10 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) e
 		applayer.TransportTCP: make(map[endpoint]portProcMapping),
 	}
 
+	if proc.hostfs != "" {
+		logp.Info("Using custom hostfs root: %s", proc.hostfs)
+	}
+
 	proc.processCache = make(map[int]*process)
 
 	proc.enabled = config.Enabled
