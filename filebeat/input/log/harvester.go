@@ -34,6 +34,7 @@ import (
 	"fmt"
 	file_helper "github.com/elastic/beats/libbeat/common/file"
 	"io"
+	"strings"
 	"sync"
 	"time"
 
@@ -310,10 +311,15 @@ func (h *Harvester) Run() error {
 					data.Event.Timestamp = ts
 				}
 			} else if &text != nil {
-				if fields == nil {
-					fields = common.MapStr{}
+				if h.config.IsLudicrousModeActivated() {
+					normalizedText := strings.ReplaceAll(text, "\r\n", "\n")
+					data.Event.Texts = strings.Split(normalizedText, "\n")
+				} else {
+					if fields == nil {
+						fields = common.MapStr{}
+					}
+					fields["data"] = text
 				}
-				fields["data"] = text
 			}
 
 			data.Event.Fields = fields

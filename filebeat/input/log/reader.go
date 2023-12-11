@@ -18,14 +18,15 @@
 // Package log harvests different inputs for new information. Currently
 // two harvester types exist:
 //
-//   * log
-//   * stdin
+//   - log
 //
-//  The log harvester reads a file line by line. In case the end of a file is found
-//  with an incomplete line, the line pointer stays at the beginning of the incomplete
-//  line. As soon as the line is completed, it is read and returned.
+//   - stdin
 //
-//  The stdin harvesters reads data from stdin.
+//     The log harvester reads a file line by line. In case the end of a file is found
+//     with an incomplete line, the line pointer stays at the beginning of the incomplete
+//     line. As soon as the line is completed, it is read and returned.
+//
+//     The stdin harvesters reads data from stdin.
 package log
 
 import (
@@ -59,7 +60,7 @@ var (
 	ErrContextNotExists = errors.New("harvester context dose not exists")
 )
 
-//ReuseMessage
+// ReuseMessage
 type ReuseMessage struct {
 	message reader.Message
 	error   error
@@ -104,7 +105,7 @@ func NewReuseHarvester(
 	return r, nil
 }
 
-//Next: 按行读取文件内容，并根据harvester offset返回
+// Next: 按行读取文件内容，并根据harvester offset返回
 func (r *ReuseHarvester) Next() (reader.Message, error) {
 	select {
 	case <-r.done:
@@ -116,7 +117,7 @@ func (r *ReuseHarvester) Next() (reader.Message, error) {
 	}
 }
 
-//OnMessage:
+// OnMessage:
 func (r *ReuseHarvester) OnMessage(message ReuseMessage) error {
 	select {
 	case <-r.done:
@@ -128,19 +129,19 @@ func (r *ReuseHarvester) OnMessage(message ReuseMessage) error {
 	}
 }
 
-//Stop: 停止harvester
+// Stop: 停止harvester
 func (r *ReuseHarvester) Stop() {
 	r.closeOnce.Do(func() {
 		close(r.done)
 	})
 }
 
-//HasState
+// HasState
 func (r *ReuseHarvester) HasState() bool {
 	return r.fileReader.HasState()
 }
 
-//GetState
+// GetState
 func (r *ReuseHarvester) GetState() file.State {
 	return r.State
 }
@@ -233,7 +234,7 @@ func (m *FileReaderManager) cleanup() {
 	}
 }
 
-//FileHarvester:
+// FileHarvester:
 type FileHarvester struct {
 	config config
 	state  file.State
@@ -258,7 +259,7 @@ type FileHarvester struct {
 	forwarder      chan *ReuseHarvester
 }
 
-//newFileHarvester: get file harvester
+// newFileHarvester: get file harvester
 func newFileHarvester(reuseReader *ReuseHarvester) (*FileHarvester, error) {
 	r := &FileHarvester{
 		config:     reuseReader.Config,
@@ -281,7 +282,7 @@ func newFileHarvester(reuseReader *ReuseHarvester) (*FileHarvester, error) {
 	return r, nil
 }
 
-//addForwarder:
+// addForwarder:
 func (h *FileHarvester) AddForwarder(reuseReader *ReuseHarvester) error {
 	h.forwardersLock.Lock()
 	defer h.forwardersLock.Unlock()
@@ -314,17 +315,17 @@ func (h *FileHarvester) AddForwarder(reuseReader *ReuseHarvester) error {
 	return nil
 }
 
-//HasReuseReader
+// HasReuseReader
 func (h *FileHarvester) HasReuseReader() bool {
 	return len(h.forwarders) > 0
 }
 
-//HasState
+// HasState
 func (h *FileHarvester) HasState() bool {
 	return h.source.HasState()
 }
 
-//Run: 从最小的Offset读取一行，并发送给所有匹配的reader
+// Run: 从最小的Offset读取一行，并发送给所有匹配的reader
 func (h *FileHarvester) Run() {
 	defer func() {
 	L:
@@ -494,7 +495,7 @@ func (h *FileHarvester) Close() {
 	})
 }
 
-//Setup: 打开文件FD，首次执行会直接转到第一个state.offset
+// Setup: 打开文件FD，首次执行会直接转到第一个state.offset
 func (h *FileHarvester) Setup() error {
 	err := h.open()
 	if err != nil {
@@ -510,7 +511,7 @@ func (h *FileHarvester) Setup() error {
 	return nil
 }
 
-//Close: 关闭FD
+// Close: 关闭FD
 func (h *FileHarvester) closeFile() {
 	if h.source != nil {
 		logp.Info("file harvester is close, file:%s", h.state.Source)
@@ -629,12 +630,12 @@ func (h *FileHarvester) initFileOffset(file *os.File) (int64, error) {
 //
 // It creates a chain of readers which looks as following:
 //
-//   limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
+//	limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
 //
 // Each reader on the left, contains the reader on the right and calls `Next()` to fetch more data.
 // At the base of all readers the the log_file reader. That means in the data is flowing in the opposite direction:
 //
-//   log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
+//	log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
 //
 // log_file implements io.Reader interface and encode reader is an adapter for io.Reader to
 // reader.Reader also handling file encodings. All other readers implement reader.Reader
@@ -655,6 +656,8 @@ func (h *FileHarvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
+	logp.Info("NewLogFileReader: %s, LudicrousMode: %v", h.state.Source, h.config.IsLudicrousModeActivated())
+
 	// Configure MaxBytes limit for EncodeReader as multiplied by 4
 	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
 	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
@@ -665,6 +668,7 @@ func (h *FileHarvester) newLogFileReader() (reader.Reader, error) {
 		Codec:      h.encoding,
 		BufferSize: h.config.BufferSize,
 		MaxBytes:   encReaderMaxBytes,
+		BatchMode:  h.config.IsLudicrousModeActivated(),
 	})
 	if err != nil {
 		return nil, err
@@ -672,7 +676,14 @@ func (h *FileHarvester) newLogFileReader() (reader.Reader, error) {
 
 	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
+		r = readjson.New(
+			r,
+			h.config.DockerJSON.Stream,
+			h.config.DockerJSON.Partial,
+			h.config.DockerJSON.ForceCRI,
+			h.config.DockerJSON.CRIFlags,
+			h.config.IsLudicrousModeActivated(),
+		)
 	}
 
 	if h.config.JSON != nil {
