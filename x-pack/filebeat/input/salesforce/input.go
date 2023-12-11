@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -19,6 +20,7 @@ import (
 	"github.com/g8rswimmer/go-sfdc/credentials"
 	"github.com/g8rswimmer/go-sfdc/session"
 	"github.com/g8rswimmer/go-sfdc/soql"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/exp/slices"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -84,7 +86,6 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 	s.publisher = pub
 	s.cursor = cursor
 	s.log = log
-
 	s.sfdcConfig, err = getSFDCConfig(&cfg)
 	if err != nil {
 		return err
@@ -272,16 +273,26 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 	switch {
 	case cfg.Auth.JWT.isEnabled():
+		pemBytes, err := os.ReadFile(cfg.Auth.JWT.ClientKeyPath)
+		if err != nil {
+			fmt.Errorf("problem with client key path for JWT auth: %w", err)
+		}
+
+		signKey, err := jwt.ParseRSAPrivateKeyFromPEM(pemBytes)
+		if err != nil {
+			fmt.Errorf("problem with client key for JWT auth: %w", err)
+		}
+
 		passCreds := credentials.JwtCredentials{
 			URL:            cfg.Auth.JWT.URL,
 			ClientId:       cfg.Auth.JWT.ClientId,
 			ClientUsername: cfg.Auth.JWT.ClientUsername,
-			ClientKey:      nil, // FIXME(SS): Set this.
+			ClientKey:      signKey,
 		}
 
 		creds, err = credentials.NewJWTCredentials(passCreds)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("problem with credentials: %w", err)
 		}
 	case cfg.Auth.OAuth2.isEnabled():
 		passCreds := credentials.PasswordCredentials{
@@ -294,7 +305,7 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 		creds, err = credentials.NewPasswordCredentials(passCreds)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("problem with credentials: %w", err)
 		}
 
 	}

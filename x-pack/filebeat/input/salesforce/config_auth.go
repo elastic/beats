@@ -26,10 +26,10 @@ type oAuth2Config struct {
 type jwtConfig struct {
 	Enabled *bool `config:"enabled"`
 
-	URL            string
-	ClientId       string
-	ClientUsername string
-	// ClientKey      struct{}
+	URL            string `config:"url"`
+	ClientId       string `config:"client.id"`
+	ClientUsername string `config:"client.username"`
+	ClientKeyPath  string `config:"client.key_path"`
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.

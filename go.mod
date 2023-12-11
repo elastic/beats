@@ -210,6 +210,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/g8rswimmer/go-sfdc v2.0.2-0.20201201191151-3190c381b3e1+incompatible
+	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/google/cel-go v0.17.7
 	github.com/googleapis/gax-go/v2 v2.11.0
 	github.com/gorilla/handlers v1.5.1
