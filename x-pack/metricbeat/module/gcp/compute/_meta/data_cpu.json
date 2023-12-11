@@ -9,10 +9,10 @@
             "id": "7206859884978665190",
             "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
         },
-        "provider": "gcp"
+        "provider": "gcp",
+        "availability_zone": "us-central1-a",
+        "region": "us-central1"
     },
-    "cloud.availability_zone": "us-central1-c",
-    "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,

@@ -22,8 +22,7 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
-	err := logp.TestingSetup()
-	assert.Nil(t, err)
+	logp.TestingSetup()
 
 	const bucket = "bucket"
 	const numberOfWorkers = 5

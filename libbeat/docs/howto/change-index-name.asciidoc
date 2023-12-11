@@ -9,7 +9,7 @@ in the {es} output. You also need to configure the `setup.template.name` and
 ["source","sh",subs="attributes,callouts"]
 -----
 output.elasticsearch.index: "customname-%{[{beat_version_key}]}"
-setup.template.name: "customname"
+setup.template.name: "customname-%{[{beat_version_key}]}"
 setup.template.pattern: "customname-%{[{beat_version_key}]}"
 -----
 

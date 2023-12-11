@@ -1,0 +1,408 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "local-path-storage",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.2",
+			"name": "local-path-provisioner-6bc4bddd6b-6vl7d",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "172.18.0.2",
+			"name": "kube-proxy-2nq9k",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.8",
+			"name": "hello-mwrpw",
+			"status": {
+				"phase": "succeeded",
+				"ready": "false",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.7",
+			"name": "fluentd-elasticsearch-m2tlp",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.9",
+			"name": "hello-28312520-d5d5s",
+			"status": {
+				"phase": "succeeded",
+				"ready": "false",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.3",
+			"name": "coredns-5d78c9869d-crtn9",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.4",
+			"name": "coredns-5d78c9869d-gskzq",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "172.18.0.2",
+			"name": "kube-scheduler-kind-control-plane",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.5",
+			"name": "kube-state-metrics-7857446fb4-x78j6",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "172.18.0.2",
+			"name": "kube-controller-manager-kind-control-plane",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "172.18.0.2",
+			"name": "kindnet-xg6gs",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "172.18.0.2",
+			"name": "kube-apiserver-kind-control-plane",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "10.244.0.6",
+			"name": "web-0",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "kind-control-plane"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "172.18.0.2",
+			"ip": "172.18.0.2",
+			"name": "etcd-kind-control-plane",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

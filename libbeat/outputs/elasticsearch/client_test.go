@@ -431,7 +431,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {
-	_ = logp.TestingSetup(logp.WithSelectors("elasticsearch"))
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	client, err := NewClient(
 		ClientSettings{

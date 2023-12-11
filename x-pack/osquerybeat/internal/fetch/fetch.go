@@ -7,7 +7,7 @@ package fetch
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -26,18 +26,18 @@ func Download(ctx context.Context, url, fp string) (hashout string, err error) {
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return
+		return "", err
 	}
 
 	res, err := cli.Do(req)
 	if err != nil {
-		return
+		return "", err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		// Read body for extended error message
-		b, err := ioutil.ReadAll(res.Body)
+		b, err := io.ReadAll(res.Body)
 		var s string
 		if err != nil {
 			log.Printf("Failed to read the error response body: %v", err)
@@ -49,7 +49,7 @@ func Download(ctx context.Context, url, fp string) (hashout string, err error) {
 
 	out, err := os.OpenFile(fp, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
-		return
+		return "", err
 	}
 	defer out.Close()
 

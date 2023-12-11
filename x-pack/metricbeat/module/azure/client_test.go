@@ -7,6 +7,7 @@ package azure
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -66,6 +67,7 @@ func TestGetMetricValues(t *testing.T) {
 	client.Config = resourceIDConfig
 
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
+		referenceTime := time.Now().UTC().Truncate(time.Second)
 		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
 				{
@@ -82,12 +84,13 @@ func TestGetMetricValues(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		metrics := client.GetMetricValues(client.ResourceConfigurations.Metrics, &mr)
+		metrics := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 		assert.Equal(t, len(metrics), 0)
 		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
 		m.AssertExpectations(t)
 	})
 	t.Run("return metric values", func(t *testing.T) {
+		referenceTime := time.Now().UTC().Truncate(time.Second)
 		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
 				{
@@ -104,7 +107,7 @@ func TestGetMetricValues(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		metricValues := client.GetMetricValues(client.ResourceConfigurations.Metrics, &mr)
+		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 		assert.Equal(t, len(metricValues), 0)
 		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
 		m.AssertExpectations(t)

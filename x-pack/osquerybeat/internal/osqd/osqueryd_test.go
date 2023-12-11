@@ -7,7 +7,6 @@ package osqd
 import (
 	"bufio"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,13 +28,16 @@ func TestNew(t *testing.T) {
 	configPluginName := "config_plugin_test"
 	loggerPluginName := "logger_plugin_test"
 
-	osq := New(
+	osq, err := New(
 		socketPath,
 		WithExtensionsTimeout(extensionsTimeout),
 		WithConfigRefresh(configurationRefreshIntervalSecs),
 		WithConfigPlugin(configPluginName),
 		WithLoggerPlugin(loggerPluginName),
 	)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	diff := cmp.Diff(extensionsTimeout, osq.extensionsTimeout)
 	if diff != "" {
@@ -76,7 +78,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
 
 	// Write fake extension file for testing
-	err := ioutil.WriteFile(mandatoryExtensionPath, nil, 0600)
+	err := os.WriteFile(mandatoryExtensionPath, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +123,7 @@ func TestPrepareAutoloadFile(t *testing.T) {
 			// Setup
 			extensionAutoloadPath := filepath.Join(t.TempDir(), osqueryAutoload)
 
-			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
+			err = os.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
 			if err != nil {
 				t.Fatal(err)
 			}
