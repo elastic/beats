@@ -9,10 +9,10 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/g8rswimmer/go-sfdc"
@@ -92,14 +92,14 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	cursor.StartTime = time.Now()
 
-	switch cfg.From {
-	case "EventLogFile":
+	switch {
+	case strings.EqualFold(cfg.From, "EventLogFile"):
 		return periodically(s.ctx, cfg.Interval, s.RunEventLogFile)
-	case "Object":
+	case strings.EqualFold(cfg.From, "Object"):
 		return periodically(s.ctx, cfg.Interval, s.RunObject)
 	}
 
-	return errors.New("invalid from: " + cfg.From + ", supported values: EventLogFile, Object")
+	return fmt.Errorf("bad configuration: value for \"from: %s\" is not correct (supported values are EventLogFile or Object)", cfg.From)
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
