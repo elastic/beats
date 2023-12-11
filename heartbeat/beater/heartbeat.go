@@ -162,7 +162,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
-	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+	logp.L().Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
 	waitMonitors := monitors.NewSignalWait()
 
@@ -226,7 +226,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	waitPublished.AddChan(bt.done)
 	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
-		logp.Info("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
+		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
 		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
 			"shutdown: timed out waiting for pipeline to publish events."))
 	}
@@ -241,7 +241,7 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (st
 		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
-				logp.L().Info("skipping disabled monitor: %s", err)
+				logp.L().Infof("skipping disabled monitor: %s", err)
 				continue // don't stop loading monitors just because they're disabled
 			}
 
