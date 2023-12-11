@@ -33,14 +33,14 @@ CHANGELOG*
 /filebeat/module/auditd @elastic/security-external-integrations
 /filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /filebeat/module/haproxy @elastic/obs-infraobs-integrations
-/filebeat/module/icinga @elastic/obs-cloud-monitoring
+/filebeat/module/icinga # TODO: find right team
 /filebeat/module/iis @elastic/obs-infraobs-integrations
 /filebeat/module/kafka @elastic/obs-infraobs-integrations
 /filebeat/module/kibana/ @elastic/infra-monitoring-ui
 /filebeat/module/logstash/ @elastic/infra-monitoring-ui
 /filebeat/module/mongodb @elastic/obs-infraobs-integrations
 /filebeat/module/mysql @elastic/security-external-integrations
-/filebeat/module/nats @elastic/obs-cloud-monitoring
+/filebeat/module/nats @elastic/obs-infraobs-integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
 /filebeat/module/osquery @elastic/security-external-integrations
 /filebeat/module/pensando @elastic/security-external-integrations
@@ -48,7 +48,7 @@ CHANGELOG*
 /filebeat/module/redis @elastic/obs-infraobs-integrations
 /filebeat/module/santa @elastic/security-external-integrations
 /filebeat/module/system @elastic/elastic-agent-data-plane
-/filebeat/module/traefik @elastic/obs-cloud-monitoring
+/filebeat/module/traefik # TODO: find right team
 /heartbeat/ @elastic/obs-ds-hosted-services
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
