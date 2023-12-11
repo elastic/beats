@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package salesforce
 
 import (
@@ -328,7 +332,7 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	// As buffer reuse is enabled, copying header is important.
 	header = slices.Clone(header)
 
-	var results []map[string]string
+	var results []map[string]string //nolint:prealloc // not sure about the size to prealloc with
 
 	event, err := r.Read()
 	for ; err == nil; event, err = r.Read() {
