@@ -39,6 +39,8 @@ type salesforceInput struct {
 	cursor     *state
 	sfdcConfig *sfdc.Configuration
 	log        *logp.Logger
+
+	clientSession *session.Session
 }
 
 // // The Filebeat user-agent is provided to the program as useragent.
@@ -88,34 +90,53 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	switch cfg.From {
 	case "EventLogFile":
-		return periodically(s.ctx, cfg.Interval, s.runEventLogFile)
+		return periodically(s.ctx, cfg.Interval, s.RunEventLogFile)
 	case "Object":
-		return periodically(s.ctx, cfg.Interval, s.runObject)
+		return periodically(s.ctx, cfg.Interval, s.RunObject)
 	}
 
 	return errors.New("invalid from: " + cfg.From + ", supported values: EventLogFile, Object")
 }
 
-func (s *salesforceInput) runObject() error {
-	qr, err := ParseCursor(&s.config, s.cursor, s.log)
-	if err != nil {
-		return err
-	}
-
-	query := &querier{Query: qr}
-
-	s.log.Infof("salesforce query: %s", qr)
-
+func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	// Open creates a session using the configuration.
 	session, err := session.Open(*s.sfdcConfig)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	// set clientSession for re-use (EventLogFile)
+	s.clientSession = session
 
 	// Create a new SOQL resource using the session.
 	soqlr, err := soql.NewResource(session)
 	if err != nil {
-		return fmt.Errorf("error setting up salesforce SOQL resource: %w", err)
+		return nil, fmt.Errorf("error setting up salesforce SOQL resource: %w", err)
+	}
+	return soqlr, nil
+}
+
+func (s *salesforceInput) FormQueryWithCursor() (*querier, error) {
+	qr, err := parseCursor(&s.config, s.cursor, s.log)
+	if err != nil {
+		return nil, err
+	}
+
+	s.log.Infof("salesforce query: %s", qr)
+
+	return &querier{Query: qr}, err
+}
+
+func (s *salesforceInput) RunObject() error {
+	// Create a new SOQL resource using the session.
+	soqlr, err := s.SetupSFClientConnection()
+	if err != nil {
+		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
+	}
+
+	query, err := s.FormQueryWithCursor()
+	if err != nil {
+		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
 
 	res, err := soqlr.Query(query, false)
@@ -160,26 +181,15 @@ func (s *salesforceInput) runObject() error {
 	return nil
 }
 
-func (s *salesforceInput) runEventLogFile() error {
-	qr, err := ParseCursor(&s.config, s.cursor, s.log)
+func (s *salesforceInput) RunEventLogFile() error {
+	soqlr, err := s.SetupSFClientConnection()
 	if err != nil {
-		return err
+		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
 
-	query := &querier{Query: qr}
-
-	s.log.Infof("salesforce query: %s", qr)
-
-	// Open creates a session using the configuration.
-	session, err := session.Open(*s.sfdcConfig)
+	query, err := s.FormQueryWithCursor()
 	if err != nil {
-		return err
-	}
-
-	// Create a new SOQL resource using the session.
-	soqlr, err := soql.NewResource(session)
-	if err != nil {
-		return fmt.Errorf("error setting up salesforce SOQL resource: %w", err)
+		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
 
 	res, err := soqlr.Query(query, false)
@@ -195,7 +205,8 @@ func (s *salesforceInput) runEventLogFile() error {
 				return err
 			}
 
-			session.AuthorizationHeader(req)
+			s.clientSession.AuthorizationHeader(req)
+
 			req.Header.Add("X-PrettyPrint", "1")
 
 			resp, err := s.sfdcConfig.Client.Do(req)

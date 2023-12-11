@@ -23,8 +23,6 @@ type InputManager struct {
 	cursor *inputcursor.InputManager
 }
 
-var _ v2.InputManager = InputManager{}
-
 func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
 	return InputManager{
 		cursor: &inputcursor.InputManager{
@@ -63,6 +61,4 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	return m.cursor.Create(cfg)
 }
 
-func defaultConfig() config {
-	return config{Interval: time.Hour}
-}
+func defaultConfig() config { return config{Interval: time.Hour} }
