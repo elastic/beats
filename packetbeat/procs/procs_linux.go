@@ -268,7 +268,7 @@ func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
 // Parses the /proc/net/(tcp|udp)6? file
 func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 
-	var sockets []*socketInfo
+	sockets := []*socketInfo{}
 	var err error
 
 	sc := bufio.NewScanner(input)
