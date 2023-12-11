@@ -267,6 +267,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 - Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 - Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
+- Bump Windows Npcap version to v1.78. {issue}37300[37300] {pull}37370[37370]
 
 *Functionbeat*
 
