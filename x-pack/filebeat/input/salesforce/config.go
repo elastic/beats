@@ -38,12 +38,13 @@ func (c *config) Validate() error {
 		// the beta release in API version 46.0
 		//
 		// To keep things simple, only one version is entertained i.e., the
-		// minimum version supported by all objects for which we have support for.
+		// minimum version supported by all objects for which we have support
+		// for.
 		//
-		// min_vesion_support_all[32.0, 15.0, 46.0] = 46.0
+		// minimum_vesion_supported_by_all_objects([32.0, 15.0, 46.0]) = 46.0
 		//
-		// (objects like EventLogFile, SetupAuditTrail and Real-time monitoring
-		// objects are available in v46.0)
+		// (Objects like EventLogFile, SetupAuditTrail and Real-time monitoring
+		// objects are available in v46.0 and above)
 
 		// References:
 		// https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm
