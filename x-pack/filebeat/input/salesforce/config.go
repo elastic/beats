@@ -27,6 +27,10 @@ type cursorConfig struct {
 
 func (c *config) Validate() error {
 	switch {
+	case !c.Auth.JWT.isEnabled() && !c.Auth.OAuth2.isEnabled():
+		return errors.New("no auth provider enabled")
+	case c.Auth.JWT.isEnabled() && c.Auth.OAuth2.isEnabled():
+		return errors.New("only one auth provider must be enabled")
 	case c.URL == "":
 		return errors.New("no instance url was configured or detected")
 	case c.Interval == 0:
@@ -50,7 +54,7 @@ func (c *config) Validate() error {
 		// https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm
 		// https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_setupaudittrail.htm
 		// https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_objects_monitoring.htm
-		return fmt.Errorf("please provide a valid version i.e., 46.0 or above")
+		return errors.New("please provide a valid version i.e., 46.0 or above")
 	}
 
 	return nil

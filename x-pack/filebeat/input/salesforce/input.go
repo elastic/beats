@@ -265,17 +265,38 @@ func (s *salesforceInput) RunEventLogFile() error {
 }
 
 func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
-	passCreds := credentials.PasswordCredentials{
-		URL:          cfg.URL,
-		Username:     cfg.Auth.OAuth2.User,
-		Password:     cfg.Auth.OAuth2.Password,
-		ClientID:     cfg.Auth.OAuth2.ClientID,
-		ClientSecret: cfg.Auth.OAuth2.ClientSecret,
-	}
+	var (
+		creds *credentials.Credentials
+		err   error
+	)
 
-	creds, err := credentials.NewPasswordCredentials(passCreds)
-	if err != nil {
-		return nil, err
+	switch {
+	case cfg.Auth.JWT.isEnabled():
+		passCreds := credentials.JwtCredentials{
+			URL:            cfg.Auth.JWT.URL,
+			ClientId:       cfg.Auth.JWT.ClientId,
+			ClientUsername: cfg.Auth.JWT.ClientUsername,
+			ClientKey:      nil, // FIXME(SS): Set this.
+		}
+
+		creds, err = credentials.NewJWTCredentials(passCreds)
+		if err != nil {
+			return nil, err
+		}
+	case cfg.Auth.OAuth2.isEnabled():
+		passCreds := credentials.PasswordCredentials{
+			URL:          cfg.URL,
+			Username:     cfg.Auth.OAuth2.User,
+			Password:     cfg.Auth.OAuth2.Password,
+			ClientID:     cfg.Auth.OAuth2.ClientID,
+			ClientSecret: cfg.Auth.OAuth2.ClientSecret,
+		}
+
+		creds, err = credentials.NewPasswordCredentials(passCreds)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 
 	return &sfdc.Configuration{

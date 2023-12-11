@@ -10,17 +10,26 @@ import (
 
 type authConfig struct {
 	OAuth2 *oAuth2Config `config:"oauth2"`
+	JWT    *jwtConfig    `config:"jwt"`
 }
 
 type oAuth2Config struct {
 	Enabled *bool `config:"enabled"`
 
-	// common oauth fields
 	ClientID     string `config:"client.id"`
 	ClientSecret string `config:"client.secret"`
 	Password     string `config:"password"`
 	TokenURL     string `config:"token_url"`
 	User         string `config:"user"`
+}
+
+type jwtConfig struct {
+	Enabled *bool `config:"enabled"`
+
+	URL            string
+	ClientId       string
+	ClientUsername string
+	// ClientKey      struct{}
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
@@ -40,6 +49,19 @@ func (o *oAuth2Config) Validate() error {
 
 	if o.Password == "" || o.User == "" {
 		return errors.New("both user and password credentials must be provided")
+	}
+
+	return nil
+}
+
+// isEnabled returns true if the `enable` field is set to true in the yaml.
+func (o *jwtConfig) isEnabled() bool {
+	return o != nil && (o.Enabled == nil || *o.Enabled)
+}
+
+func (o *jwtConfig) Validate() error {
+	if !o.isEnabled() {
+		return nil
 	}
 
 	return nil
