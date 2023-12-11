@@ -67,7 +67,8 @@ IMPORTANT: Due to a memory leak issue, Windows users running {agent} are recomme
 === Beats version 8.11.0
 https://github.com/elastic/beats/compare/v8.10.4\...v8.11.0[View commits]
 
-IMPORTANT: Due to a memory leak issue, Windows users running {agent} are recommended to avoid upgrading to this release and waiting for the upcoming 8.11.2 release in which the issue is resolved. If you've already upgraded to version 8.11.0 or 8.11.1, we recommend upgrading to 8.11.2 as soon as it becomes available.
+
+IMPORTANT: Due to a memory leak issue, Windows users running {agent} are recommended to avoid upgrading to this release and instead use the 8.11.2 release in which the issue is resolved. If you've already upgraded to version 8.11.0 or 8.11.1, we recommend upgrading to 8.11.2 as soon as possible.
 
 ==== Breaking changes
 
