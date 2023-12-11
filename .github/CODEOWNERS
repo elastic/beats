@@ -49,7 +49,7 @@ CHANGELOG*
 /filebeat/module/santa @elastic/security-external-integrations
 /filebeat/module/system @elastic/elastic-agent-data-plane
 /filebeat/module/traefik @elastic/obs-cloud-monitoring
-/heartbeat/ @elastic/hosted-services
+/heartbeat/ @elastic/obs-ds-hosted-services
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
@@ -171,7 +171,7 @@ CHANGELOG*
 /x-pack/filebeat/module/zscaler @elastic/security-external-integrations
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-external-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
-/x-pack/heartbeat/ @elastic/hosted-services
+/x-pack/heartbeat/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations
