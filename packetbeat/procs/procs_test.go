@@ -68,10 +68,18 @@ func (w *mockWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (po
 
 func (w *mockWatcher) GetSingleLocalPortToPIDMapping(transport applayer.Transport, address net.IP, port uint16) (int, bool, error) {
 	pid, ok := w.portToPID[transport][endpoint{address: address.String(), port: port}]
-	if !ok {
-		return 0, false, nil
+	if ok {
+		return pid, true, nil
 	}
-	return pid, true, nil
+	nullAddr := anyIPv4
+	if asIPv4 := address.To4(); asIPv4 == nil {
+		nullAddr = anyIPv6
+	}
+	pid, ok = w.portToPID[transport][endpoint{address: nullAddr, port: port}]
+	if ok {
+		return pid, true, nil
+	}
+	return 0, false, nil
 }
 
 func (w *mockWatcher) GetProcess(pid int) *process {

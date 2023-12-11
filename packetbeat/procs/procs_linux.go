@@ -65,7 +65,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	if err = pids.Get(); err != nil {
 		return nil, err
 	}
-	logp.Debug("procs", "getLocalPortsToPIDs()")
+	logp.Debug("procs", "GetLocalPortToPIDMapping()")
 	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false)
 	if err != nil {
 		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
@@ -94,7 +94,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 
 	ports = make(map[endpoint]int)
 	for _, pid := range pids.List {
-		inodes, err := findSocketsOfPid("", pid)
+		inodes, err := findSocketsOfPid(proc.hostfs, pid)
 		if err != nil {
 			if os.IsNotExist(err) {
 				logp.Info("FindSocketsOfPid: %s", err)
@@ -143,6 +143,21 @@ func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.
 		if (address.Equal(sock.dstIP) && port == sock.dstPort) || (address.Equal(sock.srcIP)) && port == sock.srcPort {
 			foundInode = sock.inode
 		}
+	}
+	// emulate the behavior of lookupMapping(). If there's no matching port, but there
+	// is a match when using INADDR_ANY, revert to that
+	if foundInode == 0 {
+		nullAddr := net.IPv4zero
+		if address.To4() == nil {
+			nullAddr = net.IPv6unspecified
+		}
+		for _, sock := range socketList {
+			if (sock.dstIP.Equal(nullAddr) && port == sock.dstPort) || (sock.srcIP.Equal(nullAddr)) && port == sock.srcPort {
+				foundInode = sock.inode
+				break
+			}
+		}
+
 	}
 	// connection can no longer be found
 	if foundInode == 0 {
@@ -252,10 +267,10 @@ func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
 
 // Parses the /proc/net/(tcp|udp)6? file
 func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
-	var (
-		sockets []*socketInfo
-		err     error
-	)
+
+	var sockets []*socketInfo
+	var err error
+
 	sc := bufio.NewScanner(input)
 	for sc.Scan() {
 		words := bytes.Fields(sc.Bytes())

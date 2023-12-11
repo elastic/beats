@@ -35,24 +35,56 @@ func TestGetSingleLocalPort(t *testing.T) {
 
 	pathPrefix := "./testdata"
 	procFake := []testProcFile{
-		{path: "/proc/766/fd/15", isLink: true, contents: "socket:[10150504]"},
+		{path: "/proc/766/fd/15", isLink: true, contents: "socket:[10141101]"},
+		{path: "proc/123/fd/10", isLink: true, contents: "socket:[29766]"},
 	}
 	err := createFakeDirectoryStructure(pathPrefix, procFake)
 	defer func() {
 		os.RemoveAll("testdata/proc/766")
+		os.RemoveAll("testdata/proc/123")
 	}()
+	require.NoError(t, err)
+
+	err = os.Setenv("HOST_PROC", "./testdata")
 	require.NoError(t, err)
 
 	proc := &ProcessesWatcher{hostfs: pathPrefix}
 	err = proc.Init(ProcsConfig{Enabled: true})
 	require.NoError(t, err)
-	ip, port, err := hexToIPPort([]byte("2501A8C0:0016"), false)
-	require.NoError(t, err)
 
-	pid, found, err := proc.GetSingleLocalPortToPIDMapping(applayer.TransportTCP, ip, port)
-	require.True(t, found)
-	require.NoError(t, err)
-	require.Equal(t, 766, pid)
+	for _, testCase := range []struct {
+		name         string
+		netstatTuple string
+		foundPid     int
+	}{
+		{
+			name:         "basic_lookup",
+			netstatTuple: "0100007F:D7CA",
+			foundPid:     766,
+		},
+		{
+			name:         "lookup_INADDR_ANY",
+			netstatTuple: "00000000:0016",
+			foundPid:     123,
+		},
+		{
+			name:         "lookup_to_INADDR_ANY",
+			netstatTuple: "017AA8C1:0016",
+			foundPid:     123,
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			ip, port, err := hexToIPPort([]byte(testCase.netstatTuple), false)
+			require.NoError(t, err)
+
+			pid, found, err := proc.GetSingleLocalPortToPIDMapping(applayer.TransportTCP, ip, port)
+			require.True(t, found)
+			require.NoError(t, err)
+
+			require.Equal(t, testCase.foundPid, pid)
+		})
+
+	}
 }
 
 func TestFindSocketsOfPid(t *testing.T) {
