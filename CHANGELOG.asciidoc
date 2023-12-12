@@ -3,6 +3,31 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.16]]
+=== Beats version 7.17.16
+https://github.com/elastic/beats/compare/v7.17.15\...v7.17.16[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
+
+==== Added
+
+*Winlogbeat*
+
+- Document minimum permissions required for running Winlogbeat with local user account. {issue}15773[15773] {pull}37176[37176]
+
+==== Deprecated
+
+
 [[release-notes-7.17.15]]
 === Beats version 7.17.15
 https://github.com/elastic/beats/compare/v7.17.14\...v7.17.15[View commits]
