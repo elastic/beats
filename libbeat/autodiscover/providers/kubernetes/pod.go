@@ -158,7 +158,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	}
 
 	if namespaceWatcher != nil && (config.Hints.Enabled() || metaConf.Namespace.Enabled()) {
-		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), p.namespaceWatcher.Store(), &p.crossUpdate)
+		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), p.namespaceWatcher.Store(), p.namespaceWatcher, &p.crossUpdate)
 		namespaceWatcher.AddEventHandler(updater)
 	}
 
@@ -183,6 +183,7 @@ func (p *pod) OnUpdate(obj interface{}) {
 }
 
 func (p *pod) unlockedUpdate(obj interface{}) {
+	p.logger.Infof("Watcher Pod update: %+v", obj)
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "stop")
 	p.emit(obj.(*kubernetes.Pod), "start")

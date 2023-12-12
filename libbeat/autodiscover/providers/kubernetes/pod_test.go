@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
@@ -2020,8 +2021,6 @@ func TestNamespacePodUpdater(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
 			storenamespace := &mockNamespaceStore{objects: namespace, exist: true, err: nil}
-			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, storenamespace, &sync.Mutex{})
-
 			//We simulate an update on the namespace with the addition of one label
 			namespace1 := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -2030,6 +2029,11 @@ func TestNamespacePodUpdater(t *testing.T) {
 						"beta.kubernetes.io/arch": "arm64",
 					},
 				}}
+			var deltaslice []runtime.Object
+			deltaslice = append(deltaslice, namespace)
+			deltaslice = append(deltaslice, namespace1)
+			watcher := &mockUpdaterNamespaceWatcher{objects: namespace, delta: deltaslice}
+			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, storenamespace, watcher, &sync.Mutex{})
 
 			updater.OnUpdate(namespace1)
 
@@ -2083,8 +2087,6 @@ func TestNodePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			storenode := &mockNodeStore{objects: node, exist: true, err: nil}
-			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, storenode, &sync.Mutex{})
 
 			//We simulate an update on the node with the addition of one label
 			node1 := &kubernetes.Node{
@@ -2094,6 +2096,10 @@ func TestNodePodUpdater(t *testing.T) {
 						"beta.kubernetes.io/arch": "arm64",
 					},
 				}}
+
+			storenode := &mockNodeStore{objects: node, exist: true, err: nil}
+			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, storenode, &sync.Mutex{})
+
 			updater.OnUpdate(node1)
 
 			assert.EqualValues(t, c.expected, handler.objects)
@@ -2111,6 +2117,15 @@ func (h *mockUpdaterHandler) OnUpdate(obj interface{}) {
 
 type mockUpdaterStore struct {
 	objects []interface{}
+}
+
+type mockUpdaterNamespaceWatcher struct {
+	objects interface{}
+	delta   []runtime.Object
+}
+
+func (s *mockUpdaterNamespaceWatcher) Deltaslice() []runtime.Object {
+	return s.delta
 }
 
 func (s *mockUpdaterStore) List() []interface{} {
