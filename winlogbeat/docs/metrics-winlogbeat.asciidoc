@@ -16,6 +16,6 @@ observe the event log processing activity of Winlogbeat.
 | `discarded_events_total` | Total number of discarded events.
 | `errors_total`           | Total number of errors.
 | `received_events_count`  | Histogram of the number of events in each non-zero batch.
-| `source_lag_time`        | Histogram of the difference between timestamped event's creation and reading.
-| `batch_read_period`      | Histogram of the elapsed time between non-zero batch reads.
+| `source_lag_time`        | Histogram of the difference in nanoseconds between timestamped event's creation and reading.
+| `batch_read_period`      | Histogram of the elapsed time in nanoseconds between non-zero batch reads.
 |=======
