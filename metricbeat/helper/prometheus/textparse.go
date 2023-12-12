@@ -27,12 +27,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/pkg/exemplar"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/prometheus/prometheus/pkg/timestamp"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
