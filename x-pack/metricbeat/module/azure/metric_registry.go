@@ -16,6 +16,7 @@ func NewMetricRegistry(logger *logp.Logger) *MetricRegistry {
 	return &MetricRegistry{
 		logger:          logger,
 		collectionsInfo: make(map[string]MetricCollectionInfo),
+		jitter:          1 * time.Second,
 	}
 }
 
@@ -27,6 +28,11 @@ func NewMetricRegistry(logger *logp.Logger) *MetricRegistry {
 type MetricRegistry struct {
 	logger          *logp.Logger
 	collectionsInfo map[string]MetricCollectionInfo
+	// The collection period can be jittered by a second.
+	// We introduce a small jitter to avoid skipping collections
+	// when the collection period is close (usually < 1s) to the
+	// time grain start time.
+	jitter time.Duration
 }
 
 // Update updates the metric registry with the latest timestamp and
@@ -48,42 +54,43 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 	// metric in relation to the reference time.
 	now := time.Now().UTC()
 
-	if collection, exists := m.collectionsInfo[metricKey]; exists {
+	if lastCollection, exists := m.collectionsInfo[metricKey]; exists {
 		// Turn the time grain into a duration (for example, PT5M -> 5 minutes).
-		timeGrainDuration := convertTimeGrainToDuration(collection.timeGrain)
+		timeGrainDuration := convertTimeGrainToDuration(lastCollection.timeGrain)
 
 		// Calculate the start time of the time grain in relation to
 		// the reference time.
 		timeGrainStartTime := referenceTime.Add(-timeGrainDuration)
 
-		// The collection period can be jittered by a few seconds.
-		// We introduce a small jitter to avoid skipping collections
-		// when the collection period is close (1-2 seconds) to the
-		// time grain.
-		//jitter := 3 * time.Second
-
-		// The time elapsed since the last collection, only to be
-		// used for logging.
-		elapsed := referenceTime.Sub(collection.timestamp)
+		// Only to be used for logging.
+		//
+		// The time elapsed since the last collection, and the time
+		// distance between last collection and the start of time
+		// grain.
+		elapsed := referenceTime.Sub(lastCollection.timestamp)
+		distance := lastCollection.timestamp.Sub(timeGrainStartTime)
 
 		// If the last collection time is after the start time of the time grain,
 		// it means that we already have a value for the given time grain.
 		//
 		// In this case, the metricset does not need to collect the metric
 		// values again.
-		if collection.timestamp.After(timeGrainStartTime) {
+		//
+		if lastCollection.timestamp.After(timeGrainStartTime.Add(m.jitter)) {
 			m.logger.Debugw(
 				"MetricRegistry: Metric does not need an update",
 				"needs_update", false,
 				"reference_time", referenceTime,
 				"now", now,
 				"time_grain_start_time", timeGrainStartTime,
-				"last_collection_at", collection.timestamp,
-				"time_grain", metric.TimeGrain,
+				"last_collection_at", lastCollection.timestamp,
+				"time_grain", lastCollection.timeGrain,
 				"resource_id", metric.ResourceId,
 				"namespace", metric.Namespace,
 				"names", strings.Join(metric.Names, ","),
-				"elapsed", elapsed,
+				"elapsed", elapsed.String(),
+				"jitter", m.jitter.String(),
+				"distance", distance.String(),
 			)
 
 			return false
@@ -97,12 +104,14 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 			"reference_time", referenceTime,
 			"now", now,
 			"time_grain_start_time", timeGrainStartTime,
-			"last_collection_at", collection.timestamp,
-			"time_grain", metric.TimeGrain,
+			"last_collection_at", lastCollection.timestamp,
+			"time_grain", lastCollection.timeGrain,
 			"resource_id", metric.ResourceId,
 			"namespace", metric.Namespace,
 			"names", strings.Join(metric.Names, ","),
-			"elapsed", elapsed,
+			"elapsed", elapsed.String(),
+			"jitter", m.jitter.String(),
+			"distance", distance.String(),
 		)
 
 		return true
@@ -113,7 +122,7 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 	//
 	// In this case, we need to collect the metric.
 	m.logger.Debugw(
-		"MetricRegistry: Metric needs an update",
+		"MetricRegistry: Metric needs an update (no collection info in the metric registry)",
 		"needs_update", true,
 		"reference_time", referenceTime,
 		"now", now,
@@ -121,6 +130,7 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 		"resource_id", metric.ResourceId,
 		"namespace", metric.Namespace,
 		"names", strings.Join(metric.Names, ","),
+		"jitter", m.jitter.String(),
 	)
 
 	return true

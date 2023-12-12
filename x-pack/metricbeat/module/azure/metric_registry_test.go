@@ -88,8 +88,33 @@ func TestNewMetricRegistry(t *testing.T) {
 
 		needsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric)
 
-		assert.False(t, needsUpdate, "metric should not need update")
+		assert.True(t, needsUpdate, "metric should not need update")
 	})
+
+	//t.Run("Collect metrics using a period (1 second) shorter than previous", func(t *testing.T) {
+	//	metricRegistry := NewMetricRegistry(logger)
+	//
+	//	// Create a referenceTime parsing 2023-12-08T16:42:50.000Z into a time.Time
+	//	referenceTime, _ := time.Parse(time.RFC3339, "2023-12-08T10:58:33.000Z")
+	//
+	//	// Create a lastCollectionAt parsing the string 2023-12-08T16:37:50.000Z into a time.Time
+	//	lastCollectionAt, _ := time.Parse(time.RFC3339, "2023-12-08T10:53:34.000Z")
+	//
+	//	metric := Metric{
+	//		ResourceId: "test",
+	//		Namespace:  "test",
+	//	}
+	//	metricCollectionInfo := MetricCollectionInfo{
+	//		timeGrain: "PT5M",
+	//		timestamp: lastCollectionAt,
+	//	}
+	//
+	//	metricRegistry.Update(metric, metricCollectionInfo)
+	//
+	//	needsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric)
+	//
+	//	assert.False(t, needsUpdate, "metric should not need update")
+	//})
 
 	//
 	// These tests document the limits of the time.Round function used
