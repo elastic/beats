@@ -13,109 +13,19 @@ https://github.com/elastic/beats/compare/v7.17.15\...v7.17.16[View commits]
 
 - Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
 - Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
 
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
 
 *Winlogbeat*
 
 - Document minimum permissions required for running winlogbeat with local user account. {issue}15773[15773] {pull}37176[37176]
 
-*Elastic Log Driver*
-
-
 ==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
 
 
 [[release-notes-7.17.15]]
