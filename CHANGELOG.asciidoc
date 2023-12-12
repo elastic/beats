@@ -23,7 +23,7 @@ https://github.com/elastic/beats/compare/v7.17.15\...v7.17.16[View commits]
 
 *Winlogbeat*
 
-- Document minimum permissions required for running winlogbeat with local user account. {issue}15773[15773] {pull}37176[37176]
+- Document minimum permissions required for running Winlogbeat with local user account. {issue}15773[15773] {pull}37176[37176]
 
 ==== Deprecated
 
