@@ -3,8 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.11.3]]
 === Beats version 8.11.3
 https://github.com/elastic/beats/compare/v8.11.2\...v8.11.3[View commits]
@@ -66,7 +64,6 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 - Upgrade to Go 1.20.11. {pull}37123[37123]
 
 
->>>>>>> 06a8c09655 (docs: Prepare Changelog for 8.11.3 (#37399) (#37402))
 [[release-notes-8.11.1]]
 === Beats version 8.11.1
 https://github.com/elastic/beats/compare/v8.11.0\...v8.11.1[View commits]
