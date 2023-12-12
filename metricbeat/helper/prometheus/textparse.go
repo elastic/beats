@@ -32,6 +32,7 @@ import (
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/prometheus/prometheus/pkg/timestamp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -501,6 +502,9 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			if errors.Is(err, io.EOF) {
 				break
 			}
+
+			logp.Debug("kubernetes", "Parse Prometheus Family error : %v ", err)
+
 			// NOTE: ignore any errors that are not EOF. This is to avoid breaking the parsing.
 			// if acceptHeader in the prometheus client is `Accept: text/plain; version=0.0.4` (like it is now)
 			// any `info` metrics are not supported, and then there will be ignored here.
