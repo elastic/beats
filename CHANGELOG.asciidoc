@@ -3,6 +3,20 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.11.3]]
+=== Beats version 8.11.3
+https://github.com/elastic/beats/compare/v8.11.2\...v8.11.3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+- `queue.mem.events` is changing from `4096` to `3200`.
+- `queue.mem.flush.min_events` is changing from `2048` to `1600`.
+- `queue.mem.flush.timeout` is changing from `1s` to `10s`.
+- `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
+- `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
+
+
 [[release-notes-8.11.2]]
 === Beats version 8.11.2
 https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
