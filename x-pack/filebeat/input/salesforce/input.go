@@ -78,7 +78,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 	return s.run(env, src.(*source), st, pub)
 }
 
-func getTableFromSOQL(query string) (string, error) {
+func getObjectFromSOQL(query string) (string, error) {
 	var (
 		lowered = strings.ToLower(query)
 		fields  = strings.Fields(lowered)
@@ -289,12 +289,12 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	case cfg.Auth.JWT.isEnabled():
 		pemBytes, err := os.ReadFile(cfg.Auth.JWT.ClientKeyPath)
 		if err != nil {
-			fmt.Errorf("problem with client key path for JWT auth: %w", err)
+			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
 		}
 
 		signKey, err := jwt.ParseRSAPrivateKeyFromPEM(pemBytes)
 		if err != nil {
-			fmt.Errorf("problem with client key for JWT auth: %w", err)
+			return nil, fmt.Errorf("problem with client key for JWT auth: %w", err)
 		}
 
 		passCreds := credentials.JwtCredentials{
