@@ -7,6 +7,8 @@
 === Beats version 7.17.16
 https://github.com/elastic/beats/compare/v7.17.15\...v7.17.16[View commits]
 
+The 7.17.16 patch release contains a fix for a potential security vulnerability. https://discuss.elastic.co/c/announcements/security-announcements/31[Please see our security advisory for more details].
+
 ==== Breaking changes
 
 *Affecting all Beats*
