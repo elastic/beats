@@ -503,7 +503,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 				break
 			}
 
-			logp.Debug("kubernetes", "Parse Prometheus Family error : %v ", err)
+			logp.Debug("kubernetes", "Ignored Parsing error from Prometheus : %v ", err)
 
 			// NOTE: ignore any errors that are not EOF. This is to avoid breaking the parsing.
 			// if acceptHeader in the prometheus client is `Accept: text/plain; version=0.0.4` (like it is now)
