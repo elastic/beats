@@ -21,9 +21,12 @@ https://github.com/elastic/beats/compare/v8.11.2\...v8.11.3[View commits]
 === Beats version 8.11.2
 https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 
+The 8.11.2 patch release contains a fix for a potential security vulnerability. https://discuss.elastic.co/c/announcements/security-announcements/31[Please see our security advisory for more details].
+
 ==== Breaking changes
 
 *Affecting all Beats*
+
 - Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
 ==== Bugfixes
