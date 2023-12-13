@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
 
 *Metricbeat*
 
