@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix mapping errors with invalid urls. {pull}37255[37255]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
 
 *Metricbeat*
 
