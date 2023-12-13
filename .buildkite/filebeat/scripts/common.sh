@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-WORKSPACE="$(pwd)"
+#WORKSPACE="$(pwd)"
 BIN="${WORKSPACE}/bin"
 HW_TYPE="$(uname -m)"
 PLATFORM_TYPE="$(uname)"
 
-if [[ -z "${GOLANG_VERSION-""}" ]]; then
-    export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
-fi
+#if [[ -z "${GOLANG_VERSION-""}" ]]; then
+#    export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
+#fi
 
 add_bin_path() {
     echo "Adding PATH to the environment variables..."
