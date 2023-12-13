@@ -22,7 +22,7 @@ package capabilities
 import "errors"
 
 // Returned for all public functions on "not linux".
-var ErrUnsupported = errors.New("Capabilities are only supported in linux")
+var ErrUnsupported = errors.New("capabilities are only supported in linux")
 
 // Dummy value on "not linux".
 type Flag = uint
