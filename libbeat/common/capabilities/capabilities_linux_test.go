@@ -85,7 +85,7 @@ func TestOverflow(t *testing.T) {
 func assertHasCap(t *testing.T, sl []string, s string) {
 	var found int
 
-	for _, s2 := range(sl) {
+	for _, s2 := range sl {
 		if s2 == s {
 			found++
 		}
