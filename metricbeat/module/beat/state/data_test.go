@@ -91,7 +91,7 @@ func TestNoEventIfEsOutputButNoUuidYet(t *testing.T) {
 
 	err = eventMapping(reporter, info, input, true)
 	require.NoError(t, err)
-	require.Equal(t,  0, len(reporter.GetEvents()))
+	require.Equal(t, 0, len(reporter.GetEvents()))
 	require.Equal(t, 0, len(reporter.GetErrors()))
 }
 
