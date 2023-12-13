@@ -86,7 +86,7 @@ metric_without_suffix 10
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -135,7 +135,7 @@ process_cpu 20
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -189,7 +189,7 @@ second_metric 0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -242,7 +242,7 @@ second_metric 0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -292,7 +292,7 @@ metric_without_suffix 3
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -342,7 +342,7 @@ a{a="foo"} 1.0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -395,7 +395,7 @@ summary_metric_impossible 123
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -447,7 +447,7 @@ summary_metric_impossible 123
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -507,7 +507,7 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -566,7 +566,7 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -609,7 +609,7 @@ ggh 99
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -644,7 +644,7 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0
 			},
 		},
 	}
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -678,7 +678,7 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 			},
 		},
 	}
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}

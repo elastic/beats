@@ -480,7 +480,7 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	return name, metric
 }
 
-func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricFamily, error) {
+func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
 	var (
 		parser               = textparse.New(b, contentType)
 		defTime              = timestamp.FromTime(ts)
@@ -500,7 +500,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 		)
 		if et, err = parser.Next(); err != nil {
 			if strings.HasPrefix(err.Error(), "invalid metric type") {
-				logp.Debug("prometheus", "Ignored invalid metric type : %v ", err)
+				logger.Debugf("Ignored invalid metric type : %v ", err)
 
 				// NOTE: ignore any errors that are not EOF. This is to avoid breaking the parsing.
 				// if acceptHeader in the prometheus client is `Accept: text/plain; version=0.0.4` (like it is now)
@@ -516,7 +516,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			if strings.HasPrefix(err.Error(), "data does not end with # EOF") {
 				break
 			}
-			logp.Debug("prometheus", "Error while parsing metrics: %v ", err)
+			logger.Debugf("Error while parsing metrics: %v ", err)
 			break
 		}
 		switch et {
