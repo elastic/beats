@@ -131,7 +131,6 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 			}
 		}
 	}
-	return
 }
 
 func publishEvt(publisher stateless.Publisher, msg string, line uint64, filename uint64, thread uint8, metrics *inputMetrics) {
