@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix mapping errors with invalid urls. {pull}37255[37255]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
 
 *Metricbeat*
 
@@ -161,6 +162,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 - Upgrade to Go 1.20.11. {pull}37123[37123]
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
+- Upgrade elastic-agent-system-metrics to v0.9.1. See https://github.com/elastic/elastic-agent-system-metrics/releases/tag/v0.9.1. {pull}37353[pull]
 
 *Auditbeat*
 
@@ -266,6 +268,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 - Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 - Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
+- Bump Windows Npcap version to v1.78. {issue}37300[37300] {pull}37370[37370]
 
 *Functionbeat*
 
@@ -310,6 +313,12 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 
