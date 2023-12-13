@@ -168,8 +168,8 @@ func (p *ProjectSource) Close() error {
 
 func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	cmd.Dir = dir
-	logp.L().Info("Running %s in %s", cmd, dir)
+	logp.L().Infof("Running %s in %s", cmd, dir)
 	output, err := cmd.CombinedOutput()
-	logp.L().Info("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+	logp.L().Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
 	return err
 }
