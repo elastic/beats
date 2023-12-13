@@ -183,7 +183,6 @@ func (p *pod) OnUpdate(obj interface{}) {
 }
 
 func (p *pod) unlockedUpdate(obj interface{}) {
-	p.logger.Infof("Watcher Pod update: %+v", obj)
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "stop")
 	p.emit(obj.(*kubernetes.Pod), "start")
