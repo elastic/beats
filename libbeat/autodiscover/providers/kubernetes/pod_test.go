@@ -2020,7 +2020,6 @@ func TestNamespacePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			storenamespace := &mockNamespaceStore{objects: namespace, exist: true, err: nil}
 			//We simulate an update on the namespace with the addition of one label
 			namespace1 := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -2032,8 +2031,8 @@ func TestNamespacePodUpdater(t *testing.T) {
 			var deltaslice []runtime.Object
 			deltaslice = append(deltaslice, namespace)
 			deltaslice = append(deltaslice, namespace1)
-			watcher := &mockUpdaterNamespaceWatcher{objects: namespace, delta: deltaslice}
-			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, storenamespace, watcher, &sync.Mutex{})
+			watcher := &mockUpdaterWatcher{delta: deltaslice}
+			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
 
 			updater.OnUpdate(namespace1)
 
@@ -2092,14 +2091,18 @@ func TestNodePodUpdater(t *testing.T) {
 			node1 := &kubernetes.Node{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "foo",
-					Labels: map[string]string{
+					Annotations: map[string]string{
 						"beta.kubernetes.io/arch": "arm64",
 					},
 				}}
 
-			storenode := &mockNodeStore{objects: node, exist: true, err: nil}
-			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, storenode, &sync.Mutex{})
+			var deltaslice []runtime.Object
+			deltaslice = append(deltaslice, node)
+			deltaslice = append(deltaslice, node1)
+			watcher := &mockUpdaterWatcher{delta: deltaslice}
+			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
 
+			//This is when the update happens.
 			updater.OnUpdate(node1)
 
 			assert.EqualValues(t, c.expected, handler.objects)
@@ -2119,12 +2122,11 @@ type mockUpdaterStore struct {
 	objects []interface{}
 }
 
-type mockUpdaterNamespaceWatcher struct {
-	objects interface{}
-	delta   []runtime.Object
+type mockUpdaterWatcher struct {
+	delta []runtime.Object
 }
 
-func (s *mockUpdaterNamespaceWatcher) Deltaslice() []runtime.Object {
+func (s *mockUpdaterWatcher) Deltaobjects() []runtime.Object {
 	return s.delta
 }
 

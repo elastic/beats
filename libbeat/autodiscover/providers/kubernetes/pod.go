@@ -153,12 +153,12 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	watcher.AddEventHandler(p)
 
 	if nodeWatcher != nil && (config.Hints.Enabled() || metaConf.Node.Enabled()) {
-		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), p.nodeWatcher.Store(), &p.crossUpdate)
+		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), p.nodeWatcher, &p.crossUpdate)
 		nodeWatcher.AddEventHandler(updater)
 	}
 
 	if namespaceWatcher != nil && (config.Hints.Enabled() || metaConf.Namespace.Enabled()) {
-		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), p.namespaceWatcher.Store(), p.namespaceWatcher, &p.crossUpdate)
+		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), p.namespaceWatcher, &p.crossUpdate)
 		namespaceWatcher.AddEventHandler(updater)
 	}
 
