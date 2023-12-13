@@ -37,6 +37,9 @@ var (
 	// errors.ErrUnsupported present in golang 1.21, but still
 	// support 1.20.
 	ErrUnsupported = errors.New("capabilities are only supported in linux")
+
+	// The mask when all known capabilities are set.
+	allMask = (uint64(1) << uint64(cap.MaxBits())) - 1
 )
 
 // The capability set flag/vector, re-exported from
@@ -172,8 +175,6 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 // number of capabilities on startup via cap.MaxBits().
 // May return ErrUnsupported on "not linux".
 func FromUint64(w uint64) ([]string, error) {
-	allMask := (uint64(1) << uint64(cap.MaxBits())) - 1
-
 	if w == allMask {
 		return []string{"CAP_ALL"}, nil
 	}

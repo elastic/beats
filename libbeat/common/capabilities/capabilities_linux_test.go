@@ -26,8 +26,6 @@ import (
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
-var allMask = (uint64(1) << uint64(cap.MaxBits())) - 1
-
 func TestEmpty(t *testing.T) {
 	sl, err := FromString("0", 16)
 	assert.Nil(t, err)
