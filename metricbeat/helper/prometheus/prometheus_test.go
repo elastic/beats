@@ -551,10 +551,26 @@ func TestInfoMetricPrometheus(t *testing.T) {
 		expected []mapstr.M
 	}{
 		{
-			msg: "Simple field map",
+			msg: "Ignore metrics not in mapping",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"first_metric": Metric("first.metric"),
+				},
+			},
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
+						"metric": 1.0,
+					},
+				},
+			},
+		},
+		{
+			msg: "Ignore metric in mapping but of unsupported type (eg. Info metric)",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": Metric("first.metric"),
+					"target_info":  Metric("target.info"),
 				},
 			},
 			expected: []mapstr.M{
