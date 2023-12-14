@@ -192,6 +192,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 		client.MetricRegistry.Update(metric, MetricCollectionInfo{
 			timeGrain: timeGrain,
 			timestamp: referenceTime,
+			//timestamp: time.Now().UTC(),
 		})
 
 		for i, currentMetric := range client.ResourceConfigurations.Metrics {
