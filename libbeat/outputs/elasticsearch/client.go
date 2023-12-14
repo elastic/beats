@@ -221,7 +221,7 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 func (client *Client) publishEvents(ctx context.Context, data []publisher.Event) ([]publisher.Event, error) {
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
-	begin := time.Now()
+
 	st := client.observer
 
 	if st != nil {
@@ -246,6 +246,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		return nil, nil
 	}
 
+	begin := time.Now()
 	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
 	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
 
@@ -263,9 +264,10 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	pubCount := len(data)
 	span.Context.SetLabel("events_published", pubCount)
 
+	timeSinceSend := time.Since(begin)
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		pubCount,
-		time.Since(begin))
+		timeSinceSend)
 
 	// check response for transient errors
 	var failedEvents []publisher.Event
@@ -289,6 +291,8 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		st.Dropped(dropped)
 		st.Duplicate(duplicates)
 		st.ErrTooMany(stats.tooMany)
+		st.ReportLatency(timeSinceSend)
+
 	}
 
 	if failed > 0 {

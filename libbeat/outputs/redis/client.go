@@ -233,6 +233,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 			return nil, nil
 		}
 
+		start := time.Now()
 		// RPUSH returns total length of list -> fail and retry all on error
 		_, err := conn.Do(command, args...)
 		if err != nil {
@@ -241,6 +242,8 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 
 		}
 
+		took := time.Since(start)
+		c.observer.ReportLatency(took)
 		c.observer.Acked(len(okEvents))
 		return nil, nil
 	}

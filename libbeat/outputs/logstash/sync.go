@@ -114,6 +114,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	for len(events) > 0 {
+		begin := time.Now()
 		// check if we need to reconnect
 		if c.ticker != nil {
 			select {
@@ -163,6 +164,8 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 
 			return err
 		}
+		took := time.Since(begin)
+		st.ReportLatency(took)
 	}
 
 	batch.ACK()
