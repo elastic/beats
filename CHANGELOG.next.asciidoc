@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
+- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
