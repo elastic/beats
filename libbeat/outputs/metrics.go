@@ -54,7 +54,7 @@ type Stats struct {
 	readBytes  *monitoring.Uint // total amount of bytes read
 	readErrors *monitoring.Uint // total number of errors while waiting for response on output
 
-	sendLatencyNanos metrics.Sample
+	sendLatencyMillis metrics.Sample
 }
 
 // NewStats creates a new Stats instance using a backing monitoring registry.
@@ -79,9 +79,9 @@ func NewStats(reg *monitoring.Registry) *Stats {
 		readBytes:  monitoring.NewUint(reg, "read.bytes"),
 		readErrors: monitoring.NewUint(reg, "read.errors"),
 
-		sendLatencyNanos: metrics.NewUniformSample(1024),
+		sendLatencyMillis: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "write.latency", adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyNanos))
+	_ = adapter.NewGoMetrics(reg, "write.latency", adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyMillis))
 	return obj
 }
 
@@ -95,7 +95,7 @@ func (s *Stats) NewBatch(n int) {
 }
 
 func (s *Stats) ReportLatency(time time.Duration) {
-	s.sendLatencyNanos.Update(time.Nanoseconds())
+	s.sendLatencyMillis.Update(time.Milliseconds())
 }
 
 // Acked updates active and acked event metrics.
