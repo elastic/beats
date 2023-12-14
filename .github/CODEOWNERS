@@ -24,6 +24,7 @@ CHANGELOG*
 /deploy/ @elastic/elastic-agent-data-plane
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
 /dev-tools/ @elastic/elastic-agent-data-plane
+/dev-tools/kubernetes @elastic/obs-ds-hosted-services
 /docs/ @elastic/elastic-agent-data-plane
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
