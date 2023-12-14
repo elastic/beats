@@ -200,7 +200,6 @@ func (r *Registrar) commitStateUpdates() {
 		r.log.Errorf("Error writing registrar state to statestore: %v", err)
 		registryFails.Inc()
 	}
-	r.log.Debugf("Registry file updated. %d active states.", len(states))
 	registrySuccess.Inc()
 
 	if r.out != nil {
@@ -223,8 +222,6 @@ func (r *Registrar) onEvents(states []file.State) {
 			}
 		}
 	}
-
-	r.log.Debugf("Registrar state updates processed. Count: %v", len(states))
 
 	// new set of events received -> mark state registry ready for next
 	// cleanup phase in case gc'able events are stored in the registry.
@@ -257,8 +254,6 @@ func (r *Registrar) gcStates() {
 
 // processEventStates gets the states from the events and writes them to the registrar state
 func (r *Registrar) processEventStates(states []file.State) {
-	r.log.Debugf("Processing %d events", len(states))
-
 	ts := time.Now()
 	for i := range states {
 		r.states.UpdateWithTs(states[i], ts)

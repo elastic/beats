@@ -78,9 +78,6 @@ func (l *ackLoop) handleBatchSig() int {
 	}
 
 	// return final ACK to EventLoop, in order to clean up internal buffer
-	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
-
-	l.broker.logger.Debug("ackloop:  done send ack")
 	return count
 }
 

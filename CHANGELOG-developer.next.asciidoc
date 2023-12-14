@@ -66,6 +66,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Rename `queue.Batch.ACK()` to `queue.Batch.Done()`. {pull}31903[31903]
 - `queue.ACKListener` has been removed. Queue configurations now accept an explicit callback function for ACK handling. {pull}35078[35078]
 - Split split httpmon out of x-pack/filebeat/input/internal/httplog. {pull}36385[36385]
+- Remove verbose debug logs from acker, registrar and publisher {pull}37439[37439]
 
 ==== Bugfixes
 

@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"go.elastic.co/apm/v2"
 
@@ -221,7 +220,6 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 func (client *Client) publishEvents(ctx context.Context, data []publisher.Event) ([]publisher.Event, error) {
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
-	begin := time.Now()
 	st := client.observer
 
 	if st != nil {
@@ -262,10 +260,6 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	}
 	pubCount := len(data)
 	span.Context.SetLabel("events_published", pubCount)
-
-	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
-		pubCount,
-		time.Since(begin))
 
 	// check response for transient errors
 	var failedEvents []publisher.Event
