@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/stretchr/testify/require"
 )
@@ -293,6 +294,59 @@ metric_without_suffix 3
 	}
 
 	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	if err != nil {
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+	}
+	require.ElementsMatch(t, expected, result)
+}
+
+func TestInfoPrometheus(t *testing.T) {
+	input := `
+# TYPE target info
+target_info 1
+# TYPE first_metric gauge
+first_metric{label1="value1"} 1
+# EOF
+`
+	expected := []*MetricFamily{
+		{
+			Name: stringp("target_info"),
+			Help: nil,
+			Type: "unknown",
+			Unit: nil,
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{},
+					Name:  stringp("target_info"),
+					Unknown: &Unknown{
+						Value: float64p(1),
+					},
+				},
+			},
+		},
+		{
+			Name: stringp("first_metric"),
+			Help: nil,
+			Type: "gauge",
+			Unit: nil,
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{
+						{
+							Name:  "label1",
+							Value: "value1",
+						},
+					},
+					Name: stringp("first_metric"),
+					Gauge: &Gauge{
+						Value: float64p(1),
+					},
+				},
+			},
+		},
+	}
+
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logp.NewLogger("test"))
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
