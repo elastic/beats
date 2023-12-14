@@ -286,7 +286,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 		for i := range serialized {
 			_, err := conn.Receive()
 			if err != nil {
-				if _, ok := err.(redis.Error); ok {
+				if _, ok := err.(redis.Error); ok { //nolint:errorlint //this line checks against a type, not an instance of an error
 					c.log.Errorf("Failed to %v event to list with %+v",
 						command, err)
 					failed = append(failed, data[i])
