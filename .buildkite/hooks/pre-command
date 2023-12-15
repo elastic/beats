@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -euo pipefail
+
+echo "Golang version:"
+version=$(cat .go-version)
+export GO_VERSION="${version}"
+echo "${GO_VERSION}"
+
+# addtional preparation for macos step  # TODO remove in final
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "buildkite-pipeline-metricbeat" ]] &&  \
+    [[ "$BUILDKITE_STEP_KEY" == "get-version" ]]; then
+    echo "--- prepare env"
+
+    source .buildkite/scripts/pre-install.sh
+    with_go ${GO_VERSION} ${SETUP_GVM_VERSION}
+    with_mage
+fi
