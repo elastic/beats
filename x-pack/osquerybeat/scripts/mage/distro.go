@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -111,12 +110,12 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 		fileHash, err = hash.Calculate(f, nil)
 		f.Close()
 		if err != nil {
-			return
+			return false, err
 		}
 
 		if fileHash == specHash {
 			log.Printf("Hash match, file: %s, hash: %s", fp, fileHash)
-			return
+			return false, err
 		}
 
 		log.Printf("Hash mismatch, expected: %s, got: %s.", specHash, fileHash)
@@ -125,7 +124,7 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 	fileHash, err = fetch.Download(context.Background(), url, fp)
 	if err != nil {
 		log.Printf("File %s fetch failed, err: %v", url, err)
-		return
+		return false, err
 	}
 
 	if fileHash == specHash {
@@ -161,7 +160,7 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 	if !strings.HasSuffix(src, suffixTarGz) && !strings.HasSuffix(src, suffixPkg) {
 		return fmt.Errorf("unsupported file: %s", src)
 	}
-	tmpdir, err := ioutil.TempDir(distro.DataDir, "")
+	tmpdir, err := os.MkdirTemp(distro.DataDir, "")
 	if err != nil {
 		return err
 	}
@@ -171,6 +170,8 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		osdp  string
 		osdcp string
 		distp string
+
+		osdlp string
 	)
 	// Extract osqueryd
 	if strings.HasSuffix(src, suffixTarGz) {
@@ -180,8 +181,10 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		osdcp = distro.OsquerydCertsLinuxDistroPath()
 		distp = distro.OsquerydPath(dir)
 
+		osdlp = distro.OsquerydLensesLinuxDistroDir()
+
 		// Untar
-		if err := tar.ExtractFile(src, tmpdir, osdp, osdcp); err != nil {
+		if err := tar.ExtractFile(src, tmpdir, osdp, osdcp, osdlp); err != nil {
 			return err
 		}
 	}
@@ -192,6 +195,8 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		osdp = distro.OsquerydDarwinDistroPath()
 		osdcp = distro.OsquerydCertsDarwinDistroPath()
 		distp = filepath.Join(dir, distro.OsquerydDarwinApp())
+
+		osdlp = distro.OsquerydLensesDarwinDistroDir()
 
 		// Pkgutil expand full
 		err = pkgutil.Expand(src, tmpdir)
@@ -207,6 +212,17 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		return err
 	}
 	err = devtools.Copy(filepath.Join(tmpdir, osdcp), distro.OsquerydCertsPath(dir))
+	if err != nil {
+		return err
+	}
+
+	// Copy over lenses directory
+	lensesDir := distro.OsquerydLensesDir(dir)
+	err = os.MkdirAll(lensesDir, 0750)
+	if err != nil {
+		return err
+	}
+	err = devtools.Copy(filepath.Join(tmpdir, osdlp), lensesDir)
 	if err != nil {
 		return err
 	}

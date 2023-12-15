@@ -36,6 +36,11 @@ const (
 	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
 	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
 
+	osqueryLensesLinuxDir  = "opt/osquery/share/osquery/lenses"
+	osqueryLensesDarwinDir = "private/var/osquery/lenses"
+
+	osqueryLensesDir = "lenses"
+
 	osqueryVersion = "5.10.2"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
@@ -90,6 +95,10 @@ func OsquerydCertsPath(dir string) string {
 	return filepath.Join(dir, osqueryCertsPath)
 }
 
+func OsquerydLensesDir(dir string) string {
+	return filepath.Join(dir, osqueryLensesDir)
+}
+
 func OsquerydDarwinDistroPath() string {
 	return osqueryDarwinPath
 }
@@ -108,6 +117,14 @@ func OsquerydCertsDarwinDistroPath() string {
 
 func OsquerydCertsWindowsDistroPath() string {
 	return osqueryCertsWindowsPath
+}
+
+func OsquerydLensesLinuxDistroDir() string {
+	return osqueryLensesLinuxDir
+}
+
+func OsquerydLensesDarwinDistroDir() string {
+	return osqueryLensesDarwinDir
 }
 
 func OsquerydDistroFilename() string {

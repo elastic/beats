@@ -9,11 +9,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- `queue.mem.events` is changing from `4096` to `3200`.
-- `queue.mem.flush.min_events` is changing from `2048` to `1600`.
-- `queue.mem.flush.timeout` is changing from `1s` to `10s`.
-- `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
-- `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
 
 *Auditbeat*
 
@@ -91,6 +86,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
+- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
@@ -257,6 +254,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 - Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 - Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
+- Bump Windows Npcap version to v1.78. {issue}37300[37300] {pull}37370[37370]
 
 *Functionbeat*
 
@@ -301,6 +299,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
