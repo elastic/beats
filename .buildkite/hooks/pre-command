@@ -9,7 +9,7 @@ echo "${GO_VERSION}"
 
 # addtional preparation for macos step  # TODO remove in final
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "buildkite-pipeline-metricbeat" ]] &&  \
-    [[ "$BUILDKITE_STEP_KEY" == "get-version" ]]; then
+    [[ "$BUILDKITE_STEP_KEY" == "test-"* ]]; then
     echo "--- prepare env"
 
     source .buildkite/scripts/pre-install.sh
