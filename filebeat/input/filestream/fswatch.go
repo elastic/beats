@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -406,7 +407,7 @@ type ingestTarget struct {
 	filename         string
 	originalFilename string
 	symlink          bool
-	info             os.FileInfo
+	info             commonfile.ExtendedFileInfo
 }
 
 func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
@@ -421,10 +422,11 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	it.filename = filename
 	it.originalFilename = filename
 
-	it.info, err = os.Lstat(it.filename) // to determine if it's a symlink
+	info, err := os.Lstat(it.filename) // to determine if it's a symlink
 	if err != nil {
 		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
 	}
+	it.info = commonfile.ExtendFileInfo(info)
 
 	if it.info.IsDir() {
 		return it, fmt.Errorf("file %q is a directory", it.filename)
@@ -438,10 +440,11 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		}
 
 		// now we know it's a symlink, we stat with link resolution
-		it.info, err = os.Stat(it.filename)
+		info, err := os.Stat(it.filename)
 		if err != nil {
 			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
+		it.info = commonfile.ExtendFileInfo(info)
 
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {

@@ -15,36 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package readfile
+package file
 
 import (
-	"fmt"
-	"strconv"
-
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"os"
 )
 
-const (
-	idxhiKey = "log.file.idxhi"
-	idxloKey = "log.file.idxlo"
-	volKey   = "log.file.vol"
-)
+type ExtendedFileInfo interface {
+	os.FileInfo
+	GetOSState() StateOS
+}
 
-func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
-	osstate := fi.GetOSState()
-	_, err := fields.Put(idxhiKey, strconv.FormatUint(osstate.IdxHi, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", idxhiKey, err)
-	}
-	_, err = fields.Put(idxloKey, strconv.FormatUint(osstate.IdxLo, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", idxloKey, err)
-	}
-	_, err = fields.Put(volKey, strconv.FormatUint(osstate.Vol, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", volKey, err)
+type extendedFileInfo struct {
+	os.FileInfo
+	osSpecific *StateOS
+}
+
+// GetOSState returns the platform specific StateOS.
+// The data is fetched once and cached.
+func (f *extendedFileInfo) GetOSState() StateOS {
+	if f == nil || f.FileInfo == nil {
+		return StateOS{}
 	}
 
-	return nil
+	if f.osSpecific != nil {
+		return *f.osSpecific
+	}
+
+	osSpecific := GetOSState(f.FileInfo)
+	f.osSpecific = &osSpecific
+	return osSpecific
+}
+
+// ExtendFileInfo wraps the standard FileInfo with an extended version.
+func ExtendFileInfo(fi os.FileInfo) ExtendedFileInfo {
+	return &extendedFileInfo{FileInfo: fi}
 }
