@@ -209,7 +209,7 @@ func TestManagerV2(t *testing.T) {
 		Meta: map[string]string{
 			"key": "value",
 		},
-	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	m, err := NewV2AgentManagerWithClient(&Config{
 		Enabled: true,
@@ -321,7 +321,7 @@ func TestOutputError(t *testing.T) {
 		fmt.Sprintf(":%d", server.Port),
 		"",
 		client.VersionInfo{},
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	m, err := NewV2AgentManagerWithClient(
 		&Config{
@@ -488,7 +488,7 @@ func TestErrorPerUnit(t *testing.T) {
 		fmt.Sprintf(":%d", server.Port),
 		"",
 		client.VersionInfo{},
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	m, err := NewV2AgentManagerWithClient(
 		&Config{
