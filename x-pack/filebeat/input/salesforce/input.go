@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -111,17 +112,26 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	cursor.StartTime = time.Now()
 
+	var err1, err2 error
+
 	if cfg.DataCollectionMethod.EventLogFile.Enabled {
 		log.Debugf("Starting EventLogFile collection")
-		if err := s.RunEventLogFile(); err != nil {
-			return err
-		}
+		err1 = s.RunEventLogFile()
 	}
+
 	if cfg.DataCollectionMethod.Object.Enabled {
 		log.Debugf("Starting Object collection")
-		if err := s.RunObject(); err != nil {
-			return err
-		}
+		err2 = s.RunObject()
+	}
+
+	switch {
+	case err1 != nil:
+		log.Errorf("Problem running EventLogFile collection: %s", err1)
+	case err2 != nil:
+		log.Errorf("Problem running Object collection: %s", err2)
+	case err1 != nil && err2 != nil:
+		log.Errorf("Problem running both EventLogFile and Object collection: %s", err2)
+		return errors.Join(err1, err2)
 	}
 
 	objectMethodTicker := time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
