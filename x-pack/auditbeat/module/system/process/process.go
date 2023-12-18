@@ -103,14 +103,14 @@ type MetricSet struct {
 
 // Process represents information about a process.
 type Process struct {
-	Info           types.ProcessInfo
-	UserInfo       *types.UserInfo
-	User           *user.User
-	Group          *user.Group
-	CapEffective   []string
-	CapPermitted   []string
-	Hashes         map[hasher.HashType]hasher.Digest
-	Error          error
+	Info         types.ProcessInfo
+	UserInfo     *types.UserInfo
+	User         *user.User
+	Group        *user.Group
+	CapEffective []string
+	CapPermitted []string
+	Hashes       map[hasher.HashType]hasher.Digest
+	Error        error
 }
 
 // Hash creates a hash for Process.

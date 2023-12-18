@@ -181,7 +181,7 @@ func FromUint64(w uint64) ([]string, error) {
 
 	sl := make([]string, 0, bits.OnesCount64(w))
 	for i := 0; w != 0; i++ {
-		if w & 1 != 0 {
+		if w&1 != 0 {
 			s, err := toECS(i)
 			// impossible since MaxBits <= 64
 			if err != nil {
