@@ -12,8 +12,7 @@ import (
 )
 
 type state struct {
-	StartTime   time.Time `struct:"start_timestamp"`
-	LogDateTime string    `struct:"timestamp"`
+	LogDateTime string `struct:"timestamp"`
 }
 
 func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor *state, log *logp.Logger) (qr string, err error) {
@@ -31,7 +30,7 @@ func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor *state
 		return qr, nil
 	}
 
-	ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-*initialInterval).Format(time.RFC3339)}
+	ctxTmpl["var"] = mapstr.M{"initial_interval": timeNow().Add(-*initialInterval).Format(formatRFC3339Like)}
 	qr, err = cfg.Default.Execute(ctxTmpl, cfg.Default, log)
 	if err != nil {
 		return "", err

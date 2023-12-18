@@ -110,8 +110,6 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		return err
 	}
 
-	cursor.StartTime = time.Now()
-
 	var err1, err2 error
 
 	if cfg.DataCollectionMethod.EventLogFile.Enabled {
@@ -199,16 +197,12 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig) (*querie
 }
 
 func (s *salesforceInput) RunObject() error {
-	// Create a new SOQL resource using the session.
 	soqlr, err := s.SetupSFClientConnection()
 	if err != nil {
 		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
 
 	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query)
-	if err != nil {
-		return fmt.Errorf("error forming based on cursor: %w", err)
-	}
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -231,7 +225,7 @@ func (s *salesforceInput) RunObject() error {
 			if timstamp, ok := val[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
 				s.cursor.LogDateTime = timstamp
 			} else {
-				s.cursor.LogDateTime = time.Now().Format(formatRFC3339Like)
+				s.cursor.LogDateTime = timeNow().Format(formatRFC3339Like)
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
@@ -303,7 +297,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 			if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
 				s.cursor.LogDateTime = timstamp
 			} else {
-				s.cursor.LogDateTime = time.Now().Format(formatRFC3339Like)
+				s.cursor.LogDateTime = timeNow().Format(formatRFC3339Like)
 			}
 
 			for _, val := range recs {
@@ -388,7 +382,7 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte) error {
 	event := beat.Event{
-		Timestamp: time.Now(),
+		Timestamp: timeNow(),
 		Fields: mapstr.M{
 			"message": string(jsonStrEvent),
 		},

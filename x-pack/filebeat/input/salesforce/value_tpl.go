@@ -87,7 +87,7 @@ func (t *valueTpl) Unpack(in string) error {
 }
 
 func parseRFC3339Timestamp(s string) string {
-	now := time.Now().UTC()
+	now := timeNow().UTC()
 	_, err := time.Parse(time.RFC3339, s)
 	if err != nil {
 		return now.Format(time.RFC3339)
@@ -108,7 +108,7 @@ func formatUnixTimeNanoAsRFC3339(ns int64) string {
 }
 
 func formatCurrentTimeWithDurationOffset(duration string) string {
-	now := time.Now().UTC()
+	now := timeNow().UTC()
 
 	if duration == "" {
 		return now.Format(time.RFC3339)
