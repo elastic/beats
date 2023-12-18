@@ -36,7 +36,9 @@ class TestKeystore(KeystoreBase):
 
         self.add_secret(key, secret)
         proc = self.start_beat(config="mockbeat.yml")
-        self.wait_until(lambda: self.log_contains("ackloop:  done send ack"))
+        # The 'secret' is the output folder, assert the output file
+        # contains at least one event
+        self.wait_until(lambda: self.output_has_message("Mockbeat is alive!", output_file=path.join(secret, path.basename(self.default_output_file()))))
         proc.check_kill_and_wait()
         assert path.exists(secret)
 
@@ -70,7 +72,9 @@ class TestKeystore(KeystoreBase):
 
         self.add_secret(key, secret)
         proc = self.start_beat(config="mockbeat.yml")
-        self.wait_until(lambda: self.log_contains("ackloop:  done send ack"))
+        # The 'secret' is the output folder, assert the output file
+        # contains at least one event
+        self.wait_until(lambda: self.output_has_message("Mockbeat is alive!", output_file=path.join(secret, path.basename(self.default_output_file()))))
         proc.check_kill_and_wait()
         assert path.exists(secret)
 
