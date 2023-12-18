@@ -160,6 +160,8 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 		out = make([]beat.Event, 0, eventLimit)
 	}
 	go func() {
+		// even if `collectEvents` is false we need to range the channel
+		// and wait until it's closed indicating that the input finished its job
 		for event := range events {
 			out = append(out, event)
 		}
