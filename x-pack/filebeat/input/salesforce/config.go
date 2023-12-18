@@ -10,15 +10,68 @@ import (
 	"time"
 )
 
+// Sample Config:
+/*
+- type: salesforce
+  enabled: true
+  version: 56
+  auth.oauth2:
+    enabled: false
+    client.id: clientid
+    client.secret: clientsecret
+    token_url: https://instance_id.develop.my.salesforce.com/services/oauth2/token
+    user: username
+    password: password
+  auth.jwt:
+    enabled: true
+    client.id: clientid
+    client.username: username
+    client.key_path: ./server_client.key
+    url: https://login.salesforce.com
+  url: https://instance_id.develop.my.salesforce.com
+  data_collection_method:
+    event_log_file:
+      interval: 1h
+      enabled: true
+      query:
+        default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
+        value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST"
+      cursor:
+        field: "CreatedDate"
+    object:
+      interval: 5m
+      enabled: true
+      query:
+        default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
+        value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.logdate ]]"
+      cursor:
+        field: "EventDate"
+*/
 type config struct {
-	Interval        time.Duration `config:"interval" validate:"required"`
-	Auth            *authConfig   `config:"auth"`
-	URL             string        `config:"url" validate:"required"`
-	Version         int           `config:"version" validate:"required"`
-	Query           *QueryConfig  `config:"query"`
-	InitialInterval time.Duration `config:"initial_interval"`
-	From            string        `config:"from"`
-	Cursor          *cursorConfig `config:"cursor"`
+	Auth                 *authConfig           `config:"auth"`
+	URL                  string                `config:"url" validate:"required"`
+	Version              int                   `config:"version" validate:"required"`
+	InitialInterval      time.Duration         `config:"initial_interval"`
+	DataCollectionMethod *DataCollectionMethod `config:"data_collection_method"`
+}
+
+type DataCollectionMethod struct {
+	EventLogFile EventLogFileMethod `config:"event_log_file"`
+	Object       ObjectMethod       `config:"object"`
+}
+
+type EventLogFileMethod struct {
+	Enabled  bool          `config:"enabled"`
+	Interval time.Duration `config:"interval" validate:"required"`
+	Query    *QueryConfig  `config:"query"`
+	Cursor   *cursorConfig `config:"cursor"`
+}
+
+type ObjectMethod struct {
+	Enabled  bool          `config:"enabled"`
+	Interval time.Duration `config:"interval" validate:"required"`
+	Query    *QueryConfig  `config:"query"`
+	Cursor   *cursorConfig `config:"cursor"`
 }
 
 type cursorConfig struct {
@@ -33,8 +86,12 @@ func (c *config) Validate() error {
 		return errors.New("only one auth provider must be enabled")
 	case c.URL == "":
 		return errors.New("no instance url was configured or detected")
-	case c.Interval == 0:
-		return fmt.Errorf("please provide a valid interval %d", c.Interval)
+	case c.DataCollectionMethod.EventLogFile.Interval == 0:
+		return fmt.Errorf("please provide a valid interval %d", c.DataCollectionMethod.EventLogFile.Interval)
+	case c.DataCollectionMethod.Object.Interval == 0:
+		return fmt.Errorf("please provide a valid interval %d", c.DataCollectionMethod.Object.Interval)
+	case !c.DataCollectionMethod.Object.Enabled && !c.DataCollectionMethod.EventLogFile.Enabled:
+		return errors.New("at least one of \"data_collection_method.event_log_file\" or \"data_collection_method.object\" must be set to true")
 	case c.Version < 46:
 		// * EventLogFile object is available in API version 32.0 or later
 		// * SetupAuditTrail object is available in API version 15.0 or later

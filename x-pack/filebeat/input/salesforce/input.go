@@ -13,7 +13,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
+	"sync"
 	"time"
 
 	"github.com/g8rswimmer/go-sfdc"
@@ -41,6 +41,7 @@ const (
 type salesforceInput struct {
 	config
 	ctx        context.Context
+	cancel     context.CancelCauseFunc
 	publisher  inputcursor.Publisher
 	cursor     *state
 	sfdcConfig *sfdc.Configuration
@@ -82,7 +83,11 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.URL)
 
-	s.ctx = ctxtool.FromCanceller(env.Cancelation)
+	ctx := ctxtool.FromCanceller(env.Cancelation)
+	childCtx, cancel := context.WithCancelCause(ctx)
+
+	s.ctx = childCtx
+	s.cancel = cancel
 	s.publisher = pub
 	s.cursor = cursor
 	s.log = log
@@ -93,14 +98,22 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	cursor.StartTime = time.Now()
 
-	switch {
-	case strings.EqualFold(cfg.From, "EventLogFile"):
-		return periodically(s.ctx, cfg.Interval, s.RunEventLogFile)
-	case strings.EqualFold(cfg.From, "Object"):
-		return periodically(s.ctx, cfg.Interval, s.RunObject)
+	var wg sync.WaitGroup
+
+	if cfg.DataCollectionMethod.EventLogFile.Enabled {
+		log.Debugf("Starting EventLogFile collection")
+		wg.Add(1)
+		go periodically(childCtx, cancel, cfg.DataCollectionMethod.EventLogFile.Interval, &wg, s.RunEventLogFile)
+	}
+	if cfg.DataCollectionMethod.Object.Enabled {
+		log.Debugf("Starting Object collection")
+		wg.Add(1)
+		go periodically(childCtx, cancel, cfg.DataCollectionMethod.Object.Interval, &wg, s.RunObject)
 	}
 
-	return fmt.Errorf("bad configuration: value for \"from: %s\" is not correct (supported values are EventLogFile or Object)", cfg.From)
+	wg.Wait()
+
+	return fmt.Errorf("bad configuration: value for \"from: %s\" is not correct (supported values are EventLogFile or Object)")
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
@@ -121,8 +134,8 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	return soqlr, nil
 }
 
-func (s *salesforceInput) FormQueryWithCursor() (*querier, error) {
-	qr, err := parseCursor(&s.config, s.cursor, s.log)
+func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig) (*querier, error) {
+	qr, err := parseCursor(&s.config.InitialInterval, queryConfig, s.cursor, s.log)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +152,10 @@ func (s *salesforceInput) RunObject() error {
 		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
 
-	query, err := s.FormQueryWithCursor()
+	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query)
+	if err != nil {
+		return fmt.Errorf("error forming based on cursor: %w", err)
+	}
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -159,7 +175,7 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if timstamp, ok := val[s.config.Cursor.Field].(string); ok {
+			if timstamp, ok := val[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
 				s.cursor.LogDateTime = timstamp
 			} else {
 				s.cursor.LogDateTime = time.Now().Format(formatRFC3339Like)
@@ -192,7 +208,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
 
-	query, err := s.FormQueryWithCursor()
+	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -231,7 +247,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return err
 			}
 
-			if timstamp, ok := rec.Record().Fields()[s.config.Cursor.Field].(string); ok {
+			if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
 				s.cursor.LogDateTime = timstamp
 			} else {
 				s.cursor.LogDateTime = time.Now().Format(formatRFC3339Like)
@@ -321,20 +337,21 @@ func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte)
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
-			"event": mapstr.M{
-				"message": string(jsonStrEvent),
-			},
+			"message": string(jsonStrEvent),
 		},
 	}
 
 	return pub.Publish(event, cursor)
 }
 
-func periodically(ctx context.Context, each time.Duration, fn func() error) error {
+func periodically(ctx context.Context, cancel context.CancelCauseFunc, each time.Duration, wg *sync.WaitGroup, fn func() error) {
+	defer wg.Done()
 	if err := fn(); err != nil {
-		return err
+		cancel(err)
 	}
-	return timed.Periodic(ctx, each, fn)
+	if err := timed.Periodic(ctx, each, fn); err != nil {
+		cancel(err)
+	}
 }
 
 type textContextError struct {

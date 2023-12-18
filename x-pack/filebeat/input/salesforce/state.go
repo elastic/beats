@@ -16,7 +16,7 @@ type state struct {
 	LogDateTime string    `struct:"timestamp"`
 }
 
-func parseCursor(cfg *config, cursor *state, log *logp.Logger) (qr string, err error) {
+func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor *state, log *logp.Logger) (qr string, err error) {
 	ctxTmpl := mapstr.M{
 		"var":    nil,
 		"cursor": nil,
@@ -24,15 +24,15 @@ func parseCursor(cfg *config, cursor *state, log *logp.Logger) (qr string, err e
 
 	if cursor.LogDateTime != "" {
 		ctxTmpl["cursor"] = mapstr.M{"logdate": cursor.LogDateTime}
-		qr, err = cfg.Query.Value.Execute(ctxTmpl, nil, log)
+		qr, err = cfg.Value.Execute(ctxTmpl, nil, log)
 		if err != nil {
 			return "", err
 		}
 		return qr, nil
 	}
 
-	ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-cfg.InitialInterval).Format(time.RFC3339)}
-	qr, err = cfg.Query.Default.Execute(ctxTmpl, cfg.Query.Default, log)
+	ctxTmpl["var"] = mapstr.M{"initial_interval": time.Now().Add(-*initialInterval).Format(time.RFC3339)}
+	qr, err = cfg.Default.Execute(ctxTmpl, cfg.Default, log)
 	if err != nil {
 		return "", err
 	}
