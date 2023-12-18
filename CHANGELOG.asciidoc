@@ -98,7 +98,6 @@ IMPORTANT: Due to a memory leak issue, Windows users running {agent} are recomme
 *Filebeat*
 
 - Switch types of `log.file.device`, `log.file.inode`, `log.file.idxhi`, `log.file.idxlo` and `log.file.vol` fields to strings to better align with ECS and integrations. {pull}36697[36697]
-- Improve documentation for `httpjson` input. {pull}37073[37073] 
 
 *Metricbeat*
 

@@ -122,7 +122,7 @@ All of the mentioned objects are only stored at runtime, except `cursor`, which 
 [[transforms]]
 ==== Transforms
 
-A transform is an action that lets the user modify the <<input-state,input state>>. Depending on where the transform is defined, it will have access to reading or writing different elements of the <<input-state,state>>.
+A transform is an action that lets the user modify the <<input-state,input state>>. Depending on where the transform is defined, it will have access for reading or writing different elements of the <<input-state,state>>.
 
 The access limitations are described in the corresponding configuration sections.
 
@@ -200,19 +200,19 @@ The content inside the brackets `[[` `]]` is evaluated. For more information on 
 Some built-in helper functions are provided to work with the input state inside value templates:
 
 - `add`: adds a list of integers and returns their sum.
-- `base64DecodeNoPad`: decodes the base64 string without padding. Any binary output will be converted to a UTF8 string.
-- `base64Decode`: decodes the base64 string. Any binary output will be converted to a UTF8 string.
-- `base64EncodeNoPad`: joins and base64 encodes all supplied strings without padding. Example: `[[base64EncodeNoPad "string1" "string2"]]`
-- `base64Encode`: joins and base64 encodes all supplied strings. Example: `[[base64Encode "string1" "string2"]]`
+- `base64DecodeNoPad`: Decodes the base64 string without padding. Any binary output will be converted to a UTF8 string.
+- `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
+- `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
+- `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
 - `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
 - `div`: does the integer division of two integer values.
 - `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 - `getRFC5988Link`: extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
 - `hashBase64`: calculates the hash of a list of strings concatenated together. Returns a base64 encoded hash. Supports sha1 or sha256. Example `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `hash`: calculates the hash of a list of strings concatenated together. Returns a hex-encoded hash. Supports sha1 or sha256. Example `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `hexDecode`: decodes the hexadecimal string. Any hexadecimal string will be converted to its bytes representation. Example `[[hexDecode "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96"]]`; Expected Output: `"\xb0\xa9*\b\xa9\xb4\x88:\xa3\xaa-\tW\xbe\x12\xa6x\xcb۳-\xc5\xdb\t\xfeh#\x9a\t\x87/\x96"`
+- `hash`: calculates the hash of a list of strings concatenated together. Returns a hex encoded hash. Supports sha1 or sha256. Example `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `hexDecode`: Decodes the hexadecimal string. Any hexadecimal string will be converted to its bytes representation. Example `[[hexDecode "b0a92a08a9b4883aa3aa2d0957be12a678cbdbb32dc5db09fe68239a09872f96"]]`; Expected Output: `"\xb0\xa9*\b\xa9\xb4\x88:\xa3\xaa-\tW\xbe\x12\xa6x\xcb۳-\xc5\xdb\t\xfeh#\x9a\t\x87/\x96"`
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex-encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
 - `max`: returns the maximum of two values.
 - `min`: returns the minimum of two values.
@@ -280,7 +280,7 @@ Supported providers are: `azure`, `google`, `okta`.
 ==== `auth.oauth2.client.id`
 
 The client ID used as part of the authentication flow. It is always required
-except if using `google` as the provider. Required for providers: `default`, `azure`, `okta`.
+except if using `google` as provider. Required for providers: `default`, `azure`, `okta`.
 
 [float]
 ==== `auth.oauth2.client.secret`
@@ -486,7 +486,7 @@ The maximum number of idle connections across all hosts. Zero means no limit. De
 [float]
 ==== `request.keep_alive.max_idle_connections_per_host`
 
-The maximum idle connections to keep per host. If zero, defaults to two. Default: `0`.
+The maximum idle connections to keep per-host. If zero, defaults to two. Default: `0`.
 
 [float]
 ==== `request.keep_alive.idle_connection_timeout`
@@ -547,15 +547,15 @@ It is defined with a Go template value. Can read state from: [`.last_response.he
 [float]
 ==== `request.rate_limit.early_limit`
 
-Optionally start rate-limiting before the value specified in the Response.
+Optionally start rate-limiting prior to the value specified in the Response.
 
 Under the default behavior, Requests will continue while the `remaining` value is non-zero.
-Specifying an `early_limit` will mean that rate-limiting will occur before reaching `0`.
+Specifying an `early_limit` will mean that rate-limiting will occur prior to reaching `0`.
 
 * If the value specified for `early_limit` is less than `1`,
 the value is treated as a percentage of the Response provided `limit`.
-e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate limit --
-for a `limit` value of `120`, the rate limit starts when the `remaining` reaches `12`.
+e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate-limit --
+for a `limit` value of `120`, the rate-limit starts when the `remaining` reaches `12`.
 If the `limit` header is missing from the Response, default rate-limiting will occur (when `remaining` reaches `0`).
 * If the value specified for `early_limit` is greater than or equal to `1`,
 the value is treated as the target value for `remaining`.
@@ -588,7 +588,7 @@ filebeat.inputs:
 ----
 
 NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination
-does not exist at the root level, please use the clause `.first_response.` to access the parent response object from within chains. You can look at this
+does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this
 **example** below for a better idea.
 
 **Example Config:**
@@ -627,12 +627,12 @@ Here we can see that the chain step uses `.parent_last_response.body.exportId` o
 However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is
 because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the very first response in the process chain.
 
-NOTE: The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having an array at the root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where this is the case. Splits cannot be performed on `first_response`. It must be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+NOTE: The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
 ==== `request.tracer.filename`
 
-It is possible to log httpjson requests and responses to a local file system for debugging configurations.
+It is possible to log httpjson requests and responses to a local file-system for debugging configurations.
 This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
 tune log rotation behavior.
 
@@ -662,7 +662,7 @@ setting.
 [float]
 ==== `request.tracer.localtime`
 
-Whether to use the host's local time rather than UTC for timestamping rotated log file names.
+Whether to use the host's local time rather that UTC for timestamping rotated log file names.
 
 [float]
 ==== `request.tracer.compress`
@@ -672,9 +672,9 @@ This determines whether rotated logs should be gzip compressed.
 [float]
 ==== `response.decode_as`
 
-ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise, it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`, `application/zip`, `application/xml` and `text/xml`. It is not set by default.
+ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`, `application/zip`, `application/xml` and `text/xml`. It is not set by default.
 
-NOTE: For `text/csv`, each line will create one event, using the header values as the object keys. For this reason, it is always assumed that a header exists.
+NOTE: For `text/csv`, one event for each line will be created, using the header values as the object keys. For this reason is always assumed that a header exists.
 
 NOTE: For `application/zip`, the `zip` file is expected to contain one or more `.json` or `.ndjson` files. The contents of all of them will be merged into a single list of `JSON` objects.
 
@@ -730,7 +730,7 @@ If the split target is empty the parent document will be kept. If documents with
 [float]
 ==== `response.split[].target`
 
-Defines the target field upon which the split operation will be performed.
+Defines the target field upon the split operation will be performed.
 
 [float]
 ==== `response.split[].type`
@@ -753,17 +753,17 @@ NOTE: in this context, `body.*` will be the result of all the previous transform
 [float]
 ==== `response.split[].keep_parent`
 
-If set to true, the fields from the parent document (at the same level as `target`) will be kept. Otherwise, a new document will be created using `target` as the root. Default: `false`.
+If set to true, the fields from the parent document (at the same level as `target`) will be kept. Otherwise a new document will be created using `target` as the root. Default: `false`.
 
 [float]
 ==== `response.split[].delimiter`
 
-Required if using the split type of `string`.  This is the substring used to split the string.  For example, if `delimiter` is "\n" and the string is "line 1\nline 2", then the split will result in "line 1" and "line 2".
+Required if using split type of `string`.  This is the sub string used to split the string.  For example if `delimiter` was "\n" and the string was "line 1\nline 2", then the split would result in "line 1" and "line 2".
 
 [float]
 ==== `response.split[].key_field`
 
-Valid when used with `type: map`. When not empty, define a new field where the original key value will be stored.
+Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
 
 [float]
 ==== `response.split[].ignore_empty_value`
@@ -829,7 +829,7 @@ Examples using split:
 ----
 
 +
-The config will look like this:
+The config will look like:
 
 +
 ["source","yaml",subs="attributes"]
@@ -843,7 +843,7 @@ filebeat.inputs:
     type: array
     keep_parent: true
     split:
-      # paths in nested splits need to represent the state of the body, not only their current level of nesting
+      # paths in nested splits need to represent the state of body, not only their current level of nesting
       target: body.alerts.entities
       type: array
       keep_parent: true
@@ -895,7 +895,7 @@ This will output:
 ]
 ----
 
-- We have a response with an array of two objects, and we want a document for each of the object keys while keeping the keys values:
+- We have a response with an array with two objects, and we want a document for each of the object keys while keeping the keys values:
 
 +
 ["source","json",subs="attributes"]
@@ -938,7 +938,7 @@ filebeat.inputs:
     type: array
     keep_parent: false
     split:
-      # this time alerts will not exist because the previous keep_parent is false
+      # this time alerts will not exist because previous keep_parent is false
       target: body.entities
       type: map
       keep_parent: true
@@ -969,7 +969,7 @@ This will output:
 ]
 ----
 
-- We have a response with an array of two objects, and we want a document for each of the object keys while applying a transform to each:
+- We have a response with an array with two objects, and we want a document for each of the object keys while applying a transform to each:
 
 +
 ["source","json",subs="attributes"]
@@ -1037,7 +1037,7 @@ This will output:
 ]
 ----
 
-- We have a response with string value keys.  We want the string to be split on a delimiter and a document for each substring.
+- We have a response with a keys whose value is a string.  We want the string to be split on a delimiter and a document for each sub strings.
 
 +
 ["source","json",subs="attributes"]
@@ -1120,7 +1120,7 @@ See <<response-split,response split parameter>>.
 [float]
 ==== `chain[].step.replace`
 
-A link:https://goessner.net/articles/JsonPath/index.html#e2[JSONPath] string to parse values from responses JSON, collected from previous chain steps. Place the same replace string in url where collected values from the previous call should be placed. Required.
+A link:https://goessner.net/articles/JsonPath/index.html#e2[JSONPath] string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
 
 Example:
 
@@ -1215,7 +1215,7 @@ response_json using id as '2':
 }
 ----
 
-- Third call to collect `files` using collected `file_name` from the second call.
+- Third call to collect `files` using collected `file_name` from second call.
 
 +
 request_url using file_name as 'file_1': \https://example.com/services/data/v1.0/export_ids/file_1/info
@@ -1224,7 +1224,7 @@ request_url using file_name as 'file_1': \https://example.com/services/data/v1.0
 request_url using file_name as 'file_2': \https://example.com/services/data/v1.0/export_ids/file_2/info
 
 +
-Collect and make events from the response in any format supported by httpjson for all calls.
+Collect and make events from response in any format supported by httpjson for all calls.
 
 +
 [[chain-step-replace_with]]
@@ -1281,7 +1281,7 @@ response_json:
 }
 ----
 
-- Second call to fetch `file ids` using exportId from the first call.
+- Second call to fetch `file ids` using exportId from first call.
 
 +
 request_url using exportId as '2212': \https://example.com/services/data/v1.0/2212/files
@@ -1307,7 +1307,7 @@ response_json using exportId as '2212':
     ]
 }
 ----
-This behavior of targeted fixed pattern replacement in the URL helps solve various use cases.
+This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
 **Some useful points to remember:- **
 
@@ -1319,23 +1319,23 @@ This behavior of targeted fixed pattern replacement in the URL helps solve vario
    2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with:
     '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from
     the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be
-    extracted becomes `"" (an empty string)`, which has no definition within any context variable.
+    extrated becomes `"" (an empty string)`, which has no definition within any context variable.
 
-NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having an array at the root level, NDJSON, or Gzipped JSON), hence it should only be used in scenarios where this is the case. Splits cannot be performed on `first_response`. It must be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
 ==== `chain[].while`
 
 Contains basic request and response configuration for chained while calls. Chained while calls will keep making the requests for a given number of times until a condition is met
-or the maximum number of attempts gets exhausted. While the chain has an attribute `until` which holds the expression to be evaluated. Ideally the `until` field should always be used
+or the maximum number of attempts gets exhausted. While chain has an attribute `until` which holds the expression to be evaluated. Ideally the `until` field should always be used
 together with the attributes `request.retry.max_attempts` and `request.retry.wait_min` which specifies the maximum number of attempts to evaluate `until` before giving up and the
 maximum wait time in between such requests. If `request.retry.max_attempts` is not specified, it will only try to evaluate the expression once and give up if it fails. If
-`request.retry.wait_min` is not specified the default wait time will always be `0` as successive calls will be made immediately.
+`request.retry.wait_min` is not specified the default wait time will always be `0` as in successive calls will be made immediately.
 
 [float]
 ==== `chain[].while.request`
 
-See  <<request-parameters,request parameters>>.
+See  <<request-parameters,request parameters>> .
 
 Example:
 
@@ -1413,7 +1413,7 @@ response_json:
 }
 ----
 
-- Second call to collect `file_ids` using collected id from the first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts is exhausted.
+- Second call to collect `file_ids` using collected id from first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts gets exhausted.
 
 +
 request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
@@ -1441,7 +1441,7 @@ response_json using id as '9ef0e6a5':
 }
 ----
 
-- Third call to collect `files` using collected `file_id` from the second call.
+- Third call to collect `files` using collected `file_id` from second call.
 
 +
 request_url using file_id as '1': \https://example.com/services/data/v1.0/export_ids/1/info
@@ -1476,9 +1476,9 @@ response_json using id as '2':
 ----
 
 +
-Collect and make events from the response in any format supported by httpjson for all calls.
+Collect and make events from response in any format supported by httpjson for all calls.
 
-NOTE: httpjson chain will only create and ingest events from the last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
+NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
 
 [float]
 ==== `chain[].while.replace_with`
@@ -1489,7 +1489,7 @@ See  <<chain-step-replace_with, chain[].step.replace_with>> .
 [float]
 ==== `cursor`
 
-Cursor is a list of key-value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
+Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
 Each cursor entry is formed by:
 
@@ -1537,9 +1537,9 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
 
 . Response from regular call will be processed.
-. Extract data from responses and generate new requests from responses.
-. Process generated requests and collect responses from the server.
-. Go back to step 2 for the next step.
+. Extract data from response and generate new requests from responses.
+. Process generated requests and collect responses from server.
+. Go back to step-2 for the next step.
 . Publish collected responses from the last chain step.
 
 
