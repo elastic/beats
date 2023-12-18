@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -77,6 +78,20 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 		}
 	}
 	return s.run(env, src.(*source), st, pub)
+}
+
+func getObjectFromSOQL(query string) (string, error) {
+	var (
+		lowered = strings.ToLower(query)
+		fields  = strings.Fields(lowered)
+		index   = slices.Index(fields, "from")
+	)
+	switch {
+	case index == -1, index+1 >= len(fields):
+		return "", fmt.Errorf("problem with SOQL query: %s", query)
+	default:
+		return fields[index+1], nil
+	}
 }
 
 func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub inputcursor.Publisher) (err error) {
@@ -291,12 +306,12 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	case cfg.Auth.JWT.isEnabled():
 		pemBytes, err := os.ReadFile(cfg.Auth.JWT.ClientKeyPath)
 		if err != nil {
-			fmt.Errorf("problem with client key path for JWT auth: %w", err)
+			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
 		}
 
 		signKey, err := jwt.ParseRSAPrivateKeyFromPEM(pemBytes)
 		if err != nil {
-			fmt.Errorf("problem with client key for JWT auth: %w", err)
+			return nil, fmt.Errorf("problem with client key for JWT auth: %w", err)
 		}
 
 		passCreds := credentials.JwtCredentials{
