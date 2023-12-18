@@ -34,7 +34,7 @@ var (
 
 	// Capabilities are linux only and this is returned on other
 	// systems for all the public functions. There is a generic
-	// errors.ErrUnsupported present in golang 1.21, but still
+	// errors.ErrUnsupported present in golang 1.21, but we still
 	// support 1.20.
 	ErrUnsupported = errors.New("capabilities are only supported in linux")
 
