@@ -85,13 +85,14 @@ func (c *config) Validate() error {
 	case c.Auth.JWT.isEnabled() && c.Auth.OAuth2.isEnabled():
 		return errors.New("only one auth provider must be enabled")
 	case c.URL == "":
-		return errors.New("no instance url was configured or detected")
-	case c.DataCollectionMethod.EventLogFile.Interval == 0:
-		return fmt.Errorf("please provide a valid interval %d", c.DataCollectionMethod.EventLogFile.Interval)
-	case c.DataCollectionMethod.Object.Interval == 0:
-		return fmt.Errorf("please provide a valid interval %d", c.DataCollectionMethod.Object.Interval)
+		return errors.New("no instance url is configured")
 	case !c.DataCollectionMethod.Object.Enabled && !c.DataCollectionMethod.EventLogFile.Enabled:
-		return errors.New("at least one of \"data_collection_method.event_log_file\" or \"data_collection_method.object\" must be set to true")
+		return errors.New(`at least one of "data_collection_method.event_log_file.enabled" or "data_collection_method.object.enabled" must be set to true`)
+	case c.DataCollectionMethod.EventLogFile.Enabled && c.DataCollectionMethod.EventLogFile.Interval == 0:
+		return fmt.Errorf("not a valid interval %d", c.DataCollectionMethod.EventLogFile.Interval)
+	case c.DataCollectionMethod.Object.Enabled && c.DataCollectionMethod.Object.Interval == 0:
+		return fmt.Errorf("not a valid interval %d", c.DataCollectionMethod.Object.Interval)
+
 	case c.Version < 46:
 		// * EventLogFile object is available in API version 32.0 or later
 		// * SetupAuditTrail object is available in API version 15.0 or later
@@ -111,7 +112,7 @@ func (c *config) Validate() error {
 		// https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm
 		// https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_setupaudittrail.htm
 		// https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_objects_monitoring.htm
-		return errors.New("please provide a valid version i.e., 46.0 or above")
+		return errors.New("not a valid version i.e., 46.0 or above")
 	}
 
 	return nil

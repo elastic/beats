@@ -34,7 +34,7 @@ type jwtConfig struct {
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
 func (o *oAuth2Config) isEnabled() bool {
-	return o != nil && (o.Enabled == nil || *o.Enabled)
+	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
 // Validate checks if oauth2 config is valid.
@@ -56,7 +56,7 @@ func (o *oAuth2Config) Validate() error {
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
 func (o *jwtConfig) isEnabled() bool {
-	return o != nil && (o.Enabled == nil || *o.Enabled)
+	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
 func (o *jwtConfig) Validate() error {

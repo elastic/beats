@@ -14,7 +14,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/g8rswimmer/go-sfdc"
@@ -31,7 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -387,16 +385,6 @@ func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte)
 	}
 
 	return pub.Publish(event, cursor)
-}
-
-func periodically(ctx context.Context, cancel context.CancelCauseFunc, each time.Duration, wg *sync.WaitGroup, fn func() error) {
-	defer wg.Done()
-	if err := fn(); err != nil {
-		cancel(err)
-	}
-	if err := timed.Periodic(ctx, each, fn); err != nil {
-		cancel(err)
-	}
 }
 
 type textContextError struct {
