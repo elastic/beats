@@ -9,15 +9,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
-- The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
-- Elastic-agent-autodiscover library updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for kubernetes.deployment or kubernetes.cronjob, respectively. {pull}36877[36877]
-- Defaults are changing for some options in the queue and Elasticsearch output, to improve typical performance based on current benchmark data. All changes can be overridden by setting them explicitly in the beat configuration. {pull}36990[36990] The changes are:
-  - `queue.mem.events` is changing from `4096` to `3200`.
-  - `queue.mem.flush.min_events` is changing from `2048` to `1600`.
-  - `queue.mem.flush.timeout` is changing from `1s` to `10s`.
-  - `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
-  - `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
-
 
 *Auditbeat*
 
@@ -62,7 +53,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
-- Fix memqueue producer blocking indefinitely even after being cancelled {issue}22813[22813] {pull}37077[37077]
 
 *Auditbeat*
 
@@ -91,10 +81,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of response errors in HTTPJSON and CEL request trace logging. {pull}36956[36956]
 - Do not error when Okta API returns no data. {pull}37092[37092]
 - Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
+- Make CEL input now global evaluate to a time in UTC. {pull}37159[37159]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
+- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
@@ -115,6 +108,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
 - Fix event mapping implementation for statsd module {pull}36925[36925]
 - The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
+- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
+- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
+- Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
+- Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
+- Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
+- Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
 
 *Osquerybeat*
 
@@ -124,7 +123,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix dashboards under Kibana 8.x. {issue}37080[37080] {pull}37085[37085]
 
 
 *Elastic Logging Plugin*
@@ -150,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 - Upgrade to Go 1.20.11. {pull}37123[37123]
+- The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 
 *Auditbeat*
 
@@ -209,7 +208,12 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add network processor in addition to interface based direction resolution. {pull}37023[37023]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
 - Make CEL input log current transaction ID when request tracing is turned on. {pull}37065[37065]
+- Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
 - Add request trace logging to http_endpoint input. {issue}36951[36951] {pull}36957[36957]
+- Made GCS input GA and updated docs accordingly. {pull}37127[37127]
+- Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
+- Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
+- Update CEL extensions library to v1.7.0. {pull}37172[37172]
 
 *Auditbeat*
 
@@ -229,10 +233,12 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Add metrics grouping by dimensions and time to Azure app insights {pull}36634[36634]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
-
+- Add linux IO metrics to system/process {pull}37213[37213]
+- Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 
 *Osquerybeat*
 
@@ -247,6 +253,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 *Winlogbeat*
 
 - Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
+- Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
+- Bump Windows Npcap version to v1.78. {issue}37300[37300] {pull}37370[37370]
 
 *Functionbeat*
 
@@ -291,6 +299,12 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 

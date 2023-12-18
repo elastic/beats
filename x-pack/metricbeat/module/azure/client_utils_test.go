@@ -131,36 +131,6 @@ func TestCompareMetricValues(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestGetDimension(t *testing.T) {
-	dimension := "VMName"
-	dim1 := "SlotID"
-	dim2 := "VNU"
-	dim3 := "VMName"
-	dimensionList := []Dimension{
-		{
-			Name:  dim1,
-			Value: dim1,
-		},
-		{
-			Name:  dim2,
-			Value: dim2,
-		},
-		{
-			Name:  dim3,
-			Value: dim3,
-		},
-	}
-	result, ok := getDimension(dimension, dimensionList)
-	assert.True(t, ok)
-	assert.Equal(t, result.Name, dim3)
-	assert.Equal(t, result.Value, dim3)
-	dimension = "VirtualMachine"
-	result, ok = getDimension(dimension, dimensionList)
-	assert.False(t, ok)
-	assert.Equal(t, result.Name, "")
-	assert.Equal(t, result.Value, "")
-}
-
 func TestContainsResource(t *testing.T) {
 	resourceId := "resId"
 	resourceList := []Resource{

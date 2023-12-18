@@ -36,9 +36,9 @@ const (
 func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
-		Info:       "Google Cloud Storage (Beta)",
+		Info:       "Google Cloud Storage",
 		Doc:        "Collect logs from Google Cloud Storage Service",
 		Manager: &cursor.InputManager{
 			Logger:     log,
