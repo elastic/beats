@@ -236,14 +236,14 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		start := time.Now()
 		// RPUSH returns total length of list -> fail and retry all on error
 		_, err := conn.Do(command, args...)
+		took := time.Since(start)
+		c.observer.ReportLatency(took)
 		if err != nil {
 			c.log.Errorf("Failed to %v to redis list with: %+v", command, err)
 			return okEvents, err
 
 		}
 
-		took := time.Since(start)
-		c.observer.ReportLatency(took)
 		c.observer.Acked(len(okEvents))
 		return nil, nil
 	}

@@ -249,6 +249,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	begin := time.Now()
 	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
 	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
+	timeSinceSend := time.Since(begin)
 
 	if sendErr != nil {
 		if status == http.StatusRequestEntityTooLarge {
@@ -264,7 +265,6 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	pubCount := len(data)
 	span.Context.SetLabel("events_published", pubCount)
 
-	timeSinceSend := time.Since(begin)
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		pubCount,
 		timeSinceSend)
