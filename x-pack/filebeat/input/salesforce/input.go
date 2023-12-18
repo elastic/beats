@@ -126,10 +126,10 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		}
 	}
 
-	objectMethodTicker := time.NewTicker(time.Duration(cfg.DataCollectionMethod.Object.Interval))
+	objectMethodTicker := time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
 	defer objectMethodTicker.Stop()
 
-	eventLogFileTicker := time.NewTicker(time.Duration(cfg.DataCollectionMethod.EventLogFile.Interval))
+	eventLogFileTicker := time.NewTicker(cfg.DataCollectionMethod.EventLogFile.Interval)
 	defer eventLogFileTicker.Stop()
 
 	for {
