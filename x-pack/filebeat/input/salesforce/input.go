@@ -113,22 +113,52 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	cursor.StartTime = time.Now()
 
-	var wg sync.WaitGroup
-
 	if cfg.DataCollectionMethod.EventLogFile.Enabled {
 		log.Debugf("Starting EventLogFile collection")
-		wg.Add(1)
-		go periodically(childCtx, cancel, cfg.DataCollectionMethod.EventLogFile.Interval, &wg, s.RunEventLogFile)
+		if err := s.RunEventLogFile(); err != nil {
+			return err
+		}
 	}
 	if cfg.DataCollectionMethod.Object.Enabled {
 		log.Debugf("Starting Object collection")
-		wg.Add(1)
-		go periodically(childCtx, cancel, cfg.DataCollectionMethod.Object.Interval, &wg, s.RunObject)
+		if err := s.RunObject(); err != nil {
+			return err
+		}
 	}
 
-	wg.Wait()
+	objectMethodTicker := time.NewTicker(time.Duration(cfg.DataCollectionMethod.Object.Interval))
+	defer objectMethodTicker.Stop()
 
-	return fmt.Errorf("bad configuration: value for \"from: %s\" is not correct (supported values are EventLogFile or Object)")
+	eventLogFileTicker := time.NewTicker(time.Duration(cfg.DataCollectionMethod.EventLogFile.Interval))
+	defer eventLogFileTicker.Stop()
+
+	for {
+		select {
+		case <-childCtx.Done():
+			return childCtx.Err()
+		default:
+			if cfg.DataCollectionMethod.EventLogFile.Enabled {
+				select {
+				case <-eventLogFileTicker.C:
+					log.Debugf("Starting EventLogFile collection")
+					if err := s.RunEventLogFile(); err != nil {
+						return err
+					}
+				default:
+				}
+			}
+			if cfg.DataCollectionMethod.Object.Enabled {
+				select {
+				case <-objectMethodTicker.C:
+					log.Debugf("Starting Object collection")
+					if err := s.RunObject(); err != nil {
+						return err
+					}
+				default:
+				}
+			}
+		}
+	}
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
