@@ -9,7 +9,6 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -120,37 +119,43 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		log.Errorf("Problem running EventLogFile collection: %s", err1)
 	case err2 != nil:
 		log.Errorf("Problem running Object collection: %s", err2)
-	case err1 != nil && err2 != nil:
-		log.Errorf("Problem running both EventLogFile and Object collection: %s", err2)
-		return errors.Join(err1, err2)
 	}
 
-	var (
-		eventLogFileTicker *time.Ticker
-		objectMethodTicker *time.Ticker
-	)
-	if cfg.DataCollectionMethod.Object.Enabled {
-		objectMethodTicker = time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
-		defer objectMethodTicker.Stop()
-	}
+	eventLogFileTicker, objectMethodTicker := &time.Ticker{}, &time.Ticker{}
+	eventLogFileTicker.C, objectMethodTicker.C = nil, nil
+
 	if cfg.DataCollectionMethod.EventLogFile.Enabled {
 		eventLogFileTicker = time.NewTicker(cfg.DataCollectionMethod.EventLogFile.Interval)
 		defer eventLogFileTicker.Stop()
 	}
 
+	if cfg.DataCollectionMethod.Object.Enabled {
+		objectMethodTicker = time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
+		defer objectMethodTicker.Stop()
+	}
+
 	for {
+		// Always check for cancel first, to not accidentally trigger another
+		// run if the context is already cancelled, but we have already received
+		// another ticker making the channel ready.
+		select {
+		case <-childCtx.Done():
+			return childCtx.Err()
+		default:
+		}
+
 		select {
 		case <-childCtx.Done():
 			return childCtx.Err()
 		case <-eventLogFileTicker.C:
 			log.Debugf("Starting EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
-				return err
+				log.Errorf("Problem running EventLogFile collection: %s", err)
 			}
 		case <-objectMethodTicker.C:
 			log.Debugf("Starting Object collection")
 			if err := s.RunObject(); err != nil {
-				return err
+				log.Errorf("Problem running Object collection: %s", err)
 			}
 		}
 	}
