@@ -25,3 +25,5 @@ order they are defined in the {beatname_uc} configuration file.
 -------
 event -> processor 1 -> event1 -> processor 2 -> event2 ...
 -------
+
+IMPORTANT: Please configure processors in a way that would not remove or overwrite fields created by {beatname_uc}. Certain processors might need these fields to function. If it's absolutely necessary to remove, rename or overwrite a pre-defined field, please make sure it's done by a corresponding processor (<<drop-fields,`drop_fields`>>, <<rename-fields,`rename`>> or <<add-fields, `add_fields`>>) placed at the end of the processor list defined in the input configuration.
