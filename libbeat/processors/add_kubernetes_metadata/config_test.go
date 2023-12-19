@@ -50,7 +50,7 @@ func TestConfigValidate(t *testing.T) {
 
 	for _, test := range tests {
 		cfg := config.MustNewConfigFrom(test.cfg)
-		c := defaultKubernetesAnnotatorConfig()
+		var c kubeAnnotatorConfig
 
 		err := cfg.Unpack(&c)
 		if test.error {
@@ -116,10 +116,10 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 	for _, test := range tests {
 		cfg, _ := config.NewConfigFrom(test.matcherConfig)
 
-		c := defaultKubernetesAnnotatorConfig()
-		c.DefaultMatchers = Enabled{false}
+		var c kubeAnnotatorConfig
 
 		err := cfg.Unpack(&c)
+		c.DefaultMatchers = Enabled{false}
 		c.Matchers = PluginConfig{
 			{
 				test.matcherName: *cfg,

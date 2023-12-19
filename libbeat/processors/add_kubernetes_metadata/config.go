@@ -50,15 +50,13 @@ type Enabled struct {
 
 type PluginConfig []map[string]config.C
 
-func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
-	return kubeAnnotatorConfig{
-		SyncPeriod:          10 * time.Minute,
-		CleanupTimeout:      60 * time.Second,
-		DefaultMatchers:     Enabled{true},
-		DefaultIndexers:     Enabled{true},
-		Scope:               "node",
-		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
-	}
+func (c *kubeAnnotatorConfig) InitDefaults() {
+	c.SyncPeriod = 10 * time.Minute
+	c.CleanupTimeout = 60 * time.Second
+	c.DefaultMatchers = Enabled{true}
+	c.DefaultIndexers = Enabled{true}
+	c.Scope = "node"
+	c.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
