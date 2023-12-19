@@ -30453,6 +30453,13 @@ type: long
 
 --
 
+*`elasticsearch.cluster.stats.indices.store.total_data_set_size.bytes`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.cluster.stats.indices.total`*::
 +
 --
@@ -30792,6 +30799,13 @@ type: long
 
 --
 
+*`elasticsearch.index.primaries.store.total_data_set_size_in_bytes`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.index.primaries.docs.count`*::
 +
 --
@@ -30952,6 +30966,18 @@ type: long
 +
 --
 Total size of the index in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.index.total.store.total_data_set_size_in_bytes`*::
++
+--
+Total size of the index in bytes including backing data for partially mounted indices.
 
 
 type: long
@@ -31482,6 +31508,18 @@ type: long
 +
 --
 Total size of the index in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.index.summary.primaries.store.total_data_set_size.bytes`*::
++
+--
+Total size of the index in bytes including backing data for partially mounted indices.
 
 
 type: long
@@ -32106,7 +32144,17 @@ format: bytes
 *`elasticsearch.node.stats.indices.store.size.bytes`*::
 +
 --
-Total size of the store in bytes.
+Total size of all shards assigned to this node in bytes.
+
+
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.store.total_data_set_size.bytes`*::
++
+--
+Total size of shards in bytes assigned to this node including backing data for partially mounted indices.
 
 
 type: long
