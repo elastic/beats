@@ -125,6 +125,7 @@ type beatConfig struct {
 	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *config.C              `config:"logging"`
+	EventLogging    *config.C              `config:"logging.events"`
 	MetricLogging   *config.C              `config:"logging.metrics"`
 	Keystore        *config.C              `config:"keystore"`
 	Instrumentation instrumentation.Config `config:"instrumentation"`
@@ -378,7 +379,26 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
-	outputFactory := b.makeOutputFactory(b.Config.Output)
+
+	// Get the default/current logging configuration
+	// we need some defaults to be populates otherwise Unpack will
+	// fail
+	eventsLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
+
+	// merge eventsLoggerCfg with b.Config.Logging, so logging.events.* only
+	// overwrites logging.*
+	if err := b.Config.EventLogging.Unpack(&eventsLoggerCfg); err != nil {
+		return nil, fmt.Errorf("error initialising events logger: %w", err)
+	}
+
+	// Ensure the default filename is set
+	if eventsLoggerCfg.Files.Name == "" {
+		eventsLoggerCfg.Files.Name = b.Info.Beat
+		// Append the name so the files do not overwrite themselves.
+		eventsLoggerCfg.Files.Name = eventsLoggerCfg.Files.Name + "-events-data"
+	}
+
+	outputFactory := b.makeOutputFactory(b.Config.Output, eventsLoggerCfg)
 	settings := pipeline.Settings{
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
@@ -388,7 +408,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader(), eventsLoggerCfg))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
@@ -784,6 +804,14 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	if b.Config.EventLogging == nil {
+		b.Config.EventLogging = config.NewConfig()
+	}
+	b.Config.EventLogging.Merge(b.Config.Logging)
+	if _, err := b.Config.EventLogging.Remove("events", -1); err != nil {
+		return fmt.Errorf("cannot merge logging and logging.events configuration: %w", err)
+	}
+
 	if err := promoteOutputQueueSettings(&b.Config); err != nil {
 		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
@@ -1091,7 +1119,7 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	}
 }
 
-func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
+func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader, eventsLoggerCfg logp.Config) reload.Reloadable {
 	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
 		if update == nil {
 			return nil
@@ -1113,15 +1141,16 @@ func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Re
 			}
 		}
 
-		return outReloader.Reload(update, b.createOutput)
+		return outReloader.Reload(update, eventsLoggerCfg, b.createOutput)
 	})
 }
 
 func (b *Beat) makeOutputFactory(
 	cfg config.Namespace,
+	eventLoggerCfg logp.Config,
 ) func(outputs.Observer) (string, outputs.Group, error) {
 	return func(outStats outputs.Observer) (string, outputs.Group, error) {
-		out, err := b.createOutput(outStats, cfg)
+		out, err := b.createOutput(outStats, cfg, eventLoggerCfg)
 		return cfg.Name(), out, err
 	}
 }
@@ -1217,7 +1246,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	return nil
 }
 
-func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
+func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace, eventsLoggerCfg logp.Config) (outputs.Group, error) {
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
 	}
@@ -1226,7 +1255,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
-	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), eventsLoggerCfg)
 }
 
 func (b *Beat) registerClusterUUIDFetching() {

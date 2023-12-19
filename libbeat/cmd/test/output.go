@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 
@@ -41,7 +42,8 @@ func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
 			}
 
 			im, _ := idxmgmt.DefaultSupport(nil, b.Info, nil)
-			output, err := outputs.Load(im, b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
+			// we use an empty config for the events logger because this is just a output test
+			output, err := outputs.Load(im, b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config(), logp.Config{})
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
 				os.Exit(1)

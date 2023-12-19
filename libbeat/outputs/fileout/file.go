@@ -51,6 +51,7 @@ func makeFileout(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *c.C,
+	eventsLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	foConfig := defaultConfig()
 	if err := cfg.Unpack(&foConfig); err != nil {

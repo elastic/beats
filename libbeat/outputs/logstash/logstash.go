@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -40,6 +41,7 @@ func makeLogstash(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
+	eventsLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	lsConfig, err := readConfig(cfg, beat)
 	if err != nil {

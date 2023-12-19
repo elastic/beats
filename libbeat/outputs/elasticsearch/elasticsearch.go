@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -38,8 +39,13 @@ func makeES(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	eventsLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
+	eventsLogger := logp.NewLogger(logSelector)
+	// Set a new Output so it writes to a different file than `log`
+	eventsLogger = log.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
+
 	if !cfg.HasField("bulk_max_size") {
 		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
 			return outputs.Fail(err)
@@ -110,27 +116,30 @@ func makeES(
 		}
 
 		var client outputs.NetworkClient
-		client, err = NewClient(ClientSettings{
-			ConnectionSettings: eslegclient.ConnectionSettings{
-				URL:              esURL,
-				Beatname:         beat.Beat,
-				Kerberos:         esConfig.Kerberos,
-				Username:         esConfig.Username,
-				Password:         esConfig.Password,
-				APIKey:           esConfig.APIKey,
-				Parameters:       params,
-				Headers:          esConfig.Headers,
-				CompressionLevel: esConfig.CompressionLevel,
-				Observer:         observer,
-				EscapeHTML:       esConfig.EscapeHTML,
-				Transport:        esConfig.Transport,
-				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
-			},
-			Index:              index,
-			Pipeline:           pipeline,
-			Observer:           observer,
-			NonIndexableAction: policy.action(),
-		}, &connectCallbackRegistry)
+		client, err = NewClient(
+			log,
+			eventsLogger,
+			ClientSettings{
+				ConnectionSettings: eslegclient.ConnectionSettings{
+					URL:              esURL,
+					Beatname:         beat.Beat,
+					Kerberos:         esConfig.Kerberos,
+					Username:         esConfig.Username,
+					Password:         esConfig.Password,
+					APIKey:           esConfig.APIKey,
+					Parameters:       params,
+					Headers:          esConfig.Headers,
+					CompressionLevel: esConfig.CompressionLevel,
+					Observer:         observer,
+					EscapeHTML:       esConfig.EscapeHTML,
+					Transport:        esConfig.Transport,
+					IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
+				},
+				Index:              index,
+				Pipeline:           pipeline,
+				Observer:           observer,
+				NonIndexableAction: policy.action(),
+			}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)
 		}

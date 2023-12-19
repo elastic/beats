@@ -43,6 +43,7 @@ func makeKafka(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	eventsLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	log.Debug("initialize kafka output")

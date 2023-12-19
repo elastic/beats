@@ -180,7 +180,8 @@ func (c *outputController) Set(outGrp outputs.Group) {
 // Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
-	outFactory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
+	eventsLoggerCfg logp.Config,
+	outFactory func(outputs.Observer, conf.Namespace, logp.Config) (outputs.Group, error),
 ) error {
 	outCfg := conf.Namespace{}
 	if cfg != nil {
@@ -191,7 +192,7 @@ func (c *outputController) Reload(
 
 	output, err := loadOutput(c.monitors, func(stats outputs.Observer) (string, outputs.Group, error) {
 		name := outCfg.Name()
-		out, err := outFactory(stats, outCfg)
+		out, err := outFactory(stats, outCfg, eventsLoggerCfg)
 		return name, out, err
 	})
 	if err != nil {

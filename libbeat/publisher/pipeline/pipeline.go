@@ -111,7 +111,8 @@ const (
 type OutputReloader interface {
 	Reload(
 		cfg *reload.ConfigWithMeta,
-		factory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
+		eventsLoggerCfg logp.Config,
+		factory func(outputs.Observer, conf.Namespace, logp.Config) (outputs.Group, error),
 	) error
 }
 
