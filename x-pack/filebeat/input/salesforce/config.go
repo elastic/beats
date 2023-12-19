@@ -10,43 +10,6 @@ import (
 	"time"
 )
 
-// Sample Config:
-/*
-- type: salesforce
-  enabled: true
-  version: 56
-  auth.oauth2:
-    enabled: false
-    client.id: clientid
-    client.secret: clientsecret
-    token_url: https://instance_id.develop.my.salesforce.com/services/oauth2/token
-    user: username
-    password: password
-  auth.jwt:
-    enabled: true
-    client.id: clientid
-    client.username: username
-    client.key_path: ./server_client.key
-    url: https://login.salesforce.com
-  url: https://instance_id.develop.my.salesforce.com
-  data_collection_method:
-    event_log_file:
-      interval: 1h
-      enabled: true
-      query:
-        default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-        value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST"
-      cursor:
-        field: "CreatedDate"
-    object:
-      interval: 5m
-      enabled: true
-      query:
-        default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
-        value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.logdate ]]"
-      cursor:
-        field: "EventDate"
-*/
 type config struct {
 	Auth                 *authConfig           `config:"auth"`
 	URL                  string                `config:"url" validate:"required"`

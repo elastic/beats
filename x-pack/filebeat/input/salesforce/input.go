@@ -90,14 +90,13 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 	s.log = env.Logger.With("input_url", cfg.URL)
 	s.sfdcConfig, err = getSFDCConfig(&cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("error with configuration: %w", err)
 	}
 
-	soqlr, err := s.SetupSFClientConnection() // create a new SOQL resource
+	s.soqlr, err = s.SetupSFClientConnection() // create a new SOQL resource
 	if err != nil {
 		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
-	s.soqlr = soqlr
 
 	return s.run()
 }

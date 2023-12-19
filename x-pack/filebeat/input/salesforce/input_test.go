@@ -18,7 +18,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -71,7 +70,7 @@ func TestFormQueryWithCursor(t *testing.T) {
 
 			sfInput := &salesforceInput{
 				config: config{InitialInterval: tc.initialInterval},
-				log:    logp.L().With("hello", "world"),
+				log:    logp.NewLogger("salesforce"),
 				cursor: tc.cursor,
 			}
 
@@ -82,36 +81,6 @@ func TestFormQueryWithCursor(t *testing.T) {
 		})
 	}
 }
-
-// sample:
-/*
-map[string]interface{}{
-	"data_collection_method": map[string]interface{}{
-		"event_log_file": map[string]interface{}{
-			"interval": "1h",
-			"enabled":  true,
-			"query": map[string]interface{}{
-				"default": "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST",
-				"value":   "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST",
-			},
-			"cursor": map[string]interface{}{
-				"field": "CreatedDate",
-			},
-		},
-		"object": map[string]interface{}{
-			"interval": "5m",
-			"enabled":  true,
-			"query": map[string]interface{}{
-				"default": "SELECT FIELDS(STANDARD) FROM LoginEvent",
-				"value":   "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.logdate ]]",
-			},
-			"cursor": map[string]interface{}{
-				"field": "EventDate",
-			},
-		},
-	},
-},
-*/
 
 func TestInput(t *testing.T) {
 	logp.TestingSetup()
@@ -128,7 +97,7 @@ func TestInput(t *testing.T) {
 		skipReason string
 	}{
 		{
-			name:        "test_data_collection_method_object_with_default_query_only",
+			name:        "data_collection_method_object_with_default_query_only",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{
@@ -164,22 +133,11 @@ func TestInput(t *testing.T) {
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
 			cfg := defaultConfig()
-
 			err := conf.MustNewConfigFrom(tc.baseConfig).Unpack(&cfg)
 			assert.NoError(t, err)
 
-			input := salesforceInput{config: cfg}
-
-			assert.Equal(t, "salesforce", input.Name())
-
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
-
-			v2Ctx := v2.Context{
-				Logger:      logp.NewLogger("salesforce_test"),
-				ID:          "test_id:" + tc.name,
-				Cancelation: ctx,
-			}
 
 			var client publisher
 			client.done = func() {
@@ -188,7 +146,25 @@ func TestInput(t *testing.T) {
 				}
 			}
 
-			err = input.Run(v2Ctx, &source{cfg: cfg}, inputcursor.Cursor{}, &client)
+			salesforceInput := salesforceInput{config: cfg}
+			assert.Equal(t, "salesforce", salesforceInput.Name())
+
+			ctx, cancelClause := context.WithCancelCause(ctx)
+
+			salesforceInput.cursor = &state{}
+			salesforceInput.ctx = ctx
+			salesforceInput.cancel = cancelClause
+			salesforceInput.srcConfig = &cfg
+			salesforceInput.publisher = &client
+			salesforceInput.log = logp.NewLogger("salesforce")
+
+			salesforceInput.sfdcConfig, err = getSFDCConfig(&cfg)
+			assert.NoError(t, err)
+
+			salesforceInput.soqlr, err = salesforceInput.SetupSFClientConnection()
+			assert.NoError(t, err)
+
+			err = salesforceInput.run()
 			if tc.wantErr != (err != nil) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, tc.wantErr)
 			}
