@@ -48,6 +48,7 @@ type salesforceInput struct {
 	log        *logp.Logger
 
 	clientSession *session.Session
+	soqlr         *soql.Resource
 }
 
 // // The Filebeat user-agent is provided to the program as useragent.
@@ -112,6 +113,13 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 
 	var err1, err2 error
 
+	// Create a new SOQL resource using the session.
+	soqlr, err := s.SetupSFClientConnection()
+	if err != nil {
+		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
+	}
+	s.soqlr = soqlr
+
 	if cfg.DataCollectionMethod.EventLogFile.Enabled {
 		log.Debugf("Starting EventLogFile collection")
 		err1 = s.RunEventLogFile()
@@ -132,36 +140,32 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		return errors.Join(err1, err2)
 	}
 
-	objectMethodTicker := time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
-	defer objectMethodTicker.Stop()
-
-	eventLogFileTicker := time.NewTicker(cfg.DataCollectionMethod.EventLogFile.Interval)
-	defer eventLogFileTicker.Stop()
+	var (
+		eventLogFileTicker *time.Ticker
+		objectMethodTicker *time.Ticker
+	)
+	if cfg.DataCollectionMethod.Object.Enabled {
+		objectMethodTicker = time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
+		defer objectMethodTicker.Stop()
+	}
+	if cfg.DataCollectionMethod.EventLogFile.Enabled {
+		eventLogFileTicker = time.NewTicker(cfg.DataCollectionMethod.EventLogFile.Interval)
+		defer eventLogFileTicker.Stop()
+	}
 
 	for {
 		select {
 		case <-childCtx.Done():
 			return childCtx.Err()
-		default:
-			if cfg.DataCollectionMethod.EventLogFile.Enabled {
-				select {
-				case <-eventLogFileTicker.C:
-					log.Debugf("Starting EventLogFile collection")
-					if err := s.RunEventLogFile(); err != nil {
-						return err
-					}
-				default:
-				}
+		case <-eventLogFileTicker.C:
+			log.Debugf("Starting EventLogFile collection")
+			if err := s.RunEventLogFile(); err != nil {
+				return err
 			}
-			if cfg.DataCollectionMethod.Object.Enabled {
-				select {
-				case <-objectMethodTicker.C:
-					log.Debugf("Starting Object collection")
-					if err := s.RunObject(); err != nil {
-						return err
-					}
-				default:
-				}
+		case <-objectMethodTicker.C:
+			log.Debugf("Starting Object collection")
+			if err := s.RunObject(); err != nil {
+				return err
 			}
 		}
 	}
@@ -197,17 +201,12 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig) (*querie
 }
 
 func (s *salesforceInput) RunObject() error {
-	soqlr, err := s.SetupSFClientConnection()
-	if err != nil {
-		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
-	}
-
 	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
 
-	res, err := soqlr.Query(query, false)
+	res, err := s.soqlr.Query(query, false)
 	if err != nil {
 		return err
 	}
@@ -250,17 +249,12 @@ func (s *salesforceInput) RunObject() error {
 }
 
 func (s *salesforceInput) RunEventLogFile() error {
-	soqlr, err := s.SetupSFClientConnection()
-	if err != nil {
-		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
-	}
-
 	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
 
-	res, err := soqlr.Query(query, false)
+	res, err := s.soqlr.Query(query, false)
 	if err != nil {
 		return err
 	}

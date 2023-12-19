@@ -62,14 +62,14 @@ type DataCollectionMethod struct {
 
 type EventLogFileMethod struct {
 	Enabled  bool          `config:"enabled"`
-	Interval time.Duration `config:"interval" validate:"required"`
+	Interval time.Duration `config:"interval"`
 	Query    *QueryConfig  `config:"query"`
 	Cursor   *cursorConfig `config:"cursor"`
 }
 
 type ObjectMethod struct {
 	Enabled  bool          `config:"enabled"`
-	Interval time.Duration `config:"interval" validate:"required"`
+	Interval time.Duration `config:"interval"`
 	Query    *QueryConfig  `config:"query"`
 	Cursor   *cursorConfig `config:"cursor"`
 }
