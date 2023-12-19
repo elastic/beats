@@ -72,11 +72,19 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
 	st := &state{}
 	if !cursor.IsNew() {
-		if err := cursor.Unpack(&st); err != nil {
+		if err = cursor.Unpack(&st); err != nil {
 			return err
 		}
 	}
 
+	if err = s.Setup(env, src, st, pub); err != nil {
+		return err
+	}
+
+	return s.run()
+}
+
+func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *state, pub inputcursor.Publisher) (err error) {
 	cfg := src.(*source).cfg
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -86,7 +94,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 	s.ctx = childCtx
 	s.cancel = cancel
 	s.publisher = pub
-	s.cursor = st
+	s.cursor = cursor
 	s.log = env.Logger.With("input_url", cfg.URL)
 	s.sfdcConfig, err = getSFDCConfig(&cfg)
 	if err != nil {
@@ -98,7 +106,7 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
 
-	return s.run()
+	return nil
 }
 
 func (s *salesforceInput) run() error {
