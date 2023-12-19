@@ -35,8 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
-var errStoppingOnOutputChange = errors.New("stopping Beat on output change")
-
 // diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
 // since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
 type diagnosticHandler struct {
@@ -173,7 +171,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 			client.VersionInfo{
 				Name:    "beat-v2-client-for-testing",
 				Version: version.GetDefaultVersion(),
-			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
 		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
@@ -557,7 +555,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 		for _, unit := range units {
 			errs := unitErrors[unit.ID()]
 			if len(errs) != 0 {
-				unit.UpdateState(client.UnitStateFailed, errors.Join(errs...).Error(), nil)
+				_ = unit.UpdateState(client.UnitStateFailed, errors.Join(errs...).Error(), nil)
 			}
 		}
 	}()
