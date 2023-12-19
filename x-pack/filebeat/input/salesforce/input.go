@@ -42,6 +42,7 @@ type salesforceInput struct {
 	cancel     context.CancelCauseFunc
 	publisher  inputcursor.Publisher
 	cursor     *state
+	srcConfig  *config
 	sfdcConfig *sfdc.Configuration
 	log        *logp.Logger
 
@@ -68,69 +69,66 @@ func (s *salesforceInput) Test(_ inputcursor.Source, _ v2.TestContext) error {
 
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
-func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) error {
+func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inputcursor.Cursor, pub inputcursor.Publisher) (err error) {
 	st := &state{}
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&st); err != nil {
 			return err
 		}
 	}
-	return s.run(env, src.(*source), st, pub)
-}
 
-func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub inputcursor.Publisher) (err error) {
-	cfg := src.cfg
-	log := env.Logger.With("input_url", cfg.URL)
+	cfg := src.(*source).cfg
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 	childCtx, cancel := context.WithCancelCause(ctx)
 
+	s.srcConfig = &cfg
 	s.ctx = childCtx
 	s.cancel = cancel
 	s.publisher = pub
-	s.cursor = cursor
-	s.log = log
+	s.cursor = st
+	s.log = env.Logger.With("input_url", cfg.URL)
 	s.sfdcConfig, err = getSFDCConfig(&cfg)
 	if err != nil {
 		return err
 	}
 
-	var err1, err2 error
-
-	// Create a new SOQL resource using the session.
-	soqlr, err := s.SetupSFClientConnection()
+	soqlr, err := s.SetupSFClientConnection() // create a new SOQL resource
 	if err != nil {
 		return fmt.Errorf("error setting up connection to Salesforce: %w", err)
 	}
 	s.soqlr = soqlr
 
-	if cfg.DataCollectionMethod.EventLogFile.Enabled {
-		log.Debugf("Starting EventLogFile collection")
-		err1 = s.RunEventLogFile()
+	return s.run()
+}
+
+func (s *salesforceInput) run() error {
+	if s.srcConfig.DataCollectionMethod.EventLogFile.Enabled {
+		s.log.Debugf("Starting EventLogFile collection")
+		err := s.RunEventLogFile()
+		if err != nil {
+			s.log.Errorf("Problem running EventLogFile collection: %s", err)
+		}
 	}
 
-	if cfg.DataCollectionMethod.Object.Enabled {
-		log.Debugf("Starting Object collection")
-		err2 = s.RunObject()
-	}
-
-	switch {
-	case err1 != nil:
-		log.Errorf("Problem running EventLogFile collection: %s", err1)
-	case err2 != nil:
-		log.Errorf("Problem running Object collection: %s", err2)
+	if s.srcConfig.DataCollectionMethod.Object.Enabled {
+		s.log.Debugf("Starting Object collection")
+		err := s.RunObject()
+		if err != nil {
+			s.log.Errorf("Problem running Object collection: %s", err)
+		}
 	}
 
 	eventLogFileTicker, objectMethodTicker := &time.Ticker{}, &time.Ticker{}
 	eventLogFileTicker.C, objectMethodTicker.C = nil, nil
 
-	if cfg.DataCollectionMethod.EventLogFile.Enabled {
-		eventLogFileTicker = time.NewTicker(cfg.DataCollectionMethod.EventLogFile.Interval)
+	if s.srcConfig.DataCollectionMethod.EventLogFile.Enabled {
+		eventLogFileTicker = time.NewTicker(s.srcConfig.DataCollectionMethod.EventLogFile.Interval)
 		defer eventLogFileTicker.Stop()
 	}
 
-	if cfg.DataCollectionMethod.Object.Enabled {
-		objectMethodTicker = time.NewTicker(cfg.DataCollectionMethod.Object.Interval)
+	if s.srcConfig.DataCollectionMethod.Object.Enabled {
+		objectMethodTicker = time.NewTicker(s.srcConfig.DataCollectionMethod.Object.Interval)
 		defer objectMethodTicker.Stop()
 	}
 
@@ -139,23 +137,23 @@ func (s *salesforceInput) run(env v2.Context, src *source, cursor *state, pub in
 		// run if the context is already cancelled, but we have already received
 		// another ticker making the channel ready.
 		select {
-		case <-childCtx.Done():
-			return childCtx.Err()
+		case <-s.ctx.Done():
+			return s.ctx.Err()
 		default:
 		}
 
 		select {
-		case <-childCtx.Done():
-			return childCtx.Err()
+		case <-s.ctx.Done():
+			return s.ctx.Err()
 		case <-eventLogFileTicker.C:
-			log.Debugf("Starting EventLogFile collection")
+			s.log.Debugf("Starting EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
-				log.Errorf("Problem running EventLogFile collection: %s", err)
+				s.log.Errorf("Problem running EventLogFile collection: %s", err)
 			}
 		case <-objectMethodTicker.C:
-			log.Debugf("Starting Object collection")
+			s.log.Debugf("Starting Object collection")
 			if err := s.RunObject(); err != nil {
-				log.Errorf("Problem running Object collection: %s", err)
+				s.log.Errorf("Problem running Object collection: %s", err)
 			}
 		}
 	}
