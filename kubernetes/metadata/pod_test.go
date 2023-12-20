@@ -430,6 +430,7 @@ func TestPod_Generate(t *testing.T) {
 		"annotations.dedot":   false,
 	})
 	assert.NoError(t, err)
+	assert.NotEqual(t, *addResourceMetadata.Namespace, *addResourceMetadata.Node)
 
 	replicaSets := cache.NewStore(cache.MetaNamespaceKeyFunc)
 	err = replicaSets.Add(rs)

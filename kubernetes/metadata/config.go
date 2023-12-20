@@ -59,10 +59,11 @@ func (c *Config) Unmarshal(cfg *config.C) error {
 func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
 	metaConfig := Config{}
 	metaConfig.InitDefaults()
-	metaCfg, _ := config.NewConfigFrom(&metaConfig)
+	nodeCfg, _ := config.NewConfigFrom(metaConfig)
+	nsCfg, _ := config.NewConfigFrom(metaConfig)
 	return &AddResourceMetadataConfig{
-		Node:       metaCfg,
-		Namespace:  metaCfg,
+		Node:       nodeCfg,
+		Namespace:  nsCfg,
 		Deployment: false,
 		CronJob:    false,
 	}
