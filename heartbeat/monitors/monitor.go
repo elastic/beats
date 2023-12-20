@@ -256,7 +256,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.L().Error("error closing monitor %s: %w", m.String(), err)
+			logp.L().Errorf("error closing monitor %s: %w", m.String(), err)
 		}
 	}
 

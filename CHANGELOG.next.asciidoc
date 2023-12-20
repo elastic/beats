@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
+- Support Elastic Agent control protocol chunking support {pull}37343[37343]
 
 *Auditbeat*
 
@@ -86,6 +87,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
+- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
