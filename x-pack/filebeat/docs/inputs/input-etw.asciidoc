@@ -11,9 +11,13 @@
 
 beta[]
 
-`https://learn.microsoft.com/en-us/windows/win32/etw/event-tracing-portal`[Event Tracing for Windows]) is a powerful logging and tracing mechanism built into the Windows operating system. It provides a detailed view of application and system behavior, performance issues, and runtime diagnostics. Trace events contain an event header and provider-defined data that describes the current state of an application or operation. You can use the events to debug an application and perform capacity and performance analysis.
+https://learn.microsoft.com/en-us/windows/win32/etw/event-tracing-portal[Event Tracing for Windows] is a powerful logging and tracing mechanism built into the Windows operating system. It provides a detailed view of application and system behavior, performance issues, and runtime diagnostics. Trace events contain an event header and provider-defined data that describes the current state of an application or operation. You can use the events to debug an application and perform capacity and performance analysis.
 
 The ETW input can interact with ETW in three distinct ways: it can create a new session to capture events from user-mode providers, attach to an already existing session to collect ongoing event data, or read events from a pre-recorded .etl file. This functionality enables the module to adapt to different scenarios, such as real-time event monitoring or analyzing historical data.
+
+This input currently supports manifest-based, MOF (classic) and TraceLogging providers while WPP providers are not supported. https://learn.microsoft.com/en-us/windows/win32/etw/about-event-tracing#types-of-providers[Here] you can find more information about the available types of providers.
+
+It has been tested in every Windows versions supported by Filebeat, starting from Windows 8.1 and Windows Server 2016. In addition, administrative privileges are required in order to control event tracing sessions.
 
 Example configurations:
 
