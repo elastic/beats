@@ -36,7 +36,7 @@ const (
 
 // ErrUnsupported on "not linux".
 func FromPid(flag Flag, pid int) ([]string, error) {
-	return []string{}, ErrUnsupported
+	return nil, ErrUnsupported
 }
 
 // ErrUnsupported on "not linux".
