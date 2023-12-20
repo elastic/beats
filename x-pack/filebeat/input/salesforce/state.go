@@ -12,17 +12,22 @@ import (
 )
 
 type state struct {
-	LogDateTime string `struct:"timestamp"`
+	Object       dateCursor `json:"object,omitempty"`
+	EventLogFile dateCursor `json:"event_log_file,omitempty"`
 }
 
-func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor *state, log *logp.Logger) (qr string, err error) {
+type dateCursor struct {
+	LogDateTime string `struct:"logdate,omitempty"`
+}
+
+func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor mapstr.M, log *logp.Logger) (qr string, err error) {
 	ctxTmpl := mapstr.M{
 		"var":    nil,
 		"cursor": nil,
 	}
 
-	if cursor.LogDateTime != "" {
-		ctxTmpl["cursor"] = mapstr.M{"logdate": cursor.LogDateTime}
+	if cursor != nil {
+		ctxTmpl["cursor"] = cursor
 		qr, err = cfg.Value.Execute(ctxTmpl, nil, log)
 		if err != nil {
 			return "", err

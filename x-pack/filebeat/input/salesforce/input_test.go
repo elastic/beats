@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFormQueryWithCursor(t *testing.T) {
@@ -35,21 +36,29 @@ func TestFormQueryWithCursor(t *testing.T) {
 		defaultSOQLTemplate string
 		valueSOQLTemplate   string
 		wantQuery           string
-		cursor              *state
+		cursor              mapstr.M
+		wantErr             error
 	}{
 		"valid soql templates with nil cursor": { // expect default query with LogDate > initialInterval
 			initialInterval:     60 * 24 * time.Hour, // 60 * 24h = 60 days (2 months)
 			defaultSOQLTemplate: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND Logdate > [[ .var.initial_interval ]] ORDER BY CreatedDate ASC NULLS FIRST",
 			valueSOQLTemplate:   "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST",
 			wantQuery:           "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND Logdate > 2023-03-19T12:00:00Z ORDER BY CreatedDate ASC NULLS FIRST",
-			cursor:              &state{},
+			cursor:              nil,
 		},
-		"valid soql templates with non-empty .cursor.logdate": { // expect value SOQL query with .cursor.logdate set
+		"valid soql templates with non-empty .cursor.object.logdate": { // expect value SOQL query with .cursor.object.logdate set
+			initialInterval:     60 * 24 * time.Hour, // 60 * 24h = 60 days (2 months)
+			defaultSOQLTemplate: "SELECT Id,CreatedDate,LogDate,LogFile FROM LoginEvent WHERE EventDate > [[ .var.initial_interval ]]",
+			valueSOQLTemplate:   "SELECT Id,CreatedDate,LogDate,LogFile FROM LoginEvent WHERE  CreatedDate > [[ .cursor.object.logdate ]]",
+			wantQuery:           "SELECT Id,CreatedDate,LogDate,LogFile FROM LoginEvent WHERE  CreatedDate > 2023-05-18T12:00:00Z",
+			cursor:              mapstr.M{"object": mapstr.M{"logdate": timeNow().Format(formatRFC3339Like)}},
+		},
+		"valid soql templates with non-empty .cursor.event_log_file.logdate": { // expect value SOQL query with .cursor.event_log_file.logdate set
 			initialInterval:     60 * 24 * time.Hour, // 60 * 24h = 60 days (2 months)
 			defaultSOQLTemplate: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND Logdate > [[ .var.initial_interval ]] ORDER BY CreatedDate ASC NULLS FIRST",
-			valueSOQLTemplate:   "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST",
+			valueSOQLTemplate:   "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST",
 			wantQuery:           "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-05-18T12:00:00Z ORDER BY CreatedDate ASC NULLS FIRST",
-			cursor:              &state{LogDateTime: timeNow().Format(formatRFC3339Like)},
+			cursor:              mapstr.M{"event_log_file": mapstr.M{"logdate": timeNow().Format(formatRFC3339Like)}},
 		},
 	}
 
@@ -70,11 +79,10 @@ func TestFormQueryWithCursor(t *testing.T) {
 
 			sfInput := &salesforceInput{
 				config: config{InitialInterval: tc.initialInterval},
-				log:    logp.NewLogger("salesforce"),
-				cursor: tc.cursor,
+				log:    logp.L().With("hello", "world"),
 			}
 
-			querier, err := sfInput.FormQueryWithCursor(queryConfig)
+			querier, err := sfInput.FormQueryWithCursor(queryConfig, tc.cursor)
 			assert.NoError(t, err)
 
 			assert.EqualValues(t, tc.wantQuery, querier.Query)

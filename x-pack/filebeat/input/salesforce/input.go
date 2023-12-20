@@ -184,8 +184,8 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	return soqlr, nil
 }
 
-func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig) (*querier, error) {
-	qr, err := parseCursor(&s.config.InitialInterval, queryConfig, s.cursor, s.log)
+func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor mapstr.M) (*querier, error) {
+	qr, err := parseCursor(&s.config.InitialInterval, queryConfig, cursor, s.log)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,15 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig) (*querie
 }
 
 func (s *salesforceInput) RunObject() error {
-	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query)
+	var cursor mapstr.M
+	if s.cursor.Object.LogDateTime != "" {
+		cursor = mapstr.M{
+			"object": mapstr.M{
+				"logdate": s.cursor.Object.LogDateTime,
+			},
+		}
+	}
+	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -207,6 +215,7 @@ func (s *salesforceInput) RunObject() error {
 	}
 
 	totalEvents := 0
+	firstEvent := true
 	for res.Done() {
 		for _, rec := range res.Records() {
 			val := rec.Record().Fields()
@@ -216,16 +225,18 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if timstamp, ok := val[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
-				s.cursor.LogDateTime = timstamp
-			} else {
-				s.cursor.LogDateTime = timeNow().Format(formatRFC3339Like)
+			if firstEvent {
+				s.cursor.Object.LogDateTime = timeNow().Format(formatRFC3339Like)
+				if timstamp, ok := val[s.config.DataCollectionMethod.Object.Cursor.Field].(string); ok {
+					s.cursor.Object.LogDateTime = timstamp
+				}
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
 			if err != nil {
 				return err
 			}
+			firstEvent = false
 			totalEvents++
 		}
 
@@ -244,7 +255,15 @@ func (s *salesforceInput) RunObject() error {
 }
 
 func (s *salesforceInput) RunEventLogFile() error {
-	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query)
+	var cursor mapstr.M
+	if s.cursor.EventLogFile.LogDateTime != "" {
+		cursor = mapstr.M{
+			"event_log_file": mapstr.M{
+				"logdate": s.cursor.EventLogFile.LogDateTime,
+			},
+		}
+	}
+	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -257,7 +276,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	totalEvents := 0
 	for res.Done() {
 		for _, rec := range res.Records() {
-			req, err := http.NewRequestWithContext(s.ctx, "GET", s.sfdcConfig.Credentials.URL()+rec.Record().Fields()["LogFile"].(string), nil)
+			req, err := http.NewRequestWithContext(s.ctx, "GET", s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
 			if err != nil {
 				return err
 			}
@@ -283,10 +302,9 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return err
 			}
 
+			s.cursor.EventLogFile.LogDateTime = timeNow().Format(formatRFC3339Like)
 			if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
-				s.cursor.LogDateTime = timstamp
-			} else {
-				s.cursor.LogDateTime = timeNow().Format(formatRFC3339Like)
+				s.cursor.EventLogFile.LogDateTime = timstamp
 			}
 
 			for _, val := range recs {

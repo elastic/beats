@@ -98,10 +98,10 @@ filebeat.inputs:
   data_collection_method:
     event_log_file:
       interval: 1h
-      enabled: true
+      enabled: false
       query:
         default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-        value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate ]] ORDER BY CreatedDate ASC NULLS FIRST"
+        value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate_elf ]] ORDER BY CreatedDate ASC NULLS FIRST"
       cursor:
         field: "CreatedDate"
     object:
@@ -109,7 +109,7 @@ filebeat.inputs:
       enabled: true
       query:
         default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
-        value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.logdate ]]"      
+        value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.logdate_object ]]"      
       cursor:
         field: "EventDate"
 
