@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -169,7 +168,7 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	module := EnvOr("MODULE", "")
-	modulesFileInfo, err := ioutil.ReadDir("./module")
+	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
 		return err
 	}
@@ -356,7 +355,7 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
 	}
-	c.Stdout = ioutil.Discard
+	c.Stdout = io.Discard
 	if mg.Verbose() {
 		c.Stdout = os.Stdout
 	}

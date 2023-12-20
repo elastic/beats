@@ -6,7 +6,6 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
@@ -24,7 +23,7 @@ type Config struct {
 
 var defaultCfg = Config{
 	protocols:       []string{},
-	logOutput:       ioutil.Discard,
+	logOutput:       io.Discard,
 	expiration:      time.Hour,
 	detectReset:     true,
 	sharedTemplates: false,

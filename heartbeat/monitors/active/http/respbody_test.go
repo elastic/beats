@@ -21,7 +21,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -233,7 +233,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			rc := ioutil.NopCloser(strings.NewReader(tt.body))
+			rc := io.NopCloser(strings.NewReader(tt.body))
 			gotRespSize, gotPrefix, gotHashStr, err := readPrefixAndHash(rc, tt.len)
 
 			if tt.err {
@@ -256,5 +256,5 @@ func Test_readPrefixAndHash(t *testing.T) {
 }
 
 func simpleHTTPResponse() *http.Response {
-	return &http.Response{Body: ioutil.NopCloser(strings.NewReader("hello"))}
+	return &http.Response{Body: io.NopCloser(strings.NewReader("hello"))}
 }

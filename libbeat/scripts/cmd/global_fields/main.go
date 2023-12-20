@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -110,7 +109,7 @@ func main() {
 		return
 	}
 
-	err = ioutil.WriteFile(output, buffer.Bytes(), 0644)
+	err = os.WriteFile(output, buffer.Bytes(), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot write global fields.yml file for %s: %v", name, err)
 	}

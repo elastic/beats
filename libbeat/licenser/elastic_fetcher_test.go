@@ -18,7 +18,6 @@
 package licenser
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -120,7 +119,7 @@ func TestParseJSON(t *testing.T) {
 
 			t.Run(path, func(t *testing.T) {
 				h := func(w http.ResponseWriter, r *http.Request) {
-					json, err := ioutil.ReadFile(path)
+					json, err := os.ReadFile(path)
 					if err != nil {
 						t.Fatal("could not read JSON")
 					}

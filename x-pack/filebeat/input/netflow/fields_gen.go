@@ -13,7 +13,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"sort"
@@ -119,7 +118,7 @@ func generateFieldsYml(args []string) error {
 	}
 	defer headerHandle.Close()
 
-	fileHeader, err := ioutil.ReadAll(headerHandle)
+	fileHeader, err := io.ReadAll(headerHandle)
 	if err != nil {
 		return fmt.Errorf("failed to read header %s: %v", *header, err)
 	}

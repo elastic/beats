@@ -18,7 +18,6 @@
 package cfgfile
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -35,7 +34,7 @@ func TestGlobManagerInit(t *testing.T) {
 
 func TestGlobManager(t *testing.T) {
 	// Create random temp directory
-	dir, err := ioutil.TempDir("", "glob_manager")
+	dir, err := os.MkdirTemp("", "glob_manager")
 	defer os.RemoveAll(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -43,13 +42,13 @@ func TestGlobManager(t *testing.T) {
 
 	// Prepare scenario:
 	content := []byte("test\n")
-	err = ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+	err = os.WriteFile(dir+"/config1.yml", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config2.yml", content, 0644)
+	err = os.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config2-alt.yml.disabled", content, 0644)
+	err = os.WriteFile(dir+"/config2-alt.yml.disabled", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config3.yml.disabled", content, 0644)
+	err = os.WriteFile(dir+"/config3.yml.disabled", content, 0644)
 	assert.NoError(t, err)
 
 	// Init Glob Manager

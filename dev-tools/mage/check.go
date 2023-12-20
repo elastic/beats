@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -229,7 +228,7 @@ func CheckDashboardsFormat() error {
 
 	hasErrors := false
 	for _, file := range dashboardFiles {
-		d, err := ioutil.ReadFile(file)
+		d, err := os.ReadFile(file)
 		if err != nil {
 			return fmt.Errorf("failed to read dashboard file %s: %w", file, err)
 		}

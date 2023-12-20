@@ -20,7 +20,7 @@
 package status
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -30,7 +30,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	f := "./_meta/test/input.json"
-	content, err := ioutil.ReadFile(f)
+	content, err := os.ReadFile(f)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}

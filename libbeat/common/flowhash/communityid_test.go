@@ -23,7 +23,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -60,7 +59,7 @@ func TestPCAPFiles(t *testing.T) {
 
 			if *update {
 				data := strings.Join(result, "")
-				err = ioutil.WriteFile(goldenName, []byte(data), 0644)
+				err = os.WriteFile(goldenName, []byte(data), 0644)
 				if err != nil {
 					t.Fatal(err)
 				}

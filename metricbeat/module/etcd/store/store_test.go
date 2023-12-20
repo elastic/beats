@@ -18,9 +18,9 @@
 package store
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 
 	"github.com/stretchr/testify/assert"
@@ -32,7 +32,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/storestats.json")
+	content, err := os.ReadFile("../_meta/test/storestats.json")
 	assert.NoError(t, err)
 
 	event := eventMapping(content)
@@ -44,7 +44,7 @@ func TestFetchEventContent(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/storestats.json")
+	response, err := os.ReadFile(absPath + "/storestats.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

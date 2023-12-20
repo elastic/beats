@@ -19,9 +19,9 @@ package leader
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"regexp"
 
@@ -33,7 +33,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/leaderstats.json")
+	content, err := os.ReadFile("../_meta/test/leaderstats.json")
 	assert.NoError(t, err)
 
 	var data Leader
@@ -109,7 +109,7 @@ func TestFetchEventContent(t *testing.T) {
 			absPath, err := filepath.Abs(mockedFetchLocation + tc.mockedFetchFile)
 			assert.NoError(t, err)
 
-			response, err := ioutil.ReadFile(absPath)
+			response, err := os.ReadFile(absPath)
 			assert.NoError(t, err)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -21,9 +21,9 @@ package node
 
 import (
 	"encoding/base64"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -42,7 +42,7 @@ func TestFetch(t *testing.T) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			response, err := ioutil.ReadFile(f)
+			response, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

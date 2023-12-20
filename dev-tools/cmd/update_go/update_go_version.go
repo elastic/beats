@@ -20,7 +20,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -52,7 +51,7 @@ func main() {
 }
 
 func getGoVersion() string {
-	version, err := ioutil.ReadFile(".go-version")
+	version, err := os.ReadFile(".go-version")
 	checkErr(err)
 	return strings.TrimRight(string(version), "\r\n")
 }
@@ -66,10 +65,10 @@ func checkErr(err error) {
 func updateGoVersion(oldVersion, newVersion string) {
 	for _, file := range files {
 		fmt.Printf("Updating Go version from %s to %s in %s\n", oldVersion, newVersion, file)
-		content, err := ioutil.ReadFile(file)
+		content, err := os.ReadFile(file)
 		checkErr(err)
 		updatedContent := strings.ReplaceAll(string(content), oldVersion, newVersion)
-		err = ioutil.WriteFile(file, []byte(updatedContent), 0644)
+		err = os.WriteFile(file, []byte(updatedContent), 0644)
 		checkErr(err)
 	}
 }

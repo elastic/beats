@@ -24,7 +24,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -579,7 +578,7 @@ func TestHTTPSx509Auth(t *testing.T) {
 	certReader, err := file.ReadOpen(clientCertPath)
 	require.NoError(t, err)
 
-	clientCertBytes, err := ioutil.ReadAll(certReader)
+	clientCertBytes, err := io.ReadAll(certReader)
 	require.NoError(t, err)
 
 	clientCerts := x509.NewCertPool()

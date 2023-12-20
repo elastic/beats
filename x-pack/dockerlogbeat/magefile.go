@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -93,7 +92,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 	}
 
 	// start to build the root container that'll be used to build the plugin
-	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
+	tmpDir, err := os.MkdirTemp("", "dockerBuildTar")
 	if err != nil {
 		return fmt.Errorf("error locating temp dir: %w", err)
 	}
@@ -122,7 +121,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 	}
 	defer buildResp.Body.Close()
 	// This blocks until the build operation completes
-	buildStr, errBufRead := ioutil.ReadAll(buildResp.Body)
+	buildStr, errBufRead := io.ReadAll(buildResp.Body)
 	if errBufRead != nil {
 		return fmt.Errorf("error reading from docker output: %w", errBufRead)
 	}

@@ -19,7 +19,7 @@ package watcher
 
 import (
 	"hash/fnv"
-	"io/ioutil"
+	"io"
 	"os"
 	"time"
 
@@ -99,7 +99,7 @@ func (w *fileChangeTester) check() ([]byte, bool) {
 		}
 	}
 
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		logp.Info("Reading file '%v' failed with: %v", w.path, err)
 		return nil, false

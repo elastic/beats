@@ -22,7 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
@@ -110,7 +110,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 		return
 	}
 
-	all, err := ioutil.ReadAll(rsp.Body)
+	all, err := io.ReadAll(rsp.Body)
 	if err != nil {
 		result.err = fmt.Errorf("failed requesting %v metadata: %w", f.provider, err)
 		return

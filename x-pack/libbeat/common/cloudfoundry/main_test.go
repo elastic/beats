@@ -6,7 +6,6 @@ package cloudfoundry
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -15,7 +14,7 @@ import (
 
 func TestMain(m *testing.M) {
 	// Override global beats data dir to avoid creating directories in the working copy.
-	tmpdir, err := ioutil.TempDir("", "beats-data-dir")
+	tmpdir, err := os.MkdirTemp("", "beats-data-dir")
 	if err != nil {
 		fmt.Printf("Failed to create temporal data directory: %v\n", err)
 		os.Exit(1)

@@ -19,7 +19,6 @@ package mage
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -54,7 +53,7 @@ func GenerateDirModulesD() error {
 		}
 		moduleName := parts[1]
 
-		config, err := ioutil.ReadFile(f)
+		config, err := os.ReadFile(f)
 		if err != nil {
 			return err
 		}
@@ -68,7 +67,7 @@ func GenerateDirModulesD() error {
 		}
 
 		target := filepath.Join("modules.d", moduleName+".yml.disabled")
-		err = ioutil.WriteFile(createDir(target), []byte(data), 0644)
+		err = os.WriteFile(createDir(target), []byte(data), 0644)
 		if err != nil {
 			return err
 		}
@@ -128,7 +127,7 @@ func loadModulesD() (modules map[string][]moduleDefinition, err error) {
 	}
 	modules = make(map[string][]moduleDefinition, len(files))
 	for _, file := range files {
-		contents, err := ioutil.ReadFile(file)
+		contents, err := os.ReadFile(file)
 		if err != nil {
 			return nil, fmt.Errorf("reading %s: %w", file, err)
 		}

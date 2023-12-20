@@ -24,9 +24,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -214,7 +215,7 @@ func createIndex(host string, isHidden bool) (string, error) {
 		return "", fmt.Errorf("could not send create index request: %w", err)
 	}
 	defer resp.Body.Close()
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("HTTP error %d: %s, %s", resp.StatusCode, resp.Status, string(respBody))
@@ -254,7 +255,7 @@ func enableTrialLicense(host string, version *version.V) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
@@ -279,7 +280,7 @@ func checkTrialLicenseEnabled(host string, version *version.V) (bool, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return false, err
 	}
@@ -302,7 +303,7 @@ func checkTrialLicenseEnabled(host string, version *version.V) (bool, error) {
 
 func createMLJob(host string, version *version.V) error {
 
-	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
+	mlJob, err := os.ReadFile("ml_job/_meta/test/test_job.json")
 	if err != nil {
 		return err
 	}
@@ -370,7 +371,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return false, err
 	}
@@ -389,7 +390,7 @@ func checkCCRStatsExists(host string) (bool, error) {
 }
 
 func setupCCRRemote(host string) error {
-	remoteSettings, err := ioutil.ReadFile("ccr/_meta/test/test_remote_settings.json")
+	remoteSettings, err := os.ReadFile("ccr/_meta/test/test_remote_settings.json")
 	if err != nil {
 		return err
 	}
@@ -400,7 +401,7 @@ func setupCCRRemote(host string) error {
 }
 
 func createCCRLeaderIndex(host string) error {
-	leaderIndex, err := ioutil.ReadFile("ccr/_meta/test/test_leader_index.json")
+	leaderIndex, err := os.ReadFile("ccr/_meta/test/test_leader_index.json")
 	if err != nil {
 		return err
 	}
@@ -411,7 +412,7 @@ func createCCRLeaderIndex(host string) error {
 }
 
 func createCCRFollowerIndex(host string) error {
-	followerIndex, err := ioutil.ReadFile("ccr/_meta/test/test_follower_index.json")
+	followerIndex, err := os.ReadFile("ccr/_meta/test/test_follower_index.json")
 	if err != nil {
 		return err
 	}
@@ -465,7 +466,7 @@ func createEnrichStats(host string) error {
 }
 
 func createEnrichSourceIndex(host string) error {
-	sourceDoc, err := ioutil.ReadFile("enrich/_meta/test/source_doc.json")
+	sourceDoc, err := os.ReadFile("enrich/_meta/test/source_doc.json")
 	if err != nil {
 		return err
 	}
@@ -476,7 +477,7 @@ func createEnrichSourceIndex(host string) error {
 }
 
 func createEnrichPolicy(host string) error {
-	policy, err := ioutil.ReadFile("enrich/_meta/test/policy.json")
+	policy, err := os.ReadFile("enrich/_meta/test/policy.json")
 	if err != nil {
 		return err
 	}
@@ -493,7 +494,7 @@ func executeEnrichPolicy(host string) error {
 }
 
 func createEnrichIngestPipeline(host string) error {
-	pipeline, err := ioutil.ReadFile("enrich/_meta/test/ingest_pipeline.json")
+	pipeline, err := os.ReadFile("enrich/_meta/test/ingest_pipeline.json")
 	if err != nil {
 		return err
 	}
@@ -504,7 +505,7 @@ func createEnrichIngestPipeline(host string) error {
 }
 
 func ingestAndEnrichDoc(host string) error {
-	targetDoc, err := ioutil.ReadFile("enrich/_meta/test/target_doc.json")
+	targetDoc, err := os.ReadFile("enrich/_meta/test/target_doc.json")
 	if err != nil {
 		return err
 	}
@@ -529,7 +530,7 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, err
 	}
@@ -566,7 +567,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -607,7 +608,7 @@ func httpSendJSON(host, path, method string, body []byte) ([]byte, *http.Respons
 	}
 	defer resp.Body.Close()
 
-	body, err = ioutil.ReadAll(resp.Body)
+	body, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, nil, err
 	}

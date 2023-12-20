@@ -20,7 +20,6 @@
 package instance
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -124,7 +123,7 @@ func TestEmptyMetaJson(t *testing.T) {
 	}
 
 	// prepare empty meta file
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()
@@ -145,7 +144,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	}
 	firstStart := firstBeat.Info.FirstStart
 
-	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	metaFile, err := os.CreateTemp("../test", "meta.json")
 	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
 	metaPath := metaFile.Name()

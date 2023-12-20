@@ -22,7 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path"
 	"sort"
@@ -170,11 +170,18 @@ func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
 func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
-	files, err := ioutil.ReadDir(pathStr)
+	fileEntries, err := os.ReadDir(pathStr)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't read queue directory '%s': %w", pathStr, err)
 	}
-
+	files := make([]fs.FileInfo, 0, len(fileEntries))
+	for _, entry := range fileEntries {
+		info, err := entry.Info()
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get file info '%s': %w", entry.Name(), err)
+		}
+		files = append(files, info)
+	}
 	segments := []*queueSegment{}
 	for _, file := range files {
 		components := strings.Split(file.Name(), ".")

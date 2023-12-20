@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"flag"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"testing"
@@ -79,7 +78,7 @@ func TestProduceConsumer(t *testing.T) {
 }
 
 func TestMetrics(t *testing.T) {
-	dir, err := ioutil.TempDir("", "diskqueue_metrics")
+	dir, err := os.MkdirTemp("", "diskqueue_metrics")
 	defer func() {
 		_ = os.RemoveAll(dir)
 	}()
@@ -118,7 +117,7 @@ func sendEventsToQueue(count int, prod queue.Producer) {
 
 func makeTestQueue() queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue {
-		dir, err := ioutil.TempDir("", "diskqueue_test")
+		dir, err := os.MkdirTemp("", "diskqueue_test")
 		if err != nil {
 			t.Fatal(err)
 		}

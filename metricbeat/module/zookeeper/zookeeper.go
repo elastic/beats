@@ -26,7 +26,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"strings"
 	"time"
@@ -55,7 +54,7 @@ func RunCommand(command, address string, timeout time.Duration) (io.Reader, erro
 		return nil, fmt.Errorf("writing command '%s' failed: %w", command, err)
 	}
 
-	result, err := ioutil.ReadAll(conn)
+	result, err := io.ReadAll(conn)
 	if err != nil {
 		return nil, fmt.Errorf("read failed: %w", err)
 	}

@@ -20,7 +20,6 @@
 package procs
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -44,7 +43,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("", "find-sockets")
+	pathPrefix, err := os.MkdirTemp("", "find-sockets")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -116,7 +115,7 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 		}
 
 		if !file.isLink {
-			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
+			err = os.WriteFile(filepath.Join(prefix, file.path),
 				[]byte(file.contents), 0o644)
 			if err != nil {
 				return err

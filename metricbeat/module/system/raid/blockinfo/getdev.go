@@ -19,14 +19,13 @@ package blockinfo
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
 // ListAll lists all the multi-disk devices in a RAID array
 func ListAll(path string) ([]MDDevice, error) {
-	dir, err := ioutil.ReadDir(path)
+	dir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("could not read directory: %w", err)
 	}

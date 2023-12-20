@@ -18,7 +18,6 @@
 package fields
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -80,7 +79,7 @@ func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
 	files = append(files, ymls...)
 
 	modulesRoot := filepath.Base(modulesPath)
-	sets, err := ioutil.ReadDir(filepath.Join(modulesPath, module))
+	sets, err := os.ReadDir(filepath.Join(modulesPath, module))
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ package node
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -38,7 +38,7 @@ func TestEventMapping(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
+		input, err := os.ReadFile(f)
 		require.NoError(t, err)
 
 		var data map[string]interface{}

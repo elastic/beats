@@ -5,9 +5,9 @@
 package channels
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -17,7 +17,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/test/channels.json")
+	content, err := os.ReadFile("./_meta/test/channels.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventsMapping(content, reporter)
@@ -74,7 +74,7 @@ func TestFetchEventContent(t *testing.T) {
 func initServer() *httptest.Server {
 	absPath, _ := filepath.Abs("./_meta/test/")
 
-	response, _ := ioutil.ReadFile(absPath + "/channels.json")
+	response, _ := os.ReadFile(absPath + "/channels.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")

@@ -22,7 +22,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"sync"
 	"testing"
@@ -97,7 +96,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 }
 
 func TestProspector_InitUpdateIdentifiers(t *testing.T) {
-	f, err := ioutil.TempFile("", "existing_file")
+	f, err := os.CreateTemp("", "existing_file")
 	if err != nil {
 		t.Fatalf("cannot create temp file")
 	}

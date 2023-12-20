@@ -18,7 +18,7 @@
 package jmx
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -33,7 +33,7 @@ func TestEventMapper(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response.json")
 
 	require.NoError(t, err)
 
@@ -104,7 +104,7 @@ func TestEventGroupingMapper(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response.json")
 
 	require.NoError(t, err)
 
@@ -181,7 +181,7 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_get_response.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_get_response.json")
 
 	require.NoError(t, err)
 
@@ -230,7 +230,7 @@ func TestEventGroupingMapperGetRequestUptime(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_get_response_uptime.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_get_response_uptime.json")
 
 	require.NoError(t, err)
 
@@ -264,7 +264,7 @@ func TestEventMapperWithWildcard(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response_wildcard.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response_wildcard.json")
 
 	require.NoError(t, err)
 
@@ -305,7 +305,7 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	require.NotNil(t, absPath)
 	require.NoError(t, err)
 
-	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_response_wildcard.json")
+	jolokiaResponse, err := os.ReadFile(absPath + "/jolokia_response_wildcard.json")
 
 	require.NoError(t, err)
 

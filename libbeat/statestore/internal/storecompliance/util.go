@@ -19,7 +19,6 @@ package storecompliance
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -58,7 +57,7 @@ func WithPath(factory BackendFactory, fn func(*testing.T, *Registry)) func(t *te
 //	defer cleanup()
 //	...
 func SetupRegistry(t testing.TB, factory BackendFactory) (*Registry, func()) {
-	path, err := ioutil.TempDir(defaultTempDir, "")
+	path, err := os.MkdirTemp(defaultTempDir, "")
 	if err != nil {
 		t.Fatalf("Failed to create temporary test directory: %v", err)
 	}

@@ -19,7 +19,7 @@ package http
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
@@ -147,7 +147,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			meta["Content-Type"] = contentType
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			logp.Err("Error reading body: %v", err)
 			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)

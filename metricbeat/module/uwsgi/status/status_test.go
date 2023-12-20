@@ -18,10 +18,10 @@
 package status
 
 import (
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -40,7 +40,7 @@ func testData(t *testing.T) (data []byte) {
 		return
 	}
 
-	data, err = ioutil.ReadFile(filepath.Join(absPath, "/data.json"))
+	data, err = os.ReadFile(filepath.Join(absPath, "/data.json"))
 	if err != nil {
 		t.Fatalf("ReadFile failed: %s", err.Error())
 		return

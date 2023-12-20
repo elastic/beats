@@ -22,7 +22,6 @@ package checkpoint
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -267,7 +266,7 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 	c.fileLock.RLock()
 	defer c.fileLock.RUnlock()
 
-	contents, err := ioutil.ReadFile(c.file)
+	contents, err := os.ReadFile(c.file)
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = nil

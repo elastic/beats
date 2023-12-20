@@ -19,7 +19,7 @@ package readfile
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +47,7 @@ func TestEncodeLines(t *testing.T) {
 
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
-			r := ioutil.NopCloser(bytes.NewReader(testCase.Input))
+			r := io.NopCloser(bytes.NewReader(testCase.Input))
 			codec, err := encFactory(r)
 			assert.Nil(t, err, "failed to initialize encoding: %v", err)
 

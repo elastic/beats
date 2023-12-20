@@ -20,7 +20,6 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -166,7 +165,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 
 // loadModuleFields loads the module-specific fields.yml file
 func loadModuleFields(file string) (moduleData, error) {
-	fd, err := ioutil.ReadFile(file)
+	fd, err := os.ReadFile(file)
 	if err != nil {
 		return moduleData{}, fmt.Errorf("failed to read from spec file: %w", err)
 	}
@@ -188,7 +187,7 @@ func loadModuleFields(file string) (moduleData, error) {
 
 // getReleaseState gets the release tag in the metricset-level fields.yml, since that's all we need from that file
 func getReleaseState(metricsetPath string) (string, error) {
-	raw, err := ioutil.ReadFile(metricsetPath)
+	raw, err := os.ReadFile(metricsetPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read from spec file: %w", err)
 	}
@@ -233,7 +232,7 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-	raw, err := ioutil.ReadFile(goodPath)
+	raw, err := os.ReadFile(goodPath)
 	return string(raw), err
 
 }
@@ -330,7 +329,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		}
 
 		//dump the contents of the module asciidoc
-		moduleDoc, err := ioutil.ReadFile(filepath.Join(module, "_meta/docs.asciidoc"))
+		moduleDoc, err := os.ReadFile(filepath.Join(module, "_meta/docs.asciidoc"))
 		if err != nil {
 			return moduleList, err
 		}

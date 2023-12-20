@@ -7,7 +7,6 @@ package aws
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -191,7 +190,7 @@ func (c *CLIManager) Package(outputPattern string) error {
 	}
 
 	output := strings.ReplaceAll(outputPattern, "{{.Provider}}", "aws")
-	err = ioutil.WriteFile(output, content, 0644)
+	err = os.WriteFile(output, content, 0644)
 	if err != nil {
 		return err
 	}

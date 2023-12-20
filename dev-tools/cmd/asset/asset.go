@@ -24,7 +24,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -67,7 +67,7 @@ func main() {
 		beatName = args[1]
 
 		r := bufio.NewReader(os.Stdin)
-		data, err = ioutil.ReadAll(r)
+		data, err = io.ReadAll(r)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error while reading from stdin: %v\n", err)
 			os.Exit(1)
@@ -75,7 +75,7 @@ func main() {
 	} else {
 		file = input
 		beatName = args[0]
-		data, err = ioutil.ReadFile(input)
+		data, err = os.ReadFile(input)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Invalid file path: %s\n", input)
 			os.Exit(1)
@@ -99,6 +99,6 @@ func main() {
 	if output == "-" {
 		os.Stdout.Write(bs)
 	} else {
-		ioutil.WriteFile(output, bs, 0640)
+		os.WriteFile(output, bs, 0640)
 	}
 }

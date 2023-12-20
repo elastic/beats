@@ -30,7 +30,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -805,7 +804,7 @@ type dockerManifest struct {
 }
 
 func readDockerManifest(r io.Reader) (*dockerManifest, error) {
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -833,7 +832,7 @@ type dockerInfo struct {
 }
 
 func readDockerInfo(r io.Reader) (*dockerInfo, error) {
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}

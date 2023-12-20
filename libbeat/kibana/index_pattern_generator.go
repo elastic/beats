@@ -19,7 +19,6 @@ package kibana
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -144,7 +143,7 @@ func dumpToFile(f string, pattern mapstr.M) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(f, patternIndent, 0644)
+	err = os.WriteFile(f, patternIndent, 0644)
 	if err != nil {
 		return err
 	}

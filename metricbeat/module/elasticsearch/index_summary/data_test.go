@@ -20,9 +20,9 @@
 package index_summary
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -48,7 +48,7 @@ func createEsMuxer(license string) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("../index/_meta/test/root.710.json")
+		input, _ := os.ReadFile("../index/_meta/test/root.710.json")
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +62,7 @@ func createEsMuxer(license string) *http.ServeMux {
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
 	mux.Handle("/", http.HandlerFunc(rootHandler))
 	mux.Handle("/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content, _ := ioutil.ReadFile("../index/_meta/test/stats.700-alpha1.json")
+		content, _ := os.ReadFile("../index/_meta/test/stats.700-alpha1.json")
 		w.Write(content)
 	}))
 
@@ -86,7 +86,7 @@ func TestMapper(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	input, err := ioutil.ReadFile("../index/_meta/test/empty.512.json")
+	input, err := os.ReadFile("../index/_meta/test/empty.512.json")
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}

@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -40,7 +39,7 @@ func TestNewGenerator(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	data, err := ioutil.ReadFile("./testdata/fields.yml")
+	data, err := os.ReadFile("./testdata/fields.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +79,7 @@ func TestGenerate(t *testing.T) {
 	versions := []*version.V{v7}
 	var d mapstr.M
 	for _, version := range versions {
-		data, err := ioutil.ReadFile("./testdata/fields.yml")
+		data, err := os.ReadFile("./testdata/fields.yml")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -119,7 +118,7 @@ func TestGenerateExtensive(t *testing.T) {
 
 	var d mapstr.M
 	for _, version := range versions {
-		data, err := ioutil.ReadFile("testdata/extensive/fields.yml")
+		data, err := os.ReadFile("testdata/extensive/fields.yml")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -227,7 +226,7 @@ func find(a []map[string]interface{}, key, val string) int {
 }
 
 func readNDJSON(path string) ([]map[string]interface{}, error) {
-	f, err := ioutil.ReadFile(path)
+	f, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +245,7 @@ func readNDJSON(path string) ([]map[string]interface{}, error) {
 }
 
 func tmpPath(t testing.TB) string {
-	tmpDir, err := ioutil.TempDir("", "kibana-tests")
+	tmpDir, err := os.MkdirTemp("", "kibana-tests")
 	if err != nil {
 		t.Fatal(err)
 	}

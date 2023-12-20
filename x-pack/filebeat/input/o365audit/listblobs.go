@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"time"
@@ -278,7 +278,7 @@ func readJSONBody(response *http.Response, dest interface{}) error {
 	defer autorest.Respond(response,
 		autorest.ByDiscardingBody(),
 		autorest.ByClosing())
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return fmt.Errorf("reading body failed: %w", err)
 	}

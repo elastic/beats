@@ -22,10 +22,10 @@ package template
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -270,7 +270,7 @@ func TestESLoader_Load(t *testing.T) {
 		})
 
 		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
-			fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+			fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 			require.NoError(t, err)
 			setup := newTestSetup(t, TemplateConfig{Enabled: true, Overwrite: true})
 			setup.mustLoad(fields)
@@ -310,7 +310,7 @@ func TestESLoader_Load(t *testing.T) {
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
-		fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+		fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 		require.NoError(t, err)
 		for run, data := range map[string]struct {
 			cfg        TemplateConfig

@@ -21,7 +21,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 	"syscall"
@@ -200,7 +200,7 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 	var keyValue []byte
 	if stdin {
 		reader := bufio.NewReader(os.Stdin)
-		keyValue, err = ioutil.ReadAll(reader)
+		keyValue, err = io.ReadAll(reader)
 		if err != nil {
 			return fmt.Errorf("could not read input from stdin")
 		}

@@ -18,9 +18,9 @@
 package ccr
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -44,7 +44,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os.ReadFile("./_meta/test/root.710.json")
 		input = []byte(strings.Replace(string(input), "7.10.0", esVersion, -1))
 		w.Write(input)
 	}

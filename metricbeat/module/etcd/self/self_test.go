@@ -18,9 +18,9 @@
 package self
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +31,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/selfstats.json")
+	content, err := os.ReadFile("../_meta/test/selfstats.json")
 	assert.NoError(t, err)
 
 	event := eventMapping(content)
@@ -43,7 +43,7 @@ func TestFetchEventContent(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/selfstats.json")
+	response, err := os.ReadFile(absPath + "/selfstats.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")

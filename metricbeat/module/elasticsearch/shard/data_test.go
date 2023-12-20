@@ -18,9 +18,9 @@
 package shard
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -36,7 +36,7 @@ func TestStats(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
+		input, err := os.ReadFile(f)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
@@ -58,7 +58,7 @@ func TestData(t *testing.T) {
 	}))
 	mux.Handle("/_cluster/state/version,nodes,master_node,routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/routing_table.710.json")
+			input, _ := os.ReadFile("./_meta/test/routing_table.710.json")
 			w.Write(input)
 		}))
 

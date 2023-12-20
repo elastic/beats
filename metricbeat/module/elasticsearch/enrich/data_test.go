@@ -20,9 +20,9 @@
 package enrich
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -41,7 +41,7 @@ func TestMapper(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	input, err := ioutil.ReadFile("./_meta/test/empty.750.json")
+	input, err := os.ReadFile("./_meta/test/empty.750.json")
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -76,13 +76,13 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/xpack-usage.710.json")
+			input, _ := os.ReadFile("./_meta/test/xpack-usage.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_enrich/_stats", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/enrich_stats.750.json")
+			input, _ := os.ReadFile("./_meta/test/enrich_stats.750.json")
 			w.Write(input)
 		}))
 
