@@ -63,17 +63,21 @@ func TestOverflow(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(sl), 64)
 
-	assertHasCap(t, sl, "CAP_CHOWN")
-	assertHasCap(t, sl, "CAP_DAC_OVERRIDE")
-	assertHasCap(t, sl, "CAP_DAC_READ_SEARCH")
-	assertHasCap(t, sl, "CAP_FOWNER")
-	assertHasCap(t, sl, "CAP_FSETID")
-	assertHasCap(t, sl, "CAP_KILL")
-	assertHasCap(t, sl, "CAP_SETGID")
-	assertHasCap(t, sl, "CAP_SYS_MODULE")
-	assertHasCap(t, sl, "CAP_SYS_RAWIO")
-	assertHasCap(t, sl, "CAP_IPC_LOCK")
-	assertHasCap(t, sl, "CAP_MAC_OVERRIDE")
+	for _, cap := range []string{
+		"CAP_CHOWN",
+		"CAP_DAC_OVERRIDE",
+		"CAP_DAC_READ_SEARCH",
+		"CAP_FOWNER",
+		"CAP_FSETID",
+		"CAP_KILL",
+		"CAP_SETGID",
+		"CAP_SYS_MODULE",
+		"CAP_SYS_RAWIO",
+		"CAP_IPC_LOCK",
+		"CAP_MAC_OVERRIDE",
+	} {
+		assertHasCap(t, sl, cap)
+	}
 	if cap.MaxBits() <= 62 {
 		assertHasCap(t, sl, "CAP_62")
 	}
