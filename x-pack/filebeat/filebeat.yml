@@ -14,137 +14,6 @@
 
 filebeat.inputs:
 
-- type: cel
-  enabled: false
-  auth.digest:
-    user: "fpczxkxc"
-    password: "ceb46652-b9a3-4889-92a1-6633e0dda890"
-  resource.url: https://cloud.mongodb.com/api/atlas/v1.0/groups/646f4379c47da356740d14ad/clusters/atlas-ccx4uc-shard-00-00.q5ljb.mongodb.net/logs/mongodb-audit-log.gz?endDate=1700956800&startDate=1700955700
-  state:
-    query: "/measurements?granularity=PT5M&period=PT5m"
-    want_more: false
-    next_url: ""
-  program: |
-    (
-      string(bytes(get(state.url).Body).mime('application/gzip')).split("\n").map(body, {
-          "events": body.decode_json()
-        }
-      )
-    )
-  # .mime('application/gzip').decode_json()
-
-- type: cel
-  enabled: false
-  redact:
-    fields:
-      - path
-    delete: true
-  interval: 5s
-  auth.oauth2:
-    client.id: 3MVG9n_HvETGhr3BNn.eD22p.G8AhQ.F8wFg9_pSgbUKvyJZlyzR9f1W6llXfQvfjmcVYc.4LSBPjd8u9DpQH
-    client.secret: B7E6F2FEE72BFDF2C5B9860D0DA1A35D4E5F86694FA35A77E90E056B1564DD19
-    token_url: https://crestdatasystems16-dev-ed.develop.my.salesforce.com/services/oauth2/token
-    user: ali@crest.sandbox
-    password: Letsgothere#$1234
-  resource.url: "https://crestdatasystems16-dev-ed.develop.my.salesforce.com"
-  # resource.url: "http://localhost:8010"
-  state:
-    want_more: false
-    default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-    query: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' AND LogDate > [[.cursor.last]] ORDER BY CreatedDate ASC NULLS FIRST"
-    path: "/services/data/v52.0/query"
-    initial_interval: 24h
-    url: "https://crestdatasystems16-dev-ed.develop.my.salesforce.com"
-  program: |
-    bytes(get(string(state.url + state.path).parse_url().with({"RawQuery":({"q":[(!has(state.cursor) || !has(state.cursor.last) != ''? state.default : state.query)]}).format_query()}).format_url()).Body)
-    .decode_json()
-    .as(body,body.records)
-    .map(e, e.with({
-        "csv": bytes(get(state.url + e.LogFile).Body).mime("text/csv; header=present"),
-        "e": e,
-    }).collate("csv").map(list, {
-        "csv": list,
-        "storeDate": {
-            "createdDate": e.CreatedDate
-        }
-    })).flatten().as(res, {
-        "events": res.collate("csv"),
-        "cursor": res.collate('storeDate.createdDate').as(t, {
-            "first": t.min(),
-            "last": t.max(),
-        })
-    })
-
-# Username:- salesforcetest081@gmail.com
-# Password:- Salesforceinstance786
-
-- type: salesforce
-  enabled: true
-  version: 56
-  auth.oauth2:
-    enabled: false
-    client.id: 3MVG9pRzvMkjMb6nzW6iSPJU2rxCryzVeeo7KXuRlI1uqDsJhxdi76lQ5Eks2KSfr1o8D1PoMoGQCPPILnnkB
-    client.secret: C497A710C21497FB0A1E68B8DAF78DCFBE455C41BFBE076E85B9B37553D6CAAF
-    token_url: https://devtestin-dev-ed.develop.my.salesforce.com/services/oauth2/token
-    user: salesforceinstance@devtest.in
-    password: testinginstance4salesforce
-  auth.jwt:
-    enabled: true
-    client.id: 3MVG9pRzvMkjMb6nzW6iSPJU2r_G5FX9VkEC9kY.5sHaN1HrUSJzRy3dlofAYPyxJo_aEetg0zwp3wmnKJjyY
-    client.username: salesforceinstance@devtest.in
-    client.key_path: server_client.key
-    url: https://login.salesforce.com
-  url: "https://devtestin-dev-ed.develop.my.salesforce.com"
-  data_collection_method:
-    event_log_file:
-      interval: 1h
-      enabled: false
-      query:
-        default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-        value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.logdate_elf ]] ORDER BY CreatedDate ASC NULLS FIRST"
-      cursor:
-        field: "CreatedDate"
-    object:
-      interval: 5m
-      enabled: true
-      query:
-        default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
-        value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.logdate_object ]]"      
-      cursor:
-        field: "EventDate"
-
-- type: httpjson
-  id: 100
-  enabled: false
-  interval: 1h
-  request.method: GET
-  auth.oauth2:
-    enabled: true
-    client.id: 3MVG9pRzvMkjMb6nzW6iSPJU2rxCryzVeeo7KXuRlI1uqDsJhxdi76lQ5Eks2KSfr1o8D1PoMoGQCPPILnnkB
-    client.secret: C497A710C21497FB0A1E68B8DAF78DCFBE455C41BFBE076E85B9B37553D6CAAF
-    token_url: https://devtestin-dev-ed.develop.my.salesforce.com/services/oauth2/token
-    user: salesforceinstance@devtest.in
-    password: testinginstance4salesforce
-  request.url: https://devtestin-dev-ed.develop.my.salesforce.com/services/data/v52.0/query?q=login+rest
-  request.transforms:
-    - set:
-        target: url.params.q
-        value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE LogDate > [[.cursor.last_published_apex]] AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST"
-        default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST"
-  response.pagination:
-    - set:
-        target: url.value
-        value: '[[if (ne .last_response.body.done true)]]https://devtestin-dev-ed.develop.my.salesforce.com[[.last_response.body.nextRecordsUrl]][[end]]'
-        fail_on_template_error: true
-  chain:
-    - step:
-        request.url: https://devtestin-dev-ed.develop.my.salesforce.com/services/data/v52.0/sobjects/EventLogFile/$.records[:].Id/LogFile
-        request.method: GET
-        replace: $.records[:].Id
-  cursor:
-    last_published_apex:
-      value: '[[(formatDate ((parseDate .last_event.TIMESTAMP_DERIVED "RFC3339").Add (parseDuration "-1h")))]]'
-
 # Each - is an input. Most options can be set at the input level, so
 # you can use different inputs for various configurations.
 # Below are the input-specific configurations.
@@ -266,12 +135,10 @@ setup.kibana:
 
 # Configure what output to use when sending the data collected by the beat.
 
-output.console:
-  pretty: true
 # ---------------------------- Elasticsearch Output ----------------------------
-# output.elasticsearch:
-#   # Array of hosts to connect to.
-#   hosts: ["localhost:9200"]
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -297,12 +164,12 @@ output.console:
   #ssl.key: "/etc/pki/client/cert.key"
 
 # ================================= Processors =================================
-# processors:
-#   - add_host_metadata:
-#       when.not.contains.tags: forwarded
-#   - add_cloud_metadata: ~
-#   - add_docker_metadata: ~
-#   - add_kubernetes_metadata: ~
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
 
 # ================================== Logging ===================================
 

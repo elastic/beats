@@ -94,15 +94,12 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup()
 
 	tests := []struct {
-		name         string
-		setupServer  func(testing.TB, http.HandlerFunc, map[string]interface{})
-		baseConfig   map[string]interface{}
-		handler      http.HandlerFunc
-		expected     []string
-		expectedFile string
-		wantErr      bool
-
-		skipReason string
+		name        string
+		setupServer func(testing.TB, http.HandlerFunc, map[string]interface{})
+		baseConfig  map[string]interface{}
+		handler     http.HandlerFunc
+		expected    []string
+		wantErr     bool
 	}{
 		{
 			name:        "data_collection_method_object_with_default_query_only",
@@ -184,7 +181,7 @@ func TestInput(t *testing.T) {
 
 			client.published = client.published[:len(tc.expected)]
 			for i, got := range client.published {
-				if !reflect.DeepEqual(got.Fields["event"].(map[string]interface{})["original"], tc.expected[i]) {
+				if !reflect.DeepEqual(got.Fields["message"], tc.expected[i]) {
 					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, tc.expected[i]))
 				}
 			}

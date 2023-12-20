@@ -12,12 +12,13 @@ import (
 )
 
 type state struct {
-	Object       dateCursor `json:"object,omitempty"`
-	EventLogFile dateCursor `json:"event_log_file,omitempty"`
+	Object       dateTimeCursor `json:"object,omitempty"`
+	EventLogFile dateTimeCursor `json:"event_log_file,omitempty"`
 }
 
-type dateCursor struct {
-	LogDateTime string `struct:"logdate,omitempty"`
+type dateTimeCursor struct {
+	FirstEventTime string `struct:"first_event_time,omitempty"`
+	LastEventTime  string `struct:"last_event_time,omitempty"`
 }
 
 func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor mapstr.M, log *logp.Logger) (qr string, err error) {

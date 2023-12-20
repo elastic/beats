@@ -196,15 +196,14 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 }
 
 func (s *salesforceInput) RunObject() error {
-	var cursor mapstr.M
-	if s.cursor.Object.LogDateTime != "" {
-		cursor = mapstr.M{
-			"object": mapstr.M{
-				"logdate": s.cursor.Object.LogDateTime,
-			},
-		}
+	object := mapstr.M{}
+	if s.cursor.Object.FirstEventTime != "" {
+		object.Put("first_event_time", s.cursor.Object.FirstEventTime)
 	}
-	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query, cursor)
+	if s.cursor.Object.LastEventTime != "" {
+		object.Put("last_event_time", s.cursor.Object.LastEventTime)
+	}
+	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query, mapstr.M{"object": object})
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -226,10 +225,13 @@ func (s *salesforceInput) RunObject() error {
 			}
 
 			if firstEvent {
-				s.cursor.Object.LogDateTime = timeNow().Format(formatRFC3339Like)
 				if timstamp, ok := val[s.config.DataCollectionMethod.Object.Cursor.Field].(string); ok {
-					s.cursor.Object.LogDateTime = timstamp
+					s.cursor.Object.FirstEventTime = timstamp
 				}
+			}
+
+			if timstamp, ok := val[s.config.DataCollectionMethod.Object.Cursor.Field].(string); ok {
+				s.cursor.Object.LastEventTime = timstamp
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
@@ -255,15 +257,14 @@ func (s *salesforceInput) RunObject() error {
 }
 
 func (s *salesforceInput) RunEventLogFile() error {
-	var cursor mapstr.M
-	if s.cursor.EventLogFile.LogDateTime != "" {
-		cursor = mapstr.M{
-			"event_log_file": mapstr.M{
-				"logdate": s.cursor.EventLogFile.LogDateTime,
-			},
-		}
+	eventLogFile := mapstr.M{}
+	if s.cursor.EventLogFile.FirstEventTime != "" {
+		eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
 	}
-	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query, cursor)
+	if s.cursor.EventLogFile.LastEventTime != "" {
+		eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
+	}
+	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query, mapstr.M{"event_log_file": eventLogFile})
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -274,6 +275,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	}
 
 	totalEvents := 0
+	firstEvent := true
 	for res.Done() {
 		for _, rec := range res.Records() {
 			req, err := http.NewRequestWithContext(s.ctx, "GET", s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
@@ -302,9 +304,14 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return err
 			}
 
-			s.cursor.EventLogFile.LogDateTime = timeNow().Format(formatRFC3339Like)
+			if firstEvent {
+				if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
+					s.cursor.EventLogFile.FirstEventTime = timstamp
+				}
+			}
+
 			if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
-				s.cursor.EventLogFile.LogDateTime = timstamp
+				s.cursor.EventLogFile.LastEventTime = timstamp
 			}
 
 			for _, val := range recs {
@@ -319,6 +326,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 				}
 				totalEvents++
 			}
+			firstEvent = false
 		}
 
 		if res.MoreRecords() {
