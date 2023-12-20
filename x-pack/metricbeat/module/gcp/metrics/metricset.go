@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+<<<<<<< HEAD
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
@@ -17,6 +18,14 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+=======
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
+	"google.golang.org/genproto/googleapis/api/metric"
+	"google.golang.org/protobuf/types/known/durationpb"
+>>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -106,7 +115,7 @@ type config struct {
 	CredentialsFilePath string `config:"credentials_file_path"`
 
 	opt    []option.ClientOption
-	period *duration.Duration
+	period *durationpb.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -129,8 +138,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.MetricsConfig = metricsConfigs.Metrics
+<<<<<<< HEAD
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period = &duration.Duration{
+=======
+
+	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
+		return m, fmt.Errorf("both credentials_file_path and credentials_json specified, you must use only one of them")
+	} else if m.config.CredentialsFilePath != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	} else if m.config.CredentialsJSON != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
+	} else {
+		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
+	}
+
+	m.config.period = &durationpb.Duration{
+>>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
