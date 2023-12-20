@@ -134,15 +134,18 @@ func makeIsEmpty() func(Flag, *cap.Set) (bool, error) {
 func FromPid(flag Flag, pid int) ([]string, error) {
 	set, err := cap.GetPID(pid)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 	empty, err := isEmpty(flag, set)
-	if err != nil || empty {
-		return []string{}, err
+	if err != nil {
+		return nil, err
+	}
+	if empty {
+		return []string{}, nil
 	}
 	all, err := isAll(flag, set)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 	if all {
 		return []string{"CAP_ALL"}, nil
@@ -153,7 +156,7 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 		c := cap.Value(i)
 		v, err := set.GetFlag(flag, c)
 		if err != nil {
-			return []string{}, err
+			return nil, err
 		}
 		if !v {
 			continue
@@ -161,7 +164,7 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 		s, err := toECS(i)
 		// impossible since MaxBits <= 64
 		if err != nil {
-			return []string{}, err
+			return nil, err
 		}
 		sl = append(sl, s)
 	}
@@ -185,7 +188,7 @@ func FromUint64(w uint64) ([]string, error) {
 			s, err := toECS(i)
 			// impossible since MaxBits <= 64
 			if err != nil {
-				return []string{}, err
+				return nil, err
 			}
 			sl = append(sl, s)
 		}
@@ -202,7 +205,7 @@ func FromUint64(w uint64) ([]string, error) {
 func FromString(s string, base int) ([]string, error) {
 	w, err := strconv.ParseUint(s, 16, 64)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
 	return FromUint64(w)

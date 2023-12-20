@@ -41,10 +41,10 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 
 // ErrUnsupported on "not linux".
 func FromUint64(w uint64) ([]string, error) {
-	return []string{}, ErrUnsupported
+	return nil, ErrUnsupported
 }
 
 // ErrUnsupported on "not linux".
 func FromString(s string, base int) ([]string, error) {
-	return []string{}, ErrUnsupported
+	return nil, ErrUnsupported
 }
