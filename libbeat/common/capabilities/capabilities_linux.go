@@ -54,79 +54,6 @@ const (
 	Permitted = cap.Permitted
 )
 
-// True if sets are equal for the given flag/vector, errors out in
-// case any of the sets is malformed.
-func isEqual(flag Flag, a *cap.Set, b *cap.Set) (bool, error) {
-	d, err := a.Cf(b)
-	if err != nil {
-		return false, err
-	}
-
-	return !d.Has(flag), nil
-}
-
-// Convert the capability ID to a string suitable to be used in
-// ECS.
-// If capabiliy ID X is unknown, but valid (0 <= X < 64), "CAP_X"
-// will be returned instead. Fetches from an internal table built at
-// startup.
-var toECS = makeToECS()
-
-// Make toECS() which creates a map of every possible valid capability
-// ID on startup. Returns errInvalidCapabilty for an invalid ID.
-func makeToECS() func(int) (string, error) {
-	ecsNames := make(map[int]string)
-
-	for i := 0; i < 64; i++ {
-		c := cap.Value(i)
-		if i < int(cap.MaxBits()) {
-			ecsNames[i] = strings.ToUpper(c.String())
-		} else {
-			ecsNames[i] = strings.ToUpper("CAP_" + c.String())
-		}
-	}
-
-	return func(b int) (string, error) {
-		s, ok := ecsNames[b]
-		if !ok {
-			return "", errInvalidCapability
-		}
-		return s, nil
-	}
-}
-
-// True if the set has all the capabilities set for the given
-// flag/vector, see FromUint64 for a CAP_ALL explanation.
-var isAll = makeIsAll()
-
-// Make isAll(), there is no direct way to get a full capability set,
-// so we have to build one. Instead of building it for every call,
-// build it once on startup and don't expose it.
-func makeIsAll() func(Flag, *cap.Set) (bool, error) {
-	all := cap.NewSet()
-	for i := 0; i < int(cap.MaxBits()); i++ {
-		all.SetFlag(cap.Effective, true, cap.Value(i))
-		all.SetFlag(cap.Permitted, true, cap.Value(i))
-		all.SetFlag(cap.Inheritable, true, cap.Value(i))
-	}
-
-	return func(flag Flag, set *cap.Set) (bool, error) {
-		return isEqual(flag, set, all)
-	}
-}
-
-// Like isAll(), but for the empty set, here for symmetry.
-var isEmpty = makeIsEmpty()
-
-// Make isEmpty(), the corollary to makeIsFull.
-func makeIsEmpty() func(Flag, *cap.Set) (bool, error) {
-	empty := cap.NewSet()
-
-	return func(flag Flag, set *cap.Set) (bool, error) {
-		return isEqual(flag, set, empty)
-	}
-}
-
 // Fetch the capabilities of pid for a given flag/vector and convert
 // it to the representation used in ECS. cap.GetPID() fetches it with
 // SYS_CAPGET. Check FromUint64 for a definition of []{"CAP_ALL"}.
@@ -209,4 +136,77 @@ func FromString(s string, base int) ([]string, error) {
 	}
 
 	return FromUint64(w)
+}
+
+// True if sets are equal for the given flag/vector, errors out in
+// case any of the sets is malformed.
+func isEqual(flag Flag, a *cap.Set, b *cap.Set) (bool, error) {
+	d, err := a.Cf(b)
+	if err != nil {
+		return false, err
+	}
+
+	return !d.Has(flag), nil
+}
+
+// Convert the capability ID to a string suitable to be used in
+// ECS.
+// If capabiliy ID X is unknown, but valid (0 <= X < 64), "CAP_X"
+// will be returned instead. Fetches from an internal table built at
+// startup.
+var toECS = makeToECS()
+
+// Make toECS() which creates a map of every possible valid capability
+// ID on startup. Returns errInvalidCapabilty for an invalid ID.
+func makeToECS() func(int) (string, error) {
+	ecsNames := make(map[int]string)
+
+	for i := 0; i < 64; i++ {
+		c := cap.Value(i)
+		if i < int(cap.MaxBits()) {
+			ecsNames[i] = strings.ToUpper(c.String())
+		} else {
+			ecsNames[i] = strings.ToUpper("CAP_" + c.String())
+		}
+	}
+
+	return func(b int) (string, error) {
+		s, ok := ecsNames[b]
+		if !ok {
+			return "", errInvalidCapability
+		}
+		return s, nil
+	}
+}
+
+// True if the set has all the capabilities set for the given
+// flag/vector, see FromUint64 for a CAP_ALL explanation.
+var isAll = makeIsAll()
+
+// Make isAll(), there is no direct way to get a full capability set,
+// so we have to build one. Instead of building it for every call,
+// build it once on startup and don't expose it.
+func makeIsAll() func(Flag, *cap.Set) (bool, error) {
+	all := cap.NewSet()
+	for i := 0; i < int(cap.MaxBits()); i++ {
+		all.SetFlag(cap.Effective, true, cap.Value(i))
+		all.SetFlag(cap.Permitted, true, cap.Value(i))
+		all.SetFlag(cap.Inheritable, true, cap.Value(i))
+	}
+
+	return func(flag Flag, set *cap.Set) (bool, error) {
+		return isEqual(flag, set, all)
+	}
+}
+
+// Like isAll(), but for the empty set, here for symmetry.
+var isEmpty = makeIsEmpty()
+
+// Make isEmpty(), the corollary to makeIsFull.
+func makeIsEmpty() func(Flag, *cap.Set) (bool, error) {
+	empty := cap.NewSet()
+
+	return func(flag Flag, set *cap.Set) (bool, error) {
+		return isEqual(flag, set, empty)
+	}
 }
