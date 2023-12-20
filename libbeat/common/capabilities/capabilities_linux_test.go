@@ -95,5 +95,5 @@ func assertHasCap(t *testing.T, sl []string, s string) {
 		}
 	}
 
-	assert.Equal(t, found, 1)
+	assert.Equal(t, found, 1, s)
 }
