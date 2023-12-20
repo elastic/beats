@@ -200,7 +200,7 @@ func NewResourceMetadataEnricher(
 		// update
 		func(m map[string]mapstr.M, r kubernetes.Resource) {
 			accessor, _ := meta.Accessor(r)
-			id := join(accessor.GetNamespace(), accessor.GetName()) //nolint:all
+			id := join(accessor.GetNamespace(), accessor.GetName())
 
 			switch r := r.(type) {
 			case *kubernetes.Pod:

@@ -118,14 +118,14 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 
 		var c kubeAnnotatorConfig
 
-		err := cfg.Unpack(&c)
+		_ = cfg.Unpack(&c)
 		c.DefaultMatchers = Enabled{false}
 		c.Matchers = PluginConfig{
 			{
 				test.matcherName: *cfg,
 			},
 		}
-		err = c.Validate()
+		err := c.Validate()
 		if test.error {
 			require.NotNil(t, err)
 		} else {
