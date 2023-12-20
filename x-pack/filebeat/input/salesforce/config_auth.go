@@ -43,12 +43,17 @@ func (o *oAuth2Config) Validate() error {
 		return nil
 	}
 
-	if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
-		return errors.New("both token_url and client credentials must be provided")
-	}
-
-	if o.Password == "" || o.User == "" {
-		return errors.New("both user and password credentials must be provided")
+	switch {
+	case o.TokenURL == "":
+		return errors.New("token_url must be provided")
+	case o.ClientID == "":
+		return errors.New("client.id must be provided")
+	case o.ClientSecret == "":
+		return errors.New("client.secret must be provided")
+	case o.Password == "":
+		return errors.New("password must be provided")
+	case o.User == "":
+		return errors.New("user must be provided")
 	}
 
 	return nil
@@ -62,6 +67,17 @@ func (o *jwtConfig) isEnabled() bool {
 func (o *jwtConfig) Validate() error {
 	if !o.isEnabled() {
 		return nil
+	}
+
+	switch {
+	case o.URL == "":
+		return errors.New("url must be provided")
+	case o.ClientId == "":
+		return errors.New("client.id must be provided")
+	case o.ClientUsername == "":
+		return errors.New("client.username must be provided")
+	case o.ClientKeyPath == "":
+		return errors.New("client.key_path must be provided")
 	}
 
 	return nil
