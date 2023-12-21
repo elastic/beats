@@ -7,19 +7,11 @@ package compute
 import (
 	"testing"
 
-<<<<<<< HEAD
-	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/genproto/googleapis/api/metric"
-	"google.golang.org/genproto/googleapis/api/monitoredres"
-	monitoring "google.golang.org/genproto/googleapis/monitoring/v3"
-=======
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/protobuf/types/known/timestamppb"
->>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 )
 
 var fake = &monitoring.TimeSeries{
