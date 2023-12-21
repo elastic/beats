@@ -196,7 +196,7 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 		return nil, err
 	}
 
-	s.log.Infof("salesforce query: %s", qr)
+	s.log.Infof("Salesforce query: %s", qr)
 
 	return &querier{Query: qr}, err
 }
@@ -263,7 +263,7 @@ func (s *salesforceInput) RunObject() error {
 			break
 		}
 	}
-	s.log.Debugf("total events: %d", totalEvents)
+	s.log.Debugf("Total events: %d", totalEvents)
 
 	return nil
 }
@@ -356,7 +356,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 			break
 		}
 	}
-	s.log.Debugf("total events: %d", totalEvents)
+	s.log.Debugf("Total events: %d", totalEvents)
 
 	return nil
 }
