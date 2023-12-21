@@ -9,11 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-<<<<<<< HEAD
-=======
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/durationpb"
->>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
