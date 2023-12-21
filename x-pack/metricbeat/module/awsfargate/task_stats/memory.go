@@ -13,7 +13,6 @@ type memoryStats struct {
 	TotalRss  uint64
 	TotalRssP float64
 	Usage     uint64
-	UsageP    float64
 	//Raw stats from the cgroup subsystem
 	Stats map[string]uint64
 	//Windows-only memory stats
@@ -30,7 +29,6 @@ func getMemoryStats(taskStats types.StatsJSON) memoryStats {
 		MaxUsage:  taskStats.Stats.MemoryStats.MaxUsage,
 		TotalRssP: float64(totalRSS) / float64(taskStats.Stats.MemoryStats.Limit),
 		Usage:     taskStats.Stats.MemoryStats.Usage,
-		UsageP:    float64(taskStats.Stats.MemoryStats.Usage) / float64(taskStats.Stats.MemoryStats.Limit),
 		Stats:     taskStats.Stats.MemoryStats.Stats,
 		//Windows memory statistics
 		Commit:            taskStats.Stats.MemoryStats.Commit,
