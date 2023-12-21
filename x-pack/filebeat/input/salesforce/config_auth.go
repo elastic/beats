@@ -53,7 +53,7 @@ func (o *userPasswordFlow) Validate() error {
 	case o.ClientSecret == "":
 		return errors.New("client.secret must be provided")
 	case o.Username == "":
-		return errors.New("user must be provided")
+		return errors.New("username must be provided")
 	case o.Password == "":
 		return errors.New("password must be provided")
 

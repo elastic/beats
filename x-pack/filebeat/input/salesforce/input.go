@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -143,13 +144,13 @@ func (s *salesforceInput) run() error {
 		// another ticker making the channel ready.
 		select {
 		case <-s.ctx.Done():
-			return s.ctx.Err()
+			return s.isError(s.ctx.Err())
 		default:
 		}
 
 		select {
 		case <-s.ctx.Done():
-			return s.ctx.Err()
+			return s.isError(s.ctx.Err())
 		case <-eventLogFileTicker.C:
 			if err := s.RunEventLogFile(); err != nil {
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
@@ -160,6 +161,15 @@ func (s *salesforceInput) run() error {
 			}
 		}
 	}
+}
+
+func (s *salesforceInput) isError(err error) error {
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		s.log.Infof("input stopped because context was cancelled with: %v", err)
+		return nil
+	}
+
+	return err
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
