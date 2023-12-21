@@ -90,6 +90,8 @@ func (bm *batchMock) RetryEvents(events []publisher.Event) {
 func TestPublish(t *testing.T) {
 	makePublishTestClient := func(t *testing.T, url string) *Client {
 		client, err := NewClient(
+			logp.L(),
+			logp.L(),
 			ClientSettings{
 				Observer:           outputs.NewNilObserver(),
 				ConnectionSettings: eslegclient.ConnectionSettings{URL: url},
@@ -248,6 +250,8 @@ func TestPublish(t *testing.T) {
 
 func TestCollectPublishFailsNone(t *testing.T) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -272,6 +276,8 @@ func TestCollectPublishFailsNone(t *testing.T) {
 
 func TestCollectPublishFailMiddle(t *testing.T) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -302,6 +308,8 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 
 func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "dead_letter_index",
@@ -361,6 +369,8 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 
 func TestCollectPublishFailDrop(t *testing.T) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -405,6 +415,8 @@ func TestCollectPublishFailDrop(t *testing.T) {
 
 func TestCollectPublishFailAll(t *testing.T) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -434,6 +446,8 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -481,6 +495,8 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -510,6 +526,8 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 
 func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -540,6 +558,8 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 
 func BenchmarkCollectPublishFailAll(b *testing.B) {
 	client, err := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer:           outputs.NewNilObserver(),
 			NonIndexableAction: "drop",
@@ -589,17 +609,20 @@ func TestClientWithHeaders(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client, err := NewClient(ClientSettings{
-		Observer: outputs.NewNilObserver(),
-		ConnectionSettings: eslegclient.ConnectionSettings{
-			URL: ts.URL,
-			Headers: map[string]string{
-				"host":   "myhost.local",
-				"X-Test": "testing value",
+	client, err := NewClient(
+		logp.L(),
+		logp.L(),
+		ClientSettings{
+			Observer: outputs.NewNilObserver(),
+			ConnectionSettings: eslegclient.ConnectionSettings{
+				URL: ts.URL,
+				Headers: map[string]string{
+					"host":   "myhost.local",
+					"X-Test": "testing value",
+				},
 			},
-		},
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
-	}, nil)
+			Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
+		}, nil)
 	assert.NoError(t, err)
 
 	// simple ping
@@ -667,6 +690,8 @@ func TestBulkEncodeEvents(t *testing.T) {
 			}
 
 			client, err := NewClient(
+				logp.L(),
+				logp.L(),
 				ClientSettings{
 					Observer: outputs.NewNilObserver(),
 					Index:    index,
@@ -743,6 +768,8 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	}
 
 	client, _ := NewClient(
+		logp.L(),
+		logp.L(),
 		ClientSettings{
 			Observer: outputs.NewNilObserver(),
 			Index:    index,
@@ -786,13 +813,16 @@ func TestClientWithAPIKey(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client, err := NewClient(ClientSettings{
-		Observer: outputs.NewNilObserver(),
-		ConnectionSettings: eslegclient.ConnectionSettings{
-			URL:    ts.URL,
-			APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
-		},
-	}, nil)
+	client, err := NewClient(
+		logp.L(),
+		logp.L(),
+		ClientSettings{
+			Observer: outputs.NewNilObserver(),
+			ConnectionSettings: eslegclient.ConnectionSettings{
+				URL:    ts.URL,
+				APIKey: "hyokHG4BfWk5viKZ172X:o45JUkyuS--yiSAuuxl8Uw",
+			},
+		}, nil)
 	assert.NoError(t, err)
 
 	// This connection will fail since the server doesn't return a valid
@@ -806,6 +836,8 @@ func TestClientWithAPIKey(t *testing.T) {
 func TestPublishEventsWithBulkFiltering(t *testing.T) {
 	makePublishTestClient := func(t *testing.T, url string, configParams map[string]string) *Client {
 		client, err := NewClient(
+			logp.L(),
+			logp.L(),
 			ClientSettings{
 				Observer: outputs.NewNilObserver(),
 				ConnectionSettings: eslegclient.ConnectionSettings{

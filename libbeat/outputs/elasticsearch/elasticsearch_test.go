@@ -122,11 +122,12 @@ func TestPipelineSelection(t *testing.T) {
 			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg))
 
 			client, err := NewClient(
+				logp.L(),
+				logp.L(),
 				ClientSettings{
 					Pipeline: &selector,
 				},
 				nil,
-				logp.Config{},
 			)
 			assert.NoError(t, err)
 

@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid"
@@ -247,7 +248,7 @@ elasticsearch:
 
 		update := &reload.ConfigWithMeta{Config: c}
 		m := &outputReloaderMock{}
-		reloader := b.makeOutputReloader(m)
+		reloader := b.makeOutputReloader(m, logp.Config{})
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
 		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
@@ -266,7 +267,8 @@ type outputReloaderMock struct {
 
 func (r *outputReloaderMock) Reload(
 	cfg *reload.ConfigWithMeta,
-	factory func(o outputs.Observer, cfg config.Namespace) (outputs.Group, error),
+	eventsLoggerCfg logp.Config,
+	factory func(o outputs.Observer, cfg config.Namespace, eventsLoggerCfg logp.Config) (outputs.Group, error),
 ) error {
 	r.cfg = cfg
 	return nil
