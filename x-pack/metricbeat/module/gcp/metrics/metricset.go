@@ -10,22 +10,12 @@ import (
 	"strings"
 	"time"
 
-<<<<<<< HEAD
-	monitoring "cloud.google.com/go/monitoring/apiv3"
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/pkg/errors"
-	"google.golang.org/api/iterator"
-	"google.golang.org/api/option"
-	"google.golang.org/genproto/googleapis/api/metric"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
-=======
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/protobuf/types/known/durationpb"
->>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
