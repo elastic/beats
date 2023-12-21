@@ -47,7 +47,7 @@ func (c *config) Validate() error {
 	case c.URL == "":
 		return errors.New("no instance url is configured")
 	case !c.EventMonitoringMethod.Object.isEnabled() && !c.EventMonitoringMethod.EventLogFile.isEnabled():
-		return errors.New(`at least one of "data_collection_method.event_log_file.enabled" or "data_collection_method.object.enabled" must be set to true`)
+		return errors.New(`at least one of "event_monitoring_method.event_log_file.enabled" or "event_monitoring_method.object.enabled" must be set to true`)
 	case c.EventMonitoringMethod.EventLogFile.isEnabled() && c.EventMonitoringMethod.EventLogFile.Interval == 0:
 		return fmt.Errorf("not a valid interval %d", c.EventMonitoringMethod.EventLogFile.Interval)
 	case c.EventMonitoringMethod.Object.isEnabled() && c.EventMonitoringMethod.Object.Interval == 0:

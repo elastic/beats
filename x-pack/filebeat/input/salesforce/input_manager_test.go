@@ -68,8 +68,8 @@ func TestInputManager(t *testing.T) {
 				ClientKeyPath:  "xyz",
 			},
 		},
-		"data_collection_method": &DataCollectionMethod{
-			Object: ObjectMethod{Enabled: true, Interval: 4},
+		"event_monitoring_method": &EventMonitoringMethod{
+			Object: EventMonitoringConfig{Enabled: pointer(true), Interval: 4},
 		},
 	})
 	assert.NoError(t, err)
