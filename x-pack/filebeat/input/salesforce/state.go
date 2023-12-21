@@ -21,26 +21,17 @@ type dateTimeCursor struct {
 	LastEventTime  string `struct:"last_event_time,omitempty"`
 }
 
-func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor mapstr.M, log *logp.Logger) (qr string, err error) {
-	ctxTmpl := mapstr.M{
-		"var":    nil,
-		"cursor": nil,
-	}
+func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor mapstr.M, log *logp.Logger) (string, error) {
+	ctxTmpl := mapstr.M{"cursor": nil}
 
 	if cursor != nil {
 		ctxTmpl["cursor"] = cursor
-		qr, err = cfg.Value.Execute(ctxTmpl, nil, log)
+		qr, err := cfg.Value.Execute(ctxTmpl, nil, log)
 		if err != nil {
 			return "", err
 		}
 		return qr, nil
 	}
 
-	ctxTmpl["var"] = mapstr.M{"initial_interval": timeNow().Add(-*initialInterval).Format(formatRFC3339Like)}
-	qr, err = cfg.Default.Execute(ctxTmpl, cfg.Default, log)
-	if err != nil {
-		return "", err
-	}
-
-	return qr, nil
+	return cfg.Default.Execute(ctxTmpl, nil, log)
 }

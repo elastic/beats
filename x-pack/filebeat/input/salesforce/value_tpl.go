@@ -6,7 +6,6 @@ package salesforce
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"text/template"
 	"time"
@@ -54,6 +53,7 @@ func (t *valueTpl) Execute(data any, defaultVal *valueTpl, log *logp.Logger) (va
 	if val == "" {
 		return fallback(errEmptyTemplateResult)
 	}
+
 	return val, nil
 }
 
@@ -68,12 +68,10 @@ func (t *valueTpl) Unpack(in string) error {
 	tpl, err := template.New("").
 		Option("missingkey=error").
 		Funcs(template.FuncMap{
-			"sprintf":                             fmt.Sprintf,
-			"formatCurrentTimeWithDurationOffset": formatCurrentTimeWithDurationOffset,
-			"formatUnixTimeAsRFC3339":             formatUnixTimeAsRFC3339,
-			"formatUnixTimeMilliAsRFC3339":        formatUnixTimeMilliAsRFC3339,
-			"formatUnixTimeNanoAsRFC3339":         formatUnixTimeNanoAsRFC3339,
-			"parseRFC3339Timestamp":               parseRFC3339Timestamp,
+			"now":           timeNow,
+			"parseDuration": parseDuration,
+			"parseTime":     parseTime,
+			"formatTime":    formatTime,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -86,51 +84,39 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func parseRFC3339Timestamp(s string) string {
-	_, err := time.Parse(time.RFC3339, s)
-	if err != nil {
-		return ""
-	}
-	return s
+func parseDuration(s string) time.Duration {
+	d, _ := time.ParseDuration(s)
+	return d
 }
 
-func formatUnixTimeAsRFC3339(sec int64) string {
-	return time.Unix(sec, 0).Format(time.RFC3339)
+var predefinedLayouts = map[string]string{
+	"ANSIC":             time.ANSIC,
+	"UnixDate":          time.UnixDate,
+	"RubyDate":          time.RubyDate,
+	"RFC822":            time.RFC822,
+	"RFC822Z":           time.RFC822Z,
+	"RFC850":            time.RFC850,
+	"RFC1123":           time.RFC1123,
+	"RFC1123Z":          time.RFC1123Z,
+	"RFC3339":           time.RFC3339,      // 2006-01-02T15:04:05Z07:00
+	"CustomRFC3339Like": formatRFC3339Like, // 2006-01-02T15:04:05.999Z
+	"RFC3339Nano":       time.RFC3339Nano,
+	"Kitchen":           time.Kitchen,
 }
 
-func formatUnixTimeMilliAsRFC3339(ms int64) string {
-	return time.Unix(0, ms*1e6).Format(time.RFC3339)
+func parseTime(ts string, layout string) time.Time {
+	if found := predefinedLayouts[layout]; found != "" {
+		layout = found
+	}
+
+	t, _ := time.Parse(layout, ts)
+	return t
 }
 
-func formatUnixTimeNanoAsRFC3339(ns int64) string {
-	return time.Unix(0, ns).Format(time.RFC3339)
-}
-
-func formatCurrentTimeWithDurationOffset(duration string) string {
-	now := timeNow().UTC()
-
-	if duration == "" {
-		return now.Format(time.RFC3339)
+func formatTime(t time.Time, layout string) string {
+	if found := predefinedLayouts[layout]; found != "" {
+		layout = found
 	}
 
-	d, err := time.ParseDuration(duration)
-	if err != nil {
-		return now.Format(time.RFC3339)
-	}
-
-	// Consume [-+]?
-	var neg bool
-
-	c := duration[0]
-	if c == '-' || c == '+' {
-		neg = c == '-'
-	}
-
-	// Example:
-	// * If duration d is -1h, then now()-1h
-	// * If duration d is  1h, then now()+1h
-	if neg {
-		return now.Add(-d).Format(time.RFC3339)
-	}
-	return now.Add(d).Format(time.RFC3339)
+	return t.Format(layout)
 }
