@@ -13,19 +13,12 @@ import (
 	"testing"
 	"time"
 
-<<<<<<< HEAD
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
-	aggRecProto "github.com/awslabs/kinesis-aggregation/go/records"
-	"github.com/golang/protobuf/proto"
-=======
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"google.golang.org/protobuf/runtime/protoimpl"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
 	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
->>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 
