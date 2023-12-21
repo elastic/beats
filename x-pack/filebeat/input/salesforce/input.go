@@ -363,7 +363,7 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 		passCreds := credentials.JwtCredentials{
 			URL:            cfg.Auth.JWT.URL,
-			ClientId:       cfg.Auth.JWT.ClientId,
+			ClientId:       cfg.Auth.JWT.ClientID,
 			ClientUsername: cfg.Auth.JWT.ClientUsername,
 			ClientKey:      signKey,
 		}

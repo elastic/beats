@@ -27,7 +27,7 @@ type jwtConfig struct {
 	Enabled *bool `config:"enabled"`
 
 	URL            string `config:"url"`
-	ClientId       string `config:"client.id"`
+	ClientID       string `config:"client.id"`
 	ClientUsername string `config:"client.username"`
 	ClientKeyPath  string `config:"client.key_path"`
 }
@@ -50,10 +50,11 @@ func (o *oAuth2Config) Validate() error {
 		return errors.New("client.id must be provided")
 	case o.ClientSecret == "":
 		return errors.New("client.secret must be provided")
-	case o.Password == "":
-		return errors.New("password must be provided")
 	case o.User == "":
 		return errors.New("user must be provided")
+	case o.Password == "":
+		return errors.New("password must be provided")
+
 	}
 
 	return nil
@@ -72,7 +73,7 @@ func (o *jwtConfig) Validate() error {
 	switch {
 	case o.URL == "":
 		return errors.New("url must be provided")
-	case o.ClientId == "":
+	case o.ClientID == "":
 		return errors.New("client.id must be provided")
 	case o.ClientUsername == "":
 		return errors.New("client.username must be provided")

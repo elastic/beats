@@ -13,10 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func pointer[T any](d T) *T {
-	return &d
-}
-
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
 		inputCfg config

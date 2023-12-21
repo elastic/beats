@@ -18,3 +18,7 @@ func mockTimeNow(t time.Time) {
 func resetTimeNow() {
 	timeNow = time.Now
 }
+
+func pointer[T any](d T) *T {
+	return &d
+}
