@@ -115,7 +115,6 @@ func init() {
 					"prlimit64",
 					"pselect6",
 					"pwrite64",
-					"pwrite64",
 					"read",
 					"readlinkat",
 					"recvfrom",

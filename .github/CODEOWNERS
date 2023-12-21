@@ -29,19 +29,18 @@ CHANGELOG*
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/security-external-integrations
 /filebeat/input/winlog/ @elastic/security-external-integrations
-/filebeat/module/ @elastic/integrations
 /filebeat/module/apache @elastic/obs-infraobs-integrations
 /filebeat/module/auditd @elastic/security-external-integrations
 /filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /filebeat/module/haproxy @elastic/obs-infraobs-integrations
-/filebeat/module/icinga @elastic/integrations
+/filebeat/module/icinga # TODO: find right team
 /filebeat/module/iis @elastic/obs-infraobs-integrations
 /filebeat/module/kafka @elastic/obs-infraobs-integrations
 /filebeat/module/kibana/ @elastic/infra-monitoring-ui
 /filebeat/module/logstash/ @elastic/infra-monitoring-ui
 /filebeat/module/mongodb @elastic/obs-infraobs-integrations
 /filebeat/module/mysql @elastic/security-external-integrations
-/filebeat/module/nats @elastic/integrations
+/filebeat/module/nats @elastic/obs-infraobs-integrations
 /filebeat/module/nginx @elastic/obs-infraobs-integrations
 /filebeat/module/osquery @elastic/security-external-integrations
 /filebeat/module/pensando @elastic/security-external-integrations
@@ -49,8 +48,8 @@ CHANGELOG*
 /filebeat/module/redis @elastic/obs-infraobs-integrations
 /filebeat/module/santa @elastic/security-external-integrations
 /filebeat/module/system @elastic/elastic-agent-data-plane
-/filebeat/module/traefik @elastic/integrations
-/heartbeat/ @elastic/hosted-services
+/filebeat/module/traefik # TODO: find right team
+/heartbeat/ @elastic/obs-ds-hosted-services
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
@@ -68,7 +67,6 @@ CHANGELOG*
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
-/metricbeat/module/ @elastic/integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
 /metricbeat/module/ceph @elastic/obs-infraobs-integrations
@@ -122,7 +120,6 @@ CHANGELOG*
 /x-pack/filebeat/input/lumberjack/ @elastic/security-external-integrations
 /x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
 /x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
-/x-pack/filebeat/module/ @elastic/integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
 /x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
@@ -174,10 +171,9 @@ CHANGELOG*
 /x-pack/filebeat/module/zscaler @elastic/security-external-integrations
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-external-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
-/x-pack/heartbeat/ @elastic/hosted-services
+/x-pack/heartbeat/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
-/x-pack/metricbeat/module/ @elastic/integrations
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/airflow @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cloudfoundry @elastic/obs-infraobs-integrations
