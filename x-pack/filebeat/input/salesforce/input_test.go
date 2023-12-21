@@ -273,7 +273,6 @@ func defaultHandler(expectedMethod, expectedBody, msg1, msg2 string) http.Handle
 func newTestServer(newServer func(http.Handler) *httptest.Server) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
 	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
-		fmt.Printf("server.URL: %v\n", server.URL)
 		config["url"] = server.URL
 		config["auth.oauth2"].(map[string]interface{})["user_password_flow"].(map[string]interface{})["token_url"] = server.URL + "/services/oauth2/token"
 		t.Cleanup(server.Close)
