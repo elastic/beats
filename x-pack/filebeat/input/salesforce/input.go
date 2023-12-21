@@ -358,8 +358,8 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	)
 
 	switch {
-	case cfg.Auth.JWT.isEnabled():
-		pemBytes, err := os.ReadFile(cfg.Auth.JWT.ClientKeyPath)
+	case cfg.Auth.OAuth2.JWTBearerFlow.isEnabled():
+		pemBytes, err := os.ReadFile(cfg.Auth.OAuth2.JWTBearerFlow.ClientKeyPath)
 		if err != nil {
 			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
 		}
@@ -370,9 +370,9 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 		}
 
 		passCreds := credentials.JwtCredentials{
-			URL:            cfg.Auth.JWT.URL,
-			ClientId:       cfg.Auth.JWT.ClientID,
-			ClientUsername: cfg.Auth.JWT.ClientUsername,
+			URL:            cfg.Auth.OAuth2.JWTBearerFlow.URL,
+			ClientId:       cfg.Auth.OAuth2.JWTBearerFlow.ClientID,
+			ClientUsername: cfg.Auth.OAuth2.JWTBearerFlow.ClientUsername,
 			ClientKey:      signKey,
 		}
 
@@ -380,13 +380,13 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 		if err != nil {
 			return nil, fmt.Errorf("problem with credentials: %w", err)
 		}
-	case cfg.Auth.OAuth2.isEnabled():
+	case cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		passCreds := credentials.PasswordCredentials{
 			URL:          cfg.URL,
-			Username:     cfg.Auth.OAuth2.User,
-			Password:     cfg.Auth.OAuth2.Password,
-			ClientID:     cfg.Auth.OAuth2.ClientID,
-			ClientSecret: cfg.Auth.OAuth2.ClientSecret,
+			Username:     cfg.Auth.OAuth2.UserPasswordFlow.Username,
+			Password:     cfg.Auth.OAuth2.UserPasswordFlow.Password,
+			ClientID:     cfg.Auth.OAuth2.UserPasswordFlow.ClientID,
+			ClientSecret: cfg.Auth.OAuth2.UserPasswordFlow.ClientSecret,
 		}
 
 		creds, err = credentials.NewPasswordCredentials(passCreds)

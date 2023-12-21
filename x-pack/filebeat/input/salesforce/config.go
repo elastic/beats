@@ -40,9 +40,9 @@ type cursorConfig struct {
 
 func (c *config) Validate() error {
 	switch {
-	case !c.Auth.JWT.isEnabled() && !c.Auth.OAuth2.isEnabled():
+	case !c.Auth.OAuth2.JWTBearerFlow.isEnabled() && !c.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		return errors.New("no auth provider enabled")
-	case c.Auth.JWT.isEnabled() && c.Auth.OAuth2.isEnabled():
+	case c.Auth.OAuth2.JWTBearerFlow.isEnabled() && c.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		return errors.New("only one auth provider must be enabled")
 	case c.URL == "":
 		return errors.New("no instance url is configured")

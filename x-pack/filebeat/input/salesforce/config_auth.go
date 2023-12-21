@@ -4,26 +4,28 @@
 
 package salesforce
 
-import (
-	"errors"
-)
+import "errors"
 
 type authConfig struct {
-	OAuth2 *oAuth2Config `config:"oauth2"`
-	JWT    *jwtConfig    `config:"jwt"`
+	OAuth2 OAuth2 `config:"oauth2"`
 }
 
-type oAuth2Config struct {
+type OAuth2 struct {
+	UserPasswordFlow *userPasswordFlow `config:"user_password_flow"`
+	JWTBearerFlow    *jwtBearerFlow    `config:"jwt_bearer_flow"`
+}
+
+type userPasswordFlow struct {
 	Enabled *bool `config:"enabled"`
 
 	ClientID     string `config:"client.id"`
 	ClientSecret string `config:"client.secret"`
 	Password     string `config:"password"`
 	TokenURL     string `config:"token_url"`
-	User         string `config:"user"`
+	Username     string `config:"username"`
 }
 
-type jwtConfig struct {
+type jwtBearerFlow struct {
 	Enabled *bool `config:"enabled"`
 
 	URL            string `config:"url"`
@@ -33,12 +35,12 @@ type jwtConfig struct {
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
-func (o *oAuth2Config) isEnabled() bool {
+func (o *userPasswordFlow) isEnabled() bool {
 	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
 // Validate checks if oauth2 config is valid.
-func (o *oAuth2Config) Validate() error {
+func (o *userPasswordFlow) Validate() error {
 	if !o.isEnabled() {
 		return nil
 	}
@@ -50,7 +52,7 @@ func (o *oAuth2Config) Validate() error {
 		return errors.New("client.id must be provided")
 	case o.ClientSecret == "":
 		return errors.New("client.secret must be provided")
-	case o.User == "":
+	case o.Username == "":
 		return errors.New("user must be provided")
 	case o.Password == "":
 		return errors.New("password must be provided")
@@ -61,11 +63,11 @@ func (o *oAuth2Config) Validate() error {
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
-func (o *jwtConfig) isEnabled() bool {
+func (o *jwtBearerFlow) isEnabled() bool {
 	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
-func (o *jwtConfig) Validate() error {
+func (o *jwtBearerFlow) Validate() error {
 	if !o.isEnabled() {
 		return nil
 	}

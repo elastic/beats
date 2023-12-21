@@ -102,11 +102,11 @@ func TestInput(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			name:        "data_collection_method_object_with_default_query_only",
+			name:        "event_monitoring_method_object_with_default_query_only",
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{
-					"enabled":       true,
+					"enabled":       pointer(true),
 					"client.id":     "clientid",
 					"client.secret": "clientsecret",
 					"token_url":     "https://instance_id.develop.my.salesforce.com/services/oauth2/token",
@@ -114,7 +114,7 @@ func TestInput(t *testing.T) {
 					"password":      "password",
 				},
 				"version": 56,
-				"data_collection_method": map[string]interface{}{
+				"event_monitoring_method": map[string]interface{}{
 					"object": map[string]interface{}{
 						"interval": "5m",
 						"enabled":  true,

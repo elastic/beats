@@ -87,10 +87,9 @@ func (t *valueTpl) Unpack(in string) error {
 }
 
 func parseRFC3339Timestamp(s string) string {
-	now := timeNow().UTC()
 	_, err := time.Parse(time.RFC3339, s)
 	if err != nil {
-		return now.Format(time.RFC3339)
+		return ""
 	}
 	return s
 }

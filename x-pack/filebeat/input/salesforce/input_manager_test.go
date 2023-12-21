@@ -60,13 +60,13 @@ func TestInputManager(t *testing.T) {
 		"url":     "https://salesforce.com",
 		"version": 46,
 		"auth": &authConfig{
-			JWT: &jwtConfig{
+			OAuth2: OAuth2{JWTBearerFlow: &jwtBearerFlow{
 				Enabled:        pointer(true),
 				URL:            "https://salesforce.com",
 				ClientID:       "xyz",
 				ClientUsername: "xyz",
 				ClientKeyPath:  "xyz",
-			},
+			}},
 		},
 		"event_monitoring_method": &EventMonitoringMethod{
 			Object: EventMonitoringConfig{Enabled: pointer(true), Interval: 4},
