@@ -76,7 +76,7 @@ func RunTests(
 		processing,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
+			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config(), logp.Config{})
 			return cfg.Name(), out, err
 		},
 	)

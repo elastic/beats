@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -204,7 +205,7 @@ func doClientPing(t *testing.T) {
 
 		clientSettings.Transport.Proxy.URL = &proxyURL
 	}
-	client, err := NewClient(clientSettings, nil)
+	client, err := NewClient(logp.L(), logp.L(), clientSettings, nil)
 	require.NoError(t, err)
 
 	// This ping won't succeed; we aren't testing end-to-end communication

@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -108,7 +109,7 @@ func TestMakeRedis(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			cfg, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)
-			groups, err := makeRedis(nil, beatInfo, outputs.NewNilObserver(), cfg)
+			groups, err := makeRedis(nil, beatInfo, outputs.NewNilObserver(), cfg, logp.Config{})
 			assert.Equal(t, err == nil, test.valid)
 			if err != nil && test.valid {
 				t.Log(err)

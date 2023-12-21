@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
 	pb "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
@@ -583,6 +584,7 @@ func createShipperClient(t *testing.T, cfg *config.C, observer outputs.Observer)
 		beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"},
 		observer,
 		cfg,
+		logp.Config{},
 	)
 	require.NoError(t, err)
 	require.Len(t, group.Clients, 1)
