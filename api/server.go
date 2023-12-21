@@ -18,6 +18,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -83,6 +84,11 @@ func (s *Server) Start() {
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
 	return s.l.Close()
+}
+
+// Shutdown gracefully drains the API server of connections by using the go [net/http.Server.Shutdown] function
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.srv.Shutdown(ctx)
 }
 
 // AttachHandler will attach a handler at the specified route and return an error instead of panicing.
