@@ -49,8 +49,8 @@ func TestValidate(t *testing.T) {
 		},
 		"no data collection method configured": {
 			inputCfg: config{
-				DataCollectionMethod: &DataCollectionMethod{},
-				URL:                  "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
+				EventMonitoringMethod: &EventMonitoringMethod{},
+				URL:                   "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
 					OAuth2: &oAuth2Config{
 						Enabled: pointer(true),
@@ -61,9 +61,9 @@ func TestValidate(t *testing.T) {
 		},
 		"invalid elf interval (1h)": {
 			inputCfg: config{
-				DataCollectionMethod: &DataCollectionMethod{
-					EventLogFile: EventLogFileMethod{
-						Enabled:  true,
+				EventMonitoringMethod: &EventMonitoringMethod{
+					EventLogFile: EventMonitoringConfig{
+						Enabled:  pointer(true),
 						Interval: time.Duration(0),
 					},
 				},
@@ -78,9 +78,9 @@ func TestValidate(t *testing.T) {
 		},
 		"invalid object interval (1h)": {
 			inputCfg: config{
-				DataCollectionMethod: &DataCollectionMethod{
-					Object: ObjectMethod{
-						Enabled:  true,
+				EventMonitoringMethod: &EventMonitoringMethod{
+					Object: EventMonitoringConfig{
+						Enabled:  pointer(true),
 						Interval: time.Duration(0),
 					},
 				},
@@ -96,9 +96,9 @@ func TestValidate(t *testing.T) {
 		"invalid api version (v45)": {
 			inputCfg: config{
 				Version: 45,
-				DataCollectionMethod: &DataCollectionMethod{
-					Object: ObjectMethod{
-						Enabled:  true,
+				EventMonitoringMethod: &EventMonitoringMethod{
+					Object: EventMonitoringConfig{
+						Enabled:  pointer(true),
 						Interval: time.Hour,
 					},
 				},

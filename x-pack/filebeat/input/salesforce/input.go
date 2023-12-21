@@ -110,16 +110,14 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 }
 
 func (s *salesforceInput) run() error {
-	if s.srcConfig.DataCollectionMethod.EventLogFile.Enabled {
-		s.log.Debugf("Starting EventLogFile collection")
+	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
 			s.log.Errorf("Problem running EventLogFile collection: %s", err)
 		}
 	}
 
-	if s.srcConfig.DataCollectionMethod.Object.Enabled {
-		s.log.Debugf("Starting Object collection")
+	if s.srcConfig.EventMonitoringMethod.Object.isEnabled() {
 		err := s.RunObject()
 		if err != nil {
 			s.log.Errorf("Problem running Object collection: %s", err)
@@ -129,13 +127,13 @@ func (s *salesforceInput) run() error {
 	eventLogFileTicker, objectMethodTicker := &time.Ticker{}, &time.Ticker{}
 	eventLogFileTicker.C, objectMethodTicker.C = nil, nil
 
-	if s.srcConfig.DataCollectionMethod.EventLogFile.Enabled {
-		eventLogFileTicker = time.NewTicker(s.srcConfig.DataCollectionMethod.EventLogFile.Interval)
+	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
+		eventLogFileTicker = time.NewTicker(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 		defer eventLogFileTicker.Stop()
 	}
 
-	if s.srcConfig.DataCollectionMethod.Object.Enabled {
-		objectMethodTicker = time.NewTicker(s.srcConfig.DataCollectionMethod.Object.Interval)
+	if s.srcConfig.EventMonitoringMethod.Object.isEnabled() {
+		objectMethodTicker = time.NewTicker(s.srcConfig.EventMonitoringMethod.Object.Interval)
 		defer objectMethodTicker.Stop()
 	}
 
@@ -153,12 +151,10 @@ func (s *salesforceInput) run() error {
 		case <-s.ctx.Done():
 			return s.ctx.Err()
 		case <-eventLogFileTicker.C:
-			s.log.Debugf("Starting EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
 			}
 		case <-objectMethodTicker.C:
-			s.log.Debugf("Starting Object collection")
 			if err := s.RunObject(); err != nil {
 				s.log.Errorf("Problem running Object collection: %s", err)
 			}
@@ -196,14 +192,20 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 }
 
 func (s *salesforceInput) RunObject() error {
-	object := mapstr.M{}
-	if s.cursor.Object.FirstEventTime != "" {
-		object.Put("first_event_time", s.cursor.Object.FirstEventTime)
+	s.log.Debugf("Scrape Objects every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
+
+	var cursor mapstr.M
+	if !(s.cursor.Object.FirstEventTime == "" && s.cursor.Object.LastEventTime == "") {
+		object := make(mapstr.M)
+		if s.cursor.Object.FirstEventTime != "" {
+			object.Put("first_event_time", s.cursor.Object.FirstEventTime)
+		}
+		if s.cursor.Object.LastEventTime != "" {
+			object.Put("last_event_time", s.cursor.Object.LastEventTime)
+		}
+		cursor = mapstr.M{"object": object}
 	}
-	if s.cursor.Object.LastEventTime != "" {
-		object.Put("last_event_time", s.cursor.Object.LastEventTime)
-	}
-	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.Object.Query, mapstr.M{"object": object})
+	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -225,12 +227,12 @@ func (s *salesforceInput) RunObject() error {
 			}
 
 			if firstEvent {
-				if timstamp, ok := val[s.config.DataCollectionMethod.Object.Cursor.Field].(string); ok {
+				if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
 					s.cursor.Object.FirstEventTime = timstamp
 				}
 			}
 
-			if timstamp, ok := val[s.config.DataCollectionMethod.Object.Cursor.Field].(string); ok {
+			if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
 				s.cursor.Object.LastEventTime = timstamp
 			}
 
@@ -257,14 +259,20 @@ func (s *salesforceInput) RunObject() error {
 }
 
 func (s *salesforceInput) RunEventLogFile() error {
-	eventLogFile := mapstr.M{}
-	if s.cursor.EventLogFile.FirstEventTime != "" {
-		eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
+	s.log.Debugf("Scrape EventLogFiles every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+
+	var cursor mapstr.M
+	if !(s.cursor.EventLogFile.FirstEventTime == "" && s.cursor.EventLogFile.LastEventTime == "") {
+		eventLogFile := make(mapstr.M)
+		if s.cursor.EventLogFile.FirstEventTime != "" {
+			eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
+		}
+		if s.cursor.EventLogFile.LastEventTime != "" {
+			eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
+		}
+		cursor = mapstr.M{"event_log_file": eventLogFile}
 	}
-	if s.cursor.EventLogFile.LastEventTime != "" {
-		eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
-	}
-	query, err := s.FormQueryWithCursor(s.config.DataCollectionMethod.EventLogFile.Query, mapstr.M{"event_log_file": eventLogFile})
+	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.EventLogFile.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
 	}
@@ -305,12 +313,12 @@ func (s *salesforceInput) RunEventLogFile() error {
 			}
 
 			if firstEvent {
-				if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
+				if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
 					s.cursor.EventLogFile.FirstEventTime = timstamp
 				}
 			}
 
-			if timstamp, ok := rec.Record().Fields()[s.config.DataCollectionMethod.EventLogFile.Cursor.Field].(string); ok {
+			if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
 				s.cursor.EventLogFile.LastEventTime = timstamp
 			}
 

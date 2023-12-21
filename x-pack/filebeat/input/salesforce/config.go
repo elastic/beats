@@ -11,30 +11,27 @@ import (
 )
 
 type config struct {
-	Auth                 *authConfig           `config:"auth"`
-	URL                  string                `config:"url" validate:"required"`
-	Version              int                   `config:"version" validate:"required"`
-	InitialInterval      time.Duration         `config:"initial_interval"`
-	DataCollectionMethod *DataCollectionMethod `config:"data_collection_method"`
+	Auth                  *authConfig            `config:"auth"`
+	URL                   string                 `config:"url" validate:"required"`
+	Version               int                    `config:"version" validate:"required"`
+	InitialInterval       time.Duration          `config:"initial_interval"`
+	EventMonitoringMethod *EventMonitoringMethod `config:"event_monitoring_method"`
 }
 
-type DataCollectionMethod struct {
-	EventLogFile EventLogFileMethod `config:"event_log_file"`
-	Object       ObjectMethod       `config:"object"`
+type EventMonitoringMethod struct {
+	EventLogFile EventMonitoringConfig `config:"event_log_file"`
+	Object       EventMonitoringConfig `config:"object"`
 }
 
-type EventLogFileMethod struct {
-	Enabled  bool          `config:"enabled"`
+type EventMonitoringConfig struct {
+	Enabled  *bool         `config:"enabled"`
 	Interval time.Duration `config:"interval"`
 	Query    *QueryConfig  `config:"query"`
 	Cursor   *cursorConfig `config:"cursor"`
 }
 
-type ObjectMethod struct {
-	Enabled  bool          `config:"enabled"`
-	Interval time.Duration `config:"interval"`
-	Query    *QueryConfig  `config:"query"`
-	Cursor   *cursorConfig `config:"cursor"`
+func (e *EventMonitoringConfig) isEnabled() bool {
+	return e != nil && (e.Enabled != nil && *e.Enabled)
 }
 
 type cursorConfig struct {
@@ -49,12 +46,12 @@ func (c *config) Validate() error {
 		return errors.New("only one auth provider must be enabled")
 	case c.URL == "":
 		return errors.New("no instance url is configured")
-	case !c.DataCollectionMethod.Object.Enabled && !c.DataCollectionMethod.EventLogFile.Enabled:
+	case !c.EventMonitoringMethod.Object.isEnabled() && !c.EventMonitoringMethod.EventLogFile.isEnabled():
 		return errors.New(`at least one of "data_collection_method.event_log_file.enabled" or "data_collection_method.object.enabled" must be set to true`)
-	case c.DataCollectionMethod.EventLogFile.Enabled && c.DataCollectionMethod.EventLogFile.Interval == 0:
-		return fmt.Errorf("not a valid interval %d", c.DataCollectionMethod.EventLogFile.Interval)
-	case c.DataCollectionMethod.Object.Enabled && c.DataCollectionMethod.Object.Interval == 0:
-		return fmt.Errorf("not a valid interval %d", c.DataCollectionMethod.Object.Interval)
+	case c.EventMonitoringMethod.EventLogFile.isEnabled() && c.EventMonitoringMethod.EventLogFile.Interval == 0:
+		return fmt.Errorf("not a valid interval %d", c.EventMonitoringMethod.EventLogFile.Interval)
+	case c.EventMonitoringMethod.Object.isEnabled() && c.EventMonitoringMethod.Object.Interval == 0:
+		return fmt.Errorf("not a valid interval %d", c.EventMonitoringMethod.Object.Interval)
 
 	case c.Version < 46:
 		// * EventLogFile object is available in API version 32.0 or later
