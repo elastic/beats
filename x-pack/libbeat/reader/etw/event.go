@@ -55,6 +55,9 @@ func DefaultCallback(er *EventRecord) uintptr {
 	if err != nil {
 		return 1
 	}
+
+	// This is just an example of how the event could be handled.
+	// This log is not really written as this callback is overwritten.
 	log.Println(string(jsonData))
 
 	return 0

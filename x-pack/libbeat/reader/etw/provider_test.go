@@ -23,7 +23,6 @@ func TestUTF16PtrToString(t *testing.T) {
 	// Convert to *uint16
 	ptr := &utf16Str[0]
 
-	// Test the function
 	result := UTF16PtrToString(ptr)
 	assert.Equal(t, sampleText, result, "The converted string should match the original")
 }
@@ -55,7 +54,9 @@ func TestGUIDFromProviderName_EmptyName(t *testing.T) {
 func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 	// Backup and defer restoration of the original function
 	originalFunc := EnumerateProvidersFunc
-	defer func() { EnumerateProvidersFunc = originalFunc }()
+	t.Cleanup(func() {
+		EnumerateProvidersFunc = originalFunc
+	})
 
 	// Define a mock provider name and GUID for testing.
 	mockProviderName := "NonExistentProvider"
@@ -85,7 +86,9 @@ func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 	// Backup and defer restoration of the original function
 	originalFunc := EnumerateProvidersFunc
-	defer func() { EnumerateProvidersFunc = originalFunc }()
+	t.Cleanup(func() {
+		EnumerateProvidersFunc = originalFunc
+	})
 
 	// Define a mock provider name and GUID for testing.
 	mockProviderName := "NonExistentProvider"
@@ -137,7 +140,9 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 func TestGUIDFromProviderName_Success(t *testing.T) {
 	// Backup and defer restoration of the original function
 	originalFunc := EnumerateProvidersFunc
-	defer func() { EnumerateProvidersFunc = originalFunc }()
+	t.Cleanup(func() {
+		EnumerateProvidersFunc = originalFunc
+	})
 
 	// Define a mock provider name and GUID for testing.
 	mockProviderName := "MockProvider"

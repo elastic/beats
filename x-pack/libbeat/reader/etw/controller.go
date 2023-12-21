@@ -13,10 +13,6 @@ import (
 	"unsafe"
 )
 
-func isValidHandler(handler uint64) bool {
-	return handler != 0 && handler != INVALID_PROCESSTRACE_HANDLE
-}
-
 // GetHandler queries the status of an existing ETW session to get its handler and properties.
 func (s *Session) GetHandler() error {
 	// Convert the session name to UTF16 for Windows API compatibility.
@@ -99,24 +95,30 @@ func (s *Session) CreateRealtimeSession() error {
 
 // StopSession closes the ETW session and associated handles if they were created.
 func (s *Session) StopSession() error {
-	if s.Realtime {
-		if isValidHandler(s.TraceHandler) {
-			// Attempt to close the trace and handle potential errors.
-			if err := CloseTraceFunc(s.TraceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
-				return fmt.Errorf("failed to close trace: %w", err)
-			}
-		}
+	if !s.Realtime {
+		return nil
+	}
 
-		if s.NewSession {
-			// If we created the session, send a control command to stop it.
-			return ControlTraceFunc(
-				s.Handler,
-				nil,
-				s.Properties,
-				EVENT_TRACE_CONTROL_STOP,
-			)
+	if isValidHandler(s.TraceHandler) {
+		// Attempt to close the trace and handle potential errors.
+		if err := CloseTraceFunc(s.TraceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
+			return fmt.Errorf("failed to close trace: %w", err)
 		}
 	}
 
+	if s.NewSession {
+		// If we created the session, send a control command to stop it.
+		return ControlTraceFunc(
+			s.Handler,
+			nil,
+			s.Properties,
+			EVENT_TRACE_CONTROL_STOP,
+		)
+	}
+
 	return nil
+}
+
+func isValidHandler(handler uint64) bool {
+	return handler != 0 && handler != INVALID_PROCESSTRACE_HANDLE
 }

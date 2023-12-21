@@ -67,7 +67,9 @@ func mockGUIDFromProviderName(providerName string) (GUID, error) {
 func TestSetSessionGUID_ProviderName(t *testing.T) {
 	// Backup original function and defer restoration
 	originalFunc := GUIDFromProviderNameFunc
-	defer func() { GUIDFromProviderNameFunc = originalFunc }()
+	t.Cleanup(func() {
+		GUIDFromProviderNameFunc = originalFunc
+	})
 
 	// Replace with mock function
 	GUIDFromProviderNameFunc = mockGUIDFromProviderName
@@ -146,8 +148,11 @@ func TestNewSessionProperties(t *testing.T) {
 }
 
 func TestNewSession_ProviderName(t *testing.T) {
-	// Backup original function
+	// Backup original function and defer restoration
 	originalSetSessionGUID := SetSessionGUIDFunc
+	t.Cleanup(func() {
+		SetSessionGUIDFunc = originalSetSessionGUID
+	})
 
 	// Override SetSessionGUIDFunc with mock
 	SetSessionGUIDFunc = func(conf Config) (GUID, error) {
@@ -166,7 +171,6 @@ func TestNewSession_ProviderName(t *testing.T) {
 		Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78},
 	}
 
-	// Test case
 	conf := Config{
 		ProviderName:    "Provider1",
 		SessionName:     "Session1",
@@ -176,7 +180,6 @@ func TestNewSession_ProviderName(t *testing.T) {
 	}
 	session, err := NewSession(conf)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
 	assert.Equal(t, expectedGUID, session.GUID, "The GUID in the session should match the expected GUID")
@@ -187,13 +190,14 @@ func TestNewSession_ProviderName(t *testing.T) {
 	assert.NotNil(t, session.Callback)
 	assert.NotNil(t, session.BufferCallback)
 
-	// Restore original function
-	SetSessionGUIDFunc = originalSetSessionGUID
 }
 
 func TestNewSession_GUIDError(t *testing.T) {
-	// Backup original function
+	// Backup original function and defer restoration
 	originalSetSessionGUID := SetSessionGUIDFunc
+	t.Cleanup(func() {
+		SetSessionGUIDFunc = originalSetSessionGUID
+	})
 
 	// Override SetSessionGUIDFunc with mock
 	SetSessionGUIDFunc = func(conf Config) (GUID, error) {
@@ -201,7 +205,6 @@ func TestNewSession_GUIDError(t *testing.T) {
 		return GUID{}, fmt.Errorf("mock error")
 	}
 
-	// Test case
 	conf := Config{
 		ProviderName:    "Provider1",
 		SessionName:     "Session1",
@@ -211,13 +214,10 @@ func TestNewSession_GUIDError(t *testing.T) {
 	}
 	session, err := NewSession(conf)
 
-	// Assertions
 	assert.EqualError(t, err, "mock error")
 	expectedSession := Session{}
 	assert.Equal(t, expectedSession, session, "Session should be its zero value when an error occurs")
 
-	// Restore original function
-	SetSessionGUIDFunc = originalSetSessionGUID
 }
 
 func TestNewSession_AttachSession(t *testing.T) {
@@ -231,7 +231,6 @@ func TestNewSession_AttachSession(t *testing.T) {
 	}
 	session, err := NewSession(conf)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
 	assert.Equal(t, false, session.NewSession)
@@ -251,7 +250,6 @@ func TestNewSession_Logfile(t *testing.T) {
 	}
 	session, err := NewSession(conf)
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, "LogFile1.etl", session.Name, "SessionName should match expected value")
 	assert.Equal(t, false, session.NewSession)
@@ -259,4 +257,89 @@ func TestNewSession_Logfile(t *testing.T) {
 	assert.Nil(t, session.Properties)
 	assert.NotNil(t, session.Callback)
 	assert.NotNil(t, session.BufferCallback)
+}
+
+func TestStartConsumer_OpenTraceError(t *testing.T) {
+	// Backup original functions and defer restoration
+	originalOpenTraceFunc := OpenTraceFunc
+	t.Cleanup(func() {
+		OpenTraceFunc = originalOpenTraceFunc
+	})
+
+	// Mock implementations
+	OpenTraceFunc = func(elf *EventTraceLogfile) (uint64, error) {
+		return 0, ERROR_ACCESS_DENIED // Mock a valid session handler
+	}
+
+	// Create a Session instance
+	session := &Session{
+		Name:           "TestSession",
+		Realtime:       false,
+		BufferCallback: uintptr(0),
+		Callback:       uintptr(0),
+	}
+
+	err := session.StartConsumer()
+	assert.EqualError(t, err, "access denied when opening trace: Access is denied.")
+}
+
+func TestStartConsumer_ProcessTraceError(t *testing.T) {
+	// Backup original functions and defer restoration
+	originalOpenTraceFunc := OpenTraceFunc
+	originalProcessTraceFunc := ProcessTraceFunc
+	t.Cleanup(func() {
+		OpenTraceFunc = originalOpenTraceFunc
+		ProcessTraceFunc = originalProcessTraceFunc
+	})
+
+	// Mock implementations
+	OpenTraceFunc = func(elf *EventTraceLogfile) (uint64, error) {
+		return 12345, nil // Mock a valid session handler
+	}
+
+	ProcessTraceFunc = func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error {
+		return ERROR_INVALID_PARAMETER
+	}
+
+	// Create a Session instance
+	session := &Session{
+		Name:           "TestSession",
+		Realtime:       true,
+		BufferCallback: uintptr(0),
+		Callback:       uintptr(0),
+	}
+
+	err := session.StartConsumer()
+	assert.EqualError(t, err, "failed to process trace: The parameter is incorrect.")
+}
+
+func TestStartConsumer_Success(t *testing.T) {
+	// Backup original functions and defer restoration
+	originalOpenTraceFunc := OpenTraceFunc
+	originalProcessTraceFunc := ProcessTraceFunc
+	t.Cleanup(func() {
+		OpenTraceFunc = originalOpenTraceFunc
+		ProcessTraceFunc = originalProcessTraceFunc
+	})
+
+	// Mock implementations
+	OpenTraceFunc = func(elf *EventTraceLogfile) (uint64, error) {
+		return 12345, nil // Mock a valid session handler
+	}
+
+	ProcessTraceFunc = func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error {
+		return nil
+	}
+
+	// Create a Session instance
+	session := &Session{
+		Name:           "TestSession",
+		Realtime:       true,
+		BufferCallback: uintptr(0),
+		Callback:       uintptr(0),
+	}
+
+	err := session.StartConsumer()
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(12345), session.TraceHandler, "TraceHandler should be set to the mock value")
 }

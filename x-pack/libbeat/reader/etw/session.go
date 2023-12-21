@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"errors"
 	"fmt"
 	"syscall"
 	"unsafe"
@@ -22,19 +23,39 @@ var (
 )
 
 type Session struct {
-	Name            string // Identifier of the session
-	GUID            GUID
-	Properties      *EventTraceProperties // Session properties
-	Handler         uintptr               // Session handler
-	Realtime        bool                  // Real-time flag
-	NewSession      bool                  // Flag to indicate whether a new session has been created or attached to an existing one
-	TraceLevel      uint8                 // Trace level
+	// Name is the identifier for the session.
+	// It is used to identify the session in logs and also for Windows processes.
+	Name string
+	// GUID is the provider GUID to configure the session.
+	GUID GUID
+	// Properties of the session that are initialized in newSessionProperties()
+	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
+	Properties *EventTraceProperties
+	// Handler of the event tracing session for which the provider is being configured.
+	// It is obtained from StartTrace when a new trace is started.
+	// This handler is needed to enable, query or stop the trace.
+	Handler uintptr
+	// Realtime is a flag to know if the consumer reads from a logfile or real-time session.
+	Realtime bool // Real-time flag
+	// NewSession is a flag to indicate whether a new session has been created or attached to an existing one.
+	NewSession bool
+	// TraceLevel sets the maximum level of events that we want the provider to write.
+	TraceLevel uint8
+	// MatchAnyKeyword is a 64-bit bitmask of keywords that determine the categories of events that we want the provider to write.
+	// The provider writes an event if the event's keyword bits match any of the bits set in this value
+	// or if the event has no keyword bits set, in addition to meeting the Level and MatchAllKeyword criteria.
 	MatchAnyKeyword uint64
+	// MatchAllKeyword is a 64-bit bitmask of keywords that restricts the events that we want the provider to write.
+	// The provider typically writes an event if the event's keyword bits match all of the bits set in this value
+	// or if the event has no keyword bits set, in addition to meeting the Level and MatchAnyKeyword criteria.
 	MatchAllKeyword uint64
-	TraceHandler    uint64 // Trace processing handle
-
-	Callback       uintptr // Pointer to EventRecordCallback to process ETW events
-	BufferCallback uintptr // Pointer to BufferCallback which processes retrieved metadata about the ETW buffers
+	// TraceHandler is the trace processing handle.
+	// It is used to control the trace that receives and processes events.
+	TraceHandler uint64
+	// Callback is the pointer to EventRecordCallback which receives and processes event trace events.
+	Callback uintptr
+	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers.
+	BufferCallback uintptr
 }
 
 // setSessionName determines the session name based on the provided configuration.
@@ -173,4 +194,54 @@ func NewSession(conf Config) (Session, error) {
 	session.MatchAllKeyword = conf.MatchAllKeyword
 
 	return session, nil
+}
+
+// StartConsumer initializes and starts the ETW event tracing session.
+func (s *Session) StartConsumer() error {
+	var elf EventTraceLogfile
+	var err error
+
+	// Configure EventTraceLogfile based on the session type (realtime or not).
+	if !s.Realtime {
+		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD
+		logfilePtr, err := syscall.UTF16PtrFromString(s.Name)
+		if err != nil {
+			return fmt.Errorf("failed to convert logfile name")
+		}
+		elf.LogFileName = logfilePtr
+	} else {
+		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_REAL_TIME
+		sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
+		if err != nil {
+			return fmt.Errorf("failed to convert session name")
+		}
+		elf.LoggerName = sessionPtr
+	}
+
+	// Set callbacks and context for the session.
+	elf.BufferCallback = s.BufferCallback
+	elf.Callback = s.Callback
+	elf.Context = 0
+
+	// Open an ETW trace processing handle for consuming events
+	// from an ETW real-time trace session or an ETW log file.
+	s.TraceHandler, err = OpenTraceFunc(&elf)
+
+	switch {
+	case err == nil:
+
+	// Handle specific errors for trace opening.
+	case errors.Is(err, ERROR_BAD_PATHNAME):
+		return fmt.Errorf("invalid log source when opening trace: %w", err)
+	case errors.Is(err, ERROR_ACCESS_DENIED):
+		return fmt.Errorf("access denied when opening trace: %w", err)
+	default:
+		return fmt.Errorf("failed to open trace: %w", err)
+	}
+	// Process the trace. This function blocks until processing ends.
+	if err := ProcessTraceFunc(&s.TraceHandler, 1, nil, nil); err != nil {
+		return fmt.Errorf("failed to process trace: %w", err)
+	}
+
+	return nil
 }

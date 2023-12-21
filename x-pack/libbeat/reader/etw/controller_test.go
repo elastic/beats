@@ -15,7 +15,9 @@ import (
 func TestGetHandler_Error(t *testing.T) {
 	// Backup and defer restoration of the original function
 	originalFunc := ControlTraceFunc
-	defer func() { ControlTraceFunc = originalFunc }()
+	t.Cleanup(func() {
+		ControlTraceFunc = originalFunc
+	})
 
 	// Mock implementation
 	ControlTraceFunc = func(traceHandle uintptr,
@@ -31,17 +33,16 @@ func TestGetHandler_Error(t *testing.T) {
 		Properties: &EventTraceProperties{},
 	}
 
-	// Test the GetHandler function
 	err := session.GetHandler()
-
-	// Assertions
 	assert.EqualError(t, err, "session is not running")
 }
 
 func TestGetHandler_Success(t *testing.T) {
 	// Backup original function and defer restoration
 	originalFunc := ControlTraceFunc
-	defer func() { ControlTraceFunc = originalFunc }()
+	t.Cleanup(func() {
+		ControlTraceFunc = originalFunc
+	})
 
 	// Mock implementation
 	ControlTraceFunc = func(traceHandle uintptr,
@@ -59,10 +60,8 @@ func TestGetHandler_Success(t *testing.T) {
 		Properties: &EventTraceProperties{},
 	}
 
-	// Execute GetHandler
 	err := session.GetHandler()
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, uintptr(12345), session.Handler, "Handler should be set to the mock value")
 }
@@ -70,9 +69,9 @@ func TestGetHandler_Success(t *testing.T) {
 func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
 	// Backup original functions and defer restoration
 	originalStartTraceFunc := StartTraceFunc
-	defer func() {
+	t.Cleanup(func() {
 		StartTraceFunc = originalStartTraceFunc
-	}()
+	})
 
 	// Mock implementations
 	StartTraceFunc = func(traceHandle *uintptr,
@@ -87,10 +86,7 @@ func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
 		Properties: &EventTraceProperties{},
 	}
 
-	// Test CreateRealtimeSession
 	err := session.CreateRealtimeSession()
-
-	// Assertions
 	assert.EqualError(t, err, "session already exists: Cannot create a file when that file already exists.")
 }
 
@@ -98,10 +94,10 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 	// Backup original functions and defer restoration
 	originalStartTraceFunc := StartTraceFunc
 	originalEnableTraceFunc := EnableTraceFunc
-	defer func() {
+	t.Cleanup(func() {
 		StartTraceFunc = originalStartTraceFunc
 		EnableTraceFunc = originalEnableTraceFunc
-	}()
+	})
 
 	// Mock implementations
 	StartTraceFunc = func(traceHandle *uintptr,
@@ -128,10 +124,7 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 		Properties: &EventTraceProperties{},
 	}
 
-	// Test CreateRealtimeSession
 	err := session.CreateRealtimeSession()
-
-	// Assertions
 	assert.EqualError(t, err, "invalid parameters when enabling session trace: The parameter is incorrect.")
 }
 
@@ -139,10 +132,10 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 	// Backup original functions and defer restoration
 	originalStartTraceFunc := StartTraceFunc
 	originalEnableTraceFunc := EnableTraceFunc
-	defer func() {
+	t.Cleanup(func() {
 		StartTraceFunc = originalStartTraceFunc
 		EnableTraceFunc = originalEnableTraceFunc
-	}()
+	})
 
 	// Mock implementations
 	StartTraceFunc = func(traceHandle *uintptr,
@@ -169,10 +162,8 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 		Properties: &EventTraceProperties{},
 	}
 
-	// Test CreateRealtimeSession
 	err := session.CreateRealtimeSession()
 
-	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, uintptr(12345), session.Handler, "Handler should be set to the mock value")
 }
@@ -180,7 +171,9 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 func TestStopSession_Error(t *testing.T) {
 	// Backup original function and defer restoration
 	originalFunc := CloseTraceFunc
-	defer func() { CloseTraceFunc = originalFunc }()
+	t.Cleanup(func() {
+		CloseTraceFunc = originalFunc
+	})
 
 	// Override with the mock function
 	CloseTraceFunc = func(traceHandle uint64) error {
@@ -195,10 +188,7 @@ func TestStopSession_Error(t *testing.T) {
 		Properties:   &EventTraceProperties{},
 	}
 
-	// Test the StopSession function
 	err := session.StopSession()
-
-	// Assertions
 	assert.EqualError(t, err, "failed to close trace: The parameter is incorrect.")
 }
 
@@ -206,10 +196,10 @@ func TestStopSession_Success(t *testing.T) {
 	// Backup original function and defer restoration
 	originalCloseTraceFunc := CloseTraceFunc
 	originalControlTraceFunc := ControlTraceFunc
-	defer func() {
+	t.Cleanup(func() {
 		CloseTraceFunc = originalCloseTraceFunc
 		ControlTraceFunc = originalControlTraceFunc
-	}()
+	})
 
 	// Override with the mock function
 	CloseTraceFunc = func(traceHandle uint64) error {
@@ -233,9 +223,6 @@ func TestStopSession_Success(t *testing.T) {
 		Properties:   &EventTraceProperties{},
 	}
 
-	// Test the StopSession function
 	err := session.StopSession()
-
-	// Assertions
 	assert.NoError(t, err)
 }
