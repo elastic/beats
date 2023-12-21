@@ -432,7 +432,9 @@ type textContextError struct {
 // decodeAsCSV decodes p as a headed CSV document into dst.
 func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	r := csv.NewReader(bytes.NewReader(p))
-	r.ReuseRecord = true // to control sharing of backing array for performance
+
+	// To share the backing array for performance.
+	r.ReuseRecord = true
 
 	// NOTE:
 	// Read sets `r.FieldsPerRecord` to the number of fields in the first record,

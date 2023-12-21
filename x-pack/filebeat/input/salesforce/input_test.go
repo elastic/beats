@@ -7,7 +7,6 @@ package salesforce
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +14,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -305,4 +306,50 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	p.done()
 
 	return nil
+}
+
+func TestDecodeAsCSV(t *testing.T) {
+	sampleELF := `"EVENT_TYPE","TIMESTAMP","REQUEST_ID","ORGANIZATION_ID","USER_ID","RUN_TIME","CPU_TIME","URI","SESSION_KEY","LOGIN_KEY","USER_TYPE","REQUEST_STATUS","DB_TOTAL_TIME","LOGIN_TYPE","BROWSER_TYPE","API_TYPE","API_VERSION","USER_NAME","TLS_PROTOCOL","CIPHER_SUITE","AUTHENTICATION_METHOD_REFERENCE","LOGIN_SUB_TYPE","TIMESTAMP_DERIVED","USER_ID_DERIVED","CLIENT_IP","URI_ID_DERIVED","LOGIN_STATUS","SOURCE_IP"
+"Login","20231218054831.655","4u6LyuMrDvb_G-l1cJIQk-","00D5j00000DgAYG","0055j00000AT6I1","1219","127","/services/oauth2/token","","bY5Wfv8t/Ith7WVE","Standard","","1051271151","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:31.655Z","0055j00000AT6I1AAL","Salesforce.com IP","","LOGIN_NO_ERROR","103.108.207.58"
+"Login","20231218054832.003","4u6LyuHSDv8LLVl1cJOqGV","00D5j00000DgAYG","0055j00000AT6I1","1277","104","/services/oauth2/token","","u60el7VqW8CSSKcW","Standard","","674857427","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:32.003Z","0055j00000AT6I1AAL","103.108.207.58","","LOGIN_NO_ERROR","103.108.207.58"`
+
+	mp, err := decodeAsCSV([]byte(sampleELF))
+	assert.NoError(t, err)
+
+	wantNumOfEvents := 2
+	gotNumOfEvents := len(mp)
+	assert.Equal(t, wantNumOfEvents, gotNumOfEvents)
+
+	wantEventFields := map[string]string{
+		"LOGIN_TYPE":                      "i",
+		"API_VERSION":                     "9998.0",
+		"TIMESTAMP_DERIVED":               "2023-12-18T05:48:31.655Z",
+		"TIMESTAMP":                       "20231218054831.655",
+		"USER_NAME":                       "salesforceinstance@devtest.in",
+		"SOURCE_IP":                       "103.108.207.58",
+		"CPU_TIME":                        "127",
+		"REQUEST_STATUS":                  "",
+		"DB_TOTAL_TIME":                   "1051271151",
+		"TLS_PROTOCOL":                    "TLSv1.2",
+		"AUTHENTICATION_METHOD_REFERENCE": "",
+		"REQUEST_ID":                      "4u6LyuMrDvb_G-l1cJIQk-",
+		"USER_ID":                         "0055j00000AT6I1",
+		"RUN_TIME":                        "1219",
+		"CIPHER_SUITE":                    "ECDHE-RSA-AES256-GCM-SHA384",
+		"CLIENT_IP":                       "Salesforce.com IP",
+		"EVENT_TYPE":                      "Login",
+		"LOGIN_SUB_TYPE":                  "",
+		"USER_ID_DERIVED":                 "0055j00000AT6I1AAL",
+		"URI_ID_DERIVED":                  "",
+		"ORGANIZATION_ID":                 "00D5j00000DgAYG",
+		"URI":                             "/services/oauth2/token",
+		"LOGIN_KEY":                       "bY5Wfv8t/Ith7WVE",
+		"USER_TYPE":                       "Standard",
+		"API_TYPE":                        "",
+		"SESSION_KEY":                     "",
+		"BROWSER_TYPE":                    "Go-http-client/1.1",
+		"LOGIN_STATUS":                    "LOGIN_NO_ERROR",
+	}
+
+	assert.Equal(t, wantEventFields, mp[0])
 }
