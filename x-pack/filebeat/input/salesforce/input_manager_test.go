@@ -77,3 +77,10 @@ func TestInputManager(t *testing.T) {
 	_, err = inputManager.Create(config)
 	assert.NoError(t, err)
 }
+
+func TestSource(t *testing.T) {
+	want := "https://salesforce.com"
+	src := source{cfg: config{URL: want}}
+	got := src.Name()
+	assert.Equal(t, want, got)
+}
