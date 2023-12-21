@@ -18,11 +18,13 @@
 package host
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-sysinfo/types"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 func TestMapHostInfo(t *testing.T) {

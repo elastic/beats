@@ -23,6 +23,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgv1"
@@ -77,6 +79,17 @@ type mount struct {
 	fullPath   string // Absolute path to the cgroup. It's the mountpoint joined with the path.
 }
 
+// pathListWithTime combines PathList with a timestamp.
+type pathListWithTime struct {
+	added    time.Time
+	pathList PathList
+}
+
+type pathCache struct {
+	sync.RWMutex
+	cache map[string]pathListWithTime
+}
+
 // Reader reads cgroup metrics and limits.
 type Reader struct {
 	// Mountpoint of the root filesystem. Defaults to / if not set. This can be
@@ -85,6 +98,9 @@ type Reader struct {
 	ignoreRootCgroups        bool // Ignore a cgroup when its path is "/".
 	cgroupsHierarchyOverride string
 	cgroupMountpoints        Mountpoints // Mountpoints for each subsystem (e.g. cpu, cpuacct, memory, blkio).
+
+	// Cache to map known v2 cgroup controllerPaths to pathListWithTime.
+	v2ControllerPathCache pathCache
 }
 
 // ReaderOptions holds options for NewReaderOptions.
@@ -135,6 +151,7 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 		ignoreRootCgroups:        opts.IgnoreRootCgroups,
 		cgroupsHierarchyOverride: opts.CgroupsHierarchyOverride,
 		cgroupMountpoints:        mountpoints,
+		v2ControllerPathCache:    pathCache{cache: make(map[string]pathListWithTime)},
 	}, nil
 }
 

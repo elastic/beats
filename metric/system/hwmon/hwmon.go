@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-//ReportSensors returns the metrics from all the known sensors.
+// ReportSensors returns the metrics from all the known sensors.
 func ReportSensors(dev Device) (MonData, error) {
 	metrics := MonData{}
 	for _, sensor := range dev.Sensors {
@@ -51,7 +51,7 @@ func ReportSensors(dev Device) (MonData, error) {
 	return metrics, nil
 }
 
-//DetectHwmon returns a list of hwmon sensors found on the system, if they exist
+// DetectHwmon returns a list of hwmon sensors found on the system, if they exist
 func DetectHwmon(hostfs resolve.Resolver) ([]Device, error) {
 	sensorTypeRegex := regexp.MustCompile("(^[a-z]*)([0-9]*)")
 	fullPath := hostfs.ResolveHostFS(baseDir)

@@ -20,8 +20,9 @@ package network
 import (
 	"testing"
 
-	"github.com/elastic/go-sysinfo/types"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/go-sysinfo/types"
 )
 
 func TestFilter(t *testing.T) {

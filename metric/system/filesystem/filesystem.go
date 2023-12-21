@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-//FSStat carries the metadata for a given filesystem
+// FSStat carries the metadata for a given filesystem
 type FSStat struct {
 	Directory string   `struct:"mount_point,omitempty"`
 	Device    string   `struct:"device_name,omitempty"`

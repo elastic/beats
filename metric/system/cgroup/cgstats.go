@@ -40,7 +40,7 @@ func (stat StatsV1) CGVersion() CgroupsVersion {
 	return CgroupsV1
 }
 
-//Format converts the stats object to a MapStr that can be sent to Report()
+// Format converts the stats object to a MapStr that can be sent to Report()
 func (stat StatsV1) Format() (mapstr.M, error) {
 	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
@@ -95,7 +95,7 @@ func (stat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) 
 	stat.CPUAccounting.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystem))
 }
 
-//Format converts the stats object to a MapStr that can be sent to Report()
+// Format converts the stats object to a MapStr that can be sent to Report()
 func (stat StatsV2) Format() (mapstr.M, error) {
 	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
