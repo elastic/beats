@@ -128,10 +128,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.MetricsConfig = metricsConfigs.Metrics
-<<<<<<< HEAD
-	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
-	m.config.period = &duration.Duration{
-=======
 
 	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
 		return m, fmt.Errorf("both credentials_file_path and credentials_json specified, you must use only one of them")
@@ -144,7 +140,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.config.period = &durationpb.Duration{
->>>>>>> b59a8f4769 (Replace EOL modules: github.com/golang/protobuf by google.golang.org/protobuf (#37212))
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
