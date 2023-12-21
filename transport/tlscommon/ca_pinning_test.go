@@ -94,7 +94,7 @@ func TestCAPinning(t *testing.T) {
 				ca, err := genCA()
 				require.NoError(t, err)
 
-				serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil)
+				serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
 				require.NoError(t, err)
 
 				mux := http.NewServeMux()
@@ -172,10 +172,10 @@ func TestCAPinning(t *testing.T) {
 		ca, err := genCA()
 		require.NoError(t, err)
 
-		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil)
+		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
-		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil)
+		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
 		mux := http.NewServeMux()
@@ -246,10 +246,10 @@ func TestCAPinning(t *testing.T) {
 		ca, err := genCA()
 		require.NoError(t, err)
 
-		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil)
+		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
-		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil)
+		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
 		mux := http.NewServeMux()
@@ -360,9 +360,18 @@ func genSignedCert(
 	commonName string,
 	dnsNames []string,
 	ips []net.IP,
+	expired bool,
 ) (tls.Certificate, error) {
 	if commonName == "" {
 		commonName = "You know, for search"
+	}
+
+	notBefore := time.Now()
+	notAfter := notBefore.Add(5 * time.Hour)
+
+	if expired {
+		notBefore = notBefore.Add(-42 * time.Hour)
+		notAfter = notAfter.Add(-42 * time.Hour)
 	}
 	// Create another Cert/key
 	cert := &x509.Certificate{
@@ -382,8 +391,8 @@ func genSignedCert(
 			PostalCode:    []string{"HOH OHO"},
 		},
 
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(1 * time.Hour),
+		NotBefore:             notBefore,
+		NotAfter:              notAfter,
 		IsCA:                  isCA,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:              keyUsage,
