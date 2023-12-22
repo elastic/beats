@@ -161,7 +161,13 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	cfg, _ := conf.NewConfigFrom(&config)
+	// commonMetaConfig stores the metadata configuration of the resource itself
+	commonMetaConfig := metadata.Config{}
+	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
+		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
+		return &nilEnricher{}
+	}
+	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
 
 	// if Resource is Pod then we need to create watchers for Replicasets and Jobs that it might belongs to
 	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
@@ -302,7 +308,14 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	cfg, _ := conf.NewConfigFrom(&config)
+	// commonMetaConfig stores the metadata configuration of the resource itself
+	commonMetaConfig := metadata.Config{}
+	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
+		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
+		return &nilEnricher{}
+	}
+	cfg, _ := conf.NewConfigFrom(&commonMetaConfig)
+
 	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
 	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 	// Deployment -> Replicaset -> Pod
