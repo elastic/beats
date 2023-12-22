@@ -44,7 +44,7 @@ func makeES(
 	log := logp.NewLogger(logSelector)
 	eventsLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
-	eventsLogger = log.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
+	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
 
 	if !cfg.HasField("bulk_max_size") {
 		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {

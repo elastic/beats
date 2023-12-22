@@ -30,6 +30,7 @@ import (
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -37,12 +38,13 @@ func init() {
 }
 
 type fileOutput struct {
-	log      *logp.Logger
-	filePath string
-	beat     beat.Info
-	observer outputs.Observer
-	rotator  *file.Rotator
-	codec    codec.Codec
+	log          *logp.Logger
+	eventsLogger *logp.Logger
+	filePath     string
+	beat         beat.Info
+	observer     outputs.Observer
+	rotator      *file.Rotator
+	codec        codec.Codec
 }
 
 // makeFileout instantiates a new file output instance.
@@ -61,10 +63,15 @@ func makeFileout(
 	// disable bulk support in publisher pipeline
 	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
+	logSelector := "file"
+	eventsLogger := logp.NewLogger(logSelector)
+	// Set a new Output so it writes to a different file than `log`
+	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
 	fo := &fileOutput{
-		log:      logp.NewLogger("file"),
-		beat:     beat,
-		observer: observer,
+		log:          logp.NewLogger(logSelector),
+		eventsLogger: eventsLogger,
+		beat:         beat,
+		observer:     observer,
 	}
 	if err := fo.init(beat, foConfig); err != nil {
 		return outputs.Fail(err)
@@ -132,7 +139,8 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			} else {
 				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
-			out.log.Debugf("Failed event: %v", event)
+			out.log.Debug("Event logged to events-data log file")
+			out.eventsLogger.Debugf("Failed event: %v", event)
 
 			dropped++
 			continue

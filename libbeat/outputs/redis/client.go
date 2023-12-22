@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -47,7 +48,8 @@ type publishFn func(
 ) ([]publisher.Event, error)
 
 type client struct {
-	log *logp.Logger
+	log          *logp.Logger
+	eventsLogger *logp.Logger
 	*transport.Client
 	observer outputs.Observer
 	index    string
@@ -74,18 +76,25 @@ func newClient(
 	pass string,
 	db int, key outil.Selector, dt redisDataType,
 	index string, codec codec.Codec,
+	eventsLoggerCfg logp.Config,
 ) *client {
+	logSelector := "redis"
+	eventsLogger := logp.NewLogger(logSelector)
+	// Set a new Output so it writes to a different file than `log`
+	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
+
 	return &client{
-		log:      logp.NewLogger("redis"),
-		Client:   tc,
-		observer: observer,
-		timeout:  timeout,
-		password: pass,
-		index:    strings.ToLower(index),
-		db:       db,
-		dataType: dt,
-		key:      key,
-		codec:    codec,
+		log:          logp.NewLogger(logSelector),
+		eventsLogger: eventsLogger,
+		Client:       tc,
+		observer:     observer,
+		timeout:      timeout,
+		password:     pass,
+		index:        strings.ToLower(index),
+		db:           db,
+		dataType:     dt,
+		key:          key,
+		codec:        codec,
 	}
 }
 
@@ -227,7 +236,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest
 
-		okEvents, args := serializeEvents(c.log, args, 1, data, c.index, c.codec)
+		okEvents, args := serializeEvents(c.log, c.eventsLogger, args, 1, data, c.index, c.codec)
 		c.observer.Dropped(len(data) - len(okEvents))
 		if (len(args) - 1) == 0 {
 			return nil, nil
@@ -253,7 +262,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		var okEvents []publisher.Event
 		serialized := make([]interface{}, 0, len(data))
-		okEvents, serialized = serializeEvents(c.log, serialized, 0, data, c.index, c.codec)
+		okEvents, serialized = serializeEvents(c.log, c.eventsLogger, serialized, 0, data, c.index, c.codec)
 		c.observer.Dropped(len(data) - len(okEvents))
 		if len(serialized) == 0 {
 			return nil, nil
@@ -308,6 +317,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 
 func serializeEvents(
 	log *logp.Logger,
+	eventsLogger *logp.Logger,
 	to []interface{},
 	i int,
 	data []publisher.Event,
@@ -319,8 +329,8 @@ func serializeEvents(
 	for _, d := range data {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v", err)
-			log.Debugf("Failed event: %v", d.Content)
+			log.Errorf("Encoding event failed with error: %+v. Look for events-data log file to view the event", err)
+			eventsLogger.Debugf("Failed event: %v", d.Content)
 			goto failLoop
 		}
 
@@ -337,8 +347,8 @@ failLoop:
 	for _, d := range rest {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v", err)
-			log.Debugf("Failed event: %v", d.Content)
+			log.Errorf("Encoding event failed with error: %+v. Look for events-data log file to view the event", err)
+			eventsLogger.Debugf("Failed event: %v", d.Content)
 			i++
 			continue
 		}

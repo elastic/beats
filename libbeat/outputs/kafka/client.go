@@ -28,6 +28,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/eapache/go-resiliency/breaker"
+	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -40,16 +41,17 @@ import (
 )
 
 type client struct {
-	log      *logp.Logger
-	observer outputs.Observer
-	hosts    []string
-	topic    outil.Selector
-	key      *fmtstr.EventFormatString
-	index    string
-	codec    codec.Codec
-	config   sarama.Config
-	mux      sync.Mutex
-	done     chan struct{}
+	log          *logp.Logger
+	eventsLogger *logp.Logger
+	observer     outputs.Observer
+	hosts        []string
+	topic        outil.Selector
+	key          *fmtstr.EventFormatString
+	index        string
+	codec        codec.Codec
+	config       sarama.Config
+	mux          sync.Mutex
+	done         chan struct{}
 
 	producer sarama.AsyncProducer
 
@@ -81,17 +83,23 @@ func newKafkaClient(
 	headers []header,
 	writer codec.Codec,
 	cfg *sarama.Config,
+	eventsLoggerCfg logp.Config,
 ) (*client, error) {
+	eventsLogger := logp.NewLogger(logSelector)
+	// Set a new Output so it writes to a different file than `log`
+	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
+
 	c := &client{
-		log:      logp.NewLogger(logSelector),
-		observer: observer,
-		hosts:    hosts,
-		topic:    topic,
-		key:      key,
-		index:    strings.ToLower(index),
-		codec:    writer,
-		config:   *cfg,
-		done:     make(chan struct{}),
+		log:          logp.NewLogger(logSelector),
+		eventsLogger: eventsLogger,
+		observer:     observer,
+		hosts:        hosts,
+		topic:        topic,
+		key:          key,
+		index:        strings.ToLower(index),
+		codec:        writer,
+		config:       *cfg,
+		done:         make(chan struct{}),
 	}
 
 	if len(headers) != 0 {
@@ -228,7 +236,8 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
 		if c.log.IsDebug() {
-			c.log.Debugf("failed event: %v", event)
+			c.eventsLogger.Debugf("failed event: %v", event)
+			c.log.Debug("failed event logged to events logger file")
 		}
 		return nil, err
 	}

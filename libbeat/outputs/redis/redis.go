@@ -163,7 +163,7 @@ func makeRedis(
 		}
 
 		client := newClient(conn, observer, rConfig.Timeout,
-			pass, rConfig.Db, key, dataType, rConfig.Index, enc)
+			pass, rConfig.Db, key, dataType, rConfig.Index, enc, eventsLoggerCfg)
 		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 
