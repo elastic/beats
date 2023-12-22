@@ -215,6 +215,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
 - Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
 - Update CEL extensions library to v1.7.0. {pull}37172[37172]
+- Add support for complete URL replacement in HTTPJSON chain steps. {pull}37486[37486]
 
 *Auditbeat*
 

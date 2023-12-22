@@ -714,8 +714,25 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 	return n, nil
 }
 
-// generateNewUrl returns new url value using replacement from oldUrl with ids
+// generateNewUrl returns new url value using replacement from oldUrl with ids.
+// If oldUrl is an opaque URL, the scheme: is dropped and the remaining string
+// is used as the replacement target. For example
+//
+//	placeholder:$.result[:]
+//
+// becomes
+//
+//	$.result[:]
+//
+// which is now the replacement target.
 func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
+	u, err := url.Parse(oldUrl)
+	if err != nil {
+		return url.URL{}, err
+	}
+	if u.Opaque != "" {
+		oldUrl = u.Opaque
+	}
 	newUrl, err := url.Parse(strings.Replace(oldUrl, replacement, id, 1))
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
