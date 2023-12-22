@@ -31,7 +31,7 @@ with_gh() {
 
 with_go() {
     go_version=$1
-    url=$(get_gvm_link "${GVM}")
+    url=$(get_gvm_link "${SETUP_GVM_VERSION}")
     WORKSPACE=${WORKSPACE:-"$(pwd)"}
     mkdir -p "${WORKSPACE}/bin"
     export PATH="${PATH}:${WORKSPACE}/bin"
