@@ -260,14 +260,8 @@ func TestNewSession_Logfile(t *testing.T) {
 }
 
 func TestStartConsumer_OpenTraceError(t *testing.T) {
-	// Backup original functions and defer restoration
-	originalOpenTraceFunc := OpenTraceFunc
-	t.Cleanup(func() {
-		OpenTraceFunc = originalOpenTraceFunc
-	})
-
-	// Mock implementations
-	OpenTraceFunc = func(elf *EventTraceLogfile) (uint64, error) {
+	// Mock implementation of openTrace
+	openTrace := func(elf *EventTraceLogfile) (uint64, error) {
 		return 0, ERROR_ACCESS_DENIED // Mock a valid session handler
 	}
 
@@ -277,6 +271,7 @@ func TestStartConsumer_OpenTraceError(t *testing.T) {
 		Realtime:       false,
 		BufferCallback: uintptr(0),
 		Callback:       uintptr(0),
+		openTrace:      openTrace,
 	}
 
 	err := session.StartConsumer()
@@ -284,20 +279,12 @@ func TestStartConsumer_OpenTraceError(t *testing.T) {
 }
 
 func TestStartConsumer_ProcessTraceError(t *testing.T) {
-	// Backup original functions and defer restoration
-	originalOpenTraceFunc := OpenTraceFunc
-	originalProcessTraceFunc := ProcessTraceFunc
-	t.Cleanup(func() {
-		OpenTraceFunc = originalOpenTraceFunc
-		ProcessTraceFunc = originalProcessTraceFunc
-	})
-
 	// Mock implementations
-	OpenTraceFunc = func(elf *EventTraceLogfile) (uint64, error) {
+	openTrace := func(elf *EventTraceLogfile) (uint64, error) {
 		return 12345, nil // Mock a valid session handler
 	}
 
-	ProcessTraceFunc = func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error {
+	processTrace := func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error {
 		return ERROR_INVALID_PARAMETER
 	}
 
@@ -307,6 +294,8 @@ func TestStartConsumer_ProcessTraceError(t *testing.T) {
 		Realtime:       true,
 		BufferCallback: uintptr(0),
 		Callback:       uintptr(0),
+		openTrace:      openTrace,
+		processTrace:   processTrace,
 	}
 
 	err := session.StartConsumer()
@@ -314,20 +303,12 @@ func TestStartConsumer_ProcessTraceError(t *testing.T) {
 }
 
 func TestStartConsumer_Success(t *testing.T) {
-	// Backup original functions and defer restoration
-	originalOpenTraceFunc := OpenTraceFunc
-	originalProcessTraceFunc := ProcessTraceFunc
-	t.Cleanup(func() {
-		OpenTraceFunc = originalOpenTraceFunc
-		ProcessTraceFunc = originalProcessTraceFunc
-	})
-
 	// Mock implementations
-	OpenTraceFunc = func(elf *EventTraceLogfile) (uint64, error) {
+	openTrace := func(elf *EventTraceLogfile) (uint64, error) {
 		return 12345, nil // Mock a valid session handler
 	}
 
-	ProcessTraceFunc = func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error {
+	processTrace := func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error {
 		return nil
 	}
 
@@ -337,6 +318,8 @@ func TestStartConsumer_Success(t *testing.T) {
 		Realtime:       true,
 		BufferCallback: uintptr(0),
 		Callback:       uintptr(0),
+		openTrace:      openTrace,
+		processTrace:   processTrace,
 	}
 
 	err := session.StartConsumer()

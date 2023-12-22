@@ -13,14 +13,8 @@ import (
 )
 
 func TestGetHandler_Error(t *testing.T) {
-	// Backup and defer restoration of the original function
-	originalFunc := ControlTraceFunc
-	t.Cleanup(func() {
-		ControlTraceFunc = originalFunc
-	})
-
-	// Mock implementation
-	ControlTraceFunc = func(traceHandle uintptr,
+	// Mock implementation of controlTrace
+	controlTrace := func(traceHandle uintptr,
 		instanceName *uint16,
 		properties *EventTraceProperties,
 		controlCode uint32) error {
@@ -29,8 +23,9 @@ func TestGetHandler_Error(t *testing.T) {
 
 	// Create a Session instance
 	session := &Session{
-		Name:       "TestSession",
-		Properties: &EventTraceProperties{},
+		Name:         "TestSession",
+		Properties:   &EventTraceProperties{},
+		controlTrace: controlTrace,
 	}
 
 	err := session.GetHandler()
@@ -38,14 +33,8 @@ func TestGetHandler_Error(t *testing.T) {
 }
 
 func TestGetHandler_Success(t *testing.T) {
-	// Backup original function and defer restoration
-	originalFunc := ControlTraceFunc
-	t.Cleanup(func() {
-		ControlTraceFunc = originalFunc
-	})
-
-	// Mock implementation
-	ControlTraceFunc = func(traceHandle uintptr,
+	// Mock implementation of controlTrace
+	controlTrace := func(traceHandle uintptr,
 		instanceName *uint16,
 		properties *EventTraceProperties,
 		controlCode uint32) error {
@@ -56,8 +45,9 @@ func TestGetHandler_Success(t *testing.T) {
 
 	// Create a Session instance with initialized Properties
 	session := &Session{
-		Name:       "TestSession",
-		Properties: &EventTraceProperties{},
+		Name:         "TestSession",
+		Properties:   &EventTraceProperties{},
+		controlTrace: controlTrace,
 	}
 
 	err := session.GetHandler()
@@ -67,14 +57,8 @@ func TestGetHandler_Success(t *testing.T) {
 }
 
 func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
-	// Backup original functions and defer restoration
-	originalStartTraceFunc := StartTraceFunc
-	t.Cleanup(func() {
-		StartTraceFunc = originalStartTraceFunc
-	})
-
-	// Mock implementations
-	StartTraceFunc = func(traceHandle *uintptr,
+	// Mock implementation of startTrace
+	startTrace := func(traceHandle *uintptr,
 		instanceName *uint16,
 		properties *EventTraceProperties) error {
 		return ERROR_ALREADY_EXISTS
@@ -84,6 +68,7 @@ func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
 	session := &Session{
 		Name:       "TestSession",
 		Properties: &EventTraceProperties{},
+		startTrace: startTrace,
 	}
 
 	err := session.CreateRealtimeSession()
@@ -91,23 +76,15 @@ func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
 }
 
 func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
-	// Backup original functions and defer restoration
-	originalStartTraceFunc := StartTraceFunc
-	originalEnableTraceFunc := EnableTraceFunc
-	t.Cleanup(func() {
-		StartTraceFunc = originalStartTraceFunc
-		EnableTraceFunc = originalEnableTraceFunc
-	})
-
 	// Mock implementations
-	StartTraceFunc = func(traceHandle *uintptr,
+	startTrace := func(traceHandle *uintptr,
 		instanceName *uint16,
 		properties *EventTraceProperties) error {
 		*traceHandle = 12345 // Mock handler value
 		return nil
 	}
 
-	EnableTraceFunc = func(traceHandle uintptr,
+	enableTrace := func(traceHandle uintptr,
 		providerId *GUID,
 		isEnabled uint32,
 		level uint8,
@@ -120,8 +97,10 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 
 	// Create a Session instance
 	session := &Session{
-		Name:       "TestSession",
-		Properties: &EventTraceProperties{},
+		Name:        "TestSession",
+		Properties:  &EventTraceProperties{},
+		startTrace:  startTrace,
+		enableTrace: enableTrace,
 	}
 
 	err := session.CreateRealtimeSession()
@@ -129,23 +108,15 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 }
 
 func TestCreateRealtimeSession_Success(t *testing.T) {
-	// Backup original functions and defer restoration
-	originalStartTraceFunc := StartTraceFunc
-	originalEnableTraceFunc := EnableTraceFunc
-	t.Cleanup(func() {
-		StartTraceFunc = originalStartTraceFunc
-		EnableTraceFunc = originalEnableTraceFunc
-	})
-
 	// Mock implementations
-	StartTraceFunc = func(traceHandle *uintptr,
+	startTrace := func(traceHandle *uintptr,
 		instanceName *uint16,
 		properties *EventTraceProperties) error {
 		*traceHandle = 12345 // Mock handler value
 		return nil
 	}
 
-	EnableTraceFunc = func(traceHandle uintptr,
+	enableTrace := func(traceHandle uintptr,
 		providerId *GUID,
 		isEnabled uint32,
 		level uint8,
@@ -158,8 +129,10 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 
 	// Create a Session instance
 	session := &Session{
-		Name:       "TestSession",
-		Properties: &EventTraceProperties{},
+		Name:        "TestSession",
+		Properties:  &EventTraceProperties{},
+		startTrace:  startTrace,
+		enableTrace: enableTrace,
 	}
 
 	err := session.CreateRealtimeSession()
@@ -169,14 +142,8 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 }
 
 func TestStopSession_Error(t *testing.T) {
-	// Backup original function and defer restoration
-	originalFunc := CloseTraceFunc
-	t.Cleanup(func() {
-		CloseTraceFunc = originalFunc
-	})
-
-	// Override with the mock function
-	CloseTraceFunc = func(traceHandle uint64) error {
+	// Mock implementation of closeTrace
+	closeTrace := func(traceHandle uint64) error {
 		return ERROR_INVALID_PARAMETER
 	}
 
@@ -186,6 +153,7 @@ func TestStopSession_Error(t *testing.T) {
 		NewSession:   true,
 		TraceHandler: 12345, // Example handler value
 		Properties:   &EventTraceProperties{},
+		closeTrace:   closeTrace,
 	}
 
 	err := session.StopSession()
@@ -193,21 +161,12 @@ func TestStopSession_Error(t *testing.T) {
 }
 
 func TestStopSession_Success(t *testing.T) {
-	// Backup original function and defer restoration
-	originalCloseTraceFunc := CloseTraceFunc
-	originalControlTraceFunc := ControlTraceFunc
-	t.Cleanup(func() {
-		CloseTraceFunc = originalCloseTraceFunc
-		ControlTraceFunc = originalControlTraceFunc
-	})
-
-	// Override with the mock function
-	CloseTraceFunc = func(traceHandle uint64) error {
+	// Mock implementations
+	closeTrace := func(traceHandle uint64) error {
 		return nil
 	}
 
-	// Mock implementation
-	ControlTraceFunc = func(traceHandle uintptr,
+	controlTrace := func(traceHandle uintptr,
 		instanceName *uint16,
 		properties *EventTraceProperties,
 		controlCode uint32) error {
@@ -221,6 +180,8 @@ func TestStopSession_Success(t *testing.T) {
 		NewSession:   true,
 		TraceHandler: 12345, // Example handler value
 		Properties:   &EventTraceProperties{},
+		closeTrace:   closeTrace,
+		controlTrace: controlTrace,
 	}
 
 	err := session.StopSession()

@@ -56,6 +56,15 @@ type Session struct {
 	Callback uintptr
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers.
 	BufferCallback uintptr
+
+	// Pointers to functions that make calls to the Windows API.
+	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
+	startTrace   func(*uintptr, *uint16, *EventTraceProperties) error
+	controlTrace func(traceHandle uintptr, instanceName *uint16, properties *EventTraceProperties, controlCode uint32) error
+	enableTrace  func(traceHandle uintptr, providerId *GUID, isEnabled uint32, level uint8, matchAnyKeyword uint64, matchAllKeyword uint64, enableProperty uint32, enableParameters *EnableTraceParameters) error
+	closeTrace   func(traceHandle uint64) error
+	openTrace    func(elf *EventTraceLogfile) (uint64, error)
+	processTrace func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error
 }
 
 // setSessionName determines the session name based on the provided configuration.
@@ -161,6 +170,15 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 func NewSession(conf Config) (Session, error) {
 	var session Session
 	var err error
+
+	// Assign ETW Windows API functions
+	session.startTrace = _StartTrace
+	session.controlTrace = _ControlTrace
+	session.enableTrace = _EnableTraceEx2
+	session.openTrace = _OpenTrace
+	session.processTrace = _ProcessTrace
+	session.closeTrace = _CloseTrace
+
 	session.Name = setSessionName(conf)
 	session.Realtime = true
 
@@ -225,7 +243,7 @@ func (s *Session) StartConsumer() error {
 
 	// Open an ETW trace processing handle for consuming events
 	// from an ETW real-time trace session or an ETW log file.
-	s.TraceHandler, err = OpenTraceFunc(&elf)
+	s.TraceHandler, err = s.openTrace(&elf)
 
 	switch {
 	case err == nil:
@@ -239,7 +257,7 @@ func (s *Session) StartConsumer() error {
 		return fmt.Errorf("failed to open trace: %w", err)
 	}
 	// Process the trace. This function blocks until processing ends.
-	if err := ProcessTraceFunc(&s.TraceHandler, 1, nil, nil); err != nil {
+	if err := s.processTrace(&s.TraceHandler, 1, nil, nil); err != nil {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
 

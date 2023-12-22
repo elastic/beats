@@ -242,17 +242,6 @@ type GUID struct {
 	Data4 [8]byte
 }
 
-// For testing purposes we create a variable to store the function to call
-// When running tests, these variables point to a mock function
-var (
-	StartTraceFunc   = _StartTrace
-	EnableTraceFunc  = _EnableTraceEx2
-	ControlTraceFunc = _ControlTrace
-	OpenTraceFunc    = _OpenTrace
-	ProcessTraceFunc = _ProcessTrace
-	CloseTraceFunc   = _CloseTrace
-)
-
 // Wrappers
 
 // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-starttracew
