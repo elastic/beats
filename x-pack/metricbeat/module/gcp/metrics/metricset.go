@@ -13,10 +13,10 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -107,7 +107,7 @@ type config struct {
 	CredentialsJSON     string   `config:"credentials_json"`
 
 	opt    []option.ClientOption
-	period *duration.Duration
+	period *durationpb.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -139,7 +139,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
 	}
 
-	m.config.period = &duration.Duration{
+	m.config.period = &durationpb.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
