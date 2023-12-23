@@ -204,6 +204,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Active Directory an entity analytics provider. {pull}37919[37919]
 - Add debugging breadcrumb to logs when writing request trace log. {pull}38636[38636]
 - added benchmark input {pull}37437[37437]
+- added benchmark input and discard output {pull}37437[37437]
 
 *Auditbeat*
 

@@ -6,12 +6,12 @@
 === Benchmark input
 
 ++++
-<titleabbrev>generic event generator</titleabbrev>
+<titleabbrev>Benchmark</titleabbrev>
 ++++
 
 beta[]
 
-The benchmark input generates generic events and sends them to the output.  This can be useful when you want to benchmark the difference between outputs or output settings.
+The Benchmark input generates generic events and sends them to the output.  This can be useful when you want to benchmark the difference between outputs or output settings.
 
 Example configurations:
 
@@ -49,7 +49,7 @@ Send 5 events per second example:
 
 ==== Configuration options
 
-The `benchmark` input supports the following configuration options plus the
+The Benchmark input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
