@@ -54,6 +54,7 @@ type salesforceInput struct {
 // // The Filebeat user-agent is provided to the program as useragent.
 // var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
+// Plugin returns the input plugin.
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,

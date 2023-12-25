@@ -7,12 +7,16 @@ package salesforce
 import "errors"
 
 type authConfig struct {
+	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_flows.htm&type=5
+	// for more information about OAuth2 flows.
 	OAuth2 OAuth2 `config:"oauth2"`
 }
 
 type OAuth2 struct {
+	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_username_password_flow.htm&type=5
 	UserPasswordFlow *userPasswordFlow `config:"user_password_flow"`
-	JWTBearerFlow    *jwtBearerFlow    `config:"jwt_bearer_flow"`
+	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm&type=5
+	JWTBearerFlow *jwtBearerFlow `config:"jwt_bearer_flow"`
 }
 
 type userPasswordFlow struct {

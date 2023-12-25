@@ -62,4 +62,5 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	return m.cursor.Create(cfg)
 }
 
+// defaultConfig returns the default configuration.
 func defaultConfig() config { return config{} }

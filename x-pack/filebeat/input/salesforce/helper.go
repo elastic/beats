@@ -24,7 +24,10 @@ func resetTimeNow() {
 // pointer returns a pointer to the given value.
 //
 // For example: Assigning &true to value of type *bool is not possible but
-// pointer(true) is assignable to the same value of type *bool.
+// pointer(true) is assignable to the same value of type *bool as address operator
+// can be applied to pointer(true) as the returned value is an addressable value.
+//
+// See: https://go.dev/ref/spec#Address_operators
 func pointer[T any](d T) *T {
 	return &d
 }
