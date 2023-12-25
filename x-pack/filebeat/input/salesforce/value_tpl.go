@@ -112,7 +112,7 @@ var predefinedLayouts = map[string]string{
 
 // parseTime parses a time string using the given layout. There are also some
 // predefined layouts that can be used; see predefinedLayouts for more.
-func parseTime(ts string, layout string) time.Time {
+func parseTime(ts, layout string) time.Time {
 	if found := predefinedLayouts[layout]; found != "" {
 		layout = found
 	}
