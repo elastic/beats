@@ -13,6 +13,7 @@ type querier struct {
 	Query string
 }
 
+// Format returns the query string.
 func (q querier) Format() (string, error) {
 	if strings.TrimSpace(q.Query) == "" {
 		return "", errors.New("query is empty")

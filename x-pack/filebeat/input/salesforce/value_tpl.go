@@ -23,6 +23,9 @@ var (
 	errExecuteTemplate     = errors.New("template execution failed")
 )
 
+// Execute executes the template with the given data. If the template execution
+// fails, then the defaultVal is used if it is not nil. Execute will return
+// variable substituted query with nil error.
 func (t *valueTpl) Execute(data any, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
 	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
@@ -57,6 +60,7 @@ func (t *valueTpl) Execute(data any, defaultVal *valueTpl, log *logp.Logger) (va
 	return val, nil
 }
 
+// Unpack parses the given string as a template.
 func (t *valueTpl) Unpack(in string) error {
 	// Custom delimiters to prevent issues when using template values as part of
 	// other Go templates.
@@ -84,11 +88,13 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
+// parseDuration parses a duration string and returns the time.Duration value.
 func parseDuration(s string) time.Duration {
 	d, _ := time.ParseDuration(s)
 	return d
 }
 
+// predefinedLayouts contains some predefined layouts that are commonly used.
 var predefinedLayouts = map[string]string{
 	"ANSIC":             time.ANSIC,
 	"UnixDate":          time.UnixDate,
@@ -104,6 +110,8 @@ var predefinedLayouts = map[string]string{
 	"Kitchen":           time.Kitchen,
 }
 
+// parseTime parses a time string using the given layout. There are also some
+// predefined layouts that can be used; see predefinedLayouts for more.
 func parseTime(ts string, layout string) time.Time {
 	if found := predefinedLayouts[layout]; found != "" {
 		layout = found
@@ -113,6 +121,8 @@ func parseTime(ts string, layout string) time.Time {
 	return t
 }
 
+// formatTime formats a time using the given layout. There are also some
+// predefined layouts that can be used; see predefinedLayouts for more.
 func formatTime(t time.Time, layout string) string {
 	if found := predefinedLayouts[layout]; found != "" {
 		layout = found

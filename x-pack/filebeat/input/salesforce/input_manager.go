@@ -22,6 +22,7 @@ type InputManager struct {
 	cursor *inputcursor.InputManager
 }
 
+// NewInputManager creates a new input manager.
 func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
 	return InputManager{
 		cursor: &inputcursor.InputManager{
@@ -33,6 +34,7 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 	}
 }
 
+// cursorConfigure configures the cursor input manager.
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {

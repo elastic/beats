@@ -85,6 +85,8 @@ func (s *salesforceInput) Run(env v2.Context, src inputcursor.Source, cursor inp
 	return s.run()
 }
 
+// Setup sets up the input. It will create a new SOQL resource and all other
+// necessary configurations.
 func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *state, pub inputcursor.Publisher) (err error) {
 	cfg := src.(*source).cfg
 
@@ -110,6 +112,9 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 	return nil
 }
 
+// run is the main loop of the input. It will run until the context is cancelled
+// and based on the configuration, it will run the different methods -- EventLogFile
+// or Object to collect events at defined intervals.
 func (s *salesforceInput) run() error {
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
@@ -190,6 +195,7 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	return soqlr, nil
 }
 
+// FormQueryWithCursor takes a queryConfig and a cursor and returns a querier.
 func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor mapstr.M) (*querier, error) {
 	qr, err := parseCursor(&s.config.InitialInterval, queryConfig, cursor, s.log)
 	if err != nil {
@@ -201,6 +207,7 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 	return &querier{Query: qr}, err
 }
 
+// RunObject runs the Object method of the Event Monitoring API to collect events.
 func (s *salesforceInput) RunObject() error {
 	s.log.Debugf("Scrape Objects every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
 
@@ -254,7 +261,7 @@ func (s *salesforceInput) RunObject() error {
 			totalEvents++
 		}
 
-		if res.MoreRecords() {
+		if res.MoreRecords() { // returns true if there are more records.
 			res, err = res.Next()
 			if err != nil {
 				return err
@@ -268,6 +275,8 @@ func (s *salesforceInput) RunObject() error {
 	return nil
 }
 
+// RunEventLogFile runs the EventLogFile method of the Event Monitoring API to
+// collect events.
 func (s *salesforceInput) RunEventLogFile() error {
 	s.log.Debugf("Scrape EventLogFiles every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
@@ -282,6 +291,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 		}
 		cursor = mapstr.M{"event_log_file": eventLogFile}
 	}
+
 	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.EventLogFile.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming based on cursor: %w", err)
@@ -292,8 +302,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 		return err
 	}
 
-	totalEvents := 0
-	firstEvent := true
+	totalEvents, firstEvent := 0, true
 	for res.Done() {
 		for _, rec := range res.Records() {
 			req, err := http.NewRequestWithContext(s.ctx, "GET", s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
@@ -361,6 +370,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	return nil
 }
 
+// getSFDCConfig returns a new Salesforce configuration based on the configuration.
 func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	var (
 		creds *credentials.Credentials
@@ -413,6 +423,7 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	}, nil
 }
 
+// publishEvent publishes an event using the configured publisher pub.
 func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte) error {
 	event := beat.Event{
 		Timestamp: timeNow(),

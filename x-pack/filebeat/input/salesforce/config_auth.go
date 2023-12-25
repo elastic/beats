@@ -39,7 +39,7 @@ func (o *userPasswordFlow) isEnabled() bool {
 	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
-// Validate checks if oauth2 config is valid.
+// Validate checks if User Passworld Flow config is valid.
 func (o *userPasswordFlow) Validate() error {
 	if !o.isEnabled() {
 		return nil
@@ -67,6 +67,7 @@ func (o *jwtBearerFlow) isEnabled() bool {
 	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
+// Validate checks if JWT Bearer Flow config is valid.
 func (o *jwtBearerFlow) Validate() error {
 	if !o.isEnabled() {
 		return nil

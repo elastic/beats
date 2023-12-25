@@ -38,6 +38,7 @@ type cursorConfig struct {
 	Field string `config:"field"`
 }
 
+// Validate validates the configuration.
 func (c *config) Validate() error {
 	switch {
 	case !c.Auth.OAuth2.JWTBearerFlow.isEnabled() && !c.Auth.OAuth2.UserPasswordFlow.isEnabled():
