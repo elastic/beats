@@ -21,9 +21,9 @@ func TestValidate(t *testing.T) {
 		"no auth provider enabled (no password or jwt)": {
 			inputCfg: config{
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{},
-						JWTBearerFlow:    &jwtBearerFlow{},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{},
+						JWTBearerFlow:    &JWTBearerFlow{},
 					},
 				},
 			},
@@ -32,9 +32,9 @@ func TestValidate(t *testing.T) {
 		"only one auth provider is allowed (either password or jwt)": {
 			inputCfg: config{
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{Enabled: pointer(true)},
-						JWTBearerFlow:    &jwtBearerFlow{Enabled: pointer(true)},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
+						JWTBearerFlow:    &JWTBearerFlow{Enabled: pointer(true)},
 					},
 				},
 			},
@@ -44,8 +44,8 @@ func TestValidate(t *testing.T) {
 			inputCfg: config{
 				URL: "",
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{Enabled: pointer(true)},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
 					},
 				},
 			},
@@ -56,8 +56,8 @@ func TestValidate(t *testing.T) {
 				EventMonitoringMethod: &EventMonitoringMethod{},
 				URL:                   "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{Enabled: pointer(true)},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
 					},
 				},
 			},
@@ -73,8 +73,8 @@ func TestValidate(t *testing.T) {
 				},
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{Enabled: pointer(true)},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
 					},
 				},
 			},
@@ -90,8 +90,8 @@ func TestValidate(t *testing.T) {
 				},
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{Enabled: pointer(true)},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
 					},
 				},
 			},
@@ -108,8 +108,8 @@ func TestValidate(t *testing.T) {
 				},
 				URL: "https://some-dummy-subdomain.salesforce.com/services/oauth2/token",
 				Auth: &authConfig{
-					OAuth2: OAuth2{
-						UserPasswordFlow: &userPasswordFlow{Enabled: pointer(true)},
+					OAuth2: &OAuth2{
+						UserPasswordFlow: &UserPasswordFlow{Enabled: pointer(true)},
 					},
 				},
 			},

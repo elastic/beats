@@ -61,7 +61,7 @@ func TestInputManager(t *testing.T) {
 		"url":     "https://salesforce.com",
 		"version": 46,
 		"auth": &authConfig{
-			OAuth2: OAuth2{JWTBearerFlow: &jwtBearerFlow{
+			OAuth2: &OAuth2{JWTBearerFlow: &JWTBearerFlow{
 				Enabled:        pointer(true),
 				URL:            "https://salesforce.com",
 				ClientID:       "xyz",

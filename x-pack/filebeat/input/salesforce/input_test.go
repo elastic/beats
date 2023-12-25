@@ -353,6 +353,6 @@ func TestDecodeAsCSV(t *testing.T) {
 	assert.Equal(t, wantEventFields, mp[0])
 }
 
-// func TestPlugin(t *testing.T) {
-// 	Plugin(logp.NewLogger("salesforce_test"))
-// }
+func TestPlugin(t *testing.T) {
+	_ = Plugin(logp.NewLogger("salesforce_test"), stateStore{})
+}

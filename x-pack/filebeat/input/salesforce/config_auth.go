@@ -9,17 +9,17 @@ import "errors"
 type authConfig struct {
 	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_flows.htm&type=5
 	// for more information about OAuth2 flows.
-	OAuth2 OAuth2 `config:"oauth2"`
+	OAuth2 *OAuth2 `config:"oauth2"`
 }
 
 type OAuth2 struct {
 	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_username_password_flow.htm&type=5
-	UserPasswordFlow *userPasswordFlow `config:"user_password_flow"`
+	UserPasswordFlow *UserPasswordFlow `config:"user_password_flow"`
 	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm&type=5
-	JWTBearerFlow *jwtBearerFlow `config:"jwt_bearer_flow"`
+	JWTBearerFlow *JWTBearerFlow `config:"jwt_bearer_flow"`
 }
 
-type userPasswordFlow struct {
+type UserPasswordFlow struct {
 	Enabled *bool `config:"enabled"`
 
 	ClientID     string `config:"client.id"`
@@ -29,7 +29,7 @@ type userPasswordFlow struct {
 	Username     string `config:"username"`
 }
 
-type jwtBearerFlow struct {
+type JWTBearerFlow struct {
 	Enabled *bool `config:"enabled"`
 
 	URL            string `config:"url"`
@@ -39,12 +39,12 @@ type jwtBearerFlow struct {
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
-func (o *userPasswordFlow) isEnabled() bool {
+func (o *UserPasswordFlow) isEnabled() bool {
 	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
 // Validate checks if User Passworld Flow config is valid.
-func (o *userPasswordFlow) Validate() error {
+func (o *UserPasswordFlow) Validate() error {
 	if !o.isEnabled() {
 		return nil
 	}
@@ -67,12 +67,12 @@ func (o *userPasswordFlow) Validate() error {
 }
 
 // isEnabled returns true if the `enable` field is set to true in the yaml.
-func (o *jwtBearerFlow) isEnabled() bool {
+func (o *JWTBearerFlow) isEnabled() bool {
 	return o != nil && (o.Enabled != nil && *o.Enabled)
 }
 
 // Validate checks if JWT Bearer Flow config is valid.
-func (o *jwtBearerFlow) Validate() error {
+func (o *JWTBearerFlow) Validate() error {
 	if !o.isEnabled() {
 		return nil
 	}

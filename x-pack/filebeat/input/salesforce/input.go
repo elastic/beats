@@ -378,8 +378,12 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 		err   error
 	)
 
+	if cfg.Auth == nil {
+		return nil, errors.New("no auth provider enabled")
+	}
+
 	switch {
-	case cfg.Auth.OAuth2.JWTBearerFlow.isEnabled():
+	case cfg.Auth.OAuth2.JWTBearerFlow != nil && cfg.Auth.OAuth2.JWTBearerFlow.isEnabled():
 		pemBytes, err := os.ReadFile(cfg.Auth.OAuth2.JWTBearerFlow.ClientKeyPath)
 		if err != nil {
 			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
@@ -401,9 +405,9 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 		if err != nil {
 			return nil, fmt.Errorf("problem with credentials: %w", err)
 		}
-	case cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
+	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		passCreds := credentials.PasswordCredentials{
-			URL:          cfg.URL,
+			URL:          cfg.URL, // TODO(SS): is this correct?
 			Username:     cfg.Auth.OAuth2.UserPasswordFlow.Username,
 			Password:     cfg.Auth.OAuth2.UserPasswordFlow.Password,
 			ClientID:     cfg.Auth.OAuth2.UserPasswordFlow.ClientID,
