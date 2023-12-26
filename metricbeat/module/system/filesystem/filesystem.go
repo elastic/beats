@@ -42,7 +42,8 @@ func init() {
 
 // Config stores the metricset-local config
 type Config struct {
-	IgnoreTypes []string `config:"filesystem.ignore_types"`
+	IgnoreTypes  []string `config:"filesystem.ignore_types"`
+	CollectTypes []string `config:"filesystem.collect_types"`
 }
 
 // MetricSet for fetching filesystem metrics.
@@ -69,6 +70,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
+	if len(config.CollectTypes) > 0 {
+		config.CollectTypes = strings.Split(config.CollectTypes[0], ",")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
@@ -79,7 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
+	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes, m.config.CollectTypes))
 	if err != nil {
 		return fmt.Errorf("error fetching filesystem list: %w", err)
 	}
