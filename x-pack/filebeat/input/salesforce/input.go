@@ -407,7 +407,7 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 		}
 	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		passCreds := credentials.PasswordCredentials{
-			URL:          cfg.URL, // TODO(SS): is this correct?
+			URL:          cfg.Auth.OAuth2.UserPasswordFlow.TokenURL,
 			Username:     cfg.Auth.OAuth2.UserPasswordFlow.Username,
 			Password:     cfg.Auth.OAuth2.UserPasswordFlow.Password,
 			ClientID:     cfg.Auth.OAuth2.UserPasswordFlow.ClientID,

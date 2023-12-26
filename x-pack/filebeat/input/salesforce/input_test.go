@@ -426,7 +426,7 @@ func newTestServer(newServer func(http.Handler) *httptest.Server) func(testing.T
 	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
 		config["url"] = server.URL
-		config["auth.oauth2"].(map[string]interface{})["user_password_flow"].(map[string]interface{})["token_url"] = server.URL + "/services/oauth2/token"
+		config["auth.oauth2"].(map[string]interface{})["user_password_flow"].(map[string]interface{})["token_url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }
@@ -773,7 +773,7 @@ func newTestServerBasedOnConfig(newServer func(http.Handler) *httptest.Server) f
 	return func(t testing.TB, h http.HandlerFunc, config *config) {
 		server := newServer(h)
 		config.URL = server.URL
-		config.Auth.OAuth2.UserPasswordFlow.TokenURL = server.URL + "/services/oauth2/token"
+		config.Auth.OAuth2.UserPasswordFlow.TokenURL = server.URL
 		t.Cleanup(server.Close)
 	}
 }
