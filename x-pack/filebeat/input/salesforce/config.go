@@ -12,10 +12,10 @@ import (
 
 type config struct {
 	Auth                  *authConfig            `config:"auth"`
+	EventMonitoringMethod *EventMonitoringMethod `config:"event_monitoring_method"`
 	URL                   string                 `config:"url" validate:"required"`
 	Version               int                    `config:"version" validate:"required"`
 	InitialInterval       time.Duration          `config:"initial_interval"`
-	EventMonitoringMethod *EventMonitoringMethod `config:"event_monitoring_method"`
 }
 
 type EventMonitoringMethod struct {
@@ -25,9 +25,9 @@ type EventMonitoringMethod struct {
 
 type EventMonitoringConfig struct {
 	Enabled  *bool         `config:"enabled"`
-	Interval time.Duration `config:"interval"`
 	Query    *QueryConfig  `config:"query"`
 	Cursor   *cursorConfig `config:"cursor"`
+	Interval time.Duration `config:"interval"`
 }
 
 func (e *EventMonitoringConfig) isEnabled() bool {

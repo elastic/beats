@@ -13,8 +13,8 @@ import (
 
 func TestOAuth2Config(t *testing.T) {
 	tests := map[string]struct {
-		config  UserPasswordFlow
 		wantErr error
+		config  UserPasswordFlow
 	}{
 		"auth disabled I":      {config: UserPasswordFlow{}, wantErr: nil},
 		"auth disabled II":     {config: UserPasswordFlow{Enabled: pointer(false)}, wantErr: nil},
@@ -35,8 +35,8 @@ func TestOAuth2Config(t *testing.T) {
 
 func TestJWTConfig(t *testing.T) {
 	tests := map[string]struct {
-		config  JWTBearerFlow
 		wantErr error
+		config  JWTBearerFlow
 	}{
 		"auth disabled I":        {config: JWTBearerFlow{}, wantErr: nil},
 		"auth disabled II":       {config: JWTBearerFlow{Enabled: pointer(false)}, wantErr: nil},

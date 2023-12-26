@@ -56,12 +56,12 @@ func TestFormQueryWithCursor(t *testing.T) {
 	t.Cleanup(resetTimeNow)
 
 	tests := map[string]struct {
-		initialInterval     time.Duration
+		wantErr             error
+		cursor              mapstr.M
 		defaultSOQLTemplate string
 		valueSOQLTemplate   string
 		wantQuery           string
-		cursor              mapstr.M
-		wantErr             error
+		initialInterval     time.Duration
 	}{
 		"valid soql templates with nil cursor": { // expect default query with LogDate > initialInterval
 			initialInterval:     60 * 24 * time.Hour, // 60 * 24h = 1440h = 60 days = 2 months
@@ -283,9 +283,9 @@ var _ inputcursor.Publisher = (*publisher)(nil)
 
 type publisher struct {
 	done      func()
-	mu        sync.Mutex
 	published []beat.Event
 	cursors   []map[string]interface{}
+	mu        sync.Mutex
 }
 
 func (p *publisher) Publish(e beat.Event, cursor interface{}) error {

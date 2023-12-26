@@ -17,9 +17,9 @@ var _ soql.QueryFormatter = (*querier)(nil)
 
 func TestFormat(t *testing.T) {
 	tests := map[string]struct {
+		wantErr error
 		input   string
 		wantStr string
-		wantErr error
 	}{
 		"empty query":   {input: "", wantStr: "", wantErr: errors.New("query is empty")},
 		"valid query":   {input: "SELECT FIELDS(STANDARD) FROM LoginEvent", wantStr: "SELECT FIELDS(STANDARD) FROM LoginEvent", wantErr: nil},
