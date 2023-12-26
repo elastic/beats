@@ -1,0 +1,28 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: salesforce
+  - name: tags
+    default: [salesforce-login, forwarded]
+  - name: api_version
+  - name: jwt_enabled
+  - name: client_id
+  - name: client_username
+  - name: client_key_path
+  - name: jwt_url
+  - name: client_secret
+  - name: token_url
+  - name: user
+  - name: password
+  - name: url
+  - name: event_log_file
+  - name: elf_interval
+    default: 1h
+  - name: real_time
+  - name: real_time_interval
+    default: 5m
+  
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/login.yml
