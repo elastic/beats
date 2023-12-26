@@ -198,7 +198,7 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 
 // FormQueryWithCursor takes a queryConfig and a cursor and returns a querier.
 func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor mapstr.M) (*querier, error) {
-	qr, err := parseCursor(&s.config.InitialInterval, queryConfig, cursor, s.log)
+	qr, err := parseCursor(queryConfig, cursor, s.log)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	totalEvents, firstEvent := 0, true
 	for res.Done() {
 		for _, rec := range res.Records() {
-			req, err := http.NewRequestWithContext(s.ctx, "GET", s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
+			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
 			if err != nil {
 				return err
 			}

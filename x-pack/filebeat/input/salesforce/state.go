@@ -5,8 +5,6 @@
 package salesforce
 
 import (
-	"time"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -27,7 +25,7 @@ type dateTimeCursor struct {
 // parseCursor parses the cursor from the configuration and executes the
 // template. If cursor is nil, the default templated query is used else
 // the value templated query is used. See QueryConfig struct for more.
-func parseCursor(initialInterval *time.Duration, cfg *QueryConfig, cursor mapstr.M, log *logp.Logger) (string, error) {
+func parseCursor(cfg *QueryConfig, cursor mapstr.M, log *logp.Logger) (string, error) {
 	ctxTmpl := mapstr.M{"cursor": nil}
 
 	if cursor != nil {

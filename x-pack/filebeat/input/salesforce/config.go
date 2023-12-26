@@ -15,7 +15,6 @@ type config struct {
 	EventMonitoringMethod *EventMonitoringMethod `config:"event_monitoring_method"`
 	URL                   string                 `config:"url" validate:"required"`
 	Version               int                    `config:"version" validate:"required"`
-	InitialInterval       time.Duration          `config:"initial_interval"`
 }
 
 type EventMonitoringMethod struct {
