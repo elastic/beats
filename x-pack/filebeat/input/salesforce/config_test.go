@@ -15,8 +15,8 @@ import (
 
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
-		inputCfg config
 		wantErr  error
+		inputCfg config
 	}{
 		"no auth provider enabled (no password or jwt)": {
 			inputCfg: config{

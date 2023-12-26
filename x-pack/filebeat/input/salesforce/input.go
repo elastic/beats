@@ -38,17 +38,16 @@ const (
 )
 
 type salesforceInput struct {
-	config
-	ctx        context.Context
-	cancel     context.CancelCauseFunc
-	publisher  inputcursor.Publisher
-	cursor     *state
-	srcConfig  *config
-	sfdcConfig *sfdc.Configuration
-	log        *logp.Logger
-
+	ctx           context.Context
+	publisher     inputcursor.Publisher
+	cancel        context.CancelCauseFunc
+	cursor        *state
+	srcConfig     *config
+	sfdcConfig    *sfdc.Configuration
+	log           *logp.Logger
 	clientSession *session.Session
 	soqlr         *soql.Resource
+	config
 }
 
 // // The Filebeat user-agent is provided to the program as useragent.

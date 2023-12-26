@@ -15,16 +15,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/g8rswimmer/go-sfdc"
+	"github.com/g8rswimmer/go-sfdc/soql"
+	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/g8rswimmer/go-sfdc"
-	"github.com/g8rswimmer/go-sfdc/soql"
-	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -211,15 +212,15 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup()
 
 	tests := []struct {
-		name             string
 		setupServer      func(testing.TB, http.HandlerFunc, map[string]interface{})
 		baseConfig       map[string]interface{}
 		handler          http.HandlerFunc
-		expected         []string
-		wantErr          bool
 		persistentCursor *state
-		AuthFail         bool
+		name             string
+		expected         []string
 		timeout          time.Duration
+		wantErr          bool
+		AuthFail         bool
 	}{
 		// Object
 		{
@@ -567,25 +568,25 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 	)
 
 	type fields struct {
-		config     config
 		ctx        context.Context
-		cancel     context.CancelCauseFunc
 		publisher  inputcursor.Publisher
+		cancel     context.CancelCauseFunc
 		cursor     *state
 		srcConfig  *config
 		sfdcConfig *sfdc.Configuration
 		soqlr      *soql.Resource
+		config     config
 	}
 	tests := []struct {
+		fields               fields
+		setupServer          func(testing.TB, http.HandlerFunc, *config)
+		handler              http.HandlerFunc
 		method               string
 		name                 string
-		fields               fields
 		expected             []string
 		wantErr              bool
 		AuthFail             bool
 		ClientConnectionFail bool
-		setupServer          func(testing.TB, http.HandlerFunc, *config)
-		handler              http.HandlerFunc
 	}{
 		// Object
 		{
