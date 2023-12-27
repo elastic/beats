@@ -765,7 +765,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 
 func getValueTpl(in string) *valueTpl {
 	vp := &valueTpl{}
-	vp.Unpack(in)
+	vp.Unpack(in) //nolint:errcheck // ignore error in test
 
 	return vp
 }
