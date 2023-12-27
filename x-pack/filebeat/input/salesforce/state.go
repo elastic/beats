@@ -21,6 +21,10 @@ type state struct {
 // The initial state represents the time of the first event, while the subsequent state denotes the time of the last event.
 // In certain SOQL queries for specific objects, sorting by all fields may not be feasible, and there may be no specific order.
 // This design allows users to exert maximum control over the iteration process.
+// For instance, the LoginEvent object only supports sorting based on EventIdentifier and EventDate.
+// Furthermore, if we desire to sort based on EventDate, it only supports descending order sorting.
+// In this case by using first_event_time we can get latest event EventDate to query next set of events.
+// Reference to LoginEvent: https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/sforce_api_objects_loginevent.htm
 type dateTimeCursor struct {
 	FirstEventTime string `struct:"first_event_time,omitempty"`
 	LastEventTime  string `struct:"last_event_time,omitempty"`
