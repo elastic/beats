@@ -30663,13 +30663,6 @@ index
 
 
 
-*`elasticsearch.index.created`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.index.hidden`*::
 +
 --
