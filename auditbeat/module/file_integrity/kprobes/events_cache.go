@@ -73,6 +73,9 @@ func addRecursive(d *dEntryCache, entry *dEntry, parent *dEntry, rootPath string
 	var path string
 	if cb != nil {
 		path = filepath.Join(rootPath, entry.Name)
+		if err := cb(path); err != nil {
+			return err
+		}
 	}
 
 	entry.Parent = parent
@@ -90,11 +93,7 @@ func addRecursive(d *dEntryCache, entry *dEntry, parent *dEntry, rootPath string
 		}
 	}
 
-	if cb == nil {
-		return nil
-	}
-
-	return cb(path)
+	return nil
 }
 
 // MoveFrom removes the given entry from the dEntryCache, adds it in the intermediate moveCache associating it
