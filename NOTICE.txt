@@ -12268,19 +12268,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-autodiscover
-<<<<<<< HEAD
-Version: v0.6.4
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-autodiscover@v0.6.4/LICENSE:
-=======
 Version: v0.6.6
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-autodiscover@v0.6.6/LICENSE:
->>>>>>> 8c4a40fdbf (Upgrade elastic-agent-autodiscover dependency; use InitDefaults() to init default configuration (#37458))
 
                                  Apache License
                            Version 2.0, January 2004
