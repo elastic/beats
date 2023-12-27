@@ -697,6 +697,7 @@ func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 		SyncPeriod:          time.Minute * 10,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
+
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.New("error unpacking configs")
 	}
