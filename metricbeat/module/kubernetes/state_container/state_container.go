@@ -138,9 +138,20 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Enrich(events)
 
 	for _, event := range events {
+		containerFields := mapstr.M{}
+
+		// Add container.name field (same as kubernetes.container.name)
+		if containerName, ok := event["name"]; ok {
+			cName, ok := (containerName).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+			} else {
+				kubernetes.ShouldPut(containerFields, "name", cName, m.Logger())
+			}
+		}
+
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		containerFields := mapstr.M{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
