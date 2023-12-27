@@ -12,8 +12,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
-	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
+	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
+	aggRecProto "github.com/awslabs/kinesis-aggregation/go/records"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/runtime/protoimpl"

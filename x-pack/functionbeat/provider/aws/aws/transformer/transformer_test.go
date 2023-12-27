@@ -13,12 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
 	"google.golang.org/protobuf/runtime/protoimpl"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
-	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
+	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
+	aggRecProto "github.com/awslabs/kinesis-aggregation/go/records"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 
