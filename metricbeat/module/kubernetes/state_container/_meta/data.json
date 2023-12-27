@@ -1,10 +1,11 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
+        "id": "717896cdeb9925094fcb2d73c0ba5ced6505408d2f91c0052c424712f142c4ca",
         "image": {
-            "name": "registry.k8s.io/etcd:3.5.7-0"
+            "name": "docker.io/library/nginx:1.24.0-alpine-slim"
         },
+        "name": "nginx",
         "runtime": "containerd"
     },
     "event": {
@@ -14,30 +15,20 @@
     },
     "kubernetes": {
         "container": {
-            "cpu": {
-                "request": {
-                    "cores": 0.1
-                }
-            },
-            "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
-            "memory": {
-                "request": {
-                    "bytes": 104857600
-                }
-            },
-            "name": "etcd",
+            "id": "717896cdeb9925094fcb2d73c0ba5ced6505408d2f91c0052c424712f142c4ca",
+            "name": "nginx",
             "status": {
                 "phase": "running",
                 "ready": true,
                 "restarts": 0
             }
         },
-        "namespace": "kube-system",
+        "namespace": "default",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
-            "name": "etcd-kind-control-plane"
+            "name": "web-0"
         }
     },
     "metricset": {
