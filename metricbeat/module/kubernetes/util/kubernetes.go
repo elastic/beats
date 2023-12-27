@@ -56,10 +56,10 @@ type kubernetesConfig struct {
 type Enricher interface {
 	// Start will start the Kubernetes watcher on the first call, does nothing on the rest
 	// errors are logged as warning
-	Start()
+	Start(*Watchers)
 
 	// Stop will stop the Kubernetes watcher
-	Stop()
+	Stop(*Watchers)
 
 	// Enrich the given list of events
 	Enrich([]mapstr.M)
@@ -76,8 +76,8 @@ type enricher struct {
 
 type nilEnricher struct{}
 
-func (*nilEnricher) Start()            {}
-func (*nilEnricher) Stop()             {}
+func (*nilEnricher) Start(*Watchers)   {}
+func (*nilEnricher) Stop(*Watchers)    {}
 func (*nilEnricher) Enrich([]mapstr.M) {}
 
 type watcherData struct {
@@ -86,13 +86,9 @@ type watcherData struct {
 	started       bool // true if watcher has started, false otherwise
 }
 
-type watchers struct {
+type Watchers struct {
 	watchersMap map[string]*watcherData
 	lock        sync.RWMutex
-}
-
-var resourceWatchers = watchers{
-	watchersMap: make(map[string]*watcherData),
 }
 
 const selector = "kubernetes"
@@ -112,6 +108,13 @@ const (
 	StorageClassResource          = "storageclass"
 	NamespaceResource             = "state_namespace"
 )
+
+func NewWatchers() *Watchers {
+	watchers := &Watchers{
+		watchersMap: make(map[string]*watcherData),
+	}
+	return watchers
+}
 
 func getResource(resourceName string) kubernetes.Resource {
 	switch resourceName {
@@ -221,7 +224,8 @@ func startWatcher(
 	resourceName string,
 	resource kubernetes.Resource,
 	options kubernetes.WatchOptions,
-	client k8sclient.Interface) (bool, error) {
+	client k8sclient.Interface,
+	resourceWatchers *Watchers) (bool, error) {
 
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -239,7 +243,7 @@ func startWatcher(
 	return false, nil
 }
 
-func addToWhichAreUsing(resourceName string, usingName string) {
+func addToWhichAreUsing(resourceName string, usingName string, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
@@ -261,7 +265,7 @@ func addToWhichAreUsing(resourceName string, usingName string) {
 
 // removeToWhichAreUsing returns true if element was removed and new size of array.
 // The cache should be locked when called.
-func removeToWhichAreUsing(resourceName string, notUsingName string) (bool, int) {
+func removeToWhichAreUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
 	data, ok := resourceWatchers.watchersMap[resourceName]
 	removed := false
 	if ok {
@@ -287,6 +291,7 @@ func startAllWatchers(
 	nodeScope bool,
 	config *kubernetesConfig,
 	log *logp.Logger,
+	resourceWatchers *Watchers,
 ) error {
 	res := getResource(resourceName)
 	if res == nil {
@@ -300,20 +305,20 @@ func startAllWatchers(
 
 	// Create a watcher for the given resource.
 	// If it fails, we return an error, so we can stop the extra watchers from starting.
-	created, err := startWatcher(resourceName, res, *options, client)
+	created, err := startWatcher(resourceName, res, *options, client, resourceWatchers)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, resourceName, err)
 	} else if created {
 		log.Debugf("Started watcher %s successfully, created by %s.", resourceName, resourceName)
 	}
-	addToWhichAreUsing(resourceName, resourceName)
+	addToWhichAreUsing(resourceName, resourceName, resourceWatchers)
 
 	// Create the extra watchers required by this resource
 	extraWatchers := getExtraWatchers(resourceName, config)
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = startWatcher(extra, extraRes, *options, client)
+			created, err = startWatcher(extra, extraRes, *options, client, resourceWatchers)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, resourceName, err)
 			} else {
@@ -321,7 +326,7 @@ func startAllWatchers(
 					log.Debugf("Started watcher %s successfully, created by %s.", extra, resourceName)
 				}
 				// add this resource to the ones using the extra resource
-				addToWhichAreUsing(extra, resourceName)
+				addToWhichAreUsing(extra, resourceName, resourceWatchers)
 			}
 		} else {
 			log.Errorf("Resource for name %s does not exist. Watcher cannot be created.", extra)
@@ -332,7 +337,7 @@ func startAllWatchers(
 }
 
 // createMetadataGen creates the metadata generator for resources in general
-func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, config *kubernetesConfig, resourceName string) (*metadata.Resource, error) {
+func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, config *kubernetesConfig, resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 	// check if the resource is namespace aware
 	extras := getExtraWatchers(resourceName, config)
 	namespaceAware := false
@@ -371,7 +376,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, config 
 }
 
 // createMetadataGenSpecific creates the metadata generator for a specific resource - pod or service
-func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, config *kubernetesConfig, resourceName string) (metadata.MetaGen, error) {
+func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, config *kubernetesConfig, resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
 
@@ -423,6 +428,7 @@ func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	resourceName string,
 	metricsRepo *MetricsRepo,
+	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
 
 	log := logp.NewLogger(selector)
@@ -447,7 +453,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	err = startAllWatchers(client, resourceName, nodeScope, config, log)
+	err = startAllWatchers(client, resourceName, nodeScope, config, log, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
@@ -456,9 +462,9 @@ func NewResourceMetadataEnricher(
 	var specificMetaGen metadata.MetaGen
 	var generalMetaGen *metadata.Resource
 	if resourceName == ServiceResource || resourceName == PodResource {
-		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config, resourceName)
+		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config, resourceName, resourceWatchers)
 	} else {
-		generalMetaGen, err = createMetadataGen(client, commonConfig, config, resourceName)
+		generalMetaGen, err = createMetadataGen(client, commonConfig, config, resourceName, resourceWatchers)
 	}
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
@@ -535,7 +541,7 @@ func NewResourceMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(resourceName, config, updateFunc, deleteFunc, indexFunc)
+	enricher := buildMetadataEnricher(resourceName, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
 	if resourceName == PodResource {
 		enricher.isPod = true
 	}
@@ -547,6 +553,7 @@ func NewResourceMetadataEnricher(
 func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	metricsRepo *MetricsRepo,
+	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
 
 	log := logp.NewLogger(selector)
@@ -571,13 +578,13 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	err = startAllWatchers(client, PodResource, nodeScope, config, log)
+	err = startAllWatchers(client, PodResource, nodeScope, config, log, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
 	}
 
-	metaGen, err := createMetadataGenSpecific(client, commonConfig, config, PodResource)
+	metaGen, err := createMetadataGenSpecific(client, commonConfig, config, PodResource, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
 		return &nilEnricher{}
@@ -657,7 +664,7 @@ func NewContainerMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(PodResource, config, updateFunc, deleteFunc, indexFunc)
+	enricher := buildMetadataEnricher(PodResource, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
 
 	return enricher
 }
@@ -713,6 +720,7 @@ func join(fields ...string) string {
 
 func buildMetadataEnricher(
 	resourceName string,
+	resourceWatchers *Watchers,
 	config *kubernetesConfig,
 	update func(map[string]mapstr.M, kubernetes.Resource),
 	delete func(map[string]mapstr.M, kubernetes.Resource),
@@ -752,7 +760,7 @@ func buildMetadataEnricher(
 	return &enricher
 }
 
-func (e *enricher) Start() {
+func (e *enricher) Start(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
@@ -778,13 +786,13 @@ func (e *enricher) Start() {
 	}
 }
 
-func (e *enricher) Stop() {
+func (e *enricher) Stop(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
 	if resourceWatcher != nil && resourceWatcher.watcher != nil && resourceWatcher.whichAreUsing != nil && resourceWatcher.started {
-		_, size := removeToWhichAreUsing(e.resourceName, e.resourceName)
+		_, size := removeToWhichAreUsing(e.resourceName, e.resourceName, resourceWatchers)
 		if size == 0 {
 			resourceWatcher.watcher.Stop()
 			resourceWatcher.started = false
@@ -795,7 +803,7 @@ func (e *enricher) Stop() {
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
 		if extraWatcher != nil && extraWatcher.watcher != nil && extraWatcher.whichAreUsing != nil && extraWatcher.started {
-			_, size := removeToWhichAreUsing(extra, e.resourceName)
+			_, size := removeToWhichAreUsing(extra, e.resourceName, resourceWatchers)
 			if size == 0 {
 				extraWatcher.watcher.Stop()
 				extraWatcher.started = false

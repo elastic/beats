@@ -115,7 +115,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), false),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
 		mod:           mod,
 	}, nil
 }
@@ -124,7 +124,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	m.enricher.Start()
+	m.enricher.Start(m.mod.GetResourceWatchers())
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
@@ -196,6 +196,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 // Close stops this metricset
 func (m *MetricSet) Close() error {
-	m.enricher.Stop()
+	m.enricher.Stop(m.mod.GetResourceWatchers())
 	return nil
 }

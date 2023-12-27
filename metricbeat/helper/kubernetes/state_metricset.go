@@ -88,7 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:     base,
 		prometheusClient:  prometheusClient,
 		prometheusMapping: mapping,
-		enricher:          util.NewResourceMetadataEnricher(base, resourceName, mod.GetMetricsRepo(), false),
+		enricher:          util.NewResourceMetadataEnricher(base, resourceName, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
 		mod:               mod,
 	}, nil
 }
@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		resourceName = "state_namespace"
 	}
 
-	m.enricher.Start()
+	m.enricher.Start(m.mod.GetResourceWatchers())
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheusClient)
 	if err != nil {
@@ -139,6 +139,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 // Close stops this metricset
 func (m *MetricSet) Close() error {
-	m.enricher.Stop()
+	m.enricher.Stop(m.mod.GetResourceWatchers())
 	return nil
 }
